@@ -1,0 +1,81 @@
+#pragma once
+#include <juce_audio_processors/juce_audio_processors.h>
+#include "TubbyFilter.h"
+#include "DubFX.h"
+
+class DubKnobProcessor : public juce::AudioProcessor
+{
+public:
+    DubKnobProcessor();
+    ~DubKnobProcessor() override = default;
+
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void releaseResources() override {}
+    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
+    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+
+    juce::AudioProcessorEditor* createEditor() override;
+    bool hasEditor() const override { return true; }
+
+    const juce::String getName() const override { return JucePlugin_Name; }
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
+    bool isMidiEffect() const override { return false; }
+    double getTailLengthSeconds() const override { return 8.0; }
+
+    int getNumPrograms() override { return 1; }
+    int getCurrentProgram() override { return 0; }
+    void setCurrentProgram (int) override {}
+    const juce::String getProgramName (int) override { return {}; }
+    void changeProgramName (int, const juce::String&) override {}
+
+    // o bypass do Cubase controla o nosso parâmetro "bypass" (troca suave, latência constante)
+    juce::AudioProcessorParameter* getBypassParameter() const override { return apvts.getParameter ("bypass"); }
+
+    void getStateInformation (juce::MemoryBlock& destData) override;
+    void setStateInformation (const void* data, int sizeInBytes) override;
+
+    float getDisplayFrequency() const { return displayFreq.load(); }
+    float getDisplayBpm() const       { return displayBpm.load(); }
+    dub::EQSettings getEqSettings() const
+    {
+        dub::EQSettings e;
+        e.hpHz  = getP ("eqEHp");
+        e.lpHz  = getP ("eqELp");
+        e.midHz = getP ("eqEMf");
+        e.midDb = getP ("eqEMg");
+        return e;
+    }
+    // medidor do MAXIMIZER (picos lineares do último bloco, GR em dB <= 0, LUFS curto prazo)
+    float getMaxInPeak (int ch) const  { return mInPeak[ch & 1].load(); }
+    float getMaxOutPeak (int ch) const { return mOutPeak[ch & 1].load(); }
+    float getMaxGrDb() const           { return mGrDb.load(); }
+    float getLufs() const              { return mLufs.load(); }
+    float getVuLevel (int ch) const   { return vuRms[ch & 1].load(); } // RMS linear da saída
+
+    juce::AudioProcessorValueTreeState apvts;
+    static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
+    static const juce::StringArray& divisionNames();
+
+private:
+    float getP (const char* id) const { return params.at (id)->load(); }
+
+    dub::TubbyFilter   filter;
+    dub::TapeEcho      echo;
+    dub::DubSiren      siren;
+    dub::ReturnEQ      echoEq;
+    dub::Maximizer     maximizer;
+    dub::LoudnessMeter loudness;
+    std::atomic<float> mInPeak[2] { { 0.0f }, { 0.0f } }, mOutPeak[2] { { 0.0f }, { 0.0f } };
+    std::atomic<float> mGrDb { 0.0f }, mLufs { -70.0f };
+    std::atomic<float> vuRms[2] { { 0.0f }, { 0.0f } };
+    juce::SmoothedValue<float> dryGain, outGain, bypassMix;
+    juce::AudioBuffer<float> inputCopy;                 // entrada original, para o bypass
+    std::array<std::vector<float>, 2> bypassDelay;      // atrasa o sinal original na mesma latência do maximizer
+    int bypassIdx = 0;
+
+    std::atomic<float> displayFreq { 20.0f }, displayBpm { 120.0f };
+    std::map<std::string, std::atomic<float>*> params;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubKnobProcessor)
+};
