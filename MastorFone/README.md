@@ -4,7 +4,7 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MastorPhoneVox-Windows.zip) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MastorPhoneVox-macOS.zip) (release [MPV-01-1.6](https://github.com/dubmastor/DubMastor-DubStation-/releases/tag/MPV-01-1.6))
+**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-Windows.zip) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-macOS.zip)
 
 Efeito para voz que imita três aparelhos: **RÁDIO AM**, **TELEFONE antigo** e **MEGAFONE**, com o mesmo **eco de fita** do Big Knob.
 Formatos: **VST3** (Windows/macOS, para o Cubase), **AU** (macOS) e **Standalone**.
