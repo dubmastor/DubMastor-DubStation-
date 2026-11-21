@@ -66,7 +66,7 @@ void MidiDragChip::mouseDrag (const juce::MouseEvent& e)
     if (dragging || e.getDistanceFromDragStart() < 4) return;
     dragging = true;
     auto file = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile (stem + ".mid");
-    if (proc.writeDcMidiFile (file, part, slot))
+    if (proc.writeDcMidiFile (file, slot))
         juce::DragAndDropContainer::performExternalDragDropOfFiles (juce::StringArray (file.getFullPathName()), false, this);
 }
 
@@ -79,8 +79,8 @@ void PianoRollGrid::refresh()
         const auto s = proc.getDcSlot (i);
         k << s.root << ':' << s.quality << ':' << s.beats << ':' << (int) proc.isDcSlotOn (i) << '|';
     }
-    const auto st = proc.getDcSettings (proc.apvts.getRawParameterValue ("dcBass")->load() > 0.5f);
-    k << st.pattern << '|' << st.centerNote << '|' << st.velocity << '|' << st.gate << '|' << st.swing << '|' << (int) st.bass;
+    const auto st = proc.getDcSettings();
+    k << st.pattern << '|' << st.centerNote << '|' << st.velocity << '|' << st.noteSize << '|' << st.swing;
     bool changed = false;
     if (k != key)
     {
@@ -188,14 +188,14 @@ void PianoRollGrid::mouseDrag (const juce::MouseEvent& e)
     if (dragging || e.getDistanceFromDragStart() < 4) return;
     dragging = true;
     auto file = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("Roots Keys riddim.mid");
-    if (proc.writeDcMidiFile (file, 0))
+    if (proc.writeDcMidiFile (file))
         juce::DragAndDropContainer::performExternalDragDropOfFiles (juce::StringArray (file.getFullPathName()), false, this);
 }
 
 //==============================================================================  cartão de acorde
 ChordCard::ChordCard (RootsKeysProcessor& p, int i)
     : proc (p), index (i),
-      drag (p, 0, i, "ARRASTE O ACORDE", "Roots Keys acorde " + juce::String (i + 1))
+      drag (p, i, "ARRASTE O ACORDE", "Roots Keys acorde " + juce::String (i + 1))
 {
     auto& s = proc.apvts;
     const auto n = juce::String (i);
@@ -306,9 +306,7 @@ void ChordCard::resized()
 //==============================================================================  página
 DubChordsPage::DubChordsPage (RootsKeysProcessor& p, VintageLookAndFeel& l)
     : proc (p), lnf (l),
-      dragAll   (p, 0, -1, "TUDO",  "Roots Keys riddim"),
-      dragSkank (p, 1, -1, "SKANK", "Roots Keys skank"),
-      dragBass  (p, 2, -1, "BAIXO", "Roots Keys baixo guia"),
+      dragAll (p, -1, "ARRASTE A PROGRESSAO", "Roots Keys riddim"),
       grid (p)
 {
     auto& s = proc.apvts;
@@ -329,21 +327,22 @@ DubChordsPage::DubChordsPage (RootsKeysProcessor& p, VintageLookAndFeel& l)
     };
     addAndMakeVisible (riddimBox);
 
-    for (auto* b : { &previewBtn, &dawBtn, &bassBtn }) addAndMakeVisible (b);
+    for (auto* b : { &previewBtn, &dawBtn }) addAndMakeVisible (b);
     previewAtt = std::make_unique<APVTS::ButtonAttachment> (s, "dcPreview", previewBtn);
     dawAtt     = std::make_unique<APVTS::ButtonAttachment> (s, "dcOn", dawBtn);
-    bassAtt    = std::make_unique<APVTS::ButtonAttachment> (s, "dcBass", bassBtn);
 
     setupKnob (bpm,   "dcBpm",      "BPM");
     setupKnob (reg,   "dcRegister", "Registro");
     setupKnob (vel,   "dcVel",      "Velocity");
-    setupKnob (gate,  "dcGate",     "Gate");
     setupKnob (swing, "dcSwing",    "Swing");
 
     patternBox.addItem ("Auto (segue o instrumento)", 1);
     for (int pt = 0; pt < dub::NumPatterns; ++pt) patternBox.addItem (dub::patternName (pt), pt + 2);
     addAndMakeVisible (patternBox);
     patternAtt = std::make_unique<APVTS::ComboBoxAttachment> (s, "dcPattern", patternBox);
+    for (int sz = 0; sz < dub::numNoteSizes; ++sz) noteSizeBox.addItem (dub::noteSizeName (sz), sz + 1);
+    addAndMakeVisible (noteSizeBox);
+    noteSizeAtt = std::make_unique<APVTS::ComboBoxAttachment> (s, "dcNoteSize", noteSizeBox);
     repsBox.addItemList ({ "x1", "x2", "x4", "x8" }, 1);
     addAndMakeVisible (repsBox);
     repsAtt = std::make_unique<APVTS::ComboBoxAttachment> (s, "dcReps", repsBox);
@@ -357,7 +356,7 @@ DubChordsPage::DubChordsPage (RootsKeysProcessor& p, VintageLookAndFeel& l)
         cards[i] = std::make_unique<dcui::ChordCard> (proc, i);
         addAndMakeVisible (*cards[i]);
     }
-    for (auto* c : { &dragAll, &dragSkank, &dragBass }) addAndMakeVisible (c);
+    addAndMakeVisible (dragAll);
     addAndMakeVisible (grid);
     setSkin (0);
 }
@@ -385,15 +384,15 @@ void DubChordsPage::placeKnob (Knob& k, juce::Point<int> c, int size)
 void DubChordsPage::setSkin (int skin)
 {
     theme = dcui::Theme::make (skin);
-    for (auto* b : { &previewBtn, &dawBtn, &bassBtn })
+    for (auto* b : { &previewBtn, &dawBtn })
         b->getProperties().set ("style", theme.piano ? "led" : "rocker");
-    for (auto* k : { &bpm, &reg, &vel, &gate, &swing })
+    for (auto* k : { &bpm, &reg, &vel, &swing })
     {
         k->slider.setColour (juce::Slider::rotarySliderOutlineColourId, theme.piano ? plasticMuted : brownInk);
         k->label.setColour (juce::Label::textColourId, theme.ink);
     }
     for (auto& c : cards) c->setTheme (theme);
-    for (auto* c : { &dragAll, &dragSkank, &dragBass }) c->setTheme (theme);
+    dragAll.setTheme (theme);
     grid.setTheme (theme);
     repaint();
 }
@@ -417,7 +416,7 @@ void DubChordsPage::saveMidi()
                               auto f = fc.getResult();
                               if (f == juce::File()) return;
                               if (! f.hasFileExtension ("mid")) f = f.withFileExtension ("mid");
-                              statusText = proc.writeDcMidiFile (f, 0) ? "Salvo: " + f.getFileName() : juce::String ("Nada para salvar");
+                              statusText = proc.writeDcMidiFile (f) ? "Salvo: " + f.getFileName() : juce::String ("Nada para salvar");
                               repaint();
                           });
 }
@@ -450,10 +449,14 @@ void DubChordsPage::paint (juce::Graphics& g)
     g.setColour (theme.ink);
     g.setFont (VintageLookAndFeel::mono (11.0f));
     g.drawText ("RITMO", 772, 70, 100, 14, juce::Justification::centredLeft);
+    g.setColour (theme.mutedInk);
+    g.setFont (VintageLookAndFeel::mono (9.0f, false));
+    g.drawText ("TAMANHO DA NOTA", 772, 120, 160, 12, juce::Justification::centredLeft);
+    g.setColour (theme.ink);
+    g.setFont (VintageLookAndFeel::mono (11.0f));
     g.drawText ("GRADE", 14, 286, 60, 14, juce::Justification::centredLeft);
     g.setColour (theme.mutedInk);
     g.setFont (VintageLookAndFeel::mono (9.0f, false));
-    g.drawText ("ARRASTE:", 14, 300, 60, 12, juce::Justification::centredLeft);
     g.drawText ("REPETIR", 598, 284, 60, 10, juce::Justification::centredLeft);
 
     // visor de BPM / transporte
@@ -494,16 +497,13 @@ void DubChordsPage::resized()
 
     // ritmo
     patternBox.setBounds (770, 90, 172, 24);
-    placeKnob (reg,   { 812, 150 }, 38);
-    placeKnob (vel,   { 900, 150 }, 38);
-    placeKnob (gate,  { 812, 222 }, 38);
-    placeKnob (swing, { 900, 222 }, 38);
+    noteSizeBox.setBounds (770, 134, 172, 24);
+    placeKnob (reg,   { 798, 200 }, 36);
+    placeKnob (vel,   { 856, 200 }, 36);
+    placeKnob (swing, { 914, 200 }, 36);
 
     // grade + barra de ferramentas
-    dragAll.setBounds   (80, 282, 110, 30);
-    dragSkank.setBounds (196, 282, 110, 30);
-    dragBass.setBounds  (312, 282, 110, 30);
-    bassBtn.setBounds   (434, 284, 150, 26);
+    dragAll.setBounds   (80, 282, 260, 30);
     repsBox.setBounds   (598, 294, 64, 22);
     saveBtn.setBounds   (674, 284, 120, 28);
     grid.setBounds (10, 320, 932, 208);

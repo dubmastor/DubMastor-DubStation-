@@ -21,17 +21,19 @@ inline const char* qualityName (int q)
 
 inline const std::vector<int>& intervals (int q)
 {
+    // 3 notas por mão (o acorde sai em duas oitavas = 6 notas). Nos acordes de 4 notas
+    // ficam as notas que definem o som: sem a quinta (7, m7, maj7, m6) ou sem a fundamental (m9).
     static const std::vector<int> table[NumQualities] = {
         { 0, 4, 7 },        // Maior
         { 0, 3, 7 },        // menor
-        { 0, 4, 7, 10 },    // 7
-        { 0, 3, 7, 10 },    // m7
-        { 0, 4, 7, 11 },    // maj7
-        { 0, 3, 7, 9 },     // m6
+        { 0, 4, 10 },       // 7
+        { 0, 3, 10 },       // m7
+        { 0, 4, 11 },       // maj7
+        { 0, 3, 9 },        // m6
         { 0, 2, 7 },        // sus2
         { 0, 5, 7 },        // sus4
         { 0, 3, 6 },        // dim
-        { 0, 3, 10, 14 },   // m9 (sem quinta, soa bem no skank)
+        { 3, 10, 14 },      // m9 (terça, sétima e nona)
     };
     return table[std::clamp (q, 0, NumQualities - 1)];
 }
@@ -54,6 +56,20 @@ inline double durationBeats (int d)
 {
     static const double beats[numDurations] = { 2, 4, 8, 12, 16, 32 };
     return beats[std::clamp (d, 0, numDurations - 1)];
+}
+
+//==============================================================================
+// Tamanho da nota (figura) de cada ataque — começa sempre em 1/32
+inline constexpr int numNoteSizes = 5;
+inline const char* noteSizeName (int n)
+{
+    static const char* names[numNoteSizes] = { "1/32", "1/16", "1/8", "1/4", "1/2" };
+    return names[std::clamp (n, 0, numNoteSizes - 1)];
+}
+inline double noteSizeBeats (int n)
+{
+    static const double beats[numNoteSizes] = { 0.125, 0.25, 0.5, 1.0, 2.0 };
+    return beats[std::clamp (n, 0, numNoteSizes - 1)];
 }
 
 //==============================================================================
@@ -100,18 +116,16 @@ struct NoteEvent
     double length;  // em tempos
     int note;
     int velocity;   // 1..127
-    int channel;    // 1 = acordes, 2 = baixo guia
+    int channel;    // 1 = acordes (duas mãos)
 };
 
 struct Settings
 {
     int pattern = SkankOffbeat;
-    int centerNote = 62;     // centro do registro dos acordes (D4)
+    int centerNote = 60;     // centro da mão esquerda (C4); a direita toca uma oitava acima
     float velocity = 0.8f;   // 0..1
-    float gate = 0.8f;       // 0.1..1 (fração do comprimento da nota)
+    int noteSize = 0;        // índice em noteSizeBeats (padrão 1/32)
     float swing = 0.0f;      // 0..1 (atrasa as semicolcheias pares)
-    bool bass = true;
-    int bassBase = 36;       // C2: a fundamental do baixo fica entre C2 e B2
 };
 
 //==============================================================================
@@ -185,31 +199,33 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
         const int firstStep = (int) std::lround (pos * 4.0);
         const int numSteps  = (int) std::lround (slot.beats * 4.0);
 
+        // duas mãos: a mesma inversão em duas oitavas (6 notas)
+        std::vector<int> hands (voicing);
+        for (int n : voicing) hands.push_back (n + 12);
+
         for (int st = firstStep; st < firstStep + numSteps; ++st)
         {
             const int stepInBar = st % 16;
 
-            for (const auto& h : hits)
+            for (size_t hi = 0; hi < hits.size(); ++hi)
             {
+                const auto& h = hits[hi];
                 if (h.step != stepInBar) continue;
-                double start = st * 0.25;
                 const double swingOffset = (stepInBar % 2 == 1) ? s.swing * 0.125 : 0.0;
-                start += swingOffset;
-                // termina antes do próximo passo da grade, mesmo com swing
-                const double maxLen = h.lenSteps * 0.25 - swingOffset - 0.01;
-                const double len = std::max (0.03, std::min (maxLen, h.lenSteps * 0.25 * s.gate));
-                const int vel = std::clamp ((int) std::lround (h.vel * s.velocity * 127.0f), 1, 127);
-                for (int note : voicing)
-                    events.push_back ({ start, len, std::clamp (note, 0, 127), vel, 1 });
-            }
+                const double start = st * 0.25 + swingOffset;
 
-            // Baixo guia: fundamental no 1 e no "e" do 3 (estilo one drop simples)
-            if (s.bass && (stepInBar == 0 || stepInBar == 10))
-            {
-                const int note = s.bassBase + ((slot.root % 12) + 12) % 12;
-                const double len = (stepInBar == 0 ? 1.5 : 1.0) * std::max (0.5f, s.gate);
-                const int vel = std::clamp ((int) std::lround (s.velocity * 127.0f * 0.9f), 1, 127);
-                events.push_back ({ st * 0.25, len, note, vel, 2 });
+                // tamanho escolhido, mas nunca encostando no próximo ataque do padrão
+                int gapSteps = 16;
+                for (const auto& o : hits)
+                {
+                    int d = o.step - h.step;
+                    if (d <= 0) d += 16;
+                    gapSteps = std::min (gapSteps, d);
+                }
+                const double len = std::max (0.03, std::min (noteSizeBeats (s.noteSize), gapSteps * 0.25 - swingOffset - 0.02));
+                const int vel = std::clamp ((int) std::lround (h.vel * s.velocity * 127.0f), 1, 127);
+                for (int note : hands)
+                    events.push_back ({ start, len, std::clamp (note, 0, 127), vel, 1 });
             }
         }
         pos += slot.beats;

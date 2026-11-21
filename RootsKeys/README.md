@@ -1,8 +1,8 @@
-# DubMastor Roots Keys 2.2
+# DubMastor Roots Keys 2.3
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.3/DubMastorRootsKeys-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.3/DubMastorRootsKeys-macOS.zip)**
 
 | Modo piano | Modo órgão |
 |---|---|
@@ -22,10 +22,11 @@ O gerador de harmonia do **Dub Chords** dentro do Roots Keys. Clique em **DUB CH
 
 - **Riddims prontos**: Roots menor, One drop, Rockers, Lovers, Steppers, Nyabinghi, Dub jazz e outros, para começar rápido.
 - **4 cartões de acorde**: tônica (12 notas), tipo (maior, menor, 7, m7, maj7, m6, sus2, sus4, dim, m9), duração (1/2 a 8 compassos) e ON. O plugin escolhe a inversão mais próxima do acorde anterior (condução de vozes).
-- **Ritmo**: *Auto* segue o instrumento (skank no piano, bubble no órgão) ou escolha skank, one drop, double skank, bubble ou steppers. Registro, velocity, gate e swing.
+- **Duas mãos**: cada acorde sai com **6 notas** — a mesma inversão em duas oitavas, como um tecladista tocando com as duas mãos. Nos acordes de 4 notas cada mão toca as 3 que definem o som (sem a quinta; no m9, terça, sétima e nona).
+- **Ritmo**: *Auto* segue o instrumento (skank no piano, bubble no órgão) ou escolha skank, one drop, double skank, bubble ou steppers. **Tamanho da nota** (1/32, 1/16, 1/8, 1/4, 1/2 — começa sempre em **1/32**), registro da mão esquerda, velocity e swing.
 - **Toca no próprio instrumento**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCAR COM A DAW** segue o play, o BPM e o loop da DAW. O som passa pelo eco, flanger e maximizer, e o teclado acende junto.
-- **Grade (piano roll)**: o loop inteiro com as vozes, o baixo guia, os nomes dos acordes e o cursor da DAW.
-- **Arraste para a DAW**: a **grade inteira** é arrastável, e ainda dá para arrastar **TUDO**, **SKANK**, **BAIXO** ou **um acorde sozinho** (no cartão). Vem com o tempo do projeto e repetição x1, x2, x4 ou x8. **SALVAR .MID** grava em Documentos/Roots Keys.
+- **Grade (piano roll)**: o loop inteiro com as vozes das duas mãos, os nomes dos acordes e o cursor da DAW.
+- **Arraste para a DAW**: a **grade inteira** é arrastável, e ainda dá para arrastar **a progressão** ou **um acorde sozinho** (no cartão). Vem com o tempo do projeto e repetição x1, x2, x4 ou x8. **SALVAR .MID** grava em Documentos/Roots Keys.
 
 ## Dois visuais
 
@@ -82,6 +83,11 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 - `Resources/` — fontes Archivo Black, Michroma e RootsKeys Display (licenças OFL em `Resources/licenses/`)
 
 "Korg" e "M1" são marcas da Korg Inc.; "Hammond" e "Leslie" são marcas da Hammond Suzuki. Este projeto não é afiliado a elas — os nomes indicam apenas o estilo de timbre emulado.
+
+## Novidades da 2.3
+- Aba Dub Chords: acordes com **6 notas em duas oitavas** (duas mãos).
+- Novo controle **TAMANHO DA NOTA** (1/32 a 1/2), começando sempre em **1/32**; substitui o gate.
+- Removido o **baixo guia** (da grade, da tela e do MIDI exportado).
 
 ## Novidades da 2.2
 - Novo nome: **DubMastor Roots Keys**. O número da versão aparece no cabeçalho do plugin.

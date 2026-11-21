@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(RootsKeys VERSION 2.2.0)
+project(RootsKeys VERSION 2.3.0)
 
 set(CMAKE_CXX_STANDARD 17)
 

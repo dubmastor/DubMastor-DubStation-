@@ -19,8 +19,8 @@ struct Theme
 class MidiDragChip : public juce::Component, public juce::SettableTooltipClient
 {
 public:
-    MidiDragChip (RootsKeysProcessor& p, int partIn, int slotIn, juce::String text, juce::String fileStem)
-        : proc (p), part (partIn), slot (slotIn), label (std::move (text)), stem (std::move (fileStem))
+    MidiDragChip (RootsKeysProcessor& p, int slotIn, juce::String text, juce::String fileStem)
+        : proc (p), slot (slotIn), label (std::move (text)), stem (std::move (fileStem))
     {
         setMouseCursor (juce::MouseCursor::DraggingHandCursor);
         setTooltip ("Clique e arraste para a timeline da DAW");
@@ -33,7 +33,7 @@ public:
     void mouseExit (const juce::MouseEvent&) override  { repaint(); }
 private:
     RootsKeysProcessor& proc;
-    int part, slot;
+    int slot;
     juce::String label, stem;
     Theme theme;
     bool dragging = false;
@@ -47,7 +47,7 @@ public:
     explicit PianoRollGrid (RootsKeysProcessor& p) : proc (p)
     {
         setMouseCursor (juce::MouseCursor::DraggingHandCursor);
-        setTooltip ("Arraste a grade para a timeline da DAW (skank + baixo guia)");
+        setTooltip ("Arraste a grade para a timeline da DAW");
     }
     void setTheme (const Theme& t) { theme = t; repaint(); }
     void refresh();                       // chamado ~30x/s
@@ -116,16 +116,16 @@ private:
     dcui::Theme theme;
 
     juce::ComboBox riddimBox;
-    juce::ToggleButton previewBtn { "PREVIEW" }, dawBtn { "TOCAR COM A DAW" }, bassBtn { "BAIXO GUIA" };
-    std::unique_ptr<APVTS::ButtonAttachment> previewAtt, dawAtt, bassAtt;
-    Knob bpm, reg, vel, gate, swing;
-    juce::ComboBox patternBox, repsBox;
-    std::unique_ptr<APVTS::ComboBoxAttachment> patternAtt, repsAtt;
+    juce::ToggleButton previewBtn { "PREVIEW" }, dawBtn { "TOCAR COM A DAW" };
+    std::unique_ptr<APVTS::ButtonAttachment> previewAtt, dawAtt;
+    Knob bpm, reg, vel, swing;
+    juce::ComboBox patternBox, noteSizeBox, repsBox;
+    std::unique_ptr<APVTS::ComboBoxAttachment> patternAtt, noteSizeAtt, repsAtt;
     juce::TextButton saveBtn { "SALVAR .MID" };
     std::unique_ptr<juce::FileChooser> chooser;
 
     std::unique_ptr<dcui::ChordCard> cards[RootsKeysProcessor::dcSlots];
-    dcui::MidiDragChip dragAll, dragSkank, dragBass;
+    dcui::MidiDragChip dragAll;
     dcui::PianoRollGrid grid;
     juce::String statusText;
 

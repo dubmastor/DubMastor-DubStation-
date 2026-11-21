@@ -66,12 +66,12 @@ public:
     std::vector<dub::ChordSlot> getDcSlots() const;          // só os acordes ligados
     dub::ChordSlot getDcSlot (int i) const;                  // um cartão, ligado ou não
     bool isDcSlotOn (int i) const;
-    dub::Settings getDcSettings (bool withBass) const;
+    dub::Settings getDcSettings() const;
     int effectiveDcPattern() const;                          // "Auto" segue o instrumento
     double getDcExportBpm() const;
     void applyRiddim (int index);
-    // part: 0 = skank + baixo, 1 = só skank, 2 = só baixo; slot >= 0 = só aquele acorde
-    bool writeDcMidiFile (const juce::File& file, int part, int slot = -1) const;
+    // slot = -1: a progressão inteira; slot >= 0: só aquele acorde
+    bool writeDcMidiFile (const juce::File& file, int slot = -1) const;
     std::atomic<double> dcPlayPos { -1.0 }, dcHostBpm { 0.0 };
     std::atomic<bool> dcHostPlaying { false };
 

@@ -104,11 +104,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
                 l.add (std::make_unique<AudioParameterBool> (ParameterID { "dcAct" + n, 1 }, lbl + "ligado", i == 1));
         }
         l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcPattern", 1 }, "Dub Chords: padrao", pats, 0));
-        l.add (std::make_unique<AudioParameterInt>   (ParameterID { "dcRegister", 1 }, "Dub Chords: registro", 52, 76, 64));
+        l.add (std::make_unique<AudioParameterInt>   (ParameterID { "dcRegister", 1 }, "Dub Chords: registro (mao esquerda)", 48, 72, 60));
         l.add (pct ("dcVel",   "Dub Chords: velocity", 0.80f));
-        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "dcGate", 1 }, "Dub Chords: gate", NormalisableRange<float> (0.1f, 1.0f), 0.7f));
+        StringArray sizes;
+        for (int sz = 0; sz < dub::numNoteSizes; ++sz) sizes.add (dub::noteSizeName (sz));
+        l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcNoteSize", 1 }, "Dub Chords: tamanho da nota", sizes, 0));
         l.add (pct ("dcSwing", "Dub Chords: swing", 0.0f));
-        l.add (std::make_unique<AudioParameterBool>  (ParameterID { "dcBass", 1 }, "Dub Chords: baixo guia no MIDI", true));
         l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcReps", 1 }, "Dub Chords: repetir no MIDI",
                                                        StringArray { "x1", "x2", "x4", "x8" }, 1));
     }
@@ -278,15 +279,14 @@ int RootsKeysProcessor::effectiveDcPattern() const
     return (int) get ("mode") == 1 ? dub::Bubble : dub::SkankOffbeat;
 }
 
-dub::Settings RootsKeysProcessor::getDcSettings (bool withBass) const
+dub::Settings RootsKeysProcessor::getDcSettings() const
 {
     dub::Settings s;
     s.pattern    = effectiveDcPattern();
     s.centerNote = (int) get ("dcRegister");
     s.velocity   = get ("dcVel");
-    s.gate       = get ("dcGate");
+    s.noteSize   = (int) get ("dcNoteSize");
     s.swing      = get ("dcSwing");
-    s.bass       = withBass;
     return s;
 }
 
@@ -358,7 +358,7 @@ void RootsKeysProcessor::runDubChords (juce::MidiBuffer& midi, int numSamples)
     if (bpm <= 0.0) bpm = 120.0;
 
     if (dcDirty.exchange (false))
-        dcLoop = dub::buildLoop (getDcSlots(), getDcSettings (false), dcLoopBeats);
+        dcLoop = dub::buildLoop (getDcSlots(), getDcSettings(), dcLoopBeats);
 
     const double blockBeats = (double) numSamples / sampleRateHz * bpm / 60.0;
     if (! playing || dcLoopBeats <= 0.0)
@@ -417,14 +417,13 @@ void RootsKeysProcessor::runDubChords (juce::MidiBuffer& midi, int numSamples)
     dcPlayPos.store (std::fmod (std::max (0.0, ppq), dcLoopBeats));
 }
 
-bool RootsKeysProcessor::writeDcMidiFile (const juce::File& file, int part, int slot) const
+bool RootsKeysProcessor::writeDcMidiFile (const juce::File& file, int slot) const
 {
     std::vector<dub::ChordSlot> slots;
     if (slot >= 0) slots.push_back (getDcSlot (slot));
     else           slots = getDcSlots();
-    const bool withBass = part == 2 || (part == 0 && get ("dcBass") > 0.5f);
     double lb = 0.0;
-    const auto events = dub::buildLoop (slots, getDcSettings (withBass), lb);
+    const auto events = dub::buildLoop (slots, getDcSettings(), lb);
     if (lb <= 0.0 || events.empty()) return false;
 
     static const int repsTable[4] = { 1, 2, 4, 8 };
@@ -432,28 +431,24 @@ bool RootsKeysProcessor::writeDcMidiFile (const juce::File& file, int part, int 
     const int tpq = 960;
     const double bpm = getDcExportBpm();
 
-    juce::MidiMessageSequence meta, chords, bass;
+    juce::MidiMessageSequence meta, chords;
     meta.addEvent (juce::MidiMessage::tempoMetaEvent ((int) std::round (60000000.0 / bpm)), 0.0);
     meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
     chords.addEvent (juce::MidiMessage::textMetaEvent (3, "Roots Keys - Skank"), 0.0);
-    bass.addEvent (juce::MidiMessage::textMetaEvent (3, "Roots Keys - Baixo guia"), 0.0);
 
     for (int r = 0; r < reps; ++r)
         for (const auto& e : events)
         {
-            if ((part == 1 && e.channel != 1) || (part == 2 && e.channel != 2)) continue;
-            auto& seq = (e.channel == 2) ? bass : chords;
+            auto& seq = chords;
             seq.addEvent (juce::MidiMessage::noteOn (e.channel, e.note, (juce::uint8) e.velocity), (e.start + r * lb) * tpq);
             seq.addEvent (juce::MidiMessage::noteOff (e.channel, e.note), (e.start + e.length + r * lb) * tpq);
         }
     chords.sort(); chords.updateMatchedPairs();
-    bass.sort();   bass.updateMatchedPairs();
 
     juce::MidiFile mf;
     mf.setTicksPerQuarterNote (tpq);
     mf.addTrack (meta);
     if (chords.getNumEvents() > 1) mf.addTrack (chords);
-    if (bass.getNumEvents() > 1)   mf.addTrack (bass);
 
     file.getParentDirectory().createDirectory();
     file.deleteFile();
