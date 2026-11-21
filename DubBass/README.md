@@ -1,0 +1,51 @@
+# Dub Bass - Dub Station 1.1
+
+Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, plaqueta de latão com a versão, knobs de baquelite e lâmpadas âmbar.
+
+![Interface](docs/interface.png)
+
+## Cadeia de sinal
+
+```
+OSCILADOR (Classic Sine + harmônicos | 808) → FILTRO → ENVELOPE → VÁLVULA / SATURAÇÃO (2x oversampling)
+→ EQ GRÁFICO 10 bandas → REVERB (envio paralelo com low cut) → BASS BOOST 60 Hz +4 dB
+→ MAXIMIZER (lookahead 1.5 ms, com BYPASS) → VOLUME
+```
+
+## Controles
+
+| Seção | O que tem |
+|---|---|
+| **Oscilador** | Teclas CLASSIC SINE / 808, Harm 2, Harm 3, Glide, 808 Pitch e 808 Tempo (só acendem no modo 808) |
+| **Envelope / Filtro** | Ataque, Decay, Sustain (desligado no 808), Release, Cutoff e Ressonância |
+| **Osciloscópio** | Tela de fósforo verde com a onda da saída, parada no cruzamento por zero |
+| **Válvula / Saturação** | ON, teclas TUBE / TAPE / FUZZ, Drive, Tom e Mix. A válvula 12AX7 esquenta com o DRIVE e com o sinal: vai do vermelho apagado ao laranja, âmbar e branco quente, com o brilho azul de válvula forçada no limite. Esquenta rápido e esfria devagar |
+| **EQ gráfico** | ON, 10 faders ±12 dB (32 Hz a 16 kHz) e a curva em tela verde (mostra o Bass Boost também) |
+| **Reverb** | ON, Tamanho, Damp, Abertura, Low Cut (o grave fica seco) e Mix |
+| **Bass Boost** | Botão verde: +4 dB em 60 Hz, antes do maximizer |
+| **Saída** | Display âmbar com a nota tocando (nome e Hz) e Volume |
+| **Maximizer** (lateral direita) | VU digital estilo Ozone: entrada L/R, redução de ganho e saída L/R, com leituras numéricas, pico retido e a marca do teto. Ganho, Teto, Release e BYPASS (com lâmpada vermelha; a latência continua a mesma) |
+
+Mono/legato: no Classic Sine as notas ligadas deslizam com o glide; no 808 cada nota reataca o envelope e o drop de pitch. Pitch bend ±2 semitons. Duplo clique volta qualquer controle ao padrão. A janela é redimensionável.
+
+## Versão
+
+A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha na plaqueta de latão. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site, e crie a tag `DubBass-x.y` para publicar.
+
+## Compilar
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+```
+
+Teste offline (toca uma linha de baixo, confere o teto do maximizer, NaN, estado e salva a interface):
+
+```bash
+cmake -B build-test -DDUBBASS_TESTS=ON && cmake --build build-test --target DubBassTest
+./build-test/DubBassTest_artefacts/Release/DubBassTest test-out
+```
+
+## Publicar
+
+O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, quando recebe uma tag `DubBass-x.y`, cria a release com `DubBass-Windows.zip` e `DubBass-macOS.zip`. A release do Dub Bass não vira a "latest", para não mexer nos links dos outros plugins.

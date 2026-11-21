@@ -1,0 +1,23 @@
+## Dub Bass - Dub Station 1.1 🟢🟡⚫
+
+Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, ou o 808 com o pitch caindo.
+
+**Novo na 1.1**
+- Visual da linha, igual ao Dub Chords: painel creme, madeira, plaqueta de latão com a versão, knobs de baquelite e lâmpadas âmbar
+- **Maximizer na lateral direita** com VU digital estilo Ozone: entrada L/R, redução de ganho e saída L/R, leituras numéricas, pico retido e a marca do teto; BYPASS com lâmpada vermelha
+- **Válvula 12AX7 animada** na saturação: esquenta com o DRIVE e com o sinal e muda de cor (vermelho → laranja → âmbar → branco quente, com brilho azul no limite)
+- Osciloscópio e curva do EQ em tela de fósforo verde; display âmbar com a nota tocando
+- Janela redimensionável
+
+**Desde a 1.0**
+- Modos Classic Sine (harmônicos 2 e 3) e 808 (drop de pitch), mono com glide
+- Saturação Tube / Tape / Fuzz com 2x oversampling, EQ gráfico de 10 bandas, reverb com low cut
+- BASS BOOST: +4 dB em 60 Hz, antes do maximizer
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+Downloads: `DubBass-Windows.zip` e `DubBass-macOS.zip`.
+
+No Mac, depois de copiar o `.vst3`:
+```
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Bass - Dub Station.vst3"
+```
