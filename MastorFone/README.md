@@ -1,4 +1,4 @@
-# Mastor Fone 1.4 — voz de aparelho antigo 📻☎️📣
+# Mastor Fone 1.6 — voz de aparelho antigo 📻☎️📣
 
 *Dub Station Solutions*
 

@@ -971,9 +971,9 @@ void StationPanel::paint (Graphics& g)
     const auto inset = Rectangle<float> (pl.getRight() - 70, pl.getY() + 17, 54, 46);
     g.setFont (mf::title (23.0f));
     g.setColour (amber.withAlpha (0.35f));
-    g.drawText ("1.4", inset.expanded (1.0f), Justification::centred);
+    g.drawText ("1.6", inset.expanded (1.0f), Justification::centred);
     g.setColour (amber);
-    g.drawText ("1.4", inset, Justification::centred);
+    g.drawText ("1.6", inset, Justification::centred);
 
     // assinatura "Dub Station Solutions" em tinta marrom, com traço
     {
