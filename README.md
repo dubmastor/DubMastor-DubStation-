@@ -10,6 +10,7 @@ Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e t
 | **DubMastor Roots Keys 2.2** | Instrumento: piano estilo Korg M1 e órgão estilo Hammond com Leslie, eco de fita FitaEco, flanger dub, maximizer, VUs e teclado que acende com o MIDI; aba **Dub Chords** para montar o riddim e arrastar o MIDI para a DAW; visual de teclado anos 80 no piano e de madeira e marfim no órgão | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-Windows.zip) | [RootsKeys/](RootsKeys/) |
 | **DubMastor Dub Chords 1.2** | Instrumento / gerador MIDI: escolha até 4 acordes (teclado mecânico, maior/menor, inversões com sugestão automática, contador de compassos) e ele toca o skank de piano M1 com as duas mãos e o bubble de Hammond no andamento da DAW; arraste o MIDI colorido por acorde para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.2/DubMastorDubChords-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.2/DubMastorDubChords-Windows.zip) | [DubChords/](DubChords/) |
 | **Dub Bass - Dub Station 1.1** | Instrumento: baixo de reggae em senoide com harmônicos ou 808, saturação com válvula animada, EQ gráfico, reverb, bass boost em 60 Hz e maximizer com VU digital estilo Ozone, no visual do Dub Chords | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubBass-1.1/DubBass-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubBass-1.1/DubBass-Windows.zip) | [DubBass/](DubBass/) |
+| **DubMastor Dub Drums 1.0** | Instrumento / gerador MIDI: esqueleto da bateria de reggae (One Drop, Rockers, Steppa) com chave de baterista (Style Scott, Santa Davis, Carlton Barrett) que muda o balanço e as viradas, virada de intro, preview com bateria interna, MIDI colorido por compasso e mapa de notas para qualquer kit | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.0/DubMastorDubDrums-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.0/DubMastorDubDrums-Windows.zip) | [DubDrums/](DubDrums/) |
 | **Mastor Fone 1.6** | Efeito de voz: rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorFone-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorFone-Windows.zip) | [MastorFone/](MastorFone/) |
 | **Dub Station 2.6 (FitaEco TE-12)** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-Windows.zip) | [DubStation21/](DubStation21/) |
 
@@ -29,6 +30,7 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Fone.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Chords.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Bass - Dub Station.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Drums.vst3"
    ```
 5. Abra o Cubase.
 
@@ -50,6 +52,7 @@ RootsKeys/                       DubMastor Roots Keys — piano M1 + órgão Ham
 MastorFone/                      Mastor Fone — rádio AM, telefone e megafone para voz (C++ / JUCE 8)
 DubChords/                       DubMastor Dub Chords — gerador de skank/harmonia para riddim (C++ / JUCE 8)
 DubBass/                         Dub Bass - Dub Station — baixo de reggae senoide / 808 (C++ / JUCE 8)
+DubDrums/                        DubMastor Dub Drums — gerador de bateria de reggae com bateria interna (C++ / JUCE 8)
 .github/workflows/
   build-bigknob.yml              compila, valida e publica o Big Knob
   build-dubstation21.yml         compila, valida e publica o Dub Station 2.6
@@ -57,6 +60,7 @@ DubBass/                         Dub Bass - Dub Station — baixo de reggae seno
   build-mastorfone.yml           compila, valida e publica o Mastor Fone
   build-dubchords.yml            compila, valida e publica o Dub Chords
   build-dubbass.yml              testa, compila, valida e publica o Dub Bass (release DubBass-x.y a cada versão)
+  build-dubdrums.yml             testa, compila, valida e publica o Dub Drums (release DubDrums-x.y a cada versão)
 ```
 
 Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. Quando uma release é publicada, os builds anexam seus instaladores a ela.
