@@ -14,6 +14,11 @@ on:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+      prerelease:
+        description: 'Publicar como pré-release de teste (não vira a "latest", não mexe nos links dos outros plugins)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -122,6 +127,11 @@ jobs:
       run:
         working-directory: .
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: DubChords/RELEASE_NOTES.md
+          sparse-checkout-cone-mode: false
+
       - uses: actions/download-artifact@v4
         with:
           path: dist
@@ -131,3 +141,7 @@ jobs:
         with:
           tag_name: ${{ inputs.tag || github.event.release.tag_name }}
           files: dist/*.zip
+          prerelease: ${{ inputs.prerelease == true }}
+          make_latest: ${{ inputs.prerelease == true && 'false' || 'legacy' }}
+          body_path: ${{ inputs.prerelease == true && 'DubChords/RELEASE_NOTES.md' || '' }}
+          name: ${{ inputs.prerelease == true && 'Dub Chords 1.0 (teste)' || '' }}
