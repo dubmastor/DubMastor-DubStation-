@@ -1,4 +1,4 @@
-# Mastor Fone 1.1 — voz de aparelho antigo 📻☎️📣
+# Mastor Fone 1.2 — voz de aparelho antigo 📻☎️📣
 
 *Dub Station Solutions*
 
@@ -12,7 +12,7 @@ Formatos: **VST3** (Windows/macOS, para o Cubase), **AU** (macOS) e **Standalone
 ## Dois visuais
 O botão **VISUAL** troca a aparência na hora, e a escolha fica salva no projeto do Cubase:
 - **Cartoon** (padrão): gabinete de rádio de madeira, estilo desenho animado antigo
-- **Dub Station**: o mesmo acabamento do Dub Station 2.1, com esmalte creme, plaqueta de alumínio, VU, janela da fita e botões de alumínio
+- **Dub Station**: o mesmo acabamento do Dub Station 2.1, com esmalte creme, plaqueta de alumínio, VU, janela da fita e botões de alumínio. Os aparelhos são teclas com o desenho de cada um (clique para escolher), a SINTONIA é um dial de rádio antigo (540 a 1600 kHz) e o **BYPASS** fica em destaque no painel de cima, acendendo vermelho quando o efeito está desligado
 
 ![Visual cartoon](docs/interface.png)
 

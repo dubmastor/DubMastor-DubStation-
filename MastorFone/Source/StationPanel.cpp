@@ -101,6 +101,32 @@ void StationLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int w, int
 
 void StationLookAndFeel::drawToggleButton (Graphics& g, ToggleButton& b, bool over, bool down)
 {
+    if ((bool) b.getProperties()["big"])
+    {
+        // tecla grande de BYPASS: acende vermelho quando o efeito está desligado
+        const bool on = b.getToggleState();
+        auto r = b.getLocalBounds().toFloat().reduced (2.0f);
+        g.setColour (Colours::black.withAlpha (0.5f));
+        g.fillRoundedRectangle (r.translated (1.5f, 3.0f), 6.0f);
+        g.setGradientFill (ColourGradient (Colour (0xffeaeaea), r.getX(), r.getY(), Colour (0xff5a5a5a), r.getRight(), r.getBottom(), false));
+        g.fillRoundedRectangle (r, 6.0f);
+        auto cap = r.reduced (3.0f).translated (0, down ? 1.0f : 0.0f);
+        g.setGradientFill (ColourGradient (Colour (on ? 0xffe0442a : (over ? 0xff36322e : 0xff2a2724)), 0, cap.getY(),
+                                           Colour (on ? 0xff7a1a0e : 0xff0c0b0a), 0, cap.getBottom(), false));
+        g.fillRoundedRectangle (cap, 4.5f);
+        if (on)
+        {
+            g.setColour (Colour (0x55ff6a3a));
+            g.drawRoundedRectangle (r.expanded (2.0f), 8.0f, 3.0f);
+        }
+        const auto lp = Point<float> (cap.getX() + 14.0f, cap.getCentreY());
+        g.setColour (on ? Colour (0xffffd0a0) : Colour (0xff4a1612));
+        g.fillEllipse (lp.x - 4.5f, lp.y - 4.5f, 9, 9);
+        g.setColour (cream);
+        g.setFont (bold (13.0f).withExtraKerningFactor (0.12f));
+        g.drawText (b.getButtonText(), cap.withTrimmedLeft (22.0f), Justification::centred);
+        return;
+    }
     // tecla de baquelite com lâmpada âmbar, como as dos cabeçotes do Dub Station
     const bool on = b.getToggleState();
     auto r = b.getLocalBounds().toFloat().reduced (1.5f);
@@ -151,14 +177,137 @@ void StationLookAndFeel::drawButtonText (Graphics& g, TextButton& b, bool, bool 
 }
 
 //==============================================================================
+namespace
+{
+// desenho dos aparelhos em traço creme, como serigrafia no painel
+void drawLineIcon (Graphics& g, int which, Rectangle<float> r, Colour c)
+{
+    const auto o = r.getCentre();
+    const float s = jmin (r.getWidth() / 80.0f, r.getHeight() / 44.0f);
+    auto P = [&] (float x, float y) { return Point<float> (o.x + x * s, o.y + y * s); };
+    auto R = [&] (float x, float y, float w, float h) { return Rectangle<float> (o.x + x * s, o.y + y * s, w * s, h * s); };
+    const PathStrokeType st (2.0f * s + 0.3f, PathStrokeType::curved, PathStrokeType::rounded);
+    g.setColour (c);
+    Path p;
+    if (which == 0)
+    {
+        p.addRoundedRectangle (R (-30, -14, 60, 34), 7.0f * s);
+        p.addEllipse (R (-25, -9, 24, 24));
+        p.addRoundedRectangle (R (5, -9, 20, 10), 2.0f * s);
+        p.addEllipse (R (7, 6, 7, 7)); p.addEllipse (R (17, 6, 7, 7));
+        p.startNewSubPath (P (16, -14)); p.lineTo (P (30, -24));
+        g.strokePath (p, st);
+        for (int k = 0; k < 3; ++k) g.drawLine (Line<float> (P (-20, -3 + (float) k * 6), P (-6, -3 + (float) k * 6)), 1.4f * s);
+        g.fillEllipse (Rectangle<float> (5 * s, 5 * s).withCentre (P (30, -24)));
+    }
+    else if (which == 1)
+    {
+        Path base;
+        base.startNewSubPath (P (-24, -2)); base.lineTo (P (24, -2)); base.lineTo (P (32, 20)); base.lineTo (P (-32, 20)); base.closeSubPath();
+        p.addPath (base.createPathWithRoundedCorners (5.0f * s));
+        p.addEllipse (R (-11, 0, 22, 18));
+        p.addRoundedRectangle (R (-24, -19, 48, 8), 4.0f * s);
+        p.addEllipse (R (-35, -21, 17, 12)); p.addEllipse (R (18, -21, 17, 12));
+        g.strokePath (p, st);
+        for (int k = 0; k < 7; ++k)
+            g.fillEllipse (Rectangle<float> (2.6f * s, 2.6f * s).withCentre (P (0, 9).getPointOnCircumference (6.0f * s, -2.4f + (float) k * 0.75f)));
+    }
+    else
+    {
+        Path cone;
+        cone.startNewSubPath (P (-22, -7)); cone.lineTo (P (20, -20)); cone.lineTo (P (20, 20)); cone.lineTo (P (-22, 7)); cone.closeSubPath();
+        p.addPath (cone.createPathWithRoundedCorners (3.0f * s));
+        p.addEllipse (R (15, -21, 11, 42));
+        p.addRoundedRectangle (R (-33, -5, 11, 10), 3.0f * s);
+        p.addRoundedRectangle (R (-10, 4, 7, 15), 2.0f * s);
+        p.addCentredArc (o.x + 27.0f * s, o.y, 8.0f * s, 8.0f * s, 0.0f, 0.7f, 2.45f, true);
+        g.strokePath (p, st);
+    }
+}
+} // namespace
+
+StationModeKeys::StationModeKeys (RangedAudioParameter& p)
+    : att (p, [this] (float v) { mode = jlimit (0, 2, roundToInt (v)); repaint(); })
+{
+    att.sendInitialUpdate();
+    setMouseCursor (MouseCursor::PointingHandCursor);
+}
+
+Rectangle<float> StationModeKeys::key (int i) const
+{
+    auto r = getLocalBounds().toFloat().withTrimmedTop (32.0f);
+    const float gap = 8.0f, h = (r.getHeight() - 2 * gap) / 3.0f;
+    return { r.getX(), r.getY() + (float) i * (h + gap), r.getWidth(), h };
+}
+
+void StationModeKeys::mouseDown (const MouseEvent& e)
+{
+    for (int i = 0; i < 3; ++i)
+        if (key (i).contains (e.position))
+            att.setValueAsCompleteGesture ((float) i);
+}
+
+void StationModeKeys::mouseMove (const MouseEvent& e)
+{
+    int h = -1;
+    for (int i = 0; i < 3; ++i) if (key (i).contains (e.position)) h = i;
+    if (h != hover) { hover = h; repaint(); }
+}
+
+void StationModeKeys::mouseExit (const MouseEvent&) { hover = -1; repaint(); }
+
+void StationModeKeys::paint (Graphics& g)
+{
+    g.setColour (amber);
+    g.setFont (bold (17.0f));
+    g.drawText ("APARELHO", getLocalBounds().toFloat().withHeight (30.0f), Justification::centred);
+
+    static const char* names[] = { "R\xc3\x81" "DIO AM", "TELEFONE", "MEGAFONE" };
+    for (int i = 0; i < 3; ++i)
+    {
+        const bool on = i == mode, over = i == hover;
+        auto r = key (i).reduced (1.0f);
+        // sombra + aro cromado
+        g.setColour (Colours::black.withAlpha (0.55f));
+        g.fillRoundedRectangle (r.translated (1.5f, 3.0f), 7.0f);
+        g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), r.getX(), r.getY(), Colour (0xff4c4c4c), r.getRight(), r.getBottom(), false));
+        g.fillRoundedRectangle (r, 7.0f);
+        // tecla de baquelite (afundada quando escolhida)
+        auto cap = r.reduced (3.0f).translated (0, on ? 1.5f : 0.0f);
+        g.setGradientFill (ColourGradient (Colour (on ? 0xff1a1714 : (over ? 0xff3a3633 : 0xff2e2b28)), 0, cap.getY(),
+                                           Colour (on ? 0xff050505 : 0xff0d0c0b), 0, cap.getBottom(), false));
+        g.fillRoundedRectangle (cap, 5.0f);
+        if (on)
+        {
+            g.setGradientFill (ColourGradient (amber.withAlpha (0.20f), cap.getCentreX(), cap.getCentreY(), amber.withAlpha (0.0f), cap.getRight(), cap.getCentreY(), true));
+            g.fillRoundedRectangle (cap, 5.0f);
+        }
+        // desenho do aparelho + nome + lâmpada
+        auto iconArea = cap.withWidth (cap.getHeight() * 1.6f).reduced (8.0f, 6.0f).translated (6.0f, 0);
+        drawLineIcon (g, i, iconArea, on ? amber : cream.withAlpha (over ? 0.95f : 0.75f));
+        auto txt = cap.withTrimmedLeft (iconArea.getRight() - cap.getX() + 14.0f).withTrimmedRight (22.0f);
+        g.setColour (on ? amber : cream.withAlpha (0.85f));
+        g.setFont (bold (12.5f).withExtraKerningFactor (0.08f));
+        g.drawText (String::fromUTF8 (names[i]), txt, Justification::centredLeft);
+        const auto lp = Point<float> (cap.getRight() - 13.0f, cap.getCentreY());
+        if (on)
+        {
+            g.setColour (amber.withAlpha (0.35f));
+            g.fillEllipse (lp.x - 7, lp.y - 7, 14, 14);
+        }
+        g.setColour (on ? amber : lampOff);
+        g.fillEllipse (lp.x - 4, lp.y - 4, 8, 8);
+    }
+}
+
+//==============================================================================
 StationPanel::StationPanel (RadioFoneProcessor& p)
-    : proc (p), throwBtn ("THROW", p.apvts.getParameter ("throw"))
+    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), throwBtn ("THROW", p.apvts.getParameter ("throw"))
 {
     setLookAndFeel (&lnf);
     setSize (kW, kH);
 
-    setupKnob (mode,   "mode",   "APARELHO", 0);
-    mode.slider.getProperties().set ("scaleLabels", String::fromUTF8 ("RÁDIO AM|TELEFONE|MEGAFONE"));
+    addAndMakeVisible (modeKeys);
     setupKnob (tune,   "tune",   "SINTONIA", 0);
     tune.slider.getProperties().set ("scaleLabels", "540|600|700|800|1000|1200|1600");
     setupKnob (band,   "band",   "BANDA", 1);
@@ -180,6 +329,7 @@ StationPanel::StationPanel (RadioFoneProcessor& p)
     setupToggle (echoSync, "echoSync", "SYNC");
     setupToggle (echoPP, "echoPP", "PING-PONG");
     setupToggle (bypassBtn, "bypass", "BYPASS");
+    bypassBtn.button.getProperties().set ("big", true);
     addAndMakeVisible (throwBtn);
     throwBtn.setTooltip ("Segure para jogar a voz no eco");
 
@@ -260,7 +410,7 @@ void StationPanel::resized()
     auto rowB = rows;
 
     // linha A: APARELHO e SINTONIA gigantes, depois os quatro médios
-    place (mode, rowA.removeFromLeft (226), 34);
+    modeKeys.setBounds (rowA.removeFromLeft (226).reduced (14, 2));
     place (tune, rowA.removeFromLeft (226), 34);
     const int wm = 108;
     rowA.removeFromLeft ((rowA.getWidth() - 4 * wm) / 2);
@@ -294,9 +444,9 @@ void StationPanel::resized()
     const int ws = ra.getWidth() / 3;
     for (auto* k : { &mix, &dry, &out })
         place (*k, ra.removeFromLeft (ws), 15);
-    bottom = bottom.withSizeKeepingCentre (268, 28);
-    bypassBtn.button.setBounds (bottom.removeFromLeft (118));
-    skinBtn.setBounds (bottom.removeFromRight (140));
+    skinBtn.setBounds (bottom.withSizeKeepingCentre (150, 28));
+    // BYPASS grande no painel de cima, entre "FEITO NO BRASIL" e a lâmpada NO AR
+    bypassBtn.button.setBounds ((int) plateArea.getX() + 120, topPanel.getBottom() - 46, 116, 36);
 
     renderBackground();
 }
@@ -304,14 +454,16 @@ void StationPanel::resized()
 //==============================================================================
 String StationPanel::statusText()
 {
-    Knob* all[] = { &mode, &tune, &band, &drive, &noise, &defect, &echoDiv, &echoMs, &echoHeads,
+    if (modeKeys.getHover() >= 0)
+        return String::fromUTF8 ("APARELHO:  clique para escolher");
+    Knob* all[] = { &tune, &band, &drive, &noise, &defect, &echoDiv, &echoMs, &echoHeads,
                     &echoFb, &echoTone, &echoWow, &echoSend, &mix, &dry, &out };
     for (auto* k : all)
         if (k->slider.isVisible() && k->slider.isMouseOverOrDragging())
             return k->name + ":  " + k->slider.getTextFromValue (k->slider.getValue());
 
     static const char* modes[] = { "R\xc3\x81" "DIO AM", "TELEFONE", "MEGAFONE" };
-    String t = String::fromUTF8 (modes[jlimit (0, 2, (int) mode.slider.getValue())]) + "  -  eco ";
+    String t = String::fromUTF8 (modes[jlimit (0, 2, modeKeys.getMode())]) + "  -  eco ";
     if (echoSync.button.getToggleState())
         t << RadioFoneProcessor::divisionNames()[jlimit (0, 6, (int) echoDiv.slider.getValue())]
           << " @ " << roundToInt (proc.getDisplayBpm()) << " BPM";
@@ -367,9 +519,9 @@ void StationPanel::paint (Graphics& g)
     const auto inset = Rectangle<float> (pl.getRight() - 70, pl.getY() + 17, 54, 46);
     g.setFont (toon::title (23.0f));
     g.setColour (amber.withAlpha (0.35f));
-    g.drawText ("1.1", inset.expanded (1.0f), Justification::centred);
+    g.drawText ("1.2", inset.expanded (1.0f), Justification::centred);
     g.setColour (amber);
-    g.drawText ("1.1", inset, Justification::centred);
+    g.drawText ("1.2", inset, Justification::centred);
 
     // assinatura "Dub Station Solutions" em tinta marrom, com traço
     {
@@ -713,7 +865,7 @@ void StationPanel::renderBackground()
     g.drawRoundedRectangle (plate, 6.0f, 1.0f);
 
     // poços destacados atrás de APARELHO e SINTONIA: rebaixo + aro cromado + brilho âmbar
-    for (auto* k : { &mode, &tune })
+    for (auto* k : { &tune })
     {
         const auto kb = k->slider.getBounds().toFloat();
         const auto c = kb.getCentre();

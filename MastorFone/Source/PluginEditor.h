@@ -142,6 +142,23 @@ public:
     void drawButtonText (juce::Graphics&, juce::TextButton&, bool, bool) override;
 };
 
+// Teclas com os desenhos dos aparelhos (visual Dub Station): clique para escolher
+class StationModeKeys : public juce::Component
+{
+public:
+    explicit StationModeKeys (juce::RangedAudioParameter&);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseMove (const juce::MouseEvent&) override;
+    void mouseExit (const juce::MouseEvent&) override;
+    int getMode() const { return mode; }
+    int getHover() const { return hover; }
+private:
+    juce::Rectangle<float> key (int i) const;
+    juce::ParameterAttachment att;
+    int mode = 0, hover = -1;
+};
+
 class StationPanel : public juce::Component, private juce::Timer
 {
 public:
@@ -181,7 +198,8 @@ private:
     RadioFoneProcessor& proc;
     StationLookAndFeel lnf;
 
-    Knob mode, tune, band, drive, noise, defect;
+    StationModeKeys modeKeys;
+    Knob tune, band, drive, noise, defect;
     Knob echoDiv, echoMs, echoHeads, echoFb, echoTone, echoWow, echoSend;
     Knob mix, dry, out;
     Toggle echoSync, echoPP, bypassBtn;
