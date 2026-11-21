@@ -1,10 +1,11 @@
-# Mastor Bass Machine MBM-710 — 1.0
+# Mastor Bass Machine MBM-710 — 2.0 · Gerador de Reggae Bass Lines
 
-Primeira versão do gerador de linhas de baixo da família Dub Station.
+- Botoeira de 7 teclas intertravadas no lugar da chave rotativa: **Family Man**, **Flabba**, **Derrick Barnett** (antes "Sagittarius"), e os novos **Robbie** (Shakespeare), **Leroy Sibbles**, **Fully Fullwood** e **Jammys** (Sleng Teng)
+- Novo timbre **SLENG TENG** (teclado digital de 1985) no sistema de timbres do Dub Bass
+- **Bateria de acompanhamento** no preview: Roots, One Drop (kit acústico do Dub Drums), Digital e Dancehall (kit eletrônico anos 80)
+- **Teclado do Mastor Roots Keys** no preview: skank do piano M1, bubble do órgão B3 ou os dois, seguindo a harmonia
+- Plaqueta dourada **DUB STATION 2.0** e o nome "Gerador de Reggae Bass Lines"
+- As notas de aproximação agora caem sempre colado na tônica seguinte; limitador suave na saída do preview
 
-- Chave seletora de estilo: **Family Man** (one drop melódico), **Flabba** (rub-a-dub hipnótico) e **Sagittarius** (dancehall ao vivo)
-- Harmonia de até 4 acordes (maior, menor, 7, m7) com duração de 1/2 a 8 compassos
-- IDEIA numerada (volte a uma linha de que gostou) e botão NOVA IDEIA
-- Densidade, variação, swing, registro, velocity e sustentação
-- PLAY para ouvir sem a DAW, com os timbres do Dub Bass (Classic Sine, Sine Quente, Sub Puro, Fita Roots, 808, 808 Fuzz), GANHO de entrada, tone, drive e osciloscópio; nível geral 5 dB abaixo do Dub Bass de tubo verde
-- Arraste o MIDI para a timeline ou exporte o `.mid` (1, 2, 4 ou 8 repetições)
+## 1.0
+- Estilos Family Man, Flabba e Sagittarius; harmonia de 4 acordes; IDEIA numerada; PLAY com os timbres do Dub Bass, GANHO de entrada e osciloscópio; arrastar/exportar MIDI

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(BassMachine VERSION 1.0.0)
+project(BassMachine VERSION 2.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -45,6 +45,9 @@ if(BASSMACHINE_PLUGIN)
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp)
 
+    # timbres compartilhados: piano M1 + Hammond do Roots Keys (usados pela ponte do Dub Chords)
+    target_include_directories(BassMachine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)
+
     target_compile_definitions(BassMachine PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
@@ -70,8 +73,9 @@ if(BASSMACHINE_SNAPSHOT)
     target_compile_definitions(BassMachineSnapshot PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="BassMachine" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
+        JucePlugin_Name="BassMachine" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
+    target_include_directories(BassMachineSnapshot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)
     target_link_libraries(BassMachineSnapshot PRIVATE juce::juce_audio_utils juce::juce_dsp
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 endif()

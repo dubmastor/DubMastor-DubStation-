@@ -64,6 +64,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "drive", 1 }, "Drive", 0.0f, 1.0f, 0.5f));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "volume", 1 }, "Volume", 0.0f, 1.0f, 0.75f));
 
+    // acompanhamento do preview
+    StringArray drumStyles, keysModes;
+    for (int d = 0; d < mbm::NumDrumStyles; ++d) drumStyles.add (mbm::drumStyleName (d));
+    for (int k = 0; k < mbm::NumKeysModes; ++k) keysModes.add (mbm::keysModeName (k));
+    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "drumsOn", 1 }, "Bateria", false));
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "drumStyle", 1 }, "Bateria estilo", drumStyles, mbm::DrumOneDrop));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "drumVol", 1 }, "Bateria volume", 0.0f, 1.0f, 0.7f));
+    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "keysOn", 1 }, "Teclado Roots Keys", false));
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "keysMode", 1 }, "Teclado instrumento", keysModes, mbm::KeysPiano));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "keysVol", 1 }, "Teclado volume", 0.0f, 1.0f, 0.6f));
+
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "exportReps", 1 }, "Repeticoes no export",
                                                         StringArray { "1x", "2x", "4x", "8x" }, 1));
     return layout;
@@ -79,6 +90,7 @@ BassMachineProcessor::BassMachineProcessor()
             apvts.addParameterListener (withId->paramID, this);
 
     pending.reserve (1024);
+    accPending.reserve (4096);
 }
 
 BassMachineProcessor::~BassMachineProcessor()
@@ -100,6 +112,9 @@ void BassMachineProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     synth.prepare (sampleRate, samplesPerBlock);
     monoBuf.setSize (1, juce::jmax (1, samplesPerBlock), false, true, false);
     setLatencySamples (synth.getLatencySamples());
+    acousticDrums.prepare (sampleRate);
+    digitalDrums.prepare (sampleRate);
+    keys.prepare (sampleRate);
     dirty.store (true);
 }
 
@@ -155,11 +170,29 @@ double BassMachineProcessor::getExportBpm() const
 
 void BassMachineProcessor::rebuild()
 {
-    loop = mbm::buildLoop (getSlots(), getSettings(), loopBeats);
+    const auto slots = getSlots();
+    const auto s = getSettings();
+    loop = mbm::buildLoop (slots, s, loopBeats);
+    accLoop.clear();
+    if (param ("drumsOn") > 0.5f)
+        accLoop = mbm::buildDrums (loopBeats, (int) param ("drumStyle"), s.swing);
+    if (param ("keysOn") > 0.5f)
+    {
+        const auto k = mbm::buildKeys (slots, (int) param ("keysMode"), s.swing);
+        accLoop.insert (accLoop.end(), k.begin(), k.end());
+    }
+    std::stable_sort (accLoop.begin(), accLoop.end(), [] (const mbm::AccEvent& a, const mbm::AccEvent& b) { return a.start < b.start; });
+}
+
+void BassMachineProcessor::accompOff()
+{
+    keys.allNotesOff();
+    for (auto& row : keysActive) for (auto& a : row) a = false;
 }
 
 void BassMachineProcessor::allNotesOff (juce::MidiBuffer& midi, int sample)
 {
+    accompOff();
     for (int n = 0; n < 128; ++n)
         if (active[n])
         {
@@ -218,6 +251,7 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
         const double end = ppq + blockBeats;
         pending.clear();
+        accPending.clear();
 
         auto collect = [&] (double t, bool on, const mbm::NoteEvent& e)
         {
@@ -238,6 +272,27 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
             collect (e.start, true, e);
             collect (e.start + e.length, false, e);
         }
+
+        // acompanhamento (bateria e teclado): só o som interno, não sai como MIDI
+        auto collectAcc = [&] (double t, bool on, const mbm::AccEvent& e)
+        {
+            double occ = t + std::ceil ((ppq - t) / loopBeats) * loopBeats;
+            for (; occ < end; occ += loopBeats)
+                if (occ >= ppq)
+                    accPending.push_back ({ juce::jlimit (0, numSamples - 1, (int) ((occ - ppq) / blockBeats * numSamples)),
+                                            on, e.target, e.note, e.velocity });
+        };
+        for (const auto& e : accLoop)
+        {
+            collectAcc (e.start, true, e);
+            if (e.target == mbm::AccPiano || e.target == mbm::AccOrgan)
+                collectAcc (e.start + e.length, false, e);
+        }
+        std::sort (accPending.begin(), accPending.end(), [] (const AccPending& a, const AccPending& b)
+        {
+            if (a.sample != b.sample) return a.sample < b.sample;
+            return (int) a.on < (int) b.on;
+        });
 
         // note-offs antes de note-ons na mesma amostra
         std::sort (pending.begin(), pending.end(), [] (const Pending& a, const Pending& b)
@@ -274,9 +329,8 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
     renderSynth (buffer, midi);
 
     if (param ("sound") < 0.5f) buffer.clear();
-    else buffer.applyGain (param ("volume"));
 
-    // osciloscópio
+    // osciloscópio: só o baixo
     int sw = scopeWrite.load (std::memory_order_relaxed);
     const float* l = buffer.getReadPointer (0);
     const float* r = buffer.getReadPointer (buffer.getNumChannels() > 1 ? 1 : 0);
@@ -286,6 +340,70 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         sw = (sw + 1) & (kScopeSize - 1);
     }
     scopeWrite.store (sw, std::memory_order_release);
+
+    // bateria e teclado por cima do baixo; VOLUME é o master do preview
+    const bool keysOn = param ("keysOn") > 0.5f;
+    if (lastKeysOn && ! keysOn) accompOff();
+    lastKeysOn = keysOn;
+    if (! playing) accPending.clear();
+    renderAccomp (buffer, numSamples);
+    buffer.applyGain (param ("volume"));
+
+    // limitador suave de segurança: acima de 0,8 o pico entra num joelho de tanh e nunca passa de 1
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    {
+        float* d = buffer.getWritePointer (ch);
+        for (int i = 0; i < numSamples; ++i)
+        {
+            const float a = std::abs (d[i]);
+            if (a > 0.8f) d[i] = std::copysign (0.8f + 0.2f * std::tanh ((a - 0.8f) / 0.2f), d[i]);
+        }
+    }
+}
+
+void BassMachineProcessor::renderAccomp (juce::AudioBuffer<float>& buffer, int numSamples)
+{
+    float* L = buffer.getWritePointer (0);
+    float* R = buffer.getNumChannels() > 1 ? buffer.getWritePointer (1) : nullptr;
+    const float drumGain = 1.1f * param ("drumVol");
+    keys.master = 2.2f * param ("keysVol");
+    keys.pianoLevel = 0.8f;
+    keys.organLevel = 0.55f;
+
+    // o motor do teclado soma em estéreo: em mono, soma num rascunho e copia
+    float scratchR[512];
+    auto renderSeg = [&] (int from, int to)
+    {
+        if (to <= from) return;
+        acousticDrums.render (L, R, from, to - from, drumGain);
+        digitalDrums.render (L, R, from, to - from, drumGain);
+        for (int p = from; p < to; p += 512)
+        {
+            const int n = juce::jmin (512, to - p);
+            keys.render (L + p, R != nullptr ? R + p : scratchR, n);
+        }
+    };
+
+    int pos = 0;
+    for (const auto& a : accPending)
+    {
+        renderSeg (pos, a.sample);
+        pos = juce::jmax (pos, a.sample);
+        switch (a.target)
+        {
+            case mbm::AccAcousticDrum: acousticDrums.trigger (a.note, a.vel); break;
+            case mbm::AccDigitalDrum:  digitalDrums.trigger (a.note, a.vel); break;
+            default:
+            {
+                const int ch = a.target == mbm::AccOrgan ? 3 : 1;
+                bool& act = keysActive[a.target == mbm::AccOrgan ? 1 : 0][juce::jlimit (0, 127, a.note)];
+                if (a.on) { if (act) keys.noteOff (ch, a.note); keys.noteOn (ch, a.note, (float) a.vel / 127.0f); act = true; }
+                else if (act) { keys.noteOff (ch, a.note); act = false; }
+                break;
+            }
+        }
+    }
+    renderSeg (pos, numSamples);
 }
 
 // voz do Dub Bass com precisão de amostra: renderiza os trechos entre os eventos MIDI,

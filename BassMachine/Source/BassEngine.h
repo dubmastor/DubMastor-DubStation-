@@ -8,8 +8,16 @@
 //  FLABBA      (Errol "Flabba" Holt, Roots Radics)    — rub-a-dub do começo dos anos 80: som redondo e
 //              grave, notas longas, a fundamental no 1, quinta e sétima abaixo da tônica. Um riff curto
 //              que se repete hipnoticamente, quase sem variação.
-//  SAGITTARIUS (Derrick Barnett, Sagittarius Band)    — dancehall ao vivo dos anos 80/90: ataque curto,
+//  DERRICK BARNETT (Sagittarius Band)                 — dancehall ao vivo dos anos 80/90: ataque curto,
 //              síncope 3-3-2, oitavas "estaladas", corridas de semicolcheias nas viradas.
+//  ROBBIE      (Robbie Shakespeare, Sly & Robbie)    — rockers da Channel One: sincopado, firme e quase
+//              mecânico, com o balanço do funk e do soul; fundamental no 1, oitavas e cromatismos.
+//  LEROY SIBBLES (Heptones, Studio One)              — rocksteady/roots melódico: notas esticadas em linhas
+//              cantadas, frases que descem pela escala e a nota sempre um pouco atrás do tempo.
+//  FULLY FULLWOOD (Soul Syndicate)                   — riffs de riddim dos anos 70: gancho melódico de dois
+//              compassos com saltos de oitava e anacruses de semicolcheia, repetido como assinatura.
+//  JAMMYS      (King Jammy, Sleng Teng, 1985)        — o primeiro riddim digital: riff curto de teclado
+//              Casio em semicolcheias, staccato, menor, repetido sem parar; pede o timbre SLENG TENG.
 //
 // A harmonia vem de até 4 acordes (tônica, tipo e duração). As notas de passagem e de aproximação
 // usam o acorde seguinte, então a linha "chama" a próxima tônica.
@@ -24,17 +32,18 @@ namespace mbm
 {
 //==============================================================================
 // Estilos
-enum Style { FamilyMan, Flabba, Sagittarius, NumStyles };
+enum Style { FamilyMan, Flabba, DerrickBarnett, Robbie, LeroySibbles, FullyFullwood, Jammys, NumStyles };
 
 inline const char* styleName (int s)
 {
-    static const char* n[NumStyles] = { "FAMILY MAN", "FLABBA", "SAGITTARIUS" };
+    static const char* n[NumStyles] = { "FAMILY MAN", "FLABBA", "DERRICK BARNETT", "ROBBIE", "LEROY SIBBLES", "FULLY FULLWOOD", "JAMMYS" };
     return n[std::clamp (s, 0, NumStyles - 1)];
 }
 
 inline const char* styleTagline (int s)
 {
-    static const char* n[NumStyles] = { "ONE DROP MELODICO", "RUB-A-DUB HIPNOTICO", "DANCEHALL AO VIVO" };
+    static const char* n[NumStyles] = { "ONE DROP MELODICO", "RUB-A-DUB HIPNOTICO", "DANCEHALL AO VIVO", "ROCKERS DA CHANNEL ONE",
+                                         "STUDIO ONE CANTADO", "RIFF DE RIDDIM 70s", "SLENG TENG DIGITAL 85" };
     return n[std::clamp (s, 0, NumStyles - 1)];
 }
 
@@ -129,6 +138,7 @@ struct StyleBook
     float varScale;          // quanto o estilo aceita variar
     float newCellChance;     // chance de cada acorde trocar de célula (0 = riff único)
     int phraseBars;          // tamanho da frase (virada no último compasso)
+    double lag = 0.0;        // microtempo: atraso fixo de todas as notas (tempos)
 };
 
 inline constexpr double t3 = 1.0 / 3.0;   // tercina
@@ -215,6 +225,101 @@ inline const StyleBook& book (int style)
               { 3.5, 0.22, LOW5, 0.80f, true }, { 3.75, 0.22, APP, 0.95f, false } },
           },
           0.0f, 0.8f, 0.5f, 2 },
+
+        // ---------------------------------------------------------------- ROBBIE
+        { {
+            // rockers: fundamental firme no 1, quinta e oitava empurrando
+            { { 0.0, 0.45, R, 1.0f, false }, { 0.75, 0.2, R, 0.70f, true }, { 1.0, 0.45, T5, 0.90f, false },
+              { 1.5, 0.4, OCT, 0.95f, false }, { 2.0, 0.45, R, 1.0f, false }, { 2.5, 0.2, T7, 0.75f, true },
+              { 2.75, 0.4, OCT, 0.90f, false }, { 3.5, 0.4, T5, 0.85f, false } },
+            // síncope de taxi: deixa o 3 vazio e cai no "e"
+            { { 0.0, 0.7, R, 1.0f, false }, { 0.75, 0.2, T3, 0.75f, false }, { 1.0, 0.45, T5, 0.90f, false },
+              { 1.75, 0.6, R, 0.90f, false }, { 2.5, 0.45, LOW7, 0.85f, false }, { 3.0, 0.45, R, 0.95f, false },
+              { 3.5, 0.4, T3, 0.80f, true } },
+            // funk: semicolcheias com oitava e sétima
+            { { 0.0, 0.3, R, 1.0f, false }, { 0.5, 0.2, R, 0.65f, true }, { 0.75, 0.2, OCT, 0.85f, false },
+              { 1.0, 0.2, T7, 0.75f, false }, { 1.25, 0.2, OCT, 0.70f, true }, { 1.5, 0.45, T5, 0.90f, false },
+              { 2.25, 0.4, R, 0.90f, false }, { 3.0, 0.22, T3, 0.80f, false }, { 3.25, 0.22, S4, 0.75f, false },
+              { 3.5, 0.4, T5, 0.90f, false } },
+          },
+          {
+            // subida cromática até a próxima tônica
+            { { 0.0, 0.45, R, 1.0f, false }, { 0.75, 0.2, R, 0.70f, true }, { 1.0, 0.45, T5, 0.90f, false },
+              { 1.5, 0.4, OCT, 0.95f, false }, { 2.0, 0.45, R, 1.0f, false }, { 3.0, 0.22, T5, 0.85f, false },
+              { 3.25, 0.22, S6, 0.80f, false }, { 3.5, 0.22, T7, 0.85f, false }, { 3.75, 0.22, APP, 0.95f, false } },
+            { { 0.0, 0.7, R, 1.0f, false }, { 0.75, 0.2, T3, 0.75f, false }, { 1.0, 0.45, T5, 0.90f, false },
+              { 2.0, 0.22, OCT, 0.90f, false }, { 2.25, 0.22, T7, 0.80f, false }, { 2.5, 0.22, T5, 0.85f, false },
+              { 2.75, 0.22, T3, 0.80f, false }, { 3.0, 0.45, R, 0.90f, false }, { 3.5, 0.45, APP, 0.95f, false } },
+          },
+          0.0f, 0.7f, 0.4f, 2, 0.0 },
+
+        // ---------------------------------------------------------------- LEROY SIBBLES
+        { {
+            // linha cantada: R 3 5 6 5
+            { { 0.0, 0.9, R, 1.0f, false }, { 1.0, 0.45, T3, 0.80f, false }, { 1.5, 0.9, T5, 0.90f, false },
+              { 2.5, 0.45, S6, 0.80f, true }, { 3.0, 0.9, T5, 0.85f, false } },
+            // nota esticada e oitava
+            { { 0.0, 1.4, R, 1.0f, false }, { 1.5, 0.45, T5, 0.85f, false }, { 2.0, 0.9, OCT, 0.90f, false },
+              { 3.0, 0.45, T7, 0.80f, true }, { 3.5, 0.45, T5, 0.80f, false } },
+            // frase que desce pela escala
+            { { 0.0, 0.45, OCT, 1.0f, false }, { 0.5, 0.45, T7, 0.85f, false }, { 1.0, 0.9, T5, 0.90f, false },
+              { 2.0, 0.45, T3, 0.85f, false }, { 2.5, 0.45, S2, 0.75f, true }, { 3.0, 0.9, R, 0.90f, false } },
+            // espaço: respira no meio do compasso
+            { { 0.0, 0.7, R, 1.0f, false }, { 1.0, 0.45, R, 0.70f, true }, { 1.5, 0.45, T3, 0.80f, false },
+              { 2.0, 1.4, T5, 0.90f, false }, { 3.5, 0.45, S6, 0.75f, true } },
+          },
+          {
+            { { 0.0, 0.9, R, 1.0f, false }, { 1.0, 0.45, T5, 0.85f, false }, { 1.5, 0.45, T3, 0.80f, false },
+              { 2.0, 0.45, S2, 0.75f, false }, { 2.5, 0.45, R, 0.85f, false }, { 3.0, 0.45, LOW7, 0.80f, false },
+              { 3.5, 0.45, APP, 0.90f, false } },
+            { { 0.0, 1.4, R, 1.0f, false }, { 2.0, 0.45, T3, 0.85f, false }, { 2.5, 0.45, T5, 0.85f, false },
+              { 3.0, 0.45, S6, 0.80f, false }, { 3.5, 0.45, APP, 0.90f, false } },
+          },
+          0.2f, 0.5f, 0.3f, 2, 0.035 },
+
+        // ---------------------------------------------------------------- FULLY FULLWOOD
+        { {
+            // gancho com terça na anacruse e subida para a oitava
+            { { 0.0, 0.4, R, 1.0f, false }, { 0.5, 0.2, R, 0.65f, true }, { 0.75, 0.2, T3, 0.80f, false },
+              { 1.0, 0.9, T5, 0.90f, false }, { 2.0, 0.45, OCT, 0.95f, false }, { 2.5, 0.45, T7, 0.85f, false },
+              { 3.0, 0.45, T5, 0.85f, false }, { 3.5, 0.45, T3, 0.80f, false } },
+            // entra no "e" do 1 e salta de oitava no 3
+            { { 0.5, 0.45, R, 1.0f, false }, { 1.0, 0.2, R, 0.70f, false }, { 1.25, 0.2, T3, 0.75f, false },
+              { 1.5, 0.45, T5, 0.90f, false }, { 2.0, 0.9, OCT, 0.95f, false }, { 3.0, 0.22, T7, 0.80f, false },
+              { 3.25, 0.22, T5, 0.80f, false }, { 3.5, 0.45, T3, 0.85f, false } },
+            // passeio grave: sétima abaixo e volta
+            { { 0.0, 0.9, R, 1.0f, false }, { 1.0, 0.45, LOW7, 0.80f, false }, { 1.5, 0.45, R, 0.85f, false },
+              { 2.0, 0.45, T3, 0.85f, false }, { 2.5, 0.45, T5, 0.85f, false }, { 3.0, 0.45, T5, 0.70f, true },
+              { 3.5, 0.45, OCT, 0.90f, false } },
+          },
+          {
+            { { 0.0, 0.4, R, 1.0f, false }, { 0.75, 0.2, T3, 0.80f, false }, { 1.0, 0.9, T5, 0.90f, false },
+              { 2.0, 0.45, OCT, 0.95f, false }, { 3.0, 0.22, T5, 0.85f, false }, { 3.25, 0.22, T3, 0.80f, false },
+              { 3.5, 0.22, S2, 0.80f, false }, { 3.75, 0.22, APP, 0.95f, false } },
+          },
+          0.25f, 0.6f, 0.2f, 2, 0.0 },
+
+        // ---------------------------------------------------------------- JAMMYS (Sleng Teng)
+        { {
+            // riff de teclado em semicolcheias: R 3 4 5 em volta da tônica
+            { { 0.0, 0.2, R, 1.0f, false }, { 0.5, 0.2, R, 0.80f, false }, { 0.75, 0.2, T3, 0.85f, false },
+              { 1.25, 0.2, R, 0.80f, false }, { 1.5, 0.2, S4, 0.85f, false }, { 2.0, 0.2, T5, 0.95f, false },
+              { 2.5, 0.2, R, 0.80f, false }, { 2.75, 0.2, T3, 0.85f, false }, { 3.25, 0.2, S4, 0.80f, true },
+              { 3.5, 0.2, T3, 0.85f, false } },
+            { { 0.0, 0.25, R, 1.0f, false }, { 0.75, 0.25, R, 0.85f, false }, { 1.5, 0.25, T3, 0.85f, false },
+              { 2.0, 0.25, S4, 0.90f, false }, { 2.25, 0.2, T5, 0.75f, true }, { 2.5, 0.25, S4, 0.85f, false },
+              { 3.0, 0.25, T3, 0.85f, false }, { 3.5, 0.25, R, 0.90f, false } },
+            { { 0.0, 0.2, R, 1.0f, false }, { 0.25, 0.2, R, 0.65f, true }, { 0.5, 0.2, OCT, 0.90f, false },
+              { 1.0, 0.2, R, 0.85f, false }, { 1.5, 0.2, T3, 0.85f, false }, { 1.75, 0.2, S4, 0.80f, false },
+              { 2.0, 0.45, T5, 0.95f, false }, { 3.0, 0.2, S4, 0.80f, false }, { 3.5, 0.2, T3, 0.85f, false } },
+          },
+          {
+            { { 0.0, 0.2, R, 1.0f, false }, { 0.5, 0.2, R, 0.80f, false }, { 0.75, 0.2, T3, 0.85f, false },
+              { 1.25, 0.2, R, 0.80f, false }, { 1.5, 0.2, S4, 0.85f, false }, { 2.0, 0.2, T5, 0.95f, false },
+              { 2.5, 0.2, OCT, 0.90f, false }, { 3.0, 0.2, T5, 0.85f, false }, { 3.25, 0.2, S4, 0.80f, false },
+              { 3.5, 0.2, T3, 0.85f, false }, { 3.75, 0.2, APP, 0.95f, false } },
+          },
+          0.0f, 0.3f, 0.0f, 4, 0.0 },
     };
     return books[std::clamp (style, 0, NumStyles - 1)];
 }
@@ -268,13 +373,11 @@ inline int fitRange (int n)
     return n;
 }
 
-// Nota de aproximação: chega na próxima tônica pela nota mais próxima de onde a linha está
+// Nota de aproximação: encosta na tônica que o próximo acorde vai tocar (mesmo registro)
 inline int approachNote (int prevNote, int nextRoot, int base, Rng& rng)
 {
-    int target = base + pc (nextRoot - base);
-    // escolhe a oitava do alvo mais próxima da nota anterior
-    while (target - prevNote > 6) target -= 12;
-    while (prevNote - target > 6) target += 12;
+    (void) prevNote;
+    const int target = base + pc (nextRoot - base);
     const float r = rng.uniform();
     int n;
     if (r < 0.5f)       n = target - 1;   // cromática por baixo
@@ -350,6 +453,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
                 if (std::abs (frac - 0.5) < 1e-6)                                  st += swing * (2.0 / 3.0 - 0.5);
                 else if (std::abs (frac - 0.25) < 1e-6 || std::abs (frac - 0.75) < 1e-6) st += swing * (1.0 / 12.0);
 
+                st += bk.lag;   // microtempo do estilo (Leroy Sibbles atrás do tempo)
                 const float human = 0.92f + 0.16f * rng.uniform();
                 const int vel = std::clamp ((int) std::lround (c.vel * s.velocity * human * 127.0f), 1, 127);
                 ev.push_back ({ barStart + st, c.len * sustain, note, vel, slotIdx, useFill });

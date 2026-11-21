@@ -23,7 +23,7 @@ struct DubBassPreset
     float driveDb, drvToneHz, drvMix;
 };
 
-enum TimbreId { ClassicSine, SineQuente, SubPuro, FitaRoots, Eight08, Fuzz808, NumTimbres };
+enum TimbreId { ClassicSine, SineQuente, SubPuro, FitaRoots, Eight08, Fuzz808, SlengTeng, NumTimbres };
 
 inline const DubBassPreset& timbre (int i)
 {
@@ -36,6 +36,8 @@ inline const DubBassPreset& timbre (int i)
         { "FITA ROOTS",    "SATURACAO DE FITA", M::ClassicSine, 0.30f, 0.15f, 12.0f, 70.0f, 2.0f, 420.0f, 0.60f, 140.0f, 700.0f, 1.2f, 1, 10.0f, 3000.0f, 0.70f },
         { "808",           "DROP DE PITCH",     M::Eight08,     0.10f, 0.05f, 12.0f, 70.0f, 1.0f, 600.0f, 0.0f,  180.0f, 2000.0f, 0.8f, 0, 6.0f,  5000.0f, 0.50f },
         { "808 FUZZ",      "808 CURTO COM FUZZ",            M::Eight08,     0.10f, 0.05f, 7.0f,  40.0f, 1.0f, 350.0f, 0.0f,  120.0f, 3000.0f, 0.8f, 2, 9.0f,  3500.0f, 0.45f },
+        // teclado Casio de 1985: senoide + 3º harmônico quadrada no FUZZ, ataque seco e decaimento curto
+        { "SLENG TENG",    "TECLADO DIGITAL 85 (JAMMYS)",   M::ClassicSine, 0.0f,  0.60f, 12.0f, 70.0f, 1.0f, 300.0f, 0.55f, 60.0f, 1800.0f, 0.9f, 2, 18.0f, 6000.0f, 1.00f },
     };
     return t[std::clamp (i, 0, NumTimbres - 1)];
 }

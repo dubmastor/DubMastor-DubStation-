@@ -1,4 +1,10 @@
 #include "PluginEditor.h"
+#include <tuple>
+
+#ifndef JucePlugin_VersionString
+ #define JucePlugin_VersionString "2.0.0"
+#endif
+static juce::String versionShort() { return juce::String (JucePlugin_VersionString).upToLastOccurrenceOf (".", false, false); }
 
 // Visual da família DubMastor: painel de metal creme envelhecido, laterais de madeira, knobs de
 // baquelite com saia de alumínio, lâmpadas piloto e displays âmbar (igual ao Big Knob e ao Dub Chords).
@@ -452,6 +458,80 @@ void CounterWindow::paint (juce::Graphics& g)
 }
 
 //==============================================================================
+juce::Rectangle<float> InterlockKeys::keyRect (int i) const
+{
+    auto b = getLocalBounds().toFloat().reduced (4.0f);
+    const int n = juce::jmax (1, labels.size());
+    if (vertical)
+    {
+        const float h = b.getHeight() / (float) n;
+        return { b.getX(), b.getY() + h * (float) i, b.getWidth(), h };
+    }
+    const float w = b.getWidth() / (float) n;
+    return { b.getX() + w * (float) i, b.getY(), w, b.getHeight() };
+}
+
+void InterlockKeys::mouseDown (const juce::MouseEvent& e)
+{
+    for (int i = 0; i < labels.size(); ++i)
+        if (keyRect (i).contains (e.position)) { select (i); return; }
+}
+
+void InterlockKeys::paint (juce::Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    g.setColour (juce::Colours::black.withAlpha (0.35f));                // moldura de metal escuro
+    g.fillRoundedRectangle (b.translated (0, 2.0f), 5.0f);
+    juce::ColourGradient frame (juce::Colour (0xff3a3632), b.getX(), b.getY(), juce::Colour (0xff141210), b.getX(), b.getBottom(), false);
+    g.setGradientFill (frame);
+    g.fillRoundedRectangle (b, 5.0f);
+    g.setColour (juce::Colours::white.withAlpha (0.08f));
+    g.drawRoundedRectangle (b.reduced (0.5f), 5.0f, 1.0f);
+
+    const auto mouse = getMouseXYRelative().toFloat();
+    for (int i = 0; i < labels.size(); ++i)
+    {
+        const bool on = index() == i;
+        const bool over = isMouseOver() && keyRect (i).contains (mouse);
+        auto r = keyRect (i).reduced (vertical ? 0.0f : 1.5f, vertical ? 1.2f : 0.0f).withTrimmedBottom (vertical ? 1.5f : 2.5f);
+        // vão entre as teclas
+        g.setColour (juce::Colours::black.withAlpha (0.55f));
+        g.fillRoundedRectangle (r.translated (0, 2.0f), 3.0f);
+        // tecla de baquelite: afunda quando travada
+        auto cap = r.translated (0, on ? 1.8f : 0.0f);
+        juce::ColourGradient cg (juce::Colour (on ? 0xff2a2622 : 0xff433e38).brighter (over && ! on ? 0.10f : 0.0f), cap.getX(), cap.getY(),
+                                 juce::Colour (0xff12100e), cap.getX(), cap.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRoundedRectangle (cap, 3.0f);
+        g.setColour (juce::Colours::white.withAlpha (on ? 0.04f : 0.14f));
+        g.drawHorizontalLine ((int) cap.getY() + 1, cap.getX() + 3, cap.getRight() - 3);
+        if (on)
+        {
+            g.setColour (colours::amber.withAlpha (0.10f));
+            g.fillRoundedRectangle (cap, 3.0f);
+        }
+
+        if (vertical)
+        {
+            lampAt (g, juce::Rectangle<float> (8.0f, 8.0f).withCentre ({ cap.getX() + 15.0f, cap.getCentreY() }), on);
+            g.setColour (on ? colours::cream : colours::cream.withAlpha (0.55f));
+            g.setFont (stencil (11.0f, 0.14f));
+            g.drawText (labels[i], cap.withTrimmedLeft (30.0f).withTrimmedRight (8.0f), juce::Justification::centredLeft);
+            g.setColour (colours::cream.withAlpha (0.25f));
+            g.setFont (stencil (8.0f, 0.1f));
+            g.drawText (juce::String (i + 1), cap.withTrimmedRight (10.0f), juce::Justification::centredRight);
+        }
+        else
+        {
+            lampAt (g, juce::Rectangle<float> (7.0f, 7.0f).withCentre ({ cap.getCentreX(), cap.getY() + 9.0f }), on);
+            g.setColour (on ? colours::cream : colours::cream.withAlpha (0.55f));
+            g.setFont (stencil (labels[i].length() > 7 ? 9.0f : 10.0f, 0.1f));
+            g.drawText (labels[i], cap.withTrimmedTop (15.0f), juce::Justification::centred);
+        }
+    }
+}
+
+//==============================================================================
 void PlayButton::paint (juce::Graphics& g)
 {
     const bool on = index() != 0;
@@ -707,7 +787,7 @@ void CrtScope::paint (juce::Graphics& g)
 {
     auto b = getLocalBounds().toFloat();
     juce::Path tube;
-    const auto screen = drawCrtFrame (g, b, juce::String::fromUTF8 ("OSCILOSCÓPIO  ·  SAÍDA"), tube);
+    const auto screen = drawCrtFrame (g, b, juce::String::fromUTF8 ("OSCILOSCÓPIO  ·  BAIXO"), tube);
 
     juce::Graphics::ScopedSaveState ss (g);
     g.reduceClipRegion (tube);
@@ -771,10 +851,19 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
 
     auto percent = [] (double v) { return juce::String (juce::roundToInt (v * 100.0)) + "%"; };
 
-    setupKnob (style, "style", {}, "big");
-    style.slider.setRotaryParameters (kSwStart, kSwEnd, true);
-    style.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
-    style.label.setVisible (false);
+    {
+        juce::StringArray names;
+        for (int s = 0; s < mbm::NumStyles; ++s) names.add (mbm::styleName (s));
+        styleKeys = std::make_unique<InterlockKeys> (*proc.apvts.getParameter ("style"), names, true);
+        addAndMakeVisible (*styleKeys);
+        juce::StringArray drums, kmodes;
+        for (int d = 0; d < mbm::NumDrumStyles; ++d) drums.add (mbm::drumStyleName (d));
+        kmodes.add ("PIANO M1"); kmodes.add (juce::String::fromUTF8 ("ÓRGÃO B3")); kmodes.add ("AMBOS");
+        drumKeys = std::make_unique<InterlockKeys> (*proc.apvts.getParameter ("drumStyle"), drums, false);
+        keysKeys = std::make_unique<InterlockKeys> (*proc.apvts.getParameter ("keysMode"), kmodes, false);
+        addAndMakeVisible (*drumKeys);
+        addAndMakeVisible (*keysKeys);
+    }
     setupKnob (density,   "density",   "DENSIDADE");
     setupKnob (variation, "variation", "VARIACAO");
     setupKnob (swing,     "swing",     "SWING");
@@ -806,6 +895,12 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     for (auto* k : { &tone, &drive, &volume })
         k->slider.textFromValueFunction = percent;
     setupToggle (sound, "sound", "SOM INTERNO");
+    setupToggle (drumsOn, "drumsOn", "BATERIA");
+    setupToggle (keysOn, "keysOn", "TECLADO");
+    setupKnob (drumVol, "drumVol", "VOLUME");
+    setupKnob (keysVol, "keysVol", "VOLUME");
+    for (auto* k : { &drumVol, &keysVol })
+        k->slider.textFromValueFunction = [] (double v) { return juce::String (juce::roundToInt (v * 100.0)) + "%"; };
 
     setupKnob (reps, "exportReps", "REPETIR");
     reps.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
@@ -815,7 +910,7 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     addAndMakeVisible (roll);
     addAndMakeVisible (scope);
 
-    for (auto* k : { &density, &variation, &swing, &base, &velocity, &gate, &bpm, &inGain, &tone, &drive, &volume })
+    for (auto* k : { &density, &variation, &swing, &base, &velocity, &gate, &bpm, &inGain, &tone, &drive, &volume, &drumVol, &keysVol })
         k->slider.updateText();
 
     setSize (kW, kH);
@@ -1050,7 +1145,7 @@ void BassMachinePanel::renderBackground()
 
     {   // placa de latão com o modelo
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("MBM-710");
+        const juce::String t ("DUB STATION " + versionShort());
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -1085,7 +1180,7 @@ void BassMachinePanel::renderBackground()
     }
     g.setColour (colours::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    g.drawText (juce::String::fromUTF8 ("DUBMASTOR  \xc2\xb7  GERADOR DE LINHAS DE BAIXO"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
+    g.drawText (juce::String::fromUTF8 ("MBM-710  \xc2\xb7  GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
         const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
@@ -1131,6 +1226,8 @@ void BassMachinePanel::renderBackground()
     section (timbrePanel,  juce::String::fromUTF8 ("TIMBRE  \xc2\xb7  DUB BASS"));
     section (scopePanel,   juce::String::fromUTF8 ("OSCILOSCÓPIO"));
     section (midiPanel,    "MIDI");
+    section (drumsPanel,   "BATERIA DE ACOMPANHAMENTO");
+    section (keysPanel,    juce::String::fromUTF8 ("TECLADO  \xc2\xb7  MASTOR ROOTS KEYS"));
 
     // módulos de acorde: moldura rebaixada + número gravado
     for (int i = 0; i < BassMachineProcessor::numSlots; ++i)
@@ -1166,17 +1263,19 @@ void BassMachinePanel::renderBackground()
     }
 
     // escalas
+
     {
-        juce::StringArray labels;
-        for (int s = 0; s < mbm::NumStyles; ++s) labels.add (mbm::styleName (s));
-        drawKnobScale (g, style.slider, mbm::NumStyles, labels, 92.0f);
-    }
-    {
-        juce::StringArray labels { "SINE", "QUENTE", "SUB", "FITA", "808", "FUZZ" };
+        juce::StringArray labels { "SINE", "QUENTE", "SUB", "FITA", "808", "FUZZ", "SLENG" };
         drawKnobScale (g, timbre.slider, mbm::NumTimbres, labels, 44.0f);
     }
-    for (auto* k : { &density, &variation, &swing, &base, &velocity, &gate, &bpm, &inGain, &tone, &drive, &volume })
+    for (auto* k : { &density, &variation, &swing, &base, &velocity, &gate, &bpm, &inGain, &tone, &drive, &volume, &drumVol, &keysVol })
         drawKnobScale (g, k->slider, 11);
+    g.setColour (colours::inkSoft);
+    g.setFont (stencil (8.5f, 0.12f));
+    g.drawFittedText (juce::String::fromUTF8 ("SÓ NO PREVIEW: O MIDI ARRASTADO É SÓ O BAIXO"),
+                      drumsPanel.withTrimmedLeft (14).withWidth (150).withTrimmedTop (64).withHeight (30), juce::Justification::centredLeft, 2);
+    g.drawFittedText (juce::String::fromUTF8 ("SKANK DO PIANO M1 E BUBBLE DO HAMMOND SEGUINDO A HARMONIA"),
+                      keysPanel.withTrimmedLeft (14).withWidth (150).withTrimmedTop (64).withHeight (30), juce::Justification::centredLeft, 2);
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" }, 22.0f);
 
     // dicas gravadas
@@ -1238,16 +1337,16 @@ void BassMachinePanel::resized()
     woodR = { W - 28, 0, 28, H };
     plate = { 28, 0, W - 56, H };
 
-    // --- linha 1: ESTILO | HARMONIA
-    stylePanel   = { 52, 92, 300, 330 };
-    harmonyPanel = { 366, 92, W - 52 - 366, 330 };
+    // --- linha 1: ESTILO (botoeira) | HARMONIA
+    stylePanel   = { 52, 92, 300, 362 };
+    harmonyPanel = { 366, 92, W - 52 - 366, 362 };
     {
         auto a = stylePanel.reduced (14, 0);
         a.removeFromTop (18);
-        styleDisplay = a.removeFromTop (44).reduced (4, 0);
+        styleDisplay = a.removeFromTop (42).reduced (4, 0);
+        a.removeFromTop (8);
+        styleKeys->setBounds (a.removeFromTop (204));
         a.removeFromTop (6);
-        style.slider.setBounds (a.removeFromTop (170).reduced (10, 0));
-        a.removeFromTop (2);
         const int kw = a.getWidth() / 4;
         for (auto* k : { &density, &variation, &swing, &base })
             placeKnob (*k, a.removeFromLeft (kw).withTrimmedBottom (8));
@@ -1265,19 +1364,19 @@ void BassMachinePanel::resized()
             r.removeFromTop (6);
             auto header = r.removeFromTop (28);
             m.on.button.setBounds (header.removeFromRight (62));
-            r.removeFromTop (6);
-            m.display = r.removeFromTop (30).reduced (3, 0);
-            r.removeFromTop (20);
-            m.keys->setBounds (r.removeFromTop (100).reduced (2, 0));
-            r.removeFromTop (20);
-            m.qual->setBounds (r.removeFromTop (38));
-            r.removeFromTop (20);
-            m.dur->setBounds (r.removeFromTop (42).reduced (4, 0));
+            r.removeFromTop (8);
+            m.display = r.removeFromTop (32).reduced (3, 0);
+            r.removeFromTop (22);
+            m.keys->setBounds (r.removeFromTop (110).reduced (2, 0));
+            r.removeFromTop (22);
+            m.qual->setBounds (r.removeFromTop (40));
+            r.removeFromTop (22);
+            m.dur->setBounds (r.removeFromTop (44).reduced (4, 0));
         }
     }
 
     // --- linha 2: LINHA DE BAIXO (ideia | visor | toque)
-    linePanel = { 52, 444, W - 104, 172 };
+    linePanel = { 52, 476, W - 104, 172 };
     {
         auto a = linePanel.reduced (14, 0);
         a.removeFromTop (18);
@@ -1297,7 +1396,7 @@ void BassMachinePanel::resized()
     }
 
     // --- linha 3: PREVIEW | TIMBRE | OSCILOSCÓPIO | MIDI
-    const int y3 = 640, h3 = 168;
+    const int y3 = 670, h3 = 168;
     previewPanel = { 52, y3, 214, h3 };
     timbrePanel  = { 280, y3, 470, h3 };
     scopePanel   = { 764, y3, 226, h3 };
@@ -1336,6 +1435,23 @@ void BassMachinePanel::resized()
         reps.label.setVisible (false);
         a.removeFromTop (4);
         dragZone.setBounds (a.removeFromTop (54));
+    }
+
+    // --- linha 4: ACOMPANHAMENTO (bateria | teclado do Roots Keys)
+    const int y4 = 862, h4 = 116;
+    drumsPanel = { 52, y4, 560, h4 };
+    keysPanel  = { 626, y4, W - 52 - 626, h4 };
+    for (auto [panel, onBtn, sel, vol] : { std::tuple<juce::Rectangle<int>, Toggle*, InterlockKeys*, Knob*> { drumsPanel, &drumsOn, drumKeys.get(), &drumVol },
+                                           { keysPanel, &keysOn, keysKeys.get(), &keysVol } })
+    {
+        auto a = panel.reduced (14, 0);
+        a.removeFromTop (18);
+        a.removeFromBottom (10);
+        auto left = a.removeFromLeft (150);
+        onBtn->button.setBounds (left.removeFromTop (36));
+        placeKnob (*vol, a.removeFromRight (84));
+        a.removeFromRight (10);
+        sel->setBounds (a.withSizeKeepingCentre (a.getWidth(), 56));
     }
 
     renderBackground();

@@ -2,6 +2,7 @@
 // e agendamento por blocos sem notas presas.
 // g++ -std=c++17 -O2 -Wall tests/engine_test.cpp -o engine_test && ./engine_test
 #include "../Source/BassEngine.h"
+#include "../Source/AccompEngine.h"
 #include <cstdio>
 #include <cstdlib>
 #include <set>
@@ -135,6 +136,38 @@ int main()
             CHECK (maxPoly <= 1, "%s: mais de uma nota ao mesmo tempo (%ld)", styleName (style), maxPoly);
             CHECK (std::abs (ons - offs) <= 1, "%s: note-ons %ld x note-offs %ld", styleName (style), ons, offs);
         }
+
+    // acompanhamento: bateria nos 4 estilos e teclado nos 3 modos, em loops de vários tamanhos
+    for (double L : { 2.0, 4.0, 16.0, 18.0, 34.0 })
+        for (int ds = 0; ds < NumDrumStyles; ++ds)
+            for (float sw : { 0.0f, 1.0f })
+            {
+                const auto d = buildDrums (L, ds, sw);
+                CHECK (! d.empty(), "%s: bateria vazia", drumStyleName (ds));
+                int kicks = 0;
+                for (size_t i = 0; i < d.size(); ++i)
+                {
+                    CHECK (d[i].start >= 0 && d[i].start < L, "bateria fora do loop");
+                    CHECK (i == 0 || d[i].start >= d[i - 1].start, "bateria fora de ordem");
+                    CHECK (d[i].target == (isDigitalKit (ds) ? AccDigitalDrum : AccAcousticDrum), "kit errado");
+                    kicks += d[i].note == drum::Kick;
+                }
+                CHECK (kicks >= 1 || (ds == DrumOneDrop && L < 4.0), "%s sem bumbo", drumStyleName (ds));
+                if (ds == DrumOneDrop)
+                    for (const auto& e : d) CHECK (! (e.note == drum::Kick && std::fmod (e.start, 4.0) < 1e-6), "one drop com bumbo no 1");
+            }
+    for (int km = 0; km < NumKeysModes; ++km)
+    {
+        const auto k = buildKeys (slots, km, 0.3f);
+        bool piano = false, organ = false;
+        for (const auto& e : k)
+        {
+            CHECK (e.note >= 36 && e.note <= 84, "teclado fora do registro (%d)", e.note);
+            CHECK (e.start < 18.0, "teclado fora do loop");
+            piano |= e.target == AccPiano; organ |= e.target == AccOrgan;
+        }
+        CHECK (piano == (km != KeysOrgan) && organ == (km != KeysPiano), "modo do teclado errado (%s)", keysModeName (km));
+    }
 
     std::printf (failures == 0 ? "\nTODOS OS TESTES PASSARAM\n" : "\n%d FALHAS\n", failures);
     return failures == 0 ? 0 : 1;

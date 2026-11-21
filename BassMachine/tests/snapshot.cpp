@@ -1,6 +1,6 @@
 // Renderiza a interface do Bass Machine num PNG (sem DAW), com o loop tocando para o visor e o osciloscópio:
 //   cmake -B build-snap -DBASSMACHINE_SNAPSHOT=ON -DBASSMACHINE_PLUGIN=OFF && cmake --build build-snap --target BassMachineSnapshot
-//   ./build-snap/BassMachineSnapshot_artefacts/Release/BassMachineSnapshot docs/interface.png [estilo 0-2] [timbre 0-5] [escala]
+//   ./build-snap/.../BassMachineSnapshot docs/interface.png [estilo 0-6] [timbre 0-6] [escala] [wav] [bateria 0-3] [teclado 0-2]
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/PluginProcessor.h"
 #include "../Source/PluginEditor.h"
@@ -16,6 +16,9 @@ int main (int argc, char** argv)
     if (argc > 2) set ("style",  (float) juce::String (argv[2]).getIntValue());
     if (argc > 3) set ("timbre", (float) juce::String (argv[3]).getIntValue());
     set ("on3", 1.0f);
+    // 6º e 7º argumentos: estilo da bateria (0-3) e instrumento do teclado (0-2); -1 = desligado
+    if (argc > 6 && juce::String (argv[6]).getIntValue() >= 0) { set ("drumsOn", 1.0f); set ("drumStyle", (float) juce::String (argv[6]).getIntValue()); }
+    if (argc > 7 && juce::String (argv[7]).getIntValue() >= 0) { set ("keysOn", 1.0f);  set ("keysMode",  (float) juce::String (argv[7]).getIntValue()); }
     set ("preview", 1.0f);   // PLAY ligado: cursor e osciloscópio com sinal
 
     // toca ~3,4 tempos para ter nota soando e onda no osciloscópio

@@ -97,6 +97,21 @@ private:
     int side = 0;
 };
 
+// Botoeira de teclas intertravadas (seletor de rádio valvulado / jukebox): apertar uma solta a outra
+class InterlockKeys : public ParamControl
+{
+public:
+    InterlockKeys (juce::RangedAudioParameter& p, juce::StringArray names, bool isVertical)
+        : ParamControl (p), labels (std::move (names)), vertical (isVertical) {}
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override;
+    void mouseMove (const juce::MouseEvent&) override { repaint(); }
+private:
+    juce::Rectangle<float> keyRect (int i) const;
+    juce::StringArray labels;
+    bool vertical;
+};
+
 // PLAY / STOP do preview: tampa grande de botão de pedal com lâmpada
 class PlayButton : public ParamControl
 {
@@ -143,7 +158,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kW = 1240, kH = 830;
+    static constexpr int kW = 1240, kH = 1000;
 
 private:
     using SliderAttach = juce::AudioProcessorValueTreeState::SliderAttachment;
@@ -182,12 +197,14 @@ private:
     BassLookAndFeel lnf;
 
     std::array<ChordModule, BassMachineProcessor::numSlots> mods;
-    Knob style, density, variation, swing, base;
+    std::unique_ptr<InterlockKeys> styleKeys, drumKeys, keysKeys;
+    Knob density, variation, swing, base;
     Knob velocity, gate;
     Knob bpm;
     Knob timbre, inGain, tone, drive, volume;
     Knob reps;
-    Toggle sound;
+    Toggle sound, drumsOn, keysOn;
+    Knob drumVol, keysVol;
     std::unique_ptr<CounterWindow> idea;
     std::unique_ptr<PlayButton> play;
     juce::TextButton newIdeaBtn { "NOVA IDEIA" };
@@ -199,7 +216,7 @@ private:
 
     juce::Image background;
     juce::Rectangle<int> woodL, woodR, plate;
-    juce::Rectangle<int> stylePanel, harmonyPanel, linePanel, previewPanel, timbrePanel, scopePanel, midiPanel;
+    juce::Rectangle<int> stylePanel, harmonyPanel, linePanel, previewPanel, timbrePanel, scopePanel, midiPanel, drumsPanel, keysPanel;
     juce::Rectangle<int> styleDisplay, timbreDisplay, ideaHint;
     std::array<bool, BassMachineProcessor::numSlots> lastOn {};
 

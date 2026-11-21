@@ -7,6 +7,10 @@ on:
       - 'BassMachine/**'
       - 'DubBass/Source/BassVoice.h'
       - 'DubBass/Source/Maximizer.h'
+      - 'DubDrums/Source/DrumSynth.h'
+      - 'DubDrums/Source/PatternGenerator.h'
+      - 'DubChords/Source/DubSynth.h'
+      - 'RootsKeys/Source/RootsKeysEngine.h'
       - '.github/workflows/build-bassmachine.yml'
     tags:
       - 'BassMachine-*'

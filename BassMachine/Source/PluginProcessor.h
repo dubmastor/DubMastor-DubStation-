@@ -2,6 +2,9 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "BassEngine.h"
 #include "DubBassTimbre.h"
+#include "AccompEngine.h"
+#include "../../DubDrums/Source/DrumSynth.h"      // bateria acústica do Dub Drums
+#include "../../DubChords/Source/DubSynth.h"      // piano M1 + Hammond do Roots Keys
 
 class BassMachineProcessor : public juce::AudioProcessor,
                              private juce::AudioProcessorValueTreeState::Listener
@@ -62,6 +65,8 @@ private:
     void rebuild();
     void allNotesOff (juce::MidiBuffer& midi, int sample);
     void renderSynth (juce::AudioBuffer<float>&, const juce::MidiBuffer&);
+    void renderAccomp (juce::AudioBuffer<float>&, int numSamples);
+    void accompOff();
     juce::AudioBuffer<float> monoBuf;
 
     float param (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
@@ -69,6 +74,14 @@ private:
     mbm::DubBassPreview synth;   // sistema de timbres do Dub Bass
 
     std::vector<mbm::NoteEvent> loop;
+    std::vector<mbm::AccEvent> accLoop;        // bateria + teclado (só para o som do preview)
+    dubdrums::DrumSynth acousticDrums;
+    mbm::DigitalKit digitalDrums;
+    DubSoundEngine keys;
+    struct AccPending { int sample; bool on; int target; int note; int vel; };
+    std::vector<AccPending> accPending;
+    bool keysActive[2][128] {};
+    bool lastKeysOn = false;
     double loopBeats = 0.0;
     std::atomic<bool> dirty { true };
 
