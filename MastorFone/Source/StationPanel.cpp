@@ -301,15 +301,112 @@ void StationModeKeys::paint (Graphics& g)
 }
 
 //==============================================================================
+namespace
+{
+const float kFreqs[] = { 540, 600, 700, 800, 900, 1000, 1200, 1400, 1600 };
+float valueToKHz (float v)   // -100..100 -> kHz, na mesma escala do dial
+{
+    const float t = jlimit (0.0f, 1.0f, (v + 100.0f) / 200.0f) * 8.0f;
+    const int i = jmin (7, (int) t);
+    return kFreqs[i] + (kFreqs[i + 1] - kFreqs[i]) * (t - (float) i);
+}
+}
+
+TuningDial::TuningDial (RangedAudioParameter& p)
+    : param (p), att (p, [this] (float v) { value = v; repaint(); })
+{
+    att.sendInitialUpdate();
+    setMouseCursor (MouseCursor::LeftRightResizeCursor);
+}
+
+String TuningDial::getText() const { return String (roundToInt (valueToKHz (value) / 10.0f) * 10) + " kHz"; }
+
+Rectangle<float> TuningDial::scale() const
+{
+    auto glass = getLocalBounds().toFloat().withTrimmedTop (22.0f).reduced (4.0f);
+    return { glass.getX() + 26.0f, glass.getY(), glass.getWidth() - 72.0f, glass.getHeight() };
+}
+
+float TuningDial::xToValue (float x) const
+{
+    const auto sc = scale();
+    return jlimit (-100.0f, 100.0f, -100.0f + 200.0f * (x - sc.getX()) / sc.getWidth());
+}
+
+void TuningDial::mouseDown (const MouseEvent& e) { att.beginGesture(); att.setValueAsPartOfGesture (xToValue (e.position.x)); }
+void TuningDial::mouseDrag (const MouseEvent& e) { att.setValueAsPartOfGesture (xToValue (e.position.x)); }
+void TuningDial::mouseUp (const MouseEvent&)     { att.endGesture(); }
+void TuningDial::mouseDoubleClick (const MouseEvent&) { att.setValueAsCompleteGesture (param.convertFrom0to1 (param.getDefaultValue())); }
+void TuningDial::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& w)
+{
+    att.setValueAsCompleteGesture (jlimit (-100.0f, 100.0f, value + (w.deltaY + w.deltaX) * 40.0f));
+}
+
+void TuningDial::paint (Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    // legenda + leitura da frequência
+    auto cap = b.removeFromTop (22.0f);
+    g.setColour (amber);
+    g.setFont (bold (17.0f));
+    g.drawText ("SINTONIA", cap.withTrimmedLeft (4.0f), Justification::centredLeft);
+    g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 15.0f, Font::bold));
+    g.drawText (getText(), cap.withTrimmedRight (6.0f), Justification::centredRight);
+
+    // moldura cromada + vidro iluminado por trás (mesmo tom do VU)
+    auto glass = b.reduced (4.0f);
+    g.setColour (Colours::black.withAlpha (0.55f));
+    g.fillRoundedRectangle (glass.expanded (3.0f).translated (1.5f, 3.0f), 6.0f);
+    g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), glass.getX(), glass.getY(), Colour (0xff4c4c4c), glass.getRight(), glass.getBottom(), false));
+    g.fillRoundedRectangle (glass.expanded (3.0f), 6.0f);
+    g.setGradientFill (ColourGradient (Colour (0xfff7e8b8), glass.getCentreX(), glass.getCentreY(),
+                                       Colour (0xffd9b86a), glass.getX(), glass.getY(), true));
+    g.fillRoundedRectangle (glass, 4.0f);
+
+    Graphics::ScopedSaveState ss (g);
+    g.reduceClipRegion (glass.toNearestInt());
+    const auto sc = scale();
+    const Colour printInk (0xff1a1a1a);
+    g.setColour (printInk);
+    for (int i = 0; i <= 40; ++i)
+    {
+        const float x = sc.getX() + sc.getWidth() * (float) i / 40.0f;
+        const bool major = i % 5 == 0;
+        g.fillRect (x - (major ? 1.0f : 0.6f), glass.getY() + 6.0f, major ? 2.0f : 1.2f, major ? 14.0f : 8.0f);
+    }
+    g.setFont (bold (12.0f));
+    for (int i = 0; i < 9; ++i)
+    {
+        const float x = sc.getX() + sc.getWidth() * (float) i / 8.0f;
+        g.drawText (String ((int) kFreqs[i]), Rectangle<float> (44, 16).withCentre ({ x, glass.getY() + 31.0f }), Justification::centred);
+    }
+    g.setFont (bold (10.0f).withExtraKerningFactor (0.12f));
+    g.drawText ("kHz", Rectangle<float> (glass.getRight() - 42, glass.getY() + 23, 36, 16), Justification::centred);
+    g.setColour (Colour (0xffc0262d));
+    g.drawText (String::fromUTF8 ("ONDAS MÉDIAS"), Rectangle<float> (glass.getX(), glass.getBottom() - 17, glass.getWidth(), 14), Justification::centred);
+
+    // agulha vermelha com sombra
+    const float x = sc.getX() + sc.getWidth() * (value + 100.0f) / 200.0f;
+    g.setColour (Colours::black.withAlpha (0.2f));
+    g.fillRect (x + 1.5f, glass.getY() + 3.0f, 2.5f, glass.getHeight() - 4.0f);
+    g.setColour (Colour (0xffc0262d));
+    g.fillRect (x - 1.25f, glass.getY() + 1.0f, 2.5f, glass.getHeight() - 2.0f);
+
+    // reflexo do vidro
+    g.setGradientFill (ColourGradient (Colours::white.withAlpha (0.25f), glass.getX(), glass.getY(),
+                                       Colours::transparentWhite, glass.getX(), glass.getY() + glass.getHeight() * 0.5f, false));
+    g.fillRect (glass.withHeight (glass.getHeight() * 0.45f));
+}
+
+//==============================================================================
 StationPanel::StationPanel (RadioFoneProcessor& p)
-    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), throwBtn ("THROW", p.apvts.getParameter ("throw"))
+    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), dial (*p.apvts.getParameter ("tune")), throwBtn ("THROW", p.apvts.getParameter ("throw"))
 {
     setLookAndFeel (&lnf);
     setSize (kW, kH);
 
     addAndMakeVisible (modeKeys);
-    setupKnob (tune,   "tune",   "SINTONIA", 0);
-    tune.slider.getProperties().set ("scaleLabels", "540|600|700|800|1000|1200|1600");
+    addAndMakeVisible (dial);
     setupKnob (band,   "band",   "BANDA", 1);
     setupKnob (drive,  "drive",  "DRIVE", 1);
     setupKnob (noise,  "noise",  "CHIADO", 1);
@@ -333,10 +430,6 @@ StationPanel::StationPanel (RadioFoneProcessor& p)
     addAndMakeVisible (throwBtn);
     throwBtn.setTooltip ("Segure para jogar a voz no eco");
 
-    skinBtn.setButtonText ("VISUAL CARTOON");
-    skinBtn.setClickingTogglesState (false);
-    skinBtn.onClick = [this] { if (onSwitchSkin) onSwitchSkin(); };
-    addAndMakeVisible (skinBtn);
 
     status.setJustificationType (Justification::centredLeft);
     status.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 12.5f, Font::plain));
@@ -411,9 +504,10 @@ void StationPanel::resized()
 
     // linha A: APARELHO e SINTONIA gigantes, depois os quatro médios
     modeKeys.setBounds (rowA.removeFromLeft (226).reduced (14, 2));
-    place (tune, rowA.removeFromLeft (226), 34);
-    const int wm = 108;
-    rowA.removeFromLeft ((rowA.getWidth() - 4 * wm) / 2);
+    rowA.removeFromLeft (10);
+    dial.setBounds (rowA.removeFromTop (92).reduced (4, 2));
+    rowA.removeFromTop (4);
+    const int wm = rowA.getWidth() / 4;
     for (auto* k : { &band, &drive, &noise, &defect })
         place (*k, rowA.removeFromLeft (wm), 18);
 
@@ -440,13 +534,11 @@ void StationPanel::resized()
     rightArea = rowB;
     auto ra = rowB.reduced (6, 4);
     ra.removeFromTop (20);                      // legenda
-    auto bottom = ra.removeFromBottom (34);
     const int ws = ra.getWidth() / 3;
     for (auto* k : { &mix, &dry, &out })
         place (*k, ra.removeFromLeft (ws), 15);
-    skinBtn.setBounds (bottom.withSizeKeepingCentre (150, 28));
-    // BYPASS grande no painel de cima, entre "FEITO NO BRASIL" e a lâmpada NO AR
-    bypassBtn.button.setBounds ((int) plateArea.getX() + 120, topPanel.getBottom() - 46, 116, 36);
+    // BYPASS grande no painel de cima, ao lado da lâmpada NO AR
+    bypassBtn.button.setBounds ((int) plateArea.getX() + 4, topPanel.getBottom() - 46, 132, 36);
 
     renderBackground();
 }
@@ -456,7 +548,9 @@ String StationPanel::statusText()
 {
     if (modeKeys.getHover() >= 0)
         return String::fromUTF8 ("APARELHO:  clique para escolher");
-    Knob* all[] = { &tune, &band, &drive, &noise, &defect, &echoDiv, &echoMs, &echoHeads,
+    if (dial.isMouseOverOrDragging())
+        return "SINTONIA:  " + dial.getText();
+    Knob* all[] = { &band, &drive, &noise, &defect, &echoDiv, &echoMs, &echoHeads,
                     &echoFb, &echoTone, &echoWow, &echoSend, &mix, &dry, &out };
     for (auto* k : all)
         if (k->slider.isVisible() && k->slider.isMouseOverOrDragging())
@@ -511,17 +605,17 @@ void StationPanel::paint (Graphics& g)
         g.setColour (c);
         g.drawText (t, r, j);
     };
-    g.setFont (toon::title (25.0f).withExtraKerningFactor (0.03f));
+    g.setFont (mf::title (25.0f).withExtraKerningFactor (0.03f));
     engraved ("MASTOR FONE", { pl.getX() + 15, pl.getY() + 10, pl.getWidth() - 86, 40 }, Justification::centredLeft, Colour (0xff262626));
     g.setFont (bold (9.5f).withExtraKerningFactor (0.12f));
     engraved (String::fromUTF8 ("RÁDIO AM  ·  TELEFONE  ·  MEGAFONE"), { pl.getX() + 17, pl.getY() + 53, pl.getWidth() - 96, 14 },
               Justification::centredLeft, Colour (0xff3a3a3a));
     const auto inset = Rectangle<float> (pl.getRight() - 70, pl.getY() + 17, 54, 46);
-    g.setFont (toon::title (23.0f));
+    g.setFont (mf::title (23.0f));
     g.setColour (amber.withAlpha (0.35f));
-    g.drawText ("1.2", inset.expanded (1.0f), Justification::centred);
+    g.drawText ("1.3", inset.expanded (1.0f), Justification::centred);
     g.setColour (amber);
-    g.drawText ("1.2", inset, Justification::centred);
+    g.drawText ("1.3", inset, Justification::centred);
 
     // assinatura "Dub Station Solutions" em tinta marrom, com traço
     {
@@ -529,7 +623,7 @@ void StationPanel::paint (Graphics& g)
         const auto sp = Point<float> (pl.getX() + 10, pl.getBottom() + 4);
         g.addTransform (AffineTransform::rotation (-0.05f, sp.x, sp.y + 26));
         g.setColour (ink);
-        g.setFont (toon::script (38.0f));
+        g.setFont (mf::script (38.0f));
         g.drawText ("Dub Station Solutions", Rectangle<float> (sp.x, sp.y, 330, 44), Justification::centredLeft);
         Path swash;
         swash.startNewSubPath (sp.x + 10, sp.y + 46);
@@ -540,7 +634,6 @@ void StationPanel::paint (Graphics& g)
     // origem + lâmpada NO AR
     g.setColour (ink.withAlpha (0.85f));
     g.setFont (bold (10.0f).withExtraKerningFactor (0.1f));
-    g.drawText ("FEITO NO BRASIL", Rectangle<float> (pl.getX() + 2, (float) topPanel.getBottom() - 34, 110, 14), Justification::left);
     const auto lamp = lampPos;
     g.setColour (Colour (0xff8a8a8a));
     g.fillEllipse (lamp.x - 13, lamp.y - 13, 26, 26);
@@ -692,7 +785,7 @@ void StationPanel::drawVuFace (Graphics& g)
         }
     }
     g.setColour (Colour (0xff1a1a1a));
-    g.setFont (toon::title (21.0f));
+    g.setFont (mf::title (21.0f));
     g.drawText ("VU", Rectangle<float> (v.face.getX(), v.face.getY() + v.face.getHeight() * 0.48f, v.face.getWidth(), 26), Justification::centred);
 }
 
@@ -863,22 +956,6 @@ void StationPanel::renderBackground()
     g.drawRoundedRectangle (plate.translated (0, 1), 6.0f, 1.0f);
     g.setColour (Colours::black.withAlpha (0.8f));
     g.drawRoundedRectangle (plate, 6.0f, 1.0f);
-
-    // poços destacados atrás de APARELHO e SINTONIA: rebaixo + aro cromado + brilho âmbar
-    for (auto* k : { &tune })
-    {
-        const auto kb = k->slider.getBounds().toFloat();
-        const auto c = kb.getCentre();
-        const float rr = kb.getWidth() * 0.5f + 2.0f;
-        g.setGradientFill (ColourGradient (amber.withAlpha (0.22f), c.x, c.y, amber.withAlpha (0.0f), c.x + rr + 12.0f, c.y, true));
-        g.fillEllipse (c.x - rr - 12.0f, c.y - rr - 12.0f, (rr + 12.0f) * 2, (rr + 12.0f) * 2);
-        g.setGradientFill (ColourGradient (Colour (0xff050505), c.x, c.y - rr, Colour (0xff2b2622), c.x, c.y + rr, false));
-        g.fillEllipse (c.x - rr, c.y - rr, rr * 2, rr * 2);
-        g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), c.x - rr, c.y - rr, Colour (0xff4c4c4c), c.x + rr, c.y + rr, false));
-        g.drawEllipse (c.x - rr, c.y - rr, rr * 2, rr * 2, 3.5f);
-        g.setColour (amber.withAlpha (0.55f));
-        g.drawEllipse (c.x - rr - 4.0f, c.y - rr - 4.0f, (rr + 4.0f) * 2, (rr + 4.0f) * 2, 1.2f);
-    }
 
     // parafusos
     auto screw = [&g, &rnd] (float cx, float cy)
