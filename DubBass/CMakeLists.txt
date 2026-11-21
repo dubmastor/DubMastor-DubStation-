@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-# versão: aparece na plaqueta de latão da interface ("DUB STATION 1.1") e no plugin
-project(DubBass VERSION 1.4.0)
+# versão: aparece no título da interface ("... MRDBI-07 1.5") e no plugin
+project(DubBass VERSION 1.5.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,7 +27,7 @@ endif()
 juce_add_plugin(DubBass
     COMPANY_NAME               "DubMastor"
     BUNDLE_ID                  com.dubmastor.dubbass
-    PRODUCT_NAME               "Dub Bass - Dub Station"
+    PRODUCT_NAME               "Mastor Reggae Dub Bass Instrument MRDBI-07"
     PLUGIN_MANUFACTURER_CODE   Dblb
     PLUGIN_CODE                Dbbs
     FORMATS                    VST3 AU Standalone
@@ -68,7 +68,7 @@ if(DUBBASS_TESTS)
     target_compile_definitions(DubBassTest PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="Dub Bass - Dub Station" JucePlugin_VersionString="${PROJECT_VERSION}"
+        JucePlugin_Name="Mastor Reggae Dub Bass Instrument MRDBI-07" JucePlugin_VersionString="${PROJECT_VERSION}"
         JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0)
     target_link_libraries(DubBassTest PRIVATE juce::juce_audio_utils juce::juce_dsp
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)

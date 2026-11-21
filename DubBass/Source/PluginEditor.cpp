@@ -1571,16 +1571,24 @@ void DubBassPanel::renderBackground()
     screw ((float) plate.getX() + m, (float) plate.getBottom() - m);
     screw ((float) plate.getRight() - m, (float) plate.getBottom() - m);
 
-    // --- cabeçalho
+    // --- cabeçalho: nome completo + versão; a fonte encolhe até caber antes da plaqueta
+    const float stripesX = (float) plate.getRight() - 250.0f;
+    g.setFont (stencil (15.0f, 0.34f));
+    const juce::String plateText ("DUB STATION");
+    const float plateW = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), plateText) + 64.0f;
+    const juce::String title ("MASTOR REGGAE DUB BASS INSTRUMENT MRDBI-07 " + versionShort());
+    const float maxW = stripesX - 24.0f - plateW - 26.0f - ((float) plate.getX() + 32.0f);
+    float fs = 30.0f;
+    while (fs > 16.0f && juce::GlyphArrangement::getStringWidth (stencil (fs, 0.14f), title) > maxW)
+        fs -= 0.5f;
     g.setColour (colours::ink);
-    g.setFont (stencil (30.0f, 0.22f));
-    const juce::String title ("DUBMASTOR DUB BASS " + versionShort());
-    g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
+    g.setFont (stencil (fs, 0.14f));
+    g.drawText (title, plate.getX() + 32, 20, (int) maxW + 4, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
     {   // placa de latão "DUB STATION"
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION");
+        const juce::String t (plateText);
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -1619,10 +1627,10 @@ void DubBassPanel::renderBackground()
     }
     g.setColour (colours::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    g.drawText (juce::String::fromUTF8 ("REGGAE BASS SYNTH  ·  BASS / SUPER TONE / 808"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
+    g.drawText (juce::String::fromUTF8 ("REGGAE DUB BASS  ·  BASS / SUPER TONE / 808  ·  DUBMASTOR"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
-        const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
+        const float sx = (float) plate.getRight() - 250.0f, sw = 210.0f, sh = 7.0f;
         const juce::Colour faded[] = {
             colours::jamGreen.interpolatedWith (juce::Colour (0xff6f7a4a), 0.35f),
             colours::jamGold.interpolatedWith (juce::Colour (0xffb08a3a), 0.40f),

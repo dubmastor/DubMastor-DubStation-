@@ -1,6 +1,8 @@
-# Dub Bass - Dub Station 1.4
+# Mastor Reggae Dub Bass Instrument MRDBI-07 1.5
 
-Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, versão no título (DUBMASTOR DUB BASS x.y), plaqueta de latão DUB STATION, knobs de baquelite e lâmpadas âmbar.
+O antigo **Dub Bass**.
+
+Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, nome e versão no título (MASTOR REGGAE DUB BASS INSTRUMENT MRDBI-07 x.y), plaqueta de latão DUB STATION, knobs de baquelite e lâmpadas âmbar.
 
 ![Interface](docs/interface.png)
 
@@ -31,7 +33,7 @@ Mono/legato: no Classic Sine as notas ligadas deslizam com o glide; no 808 cada 
 
 ## Versão
 
-A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha na plaqueta de latão. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site. O push na `main` publica a release `DubBass-x.y` sozinho.
+A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha no título da interface. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site. O push na `main` publica a release `MRDBI-07-x.y` sozinho.
 
 ## Compilar
 
@@ -49,4 +51,4 @@ cmake -B build-test -DDUBBASS_TESTS=ON && cmake --build build-test --target DubB
 
 ## Publicar
 
-O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, a cada push na `main` que mexa no Dub Bass, cria (ou atualiza) a release `DubBass-x.y` da versão do `CMakeLists.txt` com `DubBass-Windows.zip` e `DubBass-macOS.zip`. A release do Dub Bass não vira a "latest", para não mexer nos links dos outros plugins.
+O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, a cada push na `main` que mexa no Dub Bass, cria (ou atualiza) a release `MRDBI-07-x.y` da versão do `CMakeLists.txt` com `MastorReggaeDubBassInstrument-Windows.zip` e `MastorReggaeDubBassInstrument-macOS.zip`. A release não vira a "latest", para não mexer nos links dos outros plugins.
