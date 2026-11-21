@@ -97,6 +97,7 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
     ScopeFifo scopeFifo;
+    juce::MidiKeyboardState keyboardState;   // teclado da interface: toca e acende com o MIDI
     std::atomic<float> gainReductionDb { 0.0f };
 
     // medidores para a interface (dBFS de pico por bloco)

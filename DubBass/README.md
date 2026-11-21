@@ -1,4 +1,4 @@
-# Dub Bass - Dub Station 1.1
+# Dub Bass - Dub Station 1.2
 
 Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, plaqueta de latão com a versão, knobs de baquelite e lâmpadas âmbar.
 
@@ -24,6 +24,7 @@ OSCILADOR (Classic Sine + harmônicos | 808) → FILTRO → ENVELOPE → VÁLVUL
 | **Reverb** | ON, Tamanho, Damp, Abertura, Low Cut (o grave fica seco) e Mix |
 | **Bass Boost** | Botão verde: +4 dB em 60 Hz, antes do maximizer |
 | **Saída** | Display âmbar com a nota tocando (nome e Hz) e Volume |
+| **Teclado** | C1 a C4 no padrão Dub Station (marfim, baquelite, barra cromada com feltro vermelho): toca clicando (mais embaixo na tecla = mais forte) e acende com lâmpada âmbar nas notas que chegam da DAW |
 | **Maximizer** (lateral direita) | VU digital estilo Ozone: entrada L/R, redução de ganho e saída L/R, com leituras numéricas, pico retido e a marca do teto. Ganho, Teto, Release e BYPASS (com lâmpada vermelha; a latência continua a mesma) |
 
 Mono/legato: no Classic Sine as notas ligadas deslizam com o glide; no 808 cada nota reataca o envelope e o drop de pitch. Pitch bend ±2 semitons. Duplo clique volta qualquer controle ao padrão. A janela é redimensionável.

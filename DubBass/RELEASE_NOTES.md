@@ -1,8 +1,12 @@
-## Dub Bass - Dub Station 1.1 🟢🟡⚫
+## Dub Bass - Dub Station 1.2 🟢🟡⚫
 
 Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, ou o 808 com o pitch caindo.
 
-**Novo na 1.1**
+**Novo na 1.2**
+- **Teclado** de C1 a C4 no padrão Dub Station: teclas de marfim e baquelite, barra cromada com feltro vermelho e lâmpada âmbar nas teclas tocadas. Toca clicando e acende com o MIDI da DAW
+- Display da nota na mesma numeração do teclado (55 Hz = A1)
+
+**Na 1.1**
 - Visual da linha, igual ao Dub Chords: painel creme, madeira, plaqueta de latão com a versão, knobs de baquelite e lâmpadas âmbar
 - **Maximizer na lateral direita** com VU digital estilo Ozone: entrada L/R, redução de ganho e saída L/R, leituras numéricas, pico retido e a marca do teto; BYPASS com lâmpada vermelha
 - **Válvula 12AX7 animada** na saturação: esquenta com o DRIVE e com o sinal e muda de cor (vermelho → laranja → âmbar → branco quente, com brilho azul no limite)

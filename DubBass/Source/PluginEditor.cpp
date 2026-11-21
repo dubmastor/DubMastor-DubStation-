@@ -799,11 +799,98 @@ void CrtEqCurve::paint (juce::Graphics& g)
 }
 
 //==============================================================================
+DubKeyboard::DubKeyboard (juce::MidiKeyboardState& st)
+    : juce::MidiKeyboardComponent (st, juce::MidiKeyboardComponent::horizontalKeyboard)
+{
+    setAvailableRange (24, 60);          // C1..C4: a região do baixo (22 teclas brancas)
+    setOctaveForMiddleC (4);             // nota 60 = C4
+    setScrollButtonsVisible (false);
+    setWantsKeyboardFocus (false);
+    setMidiChannel (1);
+    setVelocity (0.8f, true);            // mais embaixo na tecla = mais forte
+    setBlackNoteLengthProportion (0.62f);
+    setBlackNoteWidthProportion (0.62f);
+    setColour (whiteNoteColourId, juce::Colour (0xff0e0c0a));   // fundo do encaixe
+    setColour (keySeparatorLineColourId, juce::Colours::transparentBlack);
+    setColour (shadowColourId, juce::Colours::transparentBlack);
+}
+
+static void keyLamp (juce::Graphics& g, juce::Point<float> c)
+{
+    const auto lamp = juce::Rectangle<float> (7.0f, 7.0f).withCentre (c);
+    g.setColour (colours::amber.withAlpha (0.35f));
+    g.fillEllipse (lamp.expanded (4.0f));
+    juce::ColourGradient lit (juce::Colour (0xffffe3a0), lamp.getCentreX(), lamp.getCentreY(),
+                              colours::amber.darker (0.2f), lamp.getRight(), lamp.getBottom(), true);
+    g.setGradientFill (lit);
+    g.fillEllipse (lamp);
+}
+
+void DubKeyboard::drawWhiteNote (int note, juce::Graphics& g, juce::Rectangle<float> area, bool isDown, bool isOver,
+                                 juce::Colour, juce::Colour)
+{
+    auto r = area.reduced (1.0f, 0.0f).withTrimmedTop (isDown ? 3.0f : 0.0f);   // tecla afundada
+    const float rad = 3.0f;
+    juce::ColourGradient iv (juce::Colour (isDown ? 0xffe9d9ae : 0xfff6ecd2).brighter (isOver && ! isDown ? 0.04f : 0.0f), r.getX(), r.getY(),
+                             juce::Colour (isDown ? 0xffc2ad78 : 0xffd9c69a), r.getX(), r.getBottom(), false);
+    g.setGradientFill (iv);
+    g.fillRoundedRectangle (r, rad);
+    g.setColour (juce::Colour (0xff3d3124).withAlpha (0.8f));
+    g.drawRoundedRectangle (r, rad, 1.0f);
+    if (! isDown)
+    {
+        g.setColour (juce::Colour (0xffb39d6a));                                  // frente da tecla
+        g.fillRect (r.withTop (r.getBottom() - 6.0f).reduced (1.0f, 0.0f));
+    }
+    else
+    {
+        g.setColour (colours::amber.withAlpha (0.20f));
+        g.fillRoundedRectangle (r, rad);
+        keyLamp (g, { r.getCentreX(), r.getBottom() - 10.0f });
+    }
+    if (note % 12 == 0)                                                           // C1, C2, C3, C4
+    {
+        g.setColour (isDown ? juce::Colour (0xff6b3f05) : colours::inkSoft);
+        g.setFont (stencil (10.0f, 0.02f));
+        g.drawText (juce::MidiMessage::getMidiNoteName (note, true, true, 4),
+                    r.withTop (r.getBottom() - (isDown ? 34.0f : 26.0f)).withHeight (14.0f), juce::Justification::centred);
+    }
+}
+
+void DubKeyboard::drawBlackNote (int, juce::Graphics& g, juce::Rectangle<float> area, bool isDown, bool isOver, juce::Colour)
+{
+    auto r = area.withTrimmedTop (isDown ? 2.0f : 0.0f);
+    const float rad = 3.0f;
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.fillRoundedRectangle (r.translated (1.5f, 2.0f), rad);
+    juce::ColourGradient bk (juce::Colour (isDown ? 0xff2a2520 : 0xff3d3833).brighter (isOver && ! isDown ? 0.12f : 0.0f), r.getX(), r.getY(),
+                             juce::Colour (0xff070605), r.getRight(), r.getBottom(), false);
+    g.setGradientFill (bk);
+    g.fillRoundedRectangle (r, rad);
+    g.setColour (juce::Colours::white.withAlpha (isDown ? 0.05f : 0.14f));
+    g.fillRoundedRectangle (r.reduced (3.0f, 2.0f).withHeight (r.getHeight() * 0.55f), 2.0f);
+    if (isDown)
+        keyLamp (g, { r.getCentreX(), r.getBottom() - 8.0f });
+}
+
+void DubKeyboard::paint (juce::Graphics& g)
+{
+    MidiKeyboardComponent::paint (g);
+    auto b = getLocalBounds().toFloat();
+    auto bar = b.withHeight (7.0f);                                               // barra cromada
+    juce::ColourGradient chrome (juce::Colour (0xffd8d6d0), bar.getX(), bar.getY(), juce::Colour (0xff5e5b55), bar.getX(), bar.getBottom(), false);
+    g.setGradientFill (chrome);
+    g.fillRect (bar);
+    g.setColour (juce::Colour (0xff5a1414));                                      // feltro vermelho
+    g.fillRect (b.withY (bar.getBottom()).withHeight (2.0f));
+}
+
+//==============================================================================
 DubBassPanel::DubBassPanel (DubBassAudioProcessor& p)
     : proc (p),
       modeKeys (*p.apvts.getParameter (ParamID::mode), { "CLASSIC SINE", "808" }),
       drvTypeKeys (*p.apvts.getParameter (ParamID::drvType), { "TUBE", "TAPE", "FUZZ" }),
-      eqCurve (p), scope (p), meter (p)
+      eqCurve (p), scope (p), keyboard (p.keyboardState), meter (p)
 {
     setLookAndFeel (&lnf);
 
@@ -855,6 +942,7 @@ DubBassPanel::DubBassPanel (DubBassAudioProcessor& p)
 
     setupKnob (output, ParamID::output, "VOLUME");
     addAndMakeVisible (scope);
+    addAndMakeVisible (keyboard);
 
     addAndMakeVisible (meter);
     setupKnob (maxGain,    ParamID::maxGain,    "GANHO",   true);
@@ -863,7 +951,7 @@ DubBassPanel::DubBassPanel (DubBassAudioProcessor& p)
     setupToggle (maxBypass, ParamID::maxBypass, "BYPASS");
     maxBypass.button.getProperties().set ("redLamp", true);
 
-    setSize (1300, 840);
+    setSize (1300, 980);
     timerCallback();
     startTimerHz (30);
 }
@@ -1201,6 +1289,18 @@ void DubBassPanel::renderBackground()
     section (revPanel,   "REVERB");
     section (boostPanel, "BASS BOOST");
     section (outPanel,   juce::String::fromUTF8 ("SAÍDA"));
+    section (keysPanel,  "TECLADO  C1 - C4");
+
+    // trilho escuro onde o teclado está encaixado
+    {
+        auto rail = keyboard.getBounds().toFloat().expanded (6.0f, 6.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.45f));
+        g.drawRoundedRectangle (rail.translated (1, 1), 5.0f, 1.0f);
+        g.setColour (juce::Colour (0xff0e0c0a));
+        g.fillRoundedRectangle (rail, 5.0f);
+        g.setColour (colours::ink.withAlpha (0.6f));
+        g.drawRoundedRectangle (rail, 5.0f, 1.2f);
+    }
 
     // linha divisória do envelope / filtro
     {
@@ -1311,7 +1411,7 @@ void DubBassPanel::paint (juce::Graphics& g)
     {
         const int n = juce::roundToInt (note);
         const double hz = 440.0 * std::pow (2.0, ((double) note - 69.0) / 12.0);
-        t = juce::MidiMessage::getMidiNoteName (n, true, true, 3) + juce::String::fromUTF8 ("  ·  ") + juce::String (hz, 1) + " Hz";
+        t = juce::MidiMessage::getMidiNoteName (n, true, true, 4) + juce::String::fromUTF8 ("  ·  ") + juce::String (hz, 1) + " Hz";
     }
     glowText (g, noteDisplay.toFloat(), t, 17.0f, note >= 0.0f ? 1.0f : 0.35f);
 }
@@ -1334,7 +1434,7 @@ void DubBassPanel::resized()
     drvPanel   = { x0,  378, 440, 232 };
     eqPanel    = { 506, 378, maxPanel.getX() - 14 - 506, 232 };
 
-    revPanel   = { x0,  636, 470, H - 636 - 26 };
+    revPanel   = { x0,  636, 470, 176 };
     boostPanel = { 536, 636, 206, revPanel.getHeight() };
     outPanel   = { 756, 636, maxPanel.getX() - 14 - 756, revPanel.getHeight() };
 
@@ -1408,6 +1508,11 @@ void DubBassPanel::resized()
         auto left = a.removeFromLeft (a.getWidth() - 110);
         noteDisplay = left.withSizeKeepingCentre (left.getWidth() - 8, 40).translated (0, -6);
         placeKnob (output, a);
+    }
+    {   // TECLADO
+        keysPanel = { x0, 836, maxPanel.getX() - 14 - x0, H - 836 - 26 };
+        keyboard.setBounds (keysPanel.reduced (22, 0).withTrimmedTop (20).withTrimmedBottom (14));
+        keyboard.setKeyWidth ((float) keyboard.getWidth() / 22.0f);
     }
     {   // MAXIMIZER
         auto a = maxPanel.reduced (10, 0);

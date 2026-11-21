@@ -94,6 +94,21 @@ private:
 };
 
 //==============================================================================
+// Teclado no padrão Dub Station: marfim envelhecido, pretas de baquelite, barra cromada
+// com feltro vermelho e lâmpada âmbar nas teclas tocadas (clique ou MIDI da DAW)
+class DubKeyboard : public juce::MidiKeyboardComponent
+{
+public:
+    explicit DubKeyboard (juce::MidiKeyboardState& s);
+    void paint (juce::Graphics&) override;
+protected:
+    void drawWhiteNote (int note, juce::Graphics&, juce::Rectangle<float> area, bool isDown, bool isOver,
+                        juce::Colour lineColour, juce::Colour textColour) override;
+    void drawBlackNote (int note, juce::Graphics&, juce::Rectangle<float> area, bool isDown, bool isOver,
+                        juce::Colour noteFillColour) override;
+};
+
+//==============================================================================
 // Painel com todo o layout no tamanho base; o editor o escala para a janela redimensionável
 class DubBassPanel : public juce::Component, private juce::Timer
 {
@@ -156,6 +171,8 @@ private:
     Knob output;
     // OSCILOSCÓPIO
     CrtScope scope;
+    // TECLADO
+    DubKeyboard keyboard;
     // MAXIMIZER (lateral direita)
     OzoneMeter meter;
     Knob maxGain, maxCeiling, maxRelease;
@@ -163,7 +180,7 @@ private:
 
     juce::Image background;
     juce::Rectangle<int> woodL, woodR, plate;
-    juce::Rectangle<int> oscPanel, envPanel, scopePanel, drvPanel, eqPanel, revPanel, boostPanel, outPanel, maxPanel;
+    juce::Rectangle<int> oscPanel, envPanel, scopePanel, drvPanel, eqPanel, revPanel, boostPanel, outPanel, maxPanel, keysPanel;
     juce::Rectangle<int> noteDisplay, tubeArea, faderArea;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubBassPanel)
@@ -180,7 +197,7 @@ public:
         setResizable (true, true);
         setResizeLimits (w / 2, h / 2, w * 3 / 2, h * 3 / 2);
         if (auto* c = getConstrainer()) c->setFixedAspectRatio ((double) w / (double) h);
-        setSize (w * 9 / 10, h * 9 / 10);
+        setSize (w * 4 / 5, h * 4 / 5);
     }
     void resized() override
     {

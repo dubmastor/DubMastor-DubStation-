@@ -158,6 +158,7 @@ bool DubBassAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 void DubBassAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     currentSampleRate = sampleRate;
+    keyboardState.reset();
     const int  nCh   = juce::jlimit (1, 2, getTotalNumOutputChannels());
     const auto block = (juce::uint32) juce::jmax (1, samplesPerBlock);
 
@@ -392,6 +393,9 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
     if (numSamples == 0 || numChannels == 0)
         return;
+
+    // teclas clicadas na interface entram no MIDI; o MIDI da DAW acende as teclas
+    keyboardState.processNextMidiBuffer (midi, 0, numSamples, true);
 
     // 1) Sintetizador mono com MIDI sample-accurate
     updateVoiceParams();
