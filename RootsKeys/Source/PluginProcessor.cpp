@@ -160,7 +160,12 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         else if (m.isSustainPedalOn())          engine.setSustain (true);
         else if (m.isSustainPedalOff())         engine.setSustain (false);
         else if (m.isController() && m.getControllerNumber() == 1)
+        {
             engine.setModWheelLeslie (m.getControllerValue() >= 64);   // mod wheel = Leslie rápido
+            modWheel.store ((float) m.getControllerValue() / 127.0f);
+        }
+        else if (m.isPitchWheel())
+            pitchWheel.store ((float) (m.getPitchWheelValue() - 8192) / 8192.0f);
         else if (m.isAllNotesOff() || m.isAllSoundOff())
             engine.allNotesOff();
     }

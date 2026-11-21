@@ -1,5 +1,5 @@
 // RootsKeysEngine.h
-// Motor de síntese header-only (sem dependências) para o plugin "Roots Keys".
+// Motor de síntese header-only (sem dependências) para o plugin "Dub Station Roots Keys".
 //  - Piano estilo Korg M1 (síntese aditiva com inarmonicidade, ataque brilhante,
 //    decaimento em dois estágios, ruído de martelo e chorus estéreo)
 //  - Órgão tonewheel estilo Hammond B3 (9 drawbars, percussão single-trigger,

@@ -56,6 +56,8 @@ public:
 
     // medidores para o VU e o maximizer (escritos no áudio, lidos pela interface)
     std::atomic<float> meterL { 0.0f }, meterR { 0.0f }, gainReduction { 0.0f };
+    // rodas de pitch/mod que chegam pelo MIDI (só para mostrar na tela)
+    std::atomic<float> pitchWheel { 0.0f }, modWheel { 0.0f };
 
 private:
     rk::Engine engine;
