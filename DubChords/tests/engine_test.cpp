@@ -11,7 +11,7 @@ static int failures = 0;
 int main()
 {
     // 1) voicings com condução de vozes: Am -> Dm -> Em -> G
-    std::vector<ChordSlot> slots { { 9, Min, 8 }, { 2, Min, 4 }, { 4, Min, 4 }, { 7, Maj, 2 } };
+    std::vector<ChordSlot> slots { { 9, Min, 8 }, { 2, Min, 4 }, { 4, Min, 4 }, { 7, Maj, 2 } };   // inclui 1/2 compasso
     std::vector<int> prev;
     for (auto& c : slots)
     {
@@ -30,12 +30,33 @@ int main()
         prev = v;
     }
 
-    // 2) padrões x gate x swing: simula a DAW tocando em blocos de 512 amostras
+    // 2) duas mãos + bubble uma oitava abaixo
+    {
+        Settings s; double L = 0;
+        const auto ev = buildLoop (slots, s, L);
+        std::vector<int> sk, org;
+        for (auto& e : ev)
+            if (e.start < 1.0) { if (e.channel == ChSkank) sk.push_back (e.note); if (e.channel == ChBubble) org.push_back (e.note); }
+        std::sort (sk.begin(), sk.end()); sk.erase (std::unique (sk.begin(), sk.end()), sk.end());
+        std::sort (org.begin(), org.end()); org.erase (std::unique (org.begin(), org.end()), org.end());
+        std::printf ("skank:"); for (int n : sk) std::printf (" %d", n);
+        std::printf ("   bubble:"); for (int n : org) std::printf (" %d", n); std::printf ("\n");
+        CHECK (sk.size() == 6, "skank deveria ter 6 notas (duas maos), tem %zu", sk.size());
+        CHECK (org.size() == 3, "bubble deveria ter 3 notas, tem %zu", org.size());
+        if (sk.size() == 6) CHECK (sk[3] == sk[0] + 12 && sk[4] == sk[1] + 12 && sk[5] == sk[2] + 12, "mao direita deveria ser a esquerda + 12");
+        if (sk.size() == 6 && org.size() == 3) CHECK (org[0] == sk[0] - 12, "bubble deveria ficar uma oitava abaixo do skank");
+        // meio compasso: o acorde 4 (G, 1/2 compasso) começa no tempo 16 e tem skank
+        bool g = false;
+        for (auto& e : ev) if (e.slot == 3 && e.channel == ChSkank && e.start >= 16.0 && e.start < 18.0) g = true;
+        CHECK (g, "acorde de meio compasso sem skank");
+    }
+
+    // 3) padrões x gate x swing: simula a DAW tocando em blocos de 512 amostras
     for (int pat = 0; pat < NumPatterns; ++pat)
-        for (float gate : { 0.1f, 0.7f, 1.0f })
+        for (int ns = 0; ns < numNoteSizes; ++ns)
             for (float swing : { 0.0f, 0.6f })
             {
-                Settings s; s.pattern = pat; s.gate = gate; s.swing = swing;
+                Settings s; s.pattern = pat; s.noteSize = ns; s.swing = swing;
                 double L = 0; const auto loop = buildLoop (slots, s, L);
                 CHECK (L == 18.0, "loop deveria ter 18 tempos (%g)", L);
                 CHECK (! loop.empty(), "loop vazio");
@@ -66,9 +87,9 @@ int main()
                 }
                 int stillOn = 0;
                 for (auto& c : active) for (bool b : c) stillOn += b;
-                std::printf ("%-24s gate=%.1f swing=%.1f  notas=%ld  re-ataques=%ld\n", patternName (pat), gate, swing, ons, retrig);
+                std::printf ("%-18s nota=%-4s swing=%.1f  notas=%ld  re-ataques=%ld\n", patternName (pat), noteSizeName (ns), swing, ons, retrig);
                 CHECK (retrig == 0, "nota re-atacada sem note-off (%s)", patternName (pat));
-                CHECK (ons - offs == stillOn && stillOn <= 4, "notas presas (%d)", stillOn);
+                CHECK (ons - offs == stillOn && stillOn <= 12, "notas presas (%d)", stillOn);
             }
 
     std::printf (failures == 0 ? "\nTODOS OS TESTES PASSARAM\n" : "\n%d FALHA(S)\n", failures);

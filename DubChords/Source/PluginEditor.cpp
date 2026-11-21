@@ -26,7 +26,7 @@ static juce::Font stencil (float size, float kerning = 0.08f)
     return juce::Font (juce::FontOptions (size, juce::Font::bold)).withExtraKerningFactor (kerning);
 }
 
-static float knobReduction (const juce::Slider& s) { return s.getName() == "root" ? 34.0f : 13.0f; }
+static float knobReduction (const juce::Slider& s) { return s.getName() == "root" ? 34.0f : 11.0f; }
 
 // área circular do knob dentro do slider (mesma conta do LookAndFeel)
 static juce::Rectangle<float> knobCircle (const juce::Slider& s)
@@ -367,16 +367,17 @@ void ModeSwitch::paint (juce::Graphics& g)
 }
 
 //==============================================================================
-void DurationWindow::mouseDown (const juce::MouseEvent& e)
+void ChoiceWindow::mouseDown (const juce::MouseEvent& e)
 {
     const int dir = e.position.x < (float) getWidth() * 0.5f ? -1 : 1;
-    select (juce::jlimit (0, dub::numDurations - 1, index() + dir));
+    select (juce::jlimit (0, numChoices() - 1, index() + dir));
 }
 
-void DurationWindow::paint (juce::Graphics& g)
+void ChoiceWindow::paint (juce::Graphics& g)
 {
     auto b = getLocalBounds().toFloat();
-    const int i = juce::jlimit (0, dub::numDurations - 1, index());
+    const int count = numChoices();
+    const int i = juce::jlimit (0, count - 1, index());
 
     // moldura de metal escuro com parafusos
     g.setColour (juce::Colours::black.withAlpha (0.35f));
@@ -389,7 +390,7 @@ void DurationWindow::paint (juce::Graphics& g)
     auto arrow = [&] (float cx, int dir)
     {
         const bool lit = side == dir;
-        const bool possible = (dir < 0 && i > 0) || (dir > 0 && i < dub::numDurations - 1);
+        const bool possible = (dir < 0 && i > 0) || (dir > 0 && i < count - 1);
         juce::Path p;
         const float cy = b.getCentreY(), s = 6.5f;
         if (dir < 0) p.addTriangle (cx + s * 0.6f, cy - s, cx + s * 0.6f, cy + s, cx - s * 0.8f, cy);
@@ -411,18 +412,24 @@ void DurationWindow::paint (juce::Graphics& g)
     g.setGradientFill (drum);
     g.fillRoundedRectangle (win, 2.0f);
 
-    static const char* nums[dub::numDurations] = { "1/2", "1", "2", "3", "4", "8" };
-    const juce::String unit = i <= 1 ? "COMPASSO" : "COMPASSOS";
+    const auto [big, unit] = format (i);
     g.setColour (colours::ink);
-    g.setFont (stencil (21.0f, 0.04f));
-    const float nw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), nums[i]);
+    float bigSize = 21.0f;
+    g.setFont (stencil (bigSize, 0.04f));
+    float nw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), big);
     g.setFont (stencil (10.0f, 0.22f));
-    const float uw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), unit);
-    const float total = nw + 8.0f + uw;
-    auto line = win.withSizeKeepingCentre (total, win.getHeight());
-    g.setFont (stencil (21.0f, 0.04f));
-    g.drawText (nums[i], line.removeFromLeft (nw), juce::Justification::centredLeft);
-    line.removeFromLeft (8.0f);
+    const float uw = unit.isEmpty() ? 0.0f : juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), unit);
+    const float gap = unit.isEmpty() ? 0.0f : 8.0f;
+    if (nw + gap + uw > win.getWidth() - 10.0f)           // texto longo: diminui o grande
+    {
+        bigSize = juce::jmax (11.0f, bigSize * (win.getWidth() - 10.0f - gap - uw) / nw);
+        g.setFont (stencil (bigSize, 0.04f));
+        nw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), big);
+    }
+    auto line = win.withSizeKeepingCentre (nw + gap + uw, win.getHeight());
+    g.setFont (stencil (bigSize, 0.04f));
+    g.drawText (big, line.removeFromLeft (nw), juce::Justification::centredLeft);
+    line.removeFromLeft (gap);
     g.setFont (stencil (10.0f, 0.22f));
     g.drawText (unit, line, juce::Justification::centredLeft);
 
@@ -431,6 +438,50 @@ void DurationWindow::paint (juce::Graphics& g)
     g.fillRoundedRectangle (win.withHeight (win.getHeight() * 0.3f).reduced (2.0f, 1.0f), 2.0f);
     g.setColour (juce::Colours::black.withAlpha (0.5f));
     g.drawRoundedRectangle (win, 2.0f, 1.0f);
+}
+
+//==============================================================================
+void PreviewButton::paintButton (juce::Graphics& g, bool over, bool down)
+{
+    const bool on = getToggleState();
+    auto r = getLocalBounds().toFloat().reduced (3.0f);
+    g.setColour (juce::Colour (0xff1a1714));
+    g.fillRoundedRectangle (r, 6.0f);                                   // moldura
+    auto cap = r.reduced (4.0f).translated (0, (down || on) ? 1.5f : 0.0f);
+    const juce::Colour base = on ? colours::jamGold.darker (0.15f) : colours::jamGreen;
+    juce::ColourGradient cg (base.brighter (over ? 0.12f : 0.0f), cap.getX(), cap.getY(), base.darker (0.75f), cap.getX(), cap.getBottom(), false);
+    g.setGradientFill (cg);
+    g.fillRoundedRectangle (cap, 4.0f);
+    g.setColour (juce::Colours::white.withAlpha (on ? 0.12f : 0.22f));
+    g.fillRoundedRectangle (cap.withHeight (cap.getHeight() * 0.38f).reduced (4, 2), 3.0f);
+
+    // lâmpada piloto
+    const auto lamp = juce::Rectangle<float> (11.0f, 11.0f).withCentre ({ cap.getX() + 18.0f, cap.getCentreY() });
+    if (on)
+    {
+        g.setColour (colours::amber.withAlpha (0.4f));
+        g.fillEllipse (lamp.expanded (6.0f));
+        juce::ColourGradient lit (juce::Colour (0xffffe3a0), lamp.getCentreX(), lamp.getCentreY(),
+                                  colours::amber.darker (0.2f), lamp.getRight(), lamp.getBottom(), true);
+        g.setGradientFill (lit);
+    }
+    else
+        g.setColour (juce::Colour (0xff3a2d18));
+    g.fillEllipse (lamp);
+    g.setColour (juce::Colours::black.withAlpha (0.6f));
+    g.drawEllipse (lamp, 1.0f);
+
+    // símbolo play / stop + texto
+    auto txt = cap.withTrimmedLeft (30.0f);
+    const auto ic = juce::Rectangle<float> (12.0f, 12.0f).withCentre ({ txt.getX() + 7.0f, cap.getCentreY() });
+    juce::Path sym;
+    if (on) sym.addRectangle (ic.reduced (1.5f));
+    else    sym.addTriangle (ic.getX() + 1.0f, ic.getY(), ic.getX() + 1.0f, ic.getBottom(), ic.getRight(), ic.getCentreY());
+    const juce::Colour ink = on ? juce::Colour (0xff2e2108) : colours::jamGold;
+    g.setColour (ink);
+    g.fillPath (sym);
+    g.setFont (stencil (13.0f, 0.1f));
+    g.drawText (on ? "PARAR" : "PREVIEW", txt.withTrimmedLeft (16.0f), juce::Justification::centred);
 }
 
 //==============================================================================
@@ -479,35 +530,52 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
         const auto n = juce::String (i);
         m.keys = std::make_unique<NoteKeys>       (*proc.apvts.getParameter ("root" + n));
         m.mode = std::make_unique<ModeSwitch>     (*proc.apvts.getParameter ("qual" + n));
-        m.dur  = std::make_unique<DurationWindow> (*proc.apvts.getParameter ("dur" + n));
+        m.dur  = std::make_unique<ChoiceWindow>   (*proc.apvts.getParameter ("dur" + n), [] (int d) -> std::pair<juce::String, juce::String>
+                 { return { dub::durationShort (d), d <= 1 ? "COMPASSO" : "COMPASSOS" }; });
         addAndMakeVisible (*m.keys);
         addAndMakeVisible (*m.mode);
         addAndMakeVisible (*m.dur);
         if (i > 0) setupToggle (m.on, "on" + n, "ON");
     }
 
-    setupKnob (pattern, "pattern", {});
-    pattern.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
-    pattern.label.setVisible (false);
+    pattern = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("pattern"), [] (int i) -> std::pair<juce::String, juce::String>
+    {
+        static const char* names[dub::NumPatterns] = { "CONTRATEMPO", "ONE DROP", "DOUBLE SKANK", "STEPPERS" };
+        static const char* sub[dub::NumPatterns]   = { "", "2 E 4", "", "" };
+        return { names[juce::jlimit (0, dub::NumPatterns - 1, i)], sub[juce::jlimit (0, dub::NumPatterns - 1, i)] };
+    });
+    noteSize = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("noteSize"), [] (int i) -> std::pair<juce::String, juce::String>
+    {
+        static const char* sub[dub::numNoteSizes] = { "FUSA", "SEMICOLCHEIA", "COLCHEIA", "SEMINIMA", "MINIMA" };
+        return { dub::noteSizeName (i), sub[juce::jlimit (0, dub::numNoteSizes - 1, i)] };
+    });
+    addAndMakeVisible (*pattern);
+    addAndMakeVisible (*noteSize);
+
     setupKnob (center,   "center",   "REGISTRO");
     setupKnob (velocity, "velocity", "VELOCITY");
-    setupKnob (gate,     "gate",     "GATE");
     setupKnob (swing,    "swing",    "SWING");
     center.slider.textFromValueFunction = [] (double v) { return juce::MidiMessage::getMidiNoteName ((int) v, true, true, 4); };
     center.slider.updateText();
-    for (auto* k : { &velocity, &gate, &swing })
+    for (auto* k : { &velocity, &swing })
     {
         k->slider.textFromValueFunction = [] (double v) { return juce::String (juce::roundToInt (v * 100.0)) + "%"; };
         k->slider.updateText();
     }
 
-    setupToggle (preview, "preview", "PREVIEW");
-    setupToggle (sound,   "sound",   "SOM INTERNO");
-    setupToggle (bass,    "bass",    "BAIXO GUIA");
-    setupKnob (bpm,    "bpm",    "BPM");
-    setupKnob (volume, "volume", "VOLUME");
-    volume.slider.textFromValueFunction = [] (double v) { return juce::String (juce::roundToInt (v * 100.0)) + "%"; };
-    volume.slider.updateText();
+    addAndMakeVisible (previewBtn);
+    previewAtt = std::make_unique<ButtonAttach> (proc.apvts, "preview", previewBtn);
+    setupToggle (bubble, "bubble", "BUBBLE");
+    setupToggle (bass,   "bass",   "BAIXO GUIA");
+    setupToggle (sound,  "sound",  "SOM INTERNO");
+    setupKnob (bpm,      "bpm",      "BPM");
+    setupKnob (pianoLvl, "pianoLvl", "PIANO M1");
+    setupKnob (organLvl, "organLvl", "HAMMOND");
+    for (auto* k : { &pianoLvl, &organLvl })
+    {
+        k->slider.textFromValueFunction = [] (double v) { return juce::String (juce::roundToInt (v * 100.0)) + "%"; };
+        k->slider.updateText();
+    }
 
     setupKnob (reps, "exportReps", "REPETIR");
     reps.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
@@ -515,7 +583,7 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     addAndMakeVisible (exportBtn);
     addAndMakeVisible (dragZone);
 
-    setSize (1240, 750);
+    setSize (1240, 790);
     timerCallback();
     startTimerHz (30);
 }
@@ -759,7 +827,7 @@ void DubChordsPanel::renderBackground()
 
     {   // placa de latão "DUB STATION"
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION 1.0");
+        const juce::String t ("DUB STATION 1.1");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -892,12 +960,12 @@ void DubChordsPanel::renderBackground()
                         juce::Justification::centredRight);
         }
     }
-    {
-        juce::StringArray pats { "CTR", "1DROP", "DBL", "BUB", "STP" };
-        drawKnobScale (g, pattern.slider, dub::NumPatterns, pats);
-    }
-    for (auto* k : { &center, &velocity, &gate, &swing, &bpm, &volume })
+    for (auto* k : { &center, &velocity, &swing, &bpm, &pianoLvl, &organLvl })
         drawKnobScale (g, k->slider, 11);
+    g.setColour (colours::inkSoft);
+    g.setFont (stencil (9.0f, 0.3f));
+    g.drawText ("PADRAO DO SKANK", pattern->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
+    g.drawText ("TAMANHO DA NOTA", noteSize->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" });
 }
 
@@ -923,8 +991,6 @@ void DubChordsPanel::paint (juce::Graphics& g)
         glowText (g, m.display.toFloat(), t, 19.0f, on ? 1.0f : 0.35f);
     }
 
-    glowText (g, patternDisplay.toFloat(),
-              juce::String (dub::patternName ((int) proc.apvts.getRawParameterValue ("pattern")->load())).toUpperCase(), 11.5f);
 
     drawTimeline (g, timeline.toFloat());
 }
@@ -1007,47 +1073,49 @@ void DubChordsPanel::resized()
     }
 
     // --- linha de baixo
-    const int by = 500, bh = 170;
-    rhythmPanel = { 52, by, 540, bh };
-    soundPanel  = { 606, by, 290, bh };
-    midiPanel   = { 910, by, W - 52 - 910, bh };
+    const int by = 500, bh = 200;
+    rhythmPanel = { 52, by, 430, bh };
+    soundPanel  = { 496, by, 430, bh };
+    midiPanel   = { 940, by, W - 52 - 940, bh };
 
-    {   // RITMO
+    {   // RITMO: contadores à esquerda, knobs à direita
         auto a = rhythmPanel.reduced (14, 0);
-        a.removeFromTop (16);
-        auto left = a.removeFromLeft (200);
-        patternDisplay = left.removeFromTop (28).reduced (6, 0);
-        left.removeFromTop (16);
-        pattern.slider.setBounds (left.withTrimmedBottom (4).withSizeKeepingCentre (left.getWidth(), left.getHeight() - 4));
-        a.removeFromLeft (10);
-        const int kw = a.getWidth() / 4;
-        for (auto* k : { &center, &velocity, &gate, &swing })
-            placeKnob (*k, a.removeFromLeft (kw).withTrimmedBottom (8).withTrimmedTop (6));
+        a.removeFromTop (34);
+        auto left = a.removeFromLeft (190);
+        pattern->setBounds (left.removeFromTop (52));
+        left.removeFromTop (34);
+        noteSize->setBounds (left.removeFromTop (52));
+        a.removeFromLeft (8);
+        const int kw = a.getWidth() / 3;
+        for (auto* k : { &center, &velocity, &swing })
+            placeKnob (*k, a.removeFromLeft (kw).withTrimmedBottom (24).withTrimmedTop (14));
     }
-    {   // SOM
+    {   // SOM: PREVIEW + chaves à esquerda, BPM e níveis dos timbres à direita
         auto a = soundPanel.reduced (12, 0);
-        a.removeFromTop (20);
-        auto left = a.removeFromLeft (128);
-        for (auto* t : { &preview, &sound, &bass })
+        a.removeFromTop (18);
+        auto c1 = a.removeFromLeft (150);
+        previewBtn.setBounds (c1.removeFromTop (58));
+        c1.removeFromTop (8);
+        for (auto* t : { &bubble, &bass, &sound })
         {
-            t->button.setBounds (left.removeFromTop (34).reduced (0, 2));
-            left.removeFromTop (8);
+            t->button.setBounds (c1.removeFromTop (34).reduced (0, 1));
+            c1.removeFromTop (4);
         }
-        a.removeFromLeft (4);
-        const int kw = a.getWidth() / 2;
-        placeKnob (bpm, a.removeFromLeft (kw).withTrimmedBottom (8).withTrimmedTop (6));
-        placeKnob (volume, a.withTrimmedBottom (8).withTrimmedTop (6));
+        a.removeFromLeft (10);
+        const int kw = a.getWidth() / 3;
+        for (auto* k : { &bpm, &pianoLvl, &organLvl })
+            placeKnob (*k, a.removeFromLeft (kw).withTrimmedBottom (24).withTrimmedTop (14));
     }
     {   // MIDI
         auto a = midiPanel.reduced (14, 0);
-        a.removeFromTop (18);
-        auto top = a.removeFromTop (86);
-        exportBtn.setBounds (top.removeFromLeft (140).withSizeKeepingCentre (140, 54));
+        a.removeFromTop (22);
+        auto top = a.removeFromTop (92);
+        exportBtn.setBounds (top.removeFromLeft (140).withSizeKeepingCentre (140, 56));
         placeKnob (reps, top);
-        a.removeFromTop (4);
-        dragZone.setBounds (a.removeFromTop (56));
+        a.removeFromTop (14);
+        dragZone.setBounds (a.removeFromTop (60));
     }
 
-    timeline = { 62, 696, W - 124, 34 };
+    timeline = { 62, 732, W - 124, 34 };
     renderBackground();
 }

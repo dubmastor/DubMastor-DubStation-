@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(DubChords VERSION 1.0.0)
+project(DubChords VERSION 1.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,6 +43,10 @@ target_sources(DubChords PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp)
 
+# timbres compartilhados com o Roots Keys (piano M1 + Hammond)
+set(DUBSTATION_SHARED ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)
+target_include_directories(DubChords PRIVATE ${DUBSTATION_SHARED})
+
 target_compile_definitions(DubChords PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
@@ -68,6 +72,7 @@ if(DUBCHORDS_SNAPSHOT)
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="DubChords" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
+    target_include_directories(DubChordsSnapshot PRIVATE ${DUBSTATION_SHARED})
     target_link_libraries(DubChordsSnapshot PRIVATE juce::juce_audio_utils
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 endif()

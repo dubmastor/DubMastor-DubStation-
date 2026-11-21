@@ -1,4 +1,7 @@
 // Dub Chords — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
+//  - skank de piano "com as duas mãos": a mesma inversão em duas oitavas (canal 1)
+//  - bubble de órgão uma oitava abaixo do skank (canal 3)
+//  - baixo guia na tônica (canal 2)
 #pragma once
 #include <algorithm>
 #include <cmath>
@@ -8,30 +11,14 @@
 namespace dub
 {
 //==============================================================================
-// Qualidades de acorde
-enum Quality { Maj, Min, Dom7, Min7, Maj7, Min6, Sus2, Sus4, Dim, Min9, NumQualities };
+enum Quality { Maj, Min, NumQualities };
 
-inline const char* qualityName (int q)
-{
-    static const char* names[NumQualities] = { "", "m", "7", "m7", "maj7", "m6", "sus2", "sus4", "dim", "m9" };
-    return names[std::clamp (q, 0, NumQualities - 1)];
-}
+inline const char* qualityName (int q) { return q == Min ? "m" : ""; }
 
 inline const std::vector<int>& intervals (int q)
 {
-    static const std::vector<int> table[NumQualities] = {
-        { 0, 4, 7 },        // Maior
-        { 0, 3, 7 },        // menor
-        { 0, 4, 7, 10 },    // 7
-        { 0, 3, 7, 10 },    // m7
-        { 0, 4, 7, 11 },    // maj7
-        { 0, 3, 7, 9 },     // m6
-        { 0, 2, 7 },        // sus2
-        { 0, 5, 7 },        // sus4
-        { 0, 3, 6 },        // dim
-        { 0, 3, 10, 14 },   // m9 (sem quinta, soa bem no skank)
-    };
-    return table[std::clamp (q, 0, NumQualities - 1)];
+    static const std::vector<int> maj { 0, 4, 7 }, min { 0, 3, 7 };
+    return q == Min ? min : maj;
 }
 
 inline const char* rootName (int r)
@@ -41,11 +28,16 @@ inline const char* rootName (int r)
 }
 
 //==============================================================================
-// Durações (em tempos de semínima, compasso 4/4)
+// Duração de cada acorde (em tempos de semínima, compasso 4/4)
 inline constexpr int numDurations = 6;
 inline const char* durationName (int d)
 {
     static const char* names[numDurations] = { "1/2 comp.", "1 comp.", "2 comp.", "3 comp.", "4 comp.", "8 comp." };
+    return names[std::clamp (d, 0, numDurations - 1)];
+}
+inline const char* durationShort (int d)
+{
+    static const char* names[numDurations] = { "1/2", "1", "2", "3", "4", "8" };
     return names[std::clamp (d, 0, numDurations - 1)];
 }
 inline double durationBeats (int d)
@@ -55,42 +47,58 @@ inline double durationBeats (int d)
 }
 
 //==============================================================================
-// Padrões rítmicos (grade de 16 semicolcheias por compasso)
-enum Pattern { SkankOffbeat, Skank24, DoubleSkank, Bubble, Steppers, NumPatterns };
+// Tamanho da nota (figura) de cada ataque do skank / bubble
+inline constexpr int numNoteSizes = 5;
+inline const char* noteSizeName (int n)
+{
+    static const char* names[numNoteSizes] = { "1/32", "1/16", "1/8", "1/4", "1/2" };
+    return names[std::clamp (n, 0, numNoteSizes - 1)];
+}
+inline double noteSizeBeats (int n)
+{
+    static const double beats[numNoteSizes] = { 0.125, 0.25, 0.5, 1.0, 2.0 };
+    return beats[std::clamp (n, 0, numNoteSizes - 1)];
+}
+
+//==============================================================================
+// Padrões do skank (grade de 16 semicolcheias por compasso)
+enum Pattern { SkankOffbeat, Skank24, DoubleSkank, Steppers, NumPatterns };
 
 inline const char* patternName (int p)
 {
-    static const char* names[NumPatterns] = {
-        "Skank contratempo", "Skank 2 e 4 (one drop)", "Double skank", "Bubble (orgao)", "Steppers skank"
-    };
+    static const char* names[NumPatterns] = { "Contratempo", "One drop (2 e 4)", "Double skank", "Steppers" };
     return names[std::clamp (p, 0, NumPatterns - 1)];
 }
 
-struct Hit { int step; float vel; double lenSteps; };
+struct Hit { int step; float vel; };
 
 inline std::vector<Hit> patternHits (int p)
 {
     switch (p)
     {
-        case Skank24:     return { { 4, 1.0f, 2 }, { 12, 1.0f, 2 } };
-        case DoubleSkank: return { { 2, 1.0f, 1 }, { 3, 0.7f, 1 }, { 6, 1.0f, 1 }, { 7, 0.7f, 1 },
-                                   { 10, 1.0f, 1 }, { 11, 0.7f, 1 }, { 14, 1.0f, 1 }, { 15, 0.7f, 1 } };
-        case Bubble:
-        {
-            std::vector<Hit> h;
-            for (int s = 0; s < 16; ++s)
-                if (s % 4 != 0)
-                    h.push_back ({ s, (s % 4 == 2) ? 1.0f : 0.55f, 1 });
-            return h;
-        }
-        case Steppers:    return { { 2, 1.0f, 1 }, { 6, 0.85f, 1 }, { 10, 1.0f, 1 }, { 14, 0.85f, 1 }, { 15, 0.6f, 1 } };
+        case Skank24:     return { { 4, 1.0f }, { 12, 1.0f } };
+        case DoubleSkank: return { { 2, 1.0f }, { 3, 0.72f }, { 6, 1.0f }, { 7, 0.72f },
+                                   { 10, 1.0f }, { 11, 0.72f }, { 14, 1.0f }, { 15, 0.72f } };
+        case Steppers:    return { { 2, 1.0f }, { 6, 0.85f }, { 10, 1.0f }, { 14, 0.85f }, { 15, 0.6f } };
         case SkankOffbeat:
-        default:          return { { 2, 1.0f, 1 }, { 6, 1.0f, 1 }, { 10, 1.0f, 1 }, { 14, 1.0f, 1 } };
+        default:          return { { 2, 1.0f }, { 6, 1.0f }, { 10, 1.0f }, { 14, 1.0f } };
     }
+}
+
+// Bubble de órgão: semicolcheias fora dos tempos, com acento no contratempo
+inline std::vector<Hit> bubbleHits()
+{
+    std::vector<Hit> h;
+    for (int s = 0; s < 16; ++s)
+        if (s % 4 != 0)
+            h.push_back ({ s, (s % 4 == 2) ? 0.9f : 0.55f });
+    return h;
 }
 
 //==============================================================================
 struct ChordSlot { int root = 9; int quality = Min; double beats = 8; };
+
+enum Channel { ChSkank = 1, ChBass = 2, ChBubble = 3 };
 
 struct NoteEvent
 {
@@ -98,16 +106,18 @@ struct NoteEvent
     double length;  // em tempos
     int note;
     int velocity;   // 1..127
-    int channel;    // 1 = acordes, 2 = baixo guia
+    int channel;    // instrumento: 1 = skank (piano), 2 = baixo guia, 3 = bubble (órgão)
+    int slot;       // índice do acorde (0..3) — usado para colorir o MIDI exportado
 };
 
 struct Settings
 {
     int pattern = SkankOffbeat;
-    int centerNote = 62;     // centro do registro dos acordes (D4)
+    int centerNote = 60;     // centro da mão esquerda do skank (C4)
     float velocity = 0.8f;   // 0..1
-    float gate = 0.8f;       // 0.1..1 (fração do comprimento da nota)
+    int noteSize = 1;        // índice em noteSizeBeats (padrão 1/16)
     float swing = 0.0f;      // 0..1 (atrasa as semicolcheias pares)
+    bool bubble = true;      // órgão uma oitava abaixo do skank
     bool bass = true;
     int bassBase = 36;       // C2: a fundamental do baixo fica entre C2 e B2
 };
@@ -134,7 +144,7 @@ inline std::vector<int> voiceChord (int root, int quality, int center, const std
             std::vector<int> cand { bottom };
             for (int k = 1; k < n; ++k)
             {
-                int pc = pcs[(size_t) ((inv + k) % n)];
+                const int pc = pcs[(size_t) ((inv + k) % n)];
                 int note = cand.back() + 1;
                 while (((note % 12) + 12) % 12 != pc) ++note;
                 cand.push_back (note);
@@ -163,58 +173,85 @@ inline std::vector<int> voiceChord (int root, int quality, int center, const std
 }
 
 //==============================================================================
-// Gera um loop completo de eventos a partir dos slots ativos
+// Comprimento de um ataque: o tamanho de nota escolhido, mas nunca encostando no próximo ataque
+inline double hitLength (const std::vector<Hit>& hits, size_t index, double noteBeats, double swingOffset)
+{
+    const int step = hits[index].step;
+    int gapSteps = 16;
+    for (const auto& h : hits)
+    {
+        int d = h.step - step;
+        if (d <= 0) d += 16;
+        gapSteps = std::min (gapSteps, d);
+    }
+    const double maxLen = gapSteps * 0.25 - swingOffset - 0.02;
+    return std::max (0.03, std::min (noteBeats, maxLen));
+}
+
+// Gera um loop completo de eventos a partir dos slots (beats == 0 → acorde desligado)
 inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, const Settings& s, double& loopBeats)
 {
     std::vector<NoteEvent> events;
     loopBeats = 0;
 
     const auto hits = patternHits (s.pattern);
+    const auto bub  = bubbleHits();
+    const double noteBeats = noteSizeBeats (s.noteSize);
     std::vector<int> prev;
     double pos = 0;   // posição em tempos
 
-    for (const auto& slot : slots)
+    for (int si = 0; si < (int) slots.size(); ++si)
     {
+        const auto& slot = slots[(size_t) si];
         if (slot.beats <= 0) continue;
 
-        const auto voicing = voiceChord (slot.root, slot.quality, s.centerNote, prev);
-        prev = voicing;
+        // mão esquerda (voicing) + mão direita uma oitava acima
+        const auto left = voiceChord (slot.root, slot.quality, s.centerNote, prev);
+        prev = left;
+        std::vector<int> skank = left;
+        for (int n : left) skank.push_back (n + 12);
+        std::vector<int> organ;
+        for (int n : left) organ.push_back (n - 12);           // bubble uma oitava abaixo do skank
 
         const int firstStep = (int) std::lround (pos * 4.0);
         const int numSteps  = (int) std::lround (slot.beats * 4.0);
 
-        for (int st = firstStep; st < firstStep + numSteps; ++st)
+        auto emit = [&] (const std::vector<Hit>& hs, const std::vector<int>& notes, int channel, float velScale, int st)
         {
             const int stepInBar = st % 16;
-
-            for (const auto& h : hits)
+            for (size_t h = 0; h < hs.size(); ++h)
             {
-                if (h.step != stepInBar) continue;
-                double start = st * 0.25;
+                if (hs[h].step != stepInBar) continue;
                 const double swingOffset = (stepInBar % 2 == 1) ? s.swing * 0.125 : 0.0;
-                start += swingOffset;
-                // termina antes do próximo passo da grade, mesmo com swing
-                const double maxLen = h.lenSteps * 0.25 - swingOffset - 0.01;
-                const double len = std::max (0.03, std::min (maxLen, h.lenSteps * 0.25 * s.gate));
-                const int vel = std::clamp ((int) std::lround (h.vel * s.velocity * 127.0f), 1, 127);
-                for (int note : voicing)
-                    events.push_back ({ start, len, std::clamp (note, 0, 127), vel, 1 });
+                const double start = st * 0.25 + swingOffset;
+                const double len = hitLength (hs, h, noteBeats, swingOffset);
+                const int vel = std::clamp ((int) std::lround (hs[h].vel * s.velocity * velScale * 127.0f), 1, 127);
+                for (int note : notes)
+                    events.push_back ({ start, len, std::clamp (note, 0, 127), vel, channel, si });
             }
+        };
 
-            // Baixo guia: fundamental no 1 e no "e" do 3 (estilo one drop simples)
+        for (int st = firstStep; st < firstStep + numSteps; ++st)
+        {
+            emit (hits, skank, ChSkank, 1.0f, st);
+            if (s.bubble) emit (bub, organ, ChBubble, 0.85f, st);
+
+            // baixo guia: tônica no 1 e no "e" do 3 (one drop simples)
+            const int stepInBar = st % 16;
             if (s.bass && (stepInBar == 0 || stepInBar == 10))
             {
                 const int note = s.bassBase + ((slot.root % 12) + 12) % 12;
-                const double len = (stepInBar == 0 ? 1.5 : 1.0) * std::max (0.5f, s.gate);
+                const double maxLen = (firstStep + numSteps - st) * 0.25 - 0.02;   // não invade o próximo acorde
+                const double len = std::min (stepInBar == 0 ? 1.4 : 0.9, maxLen);
                 const int vel = std::clamp ((int) std::lround (s.velocity * 127.0f * 0.9f), 1, 127);
-                events.push_back ({ st * 0.25, len, note, vel, 2 });
+                events.push_back ({ st * 0.25, len, note, vel, ChBass, si });
             }
         }
         pos += slot.beats;
     }
 
     loopBeats = pos;
-    std::sort (events.begin(), events.end(), [] (const NoteEvent& a, const NoteEvent& b) { return a.start < b.start; });
+    std::stable_sort (events.begin(), events.end(), [] (const NoteEvent& a, const NoteEvent& b) { return a.start < b.start; });
     return events;
 }
 

@@ -23,11 +23,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     for (int d = 0; d < dub::numDurations; ++d) durs.add (dub::durationName (d));
     for (int p = 0; p < dub::NumPatterns; ++p) pats.add (dub::patternName (p));
 
-    // Progressão padrão: Am (2 comp.) | Dm (1) | Em (1) | G (desligado)
+    // Progressão padrão: Am (2 comp.) | Dm (1) | Em (1/2) | G (1/2)
     const int  defRoot[numSlots] = { 9, 2, 4, 7 };
     const int  defQual[numSlots] = { dub::Min, dub::Min, dub::Min, dub::Maj };
-    const int  defDur [numSlots] = { 2, 1, 1, 1 };
-    const bool defOn  [numSlots] = { true, true, true, false };
+    const int  defDur [numSlots] = { 2, 1, 0, 0 };            // 2 comp. | 1 comp. | 1/2 | 1/2
+    const bool defOn  [numSlots] = { true, true, true, true };
 
     for (int i = 0; i < numSlots; ++i)
     {
@@ -40,15 +40,22 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     }
 
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pattern", 1 }, "Padrao", pats, 0));
-    layout.add (std::make_unique<AudioParameterInt>    (ParameterID { "center", 1 }, "Registro", 50, 76, 62));
+    layout.add (std::make_unique<AudioParameterInt>    (ParameterID { "center", 1 }, "Registro", 48, 72, 60));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "velocity", 1 }, "Velocity", 0.1f, 1.0f, 0.8f));
-    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "gate", 1 }, "Gate", 0.1f, 1.0f, 0.7f));
+    {
+        StringArray sizes;
+        for (int n = 0; n < dub::numNoteSizes; ++n) sizes.add (dub::noteSizeName (n));
+        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "noteSize", 1 }, "Tamanho da nota", sizes, 1));
+    }
+    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bubble", 1 }, "Bubble (orgao)", true));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "swing", 1 }, "Swing", 0.0f, 1.0f, 0.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bass", 1 }, "Baixo guia", true));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "preview", 1 }, "Preview (clock interno)", false));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (55.0f, 180.0f, 1.0f), 75.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));
-    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "volume", 1 }, "Volume", 0.0f, 1.0f, 0.7f));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "volume", 1 }, "Volume", 0.0f, 1.0f, 0.75f));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "pianoLvl", 1 }, "Piano M1", 0.0f, 1.0f, 0.8f));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "organLvl", 1 }, "Orgao Hammond", 0.0f, 1.0f, 0.6f));
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "exportReps", 1 }, "Repeticoes no export",
                                                         StringArray { "1x", "2x", "4x", "8x" }, 1));
     return layout;
@@ -59,8 +66,6 @@ DubChordsProcessor::DubChordsProcessor()
     : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       apvts (*this, nullptr, "DubChords", createLayout())
 {
-    for (int v = 0; v < 24; ++v) synth.addVoice (new DubVoice());
-    synth.addSound (new DubSound());
 
     for (auto* p : getParameters())
         if (auto* withId = dynamic_cast<juce::AudioProcessorParameterWithID*> (p))
@@ -85,7 +90,9 @@ bool DubChordsProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 void DubChordsProcessor::prepareToPlay (double sampleRate, int)
 {
     sr = sampleRate;
-    synth.setCurrentPlaybackSampleRate (sampleRate);
+    sound.prepare (sampleRate);
+    renderL.assign (8192, 0.0f);
+    renderR.assign (8192, 0.0f);
     dirty.store (true);
 }
 
@@ -111,7 +118,8 @@ dub::Settings DubChordsProcessor::getSettings() const
     s.pattern    = (int) param ("pattern");
     s.centerNote = (int) param ("center");
     s.velocity   = param ("velocity");
-    s.gate       = param ("gate");
+    s.noteSize   = (int) param ("noteSize");
+    s.bubble     = param ("bubble") > 0.5f;
     s.swing      = param ("swing");
     s.bass       = param ("bass") > 0.5f;
     return s;
@@ -253,9 +261,45 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     }
 
     // --- Som interno (o MIDI gerado continua saindo para a DAW) ---
-    synth.renderNextBlock (buffer, midi, 0, numSamples);
-    if (param ("sound") < 0.5f) buffer.clear();
-    else buffer.applyGain (param ("volume"));
+    if (param ("sound") > 0.5f)
+        renderSound (buffer, midi);
+}
+
+//==============================================================================
+// Toca o MIDI do bloco no som interno (piano M1 no canal 1, baixo no 2, Hammond no 3)
+void DubChordsProcessor::renderSound (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& midi)
+{
+    sound.pianoLevel = param ("pianoLvl");
+    sound.organLevel = param ("organLvl");
+    sound.master     = param ("volume");
+
+    const int n = buffer.getNumSamples();
+    if ((int) renderL.size() < n) { renderL.resize ((size_t) n); renderR.resize ((size_t) n); }   // só se o host mandar bloco gigante
+    std::fill (renderL.begin(), renderL.begin() + n, 0.0f);
+    std::fill (renderR.begin(), renderR.begin() + n, 0.0f);
+
+    int pos = 0;
+    for (const auto meta : midi)
+    {
+        const int at = juce::jlimit (0, n, meta.samplePosition);
+        if (at > pos) { sound.render (renderL.data() + pos, renderR.data() + pos, at - pos); pos = at; }
+        const auto m = meta.getMessage();
+        if (m.isNoteOn())                         sound.noteOn (m.getChannel(), m.getNoteNumber(), m.getFloatVelocity());
+        else if (m.isNoteOff())                   sound.noteOff (m.getChannel(), m.getNoteNumber());
+        else if (m.isAllNotesOff() || m.isAllSoundOff()) sound.allNotesOff();
+    }
+    if (pos < n) sound.render (renderL.data() + pos, renderR.data() + pos, n - pos);
+
+    if (buffer.getNumChannels() >= 2)
+    {
+        buffer.copyFrom (0, 0, renderL.data(), n);
+        buffer.copyFrom (1, 0, renderR.data(), n);
+    }
+    else if (buffer.getNumChannels() == 1)
+    {
+        for (int i = 0; i < n; ++i) renderL[(size_t) i] = 0.5f * (renderL[(size_t) i] + renderR[(size_t) i]);
+        buffer.copyFrom (0, 0, renderL.data(), n);
+    }
 }
 
 //==============================================================================
@@ -269,35 +313,53 @@ bool DubChordsProcessor::writeMidiFile (const juce::File& file) const
     const int reps = exportRepsTable[juce::jlimit (0, 3, (int) param ("exportReps"))];
     const double bpm = getExportBpm();
 
-    juce::MidiMessageSequence meta, chords, bass;
+    // Uma faixa por instrumento; dentro de cada faixa, cada acorde usa o seu canal MIDI
+    // (acorde 1 = canal 1 ... acorde 4 = canal 4). Na DAW, colorir as notas por canal
+    // (Cubase: Cores > Canal; REAPER e FL Studio também) deixa cada acorde de uma cor.
+    juce::MidiMessageSequence meta, skank, bubble, bass;
     meta.addEvent (juce::MidiMessage::tempoMetaEvent ((int) std::round (60000000.0 / bpm)), 0.0);
     meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
-    auto trackName = [] (const juce::String& n)
+    auto trackName = [] (const juce::String& n) { return juce::MidiMessage::textMetaEvent (3, n); };
+    skank.addEvent  (trackName ("Dub Chords - Skank (piano)"), 0.0);
+    bubble.addEvent (trackName ("Dub Chords - Bubble (orgao)"), 0.0);
+    bass.addEvent   (trackName ("Dub Chords - Baixo guia"), 0.0);
+
+    // marcadores com o nome de cada acorde (aparecem na régua/marker track da DAW)
+    const auto slots = getSlots();
+    for (int r = 0; r < reps; ++r)
     {
-        return juce::MidiMessage::textMetaEvent (3, n);
-    };
-    chords.addEvent (trackName ("Dub Chords - Skank"), 0.0);
-    bass.addEvent (trackName ("Dub Chords - Baixo guia"), 0.0);
+        double pos = 0.0;
+        for (const auto& sl : slots)
+        {
+            if (sl.beats <= 0) continue;
+            meta.addEvent (juce::MidiMessage::textMetaEvent (6, juce::String (dub::chordLabel (sl))), (pos + r * lb) * tpq);
+            pos += sl.beats;
+        }
+    }
 
     for (int r = 0; r < reps; ++r)
         for (const auto& e : events)
         {
             const double on  = (e.start + r * lb) * tpq;
             const double off = (e.start + e.length + r * lb) * tpq;
-            auto& seq = (e.channel == 2) ? bass : chords;
-            seq.addEvent (juce::MidiMessage::noteOn (e.channel, e.note, (juce::uint8) e.velocity), on);
-            seq.addEvent (juce::MidiMessage::noteOff (e.channel, e.note), off);
+            auto& seq = e.channel == dub::ChBass ? bass : e.channel == dub::ChBubble ? bubble : skank;
+            const int ch = juce::jlimit (1, 16, e.slot + 1);
+            seq.addEvent (juce::MidiMessage::noteOn (ch, e.note, (juce::uint8) e.velocity), on);
+            seq.addEvent (juce::MidiMessage::noteOff (ch, e.note), off);
         }
-
-    chords.sort(); chords.updateMatchedPairs();
-    bass.sort();   bass.updateMatchedPairs();
 
     juce::MidiFile mf;
     mf.setTicksPerQuarterNote (tpq);
+    meta.sort();
     mf.addTrack (meta);
-    mf.addTrack (chords);
-    if (bass.getNumEvents() > 1) mf.addTrack (bass);
+    for (auto* seq : { &skank, &bubble, &bass })
+        if (seq->getNumEvents() > 1)
+        {
+            seq->sort();
+            seq->updateMatchedPairs();
+            mf.addTrack (*seq);
+        }
 
     file.getParentDirectory().createDirectory();
     file.deleteFile();

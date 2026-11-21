@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'DubChords/**'
+      - 'RootsKeys/Source/RootsKeysEngine.h'
+      - 'RootsKeys/Source/TapeEchoDSP.h'
       - '.github/workflows/build-dubchords.yml'
   release:
     types: [published]
@@ -144,4 +146,4 @@ jobs:
           prerelease: ${{ inputs.prerelease == true }}
           make_latest: ${{ inputs.prerelease == true && 'false' || 'legacy' }}
           body_path: ${{ inputs.prerelease == true && 'DubChords/RELEASE_NOTES.md' || '' }}
-          name: ${{ inputs.prerelease == true && 'Dub Chords 1.0 (teste)' || '' }}
+          name: ${{ inputs.prerelease == true && format('{0} (teste)', inputs.tag) || '' }}

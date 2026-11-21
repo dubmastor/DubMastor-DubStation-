@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "PluginProcessor.h"
 
@@ -80,17 +81,29 @@ public:
     void mouseDown (const juce::MouseEvent& e) override { select (e.position.x < (float) getWidth() * 0.5f ? 0 : 1); }
 };
 
-// Duração: janela de contador mecânico; clique à direita avança, à esquerda volta
-class DurationWindow : public ParamControl
+// Janela de contador mecânico (duração, padrão, tamanho da nota):
+// clique à direita avança, à esquerda volta
+class ChoiceWindow : public ParamControl
 {
 public:
-    using ParamControl::ParamControl;
+    // texto grande + texto pequeno para cada opção
+    using Formatter = std::function<std::pair<juce::String, juce::String> (int)>;
+    ChoiceWindow (juce::RangedAudioParameter& p, Formatter f) : ParamControl (p), format (std::move (f)) {}
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override { side = e.position.x < (float) getWidth() * 0.5f ? -1 : 1; repaint(); }
     void mouseExit (const juce::MouseEvent&) override   { side = 0; repaint(); }
 private:
+    Formatter format;
     int side = 0;
+};
+
+// PREVIEW: botão grande de pedal com lâmpada (liga/desliga o clock interno)
+class PreviewButton : public juce::Button
+{
+public:
+    PreviewButton() : juce::Button ("PREVIEW") { setClickingTogglesState (true); }
+    void paintButton (juce::Graphics&, bool over, bool down) override;
 };
 
 //==============================================================================
@@ -123,7 +136,7 @@ private:
     {
         std::unique_ptr<NoteKeys> keys;
         std::unique_ptr<ModeSwitch> mode;
-        std::unique_ptr<DurationWindow> dur;
+        std::unique_ptr<ChoiceWindow> dur;
         Toggle on;                       // só nos acordes 2, 3 e 4
         juce::Rectangle<int> area, display;
     };
@@ -142,16 +155,19 @@ private:
     DubLookAndFeel lnf;
 
     std::array<ChordModule, DubChordsProcessor::numSlots> mods;
-    Knob pattern, center, velocity, gate, swing;
-    Knob bpm, volume, reps;
-    Toggle preview, sound, bass;
+    Knob center, velocity, swing;
+    Knob bpm, pianoLvl, organLvl, reps;
+    std::unique_ptr<ChoiceWindow> pattern, noteSize;
+    Toggle bubble, sound, bass;
+    PreviewButton previewBtn;
+    std::unique_ptr<ButtonAttach> previewAtt;
     juce::TextButton exportBtn { "EXPORTAR" };
     MidiDragZone dragZone;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
     juce::Rectangle<int> woodL, woodR, plate;
-    juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline, patternDisplay;
+    juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline;
     std::array<bool, DubChordsProcessor::numSlots> lastOn {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubChordsPanel)

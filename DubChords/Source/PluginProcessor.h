@@ -52,10 +52,12 @@ private:
     void parameterChanged (const juce::String&, float) override { dirty.store (true); }
     void rebuild();
     void allNotesOff (juce::MidiBuffer& midi, int sample);
+    void renderSound (juce::AudioBuffer<float>&, const juce::MidiBuffer&);
 
     float param (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
 
-    juce::Synthesiser synth;
+    DubSoundEngine sound;
+    std::vector<float> renderL, renderR;
 
     std::vector<dub::NoteEvent> loop;
     double loopBeats = 0.0;
