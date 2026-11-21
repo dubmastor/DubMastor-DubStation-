@@ -2,7 +2,7 @@
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
- #define JucePlugin_VersionString "2.2.0"
+ #define JucePlugin_VersionString "2.3.0"
 #endif
 static juce::String versionShort() { return juce::String (JucePlugin_VersionString).upToLastOccurrenceOf (".", false, false); }
 
@@ -1142,13 +1142,13 @@ void BassMachinePanel::renderBackground()
     // --- cabeçalho
     g.setColour (colours::ink);
     g.setFont (stencil (30.0f, 0.22f));
-    const juce::String title ("MASTOR BASS MACHINE");
+    const juce::String title ("MASTOR BASS MACHINE " + versionShort());
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
-    {   // placa de latão com o modelo
+    {   // placa de latão "DUB STATION" (a versão fica no título)
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION " + versionShort());
+        const juce::String t ("DUB STATION");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));

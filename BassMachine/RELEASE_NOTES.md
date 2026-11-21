@@ -1,4 +1,8 @@
-# Mastor Bass Machine MBM-710 — 2.2 · Gerador de Reggae Bass Lines
+# Mastor Bass Machine MBM-710 — 2.3 · Gerador de Reggae Bass Lines
+
+- Padrão visual atual da linha Dub Station: a versão fica no título ("MASTOR BASS MACHINE 2.3") e a plaqueta dourada só com "DUB STATION"
+
+## 2.2
 
 - Preview com o som do **Dub Bass 1.3** e os valores iniciais dele: Classic Sine (Harm 2 15 %, Harm 3 8 %), envelope 3 / 600 ms / 85 % / 180 ms, cutoff 900 Hz, ressonância 0,8, **sem saturação e sem reverb**
 - Seletor de timbre com só duas teclas: **ROOTS (SINE)** e **SUPER TONE** (o baixo digital King Jammy do Dub Bass)
