@@ -11,7 +11,8 @@ const Colour amber   (0xffffa630);
 const Colour lampOff (0xff4a3418);
 
 constexpr int kWood = 26;
-constexpr int kTopH = 212;
+constexpr const char* kVersion = "1.6";
+constexpr int kTopH = 236;
 
 // escala do VU: linear em tensão de -20 VU a +3 VU, ponteiro abrindo ±42°
 constexpr float kVuSwing = 0.7330f;
@@ -816,17 +817,17 @@ void StationPanel::resized()
 {
     auto content = getLocalBounds().reduced (kWood, 0);
     topPanel = content.removeFromTop (kTopH);
-    plateArea = { (float) topPanel.getX() + 24.0f, 22.0f, 326.0f, 80.0f };
+    plateArea = { (float) topPanel.getX() + 24.0f, 18.0f, 326.0f, 74.0f };
     {
         auto tp = topPanel;
         tp.removeFromLeft (350);
         vuArea = tp.removeFromLeft (190).reduced (6, 16);
         tapeWin = tp.reduced (14, 18);
     }
-    lampPos = { plateArea.getRight() - 14.0f, (float) topPanel.getBottom() - 26.0f };
+    lampPos = { plateArea.getRight() - 14.0f, plateArea.getBottom() + 26.0f };
     status.setBounds (tapeWin.getX() + 14, tapeWin.getY() + 8, tapeWin.getWidth() - 28, 18);
     // BYPASS grande no painel de cima, ao lado da lâmpada NO AR
-    bypassBtn.button.setBounds ((int) plateArea.getX() + 4, topPanel.getBottom() - 46, 132, 36);
+    bypassBtn.button.setBounds ((int) plateArea.getX() + 4, topPanel.getBottom() - 44, 132, 36);
 
     auto rows = content.reduced (8, 0).withTrimmedTop (10).withTrimmedBottom (8);
 
@@ -963,22 +964,24 @@ void StationPanel::paint (Graphics& g)
         g.setColour (c);
         g.drawText (t, r, j);
     };
-    g.setFont (mf::title (25.0f).withExtraKerningFactor (0.03f));
-    engraved ("MASTOR FONE", { pl.getX() + 15, pl.getY() + 10, pl.getWidth() - 86, 40 }, Justification::centredLeft, Colour (0xff262626));
+    // nome completo (a fonte encolhe até caber) + modelo e versão
+    {
+        const String title ("MASTOR PHONE VOX");
+        const float maxW = pl.getWidth() - 34.0f;
+        float fs = 27.0f;
+        while (fs > 14.0f && GlyphArrangement::getStringWidth (mf::title (fs).withExtraKerningFactor (0.03f), title) > maxW)
+            fs -= 0.5f;
+        g.setFont (mf::title (fs).withExtraKerningFactor (0.03f));
+        engraved (title, { pl.getX() + 15, pl.getY() + 9, maxW + 4, 36 }, Justification::centredLeft, Colour (0xff262626));
+    }
     g.setFont (bold (9.5f).withExtraKerningFactor (0.12f));
-    engraved (String::fromUTF8 ("RÁDIO AM  ·  TELEFONE  ·  MEGAFONE"), { pl.getX() + 17, pl.getY() + 53, pl.getWidth() - 96, 14 },
-              Justification::centredLeft, Colour (0xff3a3a3a));
-    const auto inset = Rectangle<float> (pl.getRight() - 70, pl.getY() + 17, 54, 46);
-    g.setFont (mf::title (23.0f));
-    g.setColour (amber.withAlpha (0.35f));
-    g.drawText ("1.6", inset.expanded (1.0f), Justification::centred);
-    g.setColour (amber);
-    g.drawText ("1.6", inset, Justification::centred);
+    engraved (String::fromUTF8 ("MPV-01  ·  ") + kVersion + String::fromUTF8 ("  ·  RÁDIO AM  ·  TELEFONE  ·  MEGAFONE"),
+              { pl.getX() + 17, pl.getY() + 48, pl.getWidth() - 30, 14 }, Justification::centredLeft, Colour (0xff3a3a3a));
 
     // assinatura "Dub Station Solutions" em tinta marrom, com traço
     {
         Graphics::ScopedSaveState ss (g);
-        const auto sp = Point<float> (pl.getX() + 10, pl.getBottom() + 4);
+        const auto sp = Point<float> (pl.getX() + 10, pl.getBottom() + 44);
         g.addTransform (AffineTransform::rotation (-0.05f, sp.x, sp.y + 26));
         g.setColour (ink);
         g.setFont (mf::script (38.0f));
@@ -1354,11 +1357,44 @@ void StationPanel::renderBackground()
             g.setGradientFill (ColourGradient (Colour (0xfff4f4f4), rv.x - 3, rv.y - 3, Colour (0xff6a6a6a), rv.x + 3, rv.y + 3, false));
             g.fillEllipse (rv.x - 3.0f, rv.y - 3.0f, 6.0f, 6.0f);
         }
-        const auto inset = Rectangle<float> (pl.getRight() - 70, pl.getY() + 17, 54, 46);
-        g.setColour (Colour (0xff0e0e0e));
-        g.fillRoundedRectangle (inset, 3.0f);
-        g.setColour (Colours::white.withAlpha (0.5f));
-        g.drawLine (inset.getX() + 2, inset.getBottom() + 0.5f, inset.getRight() - 2, inset.getBottom() + 0.5f, 1.0f);
+    }
+
+    {   // plaquinha de latão "DUB STATION", padrão da linha Dub Station
+        const auto pl = plateArea;
+        Random rng (77);
+        const auto f = mf::title (15.0f).withExtraKerningFactor (0.30f);
+        const String t ("DUB STATION");
+        const float tw = GlyphArrangement::getStringWidth (f, t);
+        auto gp = Rectangle<float> (pl.getX() + 2.0f, pl.getBottom() + 10.0f, tw + 64.0f, 32.0f);
+        g.setColour (Colours::black.withAlpha (0.28f));
+        g.fillRoundedRectangle (gp.translated (1.5f, 3.0f), 3.0f);
+        ColourGradient brass (Colour (0xffe3cd85), gp.getX(), gp.getY(), Colour (0xff8a6d2c), gp.getX(), gp.getBottom(), false);
+        brass.addColour (0.45, Colour (0xffc7a95a));
+        brass.addColour (0.55, Colour (0xffb39446));
+        g.setGradientFill (brass);
+        g.fillRoundedRectangle (gp, 3.0f);
+        for (int i = 0; i < 70; ++i)
+        {
+            const float yy = gp.getY() + 1.0f + rng.nextFloat() * (gp.getHeight() - 2.0f);
+            const float x0 = gp.getX() + rng.nextFloat() * gp.getWidth() * 0.5f;
+            g.setColour ((rng.nextBool() ? Colours::white : Colour (0xff5a4316)).withAlpha (0.06f + rng.nextFloat() * 0.08f));
+            g.drawHorizontalLine ((int) yy, x0, jmin (gp.getRight() - 1.0f, x0 + 20.0f + rng.nextFloat() * gp.getWidth() * 0.6f));
+        }
+        g.setColour (Colours::white.withAlpha (0.55f));
+        g.drawLine (gp.getX() + 2, gp.getY() + 1, gp.getRight() - 2, gp.getY() + 1, 1.0f);
+        g.setColour (Colour (0xff3d2c0c).withAlpha (0.55f));
+        g.drawRoundedRectangle (gp, 3.0f, 0.8f);
+        for (float rx : { gp.getX() + 12.0f, gp.getRight() - 12.0f })
+        {
+            const auto rv = Rectangle<float> (9, 9).withCentre ({ rx, gp.getCentreY() });
+            g.setGradientFill (ColourGradient (Colour (0xfff0dfa6), rv.getX(), rv.getY(), Colour (0xff6b5220), rv.getRight(), rv.getBottom(), false));
+            g.fillEllipse (rv);
+        }
+        g.setFont (f);
+        g.setColour (Colours::white.withAlpha (0.45f));
+        g.drawText (t, gp.translated (0.8f, 1.0f), Justification::centred);
+        g.setColour (Colour (0xff2e2108));
+        g.drawText (t, gp, Justification::centred);
     }
 
     drawVuFace (g);

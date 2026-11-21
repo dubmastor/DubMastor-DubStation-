@@ -29,7 +29,7 @@ juce_add_plugin(MastorFone
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Drfn
     FORMATS ${RF_FORMATS}
-    PRODUCT_NAME "Mastor Fone"
+    PRODUCT_NAME "Mastor Phone Vox MPV-01"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE

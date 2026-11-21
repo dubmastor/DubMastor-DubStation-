@@ -127,7 +127,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kW = 1140, kH = 680;
+    static constexpr int kW = 1140, kH = 704;
 
 private:
     struct Knob

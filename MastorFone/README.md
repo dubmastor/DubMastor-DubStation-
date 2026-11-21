@@ -1,17 +1,17 @@
-# Mastor Fone 1.6 — voz de aparelho antigo 📻☎️📣
+# Mastor Phone Vox MPV-01 1.6 — voz de aparelho antigo 📻☎️📣
 
 *Dub Station Solutions*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Baixar a versão mais nova](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest)**
+**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MastorPhoneVox-Windows.zip) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MastorPhoneVox-macOS.zip) (release [MPV-01-1.6](https://github.com/dubmastor/DubMastor-DubStation-/releases/tag/MPV-01-1.6))
 
 Efeito para voz que imita três aparelhos: **RÁDIO AM**, **TELEFONE antigo** e **MEGAFONE**, com o mesmo **eco de fita** do Big Knob.
 Formatos: **VST3** (Windows/macOS, para o Cubase), **AU** (macOS) e **Standalone**.
 
-![Interface do Mastor Fone](docs/interface.png)
+![Interface do Mastor Phone Vox MPV-01](docs/interface.png)
 
-Visual no mesmo acabamento do Dub Station 2.1: esmalte creme, plaqueta de alumínio, VU, janela da fita, botões de alumínio e laterais de madeira.
+Antigo **Mastor Fone** (projetos antigos abrem normalmente). Visual no mesmo acabamento do Dub Station 2.1, com a plaquinha de latão DUB STATION: esmalte creme, plaqueta de alumínio, VU, janela da fita, botões de alumínio e laterais de madeira.
 
 Cadeia: entrada (somada em mono) → aparelho → seco + eco de fita (estéreo) → maximizer → saída.
 
@@ -51,9 +51,9 @@ A janela é redimensionável: arraste o canto inferior direito (50% a 150%). Dup
 ## Instalação
 Igual aos outros plugins: veja a [página inicial](../README.md#instalação-no-cubase). No Mac, libere com:
 ```
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Fone.vst3"
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Phone Vox MPV-01.vst3"
 ```
-No Cubase ele aparece como **Mastor Fone**, do fabricante **DubMastor**.
+No Cubase ele aparece como **Mastor Phone Vox MPV-01**, do fabricante **DubMastor**.
 
 ## Estrutura
 - `Source/LoFiVoice.h` — os três aparelhos (filtros SVF, saturações, ruídos, defeitos)
