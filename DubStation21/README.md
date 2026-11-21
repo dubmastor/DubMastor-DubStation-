@@ -6,6 +6,8 @@ Por DubMastor.
 
 ![Interface (prévia desenhada a partir do código)](docs/interface.png)
 
+![Fita em movimento](docs/fita.gif)
+
 Plugin de delay de fita inspirado nos ecos de fita clássicos de 3 cabeças dos anos 70
 (estilo RE-201). Código em C++17 com JUCE 8.
 
@@ -14,7 +16,7 @@ Plugin de delay de fita inspirado nos ecos de fita clássicos de 3 cabeças dos 
 | Knob | Função |
 |---|---|
 | INPUT | Ganho do pré-amplificador (satura a entrada). Ajuste olhando o **VU**: ponteiro perto do 0 = fita no ponto; no vermelho = saturação |
-| MODE | Seletor de 12 posições (tabela abaixo) |
+| MODE | Seletor de 12 posições, marcado em três grupos: **ECHO** (1–4), **ECHO + REVERB** (5–11) e **REV** (12) |
 | REPEAT RATE | Velocidade da fita. Mudar durante a execução dobra o pitch, como fita de verdade |
 | INTENSITY | Realimentação. Acima de ~0,8 (1 cabeça) ou ~0,7 (várias) entra em auto-oscilação |
 | ECHO VOL / REVERB VOL | Volume dos ecos e da mola |

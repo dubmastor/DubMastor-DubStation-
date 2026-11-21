@@ -50,6 +50,39 @@ juce::String modeDescription (int m)
 }
 } // namespace
 
+namespace
+{
+// text along a circle, centred on midAngle; flips on the lower half so it always reads left-to-right
+void drawCurvedText (juce::Graphics& g, const juce::String& text, juce::Point<float> c, float radius,
+                     float midAngle, const juce::Font& font, juce::Colour colour)
+{
+    g.setFont (font);
+    g.setColour (colour);
+    const float h = font.getHeight();
+    float total = 0.0f;
+    juce::Array<float> widths;
+    for (auto ch : text)
+    {
+        const float w = juce::GlyphArrangement::getStringWidth (font, juce::String::charToString (ch)) + 0.6f;
+        widths.add (w);
+        total += w;
+    }
+    const bool bottom = std::cos (midAngle) < 0.0f;
+    float cum = 0.0f;
+    for (int i = 0; i < text.length(); ++i)
+    {
+        const float w = widths[i];
+        const float a = bottom ? midAngle + total / (2 * radius) - (cum + w / 2) / radius
+                               : midAngle - total / (2 * radius) + (cum + w / 2) / radius;
+        juce::Graphics::ScopedSaveState ss (g);
+        g.addTransform (juce::AffineTransform::rotation (bottom ? a + juce::MathConstants<float>::pi : a, c.x, c.y));
+        const float y = bottom ? c.y + radius - h / 2 : c.y - radius - h / 2;
+        g.drawText (juce::String::charToString (text[i]), juce::Rectangle<float> (c.x - w / 2, y, w, h), juce::Justification::centred);
+        cum += w;
+    }
+}
+} // namespace
+
 // ------------------------------------------------------------------ look&feel
 VintageLookAndFeel::VintageLookAndFeel()
 {
@@ -83,6 +116,19 @@ void VintageLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
             g.drawText (juce::String (stepped ? i + 1 : i), juce::Rectangle<float> (np.x - bw / 2, np.y - bw / 2, bw, bw),
                         juce::Justification::centred);
         }
+    }
+
+    // mode selector: mark the sections ECHO (1-4) | ECHO + REVERB (5-11) | REV (12)
+    if (stepped && steps == 12)
+    {
+        auto modeAngle = [&] (float m) { return a0 + (m - 1.0f) / 11.0f * (a1 - a0); };
+        g.setColour (amber.withAlpha (0.9f));
+        for (float split : { 4.5f, 11.5f })
+            g.drawLine ({ c.getPointOnCircumference (r * 0.66f, modeAngle (split)), c.getPointOnCircumference (r * 1.02f, modeAngle (split)) }, 1.6f);
+        const juce::Font legend (juce::FontOptions (juce::jmax (8.0f, r * 0.095f), juce::Font::bold));
+        drawCurvedText (g, "ECHO", c, r * 0.99f, modeAngle (2.5f), legend, cream.withAlpha (0.9f));
+        drawCurvedText (g, "ECHO + REVERB", c, r * 0.99f, modeAngle (8.0f), legend, amber);
+        drawCurvedText (g, "REV", c, r * 0.99f, modeAngle (12.0f), legend, juce::Colour (0xff8fd0a0));
     }
 
     // spun-aluminium skirt (giant knobs get a real cylinder: side wall, depth, reflections)
@@ -428,7 +474,7 @@ void FitaEcoEditor::paint (juce::Graphics& g)
     if (background.isValid())
         g.drawImage (background, getLocalBounds().toFloat());
 
-    // metal name plate: engraved "DUB STATION", tagline, version in an amber inset
+    // metal name plate: engraved "DUB STATION 2.1" and the tagline
     const auto pl = plateArea;
     auto engraved = [&g] (const juce::String& t, juce::Rectangle<float> r, juce::Justification j, juce::Colour c)
     {
@@ -438,24 +484,11 @@ void FitaEcoEditor::paint (juce::Graphics& g)
         g.drawText (t, r, j);
     };
     g.setFont (juce::FontOptions (plateFace).withHeight (28.0f).withKerningFactor (0.04f));
-    engraved ("DUB STATION", { pl.getX() + 16, pl.getY() + 10, pl.getWidth() - 100, 40 },
+    engraved ("DUB STATION 2.1", { pl.getX() + 16, pl.getY() + 10, pl.getWidth() - 28, 40 },
               juce::Justification::centredLeft, juce::Colour (0xff262626));
     g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.12f));
-    engraved (juce::String (juce::CharPointer_UTF8 ("TAPE ECHO  \xc2\xb7  SPRING REVERB")), { pl.getX() + 17, pl.getY() + 54, pl.getWidth() - 100, 14 },
+    engraved (juce::String (juce::CharPointer_UTF8 ("TAPE ECHO  \xc2\xb7  SPRING REVERB")), { pl.getX() + 17, pl.getY() + 54, pl.getWidth() - 28, 14 },
               juce::Justification::centredLeft, juce::Colour (0xff3a3a3a));
-    const auto inset = juce::Rectangle<float> (pl.getRight() - 74, pl.getY() + 18, 56, 46);
-    g.setFont (juce::FontOptions (plateFace).withHeight (24.0f));
-    g.setColour (amber.withAlpha (0.35f));
-    g.drawText ("2.1", inset.expanded (1.0f), juce::Justification::centred);
-    g.setColour (amber);
-    g.drawText ("2.1", inset, juce::Justification::centred);
-
-    // "DUB MACHINE" printed on the enamel
-    g.setColour (ink);
-    g.setFont (juce::FontOptions (plateFace).withHeight (27.0f).withKerningFactor (0.10f));
-    g.drawText ("DUB MACHINE", juce::Rectangle<float> (pl.getX() + 6, pl.getBottom() + 12, 330, 34), juce::Justification::centredLeft);
-    g.setColour (ink.withAlpha (0.7f));
-    g.drawLine (pl.getX() + 8, pl.getBottom() + 50, pl.getRight() - 6, pl.getBottom() + 50, 1.2f);
 
     // bypass switch legends + effect lamp
     {
@@ -615,15 +648,16 @@ void FitaEcoEditor::drawTapeTransport (juce::Graphics& g)
         g.setColour (juce::Colours::white.withAlpha (0.6f));
         g.fillEllipse (c.x - r * 0.55f, c.y - r * 0.62f, r * 0.35f, r * 0.22f);
     };
-    wheel ({ L - rad + 26.0f, cy }, 22.0f, tapePhase * 0.05f, false);
-    wheel ({ R + rad - 26.0f, cy }, 22.0f, tapePhase * 0.05f, false);
-    wheel ({ R - 20.0f, B - 12.0f }, 14.0f, -tapePhase * 0.08f, true);   // pinch roller
+    // wheels roll with the tape: angle = travelled distance / radius
+    wheel ({ L - rad + 26.0f, cy }, 22.0f, tapePhase / 22.0f, false);
+    wheel ({ R + rad - 26.0f, cy }, 22.0f, tapePhase / 22.0f, false);
+    wheel ({ R - 20.0f, B - 12.0f }, 14.0f, -tapePhase / 14.0f, true);   // pinch roller
     {
         const auto cap = juce::Point<float> (R - 20.0f, B + 12.0f);          // capstan shaft
         g.setGradientFill (juce::ColourGradient (juce::Colour (0xffffffff), cap.x - 5, cap.y - 5, juce::Colour (0xff707070), cap.x + 5, cap.y + 5, false));
         g.fillEllipse (cap.x - 5.5f, cap.y - 5.5f, 11.0f, 11.0f);
         g.setColour (juce::Colour (0xff2a2a2a));
-        g.drawLine ({ cap, cap.getPointOnCircumference (5.0f, tapePhase * 0.25f) }, 1.4f);
+        g.drawLine ({ cap, cap.getPointOnCircumference (5.0f, tapePhase / 5.5f) }, 1.4f);
     }
 
     // heads along the bottom run: ERASE, REC, 1, 2, 3 (metal shields with a gap and two screws)
@@ -802,8 +836,8 @@ void FitaEcoEditor::resized()
         tapeWindow = tp.reduced (24, 22);
     }
     status.setBounds (tapeWindow.getX() + 14, tapeWindow.getY() + 8, 300, 18);
-    bypassSwitch.setBounds ((int) plateArea.getX() + 8, kTopH - 70, 42, 60);
-    bypassLamp = { plateArea.getX() + 170.0f, (float) kTopH - 40.0f };
+    bypassSwitch.setBounds ((int) plateArea.getX() + 8, (int) plateArea.getBottom() + 30, 42, 60);
+    bypassLamp = { plateArea.getX() + 170.0f, plateArea.getBottom() + 60.0f };
 
     auto rows = bottomPanel.reduced (10, 0).withTrimmedTop (12).withTrimmedBottom (10);
     auto rowA = rows.removeFromTop (222);
@@ -941,12 +975,6 @@ void FitaEcoEditor::renderBackground()
             g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff4f4f4), rv.x - 3, rv.y - 3, juce::Colour (0xff6a6a6a), rv.x + 3, rv.y + 3, false));
             g.fillEllipse (rv.x - 3.0f, rv.y - 3.0f, 6.0f, 6.0f);
         }
-        // recessed black window for the version number
-        const auto inset = juce::Rectangle<float> (pl.getRight() - 74, pl.getY() + 18, 56, 46);
-        g.setColour (juce::Colour (0xff0e0e0e));
-        g.fillRoundedRectangle (inset, 3.0f);
-        g.setColour (juce::Colours::white.withAlpha (0.5f));
-        g.drawLine (inset.getX() + 2, inset.getBottom() + 0.5f, inset.getRight() - 2, inset.getBottom() + 0.5f, 1.0f);
     }
 
     drawVuFace (g);
