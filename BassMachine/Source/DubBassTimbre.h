@@ -23,21 +23,18 @@ struct DubBassPreset
     float driveDb, drvToneHz, drvMix;
 };
 
-enum TimbreId { ClassicSine, SineQuente, SubPuro, FitaRoots, Eight08, Fuzz808, SlengTeng, NumTimbres };
+enum TimbreId { RootsSine, SuperTone, NumTimbres };
 
+// Os dois timbres com os valores iniciais do Dub Bass 1.3: Harm 2 15 %, Harm 3 8 %, Glide 20 ms,
+// ataque 3 ms, decay 600 ms, sustain 85 %, release 180 ms, cutoff 900 Hz, ressonância 0,8,
+// válvula (saturação) e reverb desligados, EQ plano, sem bass boost, maximizer +3 dB / teto -0,3 dB.
 inline const DubBassPreset& timbre (int i)
 {
     using M = BassVoice::Mode;
     static const DubBassPreset t[NumTimbres] = {
-        //  nome            descrição                        modo            h2     h3     808p   808t   A     D      S      R      cutoff  reso  tipo drive tone   mix
-        { "CLASSIC SINE",  "PADRAO DO DUB BASS",  M::ClassicSine, 0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f,  5000.0f, 0.50f },
-        { "SINE QUENTE",   "HARMONICOS + VALVULA",   M::ClassicSine, 0.45f, 0.25f, 12.0f, 70.0f, 3.0f, 600.0f, 0.80f, 160.0f, 1400.0f, 0.9f, 0, 12.0f, 4000.0f, 0.60f },
-        { "SUB PURO",      "SENOIDE LIMPA, SEM DRIVE", M::ClassicSine, 0.0f,  0.0f,  12.0f, 70.0f, 5.0f, 800.0f, 0.95f, 200.0f, 320.0f, 0.7f, 0, 0.0f,  5000.0f, 0.00f },
-        { "FITA ROOTS",    "SATURACAO DE FITA", M::ClassicSine, 0.30f, 0.15f, 12.0f, 70.0f, 2.0f, 420.0f, 0.60f, 140.0f, 700.0f, 1.2f, 1, 10.0f, 3000.0f, 0.70f },
-        { "808",           "DROP DE PITCH",     M::Eight08,     0.10f, 0.05f, 12.0f, 70.0f, 1.0f, 600.0f, 0.0f,  180.0f, 2000.0f, 0.8f, 0, 6.0f,  5000.0f, 0.50f },
-        { "808 FUZZ",      "808 CURTO COM FUZZ",            M::Eight08,     0.10f, 0.05f, 7.0f,  40.0f, 1.0f, 350.0f, 0.0f,  120.0f, 3000.0f, 0.8f, 2, 9.0f,  3500.0f, 0.45f },
-        // teclado Casio de 1985: senoide + 3º harmônico quadrada no FUZZ, ataque seco e decaimento curto
-        { "SLENG TENG",    "TECLADO DIGITAL 85 (JAMMYS)",   M::ClassicSine, 0.0f,  0.60f, 12.0f, 70.0f, 1.0f, 300.0f, 0.55f, 60.0f, 1800.0f, 0.9f, 2, 18.0f, 6000.0f, 1.00f },
+        //  nome            descrição                         modo            h2     h3     808p   808t   A     D       S      R       cutoff  reso  tipo drive tone     mix
+        { "ROOTS (SINE)",  "CLASSIC SINE DO DUB BASS",       M::ClassicSine, 0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
+        { "SUPER TONE",    "DIGITAL KING JAMMY (DUB BASS)",  M::SuperTone,   0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
     };
     return t[std::clamp (i, 0, NumTimbres - 1)];
 }
@@ -133,14 +130,13 @@ private:
         vp.attackMs = p.attackMs; vp.decayMs = p.decayMs; vp.sustain = p.sustain; vp.releaseMs = p.releaseMs;
         voice.setParams (vp);
 
-        // TONE: ±1,5 oitava no cutoff do timbre; DRIVE: 0..2x o drive do timbre (0,5 = como no Dub Bass)
+        // TONE: ±1,5 oitava no cutoff do Dub Bass (50 % = 900 Hz). DRIVE: a válvula do Dub Bass
+        // (TUBE, 6 dB, mix 50 %) começa desligada como nele; o knob liga e leva até 24 dB.
         const float cut = juce::jlimit (40.0f, (float) sr * 0.45f, p.cutoff * std::pow (2.0f, (toneKnob - 0.5f) * 3.0f));
         filter.setCutoffFrequency (cut);
         filter.setResonance (p.reso);
-        const float extra = juce::jmax (0.0f, (driveKnob - 0.5f) * 24.0f);
-        const float db = p.driveDb * juce::jmin (1.0f, driveKnob * 2.0f) + extra;
-        driveGain = juce::Decibels::decibelsToGain (juce::jmin (36.0f, db));
-        mix = (driveKnob <= 0.001f) ? 0.0f : juce::jmax (p.drvMix, driveKnob > 0.5f ? 0.5f : 0.0f);
+        driveGain = juce::Decibels::decibelsToGain (driveKnob * 24.0f);
+        mix = driveKnob <= 0.001f ? 0.0f : p.drvMix;
         drvType = p.drvType;
         drvTone = p.drvToneHz;
     }

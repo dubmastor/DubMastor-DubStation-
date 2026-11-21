@@ -1,4 +1,11 @@
-# Mastor Bass Machine MBM-710 — 2.1 · Gerador de Reggae Bass Lines
+# Mastor Bass Machine MBM-710 — 2.2 · Gerador de Reggae Bass Lines
+
+- Preview com o som do **Dub Bass 1.3** e os valores iniciais dele: Classic Sine (Harm 2 15 %, Harm 3 8 %), envelope 3 / 600 ms / 85 % / 180 ms, cutoff 900 Hz, ressonância 0,8, **sem saturação e sem reverb**
+- Seletor de timbre com só duas teclas: **ROOTS (SINE)** e **SUPER TONE** (o baixo digital King Jammy do Dub Bass)
+- DRIVE começa em 0 (válvula desligada, como no Dub Bass)
+- Padrão de início: **dois acordes ligados, Am e Dm, de 1/2 compasso cada**
+
+## 2.1
 
 - Bateria de acompanhamento com o kit acústico do **Dub Drums 1.1**: bumbo abafado de estúdio jamaicano dos anos 70 (no lugar do bumbo com cara de 808) e caixa afinada alta com estalo de aro
 

@@ -94,6 +94,15 @@ int main()
         }
     }
 
+    // padrão de início do plugin: Am e Dm de meio compasso cada (loop de 1 compasso)
+    for (int style = 0; style < NumStyles; ++style)
+    {
+        Settings s; s.style = style;
+        double L = 0;
+        const auto ev = buildLoop ({ { 9, Min, 2 }, { 2, Min, 2 } }, s, L);
+        CHECK (L == 4.0 && ev.size() >= 2, "%s: padrao de inicio (2 x 1/2 compasso)", styleName (style));
+    }
+
     // um acorde só, meio compasso, e nenhum acorde
     {
         Settings s; double L = 0;

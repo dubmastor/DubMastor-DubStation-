@@ -197,11 +197,11 @@ private:
     BassLookAndFeel lnf;
 
     std::array<ChordModule, BassMachineProcessor::numSlots> mods;
-    std::unique_ptr<InterlockKeys> styleKeys, drumKeys, keysKeys;
+    std::unique_ptr<InterlockKeys> styleKeys, drumKeys, keysKeys, timbreKeys;
     Knob density, variation, swing, base;
     Knob velocity, gate;
     Knob bpm;
-    Knob timbre, inGain, tone, drive, volume;
+    Knob inGain, tone, drive, volume;
     Knob reps;
     Toggle sound, drumsOn, keysOn;
     Knob drumVol, keysVol;

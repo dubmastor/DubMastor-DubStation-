@@ -1,8 +1,8 @@
-# Mastor Bass Machine MBM-710 2.1 — Gerador de Reggae Bass Lines
+# Mastor Bass Machine MBM-710 2.2 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.1/MastorBassMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.1/MastorBassMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.2/MastorBassMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.2/MastorBassMachine-macOS.zip)**
 
 ![Interface do Bass Machine](docs/interface.png)
 
@@ -23,7 +23,7 @@ Teclas intertravadas como as de um rádio valvulado: apertar uma solta a outra.
 | **ROBBIE** | Robbie Shakespeare (Sly & Robbie) | Rockers da Channel One: sincopado, firme, quase mecânico, com o balanço do funk e do soul; oitavas e subidas cromáticas até o próximo acorde |
 | **LEROY SIBBLES** | Leroy Sibbles (Heptones, Studio One) | Linhas cantadas: notas esticadas, frases que descem pela escala, espaço, e cada nota um pouco atrás do tempo |
 | **FULLY FULLWOOD** | George "Fully" Fullwood (Soul Syndicate) | Riff de riddim dos anos 70: gancho melódico com anacruse de semicolcheia e salto de oitava, repetido como assinatura |
-| **JAMMYS** | King Jammy, *Sleng Teng* (1985) | O primeiro riddim digital: riff de teclado em semicolcheias, curto e staccato, em volta da tônica (combina com o timbre **SLENG TENG** e a bateria **DIGITAL**) |
+| **JAMMYS** | King Jammy, *Sleng Teng* (1985) | O primeiro riddim digital: riff de teclado em semicolcheias, curto e staccato, em volta da tônica (combina com o timbre **SUPER TONE** e a bateria **DIGITAL**) |
 
 | Controle | O que faz |
 |---|---|
@@ -34,7 +34,7 @@ Teclas intertravadas como as de um rádio valvulado: apertar uma solta a outra.
 
 ## HARMONIA
 Até 4 acordes: **TÔNICA** (teclado mecânico), **TIPO** (maior, menor, 7, m7), **DURAÇÃO** (1/2 a 8 compassos)
-e **ON** nos acordes 2 a 4. As notas de aproximação caem meio tom (ou um tom) da tônica que vem a seguir.
+e **ON** nos acordes 2 a 4. O plugin abre com **dois acordes ligados, Am e Dm, de 1/2 compasso cada**. As notas de aproximação caem meio tom (ou um tom) da tônica que vem a seguir.
 
 ## LINHA DE BAIXO
 | Controle | O que faz |
@@ -48,9 +48,9 @@ e **ON** nos acordes 2 a 4. As notas de aproximação caem meio tom (ou um tom) 
 | Controle | O que faz |
 |---|---|
 | **PLAY / STOP** | Toca o loop sem a DAW, no **BPM** do knob. Com a DAW tocando, segue o andamento dela |
-| **TIMBRE** | Os timbres do **Dub Bass**: CLASSIC SINE, SINE QUENTE, SUB PURO, FITA ROOTS, 808, 808 FUZZ e **SLENG TENG** (teclado digital de 1985). O preview usa a voz, o filtro, as saturações TUBE / TAPE / FUZZ e o maximizer do Dub Bass |
+| **TIMBRE** | Duas teclas com os timbres do **Dub Bass 1.3**: **ROOTS (SINE)** (Classic Sine) e **SUPER TONE** (o baixo digital da era King Jammy). O preview usa a mesma voz, filtro e maximizer do Dub Bass com os valores iniciais dele: Harm 2 15 %, Harm 3 8 %, Glide 20 ms, ataque 3 ms, decay 600 ms, sustain 85 %, release 180 ms, cutoff 900 Hz, ressonância 0,8, **sem saturação e sem reverb**, EQ plano, sem bass boost, maximizer +3 dB com teto −0,3 dB |
 | **GANHO** | Ganho de entrada (−12 a +12 dB) antes da saturação e do maximizer. Duplo clique volta a 0 dB |
-| **TONE / DRIVE / VOLUME** | Cutoff (±1,5 oitava), saturação (50% = como no Dub Bass) e volume geral do preview |
+| **TONE / DRIVE / VOLUME** | Cutoff (±1,5 oitava; 50 % = 900 Hz, como no Dub Bass), saturação da válvula TUBE do Dub Bass (começa em 0 = desligada, como nele) e volume geral do preview |
 | **SOM INTERNO** | Desligue quando mandar o MIDI para o seu próprio baixo |
 | **OSCILOSCÓPIO** | Tubo verde com a onda do baixo |
 

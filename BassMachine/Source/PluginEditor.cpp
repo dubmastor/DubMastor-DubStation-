@@ -2,7 +2,7 @@
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
- #define JucePlugin_VersionString "2.1.0"
+ #define JucePlugin_VersionString "2.2.0"
 #endif
 static juce::String versionShort() { return juce::String (JucePlugin_VersionString).upToLastOccurrenceOf (".", false, false); }
 
@@ -883,9 +883,12 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     addAndMakeVisible (*play);
     setupKnob (bpm, "bpm", "BPM");
 
-    setupKnob (timbre, "timbre", {}, "switch");
-    timbre.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
-    timbre.label.setVisible (false);
+    {
+        juce::StringArray tnames;
+        for (int t = 0; t < mbm::NumTimbres; ++t) tnames.add (mbm::timbre (t).name);
+        timbreKeys = std::make_unique<InterlockKeys> (*proc.apvts.getParameter ("timbre"), tnames, false);
+        addAndMakeVisible (*timbreKeys);
+    }
     setupKnob (inGain, "inGain", "GANHO");
     inGain.slider.textFromValueFunction = [] (double v) { return (v > 0.05 ? "+" : "") + juce::String (v, 1) + " dB"; };
     inGain.slider.setDoubleClickReturnValue (true, 0.0);
@@ -1264,10 +1267,7 @@ void BassMachinePanel::renderBackground()
 
     // escalas
 
-    {
-        juce::StringArray labels { "SINE", "QUENTE", "SUB", "FITA", "808", "FUZZ", "SLENG" };
-        drawKnobScale (g, timbre.slider, mbm::NumTimbres, labels, 44.0f);
-    }
+
     for (auto* k : { &density, &variation, &swing, &base, &velocity, &gate, &bpm, &inGain, &tone, &drive, &volume, &drumVol, &keysVol })
         drawKnobScale (g, k->slider, 11);
     g.setColour (colours::inkSoft);
@@ -1415,7 +1415,8 @@ void BassMachinePanel::resized()
         a.removeFromBottom (8);
         auto left = a.removeFromLeft (164);
         timbreDisplay = left.removeFromTop (38).reduced (2, 0);
-        timbre.slider.setBounds (left.withTrimmedTop (2));
+        left.removeFromTop (14);
+        timbreKeys->setBounds (left.removeFromTop (60));
         a.removeFromLeft (12);
         auto knobs = a.removeFromTop (96);
         const int kw = knobs.getWidth() / 4;

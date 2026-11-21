@@ -25,11 +25,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
     for (int s = 0; s < mbm::NumStyles; ++s) styles.add (mbm::styleName (s));
     for (int t = 0; t < mbm::NumTimbres; ++t) timbres.add (mbm::timbre (t).name);
 
-    // Harmonia padrão: Am (2 comp.) | Dm (1) | Em7 (1) | G (desligado)
+    // Harmonia padrão: Am (1/2 comp.) | Dm (1/2 comp.); acordes 3 e 4 desligados
     const int  defRoot[numSlots] = { 9, 2, 4, 7 };
     const int  defQual[numSlots] = { mbm::Min, mbm::Min, mbm::Min7, mbm::Maj };
-    const int  defDur [numSlots] = { 2, 1, 1, 1 };
-    const bool defOn  [numSlots] = { true, true, true, false };
+    const int  defDur [numSlots] = { 0, 0, 1, 1 };   // 1/2 compasso cada
+    const bool defOn  [numSlots] = { true, true, false, false };
 
     for (int i = 0; i < numSlots; ++i)
     {
@@ -57,11 +57,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
 
     // som interno
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));
-    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "timbre", 1 }, "Timbre", timbres, mbm::ClassicSine));
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "timbre", 1 }, "Timbre", timbres, mbm::RootsSine));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "inGain", 1 }, "Ganho de entrada", NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f,
                                                         AudioParameterFloatAttributes().withLabel ("dB")));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "tone", 1 }, "Tone", 0.0f, 1.0f, 0.5f));
-    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "drive", 1 }, "Drive", 0.0f, 1.0f, 0.5f));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "drive", 1 }, "Drive", 0.0f, 1.0f, 0.0f));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "volume", 1 }, "Volume", 0.0f, 1.0f, 0.75f));
 
     // acompanhamento do preview
