@@ -2,6 +2,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "LoFiVoice.h"
 #include "TapeEcho.h"
+#include "Maximizer.h"
 
 class RadioFoneProcessor : public juce::AudioProcessor
 {
@@ -39,6 +40,12 @@ public:
     float getEchoLevel() const   { return echoRms.load(); }  // RMS das repetições (anima as bobinas)
     float getEchoDelaySec() const { return echoDelay.load(); }
     float getDisplayBpm() const  { return displayBpm.load(); }
+    // VU digital do maximizer: pico da saída (linear) por canal e redução de ganho (dB, <= 0)
+    float getOutPeak (int ch) const { return outPeak[ch & 1].load(); }
+    float getGainReductionDb() const { return grDb.load(); }
+    // cópia do aparelho para a curva de equalização da interface
+    void getVoiceCurve (const float* hz, float* db, int n);
+    float getVoicePeakHz();
 
     // osciloscópio: últimas amostras da saída (mono)
     static constexpr int kScopeSize = 8192;
@@ -59,10 +66,16 @@ private:
 
     rf::LoFiVoice voice;
     dub::TapeEcho echo;
+    dub::Maximizer maximizer;
+    std::array<std::vector<float>, 2> bypassDelay;
+    int bypassIdx = 0;
+    rf::LoFiVoice curveVoice;            // só para desenhar a curva (thread da interface)
+    juce::SpinLock curveLock;
     juce::SmoothedValue<float> dryGain, outGain, bypassMix;
 
     std::array<float, kScopeSize> scopeBuf {};
     std::atomic<int> scopeWrite { 0 };
+    std::atomic<float> outPeak[2] { { 0.0f }, { 0.0f } }, grDb { 0.0f };
     std::atomic<float> outRms { 0.0f }, echoRms { 0.0f }, echoDelay { 0.4f }, displayBpm { 120.0f };
     std::map<std::string, std::atomic<float>*> params;
 

@@ -69,12 +69,41 @@ public:
     void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     float getValue() const { return value; }   // -100..100
     juce::String getText() const;
+    // frequência de áudio que o aparelho mais excita e largura da BANDA (0..1), mostradas no dial
+    void setExcited (float hz, float band) { if (std::abs (hz - excitedHz) > 1.0f || band != bandW) { excitedHz = hz; bandW = band; repaint(); } }
 private:
-    juce::Rectangle<float> scale() const;
-    float xToValue (float x) const;
     juce::RangedAudioParameter& param;
     juce::ParameterAttachment att;
-    float value = 0.0f;
+    float value = 0.0f, dragStartValue = 0.0f, excitedHz = 1000.0f, bandW = 0.5f;
+};
+
+// Moldura de tubo verde (osciloscópio e curva): desenha a caixa e devolve a área da tela
+juce::Rectangle<float> drawCrtFrame (juce::Graphics&, juce::Rectangle<float> bounds, const juce::String& label, juce::Path& tube);
+void drawCrtGlass (juce::Graphics&, juce::Rectangle<float> screen, const juce::Path& tube);
+
+// Curva de equalização do aparelho, no mesmo verde do osciloscópio
+class EqCurve : public juce::Component
+{
+public:
+    explicit EqCurve (RadioFoneProcessor& p);
+    void paint (juce::Graphics&) override;
+    void update();
+private:
+    RadioFoneProcessor& proc;
+    std::vector<float> hz, db, lastDb;
+};
+
+// VU digital de LEDs do maximizer: saída L/R e redução de ganho
+class DigitalMeter : public juce::Component
+{
+public:
+    explicit DigitalMeter (RadioFoneProcessor& p) : proc (p) { setInterceptsMouseClicks (false, false); }
+    void paint (juce::Graphics&) override;
+    void update();
+private:
+    RadioFoneProcessor& proc;
+    float lvl[2] { -60, -60 }, hold[2] { -60, -60 }, gr = 0;
+    int holdT[2] { 0, 0 };
 };
 
 // Osciloscópio de tubo verde: mostra a onda que sai do plugin
@@ -98,7 +127,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kW = 960, kH = 620;
+    static constexpr int kW = 1140, kH = 680;
 
 private:
     struct Knob
@@ -130,15 +159,18 @@ private:
     StationModeKeys modeKeys;
     TuningDial dial;
     CrtScope scope;
+    EqCurve eqCurve;
+    DigitalMeter meter;
     Knob band, drive, noise, defect;
     Knob echoDiv, echoMs, echoHeads, echoFb, echoTone, echoWow, echoSend;
     Knob mix, dry, out;
-    Toggle echoSync, echoPP, bypassBtn;
+    Knob maxThresh, maxCeil;
+    Toggle echoSync, echoPP, bypassBtn, maxOn;
     MomentaryButton throwBtn;
     juce::Label status;
 
     juce::Image background;
-    juce::Rectangle<int> topPanel, vuArea, tapeWin, echoPlate, rightArea;
+    juce::Rectangle<int> topPanel, vuArea, tapeWin, echoPlate, rightArea, maxiArea;
     juce::Rectangle<float> plateArea;
     juce::Point<float> lampPos;
     float needlePos = 0, needleVel = 0, tapePhase = 0, lampGlow = 0;

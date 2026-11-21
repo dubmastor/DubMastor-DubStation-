@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <iterator>
+#include <complex>
 
 namespace rf
 {
@@ -18,7 +19,7 @@ static constexpr float kTau = 6.28318530718f;
 struct SVF
 {
     enum Type { LP, HP, BP, Bell };
-    float ic1 = 0, ic2 = 0, a1 = 0, a2 = 0, a3 = 0, m0 = 0, m1 = 0, m2 = 0;
+    float ic1 = 0, ic2 = 0, a1 = 0, a2 = 0, a3 = 0, m0 = 0, m1 = 0, m2 = 0, gg = 1, kk = 1;
 
     void set (Type t, float hz, float q, float fs, float gainDb = 0.0f)
     {
@@ -35,6 +36,15 @@ struct SVF
         else if (t == HP) { m0 = 1; m1 = -k; m2 = -1; }
         else              { m0 = 0; m1 = k;  m2 = 0; }  // BP com pico unitário
         a1 = 1.0f / (1.0f + g * (g + k)); a2 = g * a1; a3 = g * a2;
+        gg = g; kk = k;
+    }
+    // resposta em frequência (o SVF trapezoidal é o protótipo analógico com pré-distorção)
+    std::complex<double> response (double hz, double fs) const
+    {
+        const std::complex<double> sj (0.0, std::tan (3.14159265358979 * std::min (hz, 0.499 * fs) / fs) / gg);
+        const auto den = sj * sj + (double) kk * sj + 1.0;
+        const auto bp = sj / den, lp = 1.0 / den;
+        return (double) m0 + (double) m1 * bp + (double) m2 * lp;
     }
     inline float tick (float x)
     {
@@ -143,6 +153,26 @@ public:
         nz1.set (SVF::BP, (mode == 0 ? 2500.0f : mode == 1 ? 1700.0f : 3000.0f) * shift, 0.6f, fs);
         nz2.set (SVF::HP, 300.0f, 0.707f, fs);
         humLp.set (SVF::LP, 900.0f, 0.707f, fs);
+    }
+
+    // resposta dos filtros do aparelho (sem a saturação), para o gráfico de equalização
+    std::complex<double> response (double hz) const
+    {
+        std::complex<double> h (1.0, 0.0);
+        for (auto* f : { &hp1, &hp2, &pk1, &pk2, &lp1, &lp2, &post1, &post2 })
+            h *= f->response (hz, (double) fs);
+        return h;
+    }
+    // frequência onde o aparelho mais "excita" (pico da curva)
+    float peakHz() const
+    {
+        double best = -1; float bestHz = 1000;
+        for (float hz = 100; hz < 12000; hz *= 1.03f)
+        {
+            const double m = std::abs (response (hz));
+            if (m > best) { best = m; bestHz = hz; }
+        }
+        return bestHz;
     }
 
     // retorna o som do aparelho (sem o seco)
@@ -256,6 +286,7 @@ private:
         return (v < 0 ? -1.0f : 1.0f) * (std::pow (1.0f + mu, std::fabs (v)) - 1.0f) / mu;
     }
     float makeup() const { return mode == 0 ? 1.15f : mode == 1 ? 1.05f : 0.8f; }
+
     // teto macio em ~0,9 (os picos que o compressor deixa passar)
     static float softLimit (float x)
     {
@@ -315,6 +346,20 @@ public:
         mixSm += mixA * (s.mix - mixSm);
         return x * (1.0f - mixSm) + y * mixSm;
     }
+
+    // curva do modo atual em dB, com o pico do aparelho em 0 dB e o MIX aplicado (seco + aparelho)
+    void curveDb (const float* hz, float* db, int n) const
+    {
+        const auto& d = dev[s.mode];
+        double peak = 1e-9;
+        for (float f = 60; f < 16000; f *= 1.05f) peak = std::max (peak, std::abs (d.response (f)));
+        for (int i = 0; i < n; ++i)
+        {
+            const auto h = (1.0 - (double) s.mix) + (double) s.mix * d.response (hz[i]) / peak;
+            db[i] = (float) (20.0 * std::log10 (std::max (1e-6, std::abs (h))));
+        }
+    }
+    float peakHz() const { return dev[s.mode].peakHz(); }
 
 private:
     float fs = 44100.0f, xfA = 0, mixA = 0, mixSm = 1;

@@ -321,20 +321,16 @@ TuningDial::TuningDial (RangedAudioParameter& p)
 
 String TuningDial::getText() const { return String (roundToInt (valueToKHz (value) / 10.0f) * 10) + " kHz"; }
 
-Rectangle<float> TuningDial::scale() const
-{
-    auto glass = getLocalBounds().toFloat().withTrimmedTop (22.0f).reduced (4.0f);
-    return { glass.getX() + 26.0f, glass.getY(), glass.getWidth() - 72.0f, glass.getHeight() };
-}
+// escala total do dial (em pixels) para a largura visível: a escala é mais longa que a janela e gira
+static float dialSpan (float visibleW) { return visibleW * 2.4f; }
 
-float TuningDial::xToValue (float x) const
+void TuningDial::mouseDown (const MouseEvent&) { dragStartValue = value; att.beginGesture(); }
+void TuningDial::mouseDrag (const MouseEvent& e)
 {
-    const auto sc = scale();
-    return jlimit (-100.0f, 100.0f, -100.0f + 200.0f * (x - sc.getX()) / sc.getWidth());
+    // arrastar move a escala por baixo da agulha (como girar o botão de um rádio)
+    const float w = (float) getWidth() - 8.0f;
+    att.setValueAsPartOfGesture (jlimit (-100.0f, 100.0f, dragStartValue - 200.0f * (float) e.getDistanceFromDragStartX() / dialSpan (w)));
 }
-
-void TuningDial::mouseDown (const MouseEvent& e) { att.beginGesture(); att.setValueAsPartOfGesture (xToValue (e.position.x)); }
-void TuningDial::mouseDrag (const MouseEvent& e) { att.setValueAsPartOfGesture (xToValue (e.position.x)); }
 void TuningDial::mouseUp (const MouseEvent&)     { att.endGesture(); }
 void TuningDial::mouseDoubleClick (const MouseEvent&) { att.setValueAsCompleteGesture (param.convertFrom0to1 (param.getDefaultValue())); }
 void TuningDial::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& w)
@@ -345,13 +341,17 @@ void TuningDial::mouseWheelMove (const MouseEvent&, const MouseWheelDetails& w)
 void TuningDial::paint (Graphics& g)
 {
     auto b = getLocalBounds().toFloat();
-    // legenda + leitura da frequência
+    // legenda + leituras: frequência sintonizada e frequência de áudio que o aparelho mais excita
     auto cap = b.removeFromTop (22.0f);
     g.setColour (amber);
     g.setFont (bold (17.0f));
     g.drawText ("SINTONIA", cap.withTrimmedLeft (4.0f), Justification::centredLeft);
     g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 15.0f, Font::bold));
     g.drawText (getText(), cap.withTrimmedRight (6.0f), Justification::centredRight);
+    const String ex = String::fromUTF8 ("excita ") + (excitedHz >= 1000.0f ? String (excitedHz / 1000.0f, 1) + " kHz" : String (roundToInt (excitedHz)) + " Hz");
+    g.setColour (Colour (0xff5dff8a));
+    g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 12.0f, Font::plain));
+    g.drawText (ex, cap.withTrimmedLeft (108.0f).withTrimmedRight (110.0f), Justification::centred);
 
     // moldura cromada + vidro iluminado por trás (mesmo tom do VU)
     auto glass = b.reduced (4.0f);
@@ -365,37 +365,276 @@ void TuningDial::paint (Graphics& g)
 
     Graphics::ScopedSaveState ss (g);
     g.reduceClipRegion (glass.toNearestInt());
-    const auto sc = scale();
+    const float cx = glass.getCentreX();
+    const float span = dialSpan (glass.getWidth());
+    const float t0 = (value + 100.0f) / 200.0f;              // posição atual na escala (0..1)
+    auto xOf = [&] (float t) { return cx + (t - t0) * span; };
+
+    // faixa âmbar em volta da agulha: largura da BANDA (o que o aparelho deixa passar)
+    {
+        const float half = glass.getWidth() * (0.06f + 0.16f * bandW);
+        auto band = Rectangle<float> (cx - half, glass.getY(), half * 2.0f, glass.getHeight());
+        g.setGradientFill (ColourGradient (Colour (0x00ffa630), band.getX(), 0, Colour (0x00ffa630), band.getRight(), 0, false));
+        ColourGradient cg (Colour (0x00ff8a00), band.getX(), 0, Colour (0x00ff8a00), band.getRight(), 0, false);
+        cg.addColour (0.5, Colour (0x66ff8a00));
+        g.setGradientFill (cg);
+        g.fillRect (band);
+    }
+
     const Colour printInk (0xff1a1a1a);
     g.setColour (printInk);
     for (int i = 0; i <= 40; ++i)
     {
-        const float x = sc.getX() + sc.getWidth() * (float) i / 40.0f;
+        const float x = xOf ((float) i / 40.0f);
+        if (x < glass.getX() - 4 || x > glass.getRight() + 4) continue;
         const bool major = i % 5 == 0;
         g.fillRect (x - (major ? 1.0f : 0.6f), glass.getY() + 6.0f, major ? 2.0f : 1.2f, major ? 14.0f : 8.0f);
     }
-    g.setFont (bold (12.0f));
+    // números: o mais perto da agulha fica maior e em vermelho
+    int nearest = 0; float nd = 1e9f;
+    for (int i = 0; i < 9; ++i) { const float d = std::abs (xOf ((float) i / 8.0f) - cx); if (d < nd) { nd = d; nearest = i; } }
     for (int i = 0; i < 9; ++i)
     {
-        const float x = sc.getX() + sc.getWidth() * (float) i / 8.0f;
-        g.drawText (String ((int) kFreqs[i]), Rectangle<float> (44, 16).withCentre ({ x, glass.getY() + 31.0f }), Justification::centred);
+        const float x = xOf ((float) i / 8.0f);
+        if (x < glass.getX() - 30 || x > glass.getRight() + 30) continue;
+        const bool hot = i == nearest && nd < span / 16.0f;
+        g.setColour (hot ? Colour (0xffc0262d) : printInk);
+        g.setFont (bold (hot ? 15.0f : 12.0f));
+        g.drawText (String ((int) kFreqs[i]), Rectangle<float> (52, 18).withCentre ({ x, glass.getY() + 31.0f }), Justification::centred);
     }
+    // pontas da escala
+    g.setColour (printInk.withAlpha (0.5f));
+    for (float t : { 0.0f, 1.0f })
+    {
+        const float x = xOf (t) + (t == 0.0f ? -14.0f : 14.0f);
+        g.fillRect (t == 0.0f ? glass.getX() : x, glass.getY(), t == 0.0f ? jmax (0.0f, x - glass.getX()) : glass.getRight() - x, 3.0f);
+    }
+    g.setColour (Colour (0xffc0262d));
     g.setFont (bold (10.0f).withExtraKerningFactor (0.12f));
-    g.drawText ("kHz", Rectangle<float> (glass.getRight() - 42, glass.getY() + 23, 36, 16), Justification::centred);
-    g.setColour (Colour (0xffc0262d));
-    g.drawText (String::fromUTF8 ("ONDAS MÉDIAS"), Rectangle<float> (glass.getX(), glass.getBottom() - 17, glass.getWidth(), 14), Justification::centred);
+    g.drawText (String::fromUTF8 ("ONDAS MÉDIAS"), Rectangle<float> (glass.getX() + 10, glass.getBottom() - 17, 120, 14), Justification::centredLeft);
+    g.drawText ("kHz", Rectangle<float> (glass.getRight() - 50, glass.getBottom() - 17, 40, 14), Justification::centredRight);
 
-    // agulha vermelha com sombra
-    const float x = sc.getX() + sc.getWidth() * (value + 100.0f) / 200.0f;
+    // agulha fixa no meio, com sombra
     g.setColour (Colours::black.withAlpha (0.2f));
-    g.fillRect (x + 1.5f, glass.getY() + 3.0f, 2.5f, glass.getHeight() - 4.0f);
+    g.fillRect (cx + 1.5f, glass.getY() + 3.0f, 2.5f, glass.getHeight() - 4.0f);
     g.setColour (Colour (0xffc0262d));
-    g.fillRect (x - 1.25f, glass.getY() + 1.0f, 2.5f, glass.getHeight() - 2.0f);
+    g.fillRect (cx - 1.25f, glass.getY() + 1.0f, 2.5f, glass.getHeight() - 2.0f);
+    Path tri; tri.addTriangle (cx - 6, glass.getY(), cx + 6, glass.getY(), cx, glass.getY() + 7);
+    g.fillPath (tri);
 
-    // reflexo do vidro
+    // sombra das bordas (tambor curvo) + reflexo do vidro
+    ColourGradient edge (Colours::black.withAlpha (0.35f), glass.getX(), 0, Colours::black.withAlpha (0.35f), glass.getRight(), 0, false);
+    edge.addColour (0.18, Colours::transparentBlack);
+    edge.addColour (0.82, Colours::transparentBlack);
+    g.setGradientFill (edge);
+    g.fillRect (glass);
     g.setGradientFill (ColourGradient (Colours::white.withAlpha (0.25f), glass.getX(), glass.getY(),
                                        Colours::transparentWhite, glass.getX(), glass.getY() + glass.getHeight() * 0.5f, false));
     g.fillRect (glass.withHeight (glass.getHeight() * 0.45f));
+}
+
+//==============================================================================
+Rectangle<float> drawCrtFrame (Graphics& g, Rectangle<float> b, const String& labelText, Path& tube)
+{
+    const Colour phosphor (0xff5dff8a);
+    g.setColour (Colours::black.withAlpha (0.55f));
+    g.fillRoundedRectangle (b.reduced (2.0f).translated (1.5f, 3.0f), 10.0f);
+    g.setGradientFill (ColourGradient (Colour (0xff2a2a2a), 0, b.getY(), Colour (0xff0b0b0b), 0, b.getBottom(), false));
+    g.fillRoundedRectangle (b.reduced (2.0f), 10.0f);
+    auto label = b.removeFromBottom (18.0f);
+    auto screen = b.reduced (12.0f, 9.0f);
+    g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), screen.getX(), screen.getY(), Colour (0xff4c4c4c), screen.getRight(), screen.getBottom(), false));
+    g.drawRoundedRectangle (screen.expanded (3.0f), 14.0f, 2.5f);
+    tube.clear();
+    tube.addRoundedRectangle (screen, 12.0f);
+    g.setGradientFill (ColourGradient (Colour (0xff0f2a17), screen.getCentreX(), screen.getCentreY(),
+                                       Colour (0xff030a05), screen.getX(), screen.getY(), true));
+    g.fillPath (tube);
+
+    g.setColour (cream.withAlpha (0.85f));
+    g.setFont (bold (9.5f).withExtraKerningFactor (0.12f));
+    g.drawText (labelText, label.withTrimmedLeft (14.0f).translated (0, -2.0f), Justification::centredLeft);
+    const auto lp = Point<float> (label.getRight() - 18.0f, label.getCentreY() - 3.0f);
+    g.setColour (phosphor);
+    g.fillEllipse (lp.x - 3.5f, lp.y - 3.5f, 7.0f, 7.0f);
+    return screen;
+}
+
+void drawCrtGlass (Graphics& g, Rectangle<float> screen, const Path& tube)
+{
+    g.setColour (Colours::black.withAlpha (0.18f));
+    for (float y = screen.getY(); y < screen.getBottom(); y += 3.0f)
+        g.drawHorizontalLine (roundToInt (y), screen.getX(), screen.getRight());
+    g.setGradientFill (ColourGradient (Colours::white.withAlpha (0.10f), screen.getX(), screen.getY(),
+                                       Colours::transparentWhite, screen.getX() + screen.getWidth() * 0.6f, screen.getY() + screen.getHeight() * 0.6f, false));
+    g.fillPath (tube);
+}
+
+//==============================================================================
+EqCurve::EqCurve (RadioFoneProcessor& p) : proc (p)
+{
+    setInterceptsMouseClicks (false, false);
+    const int n = 160;
+    hz.resize (n); db.assign (n, -60.0f);
+    for (int i = 0; i < n; ++i) hz[(size_t) i] = 40.0f * std::pow (16000.0f / 40.0f, (float) i / (float) (n - 1));
+}
+
+void EqCurve::update()
+{
+    lastDb = db;
+    proc.getVoiceCurve (hz.data(), db.data(), (int) hz.size());
+    if (db != lastDb) repaint();
+}
+
+void EqCurve::paint (Graphics& g)
+{
+    const Colour phosphor (0xff5dff8a);
+    Path tube;
+    const auto screen = drawCrtFrame (g, getLocalBounds().toFloat(), String::fromUTF8 ("EQUALIZAÇÃO  ·  APARELHO"), tube);
+    Graphics::ScopedSaveState ss (g);
+    g.reduceClipRegion (tube);
+
+    const float top = 6.0f, bottom = -42.0f;   // dB
+    auto xOf = [&] (float f) { return screen.getX() + 6.0f + (screen.getWidth() - 12.0f) * std::log (f / 40.0f) / std::log (16000.0f / 40.0f); };
+    auto yOf = [&] (float d) { return screen.getY() + 6.0f + (screen.getHeight() - 16.0f) * (top - jlimit (bottom, top, d)) / (top - bottom); };
+
+    // retícula: décadas e dB
+    g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 9.0f, Font::plain));
+    for (float f : { 100.0f, 1000.0f, 10000.0f })
+    {
+        g.setColour (phosphor.withAlpha (0.18f));
+        g.drawVerticalLine (roundToInt (xOf (f)), screen.getY(), screen.getBottom());
+        g.setColour (phosphor.withAlpha (0.45f));
+        const bool last = f > 5000.0f;
+        g.drawText (f >= 1000 ? String ((int) (f / 1000)) + "k" : String ((int) f),
+                    Rectangle<float> (30, 10).withCentre ({ xOf (f) + (last ? -18.0f : 18.0f), screen.getBottom() - 9 }),
+                    last ? Justification::centredRight : Justification::centredLeft);
+    }
+    for (float f : { 200.0f, 300.0f, 500.0f, 2000.0f, 3000.0f, 5000.0f })
+    {
+        g.setColour (phosphor.withAlpha (0.08f));
+        g.drawVerticalLine (roundToInt (xOf (f)), screen.getY(), screen.getBottom());
+    }
+    for (float d : { 0.0f, -12.0f, -24.0f, -36.0f })
+    {
+        g.setColour (phosphor.withAlpha (d == 0.0f ? 0.22f : 0.10f));
+        g.drawHorizontalLine (roundToInt (yOf (d)), screen.getX(), screen.getRight());
+    }
+
+    // curva com brilho e preenchimento por baixo
+    Path curve, fill;
+    for (size_t i = 0; i < hz.size(); ++i)
+    {
+        const float x = xOf (hz[i]), y = yOf (db[i]);
+        if (i == 0) { curve.startNewSubPath (x, y); fill.startNewSubPath (x, screen.getBottom()); }
+        else curve.lineTo (x, y);
+        fill.lineTo (x, y);
+    }
+    fill.lineTo (xOf (hz.back()), screen.getBottom());
+    fill.closeSubPath();
+    g.setGradientFill (ColourGradient (phosphor.withAlpha (0.22f), 0, screen.getY(), phosphor.withAlpha (0.02f), 0, screen.getBottom(), false));
+    g.fillPath (fill);
+    g.setColour (phosphor.withAlpha (0.2f));
+    g.strokePath (curve, PathStrokeType (6.0f, PathStrokeType::curved, PathStrokeType::rounded));
+    g.setColour (phosphor);
+    g.strokePath (curve, PathStrokeType (1.7f, PathStrokeType::curved, PathStrokeType::rounded));
+
+    drawCrtGlass (g, screen, tube);
+}
+
+//==============================================================================
+void DigitalMeter::update()
+{
+    for (int c = 0; c < 2; ++c)
+    {
+        const float d = 20.0f * std::log10 (proc.getOutPeak (c) + 1e-9f);
+        lvl[c] = d > lvl[c] ? d : jmax (d, lvl[c] - 1.2f);       // cai ~36 dB/s
+        if (lvl[c] >= hold[c]) { hold[c] = lvl[c]; holdT[c] = 45; }
+        else if (--holdT[c] <= 0) hold[c] = jmax (lvl[c], hold[c] - 1.5f);
+    }
+    const float r = proc.getGainReductionDb();
+    gr = r < gr ? r : gr + (r - gr) * 0.15f;
+    repaint();
+}
+
+void DigitalMeter::paint (Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    // visor preto rebaixado
+    g.setColour (Colours::black.withAlpha (0.55f));
+    g.fillRoundedRectangle (b.translated (1.5f, 3.0f), 6.0f);
+    g.setColour (Colour (0xff070707));
+    g.fillRoundedRectangle (b, 6.0f);
+    g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), b.getX(), b.getY(), Colour (0xff4c4c4c), b.getRight(), b.getBottom(), false));
+    g.drawRoundedRectangle (b, 6.0f, 2.0f);
+
+    auto inner = b.reduced (8.0f, 10.0f).withTrimmedTop (14.0f);
+    auto labels = inner.removeFromBottom (14.0f);
+    inner.removeFromBottom (4.0f);
+    auto scale = inner.removeFromLeft (26.0f);
+    const float barW = (inner.getWidth() - 12.0f) / 3.0f;
+    const int segs = 30;
+    const float segH = inner.getHeight() / (float) segs;
+    const float minDb = -48.0f;
+    auto dbToFrac = [&] (float d) { return jlimit (0.0f, 1.0f, (d - minDb) / (0.0f - minDb)); };
+
+    // escala em dB
+    g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 9.0f, Font::plain));
+    for (float d : { 0.0f, -3.0f, -6.0f, -12.0f, -18.0f, -24.0f, -36.0f, -48.0f })
+    {
+        const float y = inner.getBottom() - dbToFrac (d) * inner.getHeight();
+        g.setColour (d > -6.0f ? Colour (0xffff5a4a) : cream.withAlpha (0.7f));
+        g.drawText (String ((int) d), Rectangle<float> (scale.getX(), y - 5, scale.getWidth() - 3, 10), Justification::centredRight);
+    }
+
+    auto segColour = [] (float d)
+    {
+        return d > -3.0f ? Colour (0xffff3b2f) : d > -12.0f ? Colour (0xffffb020) : Colour (0xff3dff6e);
+    };
+    for (int c = 0; c < 2; ++c)
+    {
+        const float x = inner.getX() + (float) c * (barW + 6.0f);
+        const float lit = dbToFrac (lvl[c]) * (float) segs;
+        const int holdSeg = (int) (dbToFrac (hold[c]) * (float) segs);
+        for (int k = 0; k < segs; ++k)
+        {
+            const float d = minDb + (0.0f - minDb) * ((float) k + 0.5f) / (float) segs;
+            const auto r = Rectangle<float> (x, inner.getBottom() - (float) (k + 1) * segH + 1.0f, barW, segH - 2.0f);
+            const bool on = (float) k < lit || k == holdSeg - 1;
+            const auto col = segColour (d);
+            g.setColour (on ? col : col.withAlpha (0.10f));
+            g.fillRect (r);
+            if (on)
+            {
+                g.setColour (col.withAlpha (0.25f));
+                g.fillRect (r.expanded (1.5f, 1.0f));
+            }
+        }
+    }
+    // redução de ganho: desce do topo, em âmbar
+    {
+        const float x = inner.getX() + 2.0f * (barW + 6.0f);
+        const float grFrac = jlimit (0.0f, 1.0f, -gr / 12.0f);   // 0..12 dB
+        for (int k = 0; k < segs; ++k)
+        {
+            const auto r = Rectangle<float> (x, inner.getY() + (float) k * segH + 1.0f, barW, segH - 2.0f);
+            const bool on = (float) k < grFrac * (float) segs;
+            g.setColour (on ? amber : amber.withAlpha (0.10f));
+            g.fillRect (r);
+        }
+    }
+    g.setColour (cream.withAlpha (0.8f));
+    g.setFont (bold (9.0f));
+    const char* names[] = { "L", "R", "GR" };
+    for (int c = 0; c < 3; ++c)
+        g.drawText (names[c], Rectangle<float> (inner.getX() + (float) c * (barW + 6.0f), labels.getY(), barW, labels.getHeight()), Justification::centred);
+    // leitura numérica
+    g.setColour (Colour (0xff3dff6e));
+    g.setFont (FontOptions (Font::getDefaultMonospacedFontName(), 10.0f, Font::bold));
+    const float pk = jmax (lvl[0], lvl[1]);
+    g.drawText (pk <= -59.0f ? String ("-inf") : String (pk, 1), Rectangle<float> (b.getX(), b.getY() + 6, b.getWidth() * 0.5f, 12), Justification::centred);
+    g.setColour (amber);
+    g.drawText ("GR " + String (gr, 1), Rectangle<float> (b.getCentreX(), b.getY() + 6, b.getWidth() * 0.5f, 12), Justification::centred);
 }
 
 //==============================================================================
@@ -427,21 +666,8 @@ void CrtScope::paint (Graphics& g)
     auto b = getLocalBounds().toFloat();
     const Colour phosphor (0xff5dff8a);
 
-    // caixa de baquelite com aro cromado
-    g.setColour (Colours::black.withAlpha (0.55f));
-    g.fillRoundedRectangle (b.reduced (2.0f).translated (1.5f, 3.0f), 10.0f);
-    g.setGradientFill (ColourGradient (Colour (0xff2a2a2a), 0, b.getY(), Colour (0xff0b0b0b), 0, b.getBottom(), false));
-    g.fillRoundedRectangle (b.reduced (2.0f), 10.0f);
-    auto label = b.removeFromBottom (20.0f);
-    auto screen = b.reduced (12.0f, 10.0f);
-    g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), screen.getX(), screen.getY(), Colour (0xff4c4c4c), screen.getRight(), screen.getBottom(), false));
-    g.drawRoundedRectangle (screen.expanded (3.0f), 14.0f, 2.5f);
-
-    // tela de tubo: verde escuro, mais clara no meio (curvatura)
-    Path tube; tube.addRoundedRectangle (screen, 12.0f);
-    g.setGradientFill (ColourGradient (Colour (0xff0f2a17), screen.getCentreX(), screen.getCentreY(),
-                                       Colour (0xff030a05), screen.getX(), screen.getY(), true));
-    g.fillPath (tube);
+    Path tube;
+    const auto screen = drawCrtFrame (g, b, String::fromUTF8 ("OSCILOSCÓPIO  ·  SAÍDA"), tube);
     {
         Graphics::ScopedSaveState ss (g);
         g.reduceClipRegion (tube);
@@ -490,26 +716,14 @@ void CrtScope::paint (Graphics& g)
         drawTrace (prev1, 0.35f, false);
         drawTrace (trace, 1.0f, true);
 
-        // linhas de varredura + reflexo do vidro
-        g.setColour (Colours::black.withAlpha (0.18f));
-        for (float y = screen.getY(); y < screen.getBottom(); y += 3.0f)
-            g.drawHorizontalLine (roundToInt (y), screen.getX(), screen.getRight());
-        g.setGradientFill (ColourGradient (Colours::white.withAlpha (0.10f), screen.getX(), screen.getY(),
-                                           Colours::transparentWhite, screen.getX() + screen.getWidth() * 0.6f, screen.getY() + screen.getHeight() * 0.6f, false));
-        g.fillPath (tube);
+        drawCrtGlass (g, screen, tube);
     }
 
-    g.setColour (cream.withAlpha (0.85f));
-    g.setFont (bold (9.5f).withExtraKerningFactor (0.12f));
-    g.drawText (String::fromUTF8 ("OSCILOSCÓPIO  ·  SAÍDA"), label.withTrimmedLeft (14.0f), Justification::centredLeft);
-    const auto lp = Point<float> (label.getRight() - 18.0f, label.getCentreY() - 2.0f);
-    g.setColour (phosphor);
-    g.fillEllipse (lp.x - 3.5f, lp.y - 3.5f, 7.0f, 7.0f);
 }
 
 //==============================================================================
 StationPanel::StationPanel (RadioFoneProcessor& p)
-    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), dial (*p.apvts.getParameter ("tune")), scope (p), throwBtn ("THROW", p.apvts.getParameter ("throw"))
+    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), dial (*p.apvts.getParameter ("tune")), scope (p), eqCurve (p), meter (p), throwBtn ("THROW", p.apvts.getParameter ("throw"))
 {
     setLookAndFeel (&lnf);
     setSize (kW, kH);
@@ -517,6 +731,8 @@ StationPanel::StationPanel (RadioFoneProcessor& p)
     addAndMakeVisible (modeKeys);
     addAndMakeVisible (dial);
     addAndMakeVisible (scope);
+    addAndMakeVisible (eqCurve);
+    addAndMakeVisible (meter);
     setupKnob (band,   "band",   "BANDA", 1);
     setupKnob (drive,  "drive",  "DRIVE", 1);
     setupKnob (noise,  "noise",  "CHIADO", 1);
@@ -533,6 +749,9 @@ StationPanel::StationPanel (RadioFoneProcessor& p)
     setupKnob (dry, "dry", "DRY", 2);
     setupKnob (out, "out", String::fromUTF8 ("SAÍDA"), 2);
 
+    setupKnob (maxThresh, "maxThresh", "GANHO", 2);
+    setupKnob (maxCeil, "maxCeil", "TETO", 2);
+    setupToggle (maxOn, "maxOn", "LIGADO");
     setupToggle (echoSync, "echoSync", "SYNC");
     setupToggle (echoPP, "echoPP", "PING-PONG");
     setupToggle (bypassBtn, "bypass", "BYPASS");
@@ -606,24 +825,47 @@ void StationPanel::resized()
     }
     lampPos = { plateArea.getRight() - 14.0f, (float) topPanel.getBottom() - 26.0f };
     status.setBounds (tapeWin.getX() + 14, tapeWin.getY() + 8, tapeWin.getWidth() - 28, 18);
+    // BYPASS grande no painel de cima, ao lado da lâmpada NO AR
+    bypassBtn.button.setBounds ((int) plateArea.getX() + 4, topPanel.getBottom() - 46, 132, 36);
 
     auto rows = content.reduced (8, 0).withTrimmedTop (10).withTrimmedBottom (8);
-    auto rowA = rows.removeFromTop (214);
+
+    // lateral direita: MAXIMIZER com VU digital
+    maxiArea = rows.removeFromRight (156);
+    rows.removeFromRight (10);
+    {
+        auto m = maxiArea.reduced (8, 4);
+        m.removeFromTop (22);                   // legenda
+        auto controls = m.removeFromBottom (150);
+        meter.setBounds (m.reduced (6, 8));
+        maxOn.button.setBounds (controls.removeFromBottom (30).reduced (8, 0));
+        controls.removeFromBottom (6);
+        place (maxThresh, controls.removeFromLeft (controls.getWidth() / 2), 15);
+        place (maxCeil, controls, 15);
+    }
+
+    auto rowA = rows.removeFromTop (252);
     rows.removeFromTop (6);
     auto rowB = rows;
 
-    // linha A: APARELHO e SINTONIA gigantes, depois os quatro médios
-    modeKeys.setBounds (rowA.removeFromLeft (226).reduced (14, 2));
-    rowA.removeFromLeft (10);
-    dial.setBounds (rowA.removeFromTop (92).reduced (4, 2));
-    rowA.removeFromTop (4);
-    scope.setBounds (rowA.removeFromRight (232).reduced (4, 2));
-    const int wm = rowA.getWidth() / 4;
+    // linha A: teclas dos aparelhos | dial + controles | osciloscópio e curva
+    modeKeys.setBounds (rowA.removeFromLeft (226).reduced (14, 2).withTrimmedBottom (20));
+    rowA.removeFromLeft (6);
+    {
+        auto crt = rowA.removeFromRight (270);
+        scope.setBounds (crt.removeFromTop (crt.getHeight() / 2).reduced (2, 1));
+        eqCurve.setBounds (crt.reduced (2, 1));
+    }
+    rowA.removeFromRight (8);
+    dial.setBounds (rowA.removeFromTop (96).reduced (4, 2));
+    rowA.removeFromTop (8);
+    auto knobsA = rowA;
+    const int wm = knobsA.getWidth() / 4;
     for (auto* k : { &band, &drive, &noise, &defect })
-        place (*k, rowA.removeFromLeft (wm), 18);
+        place (*k, knobsA.removeFromLeft (wm), 18);
 
     // linha B: placa do ECO DE FITA à esquerda, mistura/saída à direita
-    echoPlate = rowB.removeFromLeft (594);
+    echoPlate = rowB.removeFromLeft (600);
     auto ep = echoPlate.reduced (8, 6);
     ep.removeFromTop (16);                      // legenda
     auto btnCol = ep.removeFromRight (104);
@@ -636,20 +878,19 @@ void StationPanel::resized()
         if (i == 0) place (echoMs, cell, 15);
     }
     btnCol = btnCol.reduced (4, 2);
+    btnCol = btnCol.withSizeKeepingCentre (btnCol.getWidth(), jmin (btnCol.getHeight(), 138));
     echoSync.button.setBounds (btnCol.removeFromTop (30));
     btnCol.removeFromTop (8);
     echoPP.button.setBounds (btnCol.removeFromTop (30));
     btnCol.removeFromTop (10);
     throwBtn.setBounds (btnCol.removeFromTop (jmin (52, btnCol.getHeight())));
 
-    rightArea = rowB;
-    auto ra = rowB.reduced (6, 4);
+    rightArea = rowB.withTrimmedLeft (8);
+    auto ra = rightArea.reduced (6, 4);
     ra.removeFromTop (20);                      // legenda
     const int ws = ra.getWidth() / 3;
     for (auto* k : { &mix, &dry, &out })
         place (*k, ra.removeFromLeft (ws), 15);
-    // BYPASS grande no painel de cima, ao lado da lâmpada NO AR
-    bypassBtn.button.setBounds ((int) plateArea.getX() + 4, topPanel.getBottom() - 46, 132, 36);
 
     renderBackground();
 }
@@ -662,7 +903,7 @@ String StationPanel::statusText()
     if (dial.isMouseOverOrDragging())
         return "SINTONIA:  " + dial.getText();
     Knob* all[] = { &band, &drive, &noise, &defect, &echoDiv, &echoMs, &echoHeads,
-                    &echoFb, &echoTone, &echoWow, &echoSend, &mix, &dry, &out };
+                    &echoFb, &echoTone, &echoWow, &echoSend, &mix, &dry, &out, &maxThresh, &maxCeil };
     for (auto* k : all)
         if (k->slider.isVisible() && k->slider.isMouseOverOrDragging())
             return k->name + ":  " + k->slider.getTextFromValue (k->slider.getValue());
@@ -692,11 +933,16 @@ void StationPanel::timerCallback()
     peakHold = vu > 3.0f ? 15 : jmax (0, peakHold - 1);
     lampGlow += ((lvl > 0.003f ? 1.0f : 0.0f) - lampGlow) * 0.3f;
 
-    const bool echoOn = proc.getEchoLevel() > 0.0005f || echoSend.slider.getValue() > 0.5 || throwBtn.isDown();
-    if (echoOn) tapePhase += 0.6f + 1.6f * jlimit (0.2f, 3.0f, 0.4f / jmax (0.04f, proc.getEchoDelaySec()));
+    // a fita roda sempre, como no Dub Station: mais rápida quando o eco é mais curto
+    const float rate = jlimit (0.0f, 1.0f, (0.9f - proc.getEchoDelaySec()) / 0.85f);
+    tapePhase += 0.6f + 2.2f * rate;
+    if (tapePhase > 1.0e6f) tapePhase -= 1.0e6f;
 
     status.setText (statusText(), dontSendNotification);
     scope.update();
+    eqCurve.update();
+    meter.update();
+    dial.setExcited (proc.getVoicePeakHz(), (float) band.slider.getValue() / 100.0f);
     repaint (vuArea);
     repaint (tapeWin.expanded (4));
     repaint (Rectangle<float> (40, 40).withCentre (lampPos).toNearestInt());
@@ -725,9 +971,9 @@ void StationPanel::paint (Graphics& g)
     const auto inset = Rectangle<float> (pl.getRight() - 70, pl.getY() + 17, 54, 46);
     g.setFont (mf::title (23.0f));
     g.setColour (amber.withAlpha (0.35f));
-    g.drawText ("1.3", inset.expanded (1.0f), Justification::centred);
+    g.drawText ("1.4", inset.expanded (1.0f), Justification::centred);
     g.setColour (amber);
-    g.drawText ("1.3", inset, Justification::centred);
+    g.drawText ("1.4", inset, Justification::centred);
 
     // assinatura "Dub Station Solutions" em tinta marrom, com traço
     {
@@ -767,6 +1013,9 @@ void StationPanel::paint (Graphics& g)
     g.setFont (bold (11.0f).withExtraKerningFactor (0.06f));
     g.drawText ("ECO DE FITA", echoPlate.toFloat().reduced (12, 6).withHeight (18.0f), Justification::centredLeft);
     g.drawText (String::fromUTF8 ("MISTURA  ·  SAÍDA"), rightArea.toFloat().reduced (12, 6).withHeight (18.0f), Justification::centredLeft);
+    g.setColour (amber);
+    g.setFont (bold (13.0f).withExtraKerningFactor (0.08f));
+    g.drawText ("MAXIMIZER", maxiArea.toFloat().reduced (8, 8).withHeight (18.0f), Justification::centred);
 
     drawTape (g);
     drawVuNeedle (g);
@@ -774,55 +1023,127 @@ void StationPanel::paint (Graphics& g)
 
 void StationPanel::drawTape (Graphics& g)
 {
+    // transporte de fita igual ao do Dub Station 2.1: a fita corre sempre e os roletes giram junto
     auto win = tapeWin.toFloat();
+    // recessed smoked-glass window
     g.setColour (Colour (0xff0d0f0e));
     g.fillRoundedRectangle (win, 10.0f);
 
-    const float L = win.getX() + 64, R = win.getRight() - 64;
-    const float T = win.getY() + 34, B = win.getY() + 112;
+    const float L = win.getX() + 70, R = win.getRight() - 70;
+    const float T = win.getY() + 38, B = win.getY() + 128;
     const float cy = (T + B) * 0.5f, rad = (B - T) * 0.5f;
 
-    // laço da fita com as marcas de óxido andando
+    // tape loop path
     Path loop;
     loop.addRoundedRectangle (L - rad, T, (R - L) + 2 * rad, B - T, rad);
-    g.setColour (Colour (0xff4a2e18));
-    g.strokePath (loop, PathStrokeType (7.0f));
-    g.setColour (Colour (0xff6b4626));
     const float perim = loop.getLength();
-    for (float d = std::fmod (tapePhase, 14.0f); d < perim; d += 14.0f)
+
+    g.setColour (Colours::black.withAlpha (0.55f));                 // shadow of the tape on the deck
+    g.strokePath (loop, PathStrokeType (9.0f), AffineTransform::translation (1.5f, 3.5f));
+    g.setColour (Colour (0xff1e1008));                               // tape edges
+    g.strokePath (loop, PathStrokeType (9.0f));
+    g.setColour (Colour (0xff5a361b));                               // oxide coating
+    g.strokePath (loop, PathStrokeType (7.0f));
+    g.setColour (Colour (0xff7d4f2a).withAlpha (0.85f));             // sheen band along the middle
+    g.strokePath (loop, PathStrokeType (2.6f));
+
+    // moving grain: irregular light/dark specks that travel with the tape (speed = repeat rate)
     {
-        const auto pt = loop.getPointAlongPath (d);
-        g.fillEllipse (pt.x - 1.5f, pt.y - 1.5f, 3.0f, 3.0f);
+        const float step = 3.5f;
+        const int base = (int) std::floor (tapePhase / step);
+        const float off = tapePhase - (float) base * step;
+        int k = 0;
+        for (float d = off; d < perim; d += step, ++k)
+        {
+            const auto id = (uint32) (k - base);
+            const uint32 h = (id * 2654435761u) ^ (id >> 7);
+            const float a = (float) ((h >> 8) & 255) / 255.0f;
+            if (a < 0.45f) continue;
+            const auto pt = loop.getPointAlongPath (d);
+            const bool light = (h & 1) != 0;
+            const float jitter = (float) ((h >> 16) & 7) / 7.0f * 4.0f - 2.0f;  // across the tape width
+            const auto nxt = loop.getPointAlongPath (jmin (perim, d + 0.8f));
+            const auto dirv = (nxt - pt);
+            const float len = jmax (0.001f, std::sqrt (dirv.x * dirv.x + dirv.y * dirv.y));
+            const Point<float> nrm (-dirv.y / len, dirv.x / len);
+            const auto q = pt + nrm * jitter;
+            g.setColour (light ? Colour (0xffb07a46).withAlpha (0.25f + 0.35f * a) : Colour (0xff1a0d05).withAlpha (0.20f + 0.30f * a));
+            g.fillEllipse (q.x - 1.2f, q.y - 0.8f, 2.4f, 1.6f);
+        }
+    }
+    g.setColour (Colours::white.withAlpha (0.10f));                  // thin specular edge
+    g.strokePath (loop, PathStrokeType (1.0f), AffineTransform::translation (0.0f, -3.0f));
+
+    // flanged chrome guide wheels, rubber pinch roller, polished capstan
+    auto wheel = [&g] (Point<float> c, float r, float spin, bool rubber)
+    {
+        g.setColour (Colours::black.withAlpha (0.5f));
+        g.fillEllipse (c.x - r + 2, c.y - r + 3, r * 2, r * 2);
+        if (rubber)
+        {
+            g.setGradientFill (ColourGradient (Colour (0xff2c2c2c), c.x - r, c.y - r, Colour (0xff050505), c.x + r, c.y + r, false));
+            g.fillEllipse (c.x - r, c.y - r, r * 2, r * 2);
+            g.setColour (Colours::white.withAlpha (0.10f));
+            Path sheen;
+            sheen.addCentredArc (c.x, c.y, r * 0.8f, r * 0.8f, 0.0f, spin, spin + 1.2f, true);
+            g.strokePath (sheen, PathStrokeType (1.5f));
+        }
+        else
+        {
+            g.setGradientFill (ColourGradient (Colour (0xfff2f2f0), c.x - r, c.y - r, Colour (0xff5c5c5a), c.x + r, c.y + r, false));
+            g.fillEllipse (c.x - r, c.y - r, r * 2, r * 2);
+            g.setColour (Colours::black.withAlpha (0.35f));
+            g.drawEllipse (c.x - r * 0.86f, c.y - r * 0.86f, r * 1.72f, r * 1.72f, 1.0f); // flange step
+        }
+        const float hub = r * (rubber ? 0.45f : 0.62f);
+        g.setGradientFill (ColourGradient (Colour (0xffe6e6e4), c.x - hub, c.y - hub, Colour (0xff6e6e6c), c.x + hub, c.y + hub, false));
+        g.fillEllipse (c.x - hub, c.y - hub, hub * 2, hub * 2);
+        g.setColour (Colour (0xff1c1c1c));                         // rotating holes
+        for (int i = 0; i < 3; ++i)
+        {
+            const auto hp = c.getPointOnCircumference (hub * 0.55f, spin + (float) i * 2.0944f);
+            const float hr = hub * 0.2f;
+            g.fillEllipse (hp.x - hr, hp.y - hr, hr * 2, hr * 2);
+        }
+        g.setColour (Colour (0xff333333));
+        g.fillEllipse (c.x - 2.2f, c.y - 2.2f, 4.4f, 4.4f);
+        g.setColour (Colours::white.withAlpha (0.6f));
+        g.fillEllipse (c.x - r * 0.55f, c.y - r * 0.62f, r * 0.35f, r * 0.22f);
+    };
+    // wheels roll with the tape: angle = travelled distance / radius
+    wheel ({ L - rad + 26.0f, cy }, 22.0f, tapePhase / 22.0f, false);
+    wheel ({ R + rad - 26.0f, cy }, 22.0f, tapePhase / 22.0f, false);
+    wheel ({ R - 20.0f, B - 12.0f }, 14.0f, -tapePhase / 14.0f, true);   // pinch roller
+    {
+        const auto cap = Point<float> (R - 20.0f, B + 12.0f);          // capstan shaft
+        g.setGradientFill (ColourGradient (Colour (0xffffffff), cap.x - 5, cap.y - 5, Colour (0xff707070), cap.x + 5, cap.y + 5, false));
+        g.fillEllipse (cap.x - 5.5f, cap.y - 5.5f, 11.0f, 11.0f);
+        g.setColour (Colour (0xff2a2a2a));
+        g.drawLine ({ cap, cap.getPointOnCircumference (5.0f, tapePhase / 5.5f) }, 1.4f);
     }
 
-    auto roller = [&g] (Point<float> c, float r, float spin)
-    {
-        g.setGradientFill (ColourGradient (Colour (0xffd0d0d0), c.x - r, c.y - r, Colour (0xff6a6a6a), c.x + r, c.y + r, false));
-        g.fillEllipse (c.x - r, c.y - r, r * 2, r * 2);
-        g.setColour (Colour (0xff2a2a2a));
-        for (int i = 0; i < 3; ++i)
-            g.drawLine ({ c, c.getPointOnCircumference (r * 0.8f, spin + (float) i * 2.0944f) }, 1.5f);
-        g.fillEllipse (c.x - 3, c.y - 3, 6, 6);
-    };
-    roller ({ L - rad + 24.0f, cy }, 20.0f, tapePhase * 0.05f);
-    roller ({ R + rad - 24.0f, cy }, 20.0f, tapePhase * 0.05f);
-
-    // cabeçotes: ERASE, REC, 1, 2, 3
+    // heads along the bottom run: ERASE, REC, 1, 2, 3 (metal shields with a gap and two screws)
     const int mask = headMasks[jlimit (0, 6, (int) echoHeads.slider.getValue())];
     const char* hn[] = { "ERASE", "REC", "1", "2", "3" };
-    g.setFont (bold (9.5f));
+    g.setFont (FontOptions (9.5f, Font::bold));
     for (int h = 0; h < 5; ++h)
     {
-        const float hx = L + 26.0f + (float) h * ((R - L - 52.0f) / 4.0f);
-        g.setGradientFill (ColourGradient (Colour (0xffb8b8b8), hx - 11, B - 2, Colour (0xff5e5e5e), hx + 11, B + 18, false));
-        g.fillRoundedRectangle (hx - 11, B - 1, 22, 18, 3.0f);
-        g.setColour (Colour (0xff1a1a1a));
-        g.drawLine (hx, B - 1, hx, B + 4, 1.0f);
+        const float hx = L + 40.0f + (float) h * ((R - L - 90.0f) / 4.0f);
+        g.setColour (Colours::black.withAlpha (0.5f));
+        g.fillRoundedRectangle (hx - 11, B + 1, 24, 20, 3.0f);
+        g.setGradientFill (ColourGradient (Colour (0xffd8d8d6), hx - 12, B - 2,
+                                                 Colour (0xff56565a), hx + 12, B + 20, false));
+        g.fillRoundedRectangle (hx - 12, B - 2, 24, 20, 3.0f);
+        g.setColour (Colour (0xff101010));
+        g.drawLine (hx, B - 2, hx, B + 5, 1.2f);                         // head gap
+        g.setColour (Colour (0xff3a3a3a));
+        g.fillEllipse (hx - 9, B + 11, 3.5f, 3.5f);
+        g.fillEllipse (hx + 5.5f, B + 11, 3.5f, 3.5f);
         const bool on = h <= 1 ? (h == 1) : (mask & (1 << (h - 2))) != 0;
         g.setColour (on ? amber : lampOff);
-        g.fillEllipse (hx - 4, B + 21, 8, 8);
+        g.fillEllipse (hx - 4, B + 24, 8, 8);
         g.setColour (cream.withAlpha (0.75f));
-        g.drawText (hn[h], Rectangle<float> (hx - 22, B + 30, 44, 11), Justification::centred);
+        g.drawText (hn[h], Rectangle<float> (hx - 22, B + 33, 44, 11), Justification::centred);
     }
 
     // vidro fumê + moldura
@@ -1057,7 +1378,19 @@ void StationPanel::renderBackground()
         g.drawLine (x0 + (x0 == x1 ? 1.0f : 0.0f), y0 + (y0 == y1 ? 1.0f : 0.0f), x1 + (x0 == x1 ? 1.0f : 0.0f), y1 + (y0 == y1 ? 1.0f : 0.0f), 1.0f);
     };
     const float divY = (float) echoPlate.getY() - 4.0f;
-    engrave (kWood + 20.0f, divY, w - kWood - 20.0f, divY);
+    engrave (kWood + 20.0f, divY, (float) maxiArea.getX() - 12.0f, divY);
+    engrave ((float) maxiArea.getX() - 6.0f, tH + 14.0f, (float) maxiArea.getX() - 6.0f, h - 14.0f);
+
+    // placa rebaixada do maximizer
+    {
+        auto mp = maxiArea.toFloat().reduced (2.0f, 2.0f);
+        g.setColour (Colour (0xff0b0a09).withAlpha (0.7f));
+        g.fillRoundedRectangle (mp, 6.0f);
+        g.setColour (Colours::white.withAlpha (0.07f));
+        g.drawRoundedRectangle (mp.translated (0, 1), 6.0f, 1.0f);
+        g.setColour (Colours::black.withAlpha (0.8f));
+        g.drawRoundedRectangle (mp, 6.0f, 1.0f);
+    }
     engrave ((float) echoPlate.getRight() + 4.0f, (float) echoPlate.getY() + 6.0f, (float) echoPlate.getRight() + 4.0f, (float) echoPlate.getBottom() - 4.0f);
 
     // placa rebaixada do eco

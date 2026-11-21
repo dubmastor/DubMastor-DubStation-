@@ -27,6 +27,7 @@ RadioFoneProcessor::RadioFoneProcessor()
     for (auto* p : getParameters())
         if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p))
             params[rp->getParameterID().toStdString()] = apvts.getRawParameterValue (rp->getParameterID());
+    curveVoice.prepare (48000.0);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout RadioFoneProcessor::createLayout()
@@ -63,6 +64,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout RadioFoneProcessor::createLa
     p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "echoPP", 1 }, "Ping Pong", false));
     p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "throw", 1 }, "Throw", false));
 
+    // --- MAXIMIZER (o mesmo do Big Knob)
+    p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "maxOn", 1 }, "Maximizer On", true));
+    p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "maxThresh", 1 }, "Maximizer Threshold",
+                                                        NormalisableRange<float> (-20.0f, 0.0f), 0.0f, db()));
+    p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "maxCeil", 1 }, "Maximizer Ceiling",
+                                                        NormalisableRange<float> (-3.0f, 0.0f), -0.3f, db()));
+
     // --- MASTER
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "dry", 1 }, "Dry", NormalisableRange<float> (0.0f, 100.0f), 100.0f, pct()));
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "out", 1 }, "Output", NormalisableRange<float> (-24.0f, 12.0f), 0.0f, db()));
@@ -84,6 +92,14 @@ void RadioFoneProcessor::prepareToPlay (double sampleRate, int)
 {
     voice.prepare (sampleRate);
     echo.prepare (sampleRate);
+    maximizer.prepare (sampleRate);
+    setLatencySamples (maximizer.getLatency());
+    for (auto& d : bypassDelay) d.assign ((size_t) juce::jmax (1, maximizer.getLatency()), 0.0f);
+    bypassIdx = 0;
+    {
+        const juce::SpinLock::ScopedLockType sl (curveLock);
+        curveVoice.prepare (48000.0);
+    }
     for (auto* s : { &dryGain, &outGain })
         s->reset (sampleRate, 0.02);
     bypassMix.reset (sampleRate, 0.03);
@@ -129,6 +145,13 @@ void RadioFoneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     echo.setSettings (es);
     echoDelay.store (es.delaySec);
 
+    dub::MaximizerSettings ms;
+    ms.on = getP ("maxOn") > 0.5f;
+    ms.pushDb = -getP ("maxThresh");
+    ms.ceilingDb = getP ("maxCeil");
+    maximizer.setSettings (ms);
+    float pk[2] = { 0, 0 }, grMin = 0.0f;
+
     dryGain.setTargetValue (getP ("dry") / 100.0f);
     outGain.setTargetValue (juce::Decibels::decibelsToGain (getP ("out")));
     bypassMix.setTargetValue (getP ("bypass") > 0.5f ? 1.0f : 0.0f);
@@ -146,8 +169,20 @@ void RadioFoneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         float el, er;
         echo.processSample (v, v, el, er);
         const float dg = dryGain.getNextValue(), og = outGain.getNextValue(), m = bypassMix.getNextValue();
-        const float yl = ((v * dg + el) * og) * (1.0f - m) + xl * m;
-        const float yr = ((v * dg + er) * og) * (1.0f - m) + xr * m;
+        float yl = (v * dg + el) * og, yr = (v * dg + er) * og;
+        maximizer.processSample (yl, yr);
+        grMin = std::min (grMin, maximizer.getLastGainReductionDb());
+        // bypass: mistura suave com a entrada atrasada na mesma latência do maximizer
+        {
+            const int N = (int) bypassDelay[0].size();
+            const float dl = bypassDelay[0][(size_t) bypassIdx], dr = bypassDelay[1][(size_t) bypassIdx];
+            bypassDelay[0][(size_t) bypassIdx] = xl;
+            bypassDelay[1][(size_t) bypassIdx] = xr;
+            if (++bypassIdx >= N) bypassIdx = 0;
+            yl = yl * (1.0f - m) + dl * m;
+            yr = yr * (1.0f - m) + dr * m;
+        }
+        pk[0] = std::max (pk[0], std::fabs (yl)); pk[1] = std::max (pk[1], std::fabs (yr));
         sumSq += 0.5f * (yl * yl + yr * yr);
         scopeBuf[(size_t) sw] = 0.5f * (yl + yr);
         sw = (sw + 1) & (kScopeSize - 1);
@@ -157,6 +192,8 @@ void RadioFoneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     }
     scopeWrite.store (sw, std::memory_order_release);
     outRms.store (std::sqrt (sumSq / (float) n));
+    outPeak[0].store (pk[0]); outPeak[1].store (pk[1]);
+    grDb.store (grMin);
     echoRms.store (std::sqrt (echoSq / (float) n));
 }
 
@@ -171,6 +208,32 @@ void RadioFoneProcessor::setStateInformation (const void* data, int sizeInBytes)
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         if (xml->hasTagName (apvts.state.getType()))
             apvts.replaceState (juce::ValueTree::fromXml (*xml));
+}
+
+void RadioFoneProcessor::getVoiceCurve (const float* hz, float* db, int n)
+{
+    rf::VoiceSettings vs;
+    vs.mode = juce::jlimit (0, 2, (int) getP ("mode"));
+    vs.tune = getP ("tune") / 100.0f;
+    vs.band = getP ("band") / 100.0f;
+    vs.drive = getP ("drive") / 100.0f;
+    vs.defect = getP ("defect") / 100.0f;
+    vs.mix = getP ("mix") / 100.0f;
+    const juce::SpinLock::ScopedLockType sl (curveLock);
+    curveVoice.setSettings (vs);
+    curveVoice.curveDb (hz, db, n);
+}
+
+float RadioFoneProcessor::getVoicePeakHz()
+{
+    rf::VoiceSettings vs;
+    vs.mode = juce::jlimit (0, 2, (int) getP ("mode"));
+    vs.tune = getP ("tune") / 100.0f;
+    vs.band = getP ("band") / 100.0f;
+    vs.defect = getP ("defect") / 100.0f;
+    const juce::SpinLock::ScopedLockType sl (curveLock);
+    curveVoice.setSettings (vs);
+    return curveVoice.peakHz();
 }
 
 juce::AudioProcessorEditor* RadioFoneProcessor::createEditor() { return new RadioFoneEditor (*this); }
