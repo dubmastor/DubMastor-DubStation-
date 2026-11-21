@@ -23,13 +23,15 @@ public:
 class ChoiceKeys : public juce::Component
 {
 public:
-    ChoiceKeys (juce::RangedAudioParameter& p, juce::StringArray names);
+    // order[i] = valor do parâmetro da i-ésima tecla (a ordem na tela pode diferir da do parâmetro)
+    ChoiceKeys (juce::RangedAudioParameter& p, juce::StringArray names, std::vector<int> order = {});
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override;
 private:
     juce::RangedAudioParameter& param;
     juce::ParameterAttachment att;
     juce::StringArray labels;
+    std::vector<int> order;
     float value = 0.0f;
 };
 
@@ -46,6 +48,42 @@ public:
 private:
     float heat = 0.0f, flicker = 0.0f;
     juce::Random rng;
+};
+
+//==============================================================================
+// Gravador de rolo em pé (saturação FITA): os rolos giram com a fita ligada, o carretel de cima
+// esvazia e o de baixo enche, e a fenda da cabeça acende conforme o sinal satura a fita
+class TapeReels : public juce::Component
+{
+public:
+    TapeReels() { setInterceptsMouseClicks (false, false); }
+    void update (bool on, float driveDb, float level);
+    void paint (juce::Graphics&) override;
+private:
+    float angle = 0.0f, speed = 0.0f, progress = 0.25f, glow = 0.0f;
+};
+
+//==============================================================================
+// Envelope em tela verde com pontos arrastáveis: ATAQUE, DECAY / SUSTAIN e RELEASE
+class EnvelopeEditor : public juce::Component
+{
+public:
+    explicit EnvelopeEditor (DubBassAudioProcessor& p);
+    void paint (juce::Graphics&) override;
+    void mouseMove (const juce::MouseEvent&) override;
+    void mouseExit (const juce::MouseEvent&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+private:
+    struct Geo { juce::Rectangle<float> plot; float segW, x0, xA, xD, xS, xR, yTop, yBot, ySus; };
+    Geo geometry() const;
+    int  hitTest (juce::Point<float>) const;
+    bool is808() const;
+    DubBassAudioProcessor& proc;
+    juce::RangedAudioParameter *pa, *pd, *ps, *pr;
+    int hover = -1, dragging = -1;
 };
 
 //==============================================================================
@@ -83,14 +121,26 @@ private:
     std::vector<float> trace, prev1, prev2;
 };
 
-// Curva do EQ gráfico (com o Bass Boost) em tela verde
+// Curva do EQ gráfico (com o Bass Boost) em tela verde, editável com o mouse:
+// arraste perto de uma banda para subir/baixar; duplo clique zera a banda
 class CrtEqCurve : public juce::Component
 {
 public:
-    explicit CrtEqCurve (DubBassAudioProcessor& p) : proc (p) { setInterceptsMouseClicks (false, false); }
+    explicit CrtEqCurve (DubBassAudioProcessor& p) : proc (p) { setMouseCursor (juce::MouseCursor::UpDownResizeCursor); }
     void paint (juce::Graphics&) override;
+    void mouseMove (const juce::MouseEvent&) override;
+    void mouseExit (const juce::MouseEvent&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
 private:
+    juce::Rectangle<float> screenArea() const { return getLocalBounds().toFloat().reduced (10.0f); }
+    float xFor (double f) const;
+    float yFor (float db) const;
+    int nearestBand (float x) const;
     DubBassAudioProcessor& proc;
+    int hover = -1, dragging = -1;
 };
 
 //==============================================================================
@@ -150,12 +200,14 @@ private:
     ChoiceKeys modeKeys;
     Knob harm2, harm3, glide, pitchAmt, pitchTime;
     // ENVELOPE / FILTRO
-    Knob attack, decay, sustain, release, cutoff, reso;
+    EnvelopeEditor envEditor;
+    Knob cutoff, reso;
     // VÁLVULA / DRIVE
     Toggle drvOn;
     ChoiceKeys drvTypeKeys;
     Knob drive, drvTone, drvMix;
     TubeGlow tube;
+    TapeReels reels;
     // EQ GRÁFICO
     Toggle eqOn;
     CrtEqCurve eqCurve;

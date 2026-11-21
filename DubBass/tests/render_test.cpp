@@ -93,6 +93,10 @@ int main (int argc, char** argv)
     check (pk > -0.3f, "BYPASS do maximizer deixa passar acima do teto (" + juce::String (pk, 2) + " dBFS)");
     setP (p, ParamID::maxBypass, 0);
 
+    setP (p, ParamID::mode, 1); setP (p, ParamID::drvOn, 1); setP (p, ParamID::drvType, 3); setP (p, ParamID::drive, 14);
+    pk = play (p, 48000.0, dir.getChildFile ("808_fita.wav"), nan);
+    check (pk <= -0.29f && pk > -12.0f, "808 + saturacao FITA: pico " + juce::String (pk, 2) + " dBFS respeita o teto");
+
     setP (p, ParamID::drvOn, 1); setP (p, ParamID::revOn, 1);
     setP (p, ParamID::drvType, 2); setP (p, "eq2", 6.0f); setP (p, "eq6", -8.0f);
     pk = play (p, 96000.0, {}, nan);
@@ -107,7 +111,7 @@ int main (int argc, char** argv)
            "estado salva e carrega");
 
     // interface: válvula quente, nota tocando e medidores cheios
-    setP (p, ParamID::mode, 2); setP (p, ParamID::drvType, 0); setP (p, ParamID::drive, 18);
+    setP (p, ParamID::mode, 0); setP (p, ParamID::drvType, 3); setP (p, ParamID::drive, 18);
     setP (p, ParamID::drvOn, 1);
     play (p, 48000.0, {}, nan);
     std::unique_ptr<juce::AudioProcessorEditor> ed (p.createEditor());

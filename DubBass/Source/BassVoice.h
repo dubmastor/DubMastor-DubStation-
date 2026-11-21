@@ -58,6 +58,8 @@ public:
                        ? 1.0f
                        : 1.0f - std::exp (-1.0f / (p.glideMs * 0.001f * 0.33f * sr));
 
+        clickLen = std::max (1, (int) (0.004f * sr));
+        dcR = 1.0f - 6.2832f * 8.0f / sr;
         pitchEnvCoeff = std::exp (-1.0f / (std::max (1.0f, p.pitchTimeMs) * 0.001f * sr));
     }
 
@@ -90,6 +92,7 @@ public:
             if (wasIdle) velGain = velTarget;
             env.noteOn();
             pitchEnv = 1.0f;
+            clickPos = 0;
         }
     }
 
@@ -163,9 +166,27 @@ public:
 
         if (params.mode == Mode::Eight08)
         {
-            static const float k = 1.0f / std::tanh (1.8f);
-            s = std::tanh (1.8f * s) * k;
+            // corpo: segundo harmônico que some junto com o drop de pitch (o "knock" do 808)
+            s += 0.30f * pitchEnv * std::sin (2.0f * ph);
+
+            // clique de ataque: rajada curtinha na 4ª harmônica, como o bumbo do 808
+            if (clickPos < clickLen)
+            {
+                const float w = 1.0f - (float) clickPos / (float) clickLen;
+                s += 0.45f * w * w * std::sin (4.0f * ph);
+                ++clickPos;
+            }
+
+            // saturação assimétrica (harmônicos pares = grave mais gordo e audível em caixa pequena)
+            constexpr float drive = 1.9f, bias = 0.18f;
+            static const float tb = std::tanh (bias), k = 1.0f / (std::tanh (drive + bias) - tb);
+            s = (std::tanh (drive * s + bias) - tb) * k;
         }
+
+        // tira o DC que a saturação assimétrica deixa
+        const float y = s - dcX + dcR * dcY;
+        dcX = s; dcY = y;
+        s = y;
 
         return s * env.next() * velGain;
     }
@@ -204,6 +225,8 @@ private:
     }
 
     float stLp = 0.0f;
+    int   clickPos = 1 << 30, clickLen = 192;
+    float dcX = 0.0f, dcY = 0.0f, dcR = 0.999f;
 
     //==========================================================================
     // Envelope ADSR com decay/release exponenciais (soa mais natural no 808)

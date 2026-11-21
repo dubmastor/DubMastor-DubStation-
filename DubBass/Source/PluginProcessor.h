@@ -143,7 +143,9 @@ private:
     using StereoIIR = juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>;
     std::array<StereoIIR, numEqBands> eqBands;
     std::array<float, numEqBands> lastEqGain {};
-    StereoIIR boostFilter;
+    StereoIIR boostFilter, headBump;
+    juce::SmoothedValue<float> headBumpDbSm;
+    bool headBumpNeedsUpdate = true;
     juce::SmoothedValue<float> boostDbSm;
     bool boostNeedsUpdate = true;
 

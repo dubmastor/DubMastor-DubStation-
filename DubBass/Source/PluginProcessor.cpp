@@ -36,7 +36,14 @@ namespace
                 static const float tb = std::tanh (bias);
                 return std::tanh (x + bias) - tb;
             }
-            case 1: // TAPE — compressão suave, harmônicos ímpares
+            case 3: // FITA — joelho macio de fita magnética (comprime antes de distorcer)
+            {
+                constexpr float p = 2.4f;
+                const float ax = std::abs (x * 1.15f);
+                const float y = (x * 1.15f) / std::pow (1.0f + std::pow (ax, p), 1.0f / p);
+                return y + 0.04f * y * y;                         // um pouco de 2º harmônico da cabeça
+            }
+            case 1: // SOFT — compressão suave, harmônicos ímpares
                 return (2.0f / juce::MathConstants<float>::pi) * std::atan (x * 1.3f);
 
             default: // FUZZ — clip duro
@@ -94,7 +101,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubBassAudioProcessor::creat
     };
 
     // OSC
-    addChoice (ParamID::mode, "Mode", { "Classic Sine", "808", "Super Tone" }, 0);
+    addChoice (ParamID::mode, "Mode", { "Bass", "808", "Super Tone" }, 0);   // ordem dos valores fixa (compatível); a tela mostra BASS / SUPER TONE / 808
     addFloat  (ParamID::harm2,     "Harmonic 2",  { 0.0f, 1.0f }, 0.15f, fmtPct);
     addFloat  (ParamID::harm3,     "Harmonic 3",  { 0.0f, 1.0f }, 0.08f, fmtPct);
     addFloat  (ParamID::glide,     "Glide",       skewed (0.0f, 500.0f, 80.0f), 20.0f, fmtMs);
@@ -111,7 +118,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubBassAudioProcessor::creat
 
     // DRIVE
     addBool   (ParamID::drvOn,   "Drive On", false);   // válvula começa desligada
-    addChoice (ParamID::drvType, "Drive Type", { "Tube", "Tape", "Fuzz" }, 0);
+    addChoice (ParamID::drvType, "Drive Type", { "Tube", "Soft", "Fuzz", "Fita" }, 0);
     addFloat  (ParamID::drive,   "Drive",      { 0.0f, 36.0f }, 6.0f, fmtDb);
     addFloat  (ParamID::drvTone, "Drive Tone", skewed (400.0f, 16000.0f, 2500.0f), 5000.0f, fmtHz);
     addFloat  (ParamID::drvMix,  "Drive Mix",  { 0.0f, 1.0f }, 0.5f, fmtPct);
@@ -195,6 +202,14 @@ void DubBassAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     updateBoost (0);
     boostFilter.prepare (spec);
     boostFilter.reset();
+
+    // Head bump da fita
+    headBumpDbSm.reset (sampleRate, 0.08);
+    headBumpDbSm.setCurrentAndTargetValue (0.0f);
+    *headBump.state = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter (sampleRate, 90.0f, 0.8f, 1.0f);
+    headBumpNeedsUpdate = true;
+    headBump.prepare (spec);
+    headBump.reset();
 
     // Reverb
     reverb.prepare (spec);
@@ -422,6 +437,20 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
     // 2) Distorção / saturação harmônica
     processDrive (block);
+
+    // 2b) FITA: "head bump" de grave do gravador (+2.5 dB em 90 Hz) quando a fita está ligada
+    {
+        const bool tapeOn = prm.drvOn->load() > 0.5f && juce::roundToInt (prm.drvType->load()) == 3;
+        headBumpDbSm.setTargetValue (tapeOn ? 2.5f : 0.0f);
+        if (headBumpNeedsUpdate || headBumpDbSm.isSmoothing())
+        {
+            const float db = headBumpDbSm.skip (numSamples);
+            *headBump.state = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter (
+                                  getSampleRateSafe(), 90.0f, 0.8f, juce::Decibels::decibelsToGain (db));
+            headBumpNeedsUpdate = headBumpDbSm.isSmoothing();
+        }
+        headBump.process (ctx);
+    }
 
     // 3) EQ gráfico 10 bandas
     updateEq();

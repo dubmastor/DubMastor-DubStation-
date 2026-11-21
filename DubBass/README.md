@@ -1,13 +1,13 @@
-# Dub Bass - Dub Station 1.3
+# Dub Bass - Dub Station 1.4
 
-Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, plaqueta de latão com a versão, knobs de baquelite e lâmpadas âmbar.
+Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, versão no título (DUBMASTOR DUB BASS x.y), plaqueta de latão DUB STATION, knobs de baquelite e lâmpadas âmbar.
 
 ![Interface](docs/interface.png)
 
 ## Cadeia de sinal
 
 ```
-OSCILADOR (Classic Sine + harmônicos | 808 | Super Tone) → FILTRO → ENVELOPE → VÁLVULA / SATURAÇÃO (2x oversampling)
+OSCILADOR (Bass + harmônicos | Super Tone | 808) → FILTRO → ENVELOPE → VÁLVULA / SATURAÇÃO (2x oversampling)
 → EQ GRÁFICO 10 bandas → REVERB (envio paralelo com low cut) → BASS BOOST 60 Hz +4 dB
 → MAXIMIZER (lookahead 1.5 ms, com BYPASS) → VOLUME
 ```
@@ -16,11 +16,11 @@ OSCILADOR (Classic Sine + harmônicos | 808 | Super Tone) → FILTRO → ENVELOP
 
 | Seção | O que tem |
 |---|---|
-| **Oscilador** | Teclas SINE / 808 / SUPER TONE, Harm 2 e Harm 3 (no Sine e no 808), Glide, 808 Pitch e 808 Tempo (só no 808). O **Super Tone** é o baixo digital da era Super Power do King Jammy (Sleng Teng): quadrada sem aliasing com peso de senoide e o grão de 7 bits do teclado Casio dos anos 80 |
-| **Envelope / Filtro** | Ataque, Decay, Sustain (desligado no 808), Release, Cutoff e Ressonância |
+| **Oscilador** | Teclas BASS / SUPER TONE / 808. **Bass** é a senoide clássica com Harm 2 e Harm 3. **Super Tone** é o baixo digital da era Super Power do King Jammy (Sleng Teng): quadrada sem aliasing, peso de senoide e grão de 7 bits. **808** tem drop de pitch (808 Pitch / 808 Tempo), "knock" no ataque, clique de bumbo e saturação assimétrica que deixa o grave gordo e audível até em caixa pequena. Glide |
+| **Envelope / Filtro** | Envelope gráfico em tela verde: arraste o ponto **A** (ataque), **D/S** (decay na horizontal, sustain na vertical) e **R** (release); duplo clique volta ao padrão. No 808 o som decai até zero. Abaixo, Cutoff e Ressonância |
 | **Osciloscópio** | Tela de fósforo verde com a onda da saída, parada no cruzamento por zero |
-| **Válvula / Saturação** | ON (começa desligada), teclas TUBE / TAPE / FUZZ, Drive, Tom e Mix. A válvula 12AX7 esquenta com o DRIVE e com o sinal: vai do vermelho apagado ao laranja, âmbar e branco quente, com o brilho azul de válvula forçada no limite. Esquenta rápido e esfria devagar |
-| **EQ gráfico** | ON, 10 faders ±12 dB (32 Hz a 16 kHz) e a curva em tela verde (mostra o Bass Boost também) |
+| **Válvula / Saturação** | ON (começa desligada), teclas TUBE / SOFT / FUZZ / FITA, Drive, Tom e Mix. A válvula 12AX7 esquenta com o DRIVE e com o sinal: vai do vermelho apagado ao laranja, âmbar e branco quente, com o brilho azul de válvula forçada no limite. Esquenta rápido e esfria devagar. Na **FITA** o berço vira um gravador de rolo em pé: os rolos giram, o de cima esvazia e o de baixo enche, a fenda da cabeça acende com a saturação; o som é o joelho macio da fita com o "head bump" de grave em 90 Hz |
+| **EQ gráfico** | ON, 10 faders ±12 dB (32 Hz a 16 kHz) e a curva em tela verde, **editável com o mouse**: arraste perto de uma banda para subir ou baixar, duplo clique zera (mostra o Bass Boost também) |
 | **Reverb** | ON (começa desligado), Tamanho, Damp, Abertura, Low Cut (o grave fica seco) e Mix |
 | **Bass Boost** | Botão verde: +4 dB em 60 Hz, antes do maximizer |
 | **Saída** | Display âmbar com a nota tocando (nome e Hz) e Volume |

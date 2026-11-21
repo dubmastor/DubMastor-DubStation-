@@ -1,8 +1,17 @@
-## Dub Bass - Dub Station 1.3 🟢🟡⚫
+## Dub Bass - Dub Station 1.4 🟢🟡⚫
 
 Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, o 808 com o pitch caindo, ou o Super Tone digital da era King Jammy.
 
-**Novo na 1.3**
+**Novo na 1.4**
+- **808 melhorado**: "knock" no ataque que some junto com o drop de pitch, clique de bumbo e saturação assimétrica (grave mais gordo e audível em caixa pequena)
+- **Envelope gráfico**: arraste os pontos A, D/S e R na tela verde; duplo clique volta ao padrão
+- **Saturação FITA** com gravador de rolo animado: os rolos giram, a fita passa pela cabeça que acende com a saturação; som de fita com "head bump" de grave
+- **EQ editável com o mouse** direto na curva (os faders acompanham)
+- Ordem dos timbres: **BASS** (a senoide, antes "Sine"), **SUPER TONE** e **808**
+- Versão no título (**DUBMASTOR DUB BASS 1.4**) e plaqueta de latão só com **DUB STATION**
+- A saturação "Tape" antiga passa a se chamar **SOFT**
+
+**Na 1.3**
 - **SUPER TONE**: terceiro timbre, o baixo digital do Super Power do King Jammy (era Sleng Teng). Quadrada sem aliasing com o peso da senoide e o grão de 7 bits do teclado Casio dos anos 80
 - A válvula (saturação) e o reverb agora começam **desligados**: o baixo sai limpo e seco, e você liga o que quiser
 
