@@ -15,6 +15,33 @@ int main (int argc, char** argv)
     if (argc > 2 && juce::String (argv[2]) == "4") // segundo argumento: "4" = mostrar os 4 acordes ligados
         if (auto* p = proc.apvts.getParameter ("on3")) p->setValueNotifyingHost (1.0f);
 
+    // modo "ruido": liga o PREVIEW, desliga/liga o SOM INTERNO no meio das notas, para o PREVIEW
+    // e mede se ficou algum som preso (tem que dar silêncio)
+    if (out == "ruido")
+    {
+        auto set = [&] (const char* id, float v) { if (auto* p = proc.apvts.getParameter (id)) p->setValueNotifyingHost (v); };
+        juce::AudioBuffer<float> b (2, 512);
+        juce::MidiBuffer m;
+        auto run = [&] (double secs) { float pk = 0; for (int n = 0; n < (int) (secs * 48000 / 512); ++n) { m.clear(); proc.processBlock (b, m); pk = juce::jmax (pk, b.getMagnitude (0, 512)); } return pk; };
+        int fails = 0;
+        for (int trial = 0; trial < 12; ++trial)
+        {
+            set ("preview", 1.0f);
+            run (1.0 + 0.137 * trial);       // para em pontos diferentes do compasso
+            set ("sound", 0.0f);
+            run (0.4 + 0.05 * trial);
+            set ("sound", 1.0f);
+            run (0.6);
+            set ("preview", 0.0f);
+            run (2.5);                        // cauda do reverb/Leslie
+            const float tail = run (1.0);
+            std::printf ("tentativa %2d: pico depois de parar = %.5f %s\n", trial, tail, tail < 0.001f ? "ok" : "SOM PRESO");
+            if (tail >= 0.001f) ++fails;
+        }
+        std::printf (fails == 0 ? "SEM RUIDO PRESO\n" : "%d TENTATIVA(S) COM SOM PRESO\n", fails);
+        return fails == 0 ? 0 : 1;
+    }
+
     // modo áudio: "snapshot saida.wav" grava 8 compassos do PREVIEW e um .mid exportado ao lado
     if (out.endsWithIgnoreCase (".wav"))
     {

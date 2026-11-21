@@ -1,7 +1,6 @@
 // Dub Chords — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
 //  - skank de piano "com as duas mãos": a mesma inversão em duas oitavas (canal 1)
 //  - bubble de órgão uma oitava abaixo do skank (canal 3)
-//  - baixo guia na tônica (canal 2)
 #pragma once
 #include <algorithm>
 #include <cmath>
@@ -125,7 +124,7 @@ struct Settings
     int noteSize = 1;        // índice em noteSizeBeats (padrão 1/16)
     float swing = 0.0f;      // 0..1 (atrasa as semicolcheias pares)
     bool bubble = true;      // órgão uma oitava abaixo do skank
-    bool bass = true;
+    bool bass = false;       // baixo guia (removido da interface na 1.3)
     int bassBase = 36;       // C2: a fundamental do baixo fica entre C2 e B2
 };
 

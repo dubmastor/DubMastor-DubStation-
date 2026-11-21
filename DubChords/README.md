@@ -1,8 +1,8 @@
-# DubMastor Dub Chords 1.2
+# DubMastor Dub Chords 1.3
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.2/DubMastorDubChords-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.2/DubMastorDubChords-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.3/DubMastorDubChords-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.3/DubMastorDubChords-macOS.zip)**
 
 ![Interface do Dub Chords](docs/interface.png)
 
@@ -39,15 +39,14 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 |---|---|
 | **PREVIEW** | Botão grande: toca o loop sem a DAW rodando, no **BPM** do knob. Aperte de novo para parar |
 | **BUBBLE** | Liga o bubble de órgão Hammond (semicolcheias fora do tempo, uma oitava abaixo do skank) |
-| **BAIXO GUIA** | Tônica no 1 e no "e" do 3, como referência para a linha de baixo |
 | **SOM INTERNO** | Liga/desliga o som. Desligue quando mandar o MIDI para os seus instrumentos |
 | **PIANO M1 / HAMMOND** | Volume de cada timbre (os mesmos do Dub Station Roots Keys, sintetizados, sem samples) |
 
 ## MIDI
-- **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. Vêm três faixas (skank, bubble e baixo guia), no BPM do projeto, com o nome de cada acorde como marcador.
+- **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. Vêm duas faixas (skank e bubble), no BPM do projeto, com o nome de cada acorde como marcador.
 - **Cada acorde em uma cor:** no arquivo, as notas do acorde 1 vão no canal MIDI 1, as do acorde 2 no canal 2, e assim por diante. Na DAW, peça para colorir as notas por canal: no Cubase, no Key Editor, **Cores › Canal**; no REAPER, *Color notes by channel*; no FL Studio as cores já vêm separadas.
 - **EXPORTAR:** salva o `.mid` (padrão: Documentos/Dub Chords). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
-- **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 2 = baixo guia, canal 3 = bubble.
+- **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
 
 ## Para desenvolvedores
 - **Versão:** muda só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece na plaqueta do plugin, e cada push na `main` publica a release **Dub Chords x.y** (tag `DubChords-x.y`) com as notas de `RELEASE_NOTES.md`. Lembre de atualizar os links `DubChords-x.y` no site e nos READMEs.

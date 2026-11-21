@@ -175,7 +175,7 @@ private:
     Knob center, velocity, swing;
     Knob bpm, pianoLvl, organLvl, reps;
     std::unique_ptr<ChoiceWindow> pattern, noteSize;
-    Toggle bubble, sound, bass;
+    Toggle bubble, sound;
     PreviewButton previewBtn;
     std::unique_ptr<ButtonAttach> previewAtt;
     juce::TextButton exportBtn { "EXPORTAR" };

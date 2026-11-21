@@ -83,6 +83,15 @@ public:
         }
     }
 
+    // corta todas as vozes na hora (usado quando o SOM INTERNO liga/desliga:
+    // enquanto desligado o motor não recebe os note-offs, então nada pode ficar segurado)
+    void killAll()
+    {
+        for (auto& v : piano) v.active = false;
+        for (auto& v : organ) v.active = false;
+        for (auto& b : bass)  b.active = false;
+    }
+
     void allNotesOff()
     {
         for (auto& v : piano) if (v.active) { v.held = false; v.release (sr); }

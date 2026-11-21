@@ -69,6 +69,7 @@ private:
 
     bool active[17][128] {};
     bool wasPlaying = false;
+    bool soundWasOn = true;
     double expectedPpq = 0.0;
     double internalPpq = 0.0;
     double sr = 44100.0;

@@ -625,7 +625,6 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     addAndMakeVisible (previewBtn);
     previewAtt = std::make_unique<ButtonAttach> (proc.apvts, "preview", previewBtn);
     setupToggle (bubble, "bubble", "BUBBLE");
-    setupToggle (bass,   "bass",   "BAIXO GUIA");
     setupToggle (sound,  "sound",  "SOM INTERNO");
     setupKnob (bpm,      "bpm",      "BPM");
     setupKnob (pianoLvl, "pianoLvl", "PIANO M1");
@@ -1164,11 +1163,11 @@ void DubChordsPanel::resized()
         a.removeFromTop (18);
         auto c1 = a.removeFromLeft (150);
         previewBtn.setBounds (c1.removeFromTop (58));
-        c1.removeFromTop (8);
-        for (auto* t : { &bubble, &bass, &sound })
+        c1.removeFromTop (16);
+        for (auto* t : { &bubble, &sound })
         {
-            t->button.setBounds (c1.removeFromTop (34).reduced (0, 1));
-            c1.removeFromTop (4);
+            t->button.setBounds (c1.removeFromTop (38).reduced (0, 1));
+            c1.removeFromTop (12);
         }
         a.removeFromLeft (10);
         const int kw = a.getWidth() / 3;

@@ -52,7 +52,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     }
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bubble", 1 }, "Bubble (orgao)", true));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "swing", 1 }, "Swing", 0.0f, 1.0f, 0.0f));
-    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bass", 1 }, "Baixo guia", true));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "preview", 1 }, "Preview (clock interno)", false));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (55.0f, 180.0f, 1.0f), 75.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));
@@ -125,7 +124,7 @@ dub::Settings DubChordsProcessor::getSettings() const
     s.noteSize   = (int) param ("noteSize");
     s.bubble     = param ("bubble") > 0.5f;
     s.swing      = param ("swing");
-    s.bass       = param ("bass") > 0.5f;
+    s.bass       = false;   // baixo guia removido na 1.3
     return s;
 }
 
@@ -270,7 +269,13 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     }
 
     // --- Som interno (o MIDI gerado continua saindo para a DAW) ---
-    if (param ("sound") > 0.5f)
+    const bool soundOn = param ("sound") > 0.5f;
+    if (soundOn != soundWasOn)
+    {
+        sound.killAll();          // nada fica preso ao desligar/religar o SOM INTERNO
+        soundWasOn = soundOn;
+    }
+    if (soundOn)
         renderSound (buffer, midi);
 }
 
