@@ -4,7 +4,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # Mastor Riddim Machine MRM-0420: Dub Chords + Dub Drums num só instrumento
-project(MastorRiddimMachine VERSION 1.1.0)
+project(MastorRiddimMachine VERSION 1.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,7 +54,7 @@ set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
     ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)     # timbres do piano M1 / Hammond
 set(MRM_DEFINES
-    DD_VERSION_SHORT="1.1"
+    DD_VERSION_SHORT="1.2"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -87,7 +87,7 @@ if(MRM_RENDER_TEST)
     target_compile_definitions(mrm_render PRIVATE ${MRM_DEFINES}
         JUCE_MODAL_LOOPS_PERMITTED=1 JUCE_ALSA=0 JUCE_JACK=0
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="MRM-0420" JucePlugin_VersionString="1.0.0" JucePlugin_IsSynth=1
+        JucePlugin_Name="MRM-0420" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1
         JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
     target_link_libraries(mrm_render PRIVATE juce::juce_audio_utils juce::juce_recommended_config_flags)
 endif()

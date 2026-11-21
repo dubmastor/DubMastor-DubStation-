@@ -6,7 +6,7 @@ namespace
     juce::String u8s (const char* s) { return juce::String::fromUTF8 (s); }
 
     // parâmetros que mudam o padrão (os outros só mudam o som ou a saída)
-    const char* const kParamIds[] = { "style", "bars", "hatPattern", "swing", "swingAll", "dynamics", "drummer", "backbeat", "kit",
+    const char* const kParamIds[] = { "style", "bars", "hatPattern", "swing", "swingAll", "dynamics", "drummer", "backbeat", "kit", "kickBeats", "snareBeats",
                                       "rndKick", "rndSnare", "rndHat", "rndPerc", "fill", "intro", "seed" };
     constexpr int kTicksPerQuarter = 960;
 }
@@ -42,7 +42,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
                                                            AudioParameterFloatAttributes().withLabel ("%")));
     };
 
-    choice ("style", "Estilo", { "One Drop", "Rockers", "Steppa" }, 0);
+    choice ("style", "Estilo", { "Rockers", "One Drop", "Boom Bap" }, 0);
+    // bumbo e caixa principais por colcheia (8 posições, bit 0 = "1"); o estilo carrega o padrão dele
+    layout.add (std::make_unique<AudioParameterInt> (ParameterID { "kickBeats", 1 },  "Bumbo (colcheias)", 0, 255,
+                                                     dubdrums::defaultKickMask (dubdrums::Style::Rockers)));
+    layout.add (std::make_unique<AudioParameterInt> (ParameterID { "snareBeats", 1 }, "Caixa (colcheias)", 0, 255,
+                                                     dubdrums::defaultSnareMask (dubdrums::Style::Rockers)));
     choice ("bars", "Compassos", { "1", "2", "3", "4" }, 3);
     choice ("hatPattern", "Hi-hat", { "Colcheias", "Semicolcheias", "Contratempo", "Tercinas" }, 0);
     choice ("swing", "Swing do hi-hat",
@@ -56,7 +61,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
     percent ("rndHat",   "Aleatoriedade hi-hat", 30.0f);
     percent ("rndPerc",  "Aleatoriedade tons",   20.0f);
 
-    layout.add (std::make_unique<AudioParameterBool> (ParameterID { "fill", 1 }, u8s ("Virada no último compasso"), true));
+    layout.add (std::make_unique<AudioParameterBool> (ParameterID { "fill", 1 }, u8s ("Virada no último compasso"), false));
     layout.add (std::make_unique<AudioParameterInt>  (ParameterID { "seed", 1 }, "Semente", 1, 9999, 1));
     layout.add (std::make_unique<AudioParameterInt>  (ParameterID { "channel", 1 }, "Canal MIDI", 1, 16, 10));
 
@@ -145,6 +150,8 @@ dubdrums::Settings DubDrumsProcessor::readSettings() const
     s.drummer    = (dubdrums::Drummer)    juce::roundToInt (get ("drummer"));
     s.backbeat   = (dubdrums::Backbeat)   juce::roundToInt (get ("backbeat"));
     s.machine    = juce::roundToInt (get ("kit")) == 1;
+    s.kickMask   = (uint8_t) juce::jlimit (0, 255, juce::roundToInt (get ("kickBeats")));
+    s.snareMask  = (uint8_t) juce::jlimit (0, 255, juce::roundToInt (get ("snareBeats")));
     s.seed       = (uint32_t) juce::roundToInt (get ("seed"));
     return s;
 }
@@ -164,6 +171,22 @@ dubdrums::Pattern DubDrumsProcessor::getPatternCopy() const
 {
     const juce::SpinLock::ScopedLockType lock (patternLock);
     return pattern;
+}
+
+void DubDrumsProcessor::applyStyleDefaults (int styleIndex)
+{
+    const auto st = (dubdrums::Style) juce::jlimit (0, 2, styleIndex);
+    auto set = [this] (const char* id, int v)
+    {
+        if (auto* p = apvts.getParameter (id))
+        {
+            p->beginChangeGesture();
+            p->setValueNotifyingHost (p->convertTo0to1 ((float) v));
+            p->endChangeGesture();
+        }
+    };
+    set ("kickBeats",  dubdrums::defaultKickMask (st));
+    set ("snareBeats", dubdrums::defaultSnareMask (st));
 }
 
 void DubDrumsProcessor::newVariation()

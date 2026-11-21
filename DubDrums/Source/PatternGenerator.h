@@ -23,7 +23,15 @@ namespace gm
     constexpr int Crash      = 49;
 }
 
-enum class Style      { OneDrop = 0, Rockers, Steppa };
+// Contagem do riddim: um compasso de 4 tempos com a caixa no 2 e no 4.
+//  - Rockers : bumbo no 1 e no 3, caixa no 2 e no 4 (o rockers dos Roots Radics / Style Scott)
+//  - One Drop: bumbo e caixa juntos no 2 e no 4 (o 1 e o 3 ficam vazios)
+//  - Boom Bap: hip-hop dos anos 90, bumbo no 1, no "e" do 2 e no "e" do 3, caixa no 2 e no 4
+enum class Style      { Rockers = 0, OneDrop, BoomBap };
+
+// Bumbo e caixa principais editáveis: 8 posições de colcheia por compasso (bit 0 = "1", bit 1 = "1 e", ...)
+uint8_t defaultKickMask  (Style);
+uint8_t defaultSnareMask (Style);
 enum class HatPattern { Eighths = 0, Sixteenths, Offbeat, Triplets };
 enum class Swing      { Straight = 0, Light, Medium, Heavy, Shuffle };
 enum class Dynamics   { Soft = 0, Medium, Loud, Accented, Crescendo, Breathing };
@@ -39,7 +47,9 @@ enum class Backbeat   { Snare = 0, Rim, Both };
 
 struct Settings
 {
-    Style      style      = Style::OneDrop;
+    Style      style      = Style::Rockers;
+    uint8_t    kickMask   = 0x11;   // 1 e 3
+    uint8_t    snareMask  = 0x44;   // 2 e 4
     int        bars       = 4;              // 1..4
     HatPattern hatPattern = HatPattern::Eighths;
     Swing      swing      = Swing::Straight;
@@ -56,7 +66,7 @@ struct Settings
     Backbeat backbeat = Backbeat::Snare;
     bool     machine  = false;  // kit DIGITAL (King Jammy / Sleng Teng): tempo de máquina, quantizado,
                                 // sem atraso humano e só dois níveis de força, como num teclado Casio
-    bool     fill  = true;    // virada no último compasso (+ prato no "1")
+    bool     fill  = false;   // virada no último compasso (+ prato no "1")
     bool     intro = false;   // compasso de virada antes do primeiro compasso (toca uma vez)
     uint32_t seed = 1;
 };

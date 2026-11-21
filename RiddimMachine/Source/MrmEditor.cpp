@@ -409,9 +409,12 @@ void Header::renderBackground()
     screw ((float) plate.getX() + 12.0f, 12.0f);
     screw ((float) plate.getRight() - 12.0f, 12.0f);
 
-    // --- nome: MASTOR RIDDIM MACHINE + placa de latão MRM-0420
-    const juce::String title ("MASTOR RIDDIM MACHINE");
-    g.setFont (stencil (34.0f, 0.2f));
+    // --- nome com a versão logo depois (padrão DubMastor) + placa de latão MRM-0420
+    juce::String ver (JucePlugin_VersionString);
+    if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
+        ver = ver.upToLastOccurrenceOf (".", false, false);
+    const juce::String title ("MASTOR RIDDIM MACHINE " + ver);
+    g.setFont (stencil (30.0f, 0.2f));
     const float titleW = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
     g.setColour (juce::Colours::white.withAlpha (0.35f));
     g.drawText (title, juce::Rectangle<float> (60.0f, 19.0f, titleW + 10.0f, 40.0f).translated (0.8f, 1.0f), juce::Justification::left);
@@ -420,10 +423,7 @@ void Header::renderBackground()
 
     g.setColour (col::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    juce::String ver (JucePlugin_VersionString);
-    if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
-        ver = ver.upToLastOccurrenceOf (".", false, false);
-    g.drawText (u8 ("DUB CHORDS + DUB DRUMS  \xc2\xb7  RIDDIM STARTER  \xc2\xb7  DUB STATION ") + ver,
+    g.drawText (u8 ("DUB CHORDS + DUB DRUMS  \xc2\xb7  RIDDIM STARTER  \xc2\xb7  DUB STATION"),
                 62, 58, 700, 14, juce::Justification::left);
 
     {   // placa de latão grande, com o nome do modelo gravado

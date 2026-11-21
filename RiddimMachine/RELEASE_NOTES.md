@@ -1,4 +1,13 @@
-## Mastor Riddim Machine MRM-0420 1.1
+## Mastor Riddim Machine MRM-0420 1.2
+
+A aba **BATERIA** traz o **Dub Drums 1.2**:
+
+- Estilos **ROCKERS**, **ONE DROP** e **BOOM BAP** (anos 90), com a caixa no 2 e no 4; no one drop o bumbo vem junto com a caixa
+- **BATIDA PRINCIPAL** editável: clique nas colcheias para pôr ou tirar bumbo e caixa
+- Viradas no fim e de intro desligadas por padrão; botão **NOVA VARIAÇÃO** vermelho
+- Versão logo depois do nome: **MASTOR RIDDIM MACHINE 1.2**
+
+## 1.1
 
 A aba **BATERIA** agora traz o **Dub Drums 1.1**:
 

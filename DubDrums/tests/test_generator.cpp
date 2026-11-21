@@ -89,6 +89,7 @@ int main()
     {
         Settings s;
         s.style = (Style) st;
+        s.kickMask = defaultKickMask (s.style); s.snareMask = defaultSnareMask (s.style);
         s.bars = 4;
         s.hatPattern = st == 2 ? HatPattern::Sixteenths : HatPattern::Eighths;
         s.swing = st == 0 ? Swing::Shuffle : Swing::Light;
@@ -96,20 +97,22 @@ int main()
         s.seed = 42;
         auto p = generate (s);
         printGrid (p, styleName (s.style));
-        std::string name = std::string ("exemplo_") + (st == 0 ? "onedrop" : st == 1 ? "rockers" : "steppa") + ".mid";
+        std::string name = std::string ("exemplo_") + (st == 0 ? "rockers" : st == 1 ? "onedrop" : "boombap") + ".mid";
         writeMidi (p, name);
 
         // regras de estilo (sem aleatoriedade)
         Settings clean = s; clean.randKick = clean.randSnare = clean.randHat = clean.randPerc = 0; clean.fill = false;
         clean.swing = Swing::Straight;
         auto c = generate (clean);
-        auto kickAt = [&] (double b) { for (auto& e : c.events) if (e.note == gm::Kick && std::abs (e.beat - b) < 0.02) return true; return false; };
+        auto kickAt  = [&] (double b) { for (auto& e : c.events) if (e.note == gm::Kick  && std::abs (e.beat - b) < 0.02) return true; return false; };
+        auto snareAt = [&] (double b) { for (auto& e : c.events) if (e.note == gm::Snare && std::abs (e.beat - b) < 0.03) return true; return false; };
         for (int bar = 0; bar < 4; ++bar)
         {
             double o = bar * 4.0;
-            if (s.style == Style::OneDrop) { check (! kickAt (o), "one drop sem bumbo no 1"); check (kickAt (o + 2), "one drop bumbo no 3"); }
-            if (s.style == Style::Rockers) { check (kickAt (o) && kickAt (o + 2), "rockers bumbo 1 e 3"); }
-            if (s.style == Style::Steppa)  { for (int b = 0; b < 4; ++b) check (kickAt (o + b), "steppa bumbo em todos os tempos"); }
+            check (snareAt (o + 1) && snareAt (o + 3) && ! snareAt (o + 2), "caixa no 2 e no 4 (e nao no 3)");
+            if (s.style == Style::OneDrop) { check (! kickAt (o) && ! kickAt (o + 2), "one drop: 1 e 3 vazios"); check (kickAt (o + 1) && kickAt (o + 3), "one drop: bumbo no 2 e no 4"); }
+            if (s.style == Style::Rockers) { check (kickAt (o) && kickAt (o + 2) && ! kickAt (o + 1) && ! kickAt (o + 3), "rockers: bumbo no 1 e no 3"); }
+            if (s.style == Style::BoomBap) { check (kickAt (o) && kickAt (o + 1.5) && kickAt (o + 2.5) && ! kickAt (o + 1), "boom bap: bumbo no 1, 2e, 3e"); }
         }
         // determinismo
         auto p2 = generate (s);
@@ -186,24 +189,31 @@ int main()
         for (int d = 0; d < 3; ++d) for (int st = 0; st < 3; ++st)
         {
             Settings s; s.bars = 2; s.fill = false; s.style = (Style) st; s.drummer = (Drummer) d; s.seed = 3;
+            s.kickMask = defaultKickMask (s.style); s.snareMask = defaultSnareMask (s.style);
             s.randKick = s.randSnare = s.randHat = s.randPerc = 0.2f;
             auto p = generate (s);
-            const bool scottRockers = d == 0 && st == 1;
             for (int bar = 0; bar < 2; ++bar)
             {
                 const double o = bar * 4.0;
-                if (scottRockers) check (at (p, gm::Snare, o + 1.0) && at (p, gm::Snare, o + 3.0), "Style Scott rockers: caixa no 2 e no 4");
-                else              check (at (p, gm::Snare, o + 2.0), "caixa no 3 (padrao CAIXA)");
-                if (d == 1) check (at (p, gm::OpenHat, o + 1.0) && at (p, gm::OpenHat, o + 3.0), "Santa Davis: flying cymbal no 2 e no 4");
-                if (d == 2 && st == 0) check (! at (p, gm::ClosedHat, o + 0.0, 0.01) && ! at (p, gm::OpenHat, o + 0.0, 0.01), "Carlton one drop: hi-hat cai do 1");
+                check (at (p, gm::Snare, o + 1.0) && at (p, gm::Snare, o + 3.0), "caixa no 2 e no 4 (padrao CAIXA)");
+                if (d == 1) check (at (p, gm::OpenHat, o + 0.5) && at (p, gm::OpenHat, o + 2.5), "Santa Davis: flying cymbal no contratempo");
+                if (d == 2 && st == 1) check (! at (p, gm::ClosedHat, o + 0.0, 0.01) && ! at (p, gm::OpenHat, o + 0.0, 0.01), "Carlton one drop: hi-hat cai do 1");
             }
-            if (st == 0) printGrid (p, (std::string ("Assinatura - ") + drummerName ((Drummer) d) + " / " + styleName ((Style) st)).c_str());
-            if (scottRockers) printGrid (p, "Assinatura - Style Scott / Rockers");
+            printGrid (p, (std::string ("Assinatura - ") + drummerName ((Drummer) d) + " / " + styleName ((Style) st)).c_str());
         }
         Settings rim; rim.backbeat = Backbeat::Rim; rim.fill = false; rim.bars = 1;
-        check (at (generate (rim), gm::SideStick, 2.0) && ! at (generate (rim), gm::Snare, 2.0), "opcao ARO");
+        check (at (generate (rim), gm::SideStick, 1.0) && ! at (generate (rim), gm::Snare, 1.0), "opcao ARO");
         Settings both = rim; both.backbeat = Backbeat::Both;
-        check (at (generate (both), gm::SideStick, 2.0) && at (generate (both), gm::Snare, 2.0), "opcao AMBOS");
+        check (at (generate (both), gm::SideStick, 3.0) && at (generate (both), gm::Snare, 3.0), "opcao AMBOS");
+
+        // grade editável: bumbo e caixa onde o usuário marcar
+        Settings ed; ed.fill = false; ed.bars = 1; ed.kickMask = 0x81; ed.snareMask = 0x10;   // bumbo 1 e "4 e", caixa no 3
+        auto pe = generate (ed);
+        check (at (pe, gm::Kick, 0.0) && at (pe, gm::Kick, 3.5) && ! at (pe, gm::Kick, 1.0), "bumbo editado");
+        check (at (pe, gm::Snare, 2.0) && ! at (pe, gm::Snare, 1.0) && ! at (pe, gm::Snare, 3.0), "caixa editada");
+        Settings none = ed; none.kickMask = 0; none.snareMask = 0;
+        bool anyMain = false; for (auto& e : generate (none).events) anyMain |= (e.note == gm::Kick || (e.note == gm::Snare && e.velocity > 60));
+        check (! anyMain, "grade vazia: sem bumbo nem caixa principal");
     }
 
     std::printf ("\n%s (%d falhas)\n", failures ? "TESTES FALHARAM" : "TODOS OS TESTES OK", failures);

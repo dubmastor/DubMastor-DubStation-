@@ -16,6 +16,7 @@ int main (int argc, char** argv)
         if (auto* p = proc.apvts.getParameter (id)) p->setValueNotifyingHost (p->convertTo0to1 (v));
     };
     set ("style", argc > 2 ? (float) juce::String (argv[2]).getIntValue() : 0.0f);
+    proc.applyStyleDefaults (argc > 2 ? juce::String (argv[2]).getIntValue() : 0);   // como o clique no estilo
     set ("bars",  argc > 3 ? (float) juce::String (argv[3]).getIntValue() - 1 : 3.0f);
     set ("seed",  argc > 4 ? (float) juce::String (argv[4]).getIntValue() : 42.0f);
     set ("swing", 1.0f);

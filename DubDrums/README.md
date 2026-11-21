@@ -1,12 +1,12 @@
-# DubMastor Dub Drums 1.1
+# DubMastor Dub Drums 1.2
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.1/DubMastorDubDrums-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.1/DubMastorDubDrums-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.2/DubMastorDubDrums-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.2/DubMastorDubDrums-macOS.zip)**
 
 ![Interface do Dub Drums](docs/interface.png)
 
-Gerador do esqueleto da bateria de reggae. Você escolhe o estilo (One Drop, Rockers ou Steppa), quantos
+Gerador do esqueleto da bateria de reggae. Você escolhe o estilo (Rockers, One Drop ou Boom Bap), quantos
 compassos, o baterista de referência e o balanço, e o plugin monta o groove com viradas, sincronizado com
 o andamento da DAW. Sai como MIDI (arrastar para a timeline, exportar ou MIDI ao vivo) e tem uma bateria
 interna de timbre reggae limpo para ouvir na hora.
@@ -14,23 +14,28 @@ Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um **ins
 carregue numa *Instrument Track*.
 
 ## ESTILO
+Contagem em 4 tempos, sempre com a **caixa no 2 e no 4**.
+
 | Botão | Groove |
 |---|---|
-| **ONE DROP** | Bumbo e aro só no 3, o "1" fica vazio |
-| **ROCKERS** | Bumbo no 1 e no 3, aro no 3 |
-| **STEPPA** | Bumbo nos quatro tempos, caixa no 3 |
+| **ROCKERS** | Bumbo no 1 e no 3, caixa no 2 e no 4 (o rockers dos Roots Radics / Style Scott) |
+| **ONE DROP** | Bumbo junto com a caixa no 2 e no 4; o 1 e o 3 ficam vazios |
+| **BOOM BAP** | Hip-hop dos anos 90: bumbo no 1, no "e" do 2 e no "e" do 3, caixa no 2 e no 4, ghost notes de caixa |
 
-**BATIDA PRINCIPAL:** **CAIXA** (padrão), **ARO** (cross-stick) ou **AMBOS** (aro e caixa juntos).
-As bolinhas **BUMBO NOS TEMPOS** mostram onde o bumbo cai no estilo escolhido.
+**BATIDA PRINCIPAL:** grade com as 8 colcheias do compasso (1 e 2 e 3 e 4 e) para o **BUMBO** e a **CAIXA**.
+Ao escolher um estilo, a grade carrega o padrão dele; depois é só clicar para pôr ou tirar (arrastando, marca ou
+apaga várias de uma vez). O groove, o preview e o MIDI seguem a grade.
+
+**SOM DA CAIXA:** **CAIXA** (padrão), **ARO** (cross-stick) ou **AMBOS** (aro e caixa juntos).
 
 ## LOOP
 | Controle | O que faz |
 |---|---|
 | **COMPASSOS** | Contador de 1 a 4 compassos. Clique à direita para aumentar, à esquerda para diminuir |
-| **VIRADA NO FIM** | Virada no último compasso e prato no "1" quando o loop volta |
-| **VIRADA DE INTRO** | Um compasso de introdução antes do compasso 1: contagem no hi-hat e a virada do baterista. Toca uma vez só; depois o loop se repete |
+| **VIRADA NO FIM** | Virada no último compasso e prato no "1" quando o loop volta (desligada por padrão) |
+| **VIRADA DE INTRO** | Um compasso de introdução antes do compasso 1: contagem no hi-hat e a virada do baterista. Toca uma vez só; depois o loop se repete (desligada por padrão) |
 | **SEMENTE** | A mesma semente sempre gera o mesmo groove. Arraste para cima/baixo ou use a rodinha |
-| **NOVA VARIAÇÃO** | Sorteia outra semente |
+| **NOVA VARIAÇÃO** (botão vermelho) | Sorteia outra semente |
 
 ## BATERISTA
 Chave seletora de três posições (knob "cabeça de galinha" com lâmpada e nome em cada posição): clique no nome,
@@ -38,8 +43,8 @@ arraste o knob ou use a rodinha. O display mostra o baterista e embaixo vêm a b
 
 | | Hi-hat (assinatura) | Sensação | Viradas características |
 |---|---|---|---|
-| **STYLE SCOTT** (Roots Radics, Volcano) | Acento forte no contratempo, tempos leves, quase sem enfeite, "latido" curto do aberto no "e" do 4 | Reto e em cima do tempo. No **ROCKERS** toca bumbo no 1 e 3 e **caixa no 2 e no 4**, como no estilo dos Roots Radics | Estalos de caixa em semicolcheia, estalos sincopados, tons descendo |
-| **SANTA DAVIS** (Soul Syndicate, Aggrovators) | **Flying cymbal**: hi-hat abre no 2 e no 4 e o pé fecha no contratempo seguinte, com semicolcheias leves no meio | Balanço médio, muitas ghost notes | Rufo de fusas em crescendo, caixa e tons em semicolcheia, flams |
+| **STYLE SCOTT** (Roots Radics, Volcano) | Acento forte no contratempo, tempos leves, quase sem enfeite, "latido" curto do aberto no "e" do 4 | Reto e em cima do tempo | Estalos de caixa em semicolcheia, estalos sincopados, tons descendo |
+| **SANTA DAVIS** (Soul Syndicate, Aggrovators) | **Flying cymbal**: hi-hat abre no contratempo de cada tempo e o pé fecha no tempo seguinte, com semicolcheias leves no meio | Balanço médio, muitas ghost notes | Rufo de fusas em crescendo, caixa e tons em semicolcheia, flams |
 | **CARLTON BARRETT** (The Wailers) | **Tercina quebrada**: alguns tempos viram tercina (cheia ou só 1ª e 3ª nota); no one drop o hi-hat **cai do 1** junto com o bumbo; hi-hat aberto na última colcheia puxando o compasso seguinte | Atrás do tempo, balanço puxado para a tercina | Rufo em tercina no 4 com flam, tercinas nos tons, entrada da caixa até o surdo |
 
 ## HI-HAT

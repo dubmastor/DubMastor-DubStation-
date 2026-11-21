@@ -55,6 +55,7 @@ public:
     bool isPreviewing() const noexcept            { return previewing.load(); }
 
     void newVariation();                          // sorteia uma nova semente
+    void applyStyleDefaults (int styleIndex);     // bumbo e caixa do estilo na BATIDA PRINCIPAL
     bool writeMidiFile (const juce::File& target) const;
     juce::String suggestedFileName() const;
     int mapNote (int gmNote) const;               // nota GM -> nota escolhida pelo usuário

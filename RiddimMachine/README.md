@@ -2,7 +2,7 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.1/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.1/MRM-0420-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS.zip)**
 
 ![MRM-0420, aba HARMONIA (Dub Chords)](docs/interface-harmonia.png)
 
@@ -14,7 +14,7 @@ carregue numa *Instrument Track*.
 
 ## Como começar um riddim
 1. Na aba **HARMONIA**, escolha até 4 acordes e o padrão do skank.
-2. Na aba **BATERIA**, escolha o estilo (One Drop, Rockers ou Steppa), o baterista e, se quiser, a **VIRADA DE INTRO**.
+2. Na aba **BATERIA**, escolha o estilo (Rockers, One Drop ou Boom Bap), ajuste bumbo e caixa na BATIDA PRINCIPAL, o baterista e, se quiser, a **VIRADA DE INTRO**.
 3. Aperte **PLAY RIDDIM** e ajuste o **BPM**.
 4. Escolha o tamanho (4 a 64 compassos) e **arraste o riddim** para a timeline. No Cubase, o arquivo vira
    uma faixa para cada parte: bateria, skank e bubble.

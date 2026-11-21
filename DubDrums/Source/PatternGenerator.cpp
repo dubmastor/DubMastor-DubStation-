@@ -121,6 +121,8 @@ namespace
     double stepPos (int bar, int step) { return barStart (bar) + step * kStep; }
 
     // ---------------------------------------------------------------- BUMBO
+    bool maskHas (uint8_t mask, int eighth) { return (mask >> eighth) & 1; }
+
     void buildKick (Builder& b, Rng& rng)
     {
         const auto& s = b.s;
@@ -128,29 +130,32 @@ namespace
 
         for (int bar = 0; bar < s.bars; ++bar)
         {
+            // bumbo principal: as colcheias marcadas na BATIDA PRINCIPAL
+            for (int e8 = 0; e8 < 8; ++e8)
+                if (maskHas (s.kickMask, e8))
+                {
+                    const bool onBeat = e8 % 2 == 0;
+                    b.add (stepPos (bar, e8 * 2), gm::Kick, onBeat ? (e8 == 0 ? 114 : 110) : 100);
+                }
+
+            // notas de passagem, no jeito de cada estilo (só onde não há bumbo marcado)
+            auto pickup = [&] (int st, double p, int vel)
+            {
+                if (st % 2 == 0 && maskHas (s.kickMask, st / 2)) return;
+                if (rng.chance (p)) b.add (stepPos (bar, st), gm::Kick, vel);
+            };
             switch (s.style)
             {
-                case Style::OneDrop:
-                    // bumbo só no 3 — o "1" fica vazio, é a marca do one drop
-                    b.add (stepPos (bar, 8), gm::Kick, 112);
-                    if (rng.chance (r * 0.20)) b.add (stepPos (bar, 14), gm::Kick, 80);
-                    if (rng.chance (r * 0.12)) b.add (stepPos (bar, 7),  gm::Kick, 70);
-                    break;
-
                 case Style::Rockers:
-                    // bumbo no 1 e no 3
-                    b.add (stepPos (bar, 0), gm::Kick, 110);
-                    b.add (stepPos (bar, 8), gm::Kick, 112);
-                    for (int st : { 6, 14, 3, 11 })
-                        if (rng.chance (r * 0.25)) b.add (stepPos (bar, st), gm::Kick, 78);
+                    for (int st : { 3, 7, 11, 15 }) pickup (st, r * 0.22, 76);
                     break;
-
-                case Style::Steppa:
-                    // bumbo em todos os tempos
-                    for (int st : { 0, 4, 8, 12 })
-                        b.add (stepPos (bar, st), gm::Kick, st == 0 ? 114 : 106);
-                    for (int st : { 2, 6, 10, 14 })
-                        if (rng.chance (r * 0.15)) b.add (stepPos (bar, st), gm::Kick, 72);
+                case Style::OneDrop:
+                    pickup (15, r * 0.18, 78);
+                    pickup (7, r * 0.10, 70);
+                    break;
+                case Style::BoomBap:
+                    // bumbos "sujos" de MPC: semicolcheia antes da caixa e no fim do compasso
+                    for (int st : { 7, 10, 15 }) pickup (st, r * 0.30, 88);
                     break;
             }
         }
@@ -172,9 +177,10 @@ namespace
         const auto& s = b.s;
         const double r = s.randSnare;
 
-        // Roots Radics (Style Scott) no rockers: bumbo no 1 e no 3 e caixa no 2 e no 4
-        const bool scottRockers = s.drummer == Drummer::StyleScott && s.style == Style::Rockers;
-        const std::vector<int> backbeats = scottRockers ? std::vector<int> { 4, 12 } : std::vector<int> { 8 };
+        // caixa principal: as colcheias marcadas na BATIDA PRINCIPAL (padrão: 2 e 4)
+        std::vector<int> backbeats;
+        for (int e8 = 0; e8 < 8; ++e8)
+            if (maskHas (s.snareMask, e8)) backbeats.push_back (e8 * 2);
 
         for (int bar = 0; bar < s.bars; ++bar)
         {
@@ -183,7 +189,7 @@ namespace
             for (int st : backbeats)
             {
                 // no compasso final, às vezes a caixa vem "cheia" com flam
-                if (lastBar && s.bars > 1 && st == backbeats.back() && rng.chance (r * 0.5))
+                if (lastBar && s.bars > 1 && ! backbeats.empty() && st == backbeats.back() && rng.chance (r * 0.5))
                 {
                     b.add (stepPos (bar, st) - 0.03, gm::Snare, 60);
                     b.add (stepPos (bar, st), gm::Snare, 114);
@@ -204,10 +210,10 @@ namespace
                     b.add (stepPos (bar, st), gm::Snare, (int) rng.range (26, 44));
             }
 
-            // steppa: às vezes reforça o 2 e o 4 com aro
-            if (s.style == Style::Steppa)
-                for (int st : { 4, 12 })
-                    if (rng.chance (r * 0.20)) b.add (stepPos (bar, st), gm::SideStick, 70);
+            // boom bap: ghost notes de caixa mais presentes, em semicolcheia
+            if (s.style == Style::BoomBap)
+                for (int st : { 7, 9, 15 })
+                    if (rng.chance (0.15 + r * 0.35)) b.add (stepPos (bar, st), gm::Snare, (int) rng.range (34, 52));
         }
     }
 
@@ -266,16 +272,16 @@ namespace
 
             case Drummer::SantaDavis:
             {
-                // "flying cymbal": hi-hat abre no 2 e no 4 e fecha no contratempo seguinte,
-                // com semicolcheias leves no meio
+                // "flying cymbal": o hi-hat abre no contratempo de cada tempo ("tsss")
+                // e o pé fecha no tempo seguinte ("chk"), com semicolcheias leves no meio
                 for (int st = 1; st < kStepsPerBar; st += 2)
-                    if (st != 5 && st != 13 && ! hatAt (st * kStep) && rng.chance (0.55 + r * 0.30))
-                        b.add (t0 + st * kStep, gm::ClosedHat, (int) rng.range (34, 46));
-                for (double beat : { 1.0, 3.0 })
+                    if (! hatAt (st * kStep) && rng.chance (0.45 + r * 0.30))
+                        b.add (t0 + st * kStep, gm::ClosedHat, (int) rng.range (32, 44));
+                for (double beat : { 0.0, 1.0, 2.0, 3.0 })
                 {
-                    removeHats (beat, beat + 0.5 + 0.01);
-                    b.add (t0 + beat, gm::OpenHat, 102, 0.45);
-                    b.add (t0 + beat + 0.5, gm::ClosedHat, 62);   // o pé fecha: "tsss-chk"
+                    removeHats (beat + 0.5, beat + 0.75);
+                    b.add (t0 + beat + 0.5, gm::OpenHat, 100, 0.40);
+                    if (! hatAt (beat)) b.add (t0 + beat, gm::ClosedHat, 60);   // o pé fecha
                 }
                 break;
             }
@@ -618,12 +624,25 @@ const char* styleName (Style s)
 {
     switch (s)
     {
-        case Style::OneDrop: return "One Drop";
         case Style::Rockers: return "Rockers";
-        case Style::Steppa:  return "Steppa";
+        case Style::OneDrop: return "One Drop";
+        case Style::BoomBap: return "Boom Bap";
     }
     return "";
 }
+
+uint8_t defaultKickMask (Style s)
+{
+    switch (s)
+    {
+        case Style::Rockers: return 0x11;   // 1 e 3 (Style Scott / Roots Radics)
+        case Style::OneDrop: return 0x44;   // 2 e 4 (junto com a caixa)
+        case Style::BoomBap: return 0x29;   // 1, "e" do 2, "e" do 3
+    }
+    return 0x11;
+}
+
+uint8_t defaultSnareMask (Style) { return 0x44; }   // 2 e 4
 
 const char* drummerName (Drummer d)
 {

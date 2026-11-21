@@ -72,12 +72,34 @@ public:
         : ParamControl (p), names (std::move (labels)), cols (columns), compact (compactCaps) {}
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override;
+    std::function<void (int)> onSelect;   // chamado quando o usuário escolhe (não na automação)
 
 private:
     juce::Rectangle<float> cell (int i) const;
     juce::StringArray names;
     int cols;
     bool compact;
+};
+
+// BATIDA PRINCIPAL: bumbo e caixa por colcheia (1 e 2 e 3 e 4 e). Clique liga/desliga;
+// arrastar pinta (ou apaga) várias de uma vez.
+class BeatGrid : public juce::Component
+{
+public:
+    BeatGrid (juce::RangedAudioParameter& kick, juce::RangedAudioParameter& snare);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+
+private:
+    juce::Rectangle<float> cell (int row, int col) const;
+    bool hit (juce::Point<float>, int& row, int& col) const;
+    void setCell (int row, int col, bool on);
+    juce::ParameterAttachment kickAtt, snareAtt;
+    int masks[2] { 0, 0 };
+    int dragRow = -1;
+    bool dragValue = false;
 };
 
 // Chave seletora do baterista: knob "cabeça de galinha" de baquelite com três posições,
@@ -151,7 +173,7 @@ private:
 class PushButton : public juce::Component
 {
 public:
-    explicit PushButton (juce::String t) : text (std::move (t))
+    explicit PushButton (juce::String t, bool redCap = false) : text (std::move (t)), red (redCap)
     {
         setMouseCursor (juce::MouseCursor::PointingHandCursor);
         setRepaintsOnMouseActivity (true);
@@ -168,6 +190,7 @@ public:
 
 private:
     juce::String text;
+    bool red = false;
     bool down = false;
 };
 
@@ -233,7 +256,8 @@ private:
     DrummerSwitch drummerSwitch;
     BarsWindow bars;
     SeedWindow seed;
-    PushButton variation { "NOVA VARIACAO" };
+    PushButton variation { "NOVA VARIACAO", true };
+    BeatGrid beatGrid;
     PushButton notesButton { "NOTAS" };
     Toggle fill, intro, swingAll, preview, sound, colorMidi;
     Knob swing, dynamics;
@@ -247,7 +271,7 @@ private:
     juce::Rectangle<int> woodL, woodR, plate;
     juce::Rectangle<int> styleMod, loopMod, drumMod, hatMod, dynMod, randPanel, soundPanel, midiPanel, grid;
     juce::Rectangle<int> drummerDisplay;
-    juce::Rectangle<int> styleDisplay, hatDisplay, dynDisplay, kickDots;
+    juce::Rectangle<int> styleDisplay, hatDisplay, dynDisplay;
     dubdrums::Pattern pattern;
     int lastVersion = -1;
 
