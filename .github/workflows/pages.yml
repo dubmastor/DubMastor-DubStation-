@@ -6,10 +6,15 @@ on:
     paths:
       - 'site/**'
       - '.github/workflows/pages.yml'
+  # depois de cada build do MDDM-12, publica os instaladores dele no site (site/downloads)
+  workflow_run:
+    workflows: ['Build Mastor Dub Drums Machine MDDM-12']
+    types: [completed]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -25,6 +30,23 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # Instaladores do Mastor Dub Drums Machine MDDM-12 servidos pelo próprio site
+      # (downloads/MastorDubDrumsMachine-*.zip), pegos do último build do MDDM-12 que gerou os zips.
+      # Não derruba o site se não achar nada.
+      - name: Instaladores do MDDM-12
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p site/downloads
+          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow build-dubdrums.yml --branch main -L 15 --json databaseId,status --jq '.[] | select(.status=="completed") | .databaseId'); do
+            rm -rf dl
+            if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'MastorDubDrumsMachine-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
+              echo "Instaladores do build $id"
+              find dl -name '*.zip' -exec cp {} site/downloads/ \;
+              break
+            fi
+          done
+          ls -la site/downloads
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
