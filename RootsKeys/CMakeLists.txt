@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(RootsKeys VERSION 1.3.0)
+project(RootsKeys VERSION 2.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -36,10 +36,9 @@ juce_add_plugin(RootsKeys
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     VST3_CATEGORIES Instrument Synth)
 
-# fontes embutidas: Archivo Black (placa) e Kaushan Script (assinatura DubMastor)
+# fonte embutida: Archivo Black (placa Dub Station)
 juce_add_binary_data(RootsKeysFonts SOURCES
-    Resources/ArchivoBlack-Regular.ttf
-    Resources/KaushanScript-Regular.ttf)
+    Resources/ArchivoBlack-Regular.ttf)
 
 target_sources(RootsKeys PRIVATE
     Source/PluginProcessor.cpp

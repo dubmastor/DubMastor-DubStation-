@@ -1,4 +1,4 @@
-# Dub Station Roots Keys 1.3 — DubMastor
+# Dub Station Roots Keys 2.1
 
 | Modo piano | Modo órgão |
 |---|---|
@@ -18,7 +18,7 @@ O visual muda com o instrumento — escolher um preset de piano ou de órgão (o
 - **Piano:** teclado preto anos 80 em plástico texturizado, caixas de som com grade, visor de cristal líquido verde com o preset, botões P01–P04 com LED, faders, rodas de pitch/mod e teclas que acendem em verde.
 - **Órgão:** gabinete de madeira com detalhes em marfim, drawbars que se puxam **para baixo** (como no B3; duplo clique zera/abre), chave meia-lua da Leslie, tabs de percussão, teclas de preset invertidas e teclas que acendem em laranja.
 
-As texturas são geradas por código (sem imagens), e a assinatura **DubMastor** em pincel é a mesma do Dub Station.
+As texturas são geradas por código (sem imagens). A placa metálica **Dub Station** fica no centro do cabeçalho nos dois visuais.
 
 ## Controles
 
@@ -56,15 +56,15 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 - `Source/RootsKeysEngine.h` — piano, órgão, Leslie, reverb e maximizer (sem dependências)
 - `Source/TapeEchoDSP.h` — FitaEco TE-12 (cópia do Dub Station 2.1)
 - `Source/PluginProcessor.*` — parâmetros, presets, MIDI, medidores
-- `Source/PluginEditor.*` — interface com os dois visuais, placa Dub Station e assinatura DubMastor
+- `Source/PluginEditor.*` — interface com os dois visuais e a placa Dub Station
 - `Source/VintageLookAndFeel.h` — knobs, faders, chaves e visor de cada visual
 - `Source/SkinTextures.h` — texturas procedurais (plástico preto e madeira)
 - `Source/VUMeter.h` — VU analógico
-- `Resources/` — fontes Archivo Black e Kaushan Script (licença OFL em `Resources/licenses/`)
+- `Resources/` — fonte Archivo Black (licença OFL em `Resources/licenses/`)
 
 "Korg" e "M1" são marcas da Korg Inc.; "Hammond" e "Leslie" são marcas da Hammond Suzuki. Este projeto não é afiliado a elas — os nomes indicam apenas o estilo de timbre emulado.
 
-## Novidades da 1.3
-- Novo nome: **Dub Station Roots Keys**, com a assinatura **DubMastor**.
+## Novidades da 2.1
+- Novo nome: **Dub Station Roots Keys** (antes Mastor Roots Keys), com a placa Dub Station centralizada.
 - Visual troca com o instrumento: teclado anos 80 (piano) e madeira com marfim (órgão).
 - Drawbars puxadas para baixo, como no Hammond; rodas de pitch/mod que mostram o MIDI recebido.

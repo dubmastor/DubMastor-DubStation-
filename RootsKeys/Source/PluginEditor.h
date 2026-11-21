@@ -84,7 +84,7 @@ private:
 
     RootsKeysProcessor& proc;
     VintageLookAndFeel lnf;
-    juce::Typeface::Ptr plateFace, scriptFace;
+    juce::Typeface::Ptr plateFace;
     int skin = -1;
     juce::Image background;
     int backgroundSkin = -1;
@@ -124,7 +124,6 @@ private:
     void setupKnob (Knob&, const juce::String& paramId, const juce::String& text, bool fader = false);
     void placeKnob (Knob&, juce::Point<int> centre, int size, int labelW = 80);
     void renderBackground (juce::Graphics&, int forSkin);
-    void drawSignature (juce::Graphics&, juce::Rectangle<float> area, juce::Colour ink, juce::Colour swash);
     void drawPlate (juce::Graphics&, juce::Rectangle<float> r);
     void updateLcd();
     void setModeParam (int m);

@@ -23,8 +23,7 @@ const char* kPianoPresetShort[4] = { "M1 CLASSIC", "DUB SKANK", "BRIGHT HOUSE", 
 const char* kOrganPresetShort[4] = { "BUBBLE", "PERC", "DUB DARK", "GOSPEL" };
 
 // ----- layout fixo (1000 x 724)
-const juce::Rectangle<int> kPlate      { 318, 16, 170, 40 };
-const juce::Rectangle<int> kSignature  { 500, 8, 250, 60 };
+const juce::Rectangle<int> kPlate      { 415, 16, 170, 40 };   // centralizada no cabeçalho
 const juce::Rectangle<int> kEcho       { 24, 372, 616, 120 };
 const juce::Rectangle<int> kOut        { 652, 372, 324, 120 };
 const juce::Rectangle<int> kKeysBed    { 24, 504, 952, 208 };
@@ -146,8 +145,6 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 {
     plateFace  = juce::Typeface::createSystemTypefaceFor (BinaryData::ArchivoBlackRegular_ttf,
                                                           (size_t) BinaryData::ArchivoBlackRegular_ttfSize);
-    scriptFace = juce::Typeface::createSystemTypefaceFor (BinaryData::KaushanScriptRegular_ttf,
-                                                          (size_t) BinaryData::KaushanScriptRegular_ttfSize);
     lnf.setSkin (0);
     setLookAndFeel (&lnf);
     auto& s = proc.apvts;
@@ -404,25 +401,6 @@ void RootsKeysEditor::drawPlate (juce::Graphics& g, juce::Rectangle<float> r)
     g.drawText ("DUB STATION", r, juce::Justification::centred);
 }
 
-// assinatura "DubMastor" em pincel, igual à do Dub Station / FitaEco
-void RootsKeysEditor::drawSignature (juce::Graphics& g, juce::Rectangle<float> sa, juce::Colour ink, juce::Colour swashCol)
-{
-    juce::Graphics::ScopedSaveState ss (g);
-    g.addTransform (juce::AffineTransform::rotation (-0.07f, sa.getRight(), sa.getCentreY()));
-    g.setFont (juce::FontOptions (scriptFace).withHeight (36.0f));
-    const auto txt = juce::Rectangle<float> (sa.getX(), sa.getY() + 2.0f, sa.getWidth() - 20.0f, 42.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.55f));
-    g.drawText ("DubMastor", txt.translated (1.5f, 2.0f), juce::Justification::centredRight);
-    g.setColour (ink);
-    g.drawText ("DubMastor", txt, juce::Justification::centredRight);
-    juce::Path swash;
-    const float x1 = sa.getRight() - 22.0f, y1 = sa.getBottom() - 10.0f;
-    swash.startNewSubPath (x1 - 170.0f, y1 + 2.0f);
-    swash.cubicTo (x1 - 115.0f, y1 - 4.0f, x1 - 55.0f, y1 + 4.0f, x1, y1 - 6.0f);
-    g.setColour (swashCol.withAlpha (0.85f));
-    g.strokePath (swash, juce::PathStrokeType (2.2f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-}
-
 void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 {
     const bool piano = (forSkin == 0);
@@ -578,8 +556,6 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
     }
 
     drawPlate (g, kPlate.toFloat());
-    drawSignature (g, kSignature.toFloat(), piano ? juce::Colour (0xffe8e8e8) : ivory,
-                   piano ? ledRed : juce::Colour (0xffb8862e));
 }
 
 void RootsKeysEditor::paint (juce::Graphics& g)
