@@ -24,11 +24,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     for (int d = 0; d < dub::numDurations; ++d) durs.add (dub::durationName (d));
     for (int p = 0; p < dub::NumPatterns; ++p) pats.add (dub::patternName (p));
 
-    // Progressão padrão: Am (2 comp.) | Dm (1) | Em (1/2) | G (1/2)
+    // Progressão padrão: Am (1 comp.) | Dm (1 comp.); acordes 3 (Em) e 4 (G) desligados
     const int  defRoot[numSlots] = { 9, 2, 4, 7 };
     const int  defQual[numSlots] = { dub::Min, dub::Min, dub::Min, dub::Maj };
-    const int  defDur [numSlots] = { 2, 1, 0, 0 };            // 2 comp. | 1 comp. | 1/2 | 1/2
-    const bool defOn  [numSlots] = { true, true, true, true };
+    const int  defDur [numSlots] = { 1, 1, 1, 1 };            // 1 compasso cada
+    const bool defOn  [numSlots] = { true, true, false, false };
 
     for (int i = 0; i < numSlots; ++i)
     {
@@ -48,9 +48,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     {
         StringArray sizes;
         for (int n = 0; n < dub::numNoteSizes; ++n) sizes.add (dub::noteSizeName (n));
-        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "noteSize", 1 }, "Tamanho da nota", sizes, 1));
+        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "noteSize", 1 }, "Tamanho da nota", sizes, 0));   // 1/32
     }
-    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bubble", 1 }, "Bubble (orgao)", true));
+    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bubble", 1 }, "Bubble (orgao)", false));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "swing", 1 }, "Swing", 0.0f, 1.0f, 0.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "preview", 1 }, "Preview (clock interno)", false));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (55.0f, 180.0f, 1.0f), 75.0f));
@@ -335,9 +335,9 @@ bool DubChordsProcessor::writeMidiFile (const juce::File& file) const
     meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
     auto trackName = [] (const juce::String& n) { return juce::MidiMessage::textMetaEvent (3, n); };
-    skank.addEvent  (trackName ("Dub Chords - Skank (piano)"), 0.0);
-    bubble.addEvent (trackName ("Dub Chords - Bubble (orgao)"), 0.0);
-    bass.addEvent   (trackName ("Dub Chords - Baixo guia"), 0.0);
+    skank.addEvent  (trackName ("MDCM-404 - Skank (piano)"), 0.0);
+    bubble.addEvent (trackName ("MDCM-404 - Bubble (orgao)"), 0.0);
+    bass.addEvent   (trackName ("MDCM-404 - Baixo guia"), 0.0);
 
     // marcadores com o nome de cada acorde (aparecem na régua/marker track da DAW)
     const auto slots = getSlots();

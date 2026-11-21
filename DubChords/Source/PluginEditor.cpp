@@ -570,7 +570,7 @@ void MidiDragZone::mouseDrag (const juce::MouseEvent&)
 {
     if (dragging) return;
     dragging = true;
-    auto file = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("Dub Chords riddim.mid");
+    auto file = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("MDCM-404 riddim.mid");
     if (proc.writeMidiFile (file))
         juce::DragAndDropContainer::performExternalDragDropOfFiles (juce::StringArray (file.getFullPathName()), false, this);
 }
@@ -690,7 +690,7 @@ bool DubChordsPanel::slotEnabled (int i) const
 
 void DubChordsPanel::exportMidi()
 {
-    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Dub Chords");
+    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Mastor Dub Chords Machine");
     dir.createDirectory();
     chooser = std::make_unique<juce::FileChooser> ("Salvar riddim em MIDI", dir.getChildFile ("riddim.mid"), "*.mid");
     chooser->launchAsync (juce::FileBrowserComponent::saveMode
@@ -703,7 +703,7 @@ void DubChordsPanel::exportMidi()
                               if (! f.hasFileExtension ("mid")) f = f.withFileExtension ("mid");
                               if (! proc.writeMidiFile (f))
                                   juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon,
-                                                                          "Dub Chords", juce::String::fromUTF8 ("N\xc3\xa3o foi poss\xc3\xadvel salvar o MIDI."));
+                                                                          "Mastor Dub Chords Machine", juce::String::fromUTF8 ("N\xc3\xa3o foi poss\xc3\xadvel salvar o MIDI."));
                           });
 }
 
@@ -880,8 +880,14 @@ void DubChordsPanel::renderBackground()
 
     // --- cabeçalho
     g.setColour (colours::ink);
-    g.setFont (stencil (30.0f, 0.22f));
-    const juce::String title ("DUBMASTOR DUB CHORDS");
+    const juce::String title ("MASTOR DUB CHORDS MACHINE");
+    {   // nome comprido: diminui a fonte se o título + a placa de latão não couberem antes das faixas da bandeira
+        float fs = 30.0f;
+        const float maxW = (float) plate.getWidth() - 330.0f - 32.0f - 26.0f - 260.0f;
+        while (fs > 22.0f && juce::GlyphArrangement::getStringWidth (stencil (fs, 0.22f), title) > maxW)
+            fs -= 1.0f;
+        g.setFont (stencil (fs, 0.22f));
+    }
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
@@ -931,7 +937,7 @@ void DubChordsPanel::renderBackground()
     }
     g.setColour (colours::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    g.drawText ("RIDDIM CHORD GENERATOR", plate.getX() + 34, 52, 500, 14, juce::Justification::left);
+    g.drawText (juce::String::fromUTF8 ("MDCM-404  \xc2\xb7  RIDDIM CHORD GENERATOR  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
         const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;

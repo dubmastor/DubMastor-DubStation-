@@ -1,6 +1,7 @@
-// Som interno do Dub Chords: os mesmos timbres do Dub Station Roots Keys
+// Som interno do Mastor Dub Chords Machine (MDCM-404): os mesmos timbres do Dub Station Roots Keys
 //  - skank (canal 1): piano estilo Korg M1 com chorus estéreo
-//  - bubble (canal 3): órgão tonewheel estilo Hammond B3, drawbars 888000000 do reggae,
+//  - bubble (canal 3): órgão tonewheel estilo Hammond B3 no preset "Roots Percussion" do
+//    Roots Keys: drawbars 888000000, percussão na 3ª harmônica (rápida, single-trigger),
 //    key click, overdrive valvulado e Leslie lento
 //  - baixo guia (canal 2): seno com um pouco de 2º harmônico
 // Tudo sintetizado (sem samples), header-only, sem JUCE.
@@ -19,14 +20,17 @@ public:
         p.pianoDecay  = 0.30f;
         p.pianoChorus = 0.55f;
         p.pianoLevel  = 1.0f;
-        // Hammond clássico do bubble: 16' 5⅓' 8' puxados, sem percussão, Leslie lento
+        // Hammond do bubble = preset "Organ: Roots Percussion" do Roots Keys:
+        // 16' 5⅓' 8' puxados + percussão (3ª harmônica, decaimento rápido), Leslie lento
         const float db[9] = { 8, 8, 8, 0, 0, 0, 0, 0, 0 };
         for (int i = 0; i < 9; ++i) p.drawbar[i] = db[i];
-        p.percOn = false;
-        p.click = 0.45f;
+        p.percOn   = true;
+        p.perc3rd  = true;
+        p.percFast = true;
+        p.click = 0.50f;
         p.leslieFast = false;
-        p.leslieMix = 0.85f;
-        p.drive = 0.28f;
+        p.leslieMix = 0.80f;
+        p.drive = 0.30f;
         p.organLevel = 1.0f;
     }
 
@@ -39,12 +43,14 @@ public:
         for (auto& v : piano) v.active = false;
         for (auto& v : organ) v.active = false;
         for (auto& b : bass) b.active = false;
+        percWindow = 0;
         smoothCoef = 1.0f - std::exp (-1.0f / (0.01f * sr));
         for (int i = 0; i < 9; ++i)
         {
             const float d = p.drawbar[i];
             dbGain[i] = d < 0.01f ? 0.0f : std::pow (10.0f, (d - 8.0f) * 3.0f / 20.0f);
         }
+        if (p.percOn) dbGain[8] = 0.0f;   // como no B3: a percussão "rouba" o drawbar de 1'
     }
 
     void noteOn (int channel, int note, float vel)
@@ -52,8 +58,12 @@ public:
         ++stamp;
         if (channel == 3)
         {
+            // percussão single-trigger (como no B3 e no Roots Keys): só dispara quando
+            // nenhuma tecla estava segurada, ou nas notas do mesmo acorde (janela de 25 ms)
+            const bool trig = organHeld() == 0 || percWindow > 0;
+            if (organHeld() == 0) percWindow = (int) (0.025f * sr);
             auto& v = steal (organ, note);
-            v.start (note, sr, p, false, stamp);
+            v.start (note, sr, p, trig, stamp);
         }
         else if (channel == 2)
         {
@@ -90,6 +100,7 @@ public:
         for (auto& v : piano) v.active = false;
         for (auto& v : organ) v.active = false;
         for (auto& b : bass)  b.active = false;
+        percWindow = 0;
     }
 
     void allNotesOff()
@@ -106,7 +117,8 @@ public:
         {
             float pin = 0, oin = 0, bin = 0;
             for (auto& v : piano) if (v.active) pin += v.tick();
-            for (auto& v : organ) if (v.active) oin += v.tick (dbGain, false);
+            if (percWindow > 0) --percWindow;
+            for (auto& v : organ) if (v.active) oin += v.tick (dbGain, p.percOn);
             for (auto& b : bass)  if (b.active) bin += b.tick();
 
             float pl, pr;
@@ -158,6 +170,13 @@ private:
         }
     };
 
+    int organHeld() const
+    {
+        int n = 0;
+        for (const auto& v : organ) if (v.active && v.held) ++n;
+        return n;
+    }
+
     static inline float soft (float x)
     {
         if (x > 1.5f) return 1.0f;
@@ -195,4 +214,5 @@ private:
     rk::Leslie leslie;
     rk::Reverb reverb;
     uint64_t stamp = 0;
+    int percWindow = 0;
 };

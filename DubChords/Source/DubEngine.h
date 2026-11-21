@@ -1,4 +1,4 @@
-// Dub Chords — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
+// Mastor Dub Chords Machine (MDCM-404) — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
 //  - skank de piano "com as duas mãos": a mesma inversão em duas oitavas (canal 1)
 //  - bubble de órgão uma oitava abaixo do skank (canal 3)
 #pragma once

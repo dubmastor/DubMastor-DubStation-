@@ -1,10 +1,12 @@
-# DubMastor Dub Chords 1.3
+# Mastor Dub Chords Machine MDCM-404 1.4
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.3/DubMastorDubChords-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.3/DubMastorDubChords-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-macOS.zip)**
 
-![Interface do Dub Chords](docs/interface.png)
+![Interface do Mastor Dub Chords Machine MDCM-404](docs/interface.png)
+
+(Antes se chamava **DubMastor Dub Chords**; a partir da 1.4 é o **Mastor Dub Chords Machine MDCM-404**.)
 
 Gerador de harmonia para começar a programar um riddim de reggae. Você escolhe até 4 acordes e quanto
 tempo cada um dura, e o plugin toca o skank de piano **com as duas mãos** (o acorde em duas oitavas) e o
@@ -20,7 +22,7 @@ carregue numa *Instrument Track*.
 | **MAIOR / MENOR** | Dois botões de pressão intertravados |
 | **INVERSÃO** | **AUTO** (padrão) escolhe sozinho a inversão com as notas mais próximas do acorde anterior; **FUND**, **1ª** e **2ª** fixam a inversão. A **seta âmbar** sempre marca a inversão sugerida, mesmo quando você escolhe outra |
 | **DURAÇÃO** | Janela de contador: **1/2 compasso**, 1, 2, 3, 4 ou 8 compassos. Clique à direita para aumentar, à esquerda para diminuir |
-| **ON** (acordes 2, 3 e 4) | Liga/desliga o acorde no loop. O acorde 1 fica sempre ligado |
+| **ON** (acordes 2, 3 e 4) | Liga/desliga o acorde no loop. O acorde 1 fica sempre ligado. Ao abrir, só os acordes 1 e 2 vêm ligados, com 1 compasso cada |
 
 O display âmbar mostra o acorde e a inversão que está tocando (ex.: "D MENOR · 2ª INV"). Os acordes ligados formam o loop, que se repete sozinho
 e aparece no visor **LOOP** com o cursor de reprodução. O plugin escolhe a inversão mais próxima do acorde
@@ -30,7 +32,7 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 | Controle | O que faz |
 |---|---|
 | **PADRÃO DO SKANK** | Contador clicável: Contratempo · One drop (2 e 4) · Double skank · Steppers |
-| **TAMANHO DA NOTA** | Contador clicável: 1/32, 1/16, 1/8, 1/4 ou 1/2. A nota nunca encosta no próximo ataque |
+| **TAMANHO DA NOTA** | Contador clicável: 1/32 (padrão), 1/16, 1/8, 1/4 ou 1/2. A nota nunca encosta no próximo ataque |
 | **REGISTRO** | Onde fica a mão esquerda do skank (C3 a C5). A direita fica uma oitava acima, o bubble uma abaixo |
 | **VELOCITY / SWING** | Força das notas e atraso das semicolcheias |
 
@@ -38,18 +40,18 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 | Controle | O que faz |
 |---|---|
 | **PREVIEW** | Botão grande: toca o loop sem a DAW rodando, no **BPM** do knob. Aperte de novo para parar |
-| **BUBBLE** | Liga o bubble de órgão Hammond (semicolcheias fora do tempo, uma oitava abaixo do skank) |
+| **BUBBLE** | Liga o bubble de órgão Hammond (semicolcheias fora do tempo, uma oitava abaixo do skank). Vem desligado. No som interno, usa o timbre **Roots Percussion** do Roots Keys (com percussão) |
 | **SOM INTERNO** | Liga/desliga o som. Desligue quando mandar o MIDI para os seus instrumentos |
 | **PIANO M1 / HAMMOND** | Volume de cada timbre (os mesmos do Dub Station Roots Keys, sintetizados, sem samples) |
 
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. Vêm duas faixas (skank e bubble), no BPM do projeto, com o nome de cada acorde como marcador.
 - **Cada acorde em uma cor:** no arquivo, as notas do acorde 1 vão no canal MIDI 1, as do acorde 2 no canal 2, e assim por diante. Na DAW, peça para colorir as notas por canal: no Cubase, no Key Editor, **Cores › Canal**; no REAPER, *Color notes by channel*; no FL Studio as cores já vêm separadas.
-- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Dub Chords). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
+- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Mastor Dub Chords Machine). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
 
 ## Para desenvolvedores
-- **Versão:** muda só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece na plaqueta do plugin, e cada push na `main` publica a release **Dub Chords x.y** (tag `DubChords-x.y`) com as notas de `RELEASE_NOTES.md`. Lembre de atualizar os links `DubChords-x.y` no site e nos READMEs.
+- **Versão:** muda só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece na plaqueta do plugin, e cada push na `main` publica a release **Mastor Dub Chords Machine MDCM-404 x.y** (tag `MDCM-404-x.y`) com as notas de `RELEASE_NOTES.md`. Lembre de atualizar os links `MDCM-404-x.y` no site e nos READMEs.
 - `Source/DubEngine.h`: lógica da harmonia (C++ puro). É aqui que se adiciona padrão novo.
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, saída MIDI, exportação.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob + teclado, botões e contadores clicáveis).

@@ -1,4 +1,4 @@
-// Renderiza a interface do Dub Chords num PNG (sem DAW):
+// Renderiza a interface do Mastor Dub Chords Machine (MDCM-404) num PNG (sem DAW):
 //   cmake -B build-snap -DDUBCHORDS_SNAPSHOT=ON && cmake --build build-snap --target DubChordsSnapshot
 //   ./build-snap/DubChordsSnapshot_artefacts/Release/DubChordsSnapshot docs/interface.png [4] [escala]
 #include <juce_audio_utils/juce_audio_utils.h>
