@@ -337,7 +337,7 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 juce::String DubDrumsProcessor::suggestedFileName() const
 {
     const auto s = readSettings();
-    juce::String name = juce::String ("DubDrums_") + dubdrums::styleName (s.style)
+    juce::String name = juce::String ("MDDM-12_") + dubdrums::styleName (s.style)
                       + "_" + dubdrums::drummerName (s.drummer)
                       + "_" + juce::String (s.bars) + "comp" + (s.intro ? "_intro" : "") + "_s" + juce::String ((int) s.seed);
     return name.replaceCharacter (' ', '-') + ".mid";
@@ -350,7 +350,7 @@ bool DubDrumsProcessor::writeMidiFile (const juce::File& target) const
     const double intro = p.introLengthInBeats;
 
     juce::MidiMessageSequence seq;
-    seq.addEvent (juce::MidiMessage::textMetaEvent (3, "Dub Drums"), 0.0);
+    seq.addEvent (juce::MidiMessage::textMetaEvent (3, "MDDM-12"), 0.0);
     seq.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
     // marcadores com o nome de cada compasso (aparecem na régua de DAWs que importam marcadores)

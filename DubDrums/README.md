@@ -1,10 +1,12 @@
-# DubMastor Dub Drums 1.2
+# Mastor Dub Drums Machine MDDM-12 1.3
+
+*(antigo DubMastor Dub Drums)*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.2/DubMastorDubDrums-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.2/DubMastorDubDrums-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MastorDubDrumsMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MastorDubDrumsMachine-macOS.zip)**
 
-![Interface do Dub Drums](docs/interface.png)
+![Interface do MDDM-12](docs/interface.png)
 
 Gerador do esqueleto da bateria de reggae. Você escolhe o estilo (Rockers, One Drop ou Boom Bap), quantos
 compassos, o baterista de referência e o balanço, e o plugin monta o groove com viradas, sincronizado com
@@ -71,7 +73,7 @@ pouco mais balançado, Carlton bem mais). Ele também atrasa ou adianta cada pe�
 
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. O clipe vem com a intro (se ligada) e os compassos do loop, com marcadores "Intro", "Compasso 1", "Compasso 2"...
-- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Dub Drums).
+- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Mastor Dub Drums Machine).
 - **CANAL:** canal MIDI da saída ao vivo (padrão 10) e do arquivo quando o MIDI COLORIDO está desligado.
 - **MIDI COLORIDO:** cada compasso vai num canal MIDI no arquivo (compasso 1 no canal 1 ... compasso 4 no canal 4, intro no canal 5), como no Dub Chords. Na DAW, peça para colorir as notas por canal: no Cubase, no Key Editor, **Cores › Canal**; no REAPER, *Color notes by channel*. Desligue para mandar tudo no CANAL.
 - **NOTAS (opção avançada):** abre o mapa de notas: qual nota MIDI cada peça envia (bumbo, aro, caixa, HH fechado, HH aberto, tom 1, tom 2, surdo, prato). Use as setas, arraste ou a rodinha. **PADRÃO GM** volta para o General MIDI (C1 = 36). Vale para a saída ao vivo, o arrastar e o exportar.

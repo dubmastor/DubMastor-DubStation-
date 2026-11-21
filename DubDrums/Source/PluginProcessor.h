@@ -22,7 +22,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "DubMastor Dub Drums"; }
+    const juce::String getName() const override { return "Mastor Dub Drums Machine MDDM-12"; }
     bool acceptsMidi() const override  { return true; }
     bool producesMidi() const override { return true; }
     bool isMidiEffect() const override { return false; }

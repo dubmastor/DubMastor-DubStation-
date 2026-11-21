@@ -1,20 +1,17 @@
-## DubMastor Dub Drums 1.2 🟢🟡⚫
+## Mastor Dub Drums Machine MDDM-12 1.3 🟢🟡⚫
 
-- **Caixa no 2 e no 4** em todos os estilos e com todos os bateristas
-- Estilos na ordem **ROCKERS** (bumbo no 1 e no 3), **ONE DROP** (bumbo junto com a caixa no 2 e no 4) e o novo **BOOM BAP** dos anos 90, no lugar do Steppa
-- **BATIDA PRINCIPAL editável**: grade de colcheias para o bumbo e a caixa; o estilo carrega o padrão e você clica para mudar
-- **SOM DA CAIXA**: caixa, aro ou os dois
-- **VIRADA NO FIM** e **VIRADA DE INTRO** desligadas por padrão
-- Botão **NOVA VARIAÇÃO** vermelho
-- Versão logo depois do nome (**DUBMASTOR DUB DRUMS 1.2**) e placa só com **DUB STATION**
-- O **Mastor Riddim Machine 1.2** recebe as mesmas mudanças na aba BATERIA
+O **Dub Drums** agora se chama **Mastor Dub Drums Machine MDDM-12**, no mesmo padrão do MDCM-404 e do MRM-0420.
 
-Atenção: projetos salvos na 1.1 com o estilo **One Drop** ou **Steppa** abrem com outro estilo, porque a ordem dos estilos mudou. Escolha o estilo de novo.
+- Nome novo em tudo: plugin na DAW, janela (**MASTOR DUB DRUMS MACHINE MDDM-12 1.3**, placa só com **DUB STATION**), arquivos `.vst3`/`.component`/`.app`, MIDI exportado (`MDDM-12_...mid`, pasta Documentos/Mastor Dub Drums Machine) e downloads
+- Traz tudo da 1.2: caixa no 2 e no 4 em todos os estilos, ROCKERS / ONE DROP / BOOM BAP, BATIDA PRINCIPAL editável, SOM DA CAIXA, viradas desligadas por padrão e NOVA VARIAÇÃO vermelho
+
+Atenção: como o nome do plugin mudou, a DAW mostra o MDDM-12 como um plugin novo. Apague o antigo `DubMastor Dub Drums.vst3` / `.component` da pasta de plugins e troque nos projetos. Projetos salvos na 1.1 com **One Drop** ou **Steppa** abrem com outro estilo (a ordem dos estilos mudou na 1.2).
 
 É um instrumento: no Cubase, carregue numa *Instrument Track*.
-Downloads: `DubMastorDubDrums-Windows.zip` e `DubMastorDubDrums-macOS.zip`.
+Downloads: `MastorDubDrumsMachine-Windows.zip` e `MastorDubDrumsMachine-macOS.zip`.
 
 No Mac, depois de copiar o `.vst3`:
 ```
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Drums.vst3"
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Drums Machine MDDM-12.vst3"
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/"Mastor Dub Drums Machine MDDM-12.component"
 ```

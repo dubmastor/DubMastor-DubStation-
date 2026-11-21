@@ -1,4 +1,4 @@
-// Interface do Dub Drums — visual copiado do DubMastor Dub Chords
+// Interface do Mastor Dub Drums Machine MDDM-12 (antigo Dub Drums) — visual copiado do DubMastor Dub Chords
 #include "PluginEditor.h"
 
 #ifndef DD_VERSION_SHORT
@@ -396,8 +396,14 @@ void DubDrumsPanel::renderBackground()
 
     // --- cabeçalho
     g.setColour (colours::ink);
-    g.setFont (stencil (30.0f, 0.22f));
-    const juce::String title ("DUBMASTOR DUB DRUMS " DD_VERSION_SHORT);   // padrão: versão logo depois do nome
+    const juce::String title ("MASTOR DUB DRUMS MACHINE MDDM-12 " DD_VERSION_SHORT);   // padrão: versão logo depois do nome
+    {   // nome comprido: diminui a fonte até o título + a placa DUB STATION caberem antes das faixas da bandeira
+        float fs = 30.0f;
+        const float maxW = (float) plate.getWidth() - 330.0f - 32.0f - 26.0f - 250.0f;
+        while (fs > 20.0f && juce::GlyphArrangement::getStringWidth (stencil (fs, 0.22f), title) > maxW)
+            fs -= 1.0f;
+        g.setFont (stencil (fs, 0.22f));
+    }
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
@@ -945,7 +951,7 @@ int DubDrumsPanel::choice (const char* id) const
 
 void DubDrumsPanel::exportMidi()
 {
-    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Dub Drums");
+    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Mastor Dub Drums Machine");
     dir.createDirectory();
     chooser = std::make_unique<juce::FileChooser> ("Salvar bateria em MIDI", dir.getChildFile (proc.suggestedFileName()), "*.mid");
     chooser->launchAsync (juce::FileBrowserComponent::saveMode
