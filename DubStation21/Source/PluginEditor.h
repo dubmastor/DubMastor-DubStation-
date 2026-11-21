@@ -9,6 +9,10 @@ public:
     VintageLookAndFeel();
     void drawRotarySlider (juce::Graphics&, int x, int y, int w, int h, float pos,
                            float startAngle, float endAngle, juce::Slider&) override;
+    // chrome bat-lever toggle (bypass switch) and small EQ preset keys
+    void drawToggleButton (juce::Graphics&, juce::ToggleButton&, bool highlighted, bool down) override;
+    void drawButtonBackground (juce::Graphics&, juce::Button&, const juce::Colour&, bool highlighted, bool down) override;
+    void drawButtonText (juce::Graphics&, juce::TextButton&, bool highlighted, bool down) override;
     // graphic-EQ fader: slot + chrome cap with a centre line
     void drawLinearSlider (juce::Graphics&, int x, int y, int w, int h, float sliderPos,
                            float minPos, float maxPos, juce::Slider::SliderStyle, juce::Slider&) override;
@@ -44,10 +48,16 @@ private:
     VintageLookAndFeel lnf;
     std::array<Knob, 10> knobs;
     std::array<Knob, 6> eqFaders;
+    std::array<juce::TextButton, 4> eqPresets;   // FLAT, HPF, LPF, HPF+LPF
+    juce::ToggleButton bypassSwitch;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> bypassAtt;
+    void applyEqPreset (int idx);
+    int matchingEqPreset() const;
     juce::Label status;
     int shownMode = -1;
     float tapePhase = 0.0f;
-    juce::Rectangle<int> topPanel, bottomPanel, tapeWindow, eqArea, vuArea;
+    juce::Rectangle<int> topPanel, bottomPanel, tapeWindow, eqArea, vuArea, sigArea;
+    juce::Point<float> bypassLamp;
     float needlePos = 0.0f, needleVel = 0.0f; // VU ballistics (0..1 of the scale)
     int peakHold = 0;
     juce::Image background; // pre-rendered wood / enamel / panel (2x for HiDPI)

@@ -21,6 +21,7 @@ public:
     bool producesMidi() const override { return false; }
     bool isMidiEffect() const override { return false; }
     double getTailLengthSeconds() const override { return 8.0; }
+    juce::AudioParameterBool* getBypassParameter() const override { return bypassParam; }
 
     int getNumPrograms() override { return 1; }
     int getCurrentProgram() override { return 0; }
@@ -39,7 +40,9 @@ public:
 
 private:
     fitaeco::TapeEcho echo;
-    juce::AudioBuffer<float> monoScratch;
+    juce::AudioBuffer<float> monoScratch, dryCopy;
+    juce::AudioParameterBool* bypassParam = nullptr;
+    juce::SmoothedValue<float> bypassMix; // 0 = effect, 1 = dry (click-free crossfade)
     std::atomic<float> recVu { -60.0f };
 
     std::atomic<float>* pInput {}; std::atomic<float>* pMode {}; std::atomic<float>* pRate {};

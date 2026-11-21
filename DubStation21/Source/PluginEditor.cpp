@@ -21,6 +21,13 @@ const char* ids[kNumKnobs]    = { "mode", "rate", "intensity", "echo", "reverb",
 const char* labels[kNumKnobs] = { "MODE SELECTOR", "REPEAT RATE", "INTENSITY", "ECHO VOLUME", "REVERB VOLUME",
                                   "INPUT", "WOW/FLUTTER", "TAPE AGE", "DRY", "OUTPUT" };
 constexpr int kNumEq = 6;
+constexpr int kNumEqPresets = 4;
+const char* eqPresetNames[kNumEqPresets] = { "FLAT", "HPF", "LPF", "HPF+LPF" };
+const float eqPresetValues[kNumEqPresets][kNumEq] = {
+    {   0.0f,  0.0f,  0.0f,  0.0f,  0.0f,   0.0f },   // flat
+    { -12.0f, -9.0f, -3.0f,  0.0f,  0.0f,   0.0f },   // high-pass: thin the repeats
+    {   0.0f,  0.0f,  0.0f, -2.0f, -8.0f, -12.0f },   // low-pass: dark, dubby repeats
+    { -12.0f, -9.0f, -3.0f, -2.0f, -8.0f, -12.0f } }; // band-pass: telephone-like repeats
 const char* eqLabels[kNumEq] = { "100", "250", "630", "1.6k", "4k", "10k" };
 
 // VU scale: linear in voltage from -20 VU to +3 VU, needle swing +-42 degrees
@@ -78,12 +85,37 @@ void VintageLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         }
     }
 
-    // spun-aluminium skirt
+    // spun-aluminium skirt (giant knobs get a real cylinder: side wall, depth, reflections)
     const float kr = r * 0.62f;
-    g.setColour (juce::Colours::black.withAlpha (0.55f));
-    g.fillEllipse (c.x - kr + 2, c.y - kr + 4, kr * 2, kr * 2);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xffeeeeee), c.x - kr, c.y - kr,
-                                             juce::Colour (0xff7d7d7d), c.x + kr, c.y + kr, false));
+    const bool big = r > 75.0f;
+    if (big)
+    {
+        const float depth = kr * 0.15f;
+        g.setColour (juce::Colours::black.withAlpha (0.30f));                  // long soft shadow
+        g.fillEllipse (c.x - kr + 7, c.y - kr + 16, kr * 2, kr * 2);
+        g.setColour (juce::Colours::black.withAlpha (0.45f));                  // contact shadow
+        g.fillEllipse (c.x - kr + 2, c.y - kr + depth + 3, kr * 2, kr * 2);
+        juce::ColourGradient side (juce::Colour (0xff8e8e8a), c.x - kr, c.y, juce::Colour (0xff8a8a86), c.x + kr, c.y, false);
+        side.addColour (0.5, juce::Colour (0xff3a3a38));
+        side.addColour (0.18, juce::Colour (0xffb8b8b4));
+        g.setGradientFill (side);                                              // side wall
+        g.fillEllipse (c.x - kr, c.y - kr + depth, kr * 2, kr * 2);
+        g.fillRect (c.x - kr, c.y, kr * 2, depth);
+        g.setColour (juce::Colours::black.withAlpha (0.35f));                  // knurling on the wall
+        for (int i = 0; i <= 36; ++i)
+        {
+            const float t = juce::MathConstants<float>::halfPi + juce::MathConstants<float>::pi * (float) i / 36.0f;
+            const auto top = c.getPointOnCircumference (kr, t);
+            g.drawLine (top.x, top.y, top.x, top.y + depth, 1.0f);
+        }
+    }
+    else
+    {
+        g.setColour (juce::Colours::black.withAlpha (0.55f));
+        g.fillEllipse (c.x - kr + 2, c.y - kr + 4, kr * 2, kr * 2);
+    }
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff2f2f0), c.x - kr, c.y - kr,
+                                             juce::Colour (0xff7a7a77), c.x + kr, c.y + kr, false));
     g.fillEllipse (c.x - kr, c.y - kr, kr * 2, kr * 2);
     for (int i = 0; i < 6; ++i) // concentric machining rings
     {
@@ -91,14 +123,38 @@ void VintageLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         g.setColour (juce::Colours::white.withAlpha (i % 2 ? 0.10f : 0.0f).overlaidWith (juce::Colours::black.withAlpha (i % 2 ? 0.0f : 0.06f)));
         g.drawEllipse (c.x - rr, c.y - rr, rr * 2, rr * 2, 1.0f);
     }
+    if (big) // anisotropic reflections of spun metal: two light and two dark sectors
+    {
+        const float inner = 0.66f;
+        for (int k = 0; k < 4; ++k)
+        {
+            juce::Path sector;
+            const float a = -0.95f + (float) k * juce::MathConstants<float>::halfPi;
+            sector.addPieSegment (c.x - kr, c.y - kr, kr * 2, kr * 2, a - 0.28f, a + 0.28f, inner);
+            g.setColour (k % 2 == 0 ? juce::Colours::white.withAlpha (0.30f) : juce::Colours::black.withAlpha (0.13f));
+            g.fillPath (sector);
+        }
+        g.setColour (juce::Colours::white.withAlpha (0.55f));                  // bright rim on top
+        juce::Path rim;
+        rim.addCentredArc (c.x, c.y, kr - 1.0f, kr - 1.0f, 0.0f, -1.9f, 0.6f, true);
+        g.strokePath (rim, juce::PathStrokeType (1.4f));
+    }
     g.setColour (juce::Colours::black.withAlpha (0.6f));
     g.drawEllipse (c.x - kr, c.y - kr, kr * 2, kr * 2, 1.2f);
     g.setColour (stepped ? amber.darker (0.2f) : juce::Colour (0xff111111)); // index line on the skirt
     g.drawLine ({ c.getPointOnCircumference (kr * 0.70f, ang), c.getPointOnCircumference (kr * 0.98f, ang) },
                 juce::jmax (1.8f, r * 0.03f));
 
-    // black ribbed cap
+    // black ribbed cap (raised, with a glossy highlight on the giant knobs)
     const float cr = kr * 0.68f;
+    if (big)
+    {
+        const float capDepth = cr * 0.14f;
+        g.setColour (juce::Colours::black.withAlpha (0.5f));
+        g.fillEllipse (c.x - cr + 1, c.y - cr + capDepth + 3, cr * 2, cr * 2);
+        g.setColour (juce::Colour (0xff050505));
+        g.fillEllipse (c.x - cr, c.y - cr + capDepth, cr * 2, cr * 2);
+    }
     g.setGradientFill (juce::ColourGradient (juce::Colour (0xff3a3a3a), c.x, c.y - cr,
                                              juce::Colour (0xff070707), c.x, c.y + cr, false));
     g.fillEllipse (c.x - cr, c.y - cr, cr * 2, cr * 2);
@@ -112,9 +168,93 @@ void VintageLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
     g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2c2c2c), c.x, c.y - cr * 0.8f,
                                              juce::Colour (0xff0e0e0e), c.x, c.y + cr * 0.8f, false));
     g.fillEllipse (c.x - cr * 0.84f, c.y - cr * 0.84f, cr * 1.68f, cr * 1.68f);
+    if (big)
+    {
+        const auto hl = juce::Point<float> (c.x - cr * 0.32f, c.y - cr * 0.40f);
+        g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.38f), hl.x, hl.y,
+                                                 juce::Colours::white.withAlpha (0.0f), hl.x + cr * 0.62f, hl.y, true));
+        g.fillEllipse (c.x - cr * 0.84f, c.y - cr * 0.84f, cr * 1.68f, cr * 1.68f);
+        g.setColour (juce::Colours::white.withAlpha (0.18f));
+        juce::Path capRim;
+        capRim.addCentredArc (c.x, c.y, cr * 0.84f, cr * 0.84f, 0.0f, -1.7f, 0.4f, true);
+        g.strokePath (capRim, juce::PathStrokeType (1.2f));
+    }
     g.setColour (cream);
     g.drawLine ({ c.getPointOnCircumference (cr * 0.35f, ang), c.getPointOnCircumference (cr * 0.80f, ang) },
                 juce::jmax (2.0f, r * 0.04f));
+}
+
+void VintageLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton& b, bool highlighted, bool)
+{
+    // chrome bat-lever toggle: lever up = effect ON, lever down = BYPASS
+    const auto r = b.getLocalBounds().toFloat();
+    const auto c = r.getCentre();
+    const bool bypassed = b.getToggleState();
+    const float nut = juce::jmin (r.getWidth(), r.getHeight()) * 0.26f;
+
+    juce::Path hex; // hex nut
+    for (int i = 0; i < 6; ++i)
+    {
+        const auto p = c.getPointOnCircumference (nut, (float) i * juce::MathConstants<float>::pi / 3.0f + 0.52f);
+        if (i == 0) hex.startNewSubPath (p); else hex.lineTo (p);
+    }
+    hex.closeSubPath();
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.fillPath (hex, juce::AffineTransform::translation (1.5f, 2.5f));
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff0f0ee), c.x - nut, c.y - nut, juce::Colour (0xff6d6d6a), c.x + nut, c.y + nut, false));
+    g.fillPath (hex);
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.strokePath (hex, juce::PathStrokeType (1.0f));
+    g.setColour (juce::Colour (0xff222222));
+    g.fillEllipse (c.x - nut * 0.45f, c.y - nut * 0.45f, nut * 0.9f, nut * 0.9f);
+
+    // lever
+    const float len = r.getHeight() * 0.42f;
+    const float dir = bypassed ? 1.0f : -1.0f;
+    const auto tip = juce::Point<float> (c.x, c.y + dir * len);
+    juce::Path lever;
+    lever.startNewSubPath (c.x - 3.2f, c.y);
+    lever.lineTo (c.x + 3.2f, c.y);
+    lever.lineTo (tip.x + 2.0f, tip.y);
+    lever.lineTo (tip.x - 2.0f, tip.y);
+    lever.closeSubPath();
+    g.setColour (juce::Colours::black.withAlpha (0.4f));
+    g.fillPath (lever, juce::AffineTransform::translation (2.5f, 3.0f));
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff8c8c88), c.x - 3, c.y, juce::Colour (0xff8c8c88), c.x + 3, c.y, false));
+    g.fillPath (lever);
+    g.setColour (juce::Colours::white.withAlpha (0.7f));
+    g.drawLine (c.x - 0.6f, c.y, tip.x - 0.6f, tip.y, 1.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colours::white, tip.x - 3, tip.y - 3, juce::Colour (0xff6a6a66), tip.x + 4, tip.y + 4, false));
+    g.fillEllipse (tip.x - 4.5f, tip.y - 4.5f, 9.0f, 9.0f);
+    if (highlighted)
+    {
+        g.setColour (amber.withAlpha (0.25f));
+        g.drawEllipse (r.reduced (2.0f), 1.0f);
+    }
+}
+
+void VintageLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& b, const juce::Colour&, bool highlighted, bool down)
+{
+    // small EQ preset keys: dark bakelite, lit amber when the preset is active
+    auto r = b.getLocalBounds().toFloat().reduced (1.0f);
+    const bool on = b.getToggleState();
+    g.setColour (juce::Colours::black.withAlpha (0.6f));
+    g.fillRoundedRectangle (r.translated (0.0f, down ? 0.5f : 1.5f), 3.0f);
+    if (on)
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xffffc061), 0, r.getY(), juce::Colour (0xffd9861a), 0, r.getBottom(), false));
+    else
+        g.setGradientFill (juce::ColourGradient (juce::Colour (highlighted ? 0xff3e3a35 : 0xff34312d), 0, r.getY(),
+                                                 juce::Colour (0xff181614), 0, r.getBottom(), false));
+    g.fillRoundedRectangle (down ? r.translated (0.0f, 1.0f) : r, 3.0f);
+    g.setColour (juce::Colours::white.withAlpha (on ? 0.5f : 0.12f));
+    g.drawLine (r.getX() + 3, r.getY() + 0.8f, r.getRight() - 3, r.getY() + 0.8f, 1.0f);
+}
+
+void VintageLookAndFeel::drawButtonText (juce::Graphics& g, juce::TextButton& b, bool, bool down)
+{
+    g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.06f));
+    g.setColour (b.getToggleState() ? juce::Colour (0xff1a1205) : cream.withAlpha (0.85f));
+    g.drawText (b.getButtonText(), b.getLocalBounds().translated (0, down ? 1 : 0), juce::Justification::centred);
 }
 
 void VintageLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, int w, int h, float sliderPos,
@@ -160,8 +300,8 @@ FitaEcoEditor::FitaEcoEditor (FitaEcoProcessor& p) : AudioProcessorEditor (p), p
     setLookAndFeel (&lnf);
     plateFace  = juce::Typeface::createSystemTypefaceFor (BinaryData::ArchivoBlackRegular_ttf,
                                                           (size_t) BinaryData::ArchivoBlackRegular_ttfSize);
-    scriptFace = juce::Typeface::createSystemTypefaceFor (BinaryData::texgyrechorusmediumitalic_otf,
-                                                          (size_t) BinaryData::texgyrechorusmediumitalic_otfSize);
+    scriptFace = juce::Typeface::createSystemTypefaceFor (BinaryData::KaushanScriptRegular_ttf,
+                                                          (size_t) BinaryData::KaushanScriptRegular_ttfSize);
     for (int i = 0; i < kNumKnobs; ++i)
     {
         auto& k = knobs[(size_t) i];
@@ -194,6 +334,20 @@ FitaEcoEditor::FitaEcoEditor (FitaEcoProcessor& p) : AudioProcessorEditor (p), p
         addAndMakeVisible (f.label);
     }
 
+    for (int i = 0; i < kNumEqPresets; ++i)
+    {
+        auto& b = eqPresets[(size_t) i];
+        b.setButtonText (eqPresetNames[i]);
+        b.setClickingTogglesState (false);
+        b.onClick = [this, i] { applyEqPreset (i); };
+        addAndMakeVisible (b);
+    }
+
+    bypassSwitch.setName ("bypass");
+    bypassSwitch.setTooltip ("Bypass: alavanca para cima = efeito ligado");
+    addAndMakeVisible (bypassSwitch);
+    bypassAtt = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (proc.apvts, "bypass", bypassSwitch);
+
     status.setJustificationType (juce::Justification::centredLeft);
     status.setFont (juce::FontOptions (juce::Font::getDefaultMonospacedFontName(), 12.0f, juce::Font::plain));
     status.setColour (juce::Label::textColourId, amber);
@@ -204,6 +358,29 @@ FitaEcoEditor::FitaEcoEditor (FitaEcoProcessor& p) : AudioProcessorEditor (p), p
 }
 
 FitaEcoEditor::~FitaEcoEditor() { setLookAndFeel (nullptr); }
+
+void FitaEcoEditor::applyEqPreset (int idx)
+{
+    for (int b = 0; b < kNumEq; ++b)
+        if (auto* prm = proc.apvts.getParameter ("eq" + juce::String (b + 1)))
+        {
+            prm->beginChangeGesture();
+            prm->setValueNotifyingHost (prm->convertTo0to1 (eqPresetValues[idx][b]));
+            prm->endChangeGesture();
+        }
+}
+
+int FitaEcoEditor::matchingEqPreset() const
+{
+    for (int i = 0; i < kNumEqPresets; ++i)
+    {
+        bool same = true;
+        for (int b = 0; b < kNumEq && same; ++b)
+            same = std::abs (proc.apvts.getRawParameterValue ("eq" + juce::String (b + 1))->load() - eqPresetValues[i][b]) < 0.05f;
+        if (same) return i;
+    }
+    return -1;
+}
 
 void FitaEcoEditor::timerCallback()
 {
@@ -239,6 +416,11 @@ void FitaEcoEditor::timerCallback()
     }
     status.setText (text, juce::dontSendNotification);
     repaint (tapeWindow);
+
+    const int active = matchingEqPreset();
+    for (int i = 0; i < kNumEqPresets; ++i)
+        eqPresets[(size_t) i].setToggleState (i == active, juce::dontSendNotification);
+    repaint (juce::Rectangle<int> (16, 16).withCentre (bypassLamp.toInt()).expanded (6));
 }
 
 void FitaEcoEditor::paint (juce::Graphics& g)
@@ -268,40 +450,65 @@ void FitaEcoEditor::paint (juce::Graphics& g)
     g.setColour (amber);
     g.drawText ("2.1", inset, juce::Justification::centred);
 
-    // "DubMastor" signature in brown ink with an underline swash
+    // "DUB MACHINE" printed on the enamel
+    g.setColour (ink);
+    g.setFont (juce::FontOptions (plateFace).withHeight (27.0f).withKerningFactor (0.10f));
+    g.drawText ("DUB MACHINE", juce::Rectangle<float> (pl.getX() + 6, pl.getBottom() + 12, 330, 34), juce::Justification::centredLeft);
+    g.setColour (ink.withAlpha (0.7f));
+    g.drawLine (pl.getX() + 8, pl.getBottom() + 50, pl.getRight() - 6, pl.getBottom() + 50, 1.2f);
+
+    // bypass switch legends + effect lamp
     {
-        juce::Graphics::ScopedSaveState ss (g);
-        const auto sigPos = juce::Point<float> (pl.getX() + 14, pl.getBottom() + 8);
-        g.addTransform (juce::AffineTransform::rotation (-0.06f, sigPos.x, sigPos.y + 30));
+        const auto sw = bypassSwitch.getBounds().toFloat();
         g.setColour (ink);
-        g.setFont (juce::FontOptions (scriptFace).withHeight (48.0f));
-        g.drawText ("DubMastor", juce::Rectangle<float> (sigPos.x, sigPos.y, 260, 52), juce::Justification::centredLeft);
-        juce::Path swash;
-        swash.startNewSubPath (sigPos.x + 10, sigPos.y + 54);
-        swash.cubicTo (sigPos.x + 80, sigPos.y + 46, sigPos.x + 170, sigPos.y + 60, sigPos.x + 236, sigPos.y + 44);
-        g.strokePath (swash, juce::PathStrokeType (1.8f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.08f));
+        g.drawText ("ON", juce::Rectangle<float> (sw.getRight() + 2, sw.getY() + 2, 60, 12), juce::Justification::centredLeft);
+        g.drawText ("BYPASS", juce::Rectangle<float> (sw.getRight() + 2, sw.getBottom() - 14, 60, 12), juce::Justification::centredLeft);
+        const bool on = ! bypassSwitch.getToggleState();
+        const auto lp = bypassLamp;
+        g.setColour (juce::Colour (0xff8a8a8a));
+        g.fillEllipse (lp.x - 13, lp.y - 13, 26, 26);
+        g.setColour (juce::Colours::black.withAlpha (0.4f));
+        g.drawEllipse (lp.x - 13, lp.y - 13, 26, 26, 1.0f);
+        if (on)
+        {
+            g.setGradientFill (juce::ColourGradient (juce::Colour (0x88ff3b2f), lp.x, lp.y, juce::Colour (0x00ff3b2f), lp.x + 22, lp.y, true));
+            g.fillEllipse (lp.x - 22, lp.y - 22, 44, 44);
+            g.setGradientFill (juce::ColourGradient (juce::Colour (0xffffd0c0), lp.x - 3, lp.y - 3, juce::Colour (0xffd8231a), lp.x + 8, lp.y + 8, true));
+        }
+        else
+            g.setGradientFill (juce::ColourGradient (juce::Colour (0xff7a3a32), lp.x - 3, lp.y - 3, juce::Colour (0xff3a0e0a), lp.x + 8, lp.y + 8, true));
+        g.fillEllipse (lp.x - 9, lp.y - 9, 18, 18);
+        g.setColour (juce::Colours::white.withAlpha (0.5f));
+        g.fillEllipse (lp.x - 5, lp.y - 6, 4, 3);
+        g.setColour (ink);
+        g.drawText ("EFFECT ON", juce::Rectangle<float> (lp.x + 18, lp.y - 7, 90, 14), juce::Justification::centredLeft);
     }
 
-    // origin + pilot lamp
-    auto tp = topPanel.toFloat();
-    g.setColour (ink.withAlpha (0.85f));
-    g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.1f));
-    g.drawText ("FEITO NO BRASIL", juce::Rectangle<float> (pl.getX() + 8, tp.getBottom() - 34, 200, 14), juce::Justification::left);
-    const auto lamp = juce::Point<float> (pl.getRight() - 22, tp.getBottom() - 27);
-    g.setColour (juce::Colour (0xff8a8a8a));
-    g.fillEllipse (lamp.x - 13, lamp.y - 13, 26, 26);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xffffe0a0), lamp.x - 4, lamp.y - 4,
-                                             juce::Colour (0xffd2560c), lamp.x + 9, lamp.y + 9, true));
-    g.fillEllipse (lamp.x - 9, lamp.y - 9, 18, 18);
-    g.setColour (ink);
-    g.setFont (juce::FontOptions (10.0f, juce::Font::bold));
-    g.drawText ("POWER", juce::Rectangle<float> (lamp.x - 78, lamp.y - 7, 58, 14), juce::Justification::right);
+    // "DubMastor" signature, brush script, bottom-right corner of the dark panel
+    {
+        juce::Graphics::ScopedSaveState ss (g);
+        const auto sa = sigArea.toFloat();
+        g.addTransform (juce::AffineTransform::rotation (-0.07f, sa.getRight(), sa.getCentreY()));
+        g.setFont (juce::FontOptions (scriptFace).withHeight (38.0f));
+        const auto txt = juce::Rectangle<float> (sa.getX(), sa.getY() - 16, sa.getWidth() - 20, 42);
+        g.setColour (juce::Colours::black.withAlpha (0.6f));
+        g.drawText ("DubMastor", txt.translated (1.5f, 2.0f), juce::Justification::centredRight);
+        g.setColour (cream);
+        g.drawText ("DubMastor", txt, juce::Justification::centredRight);
+        juce::Path swash;
+        const float x1 = sa.getRight() - 22, y1 = sa.getBottom() - 14;
+        swash.startNewSubPath (x1 - 190, y1 + 2);
+        swash.cubicTo (x1 - 130, y1 - 4, x1 - 60, y1 + 4, x1, y1 - 6);
+        g.setColour (amber.withAlpha (0.85f));
+        g.strokePath (swash, juce::PathStrokeType (2.2f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+    }
 
     // graphic EQ captions
     auto eq = eqArea.toFloat();
     g.setColour (cream.withAlpha (0.85f));
     g.setFont (juce::FontOptions (11.0f, juce::Font::bold));
-    g.drawText ("GRAPHIC EQ  (ECHO + REVERB)", eq.withHeight (18.0f).withTrimmedLeft (8), juce::Justification::centredLeft);
+    g.drawText ("GRAPHIC EQ", eq.withHeight (26.0f).withTrimmedLeft (10), juce::Justification::centredLeft);
     if (auto* f0 = &eqFaders[0].slider; f0->getHeight() > 0)
     {
         const float thumbR = (float) lnf.getSliderThumbRadius (*f0);
@@ -334,46 +541,108 @@ void FitaEcoEditor::drawTapeTransport (juce::Graphics& g)
     // tape loop path
     juce::Path loop;
     loop.addRoundedRectangle (L - rad, T, (R - L) + 2 * rad, B - T, rad);
-    g.setColour (juce::Colour (0xff4a2e18));
-    g.strokePath (loop, juce::PathStrokeType (7.0f));
-    // moving oxide marks (show tape speed)
-    g.setColour (juce::Colour (0xff6b4626));
     const float perim = loop.getLength();
-    for (float d = std::fmod (tapePhase, 14.0f); d < perim; d += 14.0f)
+
+    g.setColour (juce::Colours::black.withAlpha (0.55f));                 // shadow of the tape on the deck
+    g.strokePath (loop, juce::PathStrokeType (9.0f), juce::AffineTransform::translation (1.5f, 3.5f));
+    g.setColour (juce::Colour (0xff1e1008));                               // tape edges
+    g.strokePath (loop, juce::PathStrokeType (9.0f));
+    g.setColour (juce::Colour (0xff5a361b));                               // oxide coating
+    g.strokePath (loop, juce::PathStrokeType (7.0f));
+    g.setColour (juce::Colour (0xff7d4f2a).withAlpha (0.85f));             // sheen band along the middle
+    g.strokePath (loop, juce::PathStrokeType (2.6f));
+
+    // moving grain: irregular light/dark specks that travel with the tape (speed = repeat rate)
     {
-        const auto pt = loop.getPointAlongPath (d);
-        g.fillEllipse (pt.x - 1.5f, pt.y - 1.5f, 3.0f, 3.0f);
+        const float step = 3.5f;
+        const int base = (int) std::floor (tapePhase / step);
+        const float off = tapePhase - (float) base * step;
+        int k = 0;
+        for (float d = off; d < perim; d += step, ++k)
+        {
+            const auto id = (juce::uint32) (k - base);
+            const juce::uint32 h = (id * 2654435761u) ^ (id >> 7);
+            const float a = (float) ((h >> 8) & 255) / 255.0f;
+            if (a < 0.45f) continue;
+            const auto pt = loop.getPointAlongPath (d);
+            const bool light = (h & 1) != 0;
+            const float jitter = (float) ((h >> 16) & 7) / 7.0f * 4.0f - 2.0f;  // across the tape width
+            const auto nxt = loop.getPointAlongPath (juce::jmin (perim, d + 0.8f));
+            const auto dirv = (nxt - pt);
+            const float len = juce::jmax (0.001f, std::sqrt (dirv.x * dirv.x + dirv.y * dirv.y));
+            const juce::Point<float> nrm (-dirv.y / len, dirv.x / len);
+            const auto q = pt + nrm * jitter;
+            g.setColour (light ? juce::Colour (0xffb07a46).withAlpha (0.25f + 0.35f * a) : juce::Colour (0xff1a0d05).withAlpha (0.20f + 0.30f * a));
+            g.fillEllipse (q.x - 1.2f, q.y - 0.8f, 2.4f, 1.6f);
+        }
+    }
+    g.setColour (juce::Colours::white.withAlpha (0.10f));                  // thin specular edge
+    g.strokePath (loop, juce::PathStrokeType (1.0f), juce::AffineTransform::translation (0.0f, -3.0f));
+
+    // flanged chrome guide wheels, rubber pinch roller, polished capstan
+    auto wheel = [&g] (juce::Point<float> c, float r, float spin, bool rubber)
+    {
+        g.setColour (juce::Colours::black.withAlpha (0.5f));
+        g.fillEllipse (c.x - r + 2, c.y - r + 3, r * 2, r * 2);
+        if (rubber)
+        {
+            g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2c2c2c), c.x - r, c.y - r, juce::Colour (0xff050505), c.x + r, c.y + r, false));
+            g.fillEllipse (c.x - r, c.y - r, r * 2, r * 2);
+            g.setColour (juce::Colours::white.withAlpha (0.10f));
+            juce::Path sheen;
+            sheen.addCentredArc (c.x, c.y, r * 0.8f, r * 0.8f, 0.0f, spin, spin + 1.2f, true);
+            g.strokePath (sheen, juce::PathStrokeType (1.5f));
+        }
+        else
+        {
+            g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff2f2f0), c.x - r, c.y - r, juce::Colour (0xff5c5c5a), c.x + r, c.y + r, false));
+            g.fillEllipse (c.x - r, c.y - r, r * 2, r * 2);
+            g.setColour (juce::Colours::black.withAlpha (0.35f));
+            g.drawEllipse (c.x - r * 0.86f, c.y - r * 0.86f, r * 1.72f, r * 1.72f, 1.0f); // flange step
+        }
+        const float hub = r * (rubber ? 0.45f : 0.62f);
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xffe6e6e4), c.x - hub, c.y - hub, juce::Colour (0xff6e6e6c), c.x + hub, c.y + hub, false));
+        g.fillEllipse (c.x - hub, c.y - hub, hub * 2, hub * 2);
+        g.setColour (juce::Colour (0xff1c1c1c));                         // rotating holes
+        for (int i = 0; i < 3; ++i)
+        {
+            const auto hp = c.getPointOnCircumference (hub * 0.55f, spin + (float) i * 2.0944f);
+            const float hr = hub * 0.2f;
+            g.fillEllipse (hp.x - hr, hp.y - hr, hr * 2, hr * 2);
+        }
+        g.setColour (juce::Colour (0xff333333));
+        g.fillEllipse (c.x - 2.2f, c.y - 2.2f, 4.4f, 4.4f);
+        g.setColour (juce::Colours::white.withAlpha (0.6f));
+        g.fillEllipse (c.x - r * 0.55f, c.y - r * 0.62f, r * 0.35f, r * 0.22f);
+    };
+    wheel ({ L - rad + 26.0f, cy }, 22.0f, tapePhase * 0.05f, false);
+    wheel ({ R + rad - 26.0f, cy }, 22.0f, tapePhase * 0.05f, false);
+    wheel ({ R - 20.0f, B - 12.0f }, 14.0f, -tapePhase * 0.08f, true);   // pinch roller
+    {
+        const auto cap = juce::Point<float> (R - 20.0f, B + 12.0f);          // capstan shaft
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xffffffff), cap.x - 5, cap.y - 5, juce::Colour (0xff707070), cap.x + 5, cap.y + 5, false));
+        g.fillEllipse (cap.x - 5.5f, cap.y - 5.5f, 11.0f, 11.0f);
+        g.setColour (juce::Colour (0xff2a2a2a));
+        g.drawLine ({ cap, cap.getPointOnCircumference (5.0f, tapePhase * 0.25f) }, 1.4f);
     }
 
-    // guide rollers + capstan with pinch roller
-    auto roller = [&g] (juce::Point<float> c, float r, float spin)
-    {
-        g.setGradientFill (juce::ColourGradient (juce::Colour (0xffd0d0d0), c.x - r, c.y - r,
-                                                 juce::Colour (0xff6a6a6a), c.x + r, c.y + r, false));
-        g.fillEllipse (c.x - r, c.y - r, r * 2, r * 2);
-        g.setColour (juce::Colour (0xff2a2a2a));
-        for (int i = 0; i < 3; ++i)
-            g.drawLine ({ c, c.getPointOnCircumference (r * 0.8f, spin + (float) i * 2.0944f) }, 1.5f);
-        g.fillEllipse (c.x - 3, c.y - 3, 6, 6);
-    };
-    roller ({ L - rad + 26.0f, cy }, 22.0f, tapePhase * 0.05f);
-    roller ({ R + rad - 26.0f, cy }, 22.0f, tapePhase * 0.05f);
-    roller ({ R - 20.0f, B + 13.0f }, 9.0f, tapePhase * 0.2f); // capstan (below tape)
-    g.setColour (juce::Colour (0xff151515));
-    g.fillEllipse (R - 34.0f, B - 26.0f, 28, 28);              // rubber pinch roller
-
-    // heads along the bottom run: ERASE, REC, 1, 2, 3
+    // heads along the bottom run: ERASE, REC, 1, 2, 3 (metal shields with a gap and two screws)
     const int mask = fitaeco::TapeEcho::headMask (juce::jlimit (1, 12, shownMode));
     const char* hn[] = { "ERASE", "REC", "1", "2", "3" };
     g.setFont (juce::FontOptions (9.5f, juce::Font::bold));
     for (int h = 0; h < 5; ++h)
     {
         const float hx = L + 40.0f + (float) h * ((R - L - 90.0f) / 4.0f);
-        g.setGradientFill (juce::ColourGradient (juce::Colour (0xffb8b8b8), hx - 12, B - 2,
-                                                 juce::Colour (0xff5e5e5e), hx + 12, B + 20, false));
-        g.fillRoundedRectangle (hx - 12, B - 1, 24, 20, 3.0f);
-        g.setColour (juce::Colour (0xff1a1a1a));
-        g.drawLine (hx, B - 1, hx, B + 4, 1.0f); // head gap
+        g.setColour (juce::Colours::black.withAlpha (0.5f));
+        g.fillRoundedRectangle (hx - 11, B + 1, 24, 20, 3.0f);
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xffd8d8d6), hx - 12, B - 2,
+                                                 juce::Colour (0xff56565a), hx + 12, B + 20, false));
+        g.fillRoundedRectangle (hx - 12, B - 2, 24, 20, 3.0f);
+        g.setColour (juce::Colour (0xff101010));
+        g.drawLine (hx, B - 2, hx, B + 5, 1.2f);                         // head gap
+        g.setColour (juce::Colour (0xff3a3a3a));
+        g.fillEllipse (hx - 9, B + 11, 3.5f, 3.5f);
+        g.fillEllipse (hx + 5.5f, B + 11, 3.5f, 3.5f);
         const bool on = h <= 1 ? (h == 1) : (mask & (1 << (h - 2))) != 0;
         g.setColour (on ? amber : lampOff);
         g.fillEllipse (hx - 4, B + 24, 8, 8);
@@ -533,6 +802,8 @@ void FitaEcoEditor::resized()
         tapeWindow = tp.reduced (24, 22);
     }
     status.setBounds (tapeWindow.getX() + 14, tapeWindow.getY() + 8, 300, 18);
+    bypassSwitch.setBounds ((int) plateArea.getX() + 8, kTopH - 70, 42, 60);
+    bypassLamp = { plateArea.getX() + 170.0f, (float) kTopH - 40.0f };
 
     auto rows = bottomPanel.reduced (10, 0).withTrimmedTop (12).withTrimmedBottom (10);
     auto rowA = rows.removeFromTop (222);
@@ -557,7 +828,14 @@ void FitaEcoEditor::resized()
     // row B: graphic EQ on the left, small utility knobs on the right
     eqArea = rowB.removeFromLeft (460);
     auto faders = eqArea.reduced (8, 6);
-    faders.removeFromTop (16);   // caption
+    {
+        auto caption = faders.removeFromTop (22);   // "GRAPHIC EQ" + preset keys
+        caption.removeFromLeft (100);
+        const int pw = 62;
+        caption.removeFromLeft (caption.getWidth() - kNumEqPresets * pw - 4);
+        for (auto& b : eqPresets) b.setBounds (caption.removeFromLeft (pw).reduced (2, 1));
+    }
+    faders.removeFromTop (4);
     faders.removeFromLeft (30);  // dB scale
     auto freqRow = faders.removeFromBottom (14);
     const int fw = faders.getWidth() / kNumEq;
@@ -567,6 +845,7 @@ void FitaEcoEditor::resized()
         f.slider.setBounds (faders.removeFromLeft (fw).reduced (8, 0));
         f.label.setBounds (freqRow.removeFromLeft (fw));
     }
+    sigArea = rowB.removeFromBottom (44);
     const int ws = 96;
     rowB.removeFromLeft ((rowB.getWidth() - (kNumKnobs - kNumBig - kNumMedium) * ws) / 2);
     for (int i = kNumBig + kNumMedium; i < kNumKnobs; ++i) place (knobs[(size_t) i], rowB.removeFromLeft (ws), 15);
@@ -672,11 +951,6 @@ void FitaEcoEditor::renderBackground()
 
     drawVuFace (g);
 
-    // panel seam with chrome trim strip
-    g.setColour (juce::Colour (0xff111111));
-    g.fillRect ((float) kWood, tH - 2.0f, w - 2.0f * kWood, 6.0f);
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xffd8d8d8), 0, tH - 1, juce::Colour (0xff6c6c6c), 0, tH + 3, false));
-    g.fillRect ((float) kWood, tH - 1.0f, w - 2.0f * kWood, 3.0f);
 
     // engraved dividers (row A / row B, EQ / small knobs)
     auto engrave = [&g] (float x0, float y0, float x1, float y1)
@@ -732,10 +1006,33 @@ void FitaEcoEditor::renderBackground()
         g.drawLine (cx - r * 0.7f * std::cos (a), cy - r * 0.7f * std::sin (a),
                     cx + r * 0.7f * std::cos (a), cy + r * 0.7f * std::sin (a), 1.5f);
     };
-    for (float sy : { 12.0f, tH - 14.0f, h - 12.0f })
+    for (float sy : { 16.0f, tH - 18.0f, h - 16.0f })
     {
-        screw (kWood + 12.0f, sy);
-        screw (w - kWood - 12.0f, sy);
+        screw (kWood + 16.0f, sy);
+        screw (w - kWood - 16.0f, sy);
+    }
+
+    // the enamel and the dark panel are separate plates with rounded corners, set in a dark frame
+    {
+        const float r = 14.0f, gap = 3.0f;
+        const auto frame = juce::Rectangle<float> ((float) kWood, 0.0f, w - 2.0f * kWood, h);
+        const auto enamelPlate = juce::Rectangle<float> ((float) kWood + gap, gap, w - 2.0f * kWood - 2 * gap, tH - 2 * gap);
+        const auto darkPlate   = juce::Rectangle<float> ((float) kWood + gap, tH + gap, w - 2.0f * kWood - 2 * gap, h - tH - 2 * gap);
+        juce::Path outside;
+        outside.addRectangle (frame);
+        outside.addRoundedRectangle (enamelPlate, r);
+        outside.addRoundedRectangle (darkPlate, r);
+        outside.setUsingNonZeroWinding (false);
+        g.setColour (juce::Colour (0xff0e0c0a));
+        g.fillPath (outside);
+        g.setColour (juce::Colours::white.withAlpha (0.45f));            // bevel: light top edge, dark outline
+        g.drawRoundedRectangle (enamelPlate.reduced (1.0f).withTrimmedBottom (2.0f), r - 1.0f, 1.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.6f));
+        g.drawRoundedRectangle (enamelPlate, r, 1.2f);
+        g.setColour (juce::Colours::white.withAlpha (0.10f));
+        g.drawRoundedRectangle (darkPlate.reduced (1.0f), r - 1.0f, 1.0f);
+        g.setColour (juce::Colours::black);
+        g.drawRoundedRectangle (darkPlate, r, 1.2f);
     }
 
     // wooden end cheeks

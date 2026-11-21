@@ -27,6 +27,7 @@ APVTS::ParameterLayout FitaEcoProcessor::createLayout()
     knob ("age",       "Tape Age",     0.3f);
     knob ("dry",       "Dry Level",    1.0f);
     knob ("output",    "Output",       0.8f);
+    p.push_back (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "bypass", 1 }, "Bypass", false));
     return { p.begin(), p.end() };
 }
 
@@ -43,6 +44,7 @@ FitaEcoProcessor::FitaEcoProcessor()
         pEq[(size_t) b] = apvts.getRawParameterValue ("eq" + juce::String (b + 1));
     pWow = apvts.getRawParameterValue ("wow");           pAge = apvts.getRawParameterValue ("age");
     pDry = apvts.getRawParameterValue ("dry");           pOutput = apvts.getRawParameterValue ("output");
+    bypassParam = dynamic_cast<juce::AudioParameterBool*> (apvts.getParameter ("bypass"));
 }
 
 bool FitaEcoProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -57,6 +59,9 @@ void FitaEcoProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     echo.prepare (sampleRate);
     monoScratch.setSize (2, samplesPerBlock);
+    dryCopy.setSize (2, samplesPerBlock);
+    bypassMix.reset (sampleRate, 0.02);
+    bypassMix.setCurrentAndTargetValue (bypassParam != nullptr && bypassParam->get() ? 1.0f : 0.0f);
 }
 
 void FitaEcoProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
@@ -65,6 +70,7 @@ void FitaEcoProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     const int n = buffer.getNumSamples();
     const int inCh = getTotalNumInputChannels(), outCh = getTotalNumOutputChannels();
     if (monoScratch.getNumSamples() < n) monoScratch.setSize (2, n, false, false, true);
+    if (dryCopy.getNumSamples() < n)     dryCopy.setSize (2, n, false, false, true);
 
     fitaeco::Params prm;
     prm.input = pInput->load();          prm.mode = (int) pMode->load();
@@ -81,6 +87,22 @@ void FitaEcoProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     float* oR = monoScratch.getWritePointer (1);
     echo.process (inL, inR, oL, oR, n);
     recVu.store (juce::Decibels::gainToDecibels (echo.getRecRms() / fitaeco::TapeEcho::kRecRef, -60.0f));
+
+    // bypass: crossfade to the untouched input (the tape keeps running underneath)
+    dryCopy.copyFrom (0, 0, inL, n);
+    dryCopy.copyFrom (1, 0, inR, n);
+    bypassMix.setTargetValue (bypassParam != nullptr && bypassParam->get() ? 1.0f : 0.0f);
+    if (bypassMix.isSmoothing() || bypassMix.getTargetValue() > 0.0f)
+    {
+        const float* dL = dryCopy.getReadPointer (0);
+        const float* dR = dryCopy.getReadPointer (1);
+        for (int i = 0; i < n; ++i)
+        {
+            const float b = bypassMix.getNextValue();
+            oL[i] += b * (dL[i] - oL[i]);
+            oR[i] += b * (dR[i] - oR[i]);
+        }
+    }
 
     buffer.copyFrom (0, 0, oL, n);
     if (outCh > 1) buffer.copyFrom (1, 0, oR, n);

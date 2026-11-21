@@ -18,7 +18,8 @@ Plugin de delay de fita inspirado nos ecos de fita clássicos de 3 cabeças dos 
 | REPEAT RATE | Velocidade da fita. Mudar durante a execução dobra o pitch, como fita de verdade |
 | INTENSITY | Realimentação. Acima de ~0,8 (1 cabeça) ou ~0,7 (várias) entra em auto-oscilação |
 | ECHO VOL / REVERB VOL | Volume dos ecos e da mola |
-| GRAPHIC EQ | 6 faders (100, 250, 630, 1,6k, 4k, 10 kHz), ±12 dB, no eco + reverb. Duplo clique zera |
+| GRAPHIC EQ | 6 faders (100, 250, 630, 1,6k, 4k, 10 kHz), ±12 dB, no eco + reverb. Duplo clique zera. Presets: **FLAT**, **HPF** (corta graves), **LPF** (corta agudos) e **HPF+LPF** (som de rádio) |
+| BYPASS | Chave de alavanca: para cima = efeito ligado (lâmpada **EFFECT ON** acesa), para baixo = bypass sem estalo. Também responde ao bypass da DAW |
 | WOW/FLUTTER | Instabilidade da fita (wow lento ~0,6 Hz + flutter ~7 Hz + deriva aleatória) |
 | TAPE AGE | Fita gasta: mais chiado, mais saturação, cabeças mais escuras |
 | DRY / OUTPUT | Nível do sinal seco e saída geral |
@@ -87,6 +88,6 @@ citadas apenas como referência histórica.
 
 ## Fontes embutidas
 - **Archivo Black** (placa metálica) — SIL Open Font License, ver `Resources/licenses/ArchivoBlack-OFL.txt`
-- **TeX Gyre Chorus** (assinatura DubMastor) — GUST Font License, ver `Resources/licenses/TeXGyreChorus-GUST-FONT-LICENSE.txt`
+- **Kaushan Script** (assinatura DubMastor) — SIL Open Font License, ver `Resources/licenses/KaushanScript-OFL.txt`
 
 As fontes são compiladas dentro do plugin (`juce_add_binary_data`), então a interface fica igual em qualquer sistema.
