@@ -1,8 +1,12 @@
-## Dub Bass - Dub Station 1.2 🟢🟡⚫
+## Dub Bass - Dub Station 1.3 🟢🟡⚫
 
-Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, ou o 808 com o pitch caindo.
+Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, o 808 com o pitch caindo, ou o Super Tone digital da era King Jammy.
 
-**Novo na 1.2**
+**Novo na 1.3**
+- **SUPER TONE**: terceiro timbre, o baixo digital do Super Power do King Jammy (era Sleng Teng). Quadrada sem aliasing com o peso da senoide e o grão de 7 bits do teclado Casio dos anos 80
+- A válvula (saturação) e o reverb agora começam **desligados**: o baixo sai limpo e seco, e você liga o que quiser
+
+**Na 1.2**
 - **Teclado** de C1 a C4 no padrão Dub Station: teclas de marfim e baquelite, barra cromada com feltro vermelho e lâmpada âmbar nas teclas tocadas. Toca clicando e acende com o MIDI da DAW
 - Display da nota na mesma numeração do teclado (55 Hz = A1)
 

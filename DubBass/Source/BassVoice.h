@@ -13,7 +13,7 @@
 class BassVoice
 {
 public:
-    enum class Mode { ClassicSine = 0, Eight08 = 1 };
+    enum class Mode { ClassicSine = 0, Eight08 = 1, SuperTone = 2 };
 
     struct Params
     {
@@ -158,6 +158,9 @@ public:
 
         s /= norm;
 
+        if (params.mode == Mode::SuperTone)
+            s = superTone (ph, freq);
+
         if (params.mode == Mode::Eight08)
         {
             static const float k = 1.0f / std::tanh (1.8f);
@@ -168,6 +171,40 @@ public:
     }
 
 private:
+    //==========================================================================
+    // SUPER TONE: o baixo digital da era Super Power / Sleng Teng (teclado Casio dos anos 80).
+    // Quadrada com polyBLEP (sem aliasing) + um pouco de senoide para o peso, oitava acima
+    // bem baixa, e o grão digital de poucos bits (quantização em 7 bits).
+    static float polyBlep (double t, double dt) noexcept
+    {
+        if (t < dt)        { t /= dt; return (float) (t + t - t * t - 1.0); }
+        if (t > 1.0 - dt)  { t = (t - 1.0) / dt; return (float) (t * t + t + t + 1.0); }
+        return 0.0f;
+    }
+
+    float superTone (float ph, double freq) noexcept
+    {
+        constexpr double twoPi = juce::MathConstants<double>::twoPi;
+        const double t  = (double) ph / twoPi;
+        const double dt = freq / sampleRate;
+
+        float sq = t < 0.5 ? 1.0f : -1.0f;                   // quadrada 50 %
+        sq += polyBlep (t, dt);
+        sq -= polyBlep (std::fmod (t + 0.5, 1.0), dt);
+
+        // passa-baixa de 1 polo acompanhando a nota: corpo "oco" do timbre de teclado
+        const float a = (float) (1.0 - std::exp (-juce::MathConstants<double>::twoPi * std::min (freq * 9.0, sampleRate * 0.4) / sampleRate));
+        stLp += a * (sq - stLp);
+
+        float s = 0.62f * stLp + 0.48f * std::sin (ph) + 0.10f * std::sin (2.0f * ph);
+
+        constexpr float steps = 63.0f;                      // 7 bits
+        s = std::round (s * steps) / steps;
+        return s * 0.92f;
+    }
+
+    float stLp = 0.0f;
+
     //==========================================================================
     // Envelope ADSR com decay/release exponenciais (soa mais natural no 808)
     struct Envelope

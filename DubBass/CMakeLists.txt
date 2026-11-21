@@ -5,7 +5,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # versão: aparece na plaqueta de latão da interface ("DUB STATION 1.1") e no plugin
-project(DubBass VERSION 1.2.0)
+project(DubBass VERSION 1.3.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

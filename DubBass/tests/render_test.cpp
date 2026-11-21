@@ -79,11 +79,21 @@ int main (int argc, char** argv)
     check (pk <= -0.29f, "808 + boost + drive alto: pico " + juce::String (pk, 2) + " dBFS respeita o teto");
     check (p.gainReductionDb.load() < -0.5f || p.driveLevel.load() >= 0.0f, "maximizer reduzindo ganho / medidores ativos");
 
+    setP (p, ParamID::mode, 2); setP (p, ParamID::boost, 0); setP (p, ParamID::drive, 6); setP (p, ParamID::maxGain, 3);
+    pk = play (p, 48000.0, dir.getChildFile ("supertone.wav"), nan);
+    check (pk <= -0.29f && pk > -12.0f, "Super Tone: pico " + juce::String (pk, 2) + " dBFS respeita o teto");
+
+    DubBassAudioProcessor fresh;
+    check (fresh.apvts.getRawParameterValue (ParamID::drvOn)->load() < 0.5f
+           && fresh.apvts.getRawParameterValue (ParamID::revOn)->load() < 0.5f, "valvula e reverb comecam desligados");
+
+    setP (p, ParamID::mode, 1); setP (p, ParamID::boost, 1); setP (p, ParamID::drive, 20); setP (p, ParamID::maxGain, 12);
     setP (p, ParamID::maxBypass, 1);
     pk = play (p, 48000.0, {}, nan);
     check (pk > -0.3f, "BYPASS do maximizer deixa passar acima do teto (" + juce::String (pk, 2) + " dBFS)");
     setP (p, ParamID::maxBypass, 0);
 
+    setP (p, ParamID::drvOn, 1); setP (p, ParamID::revOn, 1);
     setP (p, ParamID::drvType, 2); setP (p, "eq2", 6.0f); setP (p, "eq6", -8.0f);
     pk = play (p, 96000.0, {}, nan);
     check (pk <= -0.29f, "Fuzz + EQ a 96 kHz respeita o teto");
@@ -97,7 +107,8 @@ int main (int argc, char** argv)
            "estado salva e carrega");
 
     // interface: válvula quente, nota tocando e medidores cheios
-    setP (p, ParamID::mode, 0); setP (p, ParamID::drvType, 0); setP (p, ParamID::drive, 18);
+    setP (p, ParamID::mode, 2); setP (p, ParamID::drvType, 0); setP (p, ParamID::drive, 18);
+    setP (p, ParamID::drvOn, 1);
     play (p, 48000.0, {}, nan);
     std::unique_ptr<juce::AudioProcessorEditor> ed (p.createEditor());
     {

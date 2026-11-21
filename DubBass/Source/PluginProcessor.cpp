@@ -94,7 +94,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubBassAudioProcessor::creat
     };
 
     // OSC
-    addChoice (ParamID::mode, "Mode", { "Classic Sine", "808" }, 0);
+    addChoice (ParamID::mode, "Mode", { "Classic Sine", "808", "Super Tone" }, 0);
     addFloat  (ParamID::harm2,     "Harmonic 2",  { 0.0f, 1.0f }, 0.15f, fmtPct);
     addFloat  (ParamID::harm3,     "Harmonic 3",  { 0.0f, 1.0f }, 0.08f, fmtPct);
     addFloat  (ParamID::glide,     "Glide",       skewed (0.0f, 500.0f, 80.0f), 20.0f, fmtMs);
@@ -110,7 +110,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubBassAudioProcessor::creat
     addFloat (ParamID::reso,    "Resonance", skewed (0.5f, 6.0f, 1.2f), 0.8f, fmtQ);
 
     // DRIVE
-    addBool   (ParamID::drvOn,   "Drive On", true);
+    addBool   (ParamID::drvOn,   "Drive On", false);   // válvula começa desligada
     addChoice (ParamID::drvType, "Drive Type", { "Tube", "Tape", "Fuzz" }, 0);
     addFloat  (ParamID::drive,   "Drive",      { 0.0f, 36.0f }, 6.0f, fmtDb);
     addFloat  (ParamID::drvTone, "Drive Tone", skewed (400.0f, 16000.0f, 2500.0f), 5000.0f, fmtHz);
@@ -126,7 +126,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubBassAudioProcessor::creat
     }
 
     // REVERB
-    addBool  (ParamID::revOn,     "Reverb On", true);
+    addBool  (ParamID::revOn,     "Reverb On", false);  // reverb começa desligado
     addFloat (ParamID::revSize,   "Reverb Size",    { 0.0f, 1.0f }, 0.6f, fmtPct);
     addFloat (ParamID::revDamp,   "Reverb Damping", { 0.0f, 1.0f }, 0.5f, fmtPct);
     addFloat (ParamID::revWidth,  "Reverb Width",   { 0.0f, 1.0f }, 1.0f, fmtPct);
@@ -217,7 +217,7 @@ void DubBassAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 void DubBassAudioProcessor::updateVoiceParams()
 {
     BassVoice::Params vp;
-    vp.mode        = prm.mode->load() > 0.5f ? BassVoice::Mode::Eight08 : BassVoice::Mode::ClassicSine;
+    vp.mode        = (BassVoice::Mode) juce::jlimit (0, 2, juce::roundToInt (prm.mode->load()));
     vp.harm2       = prm.harm2->load();
     vp.harm3       = prm.harm3->load();
     vp.glideMs     = prm.glide->load();

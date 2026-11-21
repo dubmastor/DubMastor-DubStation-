@@ -1,4 +1,4 @@
-# Dub Bass - Dub Station 1.2
+# Dub Bass - Dub Station 1.3
 
 Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, plaqueta de latão com a versão, knobs de baquelite e lâmpadas âmbar.
 
@@ -7,7 +7,7 @@ Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · 
 ## Cadeia de sinal
 
 ```
-OSCILADOR (Classic Sine + harmônicos | 808) → FILTRO → ENVELOPE → VÁLVULA / SATURAÇÃO (2x oversampling)
+OSCILADOR (Classic Sine + harmônicos | 808 | Super Tone) → FILTRO → ENVELOPE → VÁLVULA / SATURAÇÃO (2x oversampling)
 → EQ GRÁFICO 10 bandas → REVERB (envio paralelo com low cut) → BASS BOOST 60 Hz +4 dB
 → MAXIMIZER (lookahead 1.5 ms, com BYPASS) → VOLUME
 ```
@@ -16,12 +16,12 @@ OSCILADOR (Classic Sine + harmônicos | 808) → FILTRO → ENVELOPE → VÁLVUL
 
 | Seção | O que tem |
 |---|---|
-| **Oscilador** | Teclas CLASSIC SINE / 808, Harm 2, Harm 3, Glide, 808 Pitch e 808 Tempo (só acendem no modo 808) |
+| **Oscilador** | Teclas SINE / 808 / SUPER TONE, Harm 2 e Harm 3 (no Sine e no 808), Glide, 808 Pitch e 808 Tempo (só no 808). O **Super Tone** é o baixo digital da era Super Power do King Jammy (Sleng Teng): quadrada sem aliasing com peso de senoide e o grão de 7 bits do teclado Casio dos anos 80 |
 | **Envelope / Filtro** | Ataque, Decay, Sustain (desligado no 808), Release, Cutoff e Ressonância |
 | **Osciloscópio** | Tela de fósforo verde com a onda da saída, parada no cruzamento por zero |
-| **Válvula / Saturação** | ON, teclas TUBE / TAPE / FUZZ, Drive, Tom e Mix. A válvula 12AX7 esquenta com o DRIVE e com o sinal: vai do vermelho apagado ao laranja, âmbar e branco quente, com o brilho azul de válvula forçada no limite. Esquenta rápido e esfria devagar |
+| **Válvula / Saturação** | ON (começa desligada), teclas TUBE / TAPE / FUZZ, Drive, Tom e Mix. A válvula 12AX7 esquenta com o DRIVE e com o sinal: vai do vermelho apagado ao laranja, âmbar e branco quente, com o brilho azul de válvula forçada no limite. Esquenta rápido e esfria devagar |
 | **EQ gráfico** | ON, 10 faders ±12 dB (32 Hz a 16 kHz) e a curva em tela verde (mostra o Bass Boost também) |
-| **Reverb** | ON, Tamanho, Damp, Abertura, Low Cut (o grave fica seco) e Mix |
+| **Reverb** | ON (começa desligado), Tamanho, Damp, Abertura, Low Cut (o grave fica seco) e Mix |
 | **Bass Boost** | Botão verde: +4 dB em 60 Hz, antes do maximizer |
 | **Saída** | Display âmbar com a nota tocando (nome e Hz) e Volume |
 | **Teclado** | C1 a C4 no padrão Dub Station (marfim, baquelite, barra cromada com feltro vermelho): toca clicando (mais embaixo na tecla = mais forte) e acende com lâmpada âmbar nas notas que chegam da DAW |

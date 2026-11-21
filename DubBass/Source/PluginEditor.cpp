@@ -306,8 +306,12 @@ static void pushButtonCap (juce::Graphics& g, juce::Rectangle<float> r, bool on,
     g.drawEllipse (lamp, 1.0f);
 
     g.setColour (on ? colours::cream : colours::cream.withAlpha (0.5f));
-    g.setFont (stencil (11.5f, 0.12f));
-    g.drawText (text, cap.withTrimmedLeft (22.0f), juce::Justification::centred);
+    auto area = cap.withTrimmedLeft (22.0f).withTrimmedRight (3.0f);
+    float size = 11.5f;
+    while (size > 8.0f && juce::GlyphArrangement::getStringWidth (stencil (size, 0.12f), text) > area.getWidth())
+        size -= 0.5f;
+    g.setFont (stencil (size, 0.12f));
+    g.drawText (text, area, juce::Justification::centred);
 }
 
 ChoiceKeys::ChoiceKeys (juce::RangedAudioParameter& p, juce::StringArray names)
@@ -888,7 +892,7 @@ void DubKeyboard::paint (juce::Graphics& g)
 //==============================================================================
 DubBassPanel::DubBassPanel (DubBassAudioProcessor& p)
     : proc (p),
-      modeKeys (*p.apvts.getParameter (ParamID::mode), { "CLASSIC SINE", "808" }),
+      modeKeys (*p.apvts.getParameter (ParamID::mode), { "SINE", "808", "SUPER TONE" }),
       drvTypeKeys (*p.apvts.getParameter (ParamID::drvType), { "TUBE", "TAPE", "FUZZ" }),
       eqCurve (p), scope (p), keyboard (p.keyboardState), meter (p)
 {
@@ -1006,7 +1010,13 @@ void DubBassPanel::timerCallback()
                  proc.driveLevel.load());
 
     // knobs do 808 só valem no modo 808; sustain não existe no 808
-    const bool is808 = proc.apvts.getRawParameterValue (ParamID::mode)->load() > 0.5f;
+    const int  mode  = juce::roundToInt (proc.apvts.getRawParameterValue (ParamID::mode)->load());
+    const bool is808 = mode == 1;
+    for (auto* k : { &harm2, &harm3 })      // o Super Tone tem forma de onda própria
+    {
+        k->slider.setEnabled (mode != 2);
+        k->slider.setAlpha (mode == 2 ? 0.4f : 1.0f);
+    }
     for (auto* k : { &pitchAmt, &pitchTime })
     {
         k->slider.setEnabled (is808);
@@ -1219,7 +1229,7 @@ void DubBassPanel::renderBackground()
     }
     g.setColour (colours::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    g.drawText (juce::String::fromUTF8 ("REGGAE BASS SYNTH  ·  CLASSIC SINE / 808"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
+    g.drawText (juce::String::fromUTF8 ("REGGAE BASS SYNTH  ·  SINE / 808 / SUPER TONE"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
         const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
