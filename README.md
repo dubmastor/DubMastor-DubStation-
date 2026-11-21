@@ -4,8 +4,19 @@
 
 Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e testados para o **Cubase**.
 
+## 🎛️ Novo: Mastor Riddim Machine MRM-0420
+
+[![Mastor Riddim Machine MRM-0420](RiddimMachine/docs/interface-harmonia.png)](RiddimMachine/)
+
+**O Dub Chords e o Dub Drums num instrumento só.** Monte os acordes na aba **HARMONIA**, a bateria na aba
+**BATERIA**, aperte **PLAY RIDDIM** para ouvir tudo junto e **arraste o riddim inteiro** (bateria, skank e
+bubble, já alinhados, de 4 a 64 compassos) para a timeline. Um projeto começa em segundos.
+
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip)** · [Detalhes](RiddimMachine/)
+
 | Plugin | O que é | Mac | Windows | Detalhes |
 |---|---|---|---|---|
+| **Mastor Riddim Machine MRM-0420 1.0** | Instrumento / gerador MIDI: Dub Chords + Dub Drums num só, em abas (HARMONIA e BATERIA), com PLAY RIDDIM, BPM ligado e ARRASTE O RIDDIM com bateria, skank e bubble alinhados (os acordes entram depois da intro) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip) | [RiddimMachine/](RiddimMachine/) |
 | **DubMastor Big Knob 3.2** | Estação de dub: filtro big knob estilo King Tubby (com bypass), eco de fita com cabeçotes, presets de EQ e liga/desliga, sirene de dub, VUs e maximizer | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-Windows.zip) | [BigKnob/](BigKnob/) |
 | **DubMastor Roots Keys 2.2** | Instrumento: piano estilo Korg M1 e órgão estilo Hammond com Leslie, eco de fita FitaEco, flanger dub, maximizer, VUs e teclado que acende com o MIDI; aba **Dub Chords** para montar o riddim e arrastar o MIDI para a DAW; visual de teclado anos 80 no piano e de madeira e marfim no órgão | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-Windows.zip) | [RootsKeys/](RootsKeys/) |
 | **DubMastor Dub Chords 1.3** | Instrumento / gerador MIDI: escolha até 4 acordes (teclado mecânico, maior/menor, inversões com sugestão automática, contador de compassos) e ele toca o skank de piano M1 com as duas mãos e o bubble de Hammond no andamento da DAW; arraste o MIDI colorido por acorde para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.3/DubMastorDubChords-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.3/DubMastorDubChords-Windows.zip) | [DubChords/](DubChords/) |
@@ -35,6 +46,7 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Drums.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Bass Machine MBM-710.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Horns.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"
    ```
 5. Abra o Cubase.
 
@@ -60,6 +72,7 @@ DubDrums/                        DubMastor Dub Drums — gerador de bateria de r
 BassMachine/                     Mastor Bass Machine MBM-710 — gerador de linhas de baixo (usa a voz do Dub Bass no preview) (C++ / JUCE 8)
 MastorDubHorns/                  Mastor Dub Horns — naipe de metais anos 70 + Mastor Tape Echo (C++ / JUCE 8)
 site/horns/                      Mastor Dub Horns no navegador (Web Audio)
+RiddimMachine/                   Mastor Riddim Machine MRM-0420 — Dub Chords + Dub Drums em abas (C++ / JUCE 8)
 .github/workflows/
   build-bigknob.yml              compila, valida e publica o Big Knob
   build-dubstation21.yml         compila, valida e publica o Dub Station 2.6
@@ -70,6 +83,7 @@ site/horns/                      Mastor Dub Horns no navegador (Web Audio)
   build-dubdrums.yml             testa, compila, valida e publica o Dub Drums (release DubDrums-x.y a cada versão)
   build-bassmachine.yml          testa, compila, valida e publica o Bass Machine (release BassMachine-x.y a cada versão)
   build-mastordubhorns.yml       testa, compila, valida e publica o Mastor Dub Horns (release MastorDubHorns-x.y a cada versão)
+  build-mrm0420.yml              testa, compila, valida e publica o MRM-0420 (release MRM-0420-x.y a cada versão)
 ```
 
 Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. Quando uma release é publicada, os builds anexam seus instaladores a ela.

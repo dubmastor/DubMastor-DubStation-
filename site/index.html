@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DubMastor — Plugins de dub (VST3 / AU)</title>
-<meta name="description" content="Baixe os plugins DubMastor Big Knob, Dub Station 2.6, DubMastor Roots Keys, Dub Chords, Dub Bass, Dub Drums, Mastor Bass Machine e Mastor Fone — VST3 para Windows e Mac, AU para Mac. Grátis.">
+<meta name="description" content="Baixe o Mastor Riddim Machine MRM-0420 e os plugins DubMastor Big Knob, Dub Station 2.6, DubMastor Roots Keys, Dub Chords, Dub Bass, Dub Drums, Mastor Bass Machine e Mastor Fone — VST3 para Windows e Mac, AU para Mac. Grátis.">
 <meta property="og:title" content="DubMastor — Plugins de dub">
 <meta property="og:description" content="Big Knob 3.2, Dub Station 2.6, DubMastor Roots Keys, Dub Chords, Dub Bass 1.2 e Mastor Fone: filtro estilo King Tubby, eco de fita, reverb de mola, piano M1, órgão Hammond, baixo de senoide e 808 e voz de rádio, telefone e megafone. VST3 / AU, Windows e Mac.">
 <meta property="og:image" content="img/dubstation21.jpg">
@@ -156,6 +156,22 @@
   .btn.alt:active { box-shadow: 0 1px 0 #5f5f5b, inset 0 1px 0 #fff; }
   .btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 
+  /* --- destaque: Mastor Riddim Machine MRM-0420 */
+  .card.featured { grid-column: 1 / -1; box-shadow: 0 0 0 1px #000, 0 0 0 3px #8a6d2c, inset 0 1px 0 rgba(255,255,255,.06), 0 14px 34px rgba(0,0,0,.6); }
+  .card.featured .shot { aspect-ratio: auto; object-fit: contain; }
+  .card.featured h3 { font-size: 30px; }
+  .model {
+    display: inline-block; vertical-align: 4px; margin-left: 10px; padding: 4px 14px 3px;
+    font-family: "Plate", Impact, sans-serif; font-size: 18px; letter-spacing: .14em; color: #2a1d06;
+    border-radius: 4px; background: linear-gradient(#e8d390, #caab5c 45%, #b39446 55%, #86692a);
+    box-shadow: 1px 2px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6), inset 0 0 0 1px rgba(61,44,12,.6);
+    text-shadow: 0 1px 0 rgba(255,255,255,.45);
+  }
+  .badge { align-self: flex-start; font: 800 11px/1 system-ui, sans-serif; letter-spacing: .16em; color: #1a1205; background: var(--amber); padding: 5px 9px; border-radius: 3px; }
+  @media (min-width: 900px) {
+    .card.featured .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
+  }
+
   /* --- install */
   .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 8px; }
   .box {
@@ -200,13 +216,37 @@
       </div>
     </div>
     <p class="signature">DubMastor</p>
-    <p class="lead"><span class="lamp" aria-hidden="true"></span>Filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Dub Bass, baixo de senoide e 808, o Dub Drums, que monta a bateria do riddim, e o Mastor Bass Machine, que sugere a linha de baixo, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
+    <p class="lead"><span class="lamp" aria-hidden="true"></span>Novo: o <strong>Mastor Riddim Machine MRM-0420</strong>, que junta harmonia e bateria para começar o riddim em segundos. E mais: filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Dub Bass, baixo de senoide e 808, o Dub Drums, que monta a bateria do riddim, e o Mastor Bass Machine, que sugere a linha de baixo, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
   </header>
 
   <main>
     <section id="downloads">
       <h2>DOWNLOADS</h2>
       <div class="plugins">
+
+        <article class="card featured" id="mrm-0420">
+          <img class="shot" src="img/mrm0420.jpg" alt="Interface do Mastor Riddim Machine MRM-0420 nas duas abas: à esquerda a aba HARMONIA, com os quatro acordes do Dub Chords; à direita a aba BATERIA, com o Dub Drums. No alto, a placa de latão MRM-0420, as abas e a seção RIDDIM com PLAY RIDDIM, BPM, compassos e ARRASTE O RIDDIM" width="1816" height="680" loading="lazy">
+          <div class="body">
+            <span class="badge">NOVO</span>
+            <h3>Mastor Riddim Machine <span class="model">MRM-0420</span> <small>1.0</small></h3>
+            <div class="cols">
+              <div>
+                <p>O <strong>Dub Chords</strong> e o <strong>Dub Drums</strong> num instrumento só. Monte os acordes, escolha a bateria, aperte PLAY RIDDIM e arraste o riddim inteiro para a timeline: um projeto começa em segundos.</p>
+              </div>
+              <ul>
+                <li>Abas HARMONIA e BATERIA com os painéis completos dos dois plugins</li>
+                <li>PLAY RIDDIM: harmonia e bateria juntas, sem a DAW, com BPM ligado</li>
+                <li>ARRASTE O RIDDIM: bateria, skank e bubble alinhados, de 4 a 64 compassos</li>
+                <li>Com a virada de intro, os acordes entram depois dela, no play e no MIDI</li>
+              </ul>
+            </div>
+            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
+            <div class="dl">
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip">⬇ Windows<span>VST3 · zip</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
+            </div>
+          </div>
+        </article>
 
         <article class="card">
           <img class="shot" src="img/bigknob.jpg" alt="Interface do DubMastor Big Knob: painel creme com o grande botão do filtro, eco de fita, VUs de ponteiro, maximizer e sirene de dub" width="1400" height="786" loading="lazy">
@@ -414,12 +454,13 @@ xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Chor
 xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Bass - Dub Station.vst3"
 xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Drums.vst3"
 xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Horns.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Bass Machine MBM-710.vst3"</pre></li>
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Bass Machine MBM-710.vst3"
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"</pre></li>
             <li>Abra o Cubase.</li>
           </ol>
         </div>
       </div>
-      <p class="note"><strong>O plugin não apareceu?</strong> No Cubase, abra <em>Studio → VST Plug-in Manager</em> e faça um novo scan; se ele estiver na lista de bloqueados, clique em <em>Reactivate</em>. Na lista de plugins, o Dub Station aparece como <strong>FitaEco TE-12</strong>, do fabricante DubMastor. O <strong>DubMastor Roots Keys</strong>, o <strong>Dub Chords</strong>, o <strong>Dub Bass</strong>, o <strong>Dub Drums</strong> e o <strong>Mastor Bass Machine</strong> são instrumentos: carregue-os numa <em>Instrument Track</em>, não como efeito.</p>
+      <p class="note"><strong>O plugin não apareceu?</strong> No Cubase, abra <em>Studio → VST Plug-in Manager</em> e faça um novo scan; se ele estiver na lista de bloqueados, clique em <em>Reactivate</em>. Na lista de plugins, o Dub Station aparece como <strong>FitaEco TE-12</strong>, do fabricante DubMastor. O <strong>DubMastor Roots Keys</strong>, o <strong>Dub Chords</strong>, o <strong>Dub Bass</strong>, o <strong>Dub Drums</strong>, o <strong>Mastor Bass Machine</strong> e o <strong>Mastor Riddim Machine MRM-0420</strong> são instrumentos: carregue-os numa <em>Instrument Track</em>, não como efeito.</p>
     </section>
   </main>
 
