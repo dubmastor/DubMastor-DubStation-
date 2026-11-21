@@ -1,8 +1,13 @@
-# Dub Station Roots Keys 2.1
+# DubMastor Roots Keys 2.2
+
+← [Voltar para a página inicial do repositório](../README.md)
+
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.2/DubMastorRootsKeys-macOS.zip)**
 
 | Modo piano | Modo órgão |
 |---|---|
 | ![Modo piano](docs/interface-piano.png) | ![Modo órgão](docs/interface-organ.png) |
+| ![Aba Dub Chords no piano](docs/interface-dubchords-piano.png) | ![Aba Dub Chords no órgão](docs/interface-dubchords-organ.png) |
 
 Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cada vez:
 
@@ -10,6 +15,17 @@ Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cad
 - **Órgão tonewheel estilo Hammond B3** — 9 drawbars, percussão single-trigger (2º/3º harmônico, rápida/lenta), key click, overdrive valvulado e caixa Leslie com aceleração realista.
 
 Cadeia de saída: **Tape Echo FitaEco TE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
+
+## Aba DUB CHORDS — monte o riddim e arraste para a DAW
+
+O gerador de harmonia do **Dub Chords** dentro do Roots Keys. Clique em **DUB CHORDS** no cabeçalho:
+
+- **Riddims prontos**: Roots menor, One drop, Rockers, Lovers, Steppers, Nyabinghi, Dub jazz e outros, para começar rápido.
+- **4 cartões de acorde**: tônica (12 notas), tipo (maior, menor, 7, m7, maj7, m6, sus2, sus4, dim, m9), duração (1/2 a 8 compassos) e ON. O plugin escolhe a inversão mais próxima do acorde anterior (condução de vozes).
+- **Ritmo**: *Auto* segue o instrumento (skank no piano, bubble no órgão) ou escolha skank, one drop, double skank, bubble ou steppers. Registro, velocity, gate e swing.
+- **Toca no próprio instrumento**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCAR COM A DAW** segue o play, o BPM e o loop da DAW. O som passa pelo eco, flanger e maximizer, e o teclado acende junto.
+- **Grade (piano roll)**: o loop inteiro com as vozes, o baixo guia, os nomes dos acordes e o cursor da DAW.
+- **Arraste para a DAW**: a **grade inteira** é arrastável, e ainda dá para arrastar **TUDO**, **SKANK**, **BAIXO** ou **um acorde sozinho** (no cartão). Vem com o tempo do projeto e repetição x1, x2, x4 ou x8. **SALVAR .MID** grava em Documentos/Roots Keys.
 
 ## Dois visuais
 
@@ -43,7 +59,7 @@ Um preset de piano nunca altera o órgão, e vice-versa.
 
 ## Compilar
 
-O GitHub Actions (`.github/workflows/build-rootskeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `DubStationRootsKeys-Windows.zip` / `DubStationRootsKeys-macOS.zip` à release.
+O GitHub Actions (`.github/workflows/build-rootskeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `DubMastorRootsKeys-Windows.zip` / `DubMastorRootsKeys-macOS.zip` à release `RootsKeys-x.y` (uma por versão; ela não vira a "latest" do repositório).
 
 Localmente:
 ```bash
@@ -57,13 +73,19 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 - `Source/RootsKeysEngine.h` — piano, órgão, Leslie, reverb e maximizer (sem dependências)
 - `Source/TapeEchoDSP.h` — FitaEco TE-12 (cópia do Dub Station 2.1)
 - `Source/PluginProcessor.*` — parâmetros, presets, MIDI, medidores
-- `Source/PluginEditor.*` — interface com os dois visuais e a placa Dub Station
+- `Source/PluginEditor.*` — interface com os dois visuais, abas e a placa Dub Station
+- `Source/DubChordsPage.*` — aba DUB CHORDS (cartões, ritmo, grade e arrastar MIDI)
+- `Source/DubChordsEngine.h` — motor de harmonia (cópia do `DubChords/Source/DubEngine.h`) + riddims prontos
 - `Source/VintageLookAndFeel.h` — knobs, faders, chaves e visor de cada visual
 - `Source/SkinTextures.h` — texturas procedurais (plástico preto e madeira)
 - `Source/VUMeter.h` — VU analógico
 - `Resources/` — fontes Archivo Black, Michroma e RootsKeys Display (licenças OFL em `Resources/licenses/`)
 
 "Korg" e "M1" são marcas da Korg Inc.; "Hammond" e "Leslie" são marcas da Hammond Suzuki. Este projeto não é afiliado a elas — os nomes indicam apenas o estilo de timbre emulado.
+
+## Novidades da 2.2
+- Novo nome: **DubMastor Roots Keys**. O número da versão aparece no cabeçalho do plugin.
+- Aba **DUB CHORDS**: progressão de até 4 acordes, riddims prontos, grade piano roll e arrastar MIDI (tudo, skank, baixo ou um acorde) para a DAW, tocando no próprio piano/órgão.
 
 ## Novidades da 2.1
 - Novo nome: **Dub Station Roots Keys** (antes Mastor Roots Keys), com a placa Dub Station centralizada.

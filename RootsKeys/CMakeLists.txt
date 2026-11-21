@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(RootsKeys VERSION 2.1.0)
+project(RootsKeys VERSION 2.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -26,7 +26,7 @@ juce_add_plugin(RootsKeys
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Rtky
     FORMATS VST3 AU Standalone
-    PRODUCT_NAME "Dub Station Roots Keys"
+    PRODUCT_NAME "DubMastor Roots Keys"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE
@@ -44,7 +44,8 @@ juce_add_binary_data(RootsKeysFonts SOURCES
 
 target_sources(RootsKeys PRIVATE
     Source/PluginProcessor.cpp
-    Source/PluginEditor.cpp)
+    Source/PluginEditor.cpp
+    Source/DubChordsPage.cpp)
 
 target_include_directories(RootsKeys PRIVATE Source)
 

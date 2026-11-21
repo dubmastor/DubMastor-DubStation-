@@ -228,6 +228,17 @@ public:
             g.fillRect (r.reduced (1.0f).withTrimmedBottom (down ? 0.0f : 2.0f));
             return;
         }
+        if (style == "chip")   // botão pequeno (notas, salvar, abas): aceso na cor de destaque
+        {
+            const bool p = (skin == 0);
+            g.setColour (juce::Colours::black);
+            g.fillRoundedRectangle (r.reduced (0.5f), 3.0f);
+            const auto onCol = p ? lcdBg : keyOrange;
+            const auto offCol = p ? juce::Colour (0xff2a2a2c) : juce::Colour (0xff2a231e);
+            g.setColour ((on ? onCol : offCol).brighter (highlighted ? 0.12f : 0.0f).darker (down ? 0.2f : 0.0f));
+            g.fillRoundedRectangle (r.reduced (1.5f), 2.5f);
+            return;
+        }
         if (style == "pill")   // chave de modo do órgão
         {
             g.setColour (on ? ivory : juce::Colours::transparentBlack);
@@ -259,6 +270,7 @@ public:
         auto r = b.getLocalBounds().toFloat();
         g.setFont (mono (style == "reverseKey" ? 10.0f : 11.0f));
         if (style == "reverseKey")      g.setColour (on ? console : ivory);
+        else if (style == "chip")       { g.setFont (mono (10.0f)); g.setColour (on ? (skin == 0 ? lcdInk : console) : (skin == 0 ? plasticText : ivory)); }
         else if (style == "pill")       g.setColour (on ? brownInk : juce::Colour (0xffb89a74));
         else                            { g.setColour (plasticText); r.removeFromLeft (14.0f); }
         g.drawText (b.getButtonText(), r, juce::Justification::centred);

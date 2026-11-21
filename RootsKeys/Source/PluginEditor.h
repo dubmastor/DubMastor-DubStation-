@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 #include "VintageLookAndFeel.h"
 #include "VUMeter.h"
+#include "DubChordsPage.h"
 
 // Drawbar estilo Hammond: puxar PARA BAIXO aumenta o volume (0..8)
 class DrawbarComponent : public juce::Component
@@ -70,7 +71,7 @@ public:
 
     // usado pelo gerador de capturas de tela
     void applySkin (int newSkin);
-    void setMetersForScreenshot (float l, float r) { vuL.setNeedle (l); vuR.setNeedle (r); grLabel.setText ("GR -1.2", juce::dontSendNotification); updateLcd(); }
+    void setMetersForScreenshot (float l, float r) { vuL.setNeedle (l); vuR.setNeedle (r); grLabel.setText ("GR -1.2", juce::dontSendNotification); updateLcd(); if (chordsPage) chordsPage->refresh(); }
 
 private:
     using APVTS = juce::AudioProcessorValueTreeState;
@@ -85,12 +86,14 @@ private:
     RootsKeysProcessor& proc;
     VintageLookAndFeel lnf;
     juce::Typeface::Ptr plateFace, pianoTitleFace, organTitleFace;
-    int skin = -1;
+    int skin = -1, page = 0;
     juce::Image background;
-    int backgroundSkin = -1;
+    int backgroundSkin = -1, backgroundPage = -1;
 
     // cabeçalho
     juce::TextButton modePiano { "PIANO" }, modeOrgan { "ORGAN" };
+    juce::TextButton tabInstrument { "INSTRUMENTO" }, tabChords { "DUB CHORDS" };
+    std::unique_ptr<DubChordsPage> chordsPage;
 
     // piano anos 80
     LcdDisplay lcd;
@@ -132,6 +135,10 @@ private:
     void drawPlate (juce::Graphics&, juce::Rectangle<float> r);
     void updateLcd();
     void setModeParam (int m);
+    void updateVisibility();
+public:
+    void setPage (int newPage);   // 0 = instrumento, 1 = Dub Chords
+private:
     void timerCallback() override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RootsKeysEditor)

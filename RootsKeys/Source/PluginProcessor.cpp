@@ -81,6 +81,38 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
                                                   NormalisableRange<float> (-0.95f, 0.95f), 0.65f));
     l.add (pct ("flMix",    "Flanger Mix",    0.50f));
 
+    // ---------------- Dub Chords (aba de harmonia)
+    {
+        StringArray roots, quals, durs, pats;
+        for (int r = 0; r < 12; ++r) roots.add (dub::rootName (r));
+        quals = { "Maior", "menor", "7", "m7", "maj7", "m6", "sus2", "sus4", "dim", "m9" };
+        for (int d = 0; d < dub::numDurations; ++d) durs.add (dub::durationName (d));
+        pats.add ("Auto (segue o instrumento)");
+        for (int pt = 0; pt < dub::NumPatterns; ++pt) pats.add (dub::patternName (pt));
+        const int defRoot[4] = { 9, 2, 7, 0 }, defQual[4] = { 1, 1, 0, 0 };
+        l.add (std::make_unique<AudioParameterBool>  (ParameterID { "dcOn", 1 }, "Dub Chords: tocar com a DAW", false));
+        l.add (std::make_unique<AudioParameterBool>  (ParameterID { "dcPreview", 1 }, "Dub Chords: Preview", false));
+        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "dcBpm", 1 }, "Dub Chords: BPM do preview",
+                                                      NormalisableRange<float> (60.0f, 180.0f, 1.0f), 75.0f));
+        for (int i = 0; i < dcSlots; ++i)
+        {
+            const auto n = String (i), lbl = "Acorde " + String (i + 1) + " ";
+            l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcRoot" + n, 1 }, lbl + "tonica", roots, defRoot[i]));
+            l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcQual" + n, 1 }, lbl + "tipo", quals, defQual[i]));
+            l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcDur" + n, 1 }, lbl + "duracao", durs, 2));
+            if (i > 0)
+                l.add (std::make_unique<AudioParameterBool> (ParameterID { "dcAct" + n, 1 }, lbl + "ligado", i == 1));
+        }
+        l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcPattern", 1 }, "Dub Chords: padrao", pats, 0));
+        l.add (std::make_unique<AudioParameterInt>   (ParameterID { "dcRegister", 1 }, "Dub Chords: registro", 52, 76, 64));
+        l.add (pct ("dcVel",   "Dub Chords: velocity", 0.80f));
+        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "dcGate", 1 }, "Dub Chords: gate", NormalisableRange<float> (0.1f, 1.0f), 0.7f));
+        l.add (pct ("dcSwing", "Dub Chords: swing", 0.0f));
+        l.add (std::make_unique<AudioParameterBool>  (ParameterID { "dcBass", 1 }, "Dub Chords: baixo guia no MIDI", true));
+        l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcReps", 1 }, "Dub Chords: repetir no MIDI",
+                                                       StringArray { "x1", "x2", "x4", "x8" }, 1));
+    }
+
     l.add (pct ("reverb", "Reverb", 0.20f));
     l.add (pct ("master", "Master", 0.80f));
 
@@ -101,6 +133,17 @@ RootsKeysProcessor::RootsKeysProcessor()
 {
     for (int i = 0; i < 9; ++i)
         dbParam[i] = apvts.getRawParameterValue ("db" + juce::String (i + 1));
+    for (auto* prm : getParameters())
+        if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (prm))
+            if (rp->getParameterID().startsWith ("dc") || rp->getParameterID() == "mode")
+                apvts.addParameterListener (rp->getParameterID(), this);
+}
+
+RootsKeysProcessor::~RootsKeysProcessor()
+{
+    for (auto* prm : getParameters())
+        if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (prm))
+            apvts.removeParameterListener (rp->getParameterID(), this);
 }
 
 bool RootsKeysProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -110,6 +153,12 @@ bool RootsKeysProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void RootsKeysProcessor::prepareToPlay (double sampleRate, int)
 {
+    sampleRateHz = sampleRate;
+    dcWasPlaying = false;
+    dcInternalPpq = 0.0;
+    std::fill (std::begin (dcActive), std::end (dcActive), false);
+    dcPending.reserve (512);
+    dcDirty.store (true);
     engine.prepare (sampleRate);
     setLatencySamples (engine.latencySamples());   // lookahead do maximizer
     keyboardState.reset();
@@ -159,6 +208,9 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.maxGainDb     = get ("maxGain");
     p.maxCeilDb     = get ("maxCeiling");
 
+    // aba DUB CHORDS: gera o skank/bubble sincronizado com a DAW e toca no próprio instrumento
+    runDubChords (midi, n);
+
     // junta as notas do teclado da tela e atualiza as teclas pintadas
     keyboardState.processNextMidiBuffer (midi, 0, n, true);
 
@@ -193,6 +245,220 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     for (int i = 0; i < n; ++i) { sl += L[i] * L[i]; sr += R[i] * R[i]; }
     if (n > 0) { meterL.store (sl / (float) n); meterR.store (sr / (float) n); }
     gainReduction.store (engine.gainReductionDb());
+}
+
+// =====================================================================  DUB CHORDS
+dub::ChordSlot RootsKeysProcessor::getDcSlot (int i) const
+{
+    const auto n = juce::String (i);
+    dub::ChordSlot s;
+    s.root    = (int) apvts.getRawParameterValue ("dcRoot" + n)->load();
+    s.quality = (int) apvts.getRawParameterValue ("dcQual" + n)->load();
+    s.beats   = dub::durationBeats ((int) apvts.getRawParameterValue ("dcDur" + n)->load());
+    return s;
+}
+
+bool RootsKeysProcessor::isDcSlotOn (int i) const
+{
+    return i == 0 || apvts.getRawParameterValue ("dcAct" + juce::String (i))->load() > 0.5f;
+}
+
+std::vector<dub::ChordSlot> RootsKeysProcessor::getDcSlots() const
+{
+    std::vector<dub::ChordSlot> v;
+    for (int i = 0; i < dcSlots; ++i)
+        if (isDcSlotOn (i)) v.push_back (getDcSlot (i));
+    return v;
+}
+
+int RootsKeysProcessor::effectiveDcPattern() const
+{
+    const int pat = (int) get ("dcPattern");
+    if (pat > 0) return pat - 1;
+    return (int) get ("mode") == 1 ? dub::Bubble : dub::SkankOffbeat;
+}
+
+dub::Settings RootsKeysProcessor::getDcSettings (bool withBass) const
+{
+    dub::Settings s;
+    s.pattern    = effectiveDcPattern();
+    s.centerNote = (int) get ("dcRegister");
+    s.velocity   = get ("dcVel");
+    s.gate       = get ("dcGate");
+    s.swing      = get ("dcSwing");
+    s.bass       = withBass;
+    return s;
+}
+
+double RootsKeysProcessor::getDcExportBpm() const
+{
+    const double h = dcHostBpm.load();
+    return h > 0.0 ? h : (double) get ("dcBpm");
+}
+
+void RootsKeysProcessor::applyRiddim (int index)
+{
+    const auto& presets = dub::riddimPresets();
+    if (! juce::isPositiveAndBelow (index, (int) presets.size())) return;
+    const auto& r = presets[(size_t) index];
+    auto durIndex = [] (double beats)
+    {
+        int best = 0;
+        for (int d = 0; d < dub::numDurations; ++d)
+            if (std::abs (dub::durationBeats (d) - beats) < std::abs (dub::durationBeats (best) - beats)) best = d;
+        return best;
+    };
+    for (int i = 0; i < dcSlots; ++i)
+    {
+        const auto n = juce::String (i);
+        if (i < r.numChords)
+        {
+            setParam ("dcRoot" + n, (float) r.chords[i].root);
+            setParam ("dcQual" + n, (float) r.chords[i].quality);
+            setParam ("dcDur" + n, (float) durIndex (r.chords[i].beats));
+        }
+        if (i > 0) setParam ("dcAct" + n, i < r.numChords ? 1.0f : 0.0f);
+    }
+}
+
+void RootsKeysProcessor::dcAllNotesOff (juce::MidiBuffer& midi, int sample)
+{
+    for (int nn = 0; nn < 128; ++nn)
+        if (dcActive[nn])
+        {
+            midi.addEvent (juce::MidiMessage::noteOff (1, nn), sample);
+            dcActive[nn] = false;
+        }
+}
+
+void RootsKeysProcessor::runDubChords (juce::MidiBuffer& midi, int numSamples)
+{
+    double bpm = 0.0, ppq = 0.0;
+    bool hostPlaying = false;
+    if (auto* ph = getPlayHead())
+        if (auto pos = ph->getPosition())
+        {
+            if (auto b = pos->getBpm())         bpm = *b;
+            if (auto q = pos->getPpqPosition()) ppq = *q;
+            hostPlaying = pos->getIsPlaying();
+        }
+    if (bpm > 0.0) dcHostBpm.store (bpm);
+    dcHostPlaying.store (hostPlaying);
+
+    const bool enabled = get ("dcOn") > 0.5f;
+    const bool preview = get ("dcPreview") > 0.5f;
+    bool playing = enabled && hostPlaying;
+    if (! hostPlaying && preview)
+    {
+        bpm = (double) get ("dcBpm");
+        ppq = dcInternalPpq;
+        playing = true;
+    }
+    if (! preview || hostPlaying) dcInternalPpq = 0.0;
+    if (bpm <= 0.0) bpm = 120.0;
+
+    if (dcDirty.exchange (false))
+        dcLoop = dub::buildLoop (getDcSlots(), getDcSettings (false), dcLoopBeats);
+
+    const double blockBeats = (double) numSamples / sampleRateHz * bpm / 60.0;
+    if (! playing || dcLoopBeats <= 0.0)
+    {
+        if (dcWasPlaying) dcAllNotesOff (midi, 0);
+        dcWasPlaying = false;
+        dcPlayPos.store (-1.0);
+        return;
+    }
+
+    // salto no transporte (loop da DAW, reposicionamento): solta as notas presas
+    if (dcWasPlaying && std::abs (ppq - dcExpectedPpq) > 1.0e-3)
+        dcAllNotesOff (midi, 0);
+
+    const double end = ppq + blockBeats;
+    dcPending.clear();
+    auto collect = [&] (double t, bool on, const dub::NoteEvent& e)
+    {
+        double occ = t + std::ceil ((ppq - t) / dcLoopBeats) * dcLoopBeats;
+        while (occ < end)
+        {
+            if (occ >= ppq)
+                dcPending.push_back ({ juce::jlimit (0, numSamples - 1, (int) ((occ - ppq) / blockBeats * numSamples)), on, e.note, e.velocity });
+            occ += dcLoopBeats;
+        }
+    };
+    for (const auto& e : dcLoop)
+        if (e.channel == 1)
+        {
+            collect (e.start, true, e);
+            collect (e.start + e.length, false, e);
+        }
+    std::sort (dcPending.begin(), dcPending.end(), [] (const DcPending& a, const DcPending& b)
+    {
+        if (a.sample != b.sample) return a.sample < b.sample;
+        return (int) a.on < (int) b.on;   // note-off antes de note-on
+    });
+    for (const auto& pe : dcPending)
+    {
+        bool& isOn = dcActive[pe.note];
+        if (pe.on)
+        {
+            if (isOn) midi.addEvent (juce::MidiMessage::noteOff (1, pe.note), pe.sample);
+            midi.addEvent (juce::MidiMessage::noteOn (1, pe.note, (juce::uint8) pe.vel), pe.sample);
+            isOn = true;
+        }
+        else if (isOn)
+        {
+            midi.addEvent (juce::MidiMessage::noteOff (1, pe.note), pe.sample);
+            isOn = false;
+        }
+    }
+    dcWasPlaying = true;
+    dcExpectedPpq = end;
+    if (! hostPlaying) dcInternalPpq = end;
+    dcPlayPos.store (std::fmod (std::max (0.0, ppq), dcLoopBeats));
+}
+
+bool RootsKeysProcessor::writeDcMidiFile (const juce::File& file, int part, int slot) const
+{
+    std::vector<dub::ChordSlot> slots;
+    if (slot >= 0) slots.push_back (getDcSlot (slot));
+    else           slots = getDcSlots();
+    const bool withBass = part == 2 || (part == 0 && get ("dcBass") > 0.5f);
+    double lb = 0.0;
+    const auto events = dub::buildLoop (slots, getDcSettings (withBass), lb);
+    if (lb <= 0.0 || events.empty()) return false;
+
+    static const int repsTable[4] = { 1, 2, 4, 8 };
+    const int reps = repsTable[juce::jlimit (0, 3, (int) get ("dcReps"))];
+    const int tpq = 960;
+    const double bpm = getDcExportBpm();
+
+    juce::MidiMessageSequence meta, chords, bass;
+    meta.addEvent (juce::MidiMessage::tempoMetaEvent ((int) std::round (60000000.0 / bpm)), 0.0);
+    meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
+    chords.addEvent (juce::MidiMessage::textMetaEvent (3, "Roots Keys - Skank"), 0.0);
+    bass.addEvent (juce::MidiMessage::textMetaEvent (3, "Roots Keys - Baixo guia"), 0.0);
+
+    for (int r = 0; r < reps; ++r)
+        for (const auto& e : events)
+        {
+            if ((part == 1 && e.channel != 1) || (part == 2 && e.channel != 2)) continue;
+            auto& seq = (e.channel == 2) ? bass : chords;
+            seq.addEvent (juce::MidiMessage::noteOn (e.channel, e.note, (juce::uint8) e.velocity), (e.start + r * lb) * tpq);
+            seq.addEvent (juce::MidiMessage::noteOff (e.channel, e.note), (e.start + e.length + r * lb) * tpq);
+        }
+    chords.sort(); chords.updateMatchedPairs();
+    bass.sort();   bass.updateMatchedPairs();
+
+    juce::MidiFile mf;
+    mf.setTicksPerQuarterNote (tpq);
+    mf.addTrack (meta);
+    if (chords.getNumEvents() > 1) mf.addTrack (chords);
+    if (bass.getNumEvents() > 1)   mf.addTrack (bass);
+
+    file.getParentDirectory().createDirectory();
+    file.deleteFile();
+    juce::FileOutputStream out (file);
+    return out.openedOk() && mf.writeTo (out);
 }
 
 juce::AudioProcessorEditor* RootsKeysProcessor::createEditor()

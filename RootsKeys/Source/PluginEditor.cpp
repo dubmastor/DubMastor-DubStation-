@@ -19,6 +19,12 @@ juce::Colour drawbarColour (int i)
     }
 }
 
+juce::String versionText()
+{
+    auto parts = juce::StringArray::fromTokens (JucePlugin_VersionString, ".", "");
+    return "v" + parts[0] + "." + (parts.size() > 1 ? parts[1] : juce::String ("0"));
+}
+
 const char* kPianoPresetShort[4] = { "M1 CLASSIC", "DUB SKANK", "BRIGHT HOUSE", "SOFT BALLAD" };
 const char* kOrganPresetShort[4] = { "BUBBLE", "PERC", "DUB DARK", "GOSPEL" };
 
@@ -161,6 +167,16 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
         addAndMakeVisible (b);
     }
     modePiano.onClick = [this] { setModeParam (0); };
+    for (auto* t : { &tabInstrument, &tabChords })
+    {
+        t->setClickingTogglesState (false);
+        t->getProperties().set ("style", "chip");
+        addAndMakeVisible (t);
+    }
+    tabInstrument.onClick = [this] { setPage (0); };
+    tabChords.onClick     = [this] { setPage (1); };
+    chordsPage = std::make_unique<DubChordsPage> (proc, lnf);
+    addChildComponent (*chordsPage);
     modeOrgan.onClick = [this] { setModeParam (1); };
 
     // presets: 4 de piano (botões com LED) e 4 de órgão (teclas invertidas)
@@ -298,18 +314,6 @@ void RootsKeysEditor::applySkin (int newSkin)
     modeOrgan.setToggleState (! piano, juce::dontSendNotification);
     for (auto* b : { &modePiano, &modeOrgan }) b->getProperties().set ("style", piano ? "membrane" : "pill");
 
-    lcd.setVisible (piano);
-    wheels.setVisible (piano);
-    for (auto& b : pianoPreset) b.setVisible (piano);
-    for (auto* k : { &faderBright, &faderDecay, &faderChorus, &faderLevel })
-    { k->slider.setVisible (piano); k->label.setVisible (piano); }
-
-    for (auto& d : drawbars) d->setVisible (! piano);
-    for (auto* b : { &leslieSwitch, &percOn, &perc3rd, &percSlow }) b->setVisible (! piano);
-    for (auto& b : organPreset) b.setVisible (! piano);
-    for (auto* k : { &oLeslieMix, &oDrive, &oClick, &oLevel })
-    { k->slider.setVisible (! piano); k->label.setVisible (! piano); }
-
     // cores que dependem do visual
     const auto tickOnPanel  = piano ? plasticMuted : brownInk;   // knobs sobre painel (marfim no órgão)
     const auto tickOnWood   = ivory;
@@ -319,7 +323,6 @@ void RootsKeysEditor::applySkin (int newSkin)
     {
         k->slider.setColour (juce::Slider::rotarySliderOutlineColourId, tickOnPanel);
         k->label.setColour (juce::Label::textColourId, labelOnPanel);
-        k->slider.setVisible (true); k->label.setVisible (true);
     }
     for (auto* k : { &oLeslieMix, &oDrive, &oClick, &oLevel })
     {
@@ -348,9 +351,48 @@ void RootsKeysEditor::applySkin (int newSkin)
     keyboard.setColour (juce::MidiKeyboardComponent::shadowColourId, juce::Colours::black.withAlpha (0.35f));
     keyboard.setColour (juce::MidiKeyboardComponent::textLabelColourId, piano ? juce::Colour (0xff6a6a6e) : brownInk);
 
+    for (auto* t : { &tabInstrument, &tabChords }) t->getProperties().set ("style", "chip");
+    if (chordsPage) chordsPage->setSkin (skin);
+    updateVisibility();
     sendLookAndFeelChange();
     resized();
     repaint();
+}
+
+void RootsKeysEditor::setPage (int newPage)
+{
+    page = juce::jlimit (0, 1, newPage);
+    updateVisibility();
+    resized();
+    repaint();
+}
+
+void RootsKeysEditor::updateVisibility()
+{
+    const bool piano = (skin != 1), inst = (page == 0);
+    tabInstrument.setToggleState (inst, juce::dontSendNotification);
+    tabChords.setToggleState (! inst, juce::dontSendNotification);
+    if (chordsPage) chordsPage->setVisible (! inst);
+
+    // área do teclado (fica nas duas abas)
+    wheels.setVisible (piano);
+    for (auto& b : organPreset) b.setVisible (! piano);
+
+    // instrumento
+    lcd.setVisible (inst && piano);
+    for (auto& b : pianoPreset) b.setVisible (inst && piano);
+    for (auto* k : { &faderBright, &faderDecay, &faderChorus, &faderLevel })
+    { k->slider.setVisible (inst && piano); k->label.setVisible (inst && piano); }
+    for (auto& d : drawbars) d->setVisible (inst && ! piano);
+    for (auto* b : { &leslieSwitch, &percOn, &perc3rd, &percSlow }) b->setVisible (inst && ! piano);
+    for (auto* k : { &oLeslieMix, &oDrive, &oClick, &oLevel })
+    { k->slider.setVisible (inst && ! piano); k->label.setVisible (inst && ! piano); }
+    for (auto* k : { &eRate, &eIntensity, &eVol, &eSpring, &eWow, &eAge, &fRate, &fDepth, &fManual, &fFeedback, &fMix,
+                      &mxGain, &mxCeil, &mMaster, &mReverb })
+    { k->slider.setVisible (inst); k->label.setVisible (inst); }
+    for (juce::Component* comp : { (juce::Component*) &echoButton, (juce::Component*) &echoModeBox, (juce::Component*) &flButton,
+                                   (juce::Component*) &maxButton, (juce::Component*) &grLabel, (juce::Component*) &vuL, (juce::Component*) &vuR })
+        comp->setVisible (inst);
 }
 
 void RootsKeysEditor::updateLcd()
@@ -366,6 +408,7 @@ void RootsKeysEditor::updateLcd()
 
 void RootsKeysEditor::timerCallback()
 {
+    if (page == 1 && chordsPage) chordsPage->refresh();
     applySkin ((int) proc.apvts.getRawParameterValue ("mode")->load());
 
     vuL.update (proc.meterL.load(), 1.0f / 30.0f);
@@ -441,18 +484,19 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 
         g.setColour (plasticMuted);
         g.setFont (juce::FontOptions (13.0f, juce::Font::italic));
-        g.drawText ("Dub Station", 28, 8, 200, 18, juce::Justification::centredLeft);
+        g.drawText ("DubMastor", 28, 8, 200, 18, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xfff2f2f2));
         g.setFont (juce::FontOptions (pianoTitleFace).withHeight (23.0f).withKerningFactor (0.06f));
         g.drawText ("ROOTS KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
-        g.drawText ("DIGITAL PIANO SYNTHESIS  RK-1", 30, 58, 260, 12, juce::Justification::centredLeft);
+        g.drawText ("DIGITAL PIANO SYNTHESIS  RK-1  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
         g.setFont (VintageLookAndFeel::mono (10.0f, false));
         g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 
         // caixas de som com tela de tecido e faixa vermelha/dourada
         for (auto sp : { kSpeakerL, kSpeakerR })
+            if (page == 0)
         {
             auto box = sp.toFloat();
             g.setColour (juce::Colour (0xff0a0a0b));
@@ -493,25 +537,28 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.setColour (juce::Colours::white.withAlpha (0.05f));
             g.drawHorizontalLine (r.getY() + 1, (float) r.getX() + 4, (float) r.getRight() - 4);
         };
-        panel (kPianoPanel);
-        panel (kEcho);
-        panel (kFlanger);
-        panel (kOut);
         panel (kKeysBed);
-        g.setColour (juce::Colour (0xff050505));
-        g.fillRoundedRectangle (kLcd.toFloat(), 4.0f);
+        if (page == 0)
+        {
+            panel (kPianoPanel);
+            panel (kEcho);
+            panel (kFlanger);
+            panel (kOut);
+            g.setColour (juce::Colour (0xff050505));
+            g.fillRoundedRectangle (kLcd.toFloat(), 4.0f);
 
-        g.setFont (VintageLookAndFeel::mono (9.0f, false));
-        g.setColour (juce::Colour (0xff95959a));
-        for (int i = 0; i < 4; ++i)
-            g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 216, 96, 12, juce::Justification::centred);
+            g.setFont (VintageLookAndFeel::mono (9.0f, false));
+            g.setColour (juce::Colour (0xff95959a));
+            for (int i = 0; i < 4; ++i)
+                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 216, 96, 12, juce::Justification::centred);
 
-        sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", plasticText, plasticMuted);
-        sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
-        sectionTitle (kOut, "MAXIMIZER", "", plasticText, plasticMuted);
-        g.setColour (juce::Colour (0xff3a3a3e));
-        for (auto r : { kEcho, kFlanger, kOut })
-            g.drawHorizontalLine (r.getY() + 24, (float) r.getX() + 14, (float) r.getRight() - 14);
+            sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", plasticText, plasticMuted);
+            sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
+            sectionTitle (kOut, "MAXIMIZER", "", plasticText, plasticMuted);
+            g.setColour (juce::Colour (0xff3a3a3e));
+            for (auto r : { kEcho, kFlanger, kOut })
+                g.drawHorizontalLine (r.getY() + 24, (float) r.getX() + 14, (float) r.getRight() - 14);
+        }
         g.setColour (juce::Colour (0xff5a1310));
         g.fillRect (128, 644, 840, 4);   // feltro
     }
@@ -527,7 +574,11 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 
         g.setColour (ivory);
         g.setFont (juce::FontOptions (juce::Font::getDefaultSerifFontName(), 16.0f, juce::Font::italic));
-        g.drawText ("Dub Station", 30, 10, 220, 20, juce::Justification::centredLeft);
+        g.drawText ("DubMastor", 30, 10, 120, 20, juce::Justification::centredLeft);
+        g.setColour (ivory.withAlpha (0.75f));
+        g.setFont (VintageLookAndFeel::mono (10.0f, false));
+        g.drawText (versionText(), 112, 12, 60, 16, juce::Justification::centredLeft);
+        g.setColour (ivory);
         g.setFont (juce::FontOptions (organTitleFace).withHeight (36.0f));
         g.drawText ("Roots Keys", 28, 24, 320, 44, juce::Justification::centredLeft);
 
@@ -535,42 +586,48 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.setColour (brownInk);
         g.fillRoundedRectangle (764.0f, 24.0f, 196.0f, 32.0f, 16.0f);
 
-        // console preto das drawbars
-        g.setColour (console);
-        g.fillRoundedRectangle (kConsole.toFloat(), 4.0f);
-        g.setColour (brownInk);
-        g.drawRoundedRectangle (kConsole.toFloat(), 4.0f, 2.0f);
-
-        auto ivoryPanel = [&] (juce::Rectangle<int> r)
+        if (page == 0)
         {
-            g.setColour (juce::Colours::black.withAlpha (0.25f));
-            g.fillRoundedRectangle (r.toFloat().translated (0, 2.0f), 5.0f);
-            g.setColour (ivory);
-            g.fillRoundedRectangle (r.toFloat(), 5.0f);
-        };
-        ivoryPanel (kLeslie);
-        ivoryPanel (kPerc);
-        ivoryPanel (kEcho);
-        ivoryPanel (kFlanger);
-        ivoryPanel (kOut);
-        g.setFont (VintageLookAndFeel::mono (10.0f));
-        g.setColour (brownInk);
-        g.drawText ("LESLIE", kLeslie.getX(), kLeslie.getY() + 8, kLeslie.getWidth(), 14, juce::Justification::centred);
-        g.drawText ("PERCUSSION", kPerc.getX(), kPerc.getY() + 8, kPerc.getWidth(), 14, juce::Justification::centred);
-        sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", brownInk, brownInk.withAlpha (0.6f));
-        sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", brownInk, brownInk.withAlpha (0.6f));
-        sectionTitle (kOut, "MAXIMIZER", "", brownInk, brownInk);
-        g.setColour (brownInk.withAlpha (0.3f));
-        for (auto r : { kEcho, kFlanger, kOut })
-            g.drawHorizontalLine (r.getY() + 24, (float) r.getX() + 14, (float) r.getRight() - 14);
+            // console preto das drawbars
+            g.setColour (console);
+            g.fillRoundedRectangle (kConsole.toFloat(), 4.0f);
+            g.setColour (brownInk);
+            g.drawRoundedRectangle (kConsole.toFloat(), 4.0f, 2.0f);
+
+            auto ivoryPanel = [&] (juce::Rectangle<int> r)
+            {
+                g.setColour (juce::Colours::black.withAlpha (0.25f));
+                g.fillRoundedRectangle (r.toFloat().translated (0, 2.0f), 5.0f);
+                g.setColour (ivory);
+                g.fillRoundedRectangle (r.toFloat(), 5.0f);
+            };
+            ivoryPanel (kLeslie);
+            ivoryPanel (kPerc);
+            ivoryPanel (kEcho);
+            ivoryPanel (kFlanger);
+            ivoryPanel (kOut);
+            g.setFont (VintageLookAndFeel::mono (10.0f));
+            g.setColour (brownInk);
+            g.drawText ("LESLIE", kLeslie.getX(), kLeslie.getY() + 8, kLeslie.getWidth(), 14, juce::Justification::centred);
+            g.drawText ("PERCUSSION", kPerc.getX(), kPerc.getY() + 8, kPerc.getWidth(), 14, juce::Justification::centred);
+            sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", brownInk, brownInk.withAlpha (0.6f));
+            sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", brownInk, brownInk.withAlpha (0.6f));
+            sectionTitle (kOut, "MAXIMIZER", "", brownInk, brownInk);
+            g.setColour (brownInk.withAlpha (0.3f));
+            for (auto r : { kEcho, kFlanger, kOut })
+                g.drawHorizontalLine (r.getY() + 24, (float) r.getX() + 14, (float) r.getRight() - 14);
+        }
 
         g.setColour (brownInk);
         g.fillRoundedRectangle (kKeysBed.toFloat(), 6.0f);
         g.setColour (juce::Colour (0xff7a1a14));
         g.fillRect (34, 644, 932, 5);   // feltro
-        g.setColour (juce::Colour (0xffa89a82));
-        g.setFont (VintageLookAndFeel::mono (10.0f, false));
-        g.drawText ("MOD WHEEL = LESLIE FAST", kConsole.getX(), kConsole.getBottom() - 18, kConsole.getWidth(), 12, juce::Justification::centred);
+        if (page == 0)
+        {
+            g.setColour (juce::Colour (0xffa89a82));
+            g.setFont (VintageLookAndFeel::mono (10.0f, false));
+            g.drawText ("MOD WHEEL = LESLIE FAST", kConsole.getX(), kConsole.getBottom() - 18, kConsole.getWidth(), 12, juce::Justification::centred);
+        }
     }
 
     drawPlate (g, kPlate.toFloat());
@@ -578,12 +635,13 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 
 void RootsKeysEditor::paint (juce::Graphics& g)
 {
-    if (backgroundSkin != skin || background.isNull())
+    if (backgroundSkin != skin || backgroundPage != page || background.isNull())
     {
         background = juce::Image (juce::Image::RGB, kW, kH, true);
         juce::Graphics bg (background);
         renderBackground (bg, skin);
         backgroundSkin = skin;
+        backgroundPage = page;
     }
     g.drawImageAt (background, 0, 0);
 }
@@ -591,6 +649,11 @@ void RootsKeysEditor::paint (juce::Graphics& g)
 void RootsKeysEditor::resized()
 {
     const bool piano = (skin != 1);
+
+    // abas
+    tabInstrument.setBounds (222, 30, 92, 26);
+    tabChords.setBounds (318, 30, 92, 26);
+    if (chordsPage) chordsPage->setBounds (24, 86, 952, 538);
 
     // cabeçalho
     modePiano.setBounds (piano ? juce::Rectangle<int> (764, 28, 96, 26) : juce::Rectangle<int> (766, 27, 95, 26));

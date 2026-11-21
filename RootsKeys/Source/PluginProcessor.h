@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include "RootsKeysEngine.h"
+#include "DubChordsEngine.h"
 
 struct Preset
 {
@@ -16,11 +17,12 @@ struct Preset
     float reverb;
 };
 
-class RootsKeysProcessor : public juce::AudioProcessor
+class RootsKeysProcessor : public juce::AudioProcessor,
+                           private juce::AudioProcessorValueTreeState::Listener
 {
 public:
     RootsKeysProcessor();
-    ~RootsKeysProcessor() override = default;
+    ~RootsKeysProcessor() override;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -59,10 +61,35 @@ public:
     // rodas de pitch/mod que chegam pelo MIDI (só para mostrar na tela)
     std::atomic<float> pitchWheel { 0.0f }, modWheel { 0.0f };
 
+    // ---------------- aba DUB CHORDS (gerador de harmonia que toca o próprio piano/órgão)
+    static constexpr int dcSlots = 4;
+    std::vector<dub::ChordSlot> getDcSlots() const;          // só os acordes ligados
+    dub::ChordSlot getDcSlot (int i) const;                  // um cartão, ligado ou não
+    bool isDcSlotOn (int i) const;
+    dub::Settings getDcSettings (bool withBass) const;
+    int effectiveDcPattern() const;                          // "Auto" segue o instrumento
+    double getDcExportBpm() const;
+    void applyRiddim (int index);
+    // part: 0 = skank + baixo, 1 = só skank, 2 = só baixo; slot >= 0 = só aquele acorde
+    bool writeDcMidiFile (const juce::File& file, int part, int slot = -1) const;
+    std::atomic<double> dcPlayPos { -1.0 }, dcHostBpm { 0.0 };
+    std::atomic<bool> dcHostPlaying { false };
+
 private:
     rk::Engine engine;
     int currentProgram = 0;
     std::atomic<float>* dbParam[9] {};
+
+    // sequenciador Dub Chords (só na thread de áudio)
+    struct DcPending { int sample; bool on; int note; int vel; };
+    std::vector<dub::NoteEvent> dcLoop;
+    std::vector<DcPending> dcPending;
+    double dcLoopBeats = 0.0, dcExpectedPpq = 0.0, dcInternalPpq = 0.0, sampleRateHz = 48000.0;
+    bool dcWasPlaying = false, dcActive[128] {};
+    std::atomic<bool> dcDirty { true };
+    void parameterChanged (const juce::String&, float) override { dcDirty.store (true); }
+    void runDubChords (juce::MidiBuffer& midi, int numSamples);
+    void dcAllNotesOff (juce::MidiBuffer& midi, int sample);
 
     void setParam (const juce::String& id, float value);
     float get (const char* id) const { return apvts.getRawParameterValue (id)->load(); }
