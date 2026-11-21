@@ -37,10 +37,10 @@ Cadeia: entrada → filtro → seco + eco (com EQ de retorno) + sirene → **MAX
 **Presets** com um clique (o ativo acende em âmbar):
 | Preset | HP | LP | Som |
 |---|---|---|---|
-| **FLAT** | OFF | OFF | Repetições sem EQ |
 | **HPF** | 300 Hz | OFF | Repetições finas, sem embolar o grave |
 | **LPF** | OFF | 2,5 kHz | Repetições escuras, de fita gasta |
-| **LPF+HPF** | 300 Hz | 2,5 kHz | O clássico do dub: eco "de rádio", no meio da mix |
+| **FLAT** | OFF | OFF | Repetições sem EQ |
+| **HPF+LPF** | 300 Hz | 2,5 kHz | O clássico do dub: eco "de rádio", no meio da mix |
 
 Depois do preset, os knobs continuam livres para ajuste fino. EQ nas repetições, com visor que desenha a curva: **HP** (corta grave, OFF a 2 kHz), **MID** (150 Hz – 6 kHz) com **GAIN** (±12 dB) para acentuar ou cavar um médio, e **LP** (corta agudo, 800 Hz a OFF). Duplo clique volta ao padrão.
 

@@ -57,13 +57,13 @@ static juce::Path wavePath (int type, juce::Rectangle<float> r)
     return p;
 }
 
-// presets do EQ do delay: FLAT, HPF, LPF, LPF+HPF  (HP Hz, LP Hz, MID Hz, GAIN dB)
+// presets do EQ do delay, na ordem: HPF, LPF, FLAT, HPF+LPF  (HP Hz, LP Hz, MID Hz, GAIN dB)
 struct EqPreset { const char* name; float hp, lp, mf, mg; };
 static const EqPreset kEqPresets[4] = {
-    { "FLAT",    20.0f,  20000.0f, 1000.0f, 0.0f },
     { "HPF",     300.0f, 20000.0f, 1000.0f, 0.0f },
     { "LPF",     20.0f,  2500.0f,  1000.0f, 0.0f },
-    { "LPF+HPF", 300.0f, 2500.0f,  1000.0f, 0.0f } };
+    { "FLAT",    20.0f,  20000.0f, 1000.0f, 0.0f },
+    { "HPF+LPF", 300.0f, 2500.0f,  1000.0f, 0.0f } };
 
 static juce::Font stencil (float size, float kerning = 0.08f)
 {
@@ -1357,7 +1357,7 @@ void DubPanel::placeEq (juce::Rectangle<int> r, Knob& a, Knob& b, Knob& c, Knob&
     r.removeFromTop (18);                       // espaço do título "RETURN EQ"
     graph = r.removeFromTop (42).reduced (8, 0);
     r.removeFromTop (5);
-    {   // presets FLAT / HPF / LPF / LPF+HPF
+    {   // presets HPF / LPF / FLAT / HPF+LPF
         auto row = r.removeFromTop (22).reduced (6, 0);
         const int pw = row.getWidth() / 4;
         for (int i = 0; i < 4; ++i)
