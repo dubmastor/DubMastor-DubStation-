@@ -104,6 +104,15 @@ void FitaEcoProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
         }
     }
 
+    // feed the oscilloscope with what actually leaves the plugin
+    int sw = scopeWrite.load (std::memory_order_relaxed);
+    for (int i = 0; i < n; ++i)
+    {
+        scopeBuf[(size_t) sw] = 0.5f * (oL[i] + oR[i]);
+        sw = (sw + 1) & (kScopeSize - 1);
+    }
+    scopeWrite.store (sw, std::memory_order_release);
+
     buffer.copyFrom (0, 0, oL, n);
     if (outCh > 1) buffer.copyFrom (1, 0, oR, n);
     else

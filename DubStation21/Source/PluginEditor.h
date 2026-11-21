@@ -18,6 +18,19 @@ public:
                            float minPos, float maxPos, juce::Slider::SliderStyle, juce::Slider&) override;
 };
 
+// Green phosphor CRT showing the waveform that leaves the plugin
+// (same look as the scope of Mastor Fone)
+class CrtScope : public juce::Component
+{
+public:
+    explicit CrtScope (FitaEcoProcessor& p) : proc (p) { setInterceptsMouseClicks (false, false); }
+    void paint (juce::Graphics&) override;
+    void update();   // called by the editor's timer
+private:
+    FitaEcoProcessor& proc;
+    std::vector<float> buf = std::vector<float> (2048), trace, prev1, prev2;
+};
+
 // Layout: cream enamel upper panel (name plate + tape transport window with
 // moving tape and head lamps) over a dark lower panel: MODE and REPEAT RATE as
 // highlighted giant knobs, medium echo knobs, a 6-band graphic EQ and small
@@ -50,6 +63,7 @@ private:
     std::array<Knob, 6> eqFaders;
     std::array<juce::TextButton, 4> eqPresets;   // FLAT, HPF, LPF, HPF+LPF
     juce::ToggleButton bypassSwitch;
+    CrtScope scope { proc };
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> bypassAtt;
     void applyEqPreset (int idx);
     int matchingEqPreset() const;

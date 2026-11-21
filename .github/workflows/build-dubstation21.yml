@@ -1,4 +1,4 @@
-name: Build Dub Station 2.1 (FitaEco TE-12)
+name: Build Dub Station 2.6 (FitaEco TE-12)
 
 on:
   push:
@@ -96,7 +96,7 @@ jobs:
           New-Item -ItemType Directory -Force out | Out-Null
           Copy-Item -Recurse "build/FitaEco_artefacts/Release/VST3/FitaEco TE-12.vst3" out/
           Copy-Item "build/FitaEco_artefacts/Release/Standalone/FitaEco TE-12.exe" out/ -ErrorAction SilentlyContinue
-          Compress-Archive -Path out/* -DestinationPath ../DubStation21-Windows.zip
+          Compress-Archive -Path out/* -DestinationPath ../DubStation26-Windows.zip
 
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
@@ -107,12 +107,12 @@ jobs:
           cp -R "build/FitaEco_artefacts/Release/Standalone/FitaEco TE-12.app" out/
           # assinatura ad-hoc para o macOS aceitar o plugin localmente
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
-          cd out && ditto -c -k --sequesterRsrc . ../../DubStation21-macOS.zip
+          cd out && ditto -c -k --sequesterRsrc . ../../DubStation26-macOS.zip
 
       - uses: actions/upload-artifact@v4
         with:
-          name: DubStation21-${{ matrix.name }}
-          path: DubStation21-${{ matrix.name }}.zip
+          name: DubStation26-${{ matrix.name }}
+          path: DubStation26-${{ matrix.name }}.zip
 
   release:
     needs: build

@@ -9,7 +9,7 @@ Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e t
 | **DubMastor Big Knob 3.2** | Estação de dub: filtro big knob estilo King Tubby (com bypass), eco de fita com cabeçotes, presets de EQ e liga/desliga, sirene de dub, VUs e maximizer | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-Windows.zip) | [BigKnob/](BigKnob/) |
 | **Dub Station Roots Keys 2.1** | Instrumento: piano estilo Korg M1 e órgão estilo Hammond com Leslie, eco de fita FitaEco, maximizer, VUs e teclado que acende com o MIDI; visual de teclado anos 80 no piano e de madeira e marfim no órgão | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStationRootsKeys-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStationRootsKeys-Windows.zip) | [RootsKeys/](RootsKeys/) |
 | **Mastor Fone 1.4** | Efeito de voz: rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorFone-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorFone-Windows.zip) | [MastorFone/](MastorFone/) |
-| **Dub Station 2.1 (FitaEco TE-12)** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation21-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation21-Windows.zip) | [DubStation21/](DubStation21/) |
+| **Dub Station 2.6 (FitaEco TE-12)** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-Windows.zip) | [DubStation21/](DubStation21/) |
 
 Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest)**. Não precisa de conta no GitHub para baixar.
 
@@ -41,12 +41,12 @@ O formato é **VST3** (`.vst3`). O formato antigo `.vst` (VST2) não é suportad
 
 ```
 BigKnob/                         DubMastor Big Knob (C++ / JUCE 8)
-DubStation21/                    Dub Station 2.1 — FitaEco TE-12 (C++ / JUCE 8)
+DubStation21/                    Dub Station 2.6 — FitaEco TE-12 (C++ / JUCE 8)
 RootsKeys/                       Dub Station Roots Keys — piano M1 + órgão Hammond (C++ / JUCE 8)
 MastorFone/                      Mastor Fone — rádio AM, telefone e megafone para voz (C++ / JUCE 8)
 .github/workflows/
   build-bigknob.yml              compila, valida e publica o Big Knob
-  build-dubstation21.yml         compila, valida e publica o Dub Station 2.1
+  build-dubstation21.yml         compila, valida e publica o Dub Station 2.6
   build-rootskeys.yml            compila, valida e publica o Dub Station Roots Keys
   build-mastorfone.yml           compila, valida e publica o Mastor Fone
 ```

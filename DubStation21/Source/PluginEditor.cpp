@@ -340,6 +340,107 @@ void VintageLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, int 
     g.fillRect (cap.getX() + 2, cap.getCentreY() - 1.0f, cap.getWidth() - 4, 2.0f);
 }
 
+// ---------------------------------------------------------------- oscilloscope
+void CrtScope::update()
+{
+    const int N = (int) buf.size(), show = 1024;
+    proc.copyScope (buf.data(), N);
+    // trigger: first rising zero crossing (with hysteresis) so the wave stands still
+    int start = N - show;
+    for (int i = N - show - 1; i > 1; --i)
+        if (buf[(size_t) i - 1] < -0.01f && buf[(size_t) i] >= 0.0f) { start = i; break; }
+    start = juce::jmin (start, N - show);
+
+    prev2 = prev1; prev1 = trace;
+    const int cols = 160;
+    trace.assign ((size_t) cols * 2, 0.0f);
+    for (int c = 0; c < cols; ++c)
+    {
+        float lo = 1e9f, hi = -1e9f;
+        const int a = start + c * show / cols, b = start + (c + 1) * show / cols;
+        for (int i = a; i < b; ++i) { lo = juce::jmin (lo, buf[(size_t) i]); hi = juce::jmax (hi, buf[(size_t) i]); }
+        trace[(size_t) c * 2] = lo; trace[(size_t) c * 2 + 1] = hi;
+    }
+    repaint();
+}
+
+void CrtScope::paint (juce::Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    const juce::Colour phosphor (0xff5dff8a);
+
+    // bakelite housing with chrome bezel
+    g.setColour (juce::Colours::black.withAlpha (0.55f));
+    g.fillRoundedRectangle (b.reduced (2.0f).translated (1.5f, 3.0f), 9.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2a2a2a), 0, b.getY(), juce::Colour (0xff0b0b0b), 0, b.getBottom(), false));
+    g.fillRoundedRectangle (b.reduced (2.0f), 9.0f);
+    auto label = b.removeFromBottom (18.0f);
+    auto screen = b.reduced (11.0f, 9.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xffe8e8e8), screen.getX(), screen.getY(), juce::Colour (0xff4c4c4c), screen.getRight(), screen.getBottom(), false));
+    g.drawRoundedRectangle (screen.expanded (3.0f), 12.0f, 2.5f);
+
+    // tube face: dark green, brighter in the middle (curvature)
+    juce::Path tube;
+    tube.addRoundedRectangle (screen, 10.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff0f2a17), screen.getCentreX(), screen.getCentreY(),
+                                             juce::Colour (0xff030a05), screen.getX(), screen.getY(), true));
+    g.fillPath (tube);
+    {
+        juce::Graphics::ScopedSaveState ss (g);
+        g.reduceClipRegion (tube);
+
+        g.setColour (phosphor.withAlpha (0.13f));   // graticule
+        for (int i = 1; i < 8; ++i)
+            g.drawVerticalLine (juce::roundToInt (screen.getX() + screen.getWidth() * (float) i / 8.0f), screen.getY(), screen.getBottom());
+        for (int i = 1; i < 4; ++i)
+            g.drawHorizontalLine (juce::roundToInt (screen.getY() + screen.getHeight() * (float) i / 4.0f), screen.getX(), screen.getRight());
+        g.setColour (phosphor.withAlpha (0.22f));
+        g.drawHorizontalLine (juce::roundToInt (screen.getCentreY()), screen.getX(), screen.getRight());
+
+        // trace with phosphor persistence (previous frames fainter)
+        auto drawTrace = [&] (const std::vector<float>& t, float alpha, bool glow)
+        {
+            if (t.size() < 4) return;
+            const int cols = (int) t.size() / 2;
+            const float cy = screen.getCentreY(), amp = screen.getHeight() * 0.45f;
+            auto yOf = [&] (float v) { return cy - amp * juce::jlimit (-1.0f, 1.0f, v * 1.6f); };
+            juce::Path p;
+            for (int c = 0; c < cols; ++c)
+            {
+                const float x = screen.getX() + 4.0f + (screen.getWidth() - 8.0f) * (float) c / (float) (cols - 1);
+                const float mid = 0.5f * (t[(size_t) c * 2] + t[(size_t) c * 2 + 1]);
+                if (c == 0) p.startNewSubPath (x, yOf (mid)); else p.lineTo (x, yOf (mid));
+                g.setColour (phosphor.withAlpha (0.35f * alpha));   // min..max band of the column
+                g.drawLine (x, yOf (t[(size_t) c * 2]), x, yOf (t[(size_t) c * 2 + 1]), 1.0f);
+            }
+            if (glow)
+            {
+                g.setColour (phosphor.withAlpha (0.18f * alpha));
+                g.strokePath (p, juce::PathStrokeType (5.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+            }
+            g.setColour (phosphor.withAlpha (alpha));
+            g.strokePath (p, juce::PathStrokeType (1.5f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+        };
+        drawTrace (prev2, 0.18f, false);
+        drawTrace (prev1, 0.35f, false);
+        drawTrace (trace, 1.0f, true);
+
+        g.setColour (juce::Colours::black.withAlpha (0.18f));   // scanlines + glass reflection
+        for (float y = screen.getY(); y < screen.getBottom(); y += 3.0f)
+            g.drawHorizontalLine (juce::roundToInt (y), screen.getX(), screen.getRight());
+        g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.10f), screen.getX(), screen.getY(),
+                                                 juce::Colours::transparentWhite, screen.getX() + screen.getWidth() * 0.6f, screen.getY() + screen.getHeight() * 0.6f, false));
+        g.fillPath (tube);
+    }
+
+    g.setColour (cream.withAlpha (0.85f));
+    g.setFont (juce::FontOptions (9.0f, juce::Font::bold).withKerningFactor (0.12f));
+    g.drawText (juce::String::fromUTF8 ("OSCILOSC\xc3\x93PIO  \xc2\xb7  SA\xc3\x8d" "DA"), label.withTrimmedLeft (13.0f), juce::Justification::centredLeft);
+    const auto lp = juce::Point<float> (label.getRight() - 16.0f, label.getCentreY() - 2.0f);
+    g.setColour (phosphor);
+    g.fillEllipse (lp.x - 3.5f, lp.y - 3.5f, 7.0f, 7.0f);
+}
+
 // ---------------------------------------------------------------------- editor
 FitaEcoEditor::FitaEcoEditor (FitaEcoProcessor& p) : AudioProcessorEditor (p), proc (p)
 {
@@ -388,6 +489,8 @@ FitaEcoEditor::FitaEcoEditor (FitaEcoProcessor& p) : AudioProcessorEditor (p), p
         b.onClick = [this, i] { applyEqPreset (i); };
         addAndMakeVisible (b);
     }
+
+    addAndMakeVisible (scope);
 
     bypassSwitch.setName ("bypass");
     bypassSwitch.setTooltip ("Bypass: alavanca para cima = efeito ligado");
@@ -462,6 +565,7 @@ void FitaEcoEditor::timerCallback()
     }
     status.setText (text, juce::dontSendNotification);
     repaint (tapeWindow);
+    scope.update();
 
     const int active = matchingEqPreset();
     for (int i = 0; i < kNumEqPresets; ++i)
@@ -474,7 +578,7 @@ void FitaEcoEditor::paint (juce::Graphics& g)
     if (background.isValid())
         g.drawImage (background, getLocalBounds().toFloat());
 
-    // metal name plate: engraved "DUB STATION 2.1" and the tagline
+    // metal name plate: engraved "DUB STATION 2.6" and the tagline
     const auto pl = plateArea;
     auto engraved = [&g] (const juce::String& t, juce::Rectangle<float> r, juce::Justification j, juce::Colour c)
     {
@@ -484,7 +588,7 @@ void FitaEcoEditor::paint (juce::Graphics& g)
         g.drawText (t, r, j);
     };
     g.setFont (juce::FontOptions (plateFace).withHeight (28.0f).withKerningFactor (0.04f));
-    engraved ("DUB STATION 2.1", { pl.getX() + 16, pl.getY() + 10, pl.getWidth() - 28, 40 },
+    engraved ("DUB STATION 2.6", { pl.getX() + 16, pl.getY() + 10, pl.getWidth() - 28, 40 },
               juce::Justification::centredLeft, juce::Colour (0xff262626));
     g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.12f));
     engraved (juce::String (juce::CharPointer_UTF8 ("TAPE ECHO  \xc2\xb7  SPRING REVERB")), { pl.getX() + 17, pl.getY() + 54, pl.getWidth() - 28, 14 },
@@ -495,8 +599,8 @@ void FitaEcoEditor::paint (juce::Graphics& g)
         const auto sw = bypassSwitch.getBounds().toFloat();
         g.setColour (ink);
         g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.08f));
-        g.drawText ("ON", juce::Rectangle<float> (sw.getRight() + 2, sw.getY() + 2, 60, 12), juce::Justification::centredLeft);
-        g.drawText ("BYPASS", juce::Rectangle<float> (sw.getRight() + 2, sw.getBottom() - 14, 60, 12), juce::Justification::centredLeft);
+        g.drawText ("ON", juce::Rectangle<float> (sw.getCentreX() - 30, sw.getY() - 14, 60, 12), juce::Justification::centred);
+        g.drawText ("BYPASS", juce::Rectangle<float> (sw.getCentreX() - 30, sw.getBottom() + 2, 60, 12), juce::Justification::centred);
         const bool on = ! bypassSwitch.getToggleState();
         const auto lp = bypassLamp;
         g.setColour (juce::Colour (0xff8a8a8a));
@@ -515,7 +619,8 @@ void FitaEcoEditor::paint (juce::Graphics& g)
         g.setColour (juce::Colours::white.withAlpha (0.5f));
         g.fillEllipse (lp.x - 5, lp.y - 6, 4, 3);
         g.setColour (ink);
-        g.drawText ("EFFECT ON", juce::Rectangle<float> (lp.x + 18, lp.y - 7, 90, 14), juce::Justification::centredLeft);
+        g.drawText ("EFFECT", juce::Rectangle<float> (lp.x - 40, lp.y + 17, 80, 12), juce::Justification::centred);
+        g.drawText ("ON", juce::Rectangle<float> (lp.x - 40, lp.y + 29, 80, 12), juce::Justification::centred);
     }
 
     // "DubMastor" signature, brush script, bottom-right corner of the dark panel
@@ -837,7 +942,9 @@ void FitaEcoEditor::resized()
     }
     status.setBounds (tapeWindow.getX() + 14, tapeWindow.getY() + 8, 300, 18);
     bypassSwitch.setBounds ((int) plateArea.getX() + 8, (int) plateArea.getBottom() + 30, 42, 60);
-    bypassLamp = { plateArea.getX() + 170.0f, plateArea.getBottom() + 60.0f };
+    bypassLamp = { plateArea.getX() + 92.0f, plateArea.getBottom() + 54.0f };
+    scope.setBounds (juce::Rectangle<int> ((int) plateArea.getX() + 146, (int) plateArea.getBottom() + 6,
+                                           (int) plateArea.getWidth() - 144, kTopH - (int) plateArea.getBottom() - 16));
 
     auto rows = bottomPanel.reduced (10, 0).withTrimmedTop (12).withTrimmedBottom (10);
     auto rowA = rows.removeFromTop (222);

@@ -35,6 +35,15 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
 
+    // oscilloscope: last output samples (mono), written by the audio thread
+    static constexpr int kScopeSize = 8192;
+    void copyScope (float* dest, int n) const
+    {
+        const int w = scopeWrite.load (std::memory_order_acquire);
+        for (int i = 0; i < n; ++i)
+            dest[i] = scopeBuf[(size_t) ((w - n + i) & (kScopeSize - 1))];
+    }
+
     // level at the record head, in VU (0 VU = TapeEcho::kRecRef), read by the editor's meter
     float getRecVu() const { return recVu.load(); }
 
@@ -44,6 +53,8 @@ private:
     juce::AudioParameterBool* bypassParam = nullptr;
     juce::SmoothedValue<float> bypassMix; // 0 = effect, 1 = dry (click-free crossfade)
     std::atomic<float> recVu { -60.0f };
+    std::array<float, kScopeSize> scopeBuf {};
+    std::atomic<int> scopeWrite { 0 };
 
     std::atomic<float>* pInput {}; std::atomic<float>* pMode {}; std::atomic<float>* pRate {};
     std::atomic<float>* pIntensity {}; std::atomic<float>* pEcho {}; std::atomic<float>* pReverb {};
