@@ -17,6 +17,7 @@ namespace toon
 
     juce::Font title (float h);   // Archivo Black
     juce::Font comic (float h);   // Comic Relief Bold
+    juce::Font script (float h);  // TeX Gyre Chorus (assinatura, igual ao Dub Station)
 
     // caixa com contorno grosso e sombra dura deslocada (estilo cartoon)
     void box (juce::Graphics&, juce::Rectangle<float>, juce::Colour fill, float corner, float outline = 4.0f, float shadow = 6.0f);
@@ -83,6 +84,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    std::function<void()> onSwitchSkin;
     static constexpr int kW = 960, kH = 620;
 
 private:
@@ -118,6 +120,7 @@ private:
     Toggle echoSync, echoPP, bypassBtn;
     MomentaryButton throwBtn;
     Knob dry, out;
+    juce::ToggleButton skinBtn;
 
     juce::Image background;
     juce::Rectangle<float> dialWin, tapeWin, vuArea, lampArea;
@@ -126,23 +129,86 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RadioPanel)
 };
 
+// --------------------------------------------------------------------------
+// Visual "Dub Station": esmalte creme, plaqueta de alumínio, VU, janela da fita e painel escuro
+class StationLookAndFeel : public juce::LookAndFeel_V4
+{
+public:
+    StationLookAndFeel();
+    void drawRotarySlider (juce::Graphics&, int x, int y, int w, int h, float pos,
+                           float startAngle, float endAngle, juce::Slider&) override;
+    void drawToggleButton (juce::Graphics&, juce::ToggleButton&, bool, bool) override;
+    void drawButtonBackground (juce::Graphics&, juce::Button&, const juce::Colour&, bool, bool) override;
+    void drawButtonText (juce::Graphics&, juce::TextButton&, bool, bool) override;
+};
+
+class StationPanel : public juce::Component, private juce::Timer
+{
+public:
+    explicit StationPanel (RadioFoneProcessor&);
+    ~StationPanel() override;
+
+    void paint (juce::Graphics&) override;
+    void resized() override;
+
+    std::function<void()> onSwitchSkin;
+    static constexpr int kW = RadioPanel::kW, kH = RadioPanel::kH;
+
+private:
+    struct Knob
+    {
+        juce::Slider slider;
+        juce::Label  label;
+        juce::String name;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> att;
+    };
+    struct Toggle
+    {
+        juce::ToggleButton button;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> att;
+    };
+
+    void timerCallback() override;
+    void setupKnob (Knob&, const juce::String& id, const juce::String& name, int size);
+    void setupToggle (Toggle&, const juce::String& id, const juce::String& text);
+    void place (Knob&, juce::Rectangle<int> cell, int labelH);
+    void renderBackground();
+    void drawVuFace (juce::Graphics&);
+    void drawVuNeedle (juce::Graphics&);
+    void drawTape (juce::Graphics&);
+    juce::String statusText();
+
+    RadioFoneProcessor& proc;
+    StationLookAndFeel lnf;
+
+    Knob mode, tune, band, drive, noise, defect;
+    Knob echoDiv, echoMs, echoHeads, echoFb, echoTone, echoWow, echoSend;
+    Knob mix, dry, out;
+    Toggle echoSync, echoPP, bypassBtn;
+    MomentaryButton throwBtn;
+    juce::ToggleButton skinBtn;
+    juce::Label status;
+
+    juce::Image background;
+    juce::Rectangle<int> topPanel, vuArea, tapeWin, echoPlate, rightArea;
+    juce::Rectangle<float> plateArea;
+    juce::Point<float> lampPos;
+    float needlePos = 0, needleVel = 0, tapePhase = 0, lampGlow = 0;
+    int peakHold = 0;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StationPanel)
+};
+
+// Editor: mostra um dos dois visuais (cartoon ou Dub Station); a escolha fica salva no projeto
 class RadioFoneEditor : public juce::AudioProcessorEditor
 {
 public:
-    explicit RadioFoneEditor (RadioFoneProcessor& p) : juce::AudioProcessorEditor (p), panel (p)
-    {
-        addAndMakeVisible (panel);
-        const int w = RadioPanel::kW, h = RadioPanel::kH;
-        setResizable (true, true);
-        setResizeLimits (w / 2, h / 2, w * 3 / 2, h * 3 / 2);
-        if (auto* c = getConstrainer()) c->setFixedAspectRatio ((double) w / (double) h);
-        setSize (w, h);
-    }
-    void resized() override
-    {
-        panel.setTransform (juce::AffineTransform::scale ((float) getWidth() / (float) RadioPanel::kW));
-    }
+    explicit RadioFoneEditor (RadioFoneProcessor& p);
+    void resized() override;
+    void setSkin (int newSkin);
 private:
-    RadioPanel panel;
+    RadioFoneProcessor& proc;
+    std::unique_ptr<juce::Component> panel;
+    int skin = -1;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RadioFoneEditor)
 };

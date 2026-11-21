@@ -1,4 +1,4 @@
-# Mastor Fone 1.0 — voz de aparelho antigo 📻☎️📣
+# Mastor Fone 1.1 — voz de aparelho antigo 📻☎️📣
 
 *Dub Station Solutions*
 
@@ -9,7 +9,14 @@
 Efeito para voz que imita três aparelhos: **RÁDIO AM**, **TELEFONE antigo** e **MEGAFONE**, com o mesmo **eco de fita** do Big Knob.
 Formatos: **VST3** (Windows/macOS, para o Cubase), **AU** (macOS) e **Standalone**.
 
-![Interface do Mastor Fone](docs/interface.png)
+## Dois visuais
+O botão **VISUAL** troca a aparência na hora, e a escolha fica salva no projeto do Cubase:
+- **Cartoon** (padrão): gabinete de rádio de madeira, estilo desenho animado antigo
+- **Dub Station**: o mesmo acabamento do Dub Station 2.1, com esmalte creme, plaqueta de alumínio, VU, janela da fita e botões de alumínio
+
+![Visual cartoon](docs/interface.png)
+
+![Visual Dub Station](docs/interface-dubstation.png)
 
 Cadeia: entrada (somada em mono) → aparelho → seco + eco de fita (estéreo) → saída.
 

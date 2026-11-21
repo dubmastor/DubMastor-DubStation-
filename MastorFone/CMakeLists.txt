@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(MastorFone VERSION 1.0.0)
+project(MastorFone VERSION 1.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -40,11 +40,13 @@ juce_add_plugin(MastorFone
 
 juce_add_binary_data(MastorFoneFonts SOURCES
     Resources/ArchivoBlack-Regular.ttf
-    Resources/ComicRelief-Bold.ttf)
+    Resources/ComicRelief-Bold.ttf
+    Resources/texgyrechorus-mediumitalic.otf)
 
 target_sources(MastorFone PRIVATE
     Source/PluginProcessor.cpp
-    Source/PluginEditor.cpp)
+    Source/PluginEditor.cpp
+    Source/StationPanel.cpp)
 
 target_compile_definitions(MastorFone PUBLIC
     JUCE_WEB_BROWSER=0

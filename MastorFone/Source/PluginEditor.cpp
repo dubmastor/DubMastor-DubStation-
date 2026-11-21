@@ -10,6 +10,7 @@ namespace
     {
         Typeface::Ptr title = Typeface::createSystemTypefaceFor (BinaryData::ArchivoBlackRegular_ttf, (size_t) BinaryData::ArchivoBlackRegular_ttfSize);
         Typeface::Ptr comic = Typeface::createSystemTypefaceFor (BinaryData::ComicReliefBold_ttf, (size_t) BinaryData::ComicReliefBold_ttfSize);
+        Typeface::Ptr script = Typeface::createSystemTypefaceFor (BinaryData::texgyrechorusmediumitalic_otf, (size_t) BinaryData::texgyrechorusmediumitalic_otfSize);
     };
     Fonts& fonts() { static SharedResourcePointer<Fonts> f; return *f; }
 
@@ -18,6 +19,53 @@ namespace
 
 Font toon::title (float h) { return Font (FontOptions (fonts().title).withHeight (h)); }
 Font toon::comic (float h) { return Font (FontOptions (fonts().comic).withHeight (h)); }
+Font toon::script (float h) { return Font (FontOptions (fonts().script).withHeight (h)); }
+
+//==============================================================================
+RadioFoneEditor::RadioFoneEditor (RadioFoneProcessor& p) : AudioProcessorEditor (p), proc (p)
+{
+    const int w = RadioPanel::kW, h = RadioPanel::kH;
+    setSkin ((int) p.apvts.state.getProperty ("skin", 0));
+    setResizable (true, true);
+    setResizeLimits (w / 2, h / 2, w * 3 / 2, h * 3 / 2);
+    if (auto* c = getConstrainer()) c->setFixedAspectRatio ((double) w / (double) h);
+    setSize (w, h);
+}
+
+void RadioFoneEditor::setSkin (int newSkin)
+{
+    newSkin = jlimit (0, 1, newSkin);
+    if (newSkin == skin && panel != nullptr) return;
+    skin = newSkin;
+    proc.apvts.state.setProperty ("skin", skin, nullptr);
+
+    // troca depois do clique, para não destruir o botão que está sendo clicado
+    auto request = [sp = Component::SafePointer<RadioFoneEditor> (this)]
+    {
+        MessageManager::callAsync ([sp] { if (sp != nullptr) sp->setSkin (1 - sp->skin); });
+    };
+    panel.reset();
+    if (skin == 0)
+    {
+        auto c = std::make_unique<RadioPanel> (proc);
+        c->onSwitchSkin = request;
+        panel = std::move (c);
+    }
+    else
+    {
+        auto c = std::make_unique<StationPanel> (proc);
+        c->onSwitchSkin = request;
+        panel = std::move (c);
+    }
+    addAndMakeVisible (*panel);
+    resized();
+}
+
+void RadioFoneEditor::resized()
+{
+    if (panel != nullptr)
+        panel->setTransform (AffineTransform::scale ((float) getWidth() / (float) RadioPanel::kW));
+}
 
 void toon::box (Graphics& g, Rectangle<float> r, Colour fill, float corner, float outline, float shadow)
 {
@@ -357,6 +405,11 @@ RadioPanel::RadioPanel (RadioFoneProcessor& p)
     addAndMakeVisible (throwBtn);
     throwBtn.setTooltip ("Segure para jogar a voz no eco");
 
+    skinBtn.setButtonText ("VISUAL DUB STATION");
+    skinBtn.setClickingTogglesState (false);
+    skinBtn.onClick = [this] { if (onSwitchSkin) onSwitchSkin(); };
+    addAndMakeVisible (skinBtn);
+
     renderBackground();
     startTimerHz (30);
 }
@@ -432,6 +485,7 @@ void RadioPanel::resized()
     placeKnob (dry, { cx[0], 518 }, 62);
     placeKnob (out, { cx[1], 518 }, 62);
     bypassBtn.button.setBounds (812, 500, 104, 40);
+    skinBtn.setBounds (752, 14, 196, 38);
 }
 
 //==============================================================================
