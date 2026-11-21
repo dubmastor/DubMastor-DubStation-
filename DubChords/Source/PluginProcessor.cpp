@@ -27,7 +27,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     // Progressão padrão: Am (1 comp.) | Dm (1 comp.); acordes 3 (Em) e 4 (G) desligados
     const int  defRoot[numSlots] = { 9, 2, 4, 7 };
     const int  defQual[numSlots] = { dub::Min, dub::Min, dub::Min, dub::Maj };
-    const int  defDur [numSlots] = { 1, 1, 1, 1 };            // 1 compasso cada
+    const int  defDur [numSlots] = { 0, 0, 0, 0 };            // 1/2 compasso cada
     const bool defOn  [numSlots] = { true, true, false, false };
 
     for (int i = 0; i < numSlots; ++i)
@@ -335,9 +335,9 @@ bool DubChordsProcessor::writeMidiFile (const juce::File& file) const
     meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
     auto trackName = [] (const juce::String& n) { return juce::MidiMessage::textMetaEvent (3, n); };
-    skank.addEvent  (trackName ("MDCM-404 - Skank (piano)"), 0.0);
-    bubble.addEvent (trackName ("MDCM-404 - Bubble (orgao)"), 0.0);
-    bass.addEvent   (trackName ("MDCM-404 - Baixo guia"), 0.0);
+    skank.addEvent  (trackName ("MRCM-1240 - Skank (piano)"), 0.0);
+    bubble.addEvent (trackName ("MRCM-1240 - Bubble (orgao)"), 0.0);
+    bass.addEvent   (trackName ("MRCM-1240 - Baixo guia"), 0.0);
 
     // marcadores com o nome de cada acorde (aparecem na régua/marker track da DAW)
     const auto slots = getSlots();

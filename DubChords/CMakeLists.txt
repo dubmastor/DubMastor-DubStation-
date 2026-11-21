@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(DubChords VERSION 1.4.0)
+project(DubChords VERSION 1.5.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,7 +26,7 @@ endif()
 juce_add_plugin(DubChords
     COMPANY_NAME               "DubMastor"
     BUNDLE_ID                  com.dubmastor.dubchords
-    PRODUCT_NAME               "Mastor Dub Chords Machine MDCM-404"
+    PRODUCT_NAME               "Mastor Reggae Chord Machine MRCM-1240"
     PLUGIN_MANUFACTURER_CODE   Dblb
     PLUGIN_CODE                Dbch
     FORMATS                    VST3 AU Standalone

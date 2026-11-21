@@ -20,7 +20,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "Mastor Dub Chords Machine MDCM-404"; }
+    const juce::String getName() const override { return "Mastor Reggae Chord Machine MRCM-1240"; }
     bool acceptsMidi() const override  { return true; }
     bool producesMidi() const override { return true; }
     bool isMidiEffect() const override { return false; }

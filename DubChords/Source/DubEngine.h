@@ -1,4 +1,4 @@
-// Mastor Dub Chords Machine (MDCM-404) — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
+// Mastor Reggae Chord Machine (MRCM-1240) — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
 //  - skank de piano "com as duas mãos": a mesma inversão em duas oitavas (canal 1)
 //  - bubble de órgão uma oitava abaixo do skank (canal 3)
 #pragma once

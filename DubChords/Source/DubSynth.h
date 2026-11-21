@@ -1,4 +1,4 @@
-// Som interno do Mastor Dub Chords Machine (MDCM-404): os mesmos timbres do Dub Station Roots Keys
+// Som interno do Mastor Reggae Chord Machine (MRCM-1240): os mesmos timbres do Dub Station Roots Keys
 //  - skank (canal 1): piano estilo Korg M1 com chorus estéreo
 //  - bubble (canal 3): órgão tonewheel estilo Hammond B3 no preset "Roots Percussion" do
 //    Roots Keys: drawbars 888000000, percussão na 3ª harmônica (rápida, single-trigger),
