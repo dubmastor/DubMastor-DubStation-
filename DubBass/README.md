@@ -30,7 +30,7 @@ Mono/legato: no Classic Sine as notas ligadas deslizam com o glide; no 808 cada 
 
 ## Versão
 
-A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha na plaqueta de latão. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site, e crie a tag `DubBass-x.y` para publicar.
+A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha na plaqueta de latão. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site. O push na `main` publica a release `DubBass-x.y` sozinho.
 
 ## Compilar
 
@@ -48,4 +48,4 @@ cmake -B build-test -DDUBBASS_TESTS=ON && cmake --build build-test --target DubB
 
 ## Publicar
 
-O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, quando recebe uma tag `DubBass-x.y`, cria a release com `DubBass-Windows.zip` e `DubBass-macOS.zip`. A release do Dub Bass não vira a "latest", para não mexer nos links dos outros plugins.
+O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, a cada push na `main` que mexa no Dub Bass, cria (ou atualiza) a release `DubBass-x.y` da versão do `CMakeLists.txt` com `DubBass-Windows.zip` e `DubBass-macOS.zip`. A release do Dub Bass não vira a "latest", para não mexer nos links dos outros plugins.

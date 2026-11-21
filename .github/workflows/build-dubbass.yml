@@ -134,11 +134,12 @@ jobs:
           name: DubBass-${{ matrix.name }}
           path: DubBass-${{ matrix.name }}.zip
 
-  # Release própria do Dub Bass (tag DubBass-x.y). Não vira a "latest", para não mexer
+  # Release própria do Dub Bass: DubBass-<versão do CMakeLists>, criada/atualizada a cada push
+  # na main que mexa no Dub Bass (ou por tag DubBass-x.y). Não vira a "latest", para não mexer
   # nos links /releases/latest/download dos outros plugins.
   release:
     needs: build
-    if: ${{ !cancelled() && needs.build.result == 'success' && (startsWith(github.ref, 'refs/tags/DubBass-') || inputs.tag != '') }}
+    if: ${{ !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/DubBass-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -146,8 +147,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: DubBass/RELEASE_NOTES.md
+          sparse-checkout: |
+            DubBass/RELEASE_NOTES.md
+            DubBass/CMakeLists.txt
           sparse-checkout-cone-mode: false
+
+      - name: Versão
+        id: ver
+        run: |
+          V=$(sed -n 's/^project(DubBass VERSION \([0-9]*\.[0-9]*\).*/\1/p' DubBass/CMakeLists.txt)
+          echo "Versão do Dub Bass: $V"
+          test -n "$V"
+          echo "tag=DubBass-$V" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@v4
         with:
@@ -157,8 +168,9 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.tag || github.ref_name }}
-          name: ${{ inputs.tag || github.ref_name }}
+          tag_name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           files: dist/*.zip
           body_path: DubBass/RELEASE_NOTES.md
           make_latest: 'false'

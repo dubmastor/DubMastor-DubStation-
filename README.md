@@ -56,7 +56,7 @@ DubBass/                         Dub Bass - Dub Station — baixo de reggae seno
   build-rootskeys.yml            compila, valida e publica o DubMastor Roots Keys
   build-mastorfone.yml           compila, valida e publica o Mastor Fone
   build-dubchords.yml            compila, valida e publica o Dub Chords
-  build-dubbass.yml              testa, compila, valida e publica o Dub Bass (tag DubBass-x.y)
+  build-dubbass.yml              testa, compila, valida e publica o Dub Bass (release DubBass-x.y a cada versão)
 ```
 
 Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. Quando uma release é publicada, os builds anexam seus instaladores a ela.
