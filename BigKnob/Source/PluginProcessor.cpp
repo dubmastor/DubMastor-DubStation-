@@ -42,9 +42,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubKnobProcessor::createLayo
     p.push_back (std::make_unique<AudioParameterChoice>(ParameterID { "slope", 1 }, "Slope", StringArray { "12 dB", "24 dB" }, 0));
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "res", 1 }, "Resonance", NormalisableRange<float> (0.0f, 1.0f), 0.25f, unitPct()));
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "drive", 1 }, "Drive", NormalisableRange<float> (0.0f, 24.0f), 0.0f, db()));
+    p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "filterBypass", 1 }, "Filter Bypass", false));
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "mix", 1 }, "Filter Mix", NormalisableRange<float> (0.0f, 100.0f), 100.0f, pct()));
 
     // --- ECO DE FITA
+    p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "echoOn", 1 }, "Echo On", true));
     p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "echoSync", 1 }, "Echo Sync", true));
     p.push_back (std::make_unique<AudioParameterChoice>(ParameterID { "echoDiv", 1 }, "Echo Time (Sync)", divisionNames(), 5));
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "echoMs", 1 }, "Repeat Rate (ms)", logRange (40.0f, 1500.0f), 400.0f, ms()));
@@ -120,6 +122,11 @@ void DubKnobProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     for (auto* s : { &dryGain, &outGain })
         s->reset (sampleRate, 0.02);
     bypassMix.reset (sampleRate, 0.03);
+    filterBypassMix.reset (sampleRate, 0.02);
+    filterBypassMix.setCurrentAndTargetValue (getP ("filterBypass") > 0.5f ? 1.0f : 0.0f);
+    echoOnGain.reset (sampleRate, 0.03);
+    echoOnGain.setCurrentAndTargetValue (getP ("echoOn") > 0.5f ? 1.0f : 0.0f);
+    echoCleared = false;
     bypassMix.setCurrentAndTargetValue (getP ("bypass") > 0.5f ? 1.0f : 0.0f);
     inputCopy.setSize (2, juce::jmax (1, samplesPerBlock));
     for (auto& d : bypassDelay) d.assign ((size_t) juce::jmax (1, maximizer.getLatency()), 0.0f);
@@ -187,6 +194,10 @@ void DubKnobProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     for (int ch = 0; ch < 2; ++ch)
         inputCopy.copyFrom (ch, 0, buffer, juce::jmin (ch, numCh - 1), 0, n);
     bypassMix.setTargetValue (getP ("bypass") > 0.5f ? 1.0f : 0.0f);
+    filterBypassMix.setTargetValue (getP ("filterBypass") > 0.5f ? 1.0f : 0.0f);
+    const bool echoOn = getP ("echoOn") > 0.5f;
+    echoOnGain.setTargetValue (echoOn ? 1.0f : 0.0f);
+    if (echoOn) echoCleared = false;
 
     // cadeia: entrada -> filtro -> (seco + eco com EQ) + sirene -> maximizer
     filter.process (buffer.getArrayOfWritePointers(), numCh, n);
@@ -197,11 +208,16 @@ void DubKnobProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     float* R = numCh > 1 ? buffer.getWritePointer (1) : nullptr;
     for (int i = 0; i < n; ++i)
     {
-        const float xl = L[i], xr = R ? R[i] : xl;
+        // bypass do filtro: volta suavemente para a entrada original
+        const float fb = filterBypassMix.getNextValue();
+        const float xl = L[i] * (1.0f - fb) + inputCopy.getSample (0, i) * fb;
+        const float xr = (R ? R[i] : L[i]) * (1.0f - fb) + inputCopy.getSample (R ? 1 : 0, i) * fb;
         float el, er;
         const float sir = siren.processSample();
-        echo.processSample (xl, xr, el, er);
+        const float eg = echoOnGain.getNextValue();
+        echo.processSample (xl * eg, xr * eg, el, er);
         echoEq.processSample (el, er);
+        el *= eg; er *= eg;
 
         const float dg = dryGain.getNextValue(), og = outGain.getNextValue();
         float yl = (xl * dg + el + sir) * og;
@@ -226,6 +242,13 @@ void DubKnobProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
         if (R) { L[i] = yl; R[i] = yr; }
         else     L[i] = 0.5f * (yl + yr);
     }
+    if (! echoOn && ! echoOnGain.isSmoothing() && ! echoCleared)
+    {
+        echo.reset();
+        echoEq.reset();
+        echoCleared = true;
+    }
+
     for (int ch = 0; ch < 2; ++ch)
     {
         vuRms[ch].store (std::sqrt (sumSq[ch] / (float) juce::jmax (1, n)));

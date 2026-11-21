@@ -70,6 +70,8 @@ private:
     std::atomic<float> mGrDb { 0.0f }, mLufs { -70.0f };
     std::atomic<float> vuRms[2] { { 0.0f }, { 0.0f } };
     juce::SmoothedValue<float> dryGain, outGain, bypassMix;
+    juce::SmoothedValue<float> filterBypassMix, echoOnGain;   // v3.2: bypass do filtro e liga/desliga do delay
+    bool echoCleared = false;
     juce::AudioBuffer<float> inputCopy;                 // entrada original, para o bypass
     std::array<std::vector<float>, 2> bypassDelay;      // atrasa o sinal original na mesma latência do maximizer
     int bypassIdx = 0;

@@ -82,8 +82,13 @@ private:
     // master
     Knob dry, out;
     Toggle bypassBtn;
-    // EQ de retorno
+    // EQ de retorno + presets (v3.2)
     Knob eqEHp, eqEMf, eqEMg, eqELp;
+    juce::TextButton eqPreset[4];
+    void applyEqPreset (int i);
+    int  matchingEqPreset() const;
+    // v3.2: bypass do filtro e liga/desliga do delay
+    Toggle filterBypass, echoOn;
     juce::Rectangle<int> echoGraph;
     void drawEqGraph (juce::Graphics&, juce::Rectangle<float>);
     void placeEq (juce::Rectangle<int>, Knob&, Knob&, Knob&, Knob&, juce::Rectangle<int>& graph);

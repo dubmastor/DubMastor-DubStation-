@@ -1,4 +1,4 @@
-# DubMastor Big Knob 3.1 — King Tubby tribute 🟢🟡⚫
+# DubMastor Big Knob 3.2 — King Tubby tribute 🟢🟡⚫
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
@@ -18,10 +18,12 @@ Cadeia: entrada → filtro → seco + eco (com EQ de retorno) + sirene → **MAX
 | **LOW PASS** | Troca de high-pass para low-pass |
 | **24 dB** | Corte suave (12 dB/oit) ou radical (24 dB/oit) |
 | **Resonance / Drive / Filter Mix** | Pico no corte, saturação na entrada, mistura com o original |
+| **BYPASS** (canto do painel) | Desliga só o filtro, com transição suave. O visor mostra "BYPASS" |
 
 ## TAPE ECHO
 | Controle | O que faz |
 |---|---|
+| **DELAY ON** (canto do painel) | Liga/desliga o delay inteiro. Ao desligar, as repetições somem em 30 ms e a fita é limpa, então ao religar não volta eco antigo |
 | **SYNC** | Ligado: **TIME** em divisões do andamento do Cubase (1/16, 1/8 T, 1/8, 1/8 D, 1/4, 1/4 D, 1/2). Desligado: **REPEAT RATE** livre (40–1500 ms), como no Space Echo — girar com eco rolando dá o efeito de pitch da fita |
 | **HEADS** | Seletor de cabeçotes: 1, 2, 3, 1+2, 2+3, 1+3, 1+2+3. Cabeçote 2 = 2× o tempo, cabeçote 3 = 3× |
 | **INTENSITY** | Realimentação. Acima de 100% entra em autooscilação controlada pela saturação |
@@ -32,7 +34,15 @@ Cadeia: entrada → filtro → seco + eco (com EQ de retorno) + sirene → **MAX
 | **THROW** | Segure para jogar o som no eco (envio 100% só enquanto pressionado) |
 
 ### RETURN EQ (eco)
-EQ nas repetições, com visor que desenha a curva: **HP** (corta grave, OFF a 2 kHz), **MID** (150 Hz – 6 kHz) com **GAIN** (±12 dB) para acentuar ou cavar um médio, e **LP** (corta agudo, 800 Hz a OFF). Duplo clique volta ao padrão.
+**Presets** com um clique (o ativo acende em âmbar):
+| Preset | HP | LP | Som |
+|---|---|---|---|
+| **FLAT** | OFF | OFF | Repetições sem EQ |
+| **HPF** | 300 Hz | OFF | Repetições finas, sem embolar o grave |
+| **LPF** | OFF | 2,5 kHz | Repetições escuras, de fita gasta |
+| **LPF+HPF** | 300 Hz | 2,5 kHz | O clássico do dub: eco "de rádio", no meio da mix |
+
+Depois do preset, os knobs continuam livres para ajuste fino. EQ nas repetições, com visor que desenha a curva: **HP** (corta grave, OFF a 2 kHz), **MID** (150 Hz – 6 kHz) com **GAIN** (±12 dB) para acentuar ou cavar um médio, e **LP** (corta agudo, 800 Hz a OFF). Duplo clique volta ao padrão.
 
 
 ## DUB SIREN

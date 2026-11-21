@@ -57,6 +57,14 @@ static juce::Path wavePath (int type, juce::Rectangle<float> r)
     return p;
 }
 
+// presets do EQ do delay: FLAT, HPF, LPF, LPF+HPF  (HP Hz, LP Hz, MID Hz, GAIN dB)
+struct EqPreset { const char* name; float hp, lp, mf, mg; };
+static const EqPreset kEqPresets[4] = {
+    { "FLAT",    20.0f,  20000.0f, 1000.0f, 0.0f },
+    { "HPF",     300.0f, 20000.0f, 1000.0f, 0.0f },
+    { "LPF",     20.0f,  2500.0f,  1000.0f, 0.0f },
+    { "LPF+HPF", 300.0f, 2500.0f,  1000.0f, 0.0f } };
+
 static juce::Font stencil (float size, float kerning = 0.08f)
 {
     return juce::Font (juce::FontOptions (size, juce::Font::bold)).withExtraKerningFactor (kerning);
@@ -229,12 +237,13 @@ void DubLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton& b,
     // lâmpada (vermelha no BYPASS, âmbar nos demais)
     const bool isBypass = b.getName() == "bypass";
     const juce::Colour lampCol = isBypass ? juce::Colour (0xffff3b2a) : colours::amber;
-    const float ls = isBypass ? 12.0f : 9.0f;
-    const auto lamp = juce::Rectangle<float> (ls, ls).withCentre ({ r.getX() + (isBypass ? 18.0f : 14.0f), r.getCentreY() });
+    const bool compact = r.getHeight() < 26.0f;
+    const float ls = isBypass && ! compact ? 12.0f : 9.0f;
+    const auto lamp = juce::Rectangle<float> (ls, ls).withCentre ({ r.getX() + (isBypass && ! compact ? 18.0f : 14.0f), r.getCentreY() });
     if (on)
     {
         g.setColour (lampCol.withAlpha (0.30f));
-        g.fillEllipse (lamp.expanded (isBypass ? 7.0f : 5.0f));
+        g.fillEllipse (lamp.expanded (isBypass && ! compact ? 7.0f : 5.0f));
         juce::ColourGradient lit (isBypass ? juce::Colour (0xffffb0a0) : juce::Colour (0xffffe3a0), lamp.getCentreX(), lamp.getCentreY(),
                                   lampCol.darker (0.2f), lamp.getRight(), lamp.getBottom(), true);
         g.setGradientFill (lit);
@@ -246,13 +255,31 @@ void DubLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton& b,
     g.drawEllipse (lamp, 1.0f);
 
     g.setColour (isBypass && on ? juce::Colour (0xffff6a55) : colours::cream.withAlpha (on ? 1.0f : 0.65f));
-    g.setFont (stencil (isBypass ? 13.0f : 11.5f, isBypass ? 0.14f : 0.08f));
-    g.drawText (b.getButtonText(), r.withTrimmedLeft (isBypass ? 28 : 22), juce::Justification::centred);
+    g.setFont (stencil (isBypass && ! compact ? 13.0f : 11.0f, isBypass ? 0.14f : 0.08f));
+    g.drawText (b.getButtonText(), r.withTrimmedLeft (isBypass && ! compact ? 28 : 22), juce::Justification::centred);
 }
 
 // THROW / SHAKE: tampa vermelha grande de botão de pedal
 void DubLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& b, const juce::Colour&, bool over, bool down)
 {
+    if (b.getName() == "preset")
+    {
+        auto r = b.getLocalBounds().toFloat().reduced (2.0f, 1.0f);
+        const bool on = b.getToggleState();
+        g.setColour (juce::Colours::black.withAlpha (0.35f));
+        g.fillRoundedRectangle (r.translated (0, 1.5f), 3.0f);
+        juce::ColourGradient cg (juce::Colour (0xff3a3632).brighter (over ? 0.08f : 0.0f), r.getX(), r.getY(),
+                                 juce::Colour (0xff141210), r.getX(), r.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRoundedRectangle (r.translated (0, down ? 1.0f : 0.0f), 3.0f);
+        if (on)
+        {
+            g.setColour (colours::amber.withAlpha (0.85f));
+            g.drawRoundedRectangle (r.reduced (0.5f), 3.0f, 1.3f);
+        }
+        return;
+    }
+
     auto r = b.getLocalBounds().toFloat().reduced (3.0f);
     g.setColour (juce::Colour (0xff1a1714));
     g.fillRoundedRectangle (r, 6.0f);                 // moldura
@@ -272,6 +299,13 @@ void DubLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& b, c
 
 void DubLookAndFeel::drawButtonText (juce::Graphics& g, juce::TextButton& b, bool, bool down)
 {
+    if (b.getName() == "preset")
+    {
+        g.setColour (b.getToggleState() ? colours::amber : colours::cream.withAlpha (0.7f));
+        g.setFont (stencil (10.0f, 0.10f));
+        g.drawText (b.getButtonText(), b.getLocalBounds().translated (0, down ? 1 : 0), juce::Justification::centred);
+        return;
+    }
     g.setColour (colours::jamGold);
     g.setFont (stencil (15.0f, 0.18f));
     g.drawText (b.getButtonText(), b.getLocalBounds().translated (0, down ? 2 : 1), juce::Justification::centred);
@@ -348,6 +382,9 @@ DubPanel::DubPanel (DubKnobProcessor& p)
     setupKnob (res,   "res",   "RESONANCE");
     setupKnob (drive, "drive", "DRIVE");
     setupKnob (fmix,  "mix",   "FILTER MIX");
+    setupToggle (filterBypass, "filterBypass", "BYPASS");
+    filterBypass.button.setName ("bypass");
+    filterBypass.button.setTooltip ("Desliga so o filtro");
     setupToggle (stepped, "stepped", "STEPPED");
     setupToggle (lowPass, "mode",    "LOW PASS");
     setupToggle (steep,   "slope",   "24 dB");
@@ -359,6 +396,16 @@ DubPanel::DubPanel (DubKnobProcessor& p)
     setupKnob (echoTone,  "echoTone",  "TONE");
     setupKnob (echoWow,   "echoWow",   "WOW");
     setupKnob (echoSend,  "echoSend",  "SEND");
+    setupToggle (echoOn, "echoOn", "DELAY ON");
+    echoOn.button.setTooltip ("Liga/desliga o delay");
+    for (int i = 0; i < 4; ++i)
+    {
+        eqPreset[i].setName ("preset");
+        eqPreset[i].setButtonText (kEqPresets[i].name);
+        eqPreset[i].setTooltip ("Preset do EQ do delay");
+        eqPreset[i].onClick = [this, i] { applyEqPreset (i); };
+        addAndMakeVisible (eqPreset[i]);
+    }
     setupToggle (echoSync, "echoSync", "SYNC");
     setupToggle (echoPP,   "echoPP",   "PING-PONG");
     addAndMakeVisible (throwBtn);
@@ -459,6 +506,33 @@ void DubPanel::updateSyncVisibility()
     echoMs.slider.setVisible (! sync); echoMs.label.setVisible (! sync);
 }
 
+void DubPanel::applyEqPreset (int i)
+{
+    const auto& pr = kEqPresets[juce::jlimit (0, 3, i)];
+    auto set = [this] (const char* id, float v)
+    {
+        if (auto* p = proc.apvts.getParameter (id))
+        {
+            p->beginChangeGesture();
+            p->setValueNotifyingHost (p->convertTo0to1 (v));
+            p->endChangeGesture();
+        }
+    };
+    set ("eqEHp", pr.hp); set ("eqELp", pr.lp); set ("eqEMf", pr.mf); set ("eqEMg", pr.mg);
+}
+
+int DubPanel::matchingEqPreset() const
+{
+    const auto e = proc.getEqSettings();
+    for (int i = 0; i < 4; ++i)
+    {
+        const auto& pr = kEqPresets[i];
+        if (std::abs (e.hpHz - pr.hp) < pr.hp * 0.03f && std::abs (e.lpHz - pr.lp) < pr.lp * 0.03f && std::abs (e.midDb - pr.mg) < 0.1f)
+            return i;
+    }
+    return -1;
+}
+
 juce::Point<float> DubPanel::waveIconCentre (int i) const
 {
     const auto circ = knobCircle (sirWave.slider);
@@ -499,6 +573,11 @@ void DubPanel::timerCallback()
         peakLamp[ch] = vu > 3.0f;
     }
     repaint (vuPanel);
+    {
+        const int m = matchingEqPreset();
+        for (int i = 0; i < 4; ++i)
+            if (eqPreset[i].getToggleState() != (i == m)) eqPreset[i].setToggleState (i == m, juce::dontSendNotification);
+    }
 
     // medidor moderno: pico com queda de 20 dB/s, hold de 1.5 s, GR com retorno suave
     for (int ch = 0; ch < 2; ++ch)
@@ -518,7 +597,8 @@ void DubPanel::timerCallback()
     repaint (sirWave.slider.getBounds().expanded (4));
 
     const float f = proc.getDisplayFrequency();
-    const auto ft = f < 25.0f && ! lowPass.button.getToggleState() ? juce::String ("OFF")
+    const auto ft = filterBypass.button.getToggleState() ? juce::String ("BYPASS")
+                  : f < 25.0f && ! lowPass.button.getToggleState() ? juce::String ("OFF")
                   : f >= 1000.0f ? juce::String (f / 1000.0f, 1) + " kHz"
                                  : juce::String ((int) std::round (f)) + " Hz";
     const auto et = juce::String (proc.getDisplayBpm(), 1) + " BPM";
@@ -734,7 +814,7 @@ void DubPanel::renderBackground()
     // --- placa metálica antiga "DUB STATION" (latão escovado, rebites, letras gravadas)
     {
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION 3.1");
+        const juce::String t ("DUB STATION 3.2");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
 
@@ -1275,8 +1355,15 @@ void DubPanel::drawEqGraph (juce::Graphics& g, juce::Rectangle<float> r)
 void DubPanel::placeEq (juce::Rectangle<int> r, Knob& a, Knob& b, Knob& c, Knob& d, juce::Rectangle<int>& graph)
 {
     r.removeFromTop (18);                       // espaço do título "RETURN EQ"
-    graph = r.removeFromTop (54).reduced (8, 0);
-    r.removeFromTop (6);
+    graph = r.removeFromTop (42).reduced (8, 0);
+    r.removeFromTop (5);
+    {   // presets FLAT / HPF / LPF / LPF+HPF
+        auto row = r.removeFromTop (22).reduced (6, 0);
+        const int pw = row.getWidth() / 4;
+        for (int i = 0; i < 4; ++i)
+            eqPreset[i].setBounds (i < 3 ? row.removeFromLeft (pw) : row);
+    }
+    r.removeFromTop (3);
     const int w = r.getWidth() / 4;
     placeKnob (a, r.removeFromLeft (w));
     placeKnob (b, r.removeFromLeft (w));
@@ -1388,6 +1475,7 @@ void DubPanel::resized()
     vuPanel = area;
 
     // FILTER
+    filterBypass.button.setBounds (filterPanel.getRight() - 112, filterPanel.getY() - 12, 100, 24);
     {
         auto r = filterPanel.reduced (10);
         r.removeFromTop (14);
@@ -1409,7 +1497,8 @@ void DubPanel::resized()
     {
         auto r = echoPanel.reduced (10);
         r.removeFromTop (18);
-        echoInfo = juce::Rectangle<int> (echoPanel.getRight() - 104, echoPanel.getY() - 9, 88, 18);
+        echoOn.button.setBounds (echoPanel.getRight() - 124, echoPanel.getY() - 12, 112, 24);
+        echoInfo = juce::Rectangle<int> (echoPanel.getRight() - 124 - 96, echoPanel.getY() - 9, 88, 18);
         auto row1 = r.removeFromTop (150);
         const int w3 = row1.getWidth() / 3;
         auto t = row1.removeFromLeft (w3);
