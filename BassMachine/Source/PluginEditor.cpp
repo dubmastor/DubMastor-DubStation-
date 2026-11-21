@@ -2,7 +2,7 @@
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
- #define JucePlugin_VersionString "2.0.0"
+ #define JucePlugin_VersionString "2.1.0"
 #endif
 static juce::String versionShort() { return juce::String (JucePlugin_VersionString).upToLastOccurrenceOf (".", false, false); }
 

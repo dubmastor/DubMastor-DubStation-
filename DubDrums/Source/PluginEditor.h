@@ -68,8 +68,8 @@ private:
 class ChoiceButtons : public ParamControl
 {
 public:
-    ChoiceButtons (juce::RangedAudioParameter& p, juce::StringArray labels, int columns)
-        : ParamControl (p), names (std::move (labels)), cols (columns) {}
+    ChoiceButtons (juce::RangedAudioParameter& p, juce::StringArray labels, int columns, bool compactCaps = false)
+        : ParamControl (p), names (std::move (labels)), cols (columns), compact (compactCaps) {}
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override;
 
@@ -77,6 +77,28 @@ private:
     juce::Rectangle<float> cell (int i) const;
     juce::StringArray names;
     int cols;
+    bool compact;
+};
+
+// Chave seletora do baterista: knob "cabeça de galinha" de baquelite com três posições,
+// lâmpada e nome gravado em cada posição. Clique no nome, arraste o knob ou use a rodinha.
+class DrummerSwitch : public ParamControl
+{
+public:
+    using ParamControl::ParamControl;
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override { dragging = false; }
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+
+private:
+    juce::Point<float> centre() const;
+    float radius() const;
+    juce::Rectangle<float> labelArea (int i) const;
+    static float angleOf (int i) { return juce::MathConstants<float>::pi * 0.29f * (float) (i - 1); }
+    bool dragging = false;
+    int dragStartIndex = 0;
 };
 
 // Compassos: janela de contador mecânico; clique à direita avança, à esquerda volta
@@ -207,13 +229,14 @@ private:
     DubDrumsProcessor& proc;
     DubLookAndFeel lnf;
 
-    ChoiceButtons styleButtons, hatButtons;
+    ChoiceButtons styleButtons, hatButtons, backbeatButtons, kitButtons;
+    DrummerSwitch drummerSwitch;
     BarsWindow bars;
     SeedWindow seed;
     PushButton variation { "NOVA VARIACAO" };
     PushButton notesButton { "NOTAS" };
     Toggle fill, intro, swingAll, preview, sound, colorMidi;
-    Knob swing, dynamics, drummer;
+    Knob swing, dynamics;
     Knob rndKick, rndSnare, rndHat, rndPerc, channel, bpm, volume;
     NoteMapPanel noteMap;
     juce::TextButton exportBtn { "EXPORTAR" };
@@ -222,7 +245,8 @@ private:
 
     juce::Image background;
     juce::Rectangle<int> woodL, woodR, plate;
-    juce::Rectangle<int> styleMod, loopMod, hatMod, dynMod, randPanel, soundPanel, midiPanel, grid;
+    juce::Rectangle<int> styleMod, loopMod, drumMod, hatMod, dynMod, randPanel, soundPanel, midiPanel, grid;
+    juce::Rectangle<int> drummerDisplay;
     juce::Rectangle<int> styleDisplay, hatDisplay, dynDisplay, kickDots;
     dubdrums::Pattern pattern;
     int lastVersion = -1;

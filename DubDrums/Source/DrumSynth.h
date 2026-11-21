@@ -16,6 +16,9 @@ namespace dubdrums
 class DrumSynth
 {
 public:
+    enum class Kit { Acoustic = 0, Digital };
+    void setKit (Kit k) noexcept { kit = k; }
+
     void prepare (double sampleRate)
     {
         sr = sampleRate > 0 ? sampleRate : 44100.0;
@@ -88,7 +91,8 @@ private:
         float vel = 1.0f, pan = 0.0f;
         double t = 0.0;            // segundos desde o toque
         double phase[6] {};        // osciladores
-        float hp = 0.0f, hpIn = 0.0f, bp1 = 0.0f, bp2 = 0.0f, chokeGain = 1.0f;
+        float held = 0.0f; double holdPhase = 1.0;   // kit digital: amostragem baixa
+        float hp = 0.0f, hpIn = 0.0f, lp = 0.0f, tape = 0.0f, bp1 = 0.0f, bp2 = 0.0f, chokeGain = 1.0f;
         uint32_t noiseState = 1;
         int64_t age = 0;
     };
@@ -108,6 +112,14 @@ private:
         v.hp = a * (v.hp + x - v.hpIn);
         v.hpIn = x;
         return v.hp;
+    }
+
+    // passa-baixas de 1 polo
+    float lowpass (Voice& v, float x, float cutoff)
+    {
+        const float a = (float) std::exp (-twoPi * cutoff / sr);
+        v.lp = a * v.lp + (1.0f - a) * x;
+        return v.lp;
     }
 
     // passa-faixa simples (state variable)
@@ -145,8 +157,86 @@ private:
         return s / 6.0f;
     }
 
+    // Kit DIGITAL (King Jammy / Sleng Teng, 1985): sons de teclado Casio dos anos 80,
+    // curtos e "de brinquedo", gerados em baixa resolução e baixa taxa de amostragem.
+    float nextDigital (Voice& v)
+    {
+        const double t = v.t;
+        float out = 0.0f;
+        double end = 0.5;
+        switch (v.note)
+        {
+            case gm::Kick:      // "bip" grave e curto: seno com queda rápida
+            {
+                const double f = 62.0 + 150.0 * std::exp (-t / 0.012);
+                out = osc (v, 0, f) * env (t, 0.075) * 1.1f;
+                end = 0.35;
+                break;
+            }
+            case gm::Snare:     // chiado de ruído com um tiquinho de tom
+            {
+                out = noise (v) * env (t, 0.075) * 0.75f + square (v, 0, 235.0) * env (t, 0.018) * 0.25f;
+                end = 0.35;
+                break;
+            }
+            case gm::SideStick: // clique quadrado
+            {
+                out = square (v, 0, 1250.0) * env (t, 0.010) * 0.6f;
+                end = 0.08;
+                break;
+            }
+            case gm::ClosedHat: case gm::PedalHat:   // tique metálico
+            {
+                out = highpass (v, noise (v), 5000.0f) * env (t, 0.018) * 1.4f;
+                end = 0.12;
+                break;
+            }
+            case gm::OpenHat:
+            {
+                if (v.choke) { v.chokeGain *= 0.99f; if (v.chokeGain < 0.001f) v.active = false; }
+                out = highpass (v, noise (v), 4500.0f) * env (t, 0.14) * 1.1f * v.chokeGain;
+                end = 0.8;
+                break;
+            }
+            case gm::TomHigh: case gm::TomMid: case gm::TomLow:   // "blips" quadrados afinados
+            {
+                const double base = v.note == gm::TomHigh ? 330.0 : (v.note == gm::TomMid ? 247.0 : 185.0);
+                out = square (v, 0, base * (1.0 + 0.5 * std::exp (-t / 0.02))) * env (t, 0.09) * 0.45f;
+                end = 0.45;
+                break;
+            }
+            case gm::Crash:
+            {
+                out = highpass (v, noise (v), 3000.0f) * env (t, 0.45) * 0.6f;
+                end = 2.0;
+                break;
+            }
+            default:
+                v.active = false;
+                return 0.0f;
+        }
+        if (t > end) v.active = false;
+
+        // baixa resolução (6 bits) e baixa taxa de amostragem (~11 kHz)
+        v.holdPhase += 11025.0 / sr;
+        if (v.holdPhase >= 1.0)
+        {
+            v.holdPhase -= std::floor (v.holdPhase);
+            v.held = std::round (std::clamp (out, -1.0f, 1.0f) * 31.0f) / 31.0f;
+        }
+        return v.held * v.vel * 0.72f;
+    }
+
     float next (Voice& v)
     {
+        if (kit == Kit::Digital)
+        {
+            const float o = nextDigital (v);
+            v.t += 1.0 / sr;
+            ++v.age;
+            return o;
+        }
+
         const double t = v.t;
         v.t += 1.0 / sr;
         ++v.age;
@@ -155,12 +245,21 @@ private:
 
         switch (v.note)
         {
-            case gm::Kick:   // redondo e curto: seno com queda de afinação + clique de feltro
+            case gm::Kick:
             {
-                const double f = 48.0 + 70.0 * std::exp (-t / 0.028);
-                out = osc (v, 0, f) * env (t, 0.20) * 0.95f
-                    + highpass (v, noise (v), 1500.0f) * env (t, 0.004) * 0.25f;
-                end = 1.2;
+                // bumbo de estúdio jamaicano dos anos 70 / começo dos 80 (Channel One, Volcano):
+                // casco grande e abafado, batedor de feltro, sem a queda longa de afinação do 808,
+                // e um pouco de saturação de fita
+                const double f = 57.0 * (1.0 + 0.10 * std::exp (-t / 0.030));
+                const float attack = 1.0f - env (t, 0.0015);
+                const float body   = osc (v, 0, f) * env (t, 0.115);
+                const float shell  = osc (v, 1, f * 1.59) * env (t, 0.065) * 0.38f
+                                   + osc (v, 2, f * 2.37) * env (t, 0.032) * 0.16f;
+                const float felt   = lowpass (v, noise (v), 1600.0f) * env (t, 0.007) * 0.9f
+                                   + bandpass (v, noise (v), 210.0f, 1.4f) * env (t, 0.022) * 0.9f;
+                const float x = (body + shell) * attack + felt;
+                out = std::tanh (1.8f * x) / std::tanh (1.8f) * 0.95f;   // fita
+                end = 0.9;
                 break;
             }
             case gm::SideStick:   // aro: "toc" de madeira, seco
@@ -171,11 +270,20 @@ private:
                 end = 0.15;
                 break;
             }
-            case gm::Snare:   // caixa afinada alta, estalada, esteira curta
+            case gm::Snare:
             {
-                const double f = 260.0 + 60.0 * std::exp (-t / 0.010);
-                out = (osc (v, 0, f) * 0.55f + osc (v, 1, f * 1.62) * 0.25f) * env (t, 0.055)
-                    + highpass (v, noise (v), 1800.0f) * env (t, 0.11) * 0.55f;
+                // caixa jamaicana: afinada alta, cantando, com estalo de aro (rimshot) e esteira curta
+                const double f = 305.0 * (1.0 + 0.07 * std::exp (-t / 0.008));
+                const float tone  = osc (v, 0, f) * env (t, 0.085) * 0.55f
+                                  + osc (v, 1, f * 1.47) * env (t, 0.055) * 0.30f
+                                  + osc (v, 2, f * 2.14) * env (t, 0.030) * 0.15f;
+                const float wires = bandpass (v, noise (v), 3300.0f, 1.1f) * env (t, 0.11) * 0.60f;
+                const float crack = lowpass (v, noise (v), 5000.0f) * env (t, 0.004) * 1.4f;   // estalo do aro (filtro próprio)
+                out = std::tanh (1.4f * (tone + wires + crack)) * 0.9f;
+                // fita dos anos 70: tira o chiado de cima
+                const float a = (float) std::exp (-twoPi * 6500.0 / sr);
+                v.tape = a * v.tape + (1.0f - a) * out;
+                out = v.tape * 1.25f;
                 end = 0.7;
                 break;
             }
@@ -221,6 +329,7 @@ private:
     std::array<Voice, 32> voices {};
     double sr = 44100.0;
     uint32_t counter = 1;
+    Kit kit = Kit::Acoustic;
 };
 
 } // namespace dubdrums

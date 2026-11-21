@@ -1,4 +1,8 @@
-# Mastor Bass Machine MBM-710 — 2.0 · Gerador de Reggae Bass Lines
+# Mastor Bass Machine MBM-710 — 2.1 · Gerador de Reggae Bass Lines
+
+- Bateria de acompanhamento com o kit acústico do **Dub Drums 1.1**: bumbo abafado de estúdio jamaicano dos anos 70 (no lugar do bumbo com cara de 808) e caixa afinada alta com estalo de aro
+
+## 2.0
 
 - Botoeira de 7 teclas intertravadas no lugar da chave rotativa: **Family Man**, **Flabba**, **Derrick Barnett** (antes "Sagittarius"), e os novos **Robbie** (Shakespeare), **Leroy Sibbles**, **Fully Fullwood** e **Jammys** (Sleng Teng)
 - Novo timbre **SLENG TENG** (teclado digital de 1985) no sistema de timbres do Dub Bass

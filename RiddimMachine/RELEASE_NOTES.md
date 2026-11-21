@@ -1,4 +1,12 @@
-## Mastor Riddim Machine MRM-0420 1.0
+## Mastor Riddim Machine MRM-0420 1.1
+
+A aba **BATERIA** agora traz o **Dub Drums 1.1**:
+
+- Módulo **BATERISTA** com chave seletora (Style Scott, Santa Davis, Carlton Barrett) e a assinatura de hi-hat de cada um
+- **Caixa no 3** por padrão, com a escolha **CAIXA / ARO / AMBOS**
+- **KIT ANOS 70** (bumbo abafado de estúdio jamaicano e caixa afinada alta) ou **KIT DIGITAL** estilo King Jammy / Sleng Teng, com tempo de máquina
+
+## 1.0
 
 O **Dub Chords** e o **Dub Drums** num instrumento só, no visual Dub Station, para começar um riddim rápido.
 

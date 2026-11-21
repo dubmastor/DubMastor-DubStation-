@@ -1,5 +1,5 @@
 // Salva uma imagem da interface sem abrir a DAW:
-// ./render_preview interface.png [estilo] [compassos] [semente] [intro|notas] [baterista 0-2]
+// ./render_preview interface.png [estilo] [compassos] [semente] [intro|notas] [baterista 0-2] [kit 0-1]
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "PluginProcessor.h"
@@ -23,6 +23,7 @@ int main (int argc, char** argv)
     set ("rndSnare", 35.0f);
     set ("intro", argc > 5 && juce::String (argv[5]).contains ("intro") ? 1.0f : 0.0f);
     set ("drummer", argc > 6 ? (float) juce::String (argv[6]).getIntValue() : 2.0f);
+    set ("kit", argc > 7 ? (float) juce::String (argv[7]).getIntValue() : 0.0f);
 
     // "algo.mid": salva o MIDI que o EXPORTAR/arrastar gera
     if (out.hasFileExtension ("mid"))

@@ -1,8 +1,8 @@
-# DubMastor Dub Drums 1.0
+# DubMastor Dub Drums 1.1
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.0/DubMastorDubDrums-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.0/DubMastorDubDrums-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.1/DubMastorDubDrums-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.1/DubMastorDubDrums-macOS.zip)**
 
 ![Interface do Dub Drums](docs/interface.png)
 
@@ -20,6 +20,7 @@ carregue numa *Instrument Track*.
 | **ROCKERS** | Bumbo no 1 e no 3, aro no 3 |
 | **STEPPA** | Bumbo nos quatro tempos, caixa no 3 |
 
+**BATIDA PRINCIPAL:** **CAIXA** (padrão), **ARO** (cross-stick) ou **AMBOS** (aro e caixa juntos).
 As bolinhas **BUMBO NOS TEMPOS** mostram onde o bumbo cai no estilo escolhido.
 
 ## LOOP
@@ -31,20 +32,22 @@ As bolinhas **BUMBO NOS TEMPOS** mostram onde o bumbo cai no estilo escolhido.
 | **SEMENTE** | A mesma semente sempre gera o mesmo groove. Arraste para cima/baixo ou use a rodinha |
 | **NOVA VARIAÇÃO** | Sorteia outra semente |
 
+## BATERISTA
+Chave seletora de três posições (knob "cabeça de galinha" com lâmpada e nome em cada posição): clique no nome,
+arraste o knob ou use a rodinha. O display mostra o baterista e embaixo vêm a banda e a assinatura.
+
+| | Hi-hat (assinatura) | Sensação | Viradas características |
+|---|---|---|---|
+| **STYLE SCOTT** (Roots Radics, Volcano) | Acento forte no contratempo, tempos leves, quase sem enfeite, "latido" curto do aberto no "e" do 4 | Reto e em cima do tempo. No **ROCKERS** toca bumbo no 1 e 3 e **caixa no 2 e no 4**, como no estilo dos Roots Radics | Estalos de caixa em semicolcheia, estalos sincopados, tons descendo |
+| **SANTA DAVIS** (Soul Syndicate, Aggrovators) | **Flying cymbal**: hi-hat abre no 2 e no 4 e o pé fecha no contratempo seguinte, com semicolcheias leves no meio | Balanço médio, muitas ghost notes | Rufo de fusas em crescendo, caixa e tons em semicolcheia, flams |
+| **CARLTON BARRETT** (The Wailers) | **Tercina quebrada**: alguns tempos viram tercina (cheia ou só 1ª e 3ª nota); no one drop o hi-hat **cai do 1** junto com o bumbo; hi-hat aberto na última colcheia puxando o compasso seguinte | Atrás do tempo, balanço puxado para a tercina | Rufo em tercina no 4 com flam, tercinas nos tons, entrada da caixa até o surdo |
+
 ## HI-HAT
 | Controle | O que faz |
 |---|---|
-| **FIGURA** | 1/8 (colcheias), 1/16 (semicolcheias), CONTRA (contratempo) ou TERCINA |
-| **BATERISTA** | Chave seletora de 3 posições. Muda o balanço, o microtempo e as viradas (veja abaixo). O nome aparece no display |
+| **FIGURA** | 1/8 (colcheias), 1/16 (semicolcheias), CONTRA (contratempo) ou TERCINA. A assinatura do baterista entra por cima |
 | **SWING** | Reto, leve, médio, pesado ou shuffle (tercina) |
 | **SWING EM TUDO** | Aplica o balanço também no bumbo, caixa e tons |
-
-### Os bateristas
-| | Sensação | Viradas características |
-|---|---|---|
-| **STYLE SCOTT** (Roots Radics) | Mais reto e em cima do tempo, aro seco, hi-hat aberto "latindo" no contratempo | Estalos de caixa em semicolcheia, estalos sincopados, tons descendo em semicolcheia |
-| **SANTA DAVIS** (Soul Syndicate) | Balanço médio, muitos enfeites no hi-hat e ghost notes na caixa | Rufo de fusas em crescendo, semicolcheias misturando caixa e tons, flams em sequência |
-| **CARLTON BARRETT** (Wailers) | Atrás do tempo, balanço puxado para a tercina, hi-hat econômico | Rufo em tercina no 4 com flam, tercinas nos tons, entrada do one drop da caixa até o surdo |
 
 O swing escolhido no knob é a base; cada baterista soma o seu jeito (Scott deixa mais reto, Santa um
 pouco mais balançado, Carlton bem mais). Ele também atrasa ou adianta cada peça alguns milissegundos.
@@ -57,7 +60,9 @@ pouco mais balançado, Carlton bem mais). Ele também atrasa ou adianta cada pe�
 | Controle | O que faz |
 |---|---|
 | **PREVIEW** | Toca o groove sem a DAW rodando, no **BPM** do knob, começando pela intro |
-| **SOM INTERNO / VOLUME** | Bateria interna de reggae limpo (bumbo redondo, aro seco, caixa afinada alta, hi-hats, tons e prato). Toca junto com a DAW. Desligue quando mandar o MIDI para a sua bateria |
+| **SOM INTERNO / VOLUME** | Bateria interna, toca junto com a DAW. Desligue quando mandar o MIDI para a sua bateria |
+| **KIT: ANOS 70** | Estúdio jamaicano dos anos 70 / começo dos 80 (Channel One, Volcano): bumbo grande e abafado com batedor de feltro e um pouco de fita (sem a queda de afinação do 808), caixa afinada alta e cantando com estalo de aro, aro seco, hi-hats, tons e prato |
+| **KIT: DIGITAL** | Estilo King Jammy / **Sleng Teng** (1985): sons de teclado Casio dos anos 80, curtos e lo-fi (bumbo "bip", caixa de chiado, hi-hat em tique, tons em "blip"), em baixa resolução. Também muda o groove para **tempo de máquina**: grade exata, sem atraso humano e só dois níveis de força, no preview e no MIDI |
 
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. O clipe vem com a intro (se ligada) e os compassos do loop, com marcadores "Intro", "Compasso 1", "Compasso 2"...

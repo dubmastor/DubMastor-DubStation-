@@ -6,7 +6,7 @@ namespace
     juce::String u8s (const char* s) { return juce::String::fromUTF8 (s); }
 
     // parâmetros que mudam o padrão (os outros só mudam o som ou a saída)
-    const char* const kParamIds[] = { "style", "bars", "hatPattern", "swing", "swingAll", "dynamics", "drummer",
+    const char* const kParamIds[] = { "style", "bars", "hatPattern", "swing", "swingAll", "dynamics", "drummer", "backbeat", "kit",
                                       "rndKick", "rndSnare", "rndHat", "rndPerc", "fill", "intro", "seed" };
     constexpr int kTicksPerQuarter = 960;
 }
@@ -62,6 +62,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
 
     // 1.0: baterista, introdução, preview / som interno e mapa de notas
     choice ("drummer", "Baterista", { "Style Scott", "Santa Davis", "Carlton Barrett" }, 2);
+    choice ("backbeat", "Batida principal", { "Caixa", "Aro", "Caixa + aro" }, 0);
+    choice ("kit", "Kit", { "Acustico (anos 70)", "Digital (King Jammy / Sleng Teng)" }, 0);
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "intro", 1 }, u8s ("Virada de introdução"), false));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "preview", 1 }, "Preview", false));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "colorMidi", 1 }, "MIDI colorido (um canal por compasso)", true));
@@ -141,6 +143,8 @@ dubdrums::Settings DubDrumsProcessor::readSettings() const
     s.fill       = get ("fill") > 0.5f;
     s.intro      = get ("intro") > 0.5f;
     s.drummer    = (dubdrums::Drummer)    juce::roundToInt (get ("drummer"));
+    s.backbeat   = (dubdrums::Backbeat)   juce::roundToInt (get ("backbeat"));
+    s.machine    = juce::roundToInt (get ("kit")) == 1;
     s.seed       = (uint32_t) juce::roundToInt (get ("seed"));
     return s;
 }
@@ -217,6 +221,8 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     const bool soundOn   = apvts.getRawParameterValue ("sound")->load() > 0.5f;
     const bool previewOn = apvts.getRawParameterValue ("preview")->load() > 0.5f;
     const float volume   = apvts.getRawParameterValue ("volume")->load();
+    synth.setKit (apvts.getRawParameterValue ("kit")->load() > 0.5f ? dubdrums::DrumSynth::Kit::Digital
+                                                                   : dubdrums::DrumSynth::Kit::Acoustic);
 
     bool playing = false;
     double ppq = 0.0, bpm = 120.0;

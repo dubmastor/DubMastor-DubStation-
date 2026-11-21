@@ -34,6 +34,9 @@ enum class Dynamics   { Soft = 0, Medium, Loud, Accented, Crescendo, Breathing }
 //  - Carlton Barrett (Wailers): atrás do tempo, balanço de tercina, rufos em tercina no 4
 enum class Drummer    { StyleScott = 0, SantaDavis, CarltonBarrett };
 
+// Batida principal (o "3" do one drop/rockers/steppa): caixa, aro (cross-stick) ou os dois juntos
+enum class Backbeat   { Snare = 0, Rim, Both };
+
 struct Settings
 {
     Style      style      = Style::OneDrop;
@@ -50,6 +53,9 @@ struct Settings
     float randPerc  = 0.0f;   // tons / viradas
 
     Drummer  drummer = Drummer::CarltonBarrett;
+    Backbeat backbeat = Backbeat::Snare;
+    bool     machine  = false;  // kit DIGITAL (King Jammy / Sleng Teng): tempo de máquina, quantizado,
+                                // sem atraso humano e só dois níveis de força, como num teclado Casio
     bool     fill  = true;    // virada no último compasso (+ prato no "1")
     bool     intro = false;   // compasso de virada antes do primeiro compasso (toca uma vez)
     uint32_t seed = 1;

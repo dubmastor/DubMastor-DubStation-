@@ -57,6 +57,8 @@ jobs:
           $R test-out/notas.png 0 4 42 notas 0
           $R test-out/preview-carlton.wav 0 2 42 intro 2
           $R test-out/preview-scott.wav 2 2 42 intro 0
+          $R test-out/preview-santa.wav 0 2 42 intro 1
+          $R test-out/preview-digital.wav 1 2 42 intro 0 1
           $R test-out/onedrop-intro.mid 0 4 42 intro 2
 
       - uses: actions/upload-artifact@v4

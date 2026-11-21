@@ -176,6 +176,36 @@ int main()
         check (generate (s).intro.empty() && generate (s).introLengthInBeats == 0.0, "sem intro quando desligada");
     }
 
+    // batida principal e assinaturas de hi-hat
+    {
+        auto at = [] (const Pattern& p, int note, double beat, double tol = 0.03)
+        {
+            for (auto& e : p.events) if (e.note == note && std::abs (e.beat - beat) < tol) return true;
+            return false;
+        };
+        for (int d = 0; d < 3; ++d) for (int st = 0; st < 3; ++st)
+        {
+            Settings s; s.bars = 2; s.fill = false; s.style = (Style) st; s.drummer = (Drummer) d; s.seed = 3;
+            s.randKick = s.randSnare = s.randHat = s.randPerc = 0.2f;
+            auto p = generate (s);
+            const bool scottRockers = d == 0 && st == 1;
+            for (int bar = 0; bar < 2; ++bar)
+            {
+                const double o = bar * 4.0;
+                if (scottRockers) check (at (p, gm::Snare, o + 1.0) && at (p, gm::Snare, o + 3.0), "Style Scott rockers: caixa no 2 e no 4");
+                else              check (at (p, gm::Snare, o + 2.0), "caixa no 3 (padrao CAIXA)");
+                if (d == 1) check (at (p, gm::OpenHat, o + 1.0) && at (p, gm::OpenHat, o + 3.0), "Santa Davis: flying cymbal no 2 e no 4");
+                if (d == 2 && st == 0) check (! at (p, gm::ClosedHat, o + 0.0, 0.01) && ! at (p, gm::OpenHat, o + 0.0, 0.01), "Carlton one drop: hi-hat cai do 1");
+            }
+            if (st == 0) printGrid (p, (std::string ("Assinatura - ") + drummerName ((Drummer) d) + " / " + styleName ((Style) st)).c_str());
+            if (scottRockers) printGrid (p, "Assinatura - Style Scott / Rockers");
+        }
+        Settings rim; rim.backbeat = Backbeat::Rim; rim.fill = false; rim.bars = 1;
+        check (at (generate (rim), gm::SideStick, 2.0) && ! at (generate (rim), gm::Snare, 2.0), "opcao ARO");
+        Settings both = rim; both.backbeat = Backbeat::Both;
+        check (at (generate (both), gm::SideStick, 2.0) && at (generate (both), gm::Snare, 2.0), "opcao AMBOS");
+    }
+
     std::printf ("\n%s (%d falhas)\n", failures ? "TESTES FALHARAM" : "TODOS OS TESTES OK", failures);
     return failures ? 1 : 0;
 }

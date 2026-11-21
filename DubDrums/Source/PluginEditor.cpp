@@ -508,6 +508,7 @@ void DubDrumsPanel::renderBackground()
 
     section (styleMod,  "ESTILO");
     section (loopMod,   "LOOP");
+    section (drumMod,   "BATERISTA");
     section (hatMod,    "HI-HAT");
     section (dynMod,    "DINAMICA");
     section (randPanel, "ALEATORIEDADE");
@@ -519,7 +520,8 @@ void DubDrumsPanel::renderBackground()
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
     for (auto [c, t] : { std::pair<juce::Component*, const char*> { &styleButtons, "ESCOLHA O ESTILO" },
-                         { &bars, "COMPASSOS" }, { &seed, "SEMENTE" }, { &hatButtons, "FIGURA" } })
+                         { &bars, "COMPASSOS" }, { &seed, "SEMENTE" }, { &hatButtons, "FIGURA" },
+                         { &backbeatButtons, "BATIDA PRINCIPAL" }, { &kitButtons, "KIT" } })
         g.drawText (t, c->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
     g.drawText ("BUMBO NOS TEMPOS", kickDots.translated (0, -15).withHeight (12), juce::Justification::centred);
     g.drawText ("HUMANIZA FORCA E TEMPO", randPanel.reduced (14, 0).removeFromBottom (18).translated (0, -4),
@@ -531,7 +533,6 @@ void DubDrumsPanel::renderBackground()
     for (auto* k : { &rndKick, &rndSnare, &rndHat, &rndPerc })
         drawKnobScale (g, k->slider, 11);
     drawKnobScale (g, channel.slider, 16);
-    drawKnobScale (g, drummer.slider, 3, { "SCOTT", "SANTA", "CARLTON" });
     drawKnobScale (g, bpm.slider, 11);
     drawKnobScale (g, volume.slider, 11);
 }
@@ -573,7 +574,28 @@ void ChoiceButtons::paint (juce::Graphics& g)
     for (int i = 0; i < names.size(); ++i)
     {
         auto c = cell (i);
-        pushButtonCap (g, c.withTrimmedBottom (2.5f), index() == i, isMouseOver() && c.contains (mouse), names[i]);
+        if (! compact)
+        {
+            pushButtonCap (g, c.withTrimmedBottom (2.5f), index() == i, isMouseOver() && c.contains (mouse), names[i]);
+            continue;
+        }
+        // tampa menor: lâmpada pequena em cima, texto embaixo
+        const bool on = index() == i, over = isMouseOver() && c.contains (mouse);
+        auto cap = c.withTrimmedBottom (2.5f);
+        g.setColour (juce::Colours::black.withAlpha (0.4f));
+        g.fillRoundedRectangle (cap.translated (0, 2.5f), 3.0f);
+        cap = cap.translated (0, on ? 2.0f : 0.0f);
+        juce::ColourGradient cg (juce::Colour (on ? 0xff2c2925 : 0xff3a3632).brighter (over && ! on ? 0.08f : 0.0f), cap.getX(), cap.getY(),
+                                 juce::Colour (0xff141210), cap.getX(), cap.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRoundedRectangle (cap, 3.0f);
+        const auto lamp = juce::Rectangle<float> (7.0f, 7.0f).withCentre ({ cap.getCentreX(), cap.getY() + 9.0f });
+        if (on) { g.setColour (colours::amber.withAlpha (0.35f)); g.fillEllipse (lamp.expanded (4.0f)); }
+        g.setColour (on ? colours::amber : juce::Colour (0xff4a3a22));
+        g.fillEllipse (lamp);
+        g.setColour (on ? colours::cream : colours::cream.withAlpha (0.5f));
+        g.setFont (stencil (10.0f, 0.1f));
+        g.drawText (names[i], cap.withTrimmedTop (15.0f), juce::Justification::centred);
     }
 }
 
@@ -685,6 +707,9 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     : proc (p),
       styleButtons (*p.apvts.getParameter ("style"), { "ONE DROP", "ROCKERS", "STEPPA" }, 1),
       hatButtons (*p.apvts.getParameter ("hatPattern"), { "1/8", "1/16", "CONTRA", "TERCINA" }, 2),
+      backbeatButtons (*p.apvts.getParameter ("backbeat"), { "CAIXA", "ARO", "AMBOS" }, 3, true),
+      kitButtons (*p.apvts.getParameter ("kit"), { "ANOS 70", "DIGITAL" }, 2, true),
+      drummerSwitch (*p.apvts.getParameter ("drummer")),
       bars (*p.apvts.getParameter ("bars")),
       seed (*p.apvts.getParameter ("seed")),
       noteMap (p),
@@ -693,6 +718,8 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     setLookAndFeel (&lnf);
 
     for (juce::Component* c : { (juce::Component*) &styleButtons, (juce::Component*) &hatButtons,
+                                (juce::Component*) &backbeatButtons, (juce::Component*) &drummerSwitch,
+                                (juce::Component*) &kitButtons,
                                 (juce::Component*) &bars, (juce::Component*) &seed, (juce::Component*) &variation })
         addAndMakeVisible (c);
     variation.onClick = [this] { proc.newVariation(); };
@@ -705,11 +732,8 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     setupToggle (colorMidi, "colorMidi", "MIDI COLORIDO");
 
     setupKnob (swing, "swing", "SWING");
-    setupKnob (drummer, "drummer", "BATERISTA");
     setupKnob (dynamics, "dynamics", {});
-    drummer.slider.setRotaryParameters (juce::MathConstants<float>::twoPi - juce::MathConstants<float>::pi / 3.0f,
-                                        juce::MathConstants<float>::twoPi + juce::MathConstants<float>::pi / 3.0f, true);
-    for (auto* k : { &swing, &dynamics, &drummer })
+    for (auto* k : { &swing, &dynamics })
         k->slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     dynamics.label.setVisible (false);
 
@@ -740,7 +764,7 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     addChildComponent (noteMap);
     noteMap.onClose = [this] { noteMap.setVisible (false); };
 
-    setSize (1280, 868);
+    setSize (1280, 868);   // mesma largura da 1.0: o Riddim Machine encaixa este painel na aba BATERIA
     timerCallback();
     startTimerHz (30);
 }
@@ -854,8 +878,25 @@ void DubDrumsPanel::paint (juce::Graphics& g)
 
     const int st = juce::jlimit (0, 2, choice ("style"));
     glowText (g, styleDisplay.toFloat(), kStyleNames[st], 19.0f);
-    glowText (g, hatDisplay.toFloat(), kDrummerNames[juce::jlimit (0, 2, choice ("drummer"))], 17.0f);
-    juce::ignoreUnused (kHatNames);
+    glowText (g, hatDisplay.toFloat(), kHatNames[juce::jlimit (0, 3, choice ("hatPattern"))], 15.0f);
+
+    // ficha do baterista: nome no display e, gravado embaixo, a banda e a assinatura
+    {
+        static const char* bands[] = { "ROOTS RADICS  -  VOLCANO", "SOUL SYNDICATE  -  AGGROVATORS", "THE WAILERS" };
+        static const char* sigs[]  = { "RETO, ACENTO NO CONTRATEMPO",
+                                       "FLYING CYMBAL NO 2 E NO 4",
+                                       "TERCINA QUEBRADA, CAI DO 1" };
+        const int d = juce::jlimit (0, 2, choice ("drummer"));
+        glowText (g, drummerDisplay.toFloat(), kDrummerNames[d], 17.0f);
+        auto info = drumMod.reduced (16, 0).withTop (drummerSwitch.getBottom() + 4).withBottom (drumMod.getBottom() - 10).toFloat();
+        g.setColour (colours::ink);
+        g.setFont (stencil (9.5f, 0.16f));
+        g.drawText (bands[d], info.removeFromTop (16.0f), juce::Justification::centred);
+        g.setColour (colours::inkSoft);
+        g.setFont (stencil (9.0f, 0.12f));
+        g.drawText (choice ("kit") == 1 ? "KIT DIGITAL: TEMPO DE MAQUINA" : sigs[d],
+                    info.removeFromTop (16.0f), juce::Justification::centred);
+    }
     glowText (g, dynDisplay.toFloat(), kDynNames[juce::jlimit (0, 5, choice ("dynamics"))], 17.0f);
 
     // onde cai o bumbo: quatro tempos gravados no painel, preenchidos onde o bumbo toca
@@ -1001,37 +1042,46 @@ void DubDrumsPanel::resized()
     plate = { 28, 0, W - 56, H };
     noteMap.setBounds (getLocalBounds());
 
-    // --- 4 módulos de cima (o do hi-hat é mais largo: figura, baterista e swing)
-    const int x0 = 52, my = 92, mh = 350, narrow = 252, wide = 384;
-    const int gap = (W - 104 - narrow * 3 - wide) / 3;
-    styleMod = { x0,                          my, narrow, mh };
-    loopMod  = { styleMod.getRight() + gap,   my, narrow, mh };
-    hatMod   = { loopMod.getRight() + gap,    my, wide,   mh };
-    dynMod   = { hatMod.getRight() + gap,     my, narrow, mh };
+    // --- 5 módulos de cima: ESTILO | LOOP | BATERISTA | HI-HAT | DINÂMICA
+    const int x0 = 52, my = 92, mh = 350, gap = 10;
+    styleMod = { x0,                        my, 214, mh };
+    loopMod  = { styleMod.getRight() + gap, my, 214, mh };
+    drumMod  = { loopMod.getRight() + gap,  my, 270, mh };
+    hatMod   = { drumMod.getRight() + gap,  my, 226, mh };
+    dynMod   = { hatMod.getRight() + gap,   my, W - 52 - (hatMod.getRight() + gap), mh };
 
-    {   // ESTILO
+    {   // ESTILO: estilo, batida principal e onde cai o bumbo
         auto a = styleMod.reduced (14, 0);
-        a.removeFromTop (26);
+        a.removeFromTop (24);
         styleDisplay = a.removeFromTop (36).reduced (2, 0);
-        a.removeFromTop (30);
-        styleButtons.setBounds (a.removeFromTop (150));
-        a.removeFromTop (32);
-        kickDots = a.removeFromTop (36).reduced (24, 0);
+        a.removeFromTop (24);
+        styleButtons.setBounds (a.removeFromTop (124));
+        a.removeFromTop (24);
+        backbeatButtons.setBounds (a.removeFromTop (42));
+        a.removeFromTop (26);
+        kickDots = a.removeFromTop (36).reduced (20, 0);
     }
     {   // LOOP
         auto a = loopMod.reduced (14, 0);
         a.removeFromTop (36);
-        bars.setBounds (a.removeFromTop (52).reduced (8, 0));
+        bars.setBounds (a.removeFromTop (52).reduced (2, 0));
         a.removeFromTop (14);
-        fill.button.setBounds (a.removeFromTop (34).reduced (22, 0));
+        fill.button.setBounds (a.removeFromTop (34).reduced (12, 0));
         a.removeFromTop (8);
-        intro.button.setBounds (a.removeFromTop (34).reduced (22, 0));
+        intro.button.setBounds (a.removeFromTop (34).reduced (12, 0));
         a.removeFromTop (30);
-        seed.setBounds (a.removeFromTop (42).reduced (46, 0));
+        seed.setBounds (a.removeFromTop (42).reduced (36, 0));
         a.removeFromTop (12);
-        variation.setBounds (a.removeFromTop (42).reduced (18, 0));
+        variation.setBounds (a.removeFromTop (42).reduced (8, 0));
     }
-    {   // HI-HAT: baterista no display, figura, chave do baterista e swing
+    {   // BATERISTA: display, chave seletora e ficha
+        auto a = drumMod.reduced (14, 0);
+        a.removeFromTop (24);
+        drummerDisplay = a.removeFromTop (36).reduced (2, 0);
+        a.removeFromTop (8);
+        drummerSwitch.setBounds (a.removeFromTop (232));
+    }
+    {   // HI-HAT: figura e swing
         auto a = hatMod.reduced (14, 0);
         a.removeFromTop (16);
         auto header = a.removeFromTop (28);
@@ -1039,24 +1089,17 @@ void DubDrumsPanel::resized()
         a.removeFromTop (6);
         hatDisplay = a.removeFromTop (36).reduced (2, 0);
         a.removeFromTop (22);
-        hatButtons.setBounds (a.removeFromTop (76));
+        hatButtons.setBounds (a.removeFromTop (76).expanded (6, 0));
         a.removeFromTop (6);
-        auto knobs = a;
-        auto place = [] (Knob& k, juce::Rectangle<int> r)
-        {
-            k.label.setBounds (r.removeFromTop (15));
-            const int cy = r.getY() + 80;
-            k.slider.setBounds (juce::Rectangle<int> (104, 104).withCentre ({ r.getCentreX(), cy }));
-        };
-        place (drummer, knobs.removeFromLeft (knobs.getWidth() / 2));
-        place (swing, knobs);
+        swing.label.setBounds (a.removeFromTop (15));
+        swing.slider.setBounds (juce::Rectangle<int> (100, 100).withCentre ({ a.getCentreX(), a.getY() + 76 }));
     }
     {   // DINÂMICA
         auto a = dynMod.reduced (14, 0);
-        a.removeFromTop (26);
+        a.removeFromTop (24);
         dynDisplay = a.removeFromTop (36).reduced (2, 0);
         a.removeFromTop (16);
-        dynamics.slider.setBounds (a.withTrimmedBottom (10).withSizeKeepingCentre (192, 192));
+        dynamics.slider.setBounds (a.withTrimmedBottom (10).withSizeKeepingCentre (150, 150));
     }
 
     // --- linha do meio: ALEATORIEDADE | SOM | MIDI
@@ -1075,11 +1118,13 @@ void DubDrumsPanel::resized()
     {
         auto a = soundPanel.reduced (12, 0);
         a.removeFromTop (24);
-        auto left = a.removeFromLeft (128);
-        left.removeFromTop (10);
-        preview.button.setBounds (left.removeFromTop (36).reduced (0, 2));
-        left.removeFromTop (12);
-        sound.button.setBounds (left.removeFromTop (36).reduced (0, 2));
+        auto left = a.removeFromLeft (138);
+        left.removeFromTop (2);
+        preview.button.setBounds (left.removeFromTop (32).reduced (0, 1));
+        left.removeFromTop (4);
+        sound.button.setBounds (left.removeFromTop (32).reduced (0, 1));
+        left.removeFromTop (16);
+        kitButtons.setBounds (left.removeFromTop (42));
         a.removeFromLeft (4);
         const int kw = a.getWidth() / 2;
         placeKnob (bpm, a.removeFromLeft (kw).withTrimmedBottom (10).withTrimmedTop (2));
@@ -1234,4 +1279,133 @@ void NoteMapPanel::paint (juce::Graphics& g)
         g.drawText ("GM " + juce::String (DubDrumsProcessor::pieces[i].gmNote), row, juce::Justification::centredRight);
         g.setFont (stencil (12.0f, 0.16f));
     }
+}
+
+//==============================================================================
+// Chave seletora do baterista
+juce::Point<float> DrummerSwitch::centre() const { return { (float) getWidth() * 0.5f, (float) getHeight() * 0.64f }; }
+float DrummerSwitch::radius() const { return juce::jmin ((float) getWidth() * 0.24f, (float) getHeight() * 0.30f); }
+
+juce::Rectangle<float> DrummerSwitch::labelArea (int i) const
+{
+    const auto c = centre();
+    const float a = angleOf (i), lr = radius() + 40.0f;
+    return juce::Rectangle<float> (84.0f, 34.0f).withCentre ({ c.x + std::sin (a) * lr, c.y - std::cos (a) * lr - 4.0f });
+}
+
+void DrummerSwitch::mouseDown (const juce::MouseEvent& e)
+{
+    for (int i = 0; i < 3; ++i)
+        if (labelArea (i).expanded (4.0f).contains (e.position)) { select (i); return; }
+    dragging = e.position.getDistanceFrom (centre()) < radius() * 1.25f;
+    dragStartIndex = index();
+}
+
+void DrummerSwitch::mouseDrag (const juce::MouseEvent& e)
+{
+    if (! dragging) return;
+    const int delta = (e.getDistanceFromDragStartX() - e.getDistanceFromDragStartY()) / 40;
+    const int target = juce::jlimit (0, 2, dragStartIndex + delta);
+    if (target != index()) select (target);
+}
+
+void DrummerSwitch::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
+{
+    const int dir = w.deltaY > 0 ? 1 : (w.deltaY < 0 ? -1 : 0);
+    if (dir != 0) select (juce::jlimit (0, 2, index() + dir));
+}
+
+void DrummerSwitch::paint (juce::Graphics& g)
+{
+    static const char* first[] = { "STYLE", "SANTA", "CARLTON" };
+    static const char* last[]  = { "SCOTT", "DAVIS", "BARRETT" };
+    const auto c = centre();
+    const float r = radius();
+    const int sel = juce::jlimit (0, 2, index());
+    const auto mouse = getMouseXYRelative().toFloat();
+
+    // placa da chave: disco de alumínio escovado com as marcas das três posições
+    const float plateR = r * 1.32f;
+    g.setColour (juce::Colours::black.withAlpha (0.25f));
+    g.fillEllipse (juce::Rectangle<float> (plateR * 2, plateR * 2).withCentre (c).translated (1.5f, 3.0f));
+    juce::ColourGradient al (juce::Colour (0xffe6e3dc), c.x - plateR, c.y - plateR, juce::Colour (0xff8d8a84), c.x + plateR, c.y + plateR, false);
+    g.setGradientFill (al);
+    g.fillEllipse (juce::Rectangle<float> (plateR * 2, plateR * 2).withCentre (c));
+    g.setColour (juce::Colours::black.withAlpha (0.08f));
+    for (int k = 0; k < 18; ++k)
+    {
+        const float rr = plateR * (0.40f + 0.033f * (float) k);
+        g.drawEllipse (juce::Rectangle<float> (rr * 2, rr * 2).withCentre (c), 0.6f);
+    }
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.drawEllipse (juce::Rectangle<float> (plateR * 2, plateR * 2).withCentre (c), 1.0f);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        const float a = angleOf (i);
+        const bool on = i == sel;
+        // marca gravada na placa
+        g.setColour (colours::ink.withAlpha (on ? 0.95f : 0.6f));
+        g.drawLine (c.x + std::sin (a) * plateR * 0.80f, c.y - std::cos (a) * plateR * 0.80f,
+                    c.x + std::sin (a) * plateR * 0.97f, c.y - std::cos (a) * plateR * 0.97f, on ? 2.6f : 1.6f);
+
+        // lâmpada piloto e nome em cada posição
+        const auto la = labelArea (i);
+        const bool over = isMouseOver() && la.expanded (4.0f).contains (mouse);
+        const auto lamp = juce::Rectangle<float> (10.0f, 10.0f).withCentre ({ la.getCentreX(), la.getBottom() + 4.0f });
+        if (on)
+        {
+            g.setColour (colours::amber.withAlpha (0.35f));
+            g.fillEllipse (lamp.expanded (5.0f));
+            juce::ColourGradient lit (juce::Colour (0xffffe3a0), lamp.getCentreX(), lamp.getCentreY(),
+                                      colours::amber.darker (0.2f), lamp.getRight(), lamp.getBottom(), true);
+            g.setGradientFill (lit);
+        }
+        else
+            g.setColour (juce::Colour (0xff4a3a22));
+        g.fillEllipse (lamp);
+        g.setColour (juce::Colours::black.withAlpha (0.6f));
+        g.drawEllipse (lamp, 1.0f);
+
+        g.setColour (on ? colours::ink : colours::inkSoft.withAlpha (over ? 1.0f : 0.75f));
+        g.setFont (stencil (on ? 11.5f : 10.5f, 0.14f));
+        g.drawText (first[i], la.withHeight (la.getHeight() * 0.5f), juce::Justification::centredBottom);
+        g.drawText (last[i],  la.withTrimmedTop (la.getHeight() * 0.5f), juce::Justification::centredTop);
+    }
+
+    // knob "cabeça de galinha" de baquelite apontando para o baterista escolhido
+    const float a = angleOf (sel);
+    auto rot = juce::AffineTransform::rotation (a).translated (c.x, c.y);
+    juce::Path head;
+    head.addEllipse (-r * 0.60f, -r * 0.60f, r * 1.20f, r * 1.20f);
+    juce::Path pointer;
+    pointer.startNewSubPath (-r * 0.30f, -r * 0.40f);
+    pointer.lineTo (-r * 0.11f, -r * 1.10f);
+    pointer.quadraticTo (0.0f, -r * 1.20f, r * 0.11f, -r * 1.10f);
+    pointer.lineTo (r * 0.30f, -r * 0.40f);
+    pointer.closeSubPath();
+    head.addPath (pointer);
+    head.setUsingNonZeroWinding (true);
+
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.fillPath (head, rot.translated (2.0f, 4.0f));
+    juce::ColourGradient bak (juce::Colour (0xff45403a), c.x - r, c.y - r, juce::Colour (0xff060505), c.x + r * 0.6f, c.y + r, false);
+    g.setGradientFill (bak);
+    g.fillPath (head, rot);
+    g.setColour (juce::Colours::white.withAlpha (0.10f));
+    g.strokePath (head, juce::PathStrokeType (1.2f), rot);
+    juce::ColourGradient gloss (juce::Colours::white.withAlpha (0.18f), c.x, c.y - r, juce::Colours::transparentWhite, c.x, c.y + r * 0.2f, false);
+    g.setGradientFill (gloss);
+    g.fillEllipse (juce::Rectangle<float> (r * 0.8f, r * 0.8f).withCentre (c).translated (0, -r * 0.05f));
+
+    // linha creme no ponteiro
+    juce::Path line;
+    line.addRoundedRectangle (-1.6f, -r * 1.04f, 3.2f, r * 0.62f, 1.6f);
+    g.setColour (colours::cream);
+    g.fillPath (line, rot);
+    // parafuso central
+    const auto sc = juce::Rectangle<float> (r * 0.16f, r * 0.16f).withCentre (c);
+    juce::ColourGradient sg (juce::Colour (0xffe0ded8), sc.getX(), sc.getY(), juce::Colour (0xff5e5b55), sc.getRight(), sc.getBottom(), false);
+    g.setGradientFill (sg);
+    g.fillEllipse (sc);
 }

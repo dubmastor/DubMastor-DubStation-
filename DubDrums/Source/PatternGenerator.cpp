@@ -157,32 +157,52 @@ namespace
     }
 
     // ---------------------------------------------------------------- CAIXA / ARO
+    void addBackbeat (Builder& b, double pos, Backbeat bb, int vel)
+    {
+        switch (bb)
+        {
+            case Backbeat::Snare: b.add (pos, gm::Snare, vel); break;
+            case Backbeat::Rim:   b.add (pos, gm::SideStick, vel - 4); break;
+            case Backbeat::Both:  b.add (pos, gm::SideStick, vel - 10); b.add (pos, gm::Snare, vel - 2); break;
+        }
+    }
+
     void buildSnare (Builder& b, Rng& rng)
     {
         const auto& s = b.s;
         const double r = s.randSnare;
-        const int mainNote = (s.style == Style::Steppa) ? gm::Snare : gm::SideStick;
+
+        // Roots Radics (Style Scott) no rockers: bumbo no 1 e no 3 e caixa no 2 e no 4
+        const bool scottRockers = s.drummer == Drummer::StyleScott && s.style == Style::Rockers;
+        const std::vector<int> backbeats = scottRockers ? std::vector<int> { 4, 12 } : std::vector<int> { 8 };
 
         for (int bar = 0; bar < s.bars; ++bar)
         {
             const bool lastBar = (bar == s.bars - 1);
 
-            // no compasso final, às vezes troca o aro por uma caixa "cheia" com flam
-            if (lastBar && s.bars > 1 && rng.chance (r * 0.5))
+            for (int st : backbeats)
             {
-                b.add (stepPos (bar, 8) - 0.03, gm::Snare, 60);
-                b.add (stepPos (bar, 8), gm::Snare, 112);
-            }
-            else
-            {
-                b.add (stepPos (bar, 8), mainNote, mainNote == gm::Snare ? 108 : 104);
+                // no compasso final, às vezes a caixa vem "cheia" com flam
+                if (lastBar && s.bars > 1 && st == backbeats.back() && rng.chance (r * 0.5))
+                {
+                    b.add (stepPos (bar, st) - 0.03, gm::Snare, 60);
+                    b.add (stepPos (bar, st), gm::Snare, 114);
+                }
+                else
+                {
+                    addBackbeat (b, stepPos (bar, st), s.backbeat, 110);
+                }
             }
 
-            // ghost notes
+            // ghost notes (longe da batida principal)
             const double ghost = feelOf (s.drummer).ghosts;
             for (int st : { 3, 6, 7, 11, 14, 15 })
-                if (rng.chance (r * 0.30 * ghost))
+            {
+                bool nearBackbeat = false;
+                for (int bb : backbeats) nearBackbeat |= std::abs (st - bb) <= 1;
+                if (! nearBackbeat && rng.chance (r * 0.30 * ghost))
                     b.add (stepPos (bar, st), gm::Snare, (int) rng.range (26, 44));
+            }
 
             // steppa: às vezes reforça o 2 e o 4 com aro
             if (s.style == Style::Steppa)
@@ -192,6 +212,105 @@ namespace
     }
 
     // ---------------------------------------------------------------- HI-HAT
+    // Assinatura de hi-hat de cada baterista, aplicada por cima da figura escolhida
+    bool isHat (int n) { return n == gm::ClosedHat || n == gm::OpenHat || n == gm::PedalHat; }
+
+    void hatSignature (Builder& b, int bar, Rng& rng, double r)
+    {
+        const auto& s = b.s;
+        const double t0 = barStart (bar);
+        auto removeHats = [&] (double from, double to) { b.removeRange (t0 + from, t0 + to, { gm::ClosedHat, gm::OpenHat, gm::PedalHat }); };
+        auto hatAt = [&] (double beat)
+        {
+            for (auto& e : b.ev) if (isHat (e.note) && nearly (e.beat, t0 + beat)) return true;
+            return false;
+        };
+
+        if (s.hatPattern == HatPattern::Triplets)
+        {
+            // Carlton: acento na última nota da tercina, puxando para o tempo seguinte
+            if (s.drummer == Drummer::CarltonBarrett)
+                for (auto& e : b.ev)
+                    if (isHat (e.note) && e.beat >= t0 && e.beat < t0 + 4.0
+                        && nearly (e.beat - std::floor (e.beat), 2.0 / 3.0))
+                        e.velocity = std::min (127, e.velocity + 18);
+            return;
+        }
+
+        switch (s.drummer)
+        {
+            case Drummer::CarltonBarrett:
+            {
+                // tercina "quebrada": em alguns tempos o hi-hat vira tercina (cheia ou só 1ª e 3ª nota)
+                for (int beat : { 1, 2 })
+                {
+                    const double p = beat == 1 ? 0.40 + r * 0.40 : 0.20 + r * 0.30;
+                    if (! rng.chance (p)) continue;
+                    removeHats (beat, beat + 1.0);
+                    const bool full = rng.chance (0.5);
+                    b.add (t0 + beat, gm::ClosedHat, 72);
+                    if (full) b.add (t0 + beat + 1.0 / 3.0, gm::ClosedHat, 54);
+                    b.add (t0 + beat + 2.0 / 3.0, gm::ClosedHat, 88);   // acento puxando o tempo seguinte
+                }
+                // no one drop o hi-hat também "cai" do 1, como o bumbo
+                if (s.style == Style::OneDrop)
+                    removeHats (0.0, 0.01);
+                // hi-hat aberto na última colcheia, levando ao compasso seguinte
+                if (rng.chance (0.80 + r * 0.15))
+                {
+                    removeHats (3.5, 4.0);
+                    b.add (t0 + 3.5, gm::OpenHat, 92, 0.45);
+                }
+                break;
+            }
+
+            case Drummer::SantaDavis:
+            {
+                // "flying cymbal": hi-hat abre no 2 e no 4 e fecha no contratempo seguinte,
+                // com semicolcheias leves no meio
+                for (int st = 1; st < kStepsPerBar; st += 2)
+                    if (st != 5 && st != 13 && ! hatAt (st * kStep) && rng.chance (0.55 + r * 0.30))
+                        b.add (t0 + st * kStep, gm::ClosedHat, (int) rng.range (34, 46));
+                for (double beat : { 1.0, 3.0 })
+                {
+                    removeHats (beat, beat + 0.5 + 0.01);
+                    b.add (t0 + beat, gm::OpenHat, 102, 0.45);
+                    b.add (t0 + beat + 0.5, gm::ClosedHat, 62);   // o pé fecha: "tsss-chk"
+                }
+                break;
+            }
+
+            case Drummer::StyleScott:
+            {
+                // disciplinado: acento forte no contratempo, tempos leves, quase sem enfeite
+                for (auto& e : b.ev)
+                {
+                    if (! isHat (e.note) || e.beat < t0 || e.beat >= t0 + 4.0) continue;
+                    const double frac = e.beat - std::floor (e.beat);
+                    if (nearly (frac, 0.5))       e.velocity = 104;
+                    else if (nearly (frac, 0.0))  e.velocity = 56;
+                    else                          e.velocity = 38;
+                }
+                b.ev.erase (std::remove_if (b.ev.begin(), b.ev.end(), [&] (const NoteEvent& e)
+                {
+                    if (! isHat (e.note) || e.beat < t0 || e.beat >= t0 + 4.0) return false;
+                    const double frac = e.beat - std::floor (e.beat);
+                    const bool sixteenth = nearly (frac, 0.25) || nearly (frac, 0.75);
+                    return sixteenth && s.hatPattern != HatPattern::Sixteenths && rng.chance (0.7);
+                }), b.ev.end());
+                for (double beat : { 0.5, 1.5, 2.5, 3.5 })
+                    if (! hatAt (beat)) b.add (t0 + beat, gm::ClosedHat, 104);
+                // latido curto do hi-hat aberto no "e" do 4
+                if (rng.chance (0.30 + r * 0.30))
+                {
+                    removeHats (3.5, 3.76);
+                    b.add (t0 + 3.5, gm::OpenHat, 106, 0.14);
+                }
+                break;
+            }
+        }
+    }
+
     void buildHats (Builder& b, Rng& rng)
     {
         const auto& s = b.s;
@@ -212,6 +331,7 @@ namespace
                         const bool open = (k == 2 && rng.chance (r * 0.12));
                         b.add (pos, open ? gm::OpenHat : gm::ClosedHat, vel, open ? 0.25 : 0.1);
                     }
+                hatSignature (b, bar, rng, r);
                 continue;
             }
 
@@ -246,7 +366,8 @@ namespace
                         if (sixteen && rng.chance (orn * 0.15)) { play = true; vel = 48; }
                         break;
 
-                    default: break;
+                    case HatPattern::Triplets:
+                        break;
                 }
 
                 if (! play) continue;
@@ -259,7 +380,7 @@ namespace
                 if (offEight)
                 {
                     const double baseOpen = (s.hatPattern == HatPattern::Offbeat && st == 14) ? 0.35 : 0.0;
-                    open = rng.chance (baseOpen + feel.openHat + r * 0.15);
+                    open = rng.chance (baseOpen + feel.openHat * 0.5 + r * 0.10);
                 }
 
                 if (open)
@@ -272,6 +393,8 @@ namespace
                     b.add (stepPos (bar, st), gm::ClosedHat, vel);
                 }
             }
+
+            hatSignature (b, bar, rng, r);
         }
     }
 
@@ -428,7 +551,8 @@ Pattern generate (const Settings& in)
     Pattern p;
     p.lengthInBeats = s.bars * 4.0;
 
-    const Feel feel = feelOf (s.drummer);
+    Feel feel = feelOf (s.drummer);
+    if (s.machine) { feel.swingDelta = 0.0; for (auto& l : feel.late) l = 0.0; }   // a máquina não "senta" atrás do tempo
     const float rand[4] = { s.randKick, s.randSnare, s.randHat, s.randPerc };
     const double timingAmount[4] = { 0.006, 0.012, 0.014, 0.012 }; // em semínimas, no máximo
 
@@ -456,9 +580,17 @@ Pattern generate (const Settings& in)
 
             // humanização: velocidade e microtempo proporcionais à aleatoriedade da peça
             const double r = rand[piece];
-            vel += humanRng.range (-18.0, 18.0) * r;
-            if (e.beat > 0.0) // não tira o "1" do lugar, para o loop não começar atrasado
-                e.beat += humanRng.range (-1.0, 1.0) * timingAmount[piece] * r + feel.late[piece];
+            if (s.machine)
+            {
+                // drum machine: grade exata e acento de dois níveis
+                vel = vel >= 92.0 ? 118.0 : (vel >= 50.0 ? 88.0 : 60.0);
+            }
+            else
+            {
+                vel += humanRng.range (-18.0, 18.0) * r;
+                if (e.beat > 0.0) // não tira o "1" do lugar, para o loop não começar atrasado
+                    e.beat += humanRng.range (-1.0, 1.0) * timingAmount[piece] * r + feel.late[piece];
+            }
 
             e.velocity = std::clamp ((int) std::lround (vel), 1, 127);
             e.beat = std::clamp (e.beat, 0.0, len - 0.001);

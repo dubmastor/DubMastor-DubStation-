@@ -1,8 +1,8 @@
-# Mastor Bass Machine MBM-710 2.0 — Gerador de Reggae Bass Lines
+# Mastor Bass Machine MBM-710 2.1 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.0/MastorBassMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.0/MastorBassMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.1/MastorBassMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.1/MastorBassMachine-macOS.zip)**
 
 ![Interface do Bass Machine](docs/interface.png)
 
