@@ -24,7 +24,7 @@ bubble, já alinhados, de 4 a 64 compassos) para a timeline. Um projeto começa 
 | **Mastor Dub Drums Machine MDDM-12 1.1** | Instrumento / gerador MIDI: esqueleto da bateria de reggae (Rockers, One Drop) e Boom Bap, com caixa no 2 e no 4 e bumbo/caixa editáveis por colcheia, com chave de baterista (Style Scott, Santa Davis, Carlton Barrett) com a assinatura de hi-hat e as viradas de cada um, caixa/aro, virada de intro, kit anos 70 ou digital (King Jammy / Sleng Teng), MIDI colorido por compasso e mapa de notas | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.1/DubMastorDubDrums-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubDrums-1.1/DubMastorDubDrums-Windows.zip) | [DubDrums/](DubDrums/) |
 | **Mastor Reggae Bass Machine MRBM-69 2.4** | Instrumento / gerador de reggae bass lines em MIDI: botoeira com 7 baixistas (Family Man, Flabba, Derrick Barnett, Robbie, Leroy Sibbles, Fully Fullwood, Jammys/Sleng Teng) sobre até 4 acordes; preview com os timbres do Dub Bass (Roots Sine e Super Tone), bateria de acompanhamento (Roots, One Drop, Digital, Dancehall) e teclado do Roots Keys; arraste o MIDI para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-Windows.zip) | [BassMachine/](BassMachine/) |
 | **Mastor Dub Horns 1.1** | Instrumento: naipe de metais anos 70 (trompete, flugel, saxes e trombone) com harmonia no tom, timbres de estúdio jamaicano, Mastor Tape Echo, EQ gráfico de 10 bandas com Filtro Tubby e frases MIDI (ataques estilo Dean Fraser e introduções) com notas escolhidas por você | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MastorDubHorns-1.1/MastorDubHorns-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MastorDubHorns-1.1/MastorDubHorns-Windows.zip) | [MastorDubHorns/](MastorDubHorns/) |
-| **Mastor Fone 1.6** | Efeito de voz: rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorFone-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorFone-Windows.zip) | [MastorFone/](MastorFone/) |
+| **Mastor Phone Vox MPV-01 1.6** | Efeito de voz (antigo Mastor Fone): rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-Windows.zip) | [MastorFone/](MastorFone/) |
 | **Dub Station 2.6 (FitaEco TE-12)** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-Windows.zip) | [DubStation21/](DubStation21/) |
 
 Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest)**. Não precisa de conta no GitHub para baixar.
@@ -40,7 +40,7 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Big Knob.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"FitaEco TE-12.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Roots Keys.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Fone.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Phone Vox MPV-01.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Dub Bass Instrument MRDBI-07.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Dub Drums.vst3"
@@ -65,7 +65,7 @@ O formato é **VST3** (`.vst3`). O formato antigo `.vst` (VST2) não é suportad
 BigKnob/                         DubMastor Big Knob (C++ / JUCE 8)
 DubStation21/                    Dub Station 2.6 — FitaEco TE-12 (C++ / JUCE 8)
 RootsKeys/                       DubMastor Roots Keys — piano M1 + órgão Hammond + Dub Chords (C++ / JUCE 8)
-MastorFone/                      Mastor Fone — rádio AM, telefone e megafone para voz (C++ / JUCE 8)
+MastorFone/                      Mastor Phone Vox MPV-01 — rádio AM, telefone e megafone para voz (C++ / JUCE 8)
 DubChords/                       Mastor Reggae Chord Machine MRCM-1240 — gerador de skank/harmonia para riddim (C++ / JUCE 8)
 DubBass/                         Mastor Reggae Dub Bass Instrument MRDBI-07 — baixo de reggae Bass / Super Tone / 808 (C++ / JUCE 8)
 DubDrums/                        Mastor Dub Drums Machine MDDM-12 — gerador de bateria de reggae com bateria interna (C++ / JUCE 8)
@@ -76,7 +76,7 @@ RiddimMachine/                   Mastor Riddim Machine MRM-0420 — Dub Chords +
   build-bigknob.yml              compila, valida e publica o Big Knob
   build-dubstation21.yml         compila, valida e publica o Dub Station 2.6
   build-rootskeys.yml            compila, valida e publica o DubMastor Roots Keys
-  build-mastorfone.yml           compila, valida e publica o Mastor Fone
+  build-mastorfone.yml           compila, valida e publica o Mastor Phone Vox MPV-01
   build-dubchords.yml            compila, valida e publica o MRCM-1240
   build-dubbass.yml              testa, compila, valida e publica o MRDBI-07 (release MRDBI-07-x.y a cada versão)
   build-dubdrums.yml             testa, compila, valida e publica o MDDM-12 (release MDDM-12-x.y a cada versão)

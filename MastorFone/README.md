@@ -1,6 +1,6 @@
 # Mastor Phone Vox MPV-01 1.6 — voz de aparelho antigo 📻☎️📣
 
-*Dub Station Solutions*
+*Linha Dub Station*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
