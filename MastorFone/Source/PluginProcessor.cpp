@@ -136,6 +136,7 @@ void RadioFoneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     float* L = buffer.getWritePointer (0);
     float* R = numOut > 1 ? buffer.getWritePointer (1) : nullptr;
     float sumSq = 0.0f, echoSq = 0.0f;
+    int sw = scopeWrite.load (std::memory_order_relaxed);
 
     // cadeia: entrada (mono) -> aparelho -> seco + eco de fita -> saída
     for (int i = 0; i < n; ++i)
@@ -148,10 +149,13 @@ void RadioFoneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         const float yl = ((v * dg + el) * og) * (1.0f - m) + xl * m;
         const float yr = ((v * dg + er) * og) * (1.0f - m) + xr * m;
         sumSq += 0.5f * (yl * yl + yr * yr);
+        scopeBuf[(size_t) sw] = 0.5f * (yl + yr);
+        sw = (sw + 1) & (kScopeSize - 1);
         echoSq += 0.5f * (el * el + er * er);
         if (R) { L[i] = yl; R[i] = yr; }
         else     L[i] = 0.5f * (yl + yr);
     }
+    scopeWrite.store (sw, std::memory_order_release);
     outRms.store (std::sqrt (sumSq / (float) n));
     echoRms.store (std::sqrt (echoSq / (float) n));
 }

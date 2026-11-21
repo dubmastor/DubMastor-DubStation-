@@ -77,6 +77,18 @@ private:
     float value = 0.0f;
 };
 
+// Osciloscópio de tubo verde: mostra a onda que sai do plugin
+class CrtScope : public juce::Component
+{
+public:
+    explicit CrtScope (RadioFoneProcessor& p) : proc (p) { setInterceptsMouseClicks (false, false); }
+    void paint (juce::Graphics&) override;
+    void update();   // chamado pelo timer do painel
+private:
+    RadioFoneProcessor& proc;
+    std::vector<float> buf = std::vector<float> (2048), trace, prev1, prev2;
+};
+
 class StationPanel : public juce::Component, private juce::Timer
 {
 public:
@@ -117,6 +129,7 @@ private:
 
     StationModeKeys modeKeys;
     TuningDial dial;
+    CrtScope scope;
     Knob band, drive, noise, defect;
     Knob echoDiv, echoMs, echoHeads, echoFb, echoTone, echoWow, echoSend;
     Knob mix, dry, out;

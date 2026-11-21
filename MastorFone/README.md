@@ -39,6 +39,8 @@ O eco recebe a voz já processada, então as repetições também soam de rádio
 
 ## MASTER
 **DRY** (zere para usar num FX Channel), **SAÍDA** e **BYPASS** (o mesmo bypass do Cubase, com transição suave).
+O **OSCILOSCÓPIO** (tela verde de tubo, ao lado dos controles do aparelho) mostra a onda que sai do plugin, já passada pelo aparelho, em tempo real.
+
 O **BYPASS** fica em destaque no painel de cima e acende vermelho quando o efeito está desligado. No painel: VU de ponteiro (0 VU = -18 dBFS) e a lâmpada **NO AR**, que acende quando passa som.
 
 A janela é redimensionável: arraste o canto inferior direito (50% a 150%). Duplo clique num botão volta ao valor padrão.

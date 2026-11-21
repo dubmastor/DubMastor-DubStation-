@@ -40,6 +40,15 @@ public:
     float getEchoDelaySec() const { return echoDelay.load(); }
     float getDisplayBpm() const  { return displayBpm.load(); }
 
+    // osciloscópio: últimas amostras da saída (mono)
+    static constexpr int kScopeSize = 8192;
+    void copyScope (float* dest, int n) const
+    {
+        const int w = scopeWrite.load (std::memory_order_acquire);
+        for (int i = 0; i < n; ++i)
+            dest[i] = scopeBuf[(size_t) ((w - n + i) & (kScopeSize - 1))];
+    }
+
     juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
     static const juce::StringArray& divisionNames();
@@ -52,6 +61,8 @@ private:
     dub::TapeEcho echo;
     juce::SmoothedValue<float> dryGain, outGain, bypassMix;
 
+    std::array<float, kScopeSize> scopeBuf {};
+    std::atomic<int> scopeWrite { 0 };
     std::atomic<float> outRms { 0.0f }, echoRms { 0.0f }, echoDelay { 0.4f }, displayBpm { 120.0f };
     std::map<std::string, std::atomic<float>*> params;
 

@@ -399,14 +399,124 @@ void TuningDial::paint (Graphics& g)
 }
 
 //==============================================================================
+void CrtScope::update()
+{
+    const int N = (int) buf.size(), show = 1024;
+    proc.copyScope (buf.data(), N);
+    // gatilho: primeira subida pelo zero (com histerese) na primeira metade, para a onda ficar parada
+    int start = N - show;
+    for (int i = N - show - 1; i > 1; --i)
+        if (buf[(size_t) i - 1] < -0.01f && buf[(size_t) i] >= 0.0f) { start = i; break; }
+    start = jmin (start, N - show);
+
+    prev2 = prev1; prev1 = trace;
+    const int cols = 220;
+    trace.assign ((size_t) cols * 2, 0.0f);
+    for (int c = 0; c < cols; ++c)
+    {
+        float lo = 1e9f, hi = -1e9f;
+        const int a = start + c * show / cols, b = start + (c + 1) * show / cols;
+        for (int i = a; i < b; ++i) { lo = jmin (lo, buf[(size_t) i]); hi = jmax (hi, buf[(size_t) i]); }
+        trace[(size_t) c * 2] = lo; trace[(size_t) c * 2 + 1] = hi;
+    }
+    repaint();
+}
+
+void CrtScope::paint (Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    const Colour phosphor (0xff5dff8a);
+
+    // caixa de baquelite com aro cromado
+    g.setColour (Colours::black.withAlpha (0.55f));
+    g.fillRoundedRectangle (b.reduced (2.0f).translated (1.5f, 3.0f), 10.0f);
+    g.setGradientFill (ColourGradient (Colour (0xff2a2a2a), 0, b.getY(), Colour (0xff0b0b0b), 0, b.getBottom(), false));
+    g.fillRoundedRectangle (b.reduced (2.0f), 10.0f);
+    auto label = b.removeFromBottom (20.0f);
+    auto screen = b.reduced (12.0f, 10.0f);
+    g.setGradientFill (ColourGradient (Colour (0xffe8e8e8), screen.getX(), screen.getY(), Colour (0xff4c4c4c), screen.getRight(), screen.getBottom(), false));
+    g.drawRoundedRectangle (screen.expanded (3.0f), 14.0f, 2.5f);
+
+    // tela de tubo: verde escuro, mais clara no meio (curvatura)
+    Path tube; tube.addRoundedRectangle (screen, 12.0f);
+    g.setGradientFill (ColourGradient (Colour (0xff0f2a17), screen.getCentreX(), screen.getCentreY(),
+                                       Colour (0xff030a05), screen.getX(), screen.getY(), true));
+    g.fillPath (tube);
+    {
+        Graphics::ScopedSaveState ss (g);
+        g.reduceClipRegion (tube);
+
+        // retícula
+        g.setColour (phosphor.withAlpha (0.13f));
+        for (int i = 1; i < 8; ++i)
+        {
+            const float x = screen.getX() + screen.getWidth() * (float) i / 8.0f;
+            g.drawVerticalLine (roundToInt (x), screen.getY(), screen.getBottom());
+        }
+        for (int i = 1; i < 4; ++i)
+        {
+            const float y = screen.getY() + screen.getHeight() * (float) i / 4.0f;
+            g.drawHorizontalLine (roundToInt (y), screen.getX(), screen.getRight());
+        }
+        g.setColour (phosphor.withAlpha (0.22f));
+        g.drawHorizontalLine (roundToInt (screen.getCentreY()), screen.getX(), screen.getRight());
+
+        // traço com persistência do fósforo (quadros anteriores mais apagados)
+        auto drawTrace = [&] (const std::vector<float>& t, float alpha, bool glow)
+        {
+            if (t.size() < 4) return;
+            const int cols = (int) t.size() / 2;
+            const float cy = screen.getCentreY(), amp = screen.getHeight() * 0.45f;
+            auto yOf = [&] (float v) { return cy - amp * jlimit (-1.0f, 1.0f, v * 1.6f); };
+            Path p;
+            for (int c = 0; c < cols; ++c)
+            {
+                const float x = screen.getX() + 4.0f + (screen.getWidth() - 8.0f) * (float) c / (float) (cols - 1);
+                const float mid = 0.5f * (t[(size_t) c * 2] + t[(size_t) c * 2 + 1]);
+                if (c == 0) p.startNewSubPath (x, yOf (mid)); else p.lineTo (x, yOf (mid));
+                // faixa entre o mínimo e o máximo da coluna (detalhe da onda comprimida)
+                g.setColour (phosphor.withAlpha (0.35f * alpha));
+                g.drawLine (x, yOf (t[(size_t) c * 2]), x, yOf (t[(size_t) c * 2 + 1]), 1.0f);
+            }
+            if (glow)
+            {
+                g.setColour (phosphor.withAlpha (0.18f * alpha));
+                g.strokePath (p, PathStrokeType (6.0f, PathStrokeType::curved, PathStrokeType::rounded));
+            }
+            g.setColour (phosphor.withAlpha (alpha));
+            g.strokePath (p, PathStrokeType (1.6f, PathStrokeType::curved, PathStrokeType::rounded));
+        };
+        drawTrace (prev2, 0.18f, false);
+        drawTrace (prev1, 0.35f, false);
+        drawTrace (trace, 1.0f, true);
+
+        // linhas de varredura + reflexo do vidro
+        g.setColour (Colours::black.withAlpha (0.18f));
+        for (float y = screen.getY(); y < screen.getBottom(); y += 3.0f)
+            g.drawHorizontalLine (roundToInt (y), screen.getX(), screen.getRight());
+        g.setGradientFill (ColourGradient (Colours::white.withAlpha (0.10f), screen.getX(), screen.getY(),
+                                           Colours::transparentWhite, screen.getX() + screen.getWidth() * 0.6f, screen.getY() + screen.getHeight() * 0.6f, false));
+        g.fillPath (tube);
+    }
+
+    g.setColour (cream.withAlpha (0.85f));
+    g.setFont (bold (9.5f).withExtraKerningFactor (0.12f));
+    g.drawText (String::fromUTF8 ("OSCILOSCÓPIO  ·  SAÍDA"), label.withTrimmedLeft (14.0f), Justification::centredLeft);
+    const auto lp = Point<float> (label.getRight() - 18.0f, label.getCentreY() - 2.0f);
+    g.setColour (phosphor);
+    g.fillEllipse (lp.x - 3.5f, lp.y - 3.5f, 7.0f, 7.0f);
+}
+
+//==============================================================================
 StationPanel::StationPanel (RadioFoneProcessor& p)
-    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), dial (*p.apvts.getParameter ("tune")), throwBtn ("THROW", p.apvts.getParameter ("throw"))
+    : proc (p), modeKeys (*p.apvts.getParameter ("mode")), dial (*p.apvts.getParameter ("tune")), scope (p), throwBtn ("THROW", p.apvts.getParameter ("throw"))
 {
     setLookAndFeel (&lnf);
     setSize (kW, kH);
 
     addAndMakeVisible (modeKeys);
     addAndMakeVisible (dial);
+    addAndMakeVisible (scope);
     setupKnob (band,   "band",   "BANDA", 1);
     setupKnob (drive,  "drive",  "DRIVE", 1);
     setupKnob (noise,  "noise",  "CHIADO", 1);
@@ -507,6 +617,7 @@ void StationPanel::resized()
     rowA.removeFromLeft (10);
     dial.setBounds (rowA.removeFromTop (92).reduced (4, 2));
     rowA.removeFromTop (4);
+    scope.setBounds (rowA.removeFromRight (232).reduced (4, 2));
     const int wm = rowA.getWidth() / 4;
     for (auto* k : { &band, &drive, &noise, &defect })
         place (*k, rowA.removeFromLeft (wm), 18);
@@ -585,6 +696,7 @@ void StationPanel::timerCallback()
     if (echoOn) tapePhase += 0.6f + 1.6f * jlimit (0.2f, 3.0f, 0.4f / jmax (0.04f, proc.getEchoDelaySec()));
 
     status.setText (statusText(), dontSendNotification);
+    scope.update();
     repaint (vuArea);
     repaint (tapeWin.expanded (4));
     repaint (Rectangle<float> (40, 40).withCentre (lampPos).toNearestInt());
