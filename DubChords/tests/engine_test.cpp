@@ -30,6 +30,44 @@ int main()
         prev = v;
     }
 
+    // 1b) inversões: a sugerida é a de menor movimento; as manuais saem como pedido
+    {
+        auto movement = [] (const std::vector<int>& a, const std::vector<int>& b)
+        { int m = 0; for (size_t k = 0; k < std::min (a.size(), b.size()); ++k) m += std::abs (a[k] - b[k]); return m; };
+
+        const std::vector<std::vector<ChordSlot>> progs {
+            { { 9, Min, 8 }, { 2, Min, 4 }, { 4, Min, 4 }, { 7, Maj, 2 } },
+            { { 0, Maj, 4 }, { 5, Maj, 4 }, { 7, Maj, 4 }, { 9, Min, 4 } },
+            { { 2, Min, 4 }, { 7, Maj, 4 }, { 0, Maj, 4 }, { 9, Min, 4 } },
+            { { 4, Min, 8 }, { 9, Min, 8 }, { 11, Min, 4 }, { 4, Min, 4 } },
+        };
+        for (const auto& prog : progs)
+        {
+            const auto v = voiceProgression (prog, 60);
+            std::printf ("sugestao:");
+            for (size_t i = 0; i < prog.size(); ++i)
+            {
+                const auto& prev = v.notes[(i + prog.size() - 1) % prog.size()];
+                const int got = movement (v.notes[i], prev);
+                int bestAny = 1000;
+                for (int inv = 0; inv < 3; ++inv)
+                    bestAny = std::min (bestAny, movement (voiceChord (prog[i].root, prog[i].quality, 60, prev, inv), prev));
+                std::printf ("  %s=%s(%d st)", chordLabel (prog[i]).c_str(), inversionName (v.suggested[i]), got);
+                CHECK (got <= bestAny + 1, "%s: sugerida move %d, existe opcao com %d", chordLabel (prog[i]).c_str(), got, bestAny);
+                CHECK (v.used[i] == v.suggested[i], "AUTO deveria usar a sugerida");
+            }
+            std::printf ("\n");
+        }
+        auto forced = progs[0];
+        for (int inv = 0; inv < 3; ++inv)
+        {
+            for (auto& c : forced) c.inversion = inv;
+            const auto v = voiceProgression (forced, 60);
+            for (size_t i = 0; i < forced.size(); ++i)
+                CHECK (v.used[i] == inv, "inversao manual %d virou %d", inv, v.used[i]);
+        }
+    }
+
     // 2) duas mãos + bubble uma oitava abaixo
     {
         Settings s; double L = 0;

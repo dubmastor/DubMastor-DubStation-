@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(DubChords VERSION 1.1.0)
+project(DubChords VERSION 1.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -70,7 +70,7 @@ if(DUBCHORDS_SNAPSHOT)
     target_compile_definitions(DubChordsSnapshot PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="DubChords" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
+        JucePlugin_Name="DubChords" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
     target_include_directories(DubChordsSnapshot PRIVATE ${DUBSTATION_SHARED})
     target_link_libraries(DubChordsSnapshot PRIVATE juce::juce_audio_utils

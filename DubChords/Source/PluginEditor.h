@@ -81,6 +81,22 @@ public:
     void mouseDown (const juce::MouseEvent& e) override { select (e.position.x < (float) getWidth() * 0.5f ? 0 : 1); }
 };
 
+// Inversão: AUTO / FUND / 1ª / 2ª, botões de pressão intertravados.
+// A seta âmbar marca a inversão sugerida (notas mais próximas do acorde anterior).
+class InversionSwitch : public ParamControl
+{
+public:
+    InversionSwitch (juce::RangedAudioParameter& p, std::function<int()> suggestedFn)
+        : ParamControl (p), suggested (std::move (suggestedFn)) {}
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override
+    {
+        select (juce::jlimit (0, 3, (int) (e.position.x / ((float) getWidth() / 4.0f))));
+    }
+private:
+    std::function<int()> suggested;   // 0 = FUND, 1 = 1ª, 2 = 2ª
+};
+
 // Janela de contador mecânico (duração, padrão, tamanho da nota):
 // clique à direita avança, à esquerda volta
 class ChoiceWindow : public ParamControl
@@ -136,6 +152,7 @@ private:
     {
         std::unique_ptr<NoteKeys> keys;
         std::unique_ptr<ModeSwitch> mode;
+        std::unique_ptr<InversionSwitch> inv;
         std::unique_ptr<ChoiceWindow> dur;
         Toggle on;                       // só nos acordes 2, 3 e 4
         juce::Rectangle<int> area, display;
@@ -169,6 +186,7 @@ private:
     juce::Rectangle<int> woodL, woodR, plate;
     juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline;
     std::array<bool, DubChordsProcessor::numSlots> lastOn {};
+    dub::Voicings voicings;   // atualizado pelo timer (inversões sugeridas/usadas)
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubChordsPanel)
 };

@@ -96,7 +96,14 @@ inline std::vector<Hit> bubbleHits()
 }
 
 //==============================================================================
-struct ChordSlot { int root = 9; int quality = Min; double beats = 8; };
+// inversion: -1 = AUTO (a mais próxima do acorde anterior), 0 = fundamental, 1 = 1ª, 2 = 2ª
+struct ChordSlot { int root = 9; int quality = Min; double beats = 8; int inversion = -1; };
+
+inline const char* inversionName (int inv)
+{
+    static const char* names[3] = { "FUND", "1\xc2\xaa INV", "2\xc2\xaa INV" };   // UTF-8: 1ª / 2ª
+    return names[std::clamp (inv, 0, 2)];
+}
 
 enum Channel { ChSkank = 1, ChBass = 2, ChBubble = 3 };
 
@@ -124,7 +131,7 @@ struct Settings
 
 //==============================================================================
 // Voicing com condução de vozes: escolhe a inversão mais próxima do acorde anterior
-inline std::vector<int> voiceChord (int root, int quality, int center, const std::vector<int>& prev)
+inline std::vector<int> voiceChord (int root, int quality, int center, const std::vector<int>& prev, int forcedInversion = -1)
 {
     const auto& iv = intervals (quality);
     const int n = (int) iv.size();
@@ -137,6 +144,7 @@ inline std::vector<int> voiceChord (int root, int quality, int center, const std
 
     for (int inv = 0; inv < n; ++inv)
     {
+        if (forcedInversion >= 0 && inv != forcedInversion % n) continue;
         for (int bottom = center - 12; bottom <= center + 6; ++bottom)
         {
             if (((bottom % 12) + 12) % 12 != pcs[(size_t) inv]) continue;
@@ -172,6 +180,61 @@ inline std::vector<int> voiceChord (int root, int quality, int center, const std
     return best;
 }
 
+// Qual inversão é um voicing (0 = fundamental no baixo, 1 = terça no baixo, 2 = quinta no baixo)
+inline int inversionOf (const std::vector<int>& voicing, int root, int quality)
+{
+    if (voicing.empty()) return 0;
+    const auto& iv = intervals (quality);
+    const int bassPc = ((voicing.front() % 12) + 12) % 12;
+    for (int k = 0; k < (int) iv.size(); ++k)
+        if (((root + iv[(size_t) k]) % 12 + 12) % 12 == bassPc) return k;
+    return 0;
+}
+
+// Voicings da progressão inteira (mão esquerda do skank).
+// suggested[i] = inversão com as notas mais próximas do acorde anterior (o que o AUTO escolheria);
+// used[i] = inversão que está tocando (a escolhida pelo usuário ou a sugerida, no AUTO).
+// O primeiro acorde é sugerido em relação ao último, para o loop fechar sem salto.
+struct Voicings
+{
+    std::vector<std::vector<int>> notes;   // vazio para acorde desligado
+    std::vector<int> suggested, used;
+};
+
+inline Voicings voiceProgression (const std::vector<ChordSlot>& slots, int center)
+{
+    Voicings v;
+    v.notes.assign (slots.size(), {});
+    v.suggested.assign (slots.size(), 0);
+    v.used.assign (slots.size(), 0);
+
+    auto pass = [&] (std::vector<int> prev)
+    {
+        for (size_t i = 0; i < slots.size(); ++i)
+        {
+            const auto& s = slots[i];
+            if (s.beats <= 0) continue;
+            const auto best = voiceChord (s.root, s.quality, center, prev);
+            v.suggested[i] = inversionOf (best, s.root, s.quality);
+            v.notes[i] = s.inversion < 0 ? best : voiceChord (s.root, s.quality, center, prev, s.inversion);
+            v.used[i] = inversionOf (v.notes[i], s.root, s.quality);
+            prev = v.notes[i];
+        }
+        return prev;
+    };
+
+    // 1ª passada a partir do centro; depois recomeça pelo último acorde (o loop volta ao início)
+    // até a progressão parar de mudar
+    auto last = pass ({});
+    for (int k = 0; k < 6; ++k)
+    {
+        const auto before = v.notes;
+        last = pass (last);
+        if (v.notes == before) break;
+    }
+    return v;
+}
+
 //==============================================================================
 // Comprimento de um ataque: o tamanho de nota escolhido, mas nunca encostando no próximo ataque
 inline double hitLength (const std::vector<Hit>& hits, size_t index, double noteBeats, double swingOffset)
@@ -197,7 +260,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
     const auto hits = patternHits (s.pattern);
     const auto bub  = bubbleHits();
     const double noteBeats = noteSizeBeats (s.noteSize);
-    std::vector<int> prev;
+    const auto voicings = voiceProgression (slots, s.centerNote);
     double pos = 0;   // posição em tempos
 
     for (int si = 0; si < (int) slots.size(); ++si)
@@ -206,8 +269,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
         if (slot.beats <= 0) continue;
 
         // mão esquerda (voicing) + mão direita uma oitava acima
-        const auto left = voiceChord (slot.root, slot.quality, s.centerNote, prev);
-        prev = left;
+        const auto& left = voicings.notes[(size_t) si];
         std::vector<int> skank = left;
         for (int n : left) skank.push_back (n + 12);
         std::vector<int> organ;

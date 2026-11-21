@@ -367,6 +367,62 @@ void ModeSwitch::paint (juce::Graphics& g)
 }
 
 //==============================================================================
+void InversionSwitch::paint (juce::Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    auto frame = b.withTrimmedTop (9.0f);
+    g.setColour (juce::Colour (0xff1a1714));
+    g.fillRoundedRectangle (frame, 5.0f);
+    g.setColour (juce::Colours::white.withAlpha (0.08f));
+    g.drawRoundedRectangle (frame.reduced (0.5f), 5.0f, 1.0f);
+
+    const int sel = juce::jlimit (0, 3, index());
+    const int sug = suggested ? juce::jlimit (0, 2, suggested()) + 1 : -1;   // índice do botão sugerido
+    static const char* labels[4] = { "AUTO", "FUND", "1\xc2\xaa", "2\xc2\xaa" };
+    const auto mouse = getMouseXYRelative().toFloat();
+
+    auto inner = frame.reduced (3.0f);
+    const float w = inner.getWidth() / 4.0f;
+    for (int k = 0; k < 4; ++k)
+    {
+        auto r = juce::Rectangle<float> (inner.getX() + w * (float) k, inner.getY(), w, inner.getHeight()).reduced (1.5f, 0.0f).withTrimmedBottom (2.5f);
+        const bool on = k == sel, over = isMouseOver() && r.contains (mouse);
+        g.setColour (juce::Colours::black.withAlpha (0.4f));
+        g.fillRoundedRectangle (r.translated (0, 2.5f), 3.0f);
+        auto cap = r.translated (0, on ? 2.0f : 0.0f);
+        juce::ColourGradient cg (juce::Colour (on ? 0xff2c2925 : 0xff3a3632).brighter (over && ! on ? 0.08f : 0.0f), cap.getX(), cap.getY(),
+                                 juce::Colour (0xff141210), cap.getX(), cap.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRoundedRectangle (cap, 3.0f);
+        g.setColour (juce::Colours::white.withAlpha (on ? 0.04f : 0.12f));
+        g.drawHorizontalLine ((int) cap.getY() + 1, cap.getX() + 3, cap.getRight() - 3);
+
+        if (on)   // lâmpada do botão apertado
+        {
+            const auto lamp = juce::Rectangle<float> (6.0f, 6.0f).withCentre ({ cap.getX() + 8.0f, cap.getCentreY() });
+            g.setColour (colours::amber.withAlpha (0.35f));
+            g.fillEllipse (lamp.expanded (3.5f));
+            g.setColour (juce::Colour (0xffffd27a));
+            g.fillEllipse (lamp);
+        }
+
+        const bool isSug = k == sug;
+        g.setColour (on ? colours::cream : isSug ? colours::amber : colours::cream.withAlpha (0.5f));
+        g.setFont (stencil (11.0f, 0.08f));
+        g.drawText (juce::String::fromUTF8 (labels[k]), cap.withTrimmedLeft (on ? 10.0f : 0.0f), juce::Justification::centred);
+
+        if (isSug)   // seta âmbar em cima do botão sugerido
+        {
+            juce::Path tri;
+            const float cx = r.getCentreX(), ty = b.getY() + 1.0f;
+            tri.addTriangle (cx - 5.0f, ty, cx + 5.0f, ty, cx, ty + 6.5f);
+            g.setColour (colours::amber.darker (0.15f));
+            g.fillPath (tri);
+        }
+    }
+}
+
+//==============================================================================
 void ChoiceWindow::mouseDown (const juce::MouseEvent& e)
 {
     const int dir = e.position.x < (float) getWidth() * 0.5f ? -1 : 1;
@@ -530,10 +586,13 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
         const auto n = juce::String (i);
         m.keys = std::make_unique<NoteKeys>       (*proc.apvts.getParameter ("root" + n));
         m.mode = std::make_unique<ModeSwitch>     (*proc.apvts.getParameter ("qual" + n));
+        m.inv  = std::make_unique<InversionSwitch> (*proc.apvts.getParameter ("inv" + n),
+                                                    [this, i] { return voicings.suggested.empty() ? 0 : voicings.suggested[(size_t) i]; });
         m.dur  = std::make_unique<ChoiceWindow>   (*proc.apvts.getParameter ("dur" + n), [] (int d) -> std::pair<juce::String, juce::String>
                  { return { dub::durationShort (d), d <= 1 ? "COMPASSO" : "COMPASSOS" }; });
         addAndMakeVisible (*m.keys);
         addAndMakeVisible (*m.mode);
+        addAndMakeVisible (*m.inv);
         addAndMakeVisible (*m.dur);
         if (i > 0) setupToggle (m.on, "on" + n, "ON");
     }
@@ -546,8 +605,8 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     });
     noteSize = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("noteSize"), [] (int i) -> std::pair<juce::String, juce::String>
     {
-        static const char* sub[dub::numNoteSizes] = { "FUSA", "SEMICOLCHEIA", "COLCHEIA", "SEMINIMA", "MINIMA" };
-        return { dub::noteSizeName (i), sub[juce::jlimit (0, dub::numNoteSizes - 1, i)] };
+        static const char* sub[dub::numNoteSizes] = { "FUSA", "SEMICOLCHEIA", "COLCHEIA", "SEM\xc3\x8dNIMA", "M\xc3\x8dNIMA" };
+        return { dub::noteSizeName (i), juce::String::fromUTF8 (sub[juce::jlimit (0, dub::numNoteSizes - 1, i)]) };
     });
     addAndMakeVisible (*pattern);
     addAndMakeVisible (*noteSize);
@@ -583,7 +642,8 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     addAndMakeVisible (exportBtn);
     addAndMakeVisible (dragZone);
 
-    setSize (1240, 790);
+    voicings = proc.getVoicings();
+    setSize (1240, 846);
     timerCallback();
     startTimerHz (30);
 }
@@ -644,12 +704,13 @@ void DubChordsPanel::exportMidi()
                               if (! f.hasFileExtension ("mid")) f = f.withFileExtension ("mid");
                               if (! proc.writeMidiFile (f))
                                   juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon,
-                                                                          "Dub Chords", "Nao foi possivel salvar o MIDI.");
+                                                                          "Dub Chords", juce::String::fromUTF8 ("N\xc3\xa3o foi poss\xc3\xadvel salvar o MIDI."));
                           });
 }
 
 void DubChordsPanel::timerCallback()
 {
+    voicings = proc.getVoicings();
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);
@@ -658,7 +719,7 @@ void DubChordsPanel::timerCallback()
             lastOn[(size_t) i] = on;
             auto& m = mods[(size_t) i];
             for (juce::Component* c : { (juce::Component*) m.keys.get(), (juce::Component*) m.mode.get(),
-                                        (juce::Component*) m.dur.get() })
+                                        (juce::Component*) m.inv.get(), (juce::Component*) m.dur.get() })
                 c->setAlpha (on ? 1.0f : 0.38f);
         }
     }
@@ -827,7 +888,11 @@ void DubChordsPanel::renderBackground()
 
     {   // placa de latão "DUB STATION"
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION 1.1");
+        // versão vem do CMake (project(DubChords VERSION x.y.z)) -> "DUB STATION x.y"
+        juce::String ver (JucePlugin_VersionString);
+        if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
+            ver = ver.upToLastOccurrenceOf (".", false, false);
+        const juce::String t ("DUB STATION " + ver);
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -943,9 +1008,9 @@ void DubChordsPanel::renderBackground()
         // rótulos gravados acima de cada controle
         g.setColour (colours::inkSoft);
         g.setFont (stencil (9.0f, 0.3f));
-        for (auto [c, t] : { std::pair<juce::Component*, const char*> { md.keys.get(), "TONICA" },
-                             { md.mode.get(), "MAIOR  /  MENOR" }, { md.dur.get(), "DURACAO" } })
-            g.drawText (t, c->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
+        for (auto [c, t] : { std::pair<juce::Component*, const char*> { md.keys.get(), "T\xc3\x94NICA" },
+                             { md.mode.get(), "MAIOR  /  MENOR" }, { md.inv.get(), "INVERS\xc3\x83O" }, { md.dur.get(), "DURA\xc3\x87\xc3\x83O" } })
+            g.drawText (juce::String::fromUTF8 (t), c->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
         // trilho escuro onde o teclado está encaixado
         auto rail = md.keys->getBounds().toFloat().expanded (6.0f, 6.0f);
         g.setColour (juce::Colours::white.withAlpha (0.45f));
@@ -964,7 +1029,7 @@ void DubChordsPanel::renderBackground()
         drawKnobScale (g, k->slider, 11);
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
-    g.drawText ("PADRAO DO SKANK", pattern->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
+    g.drawText (juce::String::fromUTF8 ("PADR\xc3\x83O DO SKANK"), pattern->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
     g.drawText ("TAMANHO DA NOTA", noteSize->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" });
 }
@@ -987,8 +1052,10 @@ void DubChordsPanel::paint (juce::Graphics& g)
             const double bars = s.beats / 4.0;
             juce::ignoreUnused (bars);
             t = juce::String (dub::rootName (s.root)) + (s.quality == dub::Min ? " MENOR" : " MAIOR");
+            if ((size_t) i < voicings.used.size())
+                t << juce::String::fromUTF8 ("  \xc2\xb7  ") << juce::String::fromUTF8 (dub::inversionName (voicings.used[(size_t) i]));
         }
-        glowText (g, m.display.toFloat(), t, 19.0f, on ? 1.0f : 0.35f);
+        glowText (g, m.display.toFloat(), t, 17.0f, on ? 1.0f : 0.35f);
     }
 
 
@@ -1056,7 +1123,7 @@ void DubChordsPanel::resized()
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
     {
         auto& m = mods[(size_t) i];
-        m.area = { x0 + i * (modW + gap), 92, modW, 384 };
+        m.area = { x0 + i * (modW + gap), 92, modW, 440 };
         auto a = m.area.reduced (14, 0);
         a.removeFromTop (16);
         auto header = a.removeFromTop (28);
@@ -1068,12 +1135,14 @@ void DubChordsPanel::resized()
         m.keys->setBounds (a.removeFromTop (124).reduced (6, 0));
         a.removeFromTop (30);
         m.mode->setBounds (a.removeFromTop (40));
+        a.removeFromTop (20);
+        m.inv->setBounds (a.removeFromTop (44));
         a.removeFromTop (26);
         m.dur->setBounds (a.removeFromTop (52).reduced (20, 0));
     }
 
     // --- linha de baixo
-    const int by = 500, bh = 200;
+    const int by = 556, bh = 200;
     rhythmPanel = { 52, by, 430, bh };
     soundPanel  = { 496, by, 430, bh };
     midiPanel   = { 940, by, W - 52 - 940, bh };
@@ -1116,6 +1185,6 @@ void DubChordsPanel::resized()
         dragZone.setBounds (a.removeFromTop (60));
     }
 
-    timeline = { 62, 732, W - 124, 34 };
+    timeline = { 62, 788, W - 124, 34 };
     renderBackground();
 }

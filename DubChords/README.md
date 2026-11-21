@@ -1,8 +1,8 @@
-# DubMastor Dub Chords 1.1
+# DubMastor Dub Chords 1.2
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.1/DubMastorDubChords-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.1/DubMastorDubChords-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.2/DubMastorDubChords-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubChords-1.2/DubMastorDubChords-macOS.zip)**
 
 ![Interface do Dub Chords](docs/interface.png)
 
@@ -18,12 +18,13 @@ carregue numa *Instrument Track*.
 |---|---|
 | **TÔNICA** | Teclado mecânico de uma oitava. Clique na nota: a tecla afunda e a lâmpada acende |
 | **MAIOR / MENOR** | Dois botões de pressão intertravados |
+| **INVERSÃO** | **AUTO** (padrão) escolhe sozinho a inversão com as notas mais próximas do acorde anterior; **FUND**, **1ª** e **2ª** fixam a inversão. A **seta âmbar** sempre marca a inversão sugerida, mesmo quando você escolhe outra |
 | **DURAÇÃO** | Janela de contador: **1/2 compasso**, 1, 2, 3, 4 ou 8 compassos. Clique à direita para aumentar, à esquerda para diminuir |
 | **ON** (acordes 2, 3 e 4) | Liga/desliga o acorde no loop. O acorde 1 fica sempre ligado |
 
-O display âmbar mostra o acorde (ex.: "A MENOR"). Os acordes ligados formam o loop, que se repete sozinho
+O display âmbar mostra o acorde e a inversão que está tocando (ex.: "D MENOR · 2ª INV"). Os acordes ligados formam o loop, que se repete sozinho
 e aparece no visor **LOOP** com o cursor de reprodução. O plugin escolhe a inversão mais próxima do acorde
-anterior (condução de vozes), então a harmonia não fica pulando.
+anterior (condução de vozes), inclusive do último acorde para o primeiro, para o loop fechar sem salto.
 
 ## RITMO
 | Controle | O que faz |
@@ -49,6 +50,7 @@ anterior (condução de vozes), então a harmonia não fica pulando.
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 2 = baixo guia, canal 3 = bubble.
 
 ## Para desenvolvedores
+- **Versão:** muda só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece na plaqueta do plugin, e cada push na `main` publica a release **Dub Chords x.y** (tag `DubChords-x.y`) com as notas de `RELEASE_NOTES.md`. Lembre de atualizar os links `DubChords-x.y` no site e nos READMEs.
 - `Source/DubEngine.h`: lógica da harmonia (C++ puro). É aqui que se adiciona padrão novo.
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, saída MIDI, exportação.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob + teclado, botões e contadores clicáveis).

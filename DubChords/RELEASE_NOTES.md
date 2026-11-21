@@ -1,13 +1,11 @@
-## Dub Chords 1.1 🟢🟡⚫
+## Dub Chords 1.2 🟢🟡⚫
 
-- **Skank com as duas mãos:** o acorde de piano sai em duas oitavas (mão esquerda + direita)
-- **Bubble de órgão** uma oitava abaixo do skank (botão BUBBLE)
-- **Timbres clássicos:** piano estilo **Korg M1** no skank e **Hammond** do reggae (drawbars 888, Leslie lento) no bubble — os mesmos do Dub Station Roots Keys
-- **TAMANHO DA NOTA:** 1/32, 1/16, 1/8, 1/4 ou 1/2
-- **PREVIEW:** botão grande para ouvir o loop sem a DAW tocando
-- **MIDI colorido:** ao arrastar/exportar, cada acorde vai num canal MIDI (1 a 4) e o nome do acorde vira marcador. No Cubase: Key Editor › Cores › Canal
-- Padrão do skank em contador clicável; **1/2 compasso** continua disponível em cada acorde
-- Progressão inicial: Am (2) · Dm (1) · Em (1/2) · G (1/2)
+- **Inversão em cada acorde:** AUTO, FUND, 1ª e 2ª
+- **AUTO (padrão):** escolhe a inversão com as notas mais próximas do acorde anterior, inclusive do último acorde para o primeiro, para o loop fechar sem salto
+- **Seta âmbar** em cima da inversão sugerida, sempre visível, mesmo quando você fixa outra
+- O display mostra o acorde e a inversão que está tocando (ex.: "D MENOR · 2ª INV")
+
+Continua tudo da 1.1: skank de piano M1 com as duas mãos, bubble de Hammond uma oitava abaixo, tamanho da nota, PREVIEW e MIDI com cada acorde em um canal (cor).
 
 É um instrumento: no Cubase, carregue numa *Instrument Track*.
 

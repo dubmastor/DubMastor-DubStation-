@@ -7,6 +7,7 @@ namespace
     juce::String qualId (int i) { return "qual" + juce::String (i); }
     juce::String durId  (int i) { return "dur"  + juce::String (i); }
     juce::String onId   (int i) { return "on"   + juce::String (i); }
+    juce::String invId  (int i) { return "inv"  + juce::String (i); }
 
     const int exportRepsTable[] = { 1, 2, 4, 8 };
 }
@@ -35,6 +36,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
         layout.add (std::make_unique<AudioParameterChoice> (ParameterID { rootId (i), 1 }, n + " tonica",   roots, defRoot[i]));
         layout.add (std::make_unique<AudioParameterChoice> (ParameterID { qualId (i), 1 }, n + " tipo",     quals, defQual[i]));
         layout.add (std::make_unique<AudioParameterChoice> (ParameterID { durId (i),  1 }, n + " duracao",  durs,  defDur[i]));
+        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { invId (i), 1 }, n + " inversao",
+                                                            StringArray { "AUTO", "FUND", juce::String::fromUTF8 ("1\xc2\xaa INV"), juce::String::fromUTF8 ("2\xc2\xaa INV") }, 0));
         if (i > 0)   // o acorde 1 está sempre ligado
             layout.add (std::make_unique<AudioParameterBool> (ParameterID { onId (i), 1 }, n + " ligado", defOn[i]));
     }
@@ -107,6 +110,7 @@ std::vector<dub::ChordSlot> DubChordsProcessor::getSlots() const
         s.quality = juce::jlimit (0, 1, (int) param (qualId (i)));
         const bool on = (i == 0) || param (onId (i)) > 0.5f;
         s.beats   = on ? dub::durationBeats ((int) param (durId (i))) : 0.0;
+        s.inversion = (int) param (invId (i)) - 1;   // 0 = AUTO -> -1
         slots.push_back (s);
     }
     return slots;
@@ -136,6 +140,11 @@ juce::String DubChordsProcessor::getProgressionText() const
         }
     return parts.isEmpty() ? juce::String ("Nenhum acorde ativo")
                            : parts.joinIntoString ("  >  ");
+}
+
+dub::Voicings DubChordsProcessor::getVoicings() const
+{
+    return dub::voiceProgression (getSlots(), getSettings().centerNote);
 }
 
 double DubChordsProcessor::getExportBpm() const

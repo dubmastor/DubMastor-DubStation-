@@ -40,6 +40,7 @@ public:
     std::vector<dub::ChordSlot> getSlots() const;
     dub::Settings getSettings() const;
     juce::String getProgressionText() const;
+    dub::Voicings getVoicings() const;   // inversão sugerida e usada de cada acorde
     double getExportBpm() const;
     bool writeMidiFile (const juce::File& file) const;
     double getPlayPositionInLoop() const { return displayPos.load(); }   // -1 = parado
