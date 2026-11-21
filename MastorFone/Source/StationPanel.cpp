@@ -12,7 +12,7 @@ const Colour lampOff (0xff4a3418);
 
 constexpr int kWood = 26;
 constexpr const char* kVersion = "1.6";
-constexpr int kTopH = 236;
+constexpr int kTopH = 212;
 
 // escala do VU: linear em tensão de -20 VU a +3 VU, ponteiro abrindo ±42°
 constexpr float kVuSwing = 0.7330f;
@@ -817,7 +817,7 @@ void StationPanel::resized()
 {
     auto content = getLocalBounds().reduced (kWood, 0);
     topPanel = content.removeFromTop (kTopH);
-    plateArea = { (float) topPanel.getX() + 24.0f, 18.0f, 326.0f, 74.0f };
+    plateArea = { (float) topPanel.getX() + 24.0f, 20.0f, 326.0f, 74.0f };
     {
         auto tp = topPanel;
         tp.removeFromLeft (350);
@@ -977,20 +977,6 @@ void StationPanel::paint (Graphics& g)
     g.setFont (bold (9.5f).withExtraKerningFactor (0.12f));
     engraved (String::fromUTF8 ("MPV-01  ·  ") + kVersion + String::fromUTF8 ("  ·  RÁDIO AM  ·  TELEFONE  ·  MEGAFONE"),
               { pl.getX() + 17, pl.getY() + 48, pl.getWidth() - 30, 14 }, Justification::centredLeft, Colour (0xff3a3a3a));
-
-    // assinatura "Dub Station Solutions" em tinta marrom, com traço
-    {
-        Graphics::ScopedSaveState ss (g);
-        const auto sp = Point<float> (pl.getX() + 10, pl.getBottom() + 44);
-        g.addTransform (AffineTransform::rotation (-0.05f, sp.x, sp.y + 26));
-        g.setColour (ink);
-        g.setFont (mf::script (38.0f));
-        g.drawText ("Dub Station Solutions", Rectangle<float> (sp.x, sp.y, 330, 44), Justification::centredLeft);
-        Path swash;
-        swash.startNewSubPath (sp.x + 10, sp.y + 46);
-        swash.cubicTo (sp.x + 90, sp.y + 38, sp.x + 190, sp.y + 52, sp.x + 290, sp.y + 36);
-        g.strokePath (swash, PathStrokeType (1.6f, PathStrokeType::curved, PathStrokeType::rounded));
-    }
 
     // origem + lâmpada NO AR
     g.setColour (ink.withAlpha (0.85f));

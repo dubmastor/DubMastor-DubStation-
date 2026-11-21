@@ -63,5 +63,5 @@ No Cubase ele aparece como **Mastor Phone Vox MPV-01**, do fabricante **DubMasto
 - `Source/StationPanel.cpp`, `Source/PluginEditor.*` — interface
 - `tests/render_test.cpp` — teste de resposta em frequência, nível e estabilidade, e demos em WAV
 
-Fontes embutidas: Archivo Black e TeX Gyre Chorus (licença OFL, em `Resources/licenses`).
+Fonte embutida: Archivo Black (licença OFL, em `Resources/licenses`).
 Feito com JUCE 8 (licença AGPLv3 para projetos de código aberto).

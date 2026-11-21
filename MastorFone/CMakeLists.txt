@@ -39,8 +39,7 @@ juce_add_plugin(MastorFone
     VST3_CATEGORIES Fx Distortion Delay)
 
 juce_add_binary_data(MastorFoneFonts SOURCES
-    Resources/ArchivoBlack-Regular.ttf
-    Resources/texgyrechorus-mediumitalic.otf)
+    Resources/ArchivoBlack-Regular.ttf)
 
 target_sources(MastorFone PRIVATE
     Source/PluginProcessor.cpp

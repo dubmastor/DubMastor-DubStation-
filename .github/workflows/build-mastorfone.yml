@@ -147,8 +147,10 @@ jobs:
           merge-multiple: true
 
       # release própria MPV-01-<versão> (push na main ou tag MPV-01-x.y)
+      # (se o GitHub não deixar criar a release, o build continua valendo: os zips vão pela release existente)
       - uses: softprops/action-gh-release@v2
         if: ${{ inputs.tag == '' || inputs.tag == null }}
+        continue-on-error: true
         with:
           tag_name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           target_commitish: ${{ github.sha }}

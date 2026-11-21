@@ -5,7 +5,7 @@
 namespace mf
 {
     juce::Font title (float h);   // Archivo Black (plaqueta)
-    juce::Font script (float h);  // TeX Gyre Chorus (assinatura, igual ao Dub Station)
+
 }
 
 // Botão que só fica ligado enquanto está pressionado (THROW)
@@ -127,7 +127,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kW = 1140, kH = 704;
+    static constexpr int kW = 1140, kH = 680;
 
 private:
     struct Knob
