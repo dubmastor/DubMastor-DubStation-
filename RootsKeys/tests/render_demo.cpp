@@ -183,6 +183,18 @@ int main()
         check ("dub echo", L, R);
         writeWav ("demo_dub_tape_echo.wav", L, R, sr);
     }
+    // 6) Flanger dub (Mad Professor): órgão + eco, varredura lenta com regeneração no máximo
+    for (float fb : { 0.95f, -0.95f })
+    {
+        rk::Params p; p.mode = 1; float db[9] = { 8, 8, 8, 0, 0, 0, 0, 0, 0 };
+        std::memcpy (p.drawbar, db, sizeof db); p.drive = 0.3f; p.reverb = 0.3f;
+        p.echoOn = true; p.echoIntensity = 0.7f;
+        p.flOn = true; p.flRate = 0.15f; p.flDepth = 1.0f; p.flManual = 0.2f; p.flFeedback = fb; p.flMix = 0.6f;
+        std::vector<Ev> ev;
+        chord (ev, 0.0, 3.5, { 57, 60, 64 }, 0.8f);
+        chord (ev, 4.0, 3.5, { 55, 59, 62 }, 0.8f);
+        render (fb > 0 ? "demo_flanger_dub.wav" : "demo_flanger_dub_neg.wav", p, ev, 10.0);
+    }
     std::printf (g_ok ? "OK: todos os testes passaram\n" : "ERRO: algum teste falhou\n");
     return g_ok ? 0 : 1;
 }

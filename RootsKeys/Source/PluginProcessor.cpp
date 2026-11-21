@@ -70,6 +70,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
     l.add (pct ("echoWow",       "Echo Wow/Flutter", 0.35f));
     l.add (pct ("echoAge",       "Echo Tape Age",    0.30f));
 
+    // Flanger estilo dub (Mad Professor)
+    l.add (std::make_unique<AudioParameterBool>  (ParameterID { "flOn", 1 }, "Flanger On", false));
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "flRate", 1 }, "Flanger Rate",
+                                                  NormalisableRange<float> (0.02f, 4.0f, 0.0f, 0.35f), 0.12f,
+                                                  AudioParameterFloatAttributes().withLabel ("Hz")));
+    l.add (pct ("flDepth",  "Flanger Depth",  0.80f));
+    l.add (pct ("flManual", "Flanger Manual", 0.30f));
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "flFeedback", 1 }, "Flanger Feedback",
+                                                  NormalisableRange<float> (-0.95f, 0.95f), 0.65f));
+    l.add (pct ("flMix",    "Flanger Mix",    0.50f));
+
     l.add (pct ("reverb", "Reverb", 0.20f));
     l.add (pct ("master", "Master", 0.80f));
 
@@ -138,6 +149,12 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.echoSpring    = get ("echoSpring");
     p.echoWow       = get ("echoWow");
     p.echoAge       = get ("echoAge");
+    p.flOn          = get ("flOn") > 0.5f;
+    p.flRate        = get ("flRate");
+    p.flDepth       = get ("flDepth");
+    p.flManual      = get ("flManual");
+    p.flFeedback    = get ("flFeedback");
+    p.flMix         = get ("flMix");
     p.maxOn         = get ("maxOn") > 0.5f;
     p.maxGainDb     = get ("maxGain");
     p.maxCeilDb     = get ("maxCeiling");

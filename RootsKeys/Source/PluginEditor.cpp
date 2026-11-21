@@ -6,7 +6,7 @@ using namespace vintage;
 
 namespace
 {
-constexpr int kW = 1000, kH = 724;
+constexpr int kW = 1000, kH = 800;
 
 // cores das drawbars no padrão Hammond: marrom (sub), marfim (oitavas), preta (quintas/terças)
 juce::Colour drawbarColour (int i)
@@ -25,8 +25,9 @@ const char* kOrganPresetShort[4] = { "BUBBLE", "PERC", "DUB DARK", "GOSPEL" };
 // ----- layout fixo (1000 x 724)
 const juce::Rectangle<int> kPlate      { 415, 16, 170, 40 };   // centralizada no cabeçalho
 const juce::Rectangle<int> kEcho       { 24, 372, 616, 120 };
-const juce::Rectangle<int> kOut        { 652, 372, 324, 120 };
-const juce::Rectangle<int> kKeysBed    { 24, 504, 952, 208 };
+const juce::Rectangle<int> kFlanger    { 24, 504, 616, 120 };
+const juce::Rectangle<int> kOut        { 652, 372, 324, 252 };
+const juce::Rectangle<int> kKeysBed    { 24, 636, 952, 152 };
 // piano
 const juce::Rectangle<int> kSpeakerL   { 24, 86, 186, 274 };
 const juce::Rectangle<int> kSpeakerR   { 790, 86, 186, 274 };
@@ -145,6 +146,10 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 {
     plateFace  = juce::Typeface::createSystemTypefaceFor (BinaryData::ArchivoBlackRegular_ttf,
                                                           (size_t) BinaryData::ArchivoBlackRegular_ttfSize);
+    pianoTitleFace = juce::Typeface::createSystemTypefaceFor (BinaryData::MichromaRegular_ttf,
+                                                              (size_t) BinaryData::MichromaRegular_ttfSize);
+    organTitleFace = juce::Typeface::createSystemTypefaceFor (BinaryData::RootsKeysDisplayBoldItalic_ttf,
+                                                              (size_t) BinaryData::RootsKeysDisplayBoldItalic_ttfSize);
     lnf.setSkin (0);
     setLookAndFeel (&lnf);
     auto& s = proc.apvts;
@@ -212,6 +217,15 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     setupKnob (eSpring,    "echoSpring",    "Spring");
     setupKnob (eWow,       "echoWow",       "Wow");
     setupKnob (eAge,       "echoAge",       "Tape Age");
+
+    // flanger estilo dub (Mad Professor)
+    addAndMakeVisible (flButton);
+    flAtt = std::make_unique<APVTS::ButtonAttachment> (s, "flOn", flButton);
+    setupKnob (fRate,     "flRate",     "Rate");
+    setupKnob (fDepth,    "flDepth",    "Depth");
+    setupKnob (fManual,   "flManual",   "Manual");
+    setupKnob (fFeedback, "flFeedback", "Feedback");
+    setupKnob (fMix,      "flMix",      "Mix");
 
     // maximizer + VU
     addAndMakeVisible (maxButton);
@@ -300,7 +314,8 @@ void RootsKeysEditor::applySkin (int newSkin)
     const auto tickOnPanel  = piano ? plasticMuted : brownInk;   // knobs sobre painel (marfim no órgão)
     const auto tickOnWood   = ivory;
     const auto labelOnPanel = piano ? plasticText : brownInk;
-    for (auto* k : { &eRate, &eIntensity, &eVol, &eSpring, &eWow, &eAge, &mxGain, &mxCeil, &mMaster, &mReverb })
+    for (auto* k : { &eRate, &eIntensity, &eVol, &eSpring, &eWow, &eAge, &fRate, &fDepth, &fManual, &fFeedback, &fMix,
+                      &mxGain, &mxCeil, &mMaster, &mReverb })
     {
         k->slider.setColour (juce::Slider::rotarySliderOutlineColourId, tickOnPanel);
         k->label.setColour (juce::Label::textColourId, labelOnPanel);
@@ -315,6 +330,7 @@ void RootsKeysEditor::applySkin (int newSkin)
         k->label.setColour (juce::Label::textColourId, plasticText);
 
     echoButton.getProperties().set ("style", piano ? "led" : "rocker");
+    flButton.getProperties().set ("style", piano ? "led" : "rocker");
     maxButton.getProperties().set ("style", piano ? "led" : "rocker");
     grLabel.setColour (juce::Label::backgroundColourId, piano ? juce::Colour (0xff050505) : knobBlack);
     grLabel.setColour (juce::Label::textColourId, piano ? lcdBg : ivory);
@@ -372,32 +388,27 @@ void RootsKeysEditor::timerCallback()
 // ---------------------------------------------------------------------  fundo (gerado 1x por visual)
 void RootsKeysEditor::drawPlate (juce::Graphics& g, juce::Rectangle<float> r)
 {
-    g.setColour (juce::Colours::black.withAlpha (0.5f));
-    g.fillRoundedRectangle (r.translated (0.0f, 2.0f), 3.0f);
-    g.setColour (juce::Colour (0xffc9c6bd));
-    g.fillRoundedRectangle (r, 3.0f);
-    juce::Random rnd (42);
-    for (float y = r.getY() + 2.0f; y < r.getBottom() - 2.0f; y += 1.0f)
-    {
-        g.setColour ((rnd.nextBool() ? juce::Colours::white : juce::Colours::black).withAlpha (0.04f + 0.06f * rnd.nextFloat()));
-        g.drawHorizontalLine ((int) y, r.getX() + 2.0f, r.getRight() - 2.0f);
-    }
-    g.setColour (juce::Colours::white.withAlpha (0.6f));
-    g.drawLine (r.getX() + 3.0f, r.getY() + 1.0f, r.getRight() - 3.0f, r.getY() + 1.0f, 1.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.35f));
-    g.drawRoundedRectangle (r.reduced (0.5f), 3.0f, 1.0f);
-    for (auto pt : { juce::Point<float> (r.getX() + 7, r.getY() + 7), juce::Point<float> (r.getRight() - 7, r.getY() + 7),
-                     juce::Point<float> (r.getX() + 7, r.getBottom() - 7), juce::Point<float> (r.getRight() - 7, r.getBottom() - 7) })
-    {
-        g.setColour (juce::Colour (0xff9a978f));
-        g.fillEllipse (pt.x - 3.0f, pt.y - 3.0f, 6.0f, 6.0f);
-        g.setColour (juce::Colour (0xff5a554c));
-        g.drawLine (pt.x - 2.2f, pt.y + 1.0f, pt.x + 2.2f, pt.y - 1.0f, 1.0f);
-    }
+    // emblema de latão dourado polido, sem parafusos
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.fillRoundedRectangle (r.expanded (2.0f).translated (0.0f, 2.5f), 9.0f);
+    g.setGradientFill (juce::ColourGradient::vertical (juce::Colour (0xff8a6418), r.getY() - 2.0f,
+                                                       juce::Colour (0xff4a3208), r.getBottom() + 2.0f));
+    g.fillRoundedRectangle (r.expanded (2.0f), 9.0f);
+    juce::ColourGradient gold (juce::Colour (0xfffff3c4), 0.0f, r.getY(), juce::Colour (0xfff3d98a), 0.0f, r.getBottom(), false);
+    gold.addColour (0.35, juce::Colour (0xffe2b956));
+    gold.addColour (0.52, juce::Colour (0xffa9781f));
+    gold.addColour (0.70, juce::Colour (0xffd8a943));
+    g.setGradientFill (gold);
+    g.fillRoundedRectangle (r, 8.0f);
+    g.setColour (juce::Colours::white.withAlpha (0.25f));
+    g.fillRoundedRectangle (r.withHeight (r.getHeight() * 0.42f), 8.0f);
+    g.setColour (juce::Colour (0xff6b4a10).withAlpha (0.6f));
+    g.drawRoundedRectangle (r.reduced (3.0f), 6.0f, 1.0f);
+
     g.setFont (juce::FontOptions (plateFace).withHeight (17.0f));
-    g.setColour (juce::Colours::white.withAlpha (0.65f));
+    g.setColour (juce::Colour (0xfffff8dc).withAlpha (0.7f));
     g.drawText ("DUB STATION", r.translated (0.0f, 1.0f), juce::Justification::centred);
-    g.setColour (juce::Colour (0xff2a2622));
+    g.setColour (juce::Colour (0xff3a2606));
     g.drawText ("DUB STATION", r, juce::Justification::centred);
 }
 
@@ -419,55 +430,58 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 
     if (piano)
     {
-        // ---------------- teclado anos 80: plástico preto texturizado
-        static const juce::Image plastic = skin::makePlastic (kW, kH, 30.0f);
+        // ---------------- teclado anos 80: plástico preto liso e fosco
+        static const juce::Image plastic = skin::makeSatin (kW, kH);
         g.drawImageAt (plastic, 0, 0);
-        g.setColour (juce::Colours::black.withAlpha (0.35f));
+        g.setColour (juce::Colour (0xff18181a));
         g.fillRect (0, 0, kW, 74);
-        g.setColour (juce::Colour (0xff4a4a4e));
-        g.drawHorizontalLine (74, 0.0f, (float) kW);
-        // arranhões leves
-        juce::Random rnd (11);
-        for (int i = 0; i < 46; ++i)
-        {
-            const float x = rnd.nextFloat() * kW, y = rnd.nextFloat() * kH, l = 8.0f + rnd.nextFloat() * 40.0f, a = rnd.nextFloat() * 0.6f - 0.3f;
-            g.setColour (juce::Colour (0xff9a9aa0).withAlpha (0.06f + rnd.nextFloat() * 0.12f));
-            g.drawLine (x, y, x + l * std::cos (a), y + l * std::sin (a), 0.5f + rnd.nextFloat() * 0.7f);
-        }
+        // friso de alumínio sob o cabeçalho
+        g.setGradientFill (juce::ColourGradient::vertical (juce::Colour (0xff9a9da2), 74.0f, juce::Colour (0xff5a5d62), 77.0f));
+        g.fillRect (0, 74, kW, 3);
 
         g.setColour (plasticMuted);
-        g.setFont (juce::FontOptions (14.0f, juce::Font::italic));
-        g.drawText ("Dub Station", 28, 10, 200, 18, juce::Justification::centredLeft);
+        g.setFont (juce::FontOptions (13.0f, juce::Font::italic));
+        g.drawText ("Dub Station", 28, 8, 200, 18, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xfff2f2f2));
-        g.setFont (juce::FontOptions (plateFace).withHeight (27.0f));
-        g.drawText ("ROOTS KEYS", 28, 28, 280, 30, juce::Justification::centredLeft);
-        g.setColour (juce::Colour (0xff7a7a7e));
+        g.setFont (juce::FontOptions (pianoTitleFace).withHeight (23.0f).withKerningFactor (0.06f));
+        g.drawText ("ROOTS KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
+        g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
         g.drawText ("DIGITAL PIANO SYNTHESIS  RK-1", 30, 58, 260, 12, juce::Justification::centredLeft);
         g.setFont (VintageLookAndFeel::mono (10.0f, false));
         g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 
-        // caixas de som com grade
+        // caixas de som com tela de tecido e faixa vermelha/dourada
         for (auto sp : { kSpeakerL, kSpeakerR })
         {
-            g.setColour (juce::Colour (0xff060607));
-            g.fillRoundedRectangle (sp.toFloat(), 10.0f);
-            g.setColour (juce::Colour (0xff3a3a3e));
-            g.drawRoundedRectangle (sp.toFloat().reduced (0.5f), 10.0f, 1.0f);
-            auto grille = sp.reduced (10).toFloat();
-            g.setColour (juce::Colour (0xff141416));
-            g.fillRoundedRectangle (grille, 6.0f);
-            for (float y = grille.getY() + 4.0f; y < grille.getBottom() - 2.0f; y += 8.0f)
-                for (float x = grille.getX() + 4.0f; x < grille.getRight() - 2.0f; x += 8.0f)
-                {
-                    g.setColour (juce::Colours::black);
-                    g.fillEllipse (x - 2.2f, y - 2.2f, 4.4f, 4.4f);
-                    g.setColour (juce::Colour (0xff303034));
-                    g.fillEllipse (x - 1.5f, y - 1.5f, 1.6f, 1.6f);
-                }
-            g.setColour (juce::Colour (0xff55555a));
-            g.setFont (VintageLookAndFeel::mono (9.0f, false));
-            g.drawText ("RK SPEAKER", sp.getX(), sp.getBottom() - 22, sp.getWidth(), 12, juce::Justification::centred);
+            auto box = sp.toFloat();
+            g.setColour (juce::Colour (0xff0a0a0b));
+            g.fillRoundedRectangle (box, 8.0f);
+            auto cloth = box.reduced (8.0f);
+            g.setColour (juce::Colour (0xff1d1d20));
+            g.fillRoundedRectangle (cloth, 4.0f);
+            {
+                juce::Graphics::ScopedSaveState ss (g);
+                g.reduceClipRegion (cloth.toNearestInt());
+                g.setColour (juce::Colour (0xff151517));
+                for (float y = cloth.getY(); y < cloth.getBottom(); y += 2.0f)
+                    g.drawHorizontalLine ((int) y, cloth.getX(), cloth.getRight());
+                g.setColour (juce::Colour (0xff27272b));
+                for (float x = cloth.getX(); x < cloth.getRight(); x += 2.0f)
+                    g.drawVerticalLine ((int) x, cloth.getY(), cloth.getBottom());
+                // leve volume do cone por trás do tecido
+                g.setGradientFill (juce::ColourGradient (juce::Colours::black.withAlpha (0.0f), cloth.getCentreX(), cloth.getCentreY() - 10.0f,
+                                                         juce::Colours::black.withAlpha (0.35f), cloth.getX(), cloth.getY(), true));
+                g.fillRect (cloth);
+            }
+            const float sy = cloth.getBottom() - 44.0f;
+            g.setColour (ledRed);
+            g.fillRect (cloth.getX(), sy, cloth.getWidth(), 4.0f);
+            g.setColour (juce::Colour (0xffe2b956));
+            g.fillRect (cloth.getX(), sy + 6.0f, cloth.getWidth(), 2.0f);
+            g.setColour (juce::Colour (0xff9a9a9e));
+            g.setFont (juce::FontOptions (pianoTitleFace).withHeight (10.0f).withKerningFactor (0.2f));
+            g.drawText ("ROOTS", cloth.withTop (sy + 12.0f).withHeight (24.0f), juce::Justification::centred);
         }
 
         auto panel = [&] (juce::Rectangle<int> r)
@@ -481,6 +495,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         };
         panel (kPianoPanel);
         panel (kEcho);
+        panel (kFlanger);
         panel (kOut);
         panel (kKeysBed);
         g.setColour (juce::Colour (0xff050505));
@@ -492,12 +507,13 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 216, 96, 12, juce::Justification::centred);
 
         sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", plasticText, plasticMuted);
+        sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
         sectionTitle (kOut, "MAXIMIZER", "", plasticText, plasticMuted);
         g.setColour (juce::Colour (0xff3a3a3e));
-        g.drawHorizontalLine (kEcho.getY() + 24, (float) kEcho.getX() + 14, (float) kEcho.getRight() - 14);
-        g.drawHorizontalLine (kOut.getY() + 24, (float) kOut.getX() + 14, (float) kOut.getRight() - 14);
+        for (auto r : { kEcho, kFlanger, kOut })
+            g.drawHorizontalLine (r.getY() + 24, (float) r.getX() + 14, (float) r.getRight() - 14);
         g.setColour (juce::Colour (0xff5a1310));
-        g.fillRect (128, 512, 840, 4);   // feltro
+        g.fillRect (128, 644, 840, 4);   // feltro
     }
     else
     {
@@ -512,8 +528,8 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.setColour (ivory);
         g.setFont (juce::FontOptions (juce::Font::getDefaultSerifFontName(), 16.0f, juce::Font::italic));
         g.drawText ("Dub Station", 30, 10, 220, 20, juce::Justification::centredLeft);
-        g.setFont (juce::FontOptions (juce::Font::getDefaultSerifFontName(), 32.0f, juce::Font::bold | juce::Font::italic));
-        g.drawText ("Roots Keys", 30, 28, 280, 38, juce::Justification::centredLeft);
+        g.setFont (juce::FontOptions (organTitleFace).withHeight (36.0f));
+        g.drawText ("Roots Keys", 28, 24, 320, 44, juce::Justification::centredLeft);
 
         // trilho escuro da chave de modo
         g.setColour (brownInk);
@@ -535,21 +551,23 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         ivoryPanel (kLeslie);
         ivoryPanel (kPerc);
         ivoryPanel (kEcho);
+        ivoryPanel (kFlanger);
         ivoryPanel (kOut);
         g.setFont (VintageLookAndFeel::mono (10.0f));
         g.setColour (brownInk);
         g.drawText ("LESLIE", kLeslie.getX(), kLeslie.getY() + 8, kLeslie.getWidth(), 14, juce::Justification::centred);
         g.drawText ("PERCUSSION", kPerc.getX(), kPerc.getY() + 8, kPerc.getWidth(), 14, juce::Justification::centred);
         sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", brownInk, brownInk.withAlpha (0.6f));
+        sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", brownInk, brownInk.withAlpha (0.6f));
         sectionTitle (kOut, "MAXIMIZER", "", brownInk, brownInk);
         g.setColour (brownInk.withAlpha (0.3f));
-        g.drawHorizontalLine (kEcho.getY() + 24, (float) kEcho.getX() + 14, (float) kEcho.getRight() - 14);
-        g.drawHorizontalLine (kOut.getY() + 24, (float) kOut.getX() + 14, (float) kOut.getRight() - 14);
+        for (auto r : { kEcho, kFlanger, kOut })
+            g.drawHorizontalLine (r.getY() + 24, (float) r.getX() + 14, (float) r.getRight() - 14);
 
         g.setColour (brownInk);
         g.fillRoundedRectangle (kKeysBed.toFloat(), 6.0f);
         g.setColour (juce::Colour (0xff7a1a14));
-        g.fillRect (34, 512, 932, 5);   // feltro
+        g.fillRect (34, 644, 932, 5);   // feltro
         g.setColour (juce::Colour (0xffa89a82));
         g.setFont (VintageLookAndFeel::mono (10.0f, false));
         g.drawText ("MOD WHEEL = LESLIE FAST", kConsole.getX(), kConsole.getBottom() - 18, kConsole.getWidth(), 12, juce::Justification::centred);
@@ -591,7 +609,7 @@ void RootsKeysEditor::resized()
             fs[i]->slider.setBounds (cx - 22, 252, 44, 98);
         }
     }
-    wheels.setBounds (40, 536, 74, 160);
+    wheels.setBounds (40, 652, 74, 128);
 
     // órgão
     for (int i = 0; i < 9; ++i)
@@ -605,7 +623,7 @@ void RootsKeysEditor::resized()
     placeKnob (oClick,     { 848, 280 }, 52);
     placeKnob (oLevel,     { 920, 280 }, 52);
     for (int i = 0; i < 4; ++i)
-        organPreset[i].setBounds (40, 528 + i * 42, 100, 36);
+        organPreset[i].setBounds (40, 652 + i * 32, 100, 28);
 
     // eco (igual nos dois visuais)
     echoButton.setBounds (kEcho.getX() + 14, kEcho.getY() + 36, piano ? 76 : 80, piano ? 26 : 34);
@@ -616,18 +634,27 @@ void RootsKeysEditor::resized()
             placeKnob (*ks[i], { kEcho.getX() + 172 + i * 78, kEcho.getY() + 64 }, 46, 76);
     }
 
-    // maximizer + VU
-    vuL.setBounds (kOut.getX() + 12, kOut.getY() + 30, 92, 62);
-    vuR.setBounds (kOut.getX() + 108, kOut.getY() + 30, 92, 62);
-    maxButton.setBounds (kOut.getX() + 12, kOut.getY() + 94, piano ? 64 : 70, 24);
-    grLabel.setBounds (kOut.getX() + 136, kOut.getY() + 96, 64, 18);
-    placeKnob (mxGain,  { kOut.getX() + 236, kOut.getY() + 44 }, 32, 56);
-    placeKnob (mxCeil,  { kOut.getX() + 292, kOut.getY() + 44 }, 32, 56);
-    placeKnob (mReverb, { kOut.getX() + 236, kOut.getY() + 86 }, 32, 56);
-    placeKnob (mMaster, { kOut.getX() + 292, kOut.getY() + 86 }, 32, 56);
+    // flanger (mesma grade de knobs do eco)
+    flButton.setBounds (kFlanger.getX() + 14, kFlanger.getY() + 36, piano ? 100 : 104, piano ? 26 : 34);
+    {
+        Knob* ks[5] = { &fRate, &fDepth, &fManual, &fFeedback, &fMix };
+        for (int i = 0; i < 5; ++i)
+            placeKnob (*ks[i], { kFlanger.getX() + 172 + i * 78, kFlanger.getY() + 64 }, 46, 76);
+    }
+
+    // maximizer + VU (painel alto, ocupa as duas fileiras)
+    vuL.setBounds (kOut.getX() + 14, kOut.getY() + 34, 144, 100);
+    vuR.setBounds (kOut.getX() + 166, kOut.getY() + 34, 144, 100);
+    maxButton.setBounds (kOut.getX() + 14, kOut.getY() + 144, piano ? 70 : 74, piano ? 26 : 30);
+    grLabel.setBounds (kOut.getX() + 100, kOut.getY() + 148, 72, 20);
+    {
+        Knob* ks[4] = { &mxGain, &mxCeil, &mReverb, &mMaster };
+        for (int i = 0; i < 4; ++i)
+            placeKnob (*ks[i], { kOut.getX() + 48 + i * 76, kOut.getY() + 204 }, 42, 70);
+    }
 
     // teclado
-    if (piano) keyboard.setBounds (128, 518, 840, 186);
-    else       keyboard.setBounds (152, 520, 812, 184);
+    if (piano) keyboard.setBounds (128, 650, 840, 130);
+    else       keyboard.setBounds (152, 651, 812, 129);
     keyboard.setKeyWidth ((float) keyboard.getWidth() / 36.0f);
 }

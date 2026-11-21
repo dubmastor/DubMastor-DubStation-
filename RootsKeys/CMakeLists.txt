@@ -36,9 +36,11 @@ juce_add_plugin(RootsKeys
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     VST3_CATEGORIES Instrument Synth)
 
-# fonte embutida: Archivo Black (placa Dub Station)
+# fontes embutidas: Archivo Black (placa), Michroma (título piano), RootsKeys Display (título órgão)
 juce_add_binary_data(RootsKeysFonts SOURCES
-    Resources/ArchivoBlack-Regular.ttf)
+    Resources/ArchivoBlack-Regular.ttf
+    Resources/Michroma-Regular.ttf
+    Resources/RootsKeysDisplay-BoldItalic.ttf)
 
 target_sources(RootsKeys PRIVATE
     Source/PluginProcessor.cpp

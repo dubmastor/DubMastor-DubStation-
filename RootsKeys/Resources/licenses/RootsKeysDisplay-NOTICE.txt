@@ -1,0 +1,4 @@
+RootsKeysDisplay-BoldItalic.ttf is a Modified Version of Playfair Display Italic
+(https://github.com/clauseggers/Playfair-Display), instanced at weight 700 and renamed
+because "Playfair Display" is a Reserved Font Name. It is distributed under the
+SIL Open Font License 1.1 — see PlayfairDisplay-OFL.txt.

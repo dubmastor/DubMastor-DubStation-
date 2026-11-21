@@ -84,7 +84,7 @@ private:
 
     RootsKeysProcessor& proc;
     VintageLookAndFeel lnf;
-    juce::Typeface::Ptr plateFace;
+    juce::Typeface::Ptr plateFace, pianoTitleFace, organTitleFace;
     int skin = -1;
     juce::Image background;
     int backgroundSkin = -1;
@@ -111,6 +111,11 @@ private:
     juce::ComboBox echoModeBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> echoModeAtt;
     Knob eRate, eIntensity, eVol, eSpring, eWow, eAge;
+
+    // flanger estilo dub (Mad Professor)
+    juce::ToggleButton flButton { "FLANGER" };
+    std::unique_ptr<APVTS::ButtonAttachment> flAtt;
+    Knob fRate, fDepth, fManual, fFeedback, fMix;
 
     // maximizer + VU
     juce::ToggleButton maxButton { "MAX" };

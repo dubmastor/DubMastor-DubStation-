@@ -125,6 +125,13 @@ struct Params
     float echoSpring    = 0.3f;
     float echoWow       = 0.35f;
     float echoAge       = 0.3f;
+    // Flanger estilo dub (o "avião a jato" do Mad Professor) — na mistura inteira
+    bool  flOn       = false;
+    float flRate     = 0.12f;   // Hz (0.02..4)
+    float flDepth    = 0.8f;    // amplitude da varredura
+    float flManual   = 0.3f;    // atraso base (posição do "pente")
+    float flFeedback = 0.65f;   // -0.95..0.95 (regeneração; negativo = timbre oco)
+    float flMix      = 0.5f;
     // Master / Maximizer
     float reverb = 0.18f;
     float master = 0.8f;
@@ -178,6 +185,52 @@ struct Maximizer
 };
 
 // ---------------------------------------------------------------- PIANO (estilo M1)
+// ---------------------------------------------------------------- FLANGER (jet / dub)
+struct Flanger
+{
+    DelayLine dlL, dlR;
+    float sr = 44100, ph = 0, fbL = 0, fbR = 0, lpL = 0, lpR = 0, wet = 0, lfoSmL = 0, lfoSmR = 0;
+
+    void prepare (float s)
+    {
+        sr = s;
+        dlL.init ((int) (0.03f * s)); dlR.init ((int) (0.03f * s));
+        ph = 0; fbL = fbR = lpL = lpR = wet = lfoSmL = lfoSmR = 0;
+    }
+
+    static inline float tri (float x) { x -= std::floor (x); return x < 0.5f ? 2.0f * x : 2.0f - 2.0f * x; }
+
+    // processa no lugar; "on" abre/fecha suavemente o efeito
+    inline void process (float& L, float& R, const Params& p)
+    {
+        const float target = p.flOn ? p.flMix : 0.0f;
+        wet += (target - wet) * 0.0015f;
+        if (! p.flOn && wet < 1.0e-4f) { dlL.push (L); dlR.push (R); fbL = fbR = 0; return; }
+
+        ph += clampf (p.flRate, 0.02f, 4.0f) / sr;
+        if (ph >= 1.0f) ph -= 1.0f;
+        // triângulo suavizado: varredura "lenta e larga" típica de dub
+        lfoSmL += (tri (ph) - lfoSmL) * 0.01f;
+        lfoSmR += (tri (ph + 0.25f) - lfoSmR) * 0.01f;
+
+        const float dMin = (0.15f + clampf (p.flManual, 0.0f, 1.0f) * 2.5f) * 0.001f * sr;
+        const float dMax = std::min (dMin * (1.0f + clampf (p.flDepth, 0.0f, 1.0f) * 22.0f), 0.012f * sr);
+        const float dL = dMin * std::pow (dMax / dMin, lfoSmL);
+        const float dR = dMin * std::pow (dMax / dMin, lfoSmR);
+
+        const float fb = clampf (p.flFeedback, -0.95f, 0.95f);
+        dlL.push (L + std::tanh (fbL * fb));
+        dlR.push (R + std::tanh (fbR * fb));
+        const float yL = dlL.read (dL), yR = dlR.read (dR);
+        lpL += (yL - lpL) * 0.6f; lpR += (yR - lpR) * 0.6f;   // leve escurecimento na regeneração
+        fbL = lpL; fbR = lpR;
+
+        const float makeup = 1.0f + 0.3f * wet;
+        L = (L * (1.0f - wet) + 0.5f * wet * (L + yL)) * makeup;
+        R = (R * (1.0f - wet) + 0.5f * wet * (R + yR)) * makeup;
+    }
+};
+
 struct PianoVoice
 {
     static constexpr int MaxP = 28;
@@ -487,6 +540,7 @@ public:
         leslie.prepare (sr);
         reverb.prepare (sr);
         echo.prepare (sampleRate);
+        flanger.prepare (sr);
         echoIdle = true;
         maxi.prepare (sr);
         for (auto& v : piano) v.active = false;
@@ -644,6 +698,9 @@ public:
             L += rl * p.reverb * 1.4f;
             R += rr * p.reverb * 1.4f;
 
+            // flanger na mistura inteira (instrumento + eco + reverb), como nos dubs do Mad Professor
+            flanger.process (L, R, p);
+
             L *= p.master; R *= p.master;
             maxi.process (L, R, p.maxOn, maxGain, maxCeil);
             outL[s] = p.maxOn ? L : softClip (L);
@@ -660,6 +717,7 @@ private:
     Leslie leslie;
     Reverb reverb;
     fitaeco::TapeEcho echo;
+    Flanger flanger;
     static constexpr int kChunk = 256;
     bool echoIdle = true;
     float bufL[kChunk] = {}, bufR[kChunk] = {}, zero[kChunk] = {}, ecL[kChunk] = {}, ecR[kChunk] = {};

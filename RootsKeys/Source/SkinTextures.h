@@ -69,6 +69,25 @@ inline juce::Image makePlastic (int w, int h, float baseGrey = 30.0f)
     return img;
 }
 
+// Plástico preto liso e fosco (acetinado), com leve degradê vertical e grão finíssimo
+inline juce::Image makeSatin (int w, int h)
+{
+    juce::Image img (juce::Image::RGB, w, h, false);
+    juce::Image::BitmapData bd (img, juce::Image::BitmapData::writeOnly);
+    for (int y = 0; y < h; ++y)
+    {
+        const float t = (float) y / (float) juce::jmax (1, h - 1);
+        const float base = 43.0f - 15.0f * t;                     // #2b2b2e -> #1c1c1e
+        for (int x = 0; x < w; ++x)
+        {
+            const float n = (ValueNoise::hash (x, y, 5) - 0.5f) * 5.0f;
+            const auto v = toByte (base + n);
+            bd.setPixelColour (x, y, juce::Colour (v, v, (juce::uint8) juce::jmin (255, v + 3)));
+        }
+    }
+    return img;
+}
+
 // Madeira simples: veios longos horizontais, cor de nogueira média, acabamento acetinado
 inline juce::Image makeWood (int w, int h)
 {
