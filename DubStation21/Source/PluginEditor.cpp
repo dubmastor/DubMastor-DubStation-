@@ -9,7 +9,7 @@ const juce::Colour amber     (0xffffa630);
 const juce::Colour lampOff   (0xff4a3418);
 
 constexpr int kWood = 30;
-constexpr int kW = 900 + 2 * kWood, kH = 640;
+constexpr int kW = 1080 + 2 * kWood, kH = 640;
 constexpr int kTopH = 230;
 
 // knob index -> parameter id / label
@@ -22,6 +22,14 @@ const char* labels[kNumKnobs] = { "MODE SELECTOR", "REPEAT RATE", "INTENSITY", "
                                   "INPUT", "WOW/FLUTTER", "TAPE AGE", "DRY", "OUTPUT" };
 constexpr int kNumEq = 6;
 const char* eqLabels[kNumEq] = { "100", "250", "630", "1.6k", "4k", "10k" };
+
+// VU scale: linear in voltage from -20 VU to +3 VU, needle swing +-42 degrees
+constexpr float kVuSwing = 0.7330f; // 42 degrees in radians
+float vuToPos (float vu)
+{
+    const float a = std::pow (10.0f, juce::jlimit (-30.0f, 8.0f, vu) / 20.0f);
+    return (a - 0.1f) / (1.4125f - 0.1f);
+}
 
 juce::String modeDescription (int m)
 {
@@ -203,6 +211,14 @@ void FitaEcoEditor::timerCallback()
     tapePhase += 0.6f + 2.2f * rate;
     shownMode = (int) proc.apvts.getRawParameterValue ("mode")->load();
 
+    // VU ballistics (~300 ms rise, slight overshoot), peak lamp above +3 VU
+    const float vu = proc.getRecVu();
+    const float target = juce::jlimit (-0.03f, 1.06f, vuToPos (vu));
+    needleVel = (needleVel + (target - needlePos) * 0.30f) * 0.58f;
+    needlePos += needleVel;
+    peakHold = vu > 3.0f ? 15 : juce::jmax (0, peakHold - 1);
+    repaint (vuArea);
+
     juce::String text = modeDescription (shownMode);
     for (int i = 0; i < kNumKnobs; ++i)
     {
@@ -301,6 +317,7 @@ void FitaEcoEditor::paint (juce::Graphics& g)
     }
 
     drawTapeTransport (g);
+    drawVuNeedle (g);
 }
 
 void FitaEcoEditor::drawTapeTransport (juce::Graphics& g)
@@ -380,13 +397,141 @@ void FitaEcoEditor::drawTapeTransport (juce::Graphics& g)
     g.drawRoundedRectangle (win.expanded (2.0f), 11.0f, 3.0f);
 }
 
+// ---------------------------------------------------------------- VU meter
+namespace
+{
+struct VuGeom
+{
+    juce::Rectangle<float> housing, face, label;
+    juce::Point<float> pivot;
+    float radius;
+};
+VuGeom vuGeom (juce::Rectangle<int> area)
+{
+    VuGeom v;
+    v.housing = area.toFloat();
+    v.face = v.housing.reduced (11.0f).withHeight (124.0f);
+    v.label = juce::Rectangle<float> (v.housing.getX(), v.face.getBottom() + 6.0f, v.housing.getWidth(), v.housing.getBottom() - v.face.getBottom() - 10.0f);
+    v.pivot = { v.face.getCentreX(), v.face.getBottom() + 6.0f };
+    v.radius = v.face.getHeight() * 0.74f;
+    return v;
+}
+} // namespace
+
+void FitaEcoEditor::drawVuFace (juce::Graphics& g)
+{
+    const auto v = vuGeom (vuArea);
+    // black bakelite housing with chrome inner ring
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.fillRoundedRectangle (v.housing.translated (2.0f, 3.0f), 8.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2a2a2a), 0, v.housing.getY(), juce::Colour (0xff0b0b0b), 0, v.housing.getBottom(), false));
+    g.fillRoundedRectangle (v.housing, 8.0f);
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xffe8e8e8), v.face.getX(), v.face.getY(), juce::Colour (0xff4c4c4c), v.face.getRight(), v.face.getBottom(), false));
+    g.drawRoundedRectangle (v.face.expanded (3.0f), 4.0f, 2.5f);
+
+    // backlit face (warm incandescent glow, brighter in the middle)
+    g.setGradientFill (juce::ColourGradient (juce::Colour (0xfff7e8b8), v.face.getCentreX(), v.face.getY() + v.face.getHeight() * 0.55f,
+                                             juce::Colour (0xffd9b86a), v.face.getX(), v.face.getY(), true));
+    g.fillRoundedRectangle (v.face, 3.0f);
+
+    juce::Graphics::ScopedSaveState ss (g);
+    g.reduceClipRegion (v.face.toNearestInt());
+
+    const auto c = v.pivot;
+    const float R = v.radius;
+    auto angleOf = [] (float pos) { return -kVuSwing + 2.0f * kVuSwing * juce::jlimit (0.0f, 1.0f, pos); };
+
+    // scale arcs: black up to 0 VU, red from 0 to +3
+    juce::Path black, red;
+    black.addCentredArc (c.x, c.y, R, R, 0.0f, angleOf (0.0f), angleOf (vuToPos (0.0f)), true);
+    red.addCentredArc (c.x, c.y, R, R, 0.0f, angleOf (vuToPos (0.0f)), angleOf (1.0f), true);
+    g.setColour (juce::Colour (0xff1a1a1a));
+    g.strokePath (black, juce::PathStrokeType (1.6f));
+    g.setColour (juce::Colour (0xffc0262d));
+    g.strokePath (red, juce::PathStrokeType (5.0f));
+
+    // ticks + numbers
+    const float marks[] = { -20, -10, -7, -5, -3, -2, -1, 0, 1, 2, 3 };
+    g.setFont (juce::FontOptions (10.5f, juce::Font::bold));
+    for (float m : marks)
+    {
+        const float t = angleOf (vuToPos (m));
+        const bool hot = m > 0.0f, major = m != -2.0f;
+        g.setColour (hot ? juce::Colour (0xffc0262d) : juce::Colour (0xff1a1a1a));
+        g.drawLine ({ c.getPointOnCircumference (R - (major ? 7.0f : 4.0f), t), c.getPointOnCircumference (R + 2.0f, t) }, major ? 1.6f : 1.0f);
+        if (major)
+        {
+            const auto np = c.getPointOnCircumference (R + 11.0f, t);
+            const juce::String txt = m > 0 ? "+" + juce::String ((int) m) : juce::String ((int) std::abs (m));
+            g.drawText (txt, juce::Rectangle<float> (np.x - 12, np.y - 7, 24, 14), juce::Justification::centred);
+        }
+    }
+    g.setColour (juce::Colour (0xff1a1a1a));
+    g.setFont (juce::FontOptions (plateFace).withHeight (22.0f));
+    g.drawText ("VU", juce::Rectangle<float> (v.face.getX(), v.face.getY() + v.face.getHeight() * 0.50f, v.face.getWidth(), 26), juce::Justification::centred);
+}
+
+void FitaEcoEditor::drawVuNeedle (juce::Graphics& g)
+{
+    const auto v = vuGeom (vuArea);
+    {
+        juce::Graphics::ScopedSaveState ss (g);
+        g.reduceClipRegion (v.face.toNearestInt());
+        const float t = -kVuSwing + 2.0f * kVuSwing * juce::jlimit (-0.03f, 1.06f, needlePos);
+        const auto tip = v.pivot.getPointOnCircumference (v.radius + 4.0f, t);
+        const auto base = v.pivot.getPointOnCircumference (v.radius * 0.30f, t);
+        g.setColour (juce::Colours::black.withAlpha (0.18f)); // soft shadow on the face
+        g.drawLine ({ base.translated (2.0f, 3.0f), tip.translated (2.0f, 3.0f) }, 1.6f);
+        g.setColour (juce::Colour (0xff111111));
+        g.drawLine ({ base, tip }, 1.4f);
+
+        // dark cover hiding the pivot, with the meter's screw
+        auto cover = v.face.withTop (v.face.getBottom() - 20.0f);
+        g.setGradientFill (juce::ColourGradient (juce::Colour (0xff2b2b2b), 0, cover.getY(), juce::Colour (0xff0c0c0c), 0, cover.getBottom(), false));
+        g.fillRect (cover);
+        g.setColour (juce::Colours::white.withAlpha (0.15f));
+        g.drawLine (cover.getX(), cover.getY(), cover.getRight(), cover.getY(), 1.0f);
+
+        // glass reflection
+        g.setGradientFill (juce::ColourGradient (juce::Colours::white.withAlpha (0.22f), v.face.getX(), v.face.getY(),
+                                                 juce::Colours::transparentWhite, v.face.getX() + v.face.getWidth() * 0.55f, v.face.getY() + v.face.getHeight() * 0.6f, false));
+        juce::Path glare;
+        glare.startNewSubPath (v.face.getX(), v.face.getY());
+        glare.lineTo (v.face.getRight() * 0.6f + v.face.getX() * 0.4f, v.face.getY());
+        glare.lineTo (v.face.getX(), v.face.getY() + v.face.getHeight() * 0.7f);
+        glare.closeSubPath();
+        g.fillPath (glare);
+    }
+
+    // label strip: REC LEVEL + PEAK lamp
+    g.setColour (cream.withAlpha (0.85f));
+    g.setFont (juce::FontOptions (9.5f, juce::Font::bold).withKerningFactor (0.12f));
+    g.drawText ("REC LEVEL", v.label.withTrimmedLeft (14.0f), juce::Justification::centredLeft);
+    const auto lp = juce::Point<float> (v.label.getRight() - 24.0f, v.label.getCentreY());
+    g.setColour (peakHold > 0 ? juce::Colour (0xffff3b2f) : juce::Colour (0xff4a1612));
+    g.fillEllipse (lp.x - 4.5f, lp.y - 4.5f, 9.0f, 9.0f);
+    if (peakHold > 0)
+    {
+        g.setColour (juce::Colour (0x66ff3b2f));
+        g.fillEllipse (lp.x - 8.0f, lp.y - 8.0f, 16.0f, 16.0f);
+    }
+    g.setColour (cream.withAlpha (0.6f));
+    g.setFont (juce::FontOptions (8.0f, juce::Font::bold));
+    g.drawText ("PEAK", juce::Rectangle<float> (lp.x - 46.0f, lp.y - 6.0f, 36.0f, 12.0f), juce::Justification::centredRight);
+}
+
 void FitaEcoEditor::resized()
 {
     auto content = getLocalBounds().reduced (kWood, 0);
     topPanel = content.removeFromTop (kTopH);
     plateArea = juce::Rectangle<float> ((float) topPanel.getX() + 28.0f, 24.0f, 332.0f, 82.0f);
     bottomPanel = content;
-    tapeWindow = topPanel.withTrimmedLeft (380).reduced (24, 22);
+    {
+        auto tp = topPanel;
+        tp.removeFromLeft (380);
+        vuArea = tp.removeFromLeft (200).reduced (10, 22);
+        tapeWindow = tp.reduced (24, 22);
+    }
     status.setBounds (tapeWindow.getX() + 14, tapeWindow.getY() + 8, 300, 18);
 
     auto rows = bottomPanel.reduced (10, 0).withTrimmedTop (12).withTrimmedBottom (10);
@@ -405,7 +550,8 @@ void FitaEcoEditor::resized()
 
     // row A: giant MODE + REPEAT RATE, then the medium echo knobs
     for (int i = 0; i < kNumBig; ++i) place (knobs[(size_t) i], rowA.removeFromLeft (240), 34);
-    const int wm = rowA.getWidth() / kNumMedium;
+    const int wm = 150; // fixed widths keep MODE / REPEAT RATE the stars
+    rowA.removeFromLeft ((rowA.getWidth() - kNumMedium * wm) / 2);
     for (int i = kNumBig; i < kNumBig + kNumMedium; ++i) place (knobs[(size_t) i], rowA.removeFromLeft (wm), 18);
 
     // row B: graphic EQ on the left, small utility knobs on the right
@@ -421,7 +567,8 @@ void FitaEcoEditor::resized()
         f.slider.setBounds (faders.removeFromLeft (fw).reduced (8, 0));
         f.label.setBounds (freqRow.removeFromLeft (fw));
     }
-    const int ws = rowB.getWidth() / (kNumKnobs - kNumBig - kNumMedium);
+    const int ws = 96;
+    rowB.removeFromLeft ((rowB.getWidth() - (kNumKnobs - kNumBig - kNumMedium) * ws) / 2);
     for (int i = kNumBig + kNumMedium; i < kNumKnobs; ++i) place (knobs[(size_t) i], rowB.removeFromLeft (ws), 15);
 
     renderBackground();
@@ -523,6 +670,8 @@ void FitaEcoEditor::renderBackground()
         g.drawLine (inset.getX() + 2, inset.getBottom() + 0.5f, inset.getRight() - 2, inset.getBottom() + 0.5f, 1.0f);
     }
 
+    drawVuFace (g);
+
     // panel seam with chrome trim strip
     g.setColour (juce::Colour (0xff111111));
     g.fillRect ((float) kWood, tH - 2.0f, w - 2.0f * kWood, 6.0f);
@@ -614,4 +763,18 @@ void FitaEcoEditor::renderBackground()
     g.setColour (juce::Colours::black.withAlpha (0.6f));
     g.drawLine ((float) kWood, 0.0f, (float) kWood, h, 1.5f);
     g.drawLine (w - (float) kWood, 0.0f, w - (float) kWood, h, 1.5f);
+
+    // rounded corners for the whole unit: mask the outside, then a soft bevel along the edge
+    const auto unit = juce::Rectangle<float> (0.0f, 0.0f, w, h);
+    const float corner = 24.0f;
+    juce::Path outside;
+    outside.addRectangle (unit.expanded (2.0f));
+    outside.addRoundedRectangle (unit, corner);
+    outside.setUsingNonZeroWinding (false);
+    g.setColour (juce::Colour (0xff0c0c0c));
+    g.fillPath (outside);
+    g.setColour (juce::Colours::white.withAlpha (0.10f));
+    g.drawRoundedRectangle (unit.reduced (1.5f), corner - 1.5f, 1.2f);
+    g.setColour (juce::Colours::black.withAlpha (0.55f));
+    g.drawRoundedRectangle (unit.reduced (0.5f), corner, 1.0f);
 }

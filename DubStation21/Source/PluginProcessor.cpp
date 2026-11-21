@@ -80,6 +80,7 @@ void FitaEcoProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     float* oL = monoScratch.getWritePointer (0);
     float* oR = monoScratch.getWritePointer (1);
     echo.process (inL, inR, oL, oR, n);
+    recVu.store (juce::Decibels::gainToDecibels (echo.getRecRms() / fitaeco::TapeEcho::kRecRef, -60.0f));
 
     buffer.copyFrom (0, 0, oL, n);
     if (outCh > 1) buffer.copyFrom (1, 0, oR, n);

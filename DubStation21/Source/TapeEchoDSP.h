@@ -232,6 +232,7 @@ public:
         const float drive = 0.5f + target.input * 3.5f;
         const float fb = target.intensity * 1.09f; // single head: oscillates above ~0.8
         const float wf = target.wowFlutter;
+        double recSumSq = 0.0;
 
         for (int i = 0; i < n; ++i)
         {
@@ -275,6 +276,7 @@ public:
             float pre = std::tanh (x * drive) / std::tanh (drive * 0.6f + 0.2f);
             float fbSig = fbHP.process (echo) * fbG * fbNorm;
             float rec = recHP.process (pre * 0.7f + fbSig);
+            recSumSq += (double) rec * rec;
             float satAmt = 1.0f + 1.5f * target.tapeAge;
             float r = std::tanh (satAmt * rec + 0.08f) - std::tanh (0.08f);
             tape.push (r / satAmt * 1.15f);
@@ -299,7 +301,13 @@ public:
             outR[i] = std::tanh (yr * 0.8f) * 1.25f;
             (void) inR;
         }
+        recRms = n > 0 ? (float) std::sqrt (recSumSq / n) : 0.0f;
     }
+
+    // RMS of the signal reaching the record head in the last block (for the VU meter).
+    // 0 VU on the meter = kRecRef: about where the tape starts to saturate audibly.
+    float getRecRms() const { return recRms; }
+    static constexpr float kRecRef = 0.25f;
 
 private:
     void updateFilters (bool force)
@@ -334,6 +342,6 @@ public:
 private:
     Biquad headLP[3], recHP, fbHP, eqL[Params::kEqBands], eqR[Params::kEqBands];
     Rng rng;
-    float wowPh = 0, flPh = 0, lastEcho = 0;
+    float wowPh = 0, flPh = 0, lastEcho = 0, recRms = 0;
 };
 } // namespace fitaeco

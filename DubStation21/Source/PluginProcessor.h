@@ -34,9 +34,13 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
 
+    // level at the record head, in VU (0 VU = TapeEcho::kRecRef), read by the editor's meter
+    float getRecVu() const { return recVu.load(); }
+
 private:
     fitaeco::TapeEcho echo;
     juce::AudioBuffer<float> monoScratch;
+    std::atomic<float> recVu { -60.0f };
 
     std::atomic<float>* pInput {}; std::atomic<float>* pMode {}; std::atomic<float>* pRate {};
     std::atomic<float>* pIntensity {}; std::atomic<float>* pEcho {}; std::atomic<float>* pReverb {};

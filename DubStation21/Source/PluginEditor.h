@@ -30,6 +30,8 @@ private:
     void timerCallback() override;
     void renderBackground();
     void drawTapeTransport (juce::Graphics&);
+    void drawVuFace (juce::Graphics&);     // static: housing, face, scale (into the background)
+    void drawVuNeedle (juce::Graphics&);   // dynamic: needle, peak lamp, glass
 
     struct Knob
     {
@@ -45,7 +47,9 @@ private:
     juce::Label status;
     int shownMode = -1;
     float tapePhase = 0.0f;
-    juce::Rectangle<int> topPanel, bottomPanel, tapeWindow, eqArea;
+    juce::Rectangle<int> topPanel, bottomPanel, tapeWindow, eqArea, vuArea;
+    float needlePos = 0.0f, needleVel = 0.0f; // VU ballistics (0..1 of the scale)
+    int peakHold = 0;
     juce::Image background; // pre-rendered wood / enamel / panel (2x for HiDPI)
     juce::Typeface::Ptr plateFace, scriptFace; // embedded fonts (Archivo Black, TeX Gyre Chorus)
     juce::Rectangle<float> plateArea;

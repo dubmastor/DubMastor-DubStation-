@@ -13,7 +13,7 @@ Plugin de delay de fita inspirado nos ecos de fita clássicos de 3 cabeças dos 
 
 | Knob | Função |
 |---|---|
-| INPUT | Ganho do pré-amplificador (satura a entrada) |
+| INPUT | Ganho do pré-amplificador (satura a entrada). Ajuste olhando o **VU**: ponteiro perto do 0 = fita no ponto; no vermelho = saturação |
 | MODE | Seletor de 12 posições (tabela abaixo) |
 | REPEAT RATE | Velocidade da fita. Mudar durante a execução dobra o pitch, como fita de verdade |
 | INTENSITY | Realimentação. Acima de ~0,8 (1 cabeça) ou ~0,7 (várias) entra em auto-oscilação |
