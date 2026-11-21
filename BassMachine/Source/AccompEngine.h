@@ -1,4 +1,4 @@
-// Mastor Bass Machine — acompanhamento do PREVIEW (C++ puro, sem JUCE)
+// Mastor Reggae Bass Machine — acompanhamento do PREVIEW (C++ puro, sem JUCE)
 //
 // BATERIA: quatro levadas simples, com um compasso de virada no fim do loop.
 //   ROOTS      rockers da Channel One: bumbo no 1 e no 3, aro no 3, hi-hat em colcheias com

@@ -446,7 +446,7 @@ bool BassMachineProcessor::writeMidiFile (const juce::File& file) const
     juce::MidiMessageSequence meta, bass;
     meta.addEvent (juce::MidiMessage::tempoMetaEvent ((int) std::round (60000000.0 / bpm)), 0.0);
     meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
-    bass.addEvent (juce::MidiMessage::textMetaEvent (3, juce::String ("Bass Machine - ") + mbm::styleName (s.style)
+    bass.addEvent (juce::MidiMessage::textMetaEvent (3, juce::String ("Reggae Bass Machine - ") + mbm::styleName (s.style)
                                                           + " ideia " + juce::String (s.seed)), 0.0);
 
     for (int r = 0; r < reps; ++r)

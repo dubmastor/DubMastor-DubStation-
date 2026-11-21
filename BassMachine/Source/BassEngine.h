@@ -1,4 +1,4 @@
-// Mastor Bass Machine MBM-710 — motor de linhas de baixo (C++ puro, sem JUCE, testável isoladamente)
+// Mastor Reggae Bass Machine MRBM-69 — motor de linhas de baixo (C++ puro, sem JUCE, testável isoladamente)
 //
 // Três escolas de baixo jamaicano, cada uma com células rítmicas próprias:
 //

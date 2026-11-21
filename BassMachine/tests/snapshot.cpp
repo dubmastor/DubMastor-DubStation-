@@ -1,4 +1,4 @@
-// Renderiza a interface do Bass Machine num PNG (sem DAW), com o loop tocando para o visor e o osciloscópio:
+// Renderiza a interface do Reggae Bass Machine num PNG (sem DAW), com o loop tocando para o visor e o osciloscópio:
 //   cmake -B build-snap -DBASSMACHINE_SNAPSHOT=ON -DBASSMACHINE_PLUGIN=OFF && cmake --build build-snap --target BassMachineSnapshot
 //   ./build-snap/.../BassMachineSnapshot docs/interface.png [estilo 0-6] [timbre 0-1] [escala] [wav] [bateria 0-3] [teclado 0-2]
 #include <juce_audio_utils/juce_audio_utils.h>

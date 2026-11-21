@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(BassMachine VERSION 2.3.0)
+project(BassMachine VERSION 2.4.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,7 +28,7 @@ if(BASSMACHINE_PLUGIN)
     juce_add_plugin(BassMachine
         COMPANY_NAME               "DubMastor"
         BUNDLE_ID                  com.dubmastor.bassmachine
-        PRODUCT_NAME               "Mastor Bass Machine MBM-710"
+        PRODUCT_NAME               "Mastor Reggae Bass Machine MRBM-69"
         PLUGIN_MANUFACTURER_CODE   Dblb
         PLUGIN_CODE                Mbm7
         FORMATS                    VST3 AU Standalone

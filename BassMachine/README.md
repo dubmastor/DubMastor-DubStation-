@@ -1,10 +1,10 @@
-# Mastor Bass Machine MBM-710 2.3 — Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 2.4 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.3/MastorBassMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/BassMachine-2.3/MastorBassMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-macOS.zip)**
 
-![Interface do Bass Machine](docs/interface.png)
+![Interface do Reggae Bass Machine](docs/interface.png)
 
 Gerador de **sugestões de linha de baixo** em MIDI para reggae, dub e dancehall, da linha **Dub Station**.
 Você escolhe a harmonia e o baixista, ouve com o som do **Dub Bass**, liga a **bateria** e o **teclado do
@@ -65,7 +65,7 @@ O MIDI arrastado/exportado continua sendo **só o baixo**. O nível do baixo fic
 
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. Vem a faixa de baixo no BPM do projeto.
-- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Bass Machine). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
+- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Reggae Bass Machine). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
 - **MIDI ao vivo:** as notas do baixo também saem como MIDI do plugin (canal 1).
 
 ## Para desenvolvedores

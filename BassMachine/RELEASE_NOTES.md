@@ -1,6 +1,12 @@
-# Mastor Bass Machine MBM-710 — 2.3 · Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 — 2.4 · Gerador de Reggae Bass Lines
 
-- Padrão visual atual da linha Dub Station: a versão fica no título ("MASTOR BASS MACHINE 2.3") e a plaqueta dourada só com "DUB STATION"
+- Novo nome: **Mastor Reggae Bass Machine MRBM-69** (antes Mastor Bass Machine MBM-710) no título, na DAW, nos instaladores, na release e no site
+- Os códigos do plugin continuam os mesmos: projetos que usavam o nome antigo abrem com o novo
+- Release e instaladores agora se chamam `MRBM-69-x.y`, `MRBM-69-Windows.zip` e `MRBM-69-macOS.zip`
+
+## 2.3
+
+- Padrão visual atual da linha Dub Station: a versão fica no título ("MASTOR REGGAE BASS MACHINE 2.3") e a plaqueta dourada só com "DUB STATION"
 
 ## 2.2
 

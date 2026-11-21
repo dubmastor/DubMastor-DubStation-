@@ -1,9 +1,9 @@
-// Mastor Bass Machine MBM-710 — som do preview com o sistema de timbres do Dub Bass
+// Mastor Reggae Bass Machine MRBM-69 — som do preview com o sistema de timbres do Dub Bass
 //
 // Usa as mesmas peças do Dub Bass (pasta ../../DubBass/Source): a voz BassVoice (Classic Sine com
 // harmônicos ou 808), o filtro passa-baixa, as saturações TUBE / TAPE / FUZZ e o Maximizer.
 // Cada TIMBRE é um conjunto de ajustes do Dub Bass; TONE e DRIVE mexem por cima do timbre.
-// Se o Dub Bass mudar o som, o preview do Bass Machine acompanha.
+// Se o Dub Bass mudar o som, o preview do Reggae Bass Machine acompanha.
 #pragma once
 #include <juce_dsp/juce_dsp.h>
 #include "../../DubBass/Source/BassVoice.h"

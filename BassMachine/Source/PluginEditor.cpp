@@ -2,7 +2,7 @@
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
- #define JucePlugin_VersionString "2.3.0"
+ #define JucePlugin_VersionString "2.4.0"
 #endif
 static juce::String versionShort() { return juce::String (JucePlugin_VersionString).upToLastOccurrenceOf (".", false, false); }
 
@@ -604,7 +604,7 @@ void MidiDragZone::mouseDrag (const juce::MouseEvent&)
     dragging = true;
     const auto s = proc.getSettings();
     auto file = juce::File::getSpecialLocation (juce::File::tempDirectory)
-                    .getChildFile (juce::String ("Bass Machine ") + mbm::styleName (s.style) + " " + juce::String (s.seed) + ".mid");
+                    .getChildFile (juce::String ("Reggae Bass Machine ") + mbm::styleName (s.style) + " " + juce::String (s.seed) + ".mid");
     if (proc.writeMidiFile (file))
         juce::DragAndDropContainer::performExternalDragDropOfFiles (juce::StringArray (file.getFullPathName()), false, this);
 }
@@ -965,7 +965,7 @@ bool BassMachinePanel::slotEnabled (int i) const
 
 void BassMachinePanel::exportMidi()
 {
-    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Bass Machine");
+    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Reggae Bass Machine");
     dir.createDirectory();
     const auto s = proc.getSettings();
     const auto name = juce::String ("baixo ") + juce::String (mbm::styleName (s.style)).toLowerCase() + " " + juce::String (s.seed) + ".mid";
@@ -980,7 +980,7 @@ void BassMachinePanel::exportMidi()
                               if (! f.hasFileExtension ("mid")) f = f.withFileExtension ("mid");
                               if (! proc.writeMidiFile (f))
                                   juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon,
-                                                                          "Bass Machine", "Nao foi possivel salvar o MIDI.");
+                                                                          "Reggae Bass Machine", "Nao foi possivel salvar o MIDI.");
                           });
 }
 
@@ -1141,8 +1141,8 @@ void BassMachinePanel::renderBackground()
 
     // --- cabeçalho
     g.setColour (colours::ink);
-    g.setFont (stencil (30.0f, 0.22f));
-    const juce::String title ("MASTOR BASS MACHINE " + versionShort());
+    g.setFont (stencil (25.0f, 0.15f));
+    const juce::String title ("MASTOR REGGAE BASS MACHINE " + versionShort());
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
@@ -1183,7 +1183,7 @@ void BassMachinePanel::renderBackground()
     }
     g.setColour (colours::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    g.drawText (juce::String::fromUTF8 ("MBM-710  \xc2\xb7  GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
+    g.drawText (juce::String::fromUTF8 ("MRBM-69  \xc2\xb7  GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
         const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
