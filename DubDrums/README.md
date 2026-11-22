@@ -4,7 +4,7 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDM-12-2.2/MastorReggaeDrumMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDM-12-2.2/MastorReggaeDrumMachine-macOS.zip)** · **[📱 Abrir no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/drums/)**
+**[⬇️ Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-Windows.zip)** · **[⬇️ macOS](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-macOS.zip)** · **[📱 Abrir no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/drums/)**
 
 ![Interface do MRDM-12](docs/interface.png)
 
