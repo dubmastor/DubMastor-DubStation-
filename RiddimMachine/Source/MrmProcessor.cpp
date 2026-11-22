@@ -331,7 +331,7 @@ bool MrmProcessor::writeRiddimFile (const juce::File& file) const
                 }
                 for (const auto& e : events)
                 {
-                    auto& seq = e.channel == dub::ChBass ? bass : e.channel == dub::ChBubble ? bubble : skank;
+                    auto& seq = e.channel == 2 ? bass : e.channel == dub::ChBubble ? bubble : skank;   // canal 2 = baixo guia (saiu do Dub Chords na 1.3)
                     addNote (seq, juce::jlimit (1, 16, e.slot + 1), e.note, e.velocity, t0 + e.start, e.length);
                 }
             }
