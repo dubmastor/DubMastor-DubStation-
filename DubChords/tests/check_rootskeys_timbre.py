@@ -41,6 +41,12 @@ def bool_default(pid):
         sys.exit(f"não achei o padrão de {pid} no Roots Keys")
     return m.group(1) == "true"
 
+def choice_default(pid):
+    m = re.search(r'ParameterID\s*\{\s*"%s"\s*,\s*1\s*\}\s*,\s*"[^"]*"\s*,\s*StringArray\s*\{[^}]*\}\s*,\s*(\d+)' % pid, rk, re.S)
+    if not m:
+        return 0   # Roots Keys antigo, sem esse parâmetro: só existia o M1
+    return int(m.group(1))
+
 def preset(name):
     m = re.search(r'\{\s*"%s"\s*,(.*?)\},?\s*\n' % re.escape(name), rk)
     if not m:
@@ -73,6 +79,7 @@ classic = preset("Piano: M1 Classic")
 roots = preset("Organ: Roots Percussion")
 
 expected_piano = {
+    "type": choice_default("pianoType"),
     "bright": pct("pianoBright"), "decay": pct("pianoDecay"), "chorus": pct("pianoChorus"),
     "level": pct("pianoLevel"), "reverb": pct("reverb"), "master": pct("master"),
     "maxOn": bool_default("maxOn"), "maxGainDb": param_default("maxGain"), "maxCeilDb": param_default("maxCeiling"),

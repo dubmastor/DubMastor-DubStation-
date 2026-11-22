@@ -19,6 +19,7 @@ namespace rkdefaults
     // Piano inicial do Roots Keys (padrões dos parâmetros = preset "Piano: M1 Classic")
     struct RootsKeysPiano
     {
+        static constexpr int   type   = 0;      // pianoType: 0 = M1 (o timbre inicial do Roots Keys)
         static constexpr float bright = 0.65f;
         static constexpr float decay  = 0.55f;
         static constexpr float chorus = 0.50f;
@@ -54,6 +55,7 @@ public:
         using P = rkdefaults::RootsKeysPiano;
         auto& pp = piano.params;
         pp.mode = 0;
+        pp.pianoType   = P::type;
         pp.pianoBright = P::bright;
         pp.pianoDecay  = P::decay;
         pp.pianoChorus = P::chorus;
