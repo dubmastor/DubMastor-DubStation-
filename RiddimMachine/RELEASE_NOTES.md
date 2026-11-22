@@ -8,8 +8,9 @@ Nova geração do MRM-0420: as máquinas da DubStation num instrumento só.
 - **CONTROL ROOM**: Big Knob no master, mute de cada máquina (DRUMS verde, BASS amarelo, RIDDIM vermelho) e chave **TAPE ECHO** (também na aba RIDDIM)
 - **Bateria mais limpa** (gerador do MRDM-12): ghost colada, nota duplicada e flam saem, fica só a nota no tempo certo; nota próxima da mesma peça cai para 35% da força
 - Um BPM para todas, PLAY RIDDIM, ARRASTE O RIDDIM (4 a 64 compassos) e EXPORTAR; harmonia e baixo entram depois da intro da bateria
-- **ALAVANCA do JACKPOT**: riddim 100% aleatório (harmonia, durações, estilo e baterista, hi-hat, baixista e semente), tudo já na tela, é só dar PLAY
-- **PRESETS de harmonia**: 39 progressões clássicas do reggae em pastas (ROOTS, ROCKERS, RUB A DUB, LOVERS ROCK, DANCEHALL DIGITAL, NEW ROOTS 2000), o mesmo banco do MRCM-1240 1.7
+- **ALAVANCA do JACKPOT**: riddim aleatório, mas **sempre reggae**: harmonia de uma música clássica do banco, bateria ROCKERS ou ONE DROP com a caixa só no 2 e no 4 (sem ghost nem flam), hi-hat reto, skank no contratempo e o baixo de um dos baixistas do MRBM-69 tocando só notas do acorde (pentatônica, sem cromatismo); baterista, baixista e semente sorteados, tudo já na tela, é só dar PLAY
+- **BPM POR ESTILO**: clique em ESTILO ▾ no visor do BPM e escolha o andamento típico de ROOTS, ROCKSTEADY, ROCKERS, RUB A DUB, LOVERS ROCK, DANCEHALL, NEW ROOTS, DUB ou STEPPERS
+- **PRESETS de harmonia**: 60 músicas clássicas do reggae conferidas, 10 por pasta de estilo e década (ROOTS - ANOS 70, ROCKERS - FIM DOS 70, RUB A DUB - ANOS 80, LOVERS ROCK - 70 A 90, DANCEHALL - 80 E 90, NEW ROOTS - ANOS 2000), o mesmo banco do MRCM-1240 1.8
 - Harmonia com o skank sempre no **contratempo** (os outros padrões saíram, como no MRCM-1240 1.7)
 - **Uma máquina por aba, completa**; a aba RIDDIM resume tudo e ganhou a seção **BIG KNOB · CONTROL ROOM** (botão grande do filtro HIGH/LOW PASS, CONTROL ROOM, TAPE ECHO e mute de cada máquina)
 - **ESTILO DE REGGAE** na bateria da aba RIDDIM: ROCKERS, ONE DROP e BOOM BAP (com o bumbo e a caixa de cada estilo)

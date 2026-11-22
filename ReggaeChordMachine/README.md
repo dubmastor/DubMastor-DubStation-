@@ -1,8 +1,8 @@
-# Mastor Reggae Chord Machine MRCM-1240 1.7
+# Mastor Reggae Chord Machine MRCM-1240 1.8
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.8/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.8/MastorReggaeChordMachine-macOS.zip)**
 
 **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/chords/)**: monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
 
@@ -56,20 +56,22 @@ Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é m
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
 
 ## PRESETS (banco de harmonias clássicas)
-O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de progressões clássicas do reggae, separadas em pastas por estilo.
-Escolher um preset ajusta os acordes, a duração de cada um e quais ficam ligados (inversão em AUTO); depois é só mexer à vontade.
-As progressões estão no tom em que costumam aparecer nos riddims citados (dá para transpor no teclado de cada acorde).
+O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de harmonias de **músicas clássicas do reggae**: 60 músicas,
+10 em cada pasta, separadas por estilo e década. Escolher uma ajusta os acordes, a duração de cada um e quais ficam ligados
+(inversão em AUTO); depois é só mexer à vontade. Cada preset está no tom da gravação original; sétimas viram tríades e, quando
+a música tem várias partes, fica o groove principal. As cifras foram conferidas em sites públicos (Ultimate Guitar, E-Chords,
+GuitarTabs.cc, GuitarTabsExplorer, Ukulele-Tabs) em nov/2026; o que não tinha cifra confiável ficou de fora.
 
-| Pasta | Época | Exemplos |
-|---|---|---|
-| **ROOTS** | anos 70 | Satta (Am-Dm-Am-Em), Marcus Garvey (Am-G), Studio One I-IV, Wailers i-VII-VI, Real Rock (Bm-F#m), Nyabinghi de um acorde |
-| **ROCKERS** | anos 70 | Stalag (Cm-Bb), Channel One i-VII, Revolutionaries I-IV-V, dórico (Dm-G), melodica (Am-Em) |
-| **RUB A DUB** | anos 80 | Night Nurse (Am-G) e a ponte, Cuss Cuss (Dm-F-G), Roots Radics (Fm-Eb), Volcano (Cm-Fm-Bb) |
-| **LOVERS ROCK** | 70 a 90 | I-vi-IV-V, I-IV-V, ii-V-I soul, vi-IV-I-V, IV-V-iii-vi, crossover I-V-vi-IV |
-| **DANCEHALL DIGITAL** | 80 e 90 | Digital 85 de um acorde, Ring the Alarm (Stalag 85), ragga i-VII, Dancehall 92, Real Rock 94 |
-| **NEW ROOTS 2000** | anos 2000 | Full Up (Am-Dm), one drop i-VI-VII, juggling (Gm-Eb-F), conscious (Bm-G-A), pop reggae I-V-vi-IV |
+| Pasta | Músicas |
+|---|---|
+| **ROOTS - ANOS 70** | Satta Massagana, Pressure Drop, Marcus Garvey, Natural Mystic, Exodus, Jamming, One Love, Smile Jamaica (Marley), Police and Thieves, Roots |
+| **ROCKERS - FIM DOS 70** | Legalize It, Burial, Uptown Top Ranking, Money in My Pocket, Now That We Found Love, Ku Klux Klan, Soldiers, One Drop, Could You Be Loved, Buffalo Soldier |
+| **RUB A DUB - ANOS 80** | Night Nurse, Here I Come, Under Mi Sensi, Sensimilla, Pass the Kouchie, Bam Bam, Cool Down the Pace, Truths and Rights, Sinsemilla (Black Uhuru), Shine Eye Gal |
+| **LOVERS ROCK - 70 A 90** | Help Me Make It Through the Night, Is This Love, Waiting in Vain, Red Red Wine, Kingston Town (UB40), Close to You, Rockaway, Tempted to Touch, My Number One, Wild World |
+| **DANCEHALL - 80 E 90** | Ring the Alarm, Mr. Loverman, Informer, Sweat, Here Comes the Hotstepper, You Don't Love Me, Boombastic, It Wasn't Me, Get Busy, Temperature |
+| **NEW ROOTS - ANOS 2000** | She's Royal, Welcome to Jamrock, Herbalist, Kingston Town (Alborosie), Mystical Reggae, Callin, Ganja Farmer, Dem Gone, Access Granted, Smile Jamaica (Chronixx) |
 
-São 39 presets. O mesmo banco está no **MRM-0420** e nas versões para celular. Fonte única: `tools/harmony_presets.py`
+O mesmo banco está no **MRM-0420** e nas versões para celular. Fonte única: `tools/harmony_presets.py`
 (gera `Source/HarmonyPresets.h` e `site/chords/presets.js`).
 
 ## Para desenvolvedores

@@ -75,6 +75,8 @@ struct Settings
                                 // sem atraso humano e só dois níveis de força, como num teclado Casio
     bool     fill  = false;   // virada no último compasso (+ prato no "1")
     bool     intro = false;   // compasso de virada antes do primeiro compasso (toca uma vez)
+    bool     strict = false;  // reggae "de livro": caixa só na batida principal (sem ghost notes, flam nem
+                              // assinatura de caixa do baterista); usado pelo MRM-0420
     uint32_t seed = 1;
 };
 

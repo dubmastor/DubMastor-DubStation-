@@ -46,7 +46,9 @@ public:
     static constexpr int numPieces = 9;
     static const Piece pieces[numPieces];
 
-    dubdrums::Pattern getPatternCopy() const;     // thread da interface: o padrão que aparece na grade
+    dubdrums::Pattern getPatternCopy() const;
+    // reggae "de livro" (caixa só na batida principal): o MRM-0420 liga; o MRDM-12 sozinho fica com o balanço todo
+    void setStrictReggae (bool on) { if (strictReggae.exchange (on) != on) dirty = true; }     // thread da interface: o padrão que aparece na grade
     int  getPatternVersion() const noexcept       { return patternVersion.load(); }
 
     // Grade PADRÃO editável (thread da interface). beat = posição na linha do tempo "intro + loop".
@@ -94,6 +96,7 @@ private:
     std::atomic<bool> pendingReady { false };
     std::atomic<bool> restartRequested { false };   // NOVA VARIAÇÃO: o preview volta do começo
     std::atomic<bool> dirty { true };
+    std::atomic<bool> strictReggae { false };
     std::atomic<int>  patternVersion { 0 };
     std::array<bool, 128> held {};      // notas MIDI ligadas na saída (para desligar na troca)
 

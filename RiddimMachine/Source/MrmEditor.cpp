@@ -1,4 +1,5 @@
 #include "MrmEditor.h"
+#include "BpmPresets.h"
 #include "MrmStyle.h"
 
 #ifndef MRM_DRUMS_VER
@@ -79,7 +80,14 @@ void PlayKey::paintButton (juce::Graphics& g, bool over, bool down)
 
 //==============================================================================
 BpmWindow::BpmWindow (MrmProcessor& p)
-    : proc (p), att (*p.apvts.getParameter ("bpm"), [this] (float v) { value = v; repaint(); }, nullptr)
+    : proc (p), att (*p.apvts.getParameter ("bpm"), [this] (float v)
+      {
+          value = v;
+          bool match = false;    // o nome do estilo só fica enquanto o BPM é um dos presets dele
+          for (const auto& pr : bpmpresets::presets) match = match || (styleName == pr.style && juce::roundToInt (v) == pr.bpm);
+          if (! match) styleName = {};
+          repaint();
+      }, nullptr)
 {
     att.sendInitialUpdate();
     setMouseCursor (juce::MouseCursor::UpDownResizeCursor);
@@ -97,13 +105,50 @@ void BpmWindow::refresh()
     }
 }
 
-void BpmWindow::mouseDown (const juce::MouseEvent&)      { dragStart = value; att.beginGesture(); }
-void BpmWindow::mouseUp (const juce::MouseEvent&)        { att.endGesture(); }
+bool BpmWindow::onStyleArea (juce::Point<int> p) const { return p.x > juce::roundToInt (getWidth() * 0.4f); }
+
+void BpmWindow::showStyleMenu()
+{
+    juce::PopupMenu menu;
+    menu.addSectionHeader ("BPM POR ESTILO");
+    const char* last = nullptr;
+    juce::PopupMenu sub;
+    auto flush = [&] { if (last != nullptr) menu.addSubMenu (last, sub); sub = {}; };
+    for (int i = 0; i < bpmpresets::numPresets; ++i)
+    {
+        const auto& pr = bpmpresets::presets[i];
+        if (last == nullptr || juce::String (last) != pr.style) { flush(); last = pr.style; }
+        sub.addItem (i + 1, juce::String (pr.name) + "  " + juce::String (pr.bpm), true, juce::roundToInt (value) == pr.bpm);
+    }
+    flush();
+    juce::Component::SafePointer<BpmWindow> safe (this);
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int r)
+    {
+        if (safe == nullptr || r <= 0) return;
+        safe->att.setValueAsCompleteGesture ((float) bpmpresets::presets[r - 1].bpm);
+        safe->styleName = bpmpresets::presets[r - 1].style;
+        safe->repaint();
+    });
+}
+
+void BpmWindow::mouseDown (const juce::MouseEvent& e)
+{
+    styleClick = onStyleArea (e.getPosition());
+    if (styleClick) { showStyleMenu(); return; }
+    dragStart = value; att.beginGesture();
+}
+void BpmWindow::mouseUp (const juce::MouseEvent&)        { if (! styleClick) att.endGesture(); styleClick = false; }
+void BpmWindow::mouseMove (const juce::MouseEvent& e)
+{
+    setMouseCursor (onStyleArea (e.getPosition()) ? juce::MouseCursor::PointingHandCursor : juce::MouseCursor::UpDownResizeCursor);
+}
 void BpmWindow::mouseDrag (const juce::MouseEvent& e)
 {
+    if (styleClick) return;
+    styleName = {};
     att.setValueAsPartOfGesture (juce::jlimit (60.0f, 180.0f, std::round (dragStart - (float) e.getDistanceFromDragStartY() * 0.35f)));
 }
-void BpmWindow::mouseDoubleClick (const juce::MouseEvent&) { att.setValueAsCompleteGesture (75.0f); }
+void BpmWindow::mouseDoubleClick (const juce::MouseEvent& e) { if (! onStyleArea (e.getPosition())) { styleName = {}; att.setValueAsCompleteGesture (75.0f); } }
 void BpmWindow::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
 {
     const int step = w.deltaY > 0 ? 1 : w.deltaY < 0 ? -1 : 0;
@@ -122,15 +167,16 @@ void BpmWindow::paint (juce::Graphics& g)
     auto r = b.reduced (7.0f, 6.0f);
     displayGlass (g, r);
     const juce::String num (juce::roundToInt (dawShown ? dawBpm : (double) value));
-    auto numArea = r.withTrimmedRight (r.getWidth() * 0.42f);
-    auto unitArea = r.withTrimmedLeft (r.getWidth() * 0.58f);
+    auto numArea = r.withTrimmedRight (r.getWidth() * 0.6f);
+    auto unitArea = r.withTrimmedLeft (r.getWidth() * 0.4f);
     g.setFont (stencil (22.0f, 0.06f));
     glowText (g, num, numArea, juce::Justification::centredRight);
     g.setFont (stencil (9.0f, 0.2f));
     g.setColour (col::amber.withAlpha (0.75f));
     g.drawText ("BPM", unitArea.withTrimmedBottom (unitArea.getHeight() * 0.5f).withTrimmedLeft (6), juce::Justification::centredLeft);
     g.setColour (col::amber.withAlpha (0.5f));
-    g.drawText (dawShown ? "DAW" : "TODOS", unitArea.withTrimmedTop (unitArea.getHeight() * 0.5f).withTrimmedLeft (6), juce::Justification::centredLeft);
+    g.setFont (stencil (8.0f, 0.12f));
+    g.drawText (dawShown ? juce::String ("DAW") : (styleName.isNotEmpty() ? styleName : juce::String ("ESTILO")) + juce::String::fromUTF8 (" \xe2\x96\xbe"), unitArea.withTrimmedTop (unitArea.getHeight() * 0.5f).withTrimmedLeft (6), juce::Justification::centredLeft);
     g.setColour (juce::Colours::white.withAlpha (0.06f));
     g.fillRoundedRectangle (r.withHeight (r.getHeight() * 0.45f), 3.0f);
 }
@@ -181,7 +227,7 @@ void Header::resized()
         a.removeFromLeft (gap);
     }
     auto t = transportSection.reduced (10, 0).withTrimmedTop (11).withHeight (40);
-    play.setBounds (t.removeFromLeft (172));
+    play.setBounds (t.removeFromLeft (142));
     t.removeFromLeft (10);
     bpm.setBounds (t);
     renderBackground();

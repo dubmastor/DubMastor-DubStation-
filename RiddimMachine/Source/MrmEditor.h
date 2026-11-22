@@ -44,6 +44,7 @@ public:
     void mouseDown (const juce::MouseEvent&) override;
     void mouseDrag (const juce::MouseEvent&) override;
     void mouseUp (const juce::MouseEvent&) override;
+    void mouseMove (const juce::MouseEvent&) override;
     void mouseDoubleClick (const juce::MouseEvent&) override;
     void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     void refresh();
@@ -54,6 +55,10 @@ private:
     float value = 75.0f, dragStart = 75.0f;
     bool dawShown = false;
     double dawBpm = 0.0;
+    bool styleClick = false;
+    juce::String styleName;          // estilo escolhido no menu BPM POR ESTILO (some ao mudar o BPM à mão)
+    bool onStyleArea (juce::Point<int>) const;
+    void showStyleMenu();
 };
 
 // Cabeçalho completo (fundo pintado uma vez, controles por cima)

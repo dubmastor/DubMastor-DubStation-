@@ -162,12 +162,13 @@
     for (let bar = 0; bar < s.bars; ++bar) {
       const lastBar = bar === s.bars - 1;
       for (const st of backbeats) {
-        if (lastBar && s.bars > 1 && backbeats.length && st === backbeats[backbeats.length - 1]
+        if (!s.strict && lastBar && s.bars > 1 && backbeats.length && st === backbeats[backbeats.length - 1]
             && s.drummer !== Drummer.Digikal && rng.chance(r * 0.5)) {
           b.add(stepPos(bar, st) - 0.03, gm.Snare, 60);
           b.add(stepPos(bar, st), gm.Snare, 114);
         } else addBackbeat(b, stepPos(bar, st), s.backbeat, 110);
       }
+      if (s.strict) continue;   // reggae de livro: só a batida principal
       const ghost = feelOf(s.drummer).ghosts;
       for (const st of [3, 6, 7, 11, 14, 15]) {
         let near = false;

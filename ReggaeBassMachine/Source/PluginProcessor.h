@@ -51,6 +51,8 @@ public:
     // MIDI editável (thread da interface). A linha editada fica salva no projeto e vale até um
     // controle do gerador (estilo, ideia, harmonia, densidade...) ser mexido, como no MRDM-12.
     std::vector<mbm::NoteEvent> getCurrentLine (double& loopBeatsOut) const;   // editada, se houver
+    // reggae "de livro" (todas as notas na pentatônica do acorde): o MRM-0420 liga; o MRBM-69 sozinho fica livre
+    void setStrictReggae (bool on) { if (strictReggae.exchange (on) != on) dirty.store (true); }
     void setEdits (std::vector<mbm::NoteEvent> events, double loopBeatsIn);
     bool hasEdits() const;
     void clearEdits();
@@ -99,6 +101,7 @@ private:
     bool lastKeysOn = false;
     double loopBeats = 0.0;
     std::atomic<bool> dirty { true };
+    std::atomic<bool> strictReggae { false };
 
     struct Pending { int sample; bool on; int note; int vel; };
     std::vector<Pending> pending;

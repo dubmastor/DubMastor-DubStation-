@@ -405,6 +405,8 @@ struct Settings
     float velocity = 0.85f; // 0..1
     float gate = 0.7f;      // 0..1: sustentação das notas
     float swing = 0.0f;     // 0..1: somado ao swing do estilo
+    bool strict = false;    // reggae "de livro" (MRM-0420): toda nota dentro da pentatônica do acorde que soa,
+                            // inclusive as aproximações (sem cromatismo)
 };
 
 inline int pc (int n) { return ((n % 12) + 12) % 12; }
@@ -435,6 +437,19 @@ inline int approachNote (int prevNote, int nextRoot, int base, Rng& rng)
     else if (r < 0.8f)  n = target + 1;   // cromática por cima
     else                n = target - 2;   // diatônica por baixo
     return fitRange (n);
+}
+
+// Aproximação "de livro": a nota da pentatônica do acorde que ainda soa mais perto da tônica do próximo
+// (de preferência por baixo, subindo para ela), nunca a própria tônica nem cromatismo
+inline int strictApproach (int nextRoot, const ChordSlot& current, int base)
+{
+    const int target = fitRange (base + pc (nextRoot - base));
+    for (int d = 1; d <= 5; ++d)
+    {
+        if (inPentatonic (target - d, current) && target - d >= 28) return target - d;
+        if (inPentatonic (target + d, current) && target + d <= 67) return target + d;
+    }
+    return fitRange (base + pc (current.root - base));
 }
 
 //==============================================================================
@@ -495,10 +510,13 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
                 {
                     if (! changes && ! lastBar) note = fitRange (rootNote + tokSemis (T5, ch.quality));
                     else if (! changes)         note = fitRange (rootNote + tokSemis (LOW7, ch.quality));
-                    else                        note = approachNote (prevNote, next.root, s.base, rng);
+                    else                        note = s.strict ? strictApproach (next.root, ch, s.base)
+                                                                : approachNote (prevNote, next.root, s.base, rng);
                 }
                 else
                     note = fitRange (rootNote + tokSemis (c.tok, ch.quality));
+                if (s.strict && ! inPentatonic (note, ch))
+                    note = snapToPentatonic (note, ch, 28, 67);
 
                 // swing: colcheias e semicolcheias do contratempo atrasam em direção à tercina
                 double st = c.start;
@@ -518,7 +536,8 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
             {
                 const double appAt = barStart + barLen - 0.5;
                 while (ev.size() > firstOfBar && ev.back().start >= appAt - 1e-6) ev.pop_back();
-                const int n = approachNote (ev.empty() ? prevNote : ev.back().note, next.root, s.base, rng);
+                const int n = s.strict ? strictApproach (next.root, ch, s.base)
+                                       : approachNote (ev.empty() ? prevNote : ev.back().note, next.root, s.base, rng);
                 const int vel = std::clamp ((int) std::lround (0.9f * s.velocity * 127.0f), 1, 127);
                 ev.push_back ({ appAt, 0.45 * sustain, n, vel, slotIdx, true });
                 prevNote = n;

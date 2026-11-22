@@ -98,6 +98,7 @@ jobs:
           $R inicial
           $R presets
           $R aleatorio
+          $R reggae
 
       - uses: actions/upload-artifact@v4
         with:

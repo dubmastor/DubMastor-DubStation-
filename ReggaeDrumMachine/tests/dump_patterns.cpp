@@ -39,13 +39,14 @@ int main()
         s.machine = k == 4;
         s.randKick = rands[k % 5]; s.randSnare = rands[(k + 1) % 5]; s.randHat = rands[(k + 2) % 5]; s.randPerc = rands[(k + 3) % 5];
         s.seed = (uint32_t) (1 + n * 37 % 9999);
+        s.strict = (n % 3) == 2;   // modo "de livro" do MRM-0420
         const auto p = generate (s);
         std::printf ("{\"s\":{\"style\":%d,\"kickMask\":%d,\"snareMask\":%d,\"bars\":%d,\"hatPattern\":%d,\"swing\":%d,\"swingAll\":%s,"
                      "\"dynamics\":%d,\"randKick\":%.9g,\"randSnare\":%.9g,\"randHat\":%.9g,\"randPerc\":%.9g,\"drummer\":%d,\"backbeat\":%d,"
-                     "\"machine\":%s,\"fill\":%s,\"intro\":%s,\"seed\":%u},\"len\":%.3f,\"introLen\":%.3f,\"events\":",
+                     "\"machine\":%s,\"fill\":%s,\"intro\":%s,\"strict\":%s,\"seed\":%u},\"len\":%.3f,\"introLen\":%.3f,\"events\":",
                      style, s.kickMask, s.snareMask, s.bars, hat, (int) s.swing, s.swingAll ? "true" : "false", (int) s.dynamics,
                      (double) s.randKick, (double) s.randSnare, (double) s.randHat, (double) s.randPerc, drummer, (int) s.backbeat,
-                     s.machine ? "true" : "false", s.fill ? "true" : "false", s.intro ? "true" : "false", s.seed,
+                     s.machine ? "true" : "false", s.fill ? "true" : "false", s.intro ? "true" : "false", s.strict ? "true" : "false", s.seed,
                      p.lengthInBeats, p.introLengthInBeats);
         dumpEvents (p.events);
         std::printf (",\"intro\":");

@@ -77,12 +77,13 @@ int main (int argc, char** argv)
                             {
                                 Settings s; s.style = style; s.seed = seed; s.density = dens; s.variation = var;
                                 s.swing = sw; s.base = base; s.velocity = 0.85f; s.gate = (base == 31 ? 0.7f : 0.25f);
+                                s.strict = (seed == 42 || seed == 999);   // modo "de livro" do MRM-0420
                                 double L = 0;
                                 const auto ev = buildLoop (harmonies[h], s, L);
                                 std::printf ("%s\n{\"h\":%zu,\"style\":%d,\"seed\":%d,\"density\":%.9g,\"variation\":%.9g,\"swing\":%.9g,\"base\":%d,"
-                                             "\"velocity\":%.9g,\"gate\":%.9g,\"L\":%.17g,\"ev\":[",
+                                             "\"velocity\":%.9g,\"gate\":%.9g,\"strict\":%s,\"L\":%.17g,\"ev\":[",
                                              first ? "" : ",", h, style, seed, (double) dens, (double) var, (double) sw, base,
-                                             (double) s.velocity, (double) s.gate, L);
+                                             (double) s.velocity, (double) s.gate, s.strict ? "true" : "false", L);
                                 first = false;
                                 for (size_t i = 0; i < ev.size(); ++i)
                                     std::printf ("%s[%.17g,%.17g,%d,%d,%d]", i ? "," : "", ev[i].start, ev[i].length, ev[i].note, ev[i].velocity, ev[i].fill ? 1 : 0);

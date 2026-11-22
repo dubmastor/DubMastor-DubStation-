@@ -197,6 +197,7 @@ dubdrums::Settings DubDrumsProcessor::readSettings() const
     s.kickMask   = (uint8_t) juce::jlimit (0, 255, juce::roundToInt (get ("kickBeats")));
     s.snareMask  = (uint8_t) juce::jlimit (0, 255, juce::roundToInt (get ("snareBeats")));
     s.seed       = (uint32_t) juce::roundToInt (get ("seed"));
+    s.strict     = strictReggae.load();
     return s;
 }
 
@@ -257,6 +258,7 @@ juce::String DubDrumsProcessor::settingsKey() const
       << "/" << (int) s.swing << "/" << (int) s.swingAll << "/" << (int) s.dynamics << "/" << juce::roundToInt (s.randKick * 100.0f)
       << "/" << juce::roundToInt (s.randSnare * 100.0f) << "/" << juce::roundToInt (s.randHat * 100.0f) << "/" << juce::roundToInt (s.randPerc * 100.0f)
       << "/" << (int) s.drummer << "/" << (int) s.backbeat << "/" << (int) s.machine << "/" << (int) s.fill << "/" << (int) s.intro << "/" << (int) s.seed;
+    if (s.strict) k << "/strict";
     return k;
 }
 

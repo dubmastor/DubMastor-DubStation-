@@ -60,6 +60,16 @@
     return fitRange(n);
   }
 
+  // aproximação "de livro" (MRM-0420): nota da pentatônica do acorde que soa mais perto da tônica do próximo
+  function strictApproach(nextRoot, current, base) {
+    const target = fitRange(base + pc(nextRoot - base));
+    for (let d = 1; d <= 5; d++) {
+      if (inPentatonic(target - d, current) && target - d >= 28) return target - d;
+      if (inPentatonic(target + d, current) && target + d <= 67) return target + d;
+    }
+    return fitRange(base + pc(current.root - base));
+  }
+
   function monophonic(ev, loopBeats) {
     ev.sort((a, b) => a.start - b.start);
     for (let i = 0; i < ev.length; i++) {
@@ -116,8 +126,9 @@
           if (tok === Tok.APP) {
             if (!changes && !lastBar) note = fitRange(rootNote + tokSemis(Tok.T5, ch.quality));
             else if (!changes) note = fitRange(rootNote + tokSemis(Tok.LOW7, ch.quality));
-            else note = approachNote(next.root, s.base, rng);
+            else note = s.strict ? strictApproach(next.root, ch, s.base) : approachNote(next.root, s.base, rng);
           } else note = fitRange(rootNote + tokSemis(tok, ch.quality));
+          if (s.strict && !inPentatonic(note, ch)) note = snapToPentatonic(note, ch, 28, 67);
 
           let st = cStart;
           const frac = st - Math.floor(st);
@@ -134,7 +145,7 @@
         if (lastBar && changes && barLen < 4.0) {
           const appAt = barStart + barLen - 0.5;
           while (ev.length > firstOfBar && ev[ev.length - 1].start >= appAt - 1e-6) ev.pop();
-          const n = approachNote(next.root, s.base, rng);
+          const n = s.strict ? strictApproach(next.root, ch, s.base) : approachNote(next.root, s.base, rng);
           const vel = clamp(Math.round(f(f(f(0.9) * velocity) * 127)), 1, 127);
           ev.push({ start: appAt, length: 0.45 * sustain, note: n, velocity: vel, slot: slotIdx, fill: true });
           prevNote = n;

@@ -145,6 +145,7 @@ mbm::Settings BassMachineProcessor::getSettings() const
     s.base      = (int) param ("base");
     s.velocity  = param ("velocity");
     s.gate      = param ("gate");
+    s.strict    = strictReggae.load();
     return s;
 }
 
@@ -174,6 +175,7 @@ uint64_t BassMachineProcessor::settingsKey() const
     auto mix = [&h] (int64_t v) { for (int i = 0; i < 8; ++i) { h ^= (uint64_t) ((v >> (i * 8)) & 0xff); h *= 1099511628211ull; } };
     for (const char* id : { "style", "seed", "density", "variation", "swing", "base", "velocity", "gate" })
         mix ((int64_t) std::llround (param (id) * 10000.0f));
+    mix (strictReggae.load() ? 1 : 0);
     for (int i = 0; i < numSlots; ++i)
     {
         mix ((int64_t) param (rootId (i))); mix ((int64_t) param (qualId (i))); mix ((int64_t) param (durId (i)));

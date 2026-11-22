@@ -1,3 +1,23 @@
+## Mastor Reggae Chord Machine MRCM-1240 1.8 🟢🟡⚫
+
+- **PRESETS conferidos, só músicas de verdade:** o banco agora tem **60 harmonias de músicas clássicas**, no tom da gravação, conferidas em cifras públicas (as progressões genéricas saíram). São **6 pastas por estilo e década, 10 músicas em cada**:
+  **ROOTS - ANOS 70** (Satta Massagana, Pressure Drop, Marcus Garvey, Natural Mystic, Exodus, Jamming, One Love, Police and Thieves...),
+  **ROCKERS - FIM DOS 70** (Legalize It, Uptown Top Ranking, Money in My Pocket, Ku Klux Klan, Could You Be Loved...),
+  **RUB A DUB - ANOS 80** (Night Nurse, Here I Come, Under Mi Sensi, Pass the Kouchie, Bam Bam, Truths and Rights...),
+  **LOVERS ROCK - 70 A 90** (Red Red Wine, Kingston Town, Close to You, Tempted to Touch, Is This Love...),
+  **DANCEHALL - 80 E 90** (Ring the Alarm, Mr. Loverman, Sweat, Hotstepper, Boombastic, It Wasn't Me...) e
+  **NEW ROOTS - ANOS 2000** (She's Royal, Welcome to Jamrock, Herbalist, Ganja Farmer, Smile Jamaica...)
+- O mesmo banco na versão para celular e no **Mastor Riddim Machine MRM-0420**
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+No Mac, depois de copiar o `.vst3`:
+```
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
+```
+
+---
+
 ## Mastor Reggae Chord Machine MRCM-1240 1.7 🟢🟡⚫
 
 - **PRESETS de harmonia:** botão verde **PRESETS ▾** na faixa do LOOP, com 39 progressões clássicas do reggae em pastas por estilo: **ROOTS**, **ROCKERS**, **RUB A DUB**, **LOVERS ROCK**, **DANCEHALL DIGITAL** e **NEW ROOTS 2000** (anos 70, 80, 90 e 2000). Ajusta acordes, durações e quais ficam ligados

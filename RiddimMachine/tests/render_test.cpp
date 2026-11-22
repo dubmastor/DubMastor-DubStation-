@@ -121,7 +121,13 @@ int main (int argc, char** argv)
     {
         // banco de presets: cada um aplica raiz/qualidade/duração e liga só os acordes do preset; o baixo segue
         auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
-        bool ok = dubpresets::numPresets >= 30 && dubpresets::numFolders >= 4;
+        bool ok = dubpresets::numPresets == 60 && dubpresets::numFolders == 6;
+        for (int f = 0; f < dubpresets::numFolders; ++f)
+        {
+            int n = 0;
+            for (int i = 0; i < dubpresets::numPresets; ++i) n += juce::String (dubpresets::presets[i].folder) == dubpresets::folders[f];
+            if (n != 10) { ok = false; std::printf ("pasta %s tem %d presets\n", dubpresets::folders[f], n); }
+        }
         for (int i = 0; i < dubpresets::numPresets && ok; ++i)
         {
             const auto& pr = dubpresets::presets[i];
@@ -172,6 +178,55 @@ int main (int argc, char** argv)
         const bool ok = seen.size() >= 10 && harmonyChanges >= 8 && drumChanges >= 6 && linked && get (proc.apvts, "play") < 0.5f;
         std::printf ("aleatorio: %s (%d riddims diferentes, harmonia mudou %d/12, bateria mudou %d/12, baixo ligado: %s)\n",
                      ok ? "ok" : "FALHOU", seen.size(), harmonyChanges, drumChanges, linked ? "sim" : "nao");
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "reggae")
+    {
+        // ALAVANCA sempre no reggae: piano só no contratempo, caixa só no 2 e no 4,
+        // baixo só com notas do acorde da hora (pentatônica do baixista)
+        int badSkank = 0, badSnare = 0, badBass = 0, snares = 0, bassNotes = 0, skanks = 0;
+        for (int run = 0; run < 40; ++run)
+        {
+            proc.randomRiddim();
+            pump (3);
+            double lb = 0.0;
+            const auto slots = proc.getChords().getSlots();
+            for (const auto& e : proc.getChords().getCurrentLoop (lb))
+                if (e.channel == dub::ChSkank)
+                {
+                    ++skanks;
+                    const double f = std::fmod (e.start, 1.0);
+                    if (std::abs (f - 0.5) > 0.06) ++badSkank;
+                }
+            const auto pat = proc.getDrums().getPatternCopy();
+            for (const auto& e : pat.events)
+                if (e.note == dubdrums::gm::Snare || e.note == dubdrums::gm::SideStick)
+                {
+                    ++snares;
+                    const double inBar = std::fmod (e.beat, 4.0);
+                    const bool onBackbeat = std::abs (inBar - 1.0) < 0.06 || std::abs (inBar - 3.0) < 0.06;
+                    const bool lastBarFill = e.beat >= pat.lengthInBeats - 4.0 + 1e-9 && get (proc.getDrums().apvts, "fill") > 0.5f;
+                    if (! onBackbeat && ! lastBarFill) { ++badSnare; if (badSnare < 6) std::printf ("  caixa fora: tempo %.2f nota %d vel %d estilo %d baterista %d\n", e.beat, e.note, e.velocity, (int) get (proc.getDrums().apvts, "style"), (int) get (proc.getDrums().apvts, "drummer")); }
+                }
+            double bl = 0.0;
+            for (const auto& e : proc.getBass().getCurrentLine (bl))
+            {
+                ++bassNotes;
+                // acorde que soa naquele tempo
+                double t = 0.0; int root = 0; bool minor = false;
+                const double at = std::fmod (e.start, lb > 0 ? lb : 1.0);
+                for (const auto& sl : slots) { if (sl.beats <= 0) continue; if (at >= t - 1e-9) { root = sl.root; minor = sl.quality == dub::Min; } t += sl.beats; }
+                static const int minP[] = { 0, 3, 5, 7, 10 }, majP[] = { 0, 2, 4, 7, 9 };
+                const int iv = ((e.note - root) % 12 + 12) % 12;
+                bool ok = false;
+                for (int k = 0; k < 5; ++k) if (iv == (minor ? minP[k] : majP[k])) ok = true;
+                if (! ok) { ++badBass; if (badBass < 25) std::printf ("  baixo fora: tempo %.2f nota %d acorde %d%s baixista %d fill %d slot %d loop %.1f/%.1f\n", e.start, e.note, root, minor ? "m" : "", (int) get (proc.getBass().apvts, "style"), (int) e.fill, e.slot, lb, bl); }
+            }
+        }
+        const bool ok = badSkank == 0 && badSnare == 0 && badBass == 0 && skanks > 0 && snares > 0 && bassNotes > 0;
+        std::printf ("reggae: %s (40 alavancadas: skank fora do contratempo %d/%d, caixa fora do 2 e 4 %d/%d, baixo fora do acorde %d/%d)\n",
+                     ok ? "ok" : "FALHOU", badSkank, skanks, badSnare, snares, badBass, bassNotes);
         return ok ? 0 : 1;
     }
 
