@@ -536,20 +536,10 @@ void InterlockKeys::paint (juce::Graphics& g)
 //==============================================================================
 void PlayButton::paint (juce::Graphics& g)
 {
+    // sem animação: tampa de botão de pedal com a lâmpada acesa (tocando) ou apagada (parado)
     const bool on = index() != 0;
     const bool over = isMouseOver();
     auto r = getLocalBounds().toFloat().reduced (3.0f);
-    const double now = juce::Time::getMillisecondCounterHiRes() * 0.001;
-
-    // tocando: pulso no tempo (forte na cabeça de cada tempo, decaindo); parado: respira devagar
-    float pulse = 0.0f, beatFrac = 0.0f;
-    if (on)
-    {
-        const double pos = beatPosition ? beatPosition() : -1.0;
-        beatFrac = pos >= 0.0 ? (float) (pos - std::floor (pos)) : (float) std::fmod (now * 1.25, 1.0);
-        pulse = std::pow (1.0f - beatFrac, 2.2f);
-    }
-    const float breathe = on ? 0.0f : 0.5f + 0.5f * (float) std::sin (now * 2.4);
 
     g.setColour (juce::Colours::black.withAlpha (0.35f));
     g.fillRoundedRectangle (r.translated (0, 3.0f), 8.0f);
@@ -558,50 +548,28 @@ void PlayButton::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white.withAlpha (0.08f));
     g.drawRoundedRectangle (r.reduced (0.5f), 8.0f, 1.0f);
 
-    // halo dourado que pulsa no tempo
-    if (on)
-    {
-        g.setColour (colours::jamGold.withAlpha (0.18f + 0.45f * pulse));
-        g.drawRoundedRectangle (r.expanded (2.0f + 2.0f * pulse), 10.0f, 2.0f + 2.5f * pulse);
-    }
-
     auto cap = r.reduced (6.0f).translated (0, on ? 2.0f : 0.0f);
-    const auto base = on ? colours::jamGreen.brighter (0.15f + 0.45f * pulse) : colours::jamGreen.brighter (0.06f * breathe);
-    juce::ColourGradient cg (base.brighter (over ? 0.12f : 0.0f), cap.getX(), cap.getY(),
+    juce::ColourGradient cg (colours::jamGreen.brighter (over ? 0.12f : 0.0f), cap.getX(), cap.getY(),
                              colours::jamGreen.darker (0.8f), cap.getX(), cap.getBottom(), false);
     g.setGradientFill (cg);
     g.fillRoundedRectangle (cap, 6.0f);
     g.setColour (juce::Colours::white.withAlpha (on ? 0.10f : 0.22f));
     g.fillRoundedRectangle (cap.withHeight (cap.getHeight() * 0.36f).reduced (6, 3), 4.0f);
 
-    // ícone + texto
     const float iconS = 16.0f;
     g.setFont (stencil (17.0f, 0.2f));
     const juce::String text = on ? "STOP" : "PLAY";
     const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), text);
     const float total = iconS + 12.0f + tw;
-    const float x0 = cap.getCentreX() - total * 0.5f - (on ? 8.0f : 0.0f), cy = cap.getCentreY() + 1.0f;
+    const float x0 = cap.getCentreX() - total * 0.5f, cy = cap.getCentreY() + 1.0f;
     juce::Path icon;
     if (on) icon.addRoundedRectangle (x0, cy - iconS * 0.45f, iconS * 0.9f, iconS * 0.9f, 2.0f);
     else    icon.addTriangle (x0, cy - iconS * 0.55f, x0, cy + iconS * 0.55f, x0 + iconS, cy);
-    g.setColour (colours::jamGold.withAlpha (on ? 1.0f : 0.75f + 0.25f * breathe));
+    g.setColour (colours::jamGold);
     g.fillPath (icon);
     g.drawText (text, juce::Rectangle<float> (x0 + iconS + 12.0f, cy - 12.0f, tw + 4.0f, 24.0f), juce::Justification::centredLeft);
 
-    // tocando: três barrinhas de VU dançando no tempo ao lado do texto
-    if (on)
-    {
-        const float bx = x0 + iconS + 12.0f + tw + 9.0f, bottom = cy + 8.0f;
-        for (int i = 0; i < 3; ++i)
-        {
-            const float wob = 0.5f + 0.5f * (float) std::sin (now * (7.0 + 2.3 * i) + i * 1.7);
-            const float h = 4.0f + 12.0f * juce::jlimit (0.0f, 1.0f, 0.55f * pulse + 0.45f * wob);
-            g.setColour (colours::jamGold.withAlpha (0.85f));
-            g.fillRoundedRectangle (bx + (float) i * 5.0f, bottom - h, 3.0f, h, 1.0f);
-        }
-    }
-
-    lampAt (g, juce::Rectangle<float> (10.0f, 10.0f).withCentre ({ cap.getRight() - 14.0f, cap.getY() + 13.0f }), on && beatFrac < 0.35f);
+    lampAt (g, juce::Rectangle<float> (10.0f, 10.0f).withCentre ({ cap.getRight() - 14.0f, cap.getY() + 13.0f }), on);
 }
 
 //==============================================================================
@@ -1039,7 +1007,6 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     addAndMakeVisible (newIdeaBtn);
 
     play = std::make_unique<PlayButton> (*proc.apvts.getParameter ("preview"));
-    play->beatPosition = [this] { return proc.getPlayPositionInLoop(); };
     clearEditsBtn.onClick = [this] { proc.clearEdits(); roll.update(); };
     addAndMakeVisible (clearEditsBtn);
     addAndMakeVisible (*play);

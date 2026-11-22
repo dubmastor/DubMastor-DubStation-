@@ -157,26 +157,26 @@
     const hats8 = (on, off, until) => { for (let s = 0; s < until; s += 2) add(s, drum.ClosedHat, s % 4 === 0 ? on : off); };
     switch (style) {
       case 0:
-        add(0, drum.Kick, .95); add(8, drum.Kick, .95); add(8, drum.Rim, .9);
+        add(0, drum.Kick, .95); add(8, drum.Kick, .95); add(4, drum.Snare, .9); if (!fill) add(12, drum.Snare, .9);
         hats8(.7, .55, fill ? 12 : 16);
         add(3, drum.ClosedHat, .3); add(11, drum.ClosedHat, .3);
         if (!fill) add(14, drum.OpenHat, .6);
-        else { add(12, drum.Snare, .8); add(13, drum.TomHigh, .7); add(14, drum.TomMid, .75); add(15, drum.TomLow, .85); }
+        else { add(12, drum.Snare, .9); add(13, drum.TomHigh, .7); add(14, drum.TomMid, .75); add(15, drum.TomLow, .85); }
         break;
       case 1:
-        add(8, drum.Kick, 1); add(8, drum.Rim, .95);
+        add(8, drum.Kick, 1); add(4, drum.Snare, .95); add(12, drum.Snare, .95);
         for (let s = 0; s < (fill ? 12 : 16); s += 2) add(s, drum.ClosedHat, s % 4 === 0 ? .65 : .5, s % 4 === 2 ? 0.06 : 0);
-        if (fill) { add(12, drum.Snare, .7, 0); add(12, drum.TomHigh, .75, 1 / 3); add(12, drum.TomMid, .8, 2 / 3); }
+        if (fill) { add(12, drum.TomHigh, .75, 1 / 3); add(12, drum.TomMid, .8, 2 / 3); }
         break;
       case 2:
-        add(0, drum.Kick, 1); add(8, drum.Kick, .95); add(4, drum.Clap, .95); add(12, drum.Clap, .95);
+        add(0, drum.Kick, 1); add(8, drum.Kick, .95); add(4, drum.Snare, .95); add(12, drum.Snare, .95); add(4, drum.Clap, .8); add(12, drum.Clap, .8);
         hats8(.65, .55, 16); add(14, drum.Rim, .45);
         if (fill) { add(13, drum.Clap, .6); add(14, drum.Clap, .75); add(15, drum.Clap, .9); }
         else add(15, drum.ClosedHat, .4);
         break;
       default:
         for (const s of [0, 4, 8, 12]) add(s, drum.Kick, s === 0 ? 1 : .9);
-        for (const s of [3, 6, 11, 14]) add(s, drum.Snare, s === 6 || s === 14 ? .95 : .75);
+        add(4, drum.Snare, .95); add(12, drum.Snare, .95);
         hats8(.55, .6, 16);
         if (fill) { add(12, drum.TimbaleHi, .8); add(13, drum.TimbaleHi, .7); add(14, drum.TimbaleLo, .8); add(15, drum.TimbaleLo, .9); }
         else { add(7, drum.TimbaleHi, .55); add(15, drum.TimbaleLo, .6); }

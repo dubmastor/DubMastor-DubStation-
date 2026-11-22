@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Bass Machine MRBM-69 2.5 — Dub Station</title>
+<title>Mastor Reggae Bass Machine MRBM-69 2.6 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -78,19 +78,13 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 .stamp{position:absolute;right:12px;top:10px;border:1px solid var(--cream);color:var(--cream);font-size:9px;font-weight:800;letter-spacing:.2em;padding:2px 8px;border-radius:2px;display:none}
 .stamp.show{display:block}
 .hint{font-size:10px;letter-spacing:.1em;color:var(--ink2);font-weight:700;margin:6px 2px 0;line-height:1.5}
-/* PLAY animado: halo e brilho pulsam no tempo, barrinhas de VU dançam */
+/* PLAY sem animação: só a lâmpada acesa (tocando) ou apagada (parado) */
 .preview{width:100%;padding:16px;border:0;border-radius:8px;cursor:pointer;color:var(--gold);font-weight:800;font-size:20px;letter-spacing:.18em;position:relative;overflow:hidden;
-  background:linear-gradient(180deg,#2c7c45,#0f3f1f);box-shadow:0 0 0 4px var(--label);display:flex;align-items:center;justify-content:center;gap:14px;animation:idle 2.6s ease-in-out infinite}
-@keyframes idle{50%{filter:brightness(1.12)}}
+  background:linear-gradient(180deg,#2c7c45,#0f3f1f);box-shadow:0 0 0 4px var(--label);display:flex;align-items:center;justify-content:center;gap:14px}
 .preview .ic{width:0;height:0;border-left:17px solid var(--gold);border-top:10px solid transparent;border-bottom:10px solid transparent}
-.preview.on{animation:none;filter:brightness(calc(1 + var(--pulse) * .45));
-  box-shadow:0 0 0 4px var(--label),0 0 calc(6px + var(--pulse) * 26px) rgba(234,189,18,calc(.25 + var(--pulse) * .6))}
 .preview.on .ic{border:0;width:15px;height:15px;background:var(--gold);border-radius:2px}
-.preview .vu{display:none;gap:3px;align-items:flex-end;height:18px}
-.preview.on .vu{display:flex}
-.preview .vu b{width:4px;background:var(--gold);border-radius:1px;height:6px}
 .preview .lamp{position:absolute;right:12px;top:10px;width:11px;height:11px;border-radius:50%;background:#4a3a22;box-shadow:0 0 0 1px #000}
-.preview.on .lamp.lit{background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 10px var(--amber)}
+.preview.on .lamp{background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 10px var(--amber)}
 .redbtn{width:100%;padding:14px;border:0;border-radius:6px;color:var(--cream);font-weight:800;letter-spacing:.2em;font-size:14px;cursor:pointer;
   background:linear-gradient(180deg,#e8533a,#7e1a0e);box-shadow:0 0 0 3px var(--label)}
 .scope{display:block;width:100%;height:120px;border-radius:12px;background:radial-gradient(circle at 50% 50%,#0f2a17,#030a05);box-shadow:0 0 0 6px #1b1b1b,0 0 0 8px #555}
@@ -107,7 +101,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.5</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.6</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -146,7 +140,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
   </section>
 
   <section class="mod"><div class="tag">PREVIEW</div>
-    <button class="preview" id="play"><span class="ic"></span><span id="playTxt">PLAY</span><span class="vu"><b></b><b></b><b></b></span><span class="lamp" id="playLamp"></span></button>
+    <button class="preview" id="play"><span class="ic"></span><span id="playTxt">PLAY</span><span class="lamp" id="playLamp"></span></button>
     <div class="slider"><span>BPM</span><input type="range" id="bpm" min="55" max="180" step="1"><output id="o-bpm"></output></div>
     <div class="lbl">TIMBRE · MRDBI-07</div>
     <div class="btns c3" id="timbreBtns"></div>
@@ -341,9 +335,12 @@ const engine = (() => {
   }
 
   // nota de baixo com o envelope do timbre (808 = preset MÉDIO do MRDBI-07)
+  let lastBass = null;
   function bassNote(t, note, vel, dur) {
     const tim = st.timbre, is808 = tim === 2;
-    const A = is808 ? .001 : .003, D = is808 ? .75 : .6, S = is808 ? 0 : .85, R = is808 ? .22 : .18;
+    const A = is808 ? .001 : .003, D = is808 ? 1.6 : .6, S = is808 ? 0 : .85, R = is808 ? 1.2 : .18;
+    // voz mono como no plugin: a nota nova corta a cauda da anterior
+    if (lastBass && lastBass.end > t) { lastBass.amp.gain.cancelScheduledValues(t); lastBass.amp.gain.setTargetAtTime(0, t, .004); }
     const osc = ctx.createOscillator(); osc.setPeriodicWave(waves[tim]); osc.frequency.value = midiHz(note);
     const filt = ctx.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 900; filt.Q.value = .8;
     const amp = ctx.createGain(); amp.gain.value = 0;
@@ -363,6 +360,7 @@ const engine = (() => {
       kn.connect(kg).connect(head === osc ? filt : head); kn.start(t); kn.stop(t + .5);
     }
     osc.start(t); osc.stop(off + R * 5 + .05);
+    lastBass = { amp, end: off + R * 5 };
   }
 
   // bateria: kit acústico (ROOTS, ONE DROP) e eletrônico anos 80 (DIGITAL, DANCEHALL)
@@ -559,7 +557,7 @@ $('download').onclick = () => {
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 };
 
-// ---------------------------------------------------------------- animação: PLAY no tempo, letreiro, visor e osciloscópio
+// ---------------------------------------------------------------- quadro a quadro: PLAY (luz), letreiro, visor e osciloscópio
 const sc = $('scope'), sg = sc.getContext('2d'), scopeBuf = new Float32Array(2048);
 function drawScope() {
   const dpr = window.devicePixelRatio || 1, W = sc.clientWidth, H = sc.clientHeight;
@@ -576,17 +574,10 @@ function drawScope() {
   sg.strokeStyle = 'rgba(93,255,138,.2)'; sg.lineWidth = 6; sg.stroke();
   sg.strokeStyle = '#5dff8a'; sg.lineWidth = 1.6; sg.stroke();
 }
-const vuBars = document.querySelectorAll('#play .vu b');
 (function frame() {
   const now = performance.now() / 1000, on = engine.isPlaying();
   for (const id of ['play', 'play2']) $(id).classList.toggle('on', on);
   $('playTxt').textContent = $('playTxt2').textContent = on ? 'STOP' : 'PLAY';
-  if (on) {
-    const pos = engine.position(), frac = pos >= 0 ? pos - Math.floor(pos) : 0, pulse = Math.pow(1 - frac, 2.2);
-    document.documentElement.style.setProperty('--pulse', pulse.toFixed(3));
-    $('playLamp').classList.toggle('lit', frac < .35);
-    vuBars.forEach((b, i) => { const wob = .5 + .5 * Math.sin(now * (7 + 2.3 * i) + i * 1.7); b.style.height = (4 + 14 * Math.min(1, .55 * pulse + .45 * wob)) + 'px'; });
-  }
   drawFlap(now);
   if (on || drag) drawRoll();
   drawScope();

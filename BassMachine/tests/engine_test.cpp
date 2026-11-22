@@ -162,6 +162,21 @@ int main()
                     kicks += d[i].note == drum::Kick;
                 }
                 CHECK (kicks >= 1 || (ds == DrumOneDrop && L < 4.0), "%s sem bumbo", drumStyleName (ds));
+                for (int bar = 0; bar < (int) std::floor (L / 4.0 + 1e-9); ++bar)
+                    for (double bt : { 1.0, 3.0 })
+                    {
+                        bool hit = false; int wrong = 0;
+                        for (const auto& e : d)
+                            if (e.note == drum::Snare || e.note == drum::Rim)
+                            {
+                                const double rel = e.start - bar * 4.0;
+                                if (rel < -0.01 || rel >= 4.0 - 0.01) continue;
+                                if (std::abs (rel - bt) < 0.05) hit = true;
+                                if (e.note == drum::Snare && std::abs (rel - 1.0) > 0.05 && std::abs (rel - 3.0) > 0.05) ++wrong;
+                            }
+                        CHECK (hit, "%s: sem caixa no tempo %d", drumStyleName (ds), (int) bt + 1);
+                        CHECK (wrong == 0, "%s: caixa fora do 2 e 4", drumStyleName (ds));
+                    }
                 if (ds == DrumOneDrop)
                     for (const auto& e : d) CHECK (! (e.note == drum::Kick && std::fmod (e.start, 4.0) < 1e-6), "one drop com bumbo no 1");
             }

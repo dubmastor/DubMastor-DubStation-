@@ -1,4 +1,11 @@
-# Mastor Reggae Bass Machine MRBM-69 — 2.5 · Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 — 2.6 · Gerador de Reggae Bass Lines
+
+- **Bateria corrigida**: em todos os estilos (Roots, One Drop, Digital e Dancehall) a caixa cai sempre no 2 e no 4; teste novo no CI confere isso em todo compasso
+- **PLAY sem animação**: só a lâmpada, acesa tocando e apagada parado
+- **808 do preview com cauda longa**: decay 1,6 s e release 1,2 s (antes 750 ms / 220 ms); a nota seguinte corta a anterior, como num baixo mono
+- Mesmas mudanças na versão para navegador
+
+## 2.5
 
 - **MIDI editável** no visor: põe, move, estica e apaga notas (grade 1/16, Shift = 1/32); DESFAZER EDIÇÃO; a linha editada fica salva no projeto e sai no MIDI
 - **Timbre no PREVIEW** com os timbres do MRDBI-07: Roots (Sine), Super Tone e 808 (preset MÉDIO)

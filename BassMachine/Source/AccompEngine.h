@@ -75,24 +75,25 @@ inline std::vector<DrumHit> drumBar (int style, bool fill)
     {
         case DrumRoots:
             h.push_back ({ 0, Kick, 0.95f }); h.push_back ({ 8, Kick, 0.95f });
-            h.push_back ({ 8, Rim, 0.90f });
+            h.push_back ({ 4, Snare, 0.90f });
+            if (! fill) h.push_back ({ 12, Snare, 0.90f });
             hats8 (0.70f, 0.55f, fill ? 12 : 16);
             h.push_back ({ 3, ClosedHat, 0.30f }); h.push_back ({ 11, ClosedHat, 0.30f });
             if (! fill) h.push_back ({ 14, OpenHat, 0.60f });
             else
             {
-                h.push_back ({ 12, Snare, 0.80f }); h.push_back ({ 13, TomHigh, 0.70f });
+                h.push_back ({ 12, Snare, 0.90f }); h.push_back ({ 13, TomHigh, 0.70f });
                 h.push_back ({ 14, TomMid, 0.75f }); h.push_back ({ 15, TomLow, 0.85f });
             }
             break;
 
         case DrumOneDrop:
-            h.push_back ({ 8, Kick, 1.0f }); h.push_back ({ 8, Rim, 0.95f });
+            h.push_back ({ 8, Kick, 1.0f });
+            h.push_back ({ 4, Snare, 0.95f }); h.push_back ({ 12, Snare, 0.95f });
             for (int s = 0; s < (fill ? 12 : 16); s += 2)
                 h.push_back ({ s, ClosedHat, (s % 4 == 0) ? 0.65f : 0.50f, (s % 4 == 2) ? 0.06 : 0.0 });
             if (fill)   // tercinas puxadas no 4, como o Carlton Barrett
             {
-                h.push_back ({ 12, Snare, 0.70f, 0.0 });
                 h.push_back ({ 12, TomHigh, 0.75f, 1.0 / 3.0 });
                 h.push_back ({ 12, TomMid, 0.80f, 2.0 / 3.0 });
             }
@@ -100,7 +101,8 @@ inline std::vector<DrumHit> drumBar (int style, bool fill)
 
         case DrumDigital:
             h.push_back ({ 0, Kick, 1.0f }); h.push_back ({ 8, Kick, 0.95f });
-            h.push_back ({ 4, Clap, 0.95f }); h.push_back ({ 12, Clap, 0.95f });
+            h.push_back ({ 4, Snare, 0.95f }); h.push_back ({ 12, Snare, 0.95f });
+            h.push_back ({ 4, Clap, 0.80f }); h.push_back ({ 12, Clap, 0.80f });
             hats8 (0.65f, 0.55f, 16);
             h.push_back ({ 14, Rim, 0.45f });
             if (fill) { h.push_back ({ 13, Clap, 0.60f }); h.push_back ({ 14, Clap, 0.75f }); h.push_back ({ 15, Clap, 0.90f }); }
@@ -110,7 +112,7 @@ inline std::vector<DrumHit> drumBar (int style, bool fill)
         case DrumDancehall:
         default:
             for (int s : { 0, 4, 8, 12 }) h.push_back ({ s, Kick, s == 0 ? 1.0f : 0.90f });
-            for (int s : { 3, 6, 11, 14 }) h.push_back ({ s, Snare, (s == 6 || s == 14) ? 0.95f : 0.75f });
+            h.push_back ({ 4, Snare, 0.95f }); h.push_back ({ 12, Snare, 0.95f });
             hats8 (0.55f, 0.60f, 16);
             if (fill)
             {

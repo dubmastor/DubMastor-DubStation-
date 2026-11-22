@@ -1,8 +1,8 @@
-# Mastor Reggae Bass Machine MRBM-69 2.5 — Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 2.6 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.5/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.5/MRBM-69-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.6/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.6/MRBM-69-macOS.zip)**
 
 ![Interface do Reggae Bass Machine](docs/interface.png)
 
@@ -48,8 +48,8 @@ e **ON** nos acordes 2 a 4. O plugin abre com **dois acordes ligados, Am e Dm, d
 ## PREVIEW e SOM DO BAIXO (MRDBI-07)
 | Controle | O que faz |
 |---|---|
-| **PLAY / STOP** | Toca o loop sem a DAW, no **BPM** do knob. Com a DAW tocando, segue o andamento dela. Tocando, o botão pulsa no tempo (halo dourado, lâmpada e barrinhas de VU) |
-| **TIMBRE** (no PREVIEW) | Três teclas com os timbres do **Mastor Reggae Dub Bass Instrument MRDBI-07**: **ROOTS (SINE)** (Bass / Classic Sine), **SUPER TONE** (o baixo digital da era King Jammy) e **808** (preset MÉDIO do MRDBI-07: ataque 1 ms, decay 750 ms, release 220 ms, drop de 12 semitons em 70 ms). Mesma voz, filtro e maximizer do MRDBI-07 com os valores de fábrica dele: cutoff 900 Hz, ressonância 0,8, sem saturação e sem reverb |
+| **PLAY / STOP** | Toca o loop sem a DAW, no **BPM** do knob. Com a DAW tocando, segue o andamento dela. A lâmpada do botão fica acesa enquanto toca e apagada quando para |
+| **TIMBRE** (no PREVIEW) | Três teclas com os timbres do **Mastor Reggae Dub Bass Instrument MRDBI-07**: **ROOTS (SINE)** (Bass / Classic Sine), **SUPER TONE** (o baixo digital da era King Jammy) e **808** (base do preset MÉDIO do MRDBI-07 com cauda longa: ataque 1 ms, decay 1,6 s, release 1,2 s, drop de 12 semitons em 70 ms). Mesma voz, filtro e maximizer do MRDBI-07 com os valores de fábrica dele: cutoff 900 Hz, ressonância 0,8, sem saturação e sem reverb |
 | **GANHO** | Ganho de entrada (−12 a +12 dB) antes da saturação e do maximizer. Duplo clique volta a 0 dB |
 | **TONE / DRIVE / VOLUME** | Cutoff (±1,5 oitava; 50 % = 900 Hz, como no Dub Bass), saturação da válvula TUBE do Dub Bass (começa em 0 = desligada, como nele) e volume geral do preview |
 | **SOM INTERNO** | Desligue quando mandar o MIDI para o seu próprio baixo |
@@ -58,7 +58,7 @@ e **ON** nos acordes 2 a 4. O plugin abre com **dois acordes ligados, Am e Dm, d
 ## ACOMPANHAMENTO (só no preview)
 | Controle | O que faz |
 |---|---|
-| **BATERIA** | Liga a bateria. **ROOTS** (rockers da Channel One) e **ONE DROP** usam o kit acústico do Dub Drums; **DIGITAL** (caixa de ritmos de 1985, palmas no 2 e no 4) e **DANCEHALL** (bumbo nos quatro, caixa "dem bow", timbales) usam um kit eletrônico anos 80. Uma virada no último compasso do loop |
+| **BATERIA** | Liga a bateria. Em todos os estilos a **caixa cai no 2 e no 4**. **ROOTS** (rockers da Channel One) e **ONE DROP** usam o kit acústico do Dub Drums; **DIGITAL** (caixa de ritmos de 1985, caixa e palmas no 2 e no 4) e **DANCEHALL** (bumbo nos quatro, timbales) usam um kit eletrônico anos 80. Uma virada no último compasso do loop |
 | **TECLADO** | Liga o teclado do **Mastor Roots Keys**: skank do **PIANO M1** no contratempo, bubble do **ÓRGÃO B3** ou **AMBOS**, seguindo os acordes da HARMONIA |
 | **VOLUME** | Volume de cada um |
 

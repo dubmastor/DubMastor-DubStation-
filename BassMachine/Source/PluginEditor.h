@@ -117,7 +117,6 @@ class PlayButton : public ParamControl
 {
 public:
     using ParamControl::ParamControl;
-    std::function<double()> beatPosition;   // posição no loop (tempos); -1 = parado: pulsa no tempo
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override { select (index() == 0 ? 1 : 0); }
 };
