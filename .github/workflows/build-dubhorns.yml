@@ -9,6 +9,14 @@ on:
     paths:
       - 'DubHorns/**'
       - '.github/workflows/build-dubhorns.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
+  pull_request:
+    paths:
+      - 'DubHorns/**'
+      - '.github/workflows/build-dubhorns.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
   workflow_dispatch:
 
 permissions:
@@ -76,7 +84,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           VST3="build/MastorDubHorns_artefacts/Release/VST3/Mastor Dub Horns MDH-70.vst3"
-          BIN="$VST3/Contents/MacOS/Mastor Dub Horns"
+          BIN="$VST3/Contents/MacOS/Mastor Dub Horns MDH-70"
           echo "== Arquiteturas do binário"; lipo -info "$BIN"
           lipo -info "$BIN" | grep -q x86_64 && lipo -info "$BIN" | grep -q arm64
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
@@ -98,6 +106,11 @@ jobs:
           Copy-Item "build/MastorDubHorns_artefacts/Release/Standalone/Mastor Dub Horns MDH-70.exe" out/ -ErrorAction SilentlyContinue
           Compress-Archive -Path out/* -DestinationPath ../MDH-70-Windows.zip
 
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Dub Horns MDH-70" -Sigla MDH-70 -Saida ../MDH-70-Windows-Instalador.exe
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -109,15 +122,21 @@ jobs:
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
           cd out && ditto -c -k --sequesterRsrc . ../../MDH-70-macOS.zip
 
+      - name: Instalador (macOS)
+        if: runner.os == 'macOS'
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Dub Horns MDH-70" MDH-70 ../MDH-70-macOS-Instalador.pkg
+
       - uses: actions/upload-artifact@v4
         with:
           name: MDH-70-${{ matrix.name }}
-          path: MDH-70-${{ matrix.name }}.zip
+          path: |
+            MDH-70-${{ matrix.name }}.zip
+            MDH-70-${{ matrix.name }}-Instalador.*
 
   # publica (ou atualiza) a release da versão atual com os zips que passaram na validação
   release:
     needs: [engine-test, build]
-    if: ${{ !cancelled() && needs.engine-test.result == 'success' }}
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.engine-test.result == 'success' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -133,8 +152,16 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - name: Conferir os zips
-        run: ls -la dist && test -n "$(ls dist/*.zip 2>/dev/null)"
+      - name: Conferir os arquivos
+        run: |
+          ls -la dist
+          test -n "$(ls dist/*.zip 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.exe 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.pkg 2>/dev/null)"
+          # o plugin do Windows não pode depender do Visual C++ Redistributable (senão não abre em PCs sem ele)
+          d=$(mktemp -d); unzip -q dist/*-Windows.zip -d "$d"
+          dll=$(find "$d" -path '*x86_64-win*' -type f | head -1)
+          if objdump -p "$dll" | grep -iE 'DLL Name: (VCRUNTIME|MSVCP)'; then echo "::error::plugin depende do runtime do Visual C++"; exit 1; fi
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -142,6 +169,9 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Mastor Dub Horns MDH-70 ${{ needs.engine-test.outputs.version }}
           body_path: DubHorns/RELEASE_NOTES.md
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
           make_latest: 'false'
           overwrite_files: true

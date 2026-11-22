@@ -11,8 +11,19 @@ on:
       - 'DubDrumsMachine/Source/**'
       - 'RootsKeys/Source/RootsKeysEngine.h'
       - '.github/workflows/build-riddimmachine.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
     tags:
       - 'MRM-0420-*'
+  pull_request:
+    paths:
+      - 'RiddimMachine/**'
+      - 'ReggaeChordMachine/Source/**'
+      - 'DubDrumsMachine/Source/**'
+      - 'RootsKeys/Source/RootsKeysEngine.h'
+      - '.github/workflows/build-riddimmachine.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
@@ -134,6 +145,11 @@ jobs:
           Copy-Item "build/MastorRiddimMachine_artefacts/Release/Standalone/Mastor Riddim Machine MRM-0420.exe" out/ -ErrorAction SilentlyContinue
           Compress-Archive -Path out/* -DestinationPath ../MRM-0420-Windows.zip
 
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Riddim Machine MRM-0420" -Sigla MRM-0420 -Saida ../MRM-0420-Windows-Instalador.exe
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -145,17 +161,23 @@ jobs:
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
           cd out && ditto -c -k --sequesterRsrc . ../../MRM-0420-macOS.zip
 
+      - name: Instalador (macOS)
+        if: runner.os == 'macOS'
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Riddim Machine MRM-0420" MRM-0420 ../MRM-0420-macOS-Instalador.pkg
+
       - uses: actions/upload-artifact@v4
         with:
           name: MRM-0420-${{ matrix.name }}
-          path: MRM-0420-${{ matrix.name }}.zip
+          path: |
+            MRM-0420-${{ matrix.name }}.zip
+            MRM-0420-${{ matrix.name }}-Instalador.*
 
   # Release própria: MRM-0420-<versão do CMakeLists>, criada/atualizada a cada push na main que mexa
   # no MRM-0420 (ou por tag MRM-0420-x.y). Não vira a "latest", para não mexer nos links
   # /releases/latest/download dos outros plugins.
   release:
     needs: build
-    if: ${{ !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRM-0420-') || inputs.tag != '') }}
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRM-0420-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -185,11 +207,25 @@ jobs:
       - name: Só os instaladores
         run: ls dist && rm -f dist/*.png dist/*.wav dist/*.mid
 
+      - name: Conferir os arquivos
+        run: |
+          ls -la dist
+          test -n "$(ls dist/*.zip 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.exe 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.pkg 2>/dev/null)"
+          # o plugin do Windows não pode depender do Visual C++ Redistributable (senão não abre em PCs sem ele)
+          d=$(mktemp -d); unzip -q dist/*-Windows.zip -d "$d"
+          dll=$(find "$d" -path '*x86_64-win*' -type f | head -1)
+          if objdump -p "$dll" | grep -iE 'DLL Name: (VCRUNTIME|MSVCP)'; then echo "::error::plugin depende do runtime do Visual C++"; exit 1; fi
+
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: ${{ inputs.tag && inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || format('Mastor Riddim Machine {0}', steps.ver.outputs.tag) }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
           body_path: RiddimMachine/RELEASE_NOTES.md
           make_latest: 'false'

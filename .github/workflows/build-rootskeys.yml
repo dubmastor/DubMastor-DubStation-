@@ -6,8 +6,16 @@ on:
     paths:
       - 'RootsKeys/**'
       - '.github/workflows/build-rootskeys.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
     tags:
       - 'MRK-80-*'
+  pull_request:
+    paths:
+      - 'RootsKeys/**'
+      - '.github/workflows/build-rootskeys.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
@@ -76,7 +84,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           VST3="build/RootsKeys_artefacts/Release/VST3/Mastor Roots Keys MRK-80.vst3"
-          BIN="$VST3/Contents/MacOS/DubMastor Roots Keys"
+          BIN="$VST3/Contents/MacOS/Mastor Roots Keys MRK-80"
           echo "== Arquiteturas do binário"; lipo -info "$BIN"
           lipo -info "$BIN" | grep -q x86_64 && lipo -info "$BIN" | grep -q arm64
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
@@ -98,6 +106,11 @@ jobs:
           Copy-Item "build/RootsKeys_artefacts/Release/Standalone/Mastor Roots Keys MRK-80.exe" out/ -ErrorAction SilentlyContinue
           Compress-Archive -Path out/* -DestinationPath ../MRK-80-Windows.zip
 
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Roots Keys MRK-80" -Sigla MRK-80 -Saida ../MRK-80-Windows-Instalador.exe
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -109,16 +122,22 @@ jobs:
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
           cd out && ditto -c -k --sequesterRsrc . ../../MRK-80-macOS.zip
 
+      - name: Instalador (macOS)
+        if: runner.os == 'macOS'
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Roots Keys MRK-80" MRK-80 ../MRK-80-macOS-Instalador.pkg
+
       - uses: actions/upload-artifact@v4
         with:
           name: MRK-80-${{ matrix.name }}
-          path: MRK-80-${{ matrix.name }}.zip
+          path: |
+            MRK-80-${{ matrix.name }}.zip
+            MRK-80-${{ matrix.name }}-Instalador.*
 
   # Release própria: MRK-80-<versão do CMakeLists>, criada/atualizada a cada push na main que mexa no plugin
   # (ou por tag MRK-80-x.y). Não vira a "latest", para não mexer nos links dos outros plugins.
   release:
     needs: build
-    if: ${{ !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRK-80-') || inputs.tag != '') }}
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRK-80-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -146,8 +165,16 @@ jobs:
           pattern: MRK-80-*
           merge-multiple: true
 
-      - name: Conferir os zips
-        run: ls -la dist && test -n "$(ls dist/*.zip 2>/dev/null)"
+      - name: Conferir os arquivos
+        run: |
+          ls -la dist
+          test -n "$(ls dist/*.zip 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.exe 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.pkg 2>/dev/null)"
+          # o plugin do Windows não pode depender do Visual C++ Redistributable (senão não abre em PCs sem ele)
+          d=$(mktemp -d); unzip -q dist/*-Windows.zip -d "$d"
+          dll=$(find "$d" -path '*x86_64-win*' -type f | head -1)
+          if objdump -p "$dll" | grep -iE 'DLL Name: (VCRUNTIME|MSVCP)'; then echo "::error::plugin depende do runtime do Visual C++"; exit 1; fi
 
       - uses: softprops/action-gh-release@v2
         if: ${{ inputs.tag == '' || inputs.tag == null }}
@@ -155,7 +182,10 @@ jobs:
           tag_name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: ${{ steps.ver.outputs.name }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
           body_path: RootsKeys/RELEASE_NOTES.md
           make_latest: 'false'
           overwrite_files: true
@@ -165,4 +195,7 @@ jobs:
         if: ${{ inputs.tag != '' && inputs.tag != null }}
         with:
           tag_name: ${{ inputs.tag }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg

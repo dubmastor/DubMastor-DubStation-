@@ -4,6 +4,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # Mastor Riddim Machine MRM-0420: Dub Chords + Dub Drums num só instrumento
+# Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 project(MastorRiddimMachine VERSION 1.2.0)
 
 set(CMAKE_CXX_STANDARD 17)

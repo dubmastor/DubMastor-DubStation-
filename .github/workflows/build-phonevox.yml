@@ -6,8 +6,16 @@ on:
     paths:
       - 'PhoneVox/**'
       - '.github/workflows/build-phonevox.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
     tags:
       - 'MPV-01-*'
+  pull_request:
+    paths:
+      - 'PhoneVox/**'
+      - '.github/workflows/build-phonevox.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
@@ -98,6 +106,11 @@ jobs:
           Copy-Item "build/MastorFone_artefacts/Release/Standalone/Mastor Phone Vox MPV-01.exe" out/ -ErrorAction SilentlyContinue
           Compress-Archive -Path out/* -DestinationPath ../MPV-01-Windows.zip
 
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Phone Vox MPV-01" -Sigla MPV-01 -Saida ../MPV-01-Windows-Instalador.exe
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -109,17 +122,23 @@ jobs:
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
           cd out && ditto -c -k --sequesterRsrc . ../../MPV-01-macOS.zip
 
+      - name: Instalador (macOS)
+        if: runner.os == 'macOS'
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Phone Vox MPV-01" MPV-01 ../MPV-01-macOS-Instalador.pkg
+
       - uses: actions/upload-artifact@v4
         with:
           name: MPV-01-${{ matrix.name }}
-          path: MPV-01-${{ matrix.name }}.zip
+          path: |
+            MPV-01-${{ matrix.name }}.zip
+            MPV-01-${{ matrix.name }}-Instalador.*
 
   # Release própria do MPV-01 (antigo Mastor Fone): MPV-01-<versão do CMakeLists>, criada/atualizada a cada
   # push na main que mexa no plugin (ou por tag MPV-01-x.y). Não vira a "latest", para não mexer nos
   # links /releases/latest/download dos outros plugins.
   release:
     needs: build
-    if: ${{ !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MPV-01-') || inputs.tag != '') }}
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MPV-01-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -148,6 +167,17 @@ jobs:
 
       # release própria MPV-01-<versão> (push na main ou tag MPV-01-x.y)
       # (se o GitHub não deixar criar a release, o build continua valendo: os zips vão pela release existente)
+      - name: Conferir os arquivos
+        run: |
+          ls -la dist
+          test -n "$(ls dist/*.zip 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.exe 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.pkg 2>/dev/null)"
+          # o plugin do Windows não pode depender do Visual C++ Redistributable (senão não abre em PCs sem ele)
+          d=$(mktemp -d); unzip -q dist/*-Windows.zip -d "$d"
+          dll=$(find "$d" -path '*x86_64-win*' -type f | head -1)
+          if objdump -p "$dll" | grep -iE 'DLL Name: (VCRUNTIME|MSVCP)'; then echo "::error::plugin depende do runtime do Visual C++"; exit 1; fi
+
       - uses: softprops/action-gh-release@v2
         if: ${{ inputs.tag == '' || inputs.tag == null }}
         continue-on-error: true
@@ -155,7 +185,10 @@ jobs:
           tag_name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
           body_path: PhoneVox/RELEASE_NOTES.md
           make_latest: 'false'
 
@@ -164,4 +197,7 @@ jobs:
         if: ${{ inputs.tag != '' && inputs.tag != null }}
         with:
           tag_name: ${{ inputs.tag }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg

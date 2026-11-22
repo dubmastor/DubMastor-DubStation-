@@ -5,6 +5,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # versão: aparece no título da interface ("... MRDBI-07 1.5") e no plugin
+# Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 project(DubBass VERSION 1.5.0)
 
 set(CMAKE_CXX_STANDARD 17)

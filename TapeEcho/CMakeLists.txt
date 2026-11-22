@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
+# Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 project(FitaEco VERSION 2.6.0)
 
 set(CMAKE_CXX_STANDARD 17)

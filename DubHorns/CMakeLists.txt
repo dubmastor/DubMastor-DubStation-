@@ -8,6 +8,8 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 file(STRINGS Source/Version.h HORNS_VERSION_LINE REGEX "MASTOR_HORNS_VERSION \"[0-9.]+\"")
 string(REGEX MATCH "[0-9]+\\.[0-9]+(\\.[0-9]+)?" HORNS_VERSION "${HORNS_VERSION_LINE}")
 
+# Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 project(MastorDubHorns VERSION ${HORNS_VERSION})
 
 set(CMAKE_CXX_STANDARD 17)
