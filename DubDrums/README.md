@@ -4,7 +4,7 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorDubDrumsMachine-Windows.zip)** · **[⬇️ macOS](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorDubDrumsMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MastorDubDrumsMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MastorDubDrumsMachine-macOS.zip)**
 
 ![Interface do MDDM-12](docs/interface.png)
 
