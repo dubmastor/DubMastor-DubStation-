@@ -4,14 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-      - 'BassMachine/**'
-      - 'DubBass/Source/BassVoice.h'
-      - 'DubBass/Source/Maximizer.h'
-      - 'DubDrums/Source/DrumSynth.h'
-      - 'DubDrums/Source/PatternGenerator.h'
-      - 'DubChords/Source/DubSynth.h'
+      - 'ReggaeBassMachine/**'
+      - 'ReggaeDubBassInstrument/Source/BassVoice.h'
+      - 'ReggaeDubBassInstrument/Source/Maximizer.h'
+      - 'DubDrumsMachine/Source/DrumSynth.h'
+      - 'DubDrumsMachine/Source/PatternGenerator.h'
+      - 'ReggaeChordMachine/Source/DubSynth.h'
       - 'RootsKeys/Source/RootsKeysEngine.h'
-      - '.github/workflows/build-bassmachine.yml'
+      - '.github/workflows/build-reggaebassmachine.yml'
     tags:
       - 'MRBM-69-*'
   workflow_dispatch:
@@ -26,7 +26,7 @@ permissions:
 
 defaults:
   run:
-    working-directory: BassMachine
+    working-directory: ReggaeBassMachine
 
 jobs:
   engine-test:
@@ -134,14 +134,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            BassMachine/RELEASE_NOTES.md
-            BassMachine/CMakeLists.txt
+            ReggaeBassMachine/RELEASE_NOTES.md
+            ReggaeBassMachine/CMakeLists.txt
           sparse-checkout-cone-mode: false
 
       - name: Versão
         id: ver
         run: |
-          V=$(sed -n 's/^project(BassMachine VERSION \([0-9]*\.[0-9]*\).*/\1/p' BassMachine/CMakeLists.txt)
+          V=$(sed -n 's/^project(BassMachine VERSION \([0-9]*\.[0-9]*\).*/\1/p' ReggaeBassMachine/CMakeLists.txt)
           echo "Versão do Reggae Bass Machine: $V"
           test -n "$V"
           echo "tag=MRBM-69-$V" >> "$GITHUB_OUTPUT"
@@ -158,5 +158,5 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           files: dist/*.zip
-          body_path: BassMachine/RELEASE_NOTES.md
+          body_path: ReggaeBassMachine/RELEASE_NOTES.md
           make_latest: 'false'

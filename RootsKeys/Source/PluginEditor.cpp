@@ -490,7 +490,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.drawText ("ROOTS KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
-        g.drawText ("DIGITAL PIANO SYNTHESIS  RK-1  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
+        g.drawText ("DIGITAL PIANO SYNTHESIS  MRK-80  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
         g.setFont (VintageLookAndFeel::mono (10.0f, false));
         g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 

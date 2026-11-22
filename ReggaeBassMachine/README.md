@@ -71,8 +71,8 @@ O MIDI arrastado/exportado continua sendo **só o baixo**. O nível do baixo fic
 ## Para desenvolvedores
 - `Source/BassEngine.h`: lógica das linhas (C++ puro). Cada estilo é um "livro" de células de um compasso (grooves e viradas) com graus (R, 3, 5, 7, oitava, quinta grave, aproximação...), swing e microtempo próprios.
 - `Source/AccompEngine.h`: padrões da bateria e do teclado e o kit eletrônico (C++ puro).
-- `Source/DubBassTimbre.h`: preview com o sistema de timbres do Dub Bass (inclui `DubBass/Source/BassVoice.h` e `Maximizer.h`).
-- Bateria acústica: `DubDrums/Source/DrumSynth.h`. Teclado: `DubChords/Source/DubSynth.h` + `RootsKeys/Source/RootsKeysEngine.h`.
+- `Source/DubBassTimbre.h`: preview com o sistema de timbres do Dub Bass (inclui `ReggaeDubBassInstrument/Source/BassVoice.h` e `Maximizer.h`).
+- Bateria acústica: `DubDrumsMachine/Source/DrumSynth.h`. Teclado: `ReggaeChordMachine/Source/DubSynth.h` + `RootsKeys/Source/RootsKeysEngine.h`.
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, PLAY, MIDI, mixagem do preview.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob / Dub Chords, osciloscópio do Mastor Fone, botoeira intertravada).
 - `tests/engine_test.cpp`: teste dos 7 estilos e do acompanhamento.

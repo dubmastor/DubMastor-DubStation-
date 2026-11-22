@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'MastorFone/**'
-      - '.github/workflows/build-mastorfone.yml'
+      - 'PhoneVox/**'
+      - '.github/workflows/build-phonevox.yml'
     tags:
       - 'MPV-01-*'
   workflow_dispatch:
@@ -20,7 +20,7 @@ permissions:
 
 defaults:
   run:
-    working-directory: MastorFone
+    working-directory: PhoneVox
 
 jobs:
   dsp-test:
@@ -128,14 +128,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            MastorFone/RELEASE_NOTES.md
-            MastorFone/CMakeLists.txt
+            PhoneVox/RELEASE_NOTES.md
+            PhoneVox/CMakeLists.txt
           sparse-checkout-cone-mode: false
 
       - name: Versão
         id: ver
         run: |
-          V=$(sed -n 's/^project(MastorFone VERSION \([0-9]*\.[0-9]*\).*/\1/p' MastorFone/CMakeLists.txt)
+          V=$(sed -n 's/^project(MastorFone VERSION \([0-9]*\.[0-9]*\).*/\1/p' PhoneVox/CMakeLists.txt)
           echo "Versão do MPV-01: $V"
           test -n "$V"
           echo "tag=MPV-01-$V" >> "$GITHUB_OUTPUT"
@@ -156,7 +156,7 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           files: dist/*.zip
-          body_path: MastorFone/RELEASE_NOTES.md
+          body_path: PhoneVox/RELEASE_NOTES.md
           make_latest: 'false'
 
       # só anexa os zips a uma release que já existe (sem mexer no nome nem nas notas dela)

@@ -24,7 +24,7 @@ Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU**
 
 A versão fica em [`Source/Version.h`](Source/Version.h). **Toda alteração sobe o número** (1.0 → 1.1 → 1.2 …) e ganha uma linha em [`RELEASE_NOTES.md`](RELEASE_NOTES.md) e no histórico dentro do plugin (botão da versão, no topo).
 
-A cada push no `main` que mexe nesta pasta, o workflow `build-mastordubhorns.yml` testa o motor, compila Windows e Mac, valida com o **pluginval** e o **auval** e publica a release `MastorDubHorns-<versão>`. Essa release não vira a "latest", para não mudar os links dos outros plugins.
+A cada push no `main` que mexe nesta pasta, o workflow `build-dubhorns.yml` testa o motor, compila Windows e Mac, valida com o **pluginval** e o **auval** e publica a release `MastorDubHorns-<versão>`. Essa release não vira a "latest", para não mudar os links dos outros plugins.
 
 ## Compilar
 

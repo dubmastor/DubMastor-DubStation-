@@ -30,14 +30,14 @@ carregue numa *Instrument Track*.
 | **EXPORTAR** | Salva o mesmo `.mid` (padrão: Documentos/MRM-0420) |
 
 ## Aba HARMONIA (Dub Chords)
-O painel completo do [Dub Chords](../DubChords/README.md): 4 acordes com teclado, maior/menor, inversão e
+O painel completo do [Dub Chords](../ReggaeChordMachine/README.md): 4 acordes com teclado, maior/menor, inversão e
 duração; padrão do skank, tamanho da nota, registro, velocity e swing; bubble de Hammond e som
 interno com o piano M1 e o Hammond. O **ARRASTE O MIDI** desta aba continua mandando só a harmonia.
 
 ## Aba BATERIA (Dub Drums)
 ![MRM-0420, aba BATERIA (Dub Drums)](docs/interface-bateria.png)
 
-O painel completo do [Dub Drums](../DubDrums/README.md): estilo, compassos, viradas, semente, hi-hat, os três
+O painel completo do [Dub Drums](../DubDrumsMachine/README.md): estilo, compassos, viradas, semente, hi-hat, os três
 bateristas, swing, dinâmica, aleatoriedade, bateria interna, canal, MIDI colorido e mapa de notas. O
 **ARRASTE O MIDI** desta aba continua mandando só a bateria.
 
@@ -56,7 +56,7 @@ bateristas, swing, dinâmica, aleatoriedade, bateria interna, canal, MIDI colori
   Na DAW, a automação vê o **Play riddim**, o **BPM** e o **Tamanho do riddim**.
 
 ## Para desenvolvedores
-O MRM-0420 não copia o código: ele compila os arquivos do `DubChords/Source` e do `DubDrums/Source` direto
+O MRM-0420 não copia o código: ele compila os arquivos do `ReggaeChordMachine/Source` e do `DubDrumsMachine/Source` direto
 das pastas deles, então melhorias nos dois plugins entram aqui no próximo build.
 - `Source/MrmProcessor.*`: roda os dois geradores no mesmo relógio (DAW ou PLAY RIDDIM), atrasa a
   harmonia pela intro (dividindo o bloco de áudio na amostra exata), soma o áudio, junta o MIDI, liga os

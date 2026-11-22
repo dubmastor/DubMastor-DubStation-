@@ -76,7 +76,7 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 - `Source/PluginProcessor.*` — parâmetros, presets, MIDI, medidores
 - `Source/PluginEditor.*` — interface com os dois visuais, abas e a placa Dub Station
 - `Source/DubChordsPage.*` — aba DUB CHORDS (cartões, ritmo, grade e arrastar MIDI)
-- `Source/DubChordsEngine.h` — motor de harmonia (cópia do `DubChords/Source/DubEngine.h`) + riddims prontos
+- `Source/DubChordsEngine.h` — motor de harmonia (cópia do `ReggaeChordMachine/Source/DubEngine.h`) + riddims prontos
 - `Source/VintageLookAndFeel.h` — knobs, faders, chaves e visor de cada visual
 - `Source/SkinTextures.h` — texturas procedurais (plástico preto e madeira)
 - `Source/VUMeter.h` — VU analógico

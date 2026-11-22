@@ -578,7 +578,7 @@ void FitaEcoEditor::paint (juce::Graphics& g)
     if (background.isValid())
         g.drawImage (background, getLocalBounds().toFloat());
 
-    // metal name plate: engraved "DUB STATION 2.6" and the tagline
+    // metal name plate: engraved "TAPE ECHO MTE-12" and the tagline
     const auto pl = plateArea;
     auto engraved = [&g] (const juce::String& t, juce::Rectangle<float> r, juce::Justification j, juce::Colour c)
     {
@@ -588,10 +588,10 @@ void FitaEcoEditor::paint (juce::Graphics& g)
         g.drawText (t, r, j);
     };
     g.setFont (juce::FontOptions (plateFace).withHeight (28.0f).withKerningFactor (0.04f));
-    engraved ("DUB STATION 2.6", { pl.getX() + 16, pl.getY() + 10, pl.getWidth() - 28, 40 },
+    engraved ("TAPE ECHO MTE-12", { pl.getX() + 16, pl.getY() + 10, pl.getWidth() - 28, 40 },
               juce::Justification::centredLeft, juce::Colour (0xff262626));
     g.setFont (juce::FontOptions (10.0f, juce::Font::bold).withKerningFactor (0.12f));
-    engraved (juce::String (juce::CharPointer_UTF8 ("TAPE ECHO  \xc2\xb7  SPRING REVERB")), { pl.getX() + 17, pl.getY() + 54, pl.getWidth() - 28, 14 },
+    engraved (juce::String (juce::CharPointer_UTF8 ("MASTOR  \xc2\xb7  SPRING REVERB  \xc2\xb7  DUB STATION 2.6")), { pl.getX() + 17, pl.getY() + 54, pl.getWidth() - 28, 14 },
               juce::Justification::centredLeft, juce::Colour (0xff3a3a3a));
 
     // bypass switch legends + effect lamp

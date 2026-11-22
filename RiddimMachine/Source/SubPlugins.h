@@ -3,7 +3,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 
 #include "DrumsNames.h"
-#include "../../DubDrums/Source/PluginEditor.h"
+#include "../../DubDrumsMachine/Source/PluginEditor.h"
 #include "DrumsNamesEnd.h"
 
-#include "../../DubChords/Source/PluginEditor.h"
+#include "../../ReggaeChordMachine/Source/PluginEditor.h"

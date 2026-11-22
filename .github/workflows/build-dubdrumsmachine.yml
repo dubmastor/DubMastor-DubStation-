@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'DubDrums/**'
-      - '.github/workflows/build-dubdrums.yml'
+      - 'DubDrumsMachine/**'
+      - '.github/workflows/build-dubdrumsmachine.yml'
     tags:
       - 'MDDM-12-*'
   workflow_dispatch:
@@ -20,7 +20,7 @@ permissions:
 
 defaults:
   run:
-    working-directory: DubDrums
+    working-directory: DubDrumsMachine
 
 jobs:
   render-test:
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: DubDrums-teste
-          path: DubDrums/test-out
+          path: DubDrumsMachine/test-out
 
   build:
     needs: render-test
@@ -161,14 +161,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            DubDrums/RELEASE_NOTES.md
-            DubDrums/CMakeLists.txt
+            DubDrumsMachine/RELEASE_NOTES.md
+            DubDrumsMachine/CMakeLists.txt
           sparse-checkout-cone-mode: false
 
       - name: Versão
         id: ver
         run: |
-          V=$(sed -n 's/^project(DubDrums VERSION \([0-9]*\.[0-9]*\).*/\1/p' DubDrums/CMakeLists.txt)
+          V=$(sed -n 's/^project(DubDrums VERSION \([0-9]*\.[0-9]*\).*/\1/p' DubDrumsMachine/CMakeLists.txt)
           echo "Versão do MDDM-12: $V"
           test -n "$V"
           echo "tag=MDDM-12-$V" >> "$GITHUB_OUTPUT"
@@ -195,5 +195,5 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.name }}
           files: dist/*.zip
-          body_path: DubDrums/RELEASE_NOTES.md
+          body_path: DubDrumsMachine/RELEASE_NOTES.md
           make_latest: 'false'

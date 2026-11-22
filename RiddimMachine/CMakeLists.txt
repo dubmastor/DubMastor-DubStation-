@@ -49,7 +49,7 @@ set(MRM_SOURCES
     Source/ChordsEditorUnit.cpp
     Source/DrumsProcessorUnit.cpp
     Source/DrumsEditorUnit.cpp
-    ../DubDrums/Source/PatternGenerator.cpp)
+    ../DubDrumsMachine/Source/PatternGenerator.cpp)
 set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
     ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)     # timbres do piano M1 / Hammond

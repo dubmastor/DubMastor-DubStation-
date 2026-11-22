@@ -3,4 +3,4 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "DrumsNames.h"
 #define createPluginFilter mrmUnused_createDubDrums
-#include "../../DubDrums/Source/PluginProcessor.cpp"
+#include "../../DubDrumsMachine/Source/PluginProcessor.cpp"

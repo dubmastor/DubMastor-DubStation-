@@ -7,10 +7,10 @@ on:
     branches: [main]
     paths:
       - 'RiddimMachine/**'
-      - 'DubChords/Source/**'
-      - 'DubDrums/Source/**'
+      - 'ReggaeChordMachine/Source/**'
+      - 'DubDrumsMachine/Source/**'
       - 'RootsKeys/Source/RootsKeysEngine.h'
-      - '.github/workflows/build-mrm0420.yml'
+      - '.github/workflows/build-riddimmachine.yml'
     tags:
       - 'MRM-0420-*'
   workflow_dispatch:

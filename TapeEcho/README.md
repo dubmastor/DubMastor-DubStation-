@@ -50,7 +50,7 @@ Tempos: cabeça 1 de 175 ms (lento) a 55 ms (rápido); cabeças 2 e 3 em 2× e 3
 
 ## Download
 
-O GitHub Actions compila sozinho a cada push nesta pasta (`.github/workflows/build-dubstation21.yml`):
+O GitHub Actions compila sozinho a cada push nesta pasta (`.github/workflows/build-tapeecho.yml`):
 - **Actions → "Build Mastor Tape Echo MTE-12" → última execução → Artifacts**: `MTE-12-Windows` e `MTE-12-macOS`.
 - Quando uma release é publicada na página de **Releases** do repositório, os zips (`MTE-12-macOS.zip` e `MTE-12-Windows.zip`) são anexados a ela automaticamente.
 
@@ -63,7 +63,7 @@ Requisitos: CMake ≥ 3.22, Git e um compilador C++17
 (Windows: Visual Studio 2022 · macOS: Xcode · Linux: g++ + pacotes de dev do JUCE).
 
 ```bash
-cd DubStation21
+cd TapeEcho
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
