@@ -2,6 +2,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "DubEngine.h"
 #include "RootsKeysSound.h"
+#include "HarmonyPresets.h"
 
 class DubChordsProcessor : public juce::AudioProcessor,
                            private juce::AudioProcessorValueTreeState::Listener,
@@ -54,6 +55,10 @@ public:
     bool hasEdits() const;
     void clearEdits();
 
+    // PRESETS de harmonia (banco DubStation por estilo e década, Source/HarmonyPresets.h)
+    void applyPreset (int index);                 // thread da interface: acordes, tipos, durações e ON
+    int  getLastPreset() const noexcept { return lastPreset.load(); }   // -1 = nenhum
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:
@@ -68,6 +73,7 @@ private:
     float param (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
     juce::String settingsKey() const;         // impressão digital dos controles que montam o loop
 
+    std::atomic<int> lastPreset { -1 };
     mutable juce::SpinLock editLock;
     std::vector<dub::NoteEvent> edits;
     double editsLoopBeats = 0.0;

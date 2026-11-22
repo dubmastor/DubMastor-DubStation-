@@ -63,6 +63,8 @@ public:
     double introBeats() const;                     // 4 com a VIRADA DE INTRO do MRDM-12 ligada
 
     void newRiddim();                              // JACKPOT: sorteia outra semente para a bateria e o baixo
+    void randomRiddim();                           // ALAVANCA: aleatoriedade total (harmonia, durações, estilo e
+                                                   // baterista, padrão do skank, baixista e semente)
 
     // MIDI: o riddim inteiro (só as máquinas ligadas) ou uma máquina só, como no plugin dela
     bool writeRiddimFile (const juce::File&) const;

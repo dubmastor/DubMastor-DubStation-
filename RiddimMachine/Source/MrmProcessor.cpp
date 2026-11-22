@@ -402,6 +402,76 @@ void MrmProcessor::newRiddim()
     timerCallback();   // bateria e baixo recebem a semente na hora
 }
 
+// ALAVANCA do JACKPOT: um riddim novo inteiro. Metade das vezes a harmonia vem do banco de PRESETS
+// (progressões clássicas por estilo); na outra metade é sorteada dentro de um tom (menor ou maior),
+// com os graus que o reggae mais usa. Tudo aparece na tela na hora; é só apertar PLAY.
+void MrmProcessor::randomRiddim()
+{
+    juce::Random rng;
+    auto set = [] (juce::AudioProcessorValueTreeState& s, const juce::String& id, float v)
+    {
+        if (auto* p = s.getParameter (id))
+        {
+            p->beginChangeGesture();
+            p->setValueNotifyingHost (p->convertTo0to1 (v));
+            p->endChangeGesture();
+        }
+    };
+
+    // --- harmonia
+    if (rng.nextBool())
+        chords.applyPreset (rng.nextInt (dubpresets::numPresets));
+    else
+    {
+        struct Deg { int semis; int minor; };
+        static const Deg minorKey[] = { { 5, 1 }, { 7, 1 }, { 8, 0 }, { 10, 0 }, { 3, 0 } };   // iv, v, VI, VII, III
+        static const Deg majorKey[] = { { 5, 0 }, { 7, 0 }, { 9, 1 }, { 2, 1 }, { 4, 1 } };   // IV, V, vi, ii, iii
+        const bool minor = rng.nextFloat() < 0.7f;
+        const int tonic = rng.nextInt (12);
+        const float r = rng.nextFloat();
+        const int n = r < 0.45f ? 2 : r < 0.75f ? 3 : 4;
+        int last = -1;
+        for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
+        {
+            const juce::String id (i);
+            if (i < n)
+            {
+                int root = tonic, isMinor = minor ? 1 : 0;
+                if (i > 0)
+                {
+                    int k;
+                    do { k = rng.nextInt (5); } while (k == last);
+                    last = k;
+                    const auto& d = minor ? minorKey[k] : majorKey[k];
+                    root = (tonic + d.semis) % 12;
+                    isMinor = d.minor;
+                }
+                const float dr = rng.nextFloat();
+                const int dur = n == 2 ? (dr < 0.3f ? 0 : dr < 0.85f ? 1 : 2) : (dr < 0.45f ? 0 : dr < 0.95f ? 1 : 2);
+                set (chords.apvts, "root" + id, (float) root);
+                set (chords.apvts, "qual" + id, (float) (isMinor ? dub::Min : dub::Maj));
+                set (chords.apvts, "dur" + id, (float) dur);
+                set (chords.apvts, "inv" + id, 0.0f);
+            }
+            if (i > 0) set (chords.apvts, "on" + id, i < n ? 1.0f : 0.0f);
+        }
+    }
+
+    // --- bateria: estilo (com o bumbo e a caixa dele), baterista e hi-hat
+    const int style = rng.nextInt (3);
+    set (drums.apvts, "style", (float) style);
+    drums.applyStyleDefaults (style);
+    set (drums.apvts, "drummer", (float) rng.nextInt (5));
+    set (drums.apvts, "hatPattern", (float) rng.nextInt (4));
+
+    // --- skank e baixista
+    set (chords.apvts, "pattern", (float) rng.nextInt (dub::NumPatterns));
+    set (bass.apvts, "style", (float) rng.nextInt (mbm::NumStyles));
+
+    syncLinks();       // o baixo recebe a harmonia nova agora
+    newRiddim();       // e a semente nova gira os rolos do JACKPOT
+}
+
 //==============================================================================
 juce::String MrmProcessor::suggestedRiddimName() const
 {

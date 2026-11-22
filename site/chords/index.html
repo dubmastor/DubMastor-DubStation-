@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Chord Machine MRCM-1240 1.6 — Dub Station</title>
+<title>Mastor Reggae Chord Machine MRCM-1240 1.7 — Dub Station</title>
 <meta name="description" content="Mastor Reggae Chord Machine MRCM-1240 no celular: escolha os acordes, ouça o skank de piano M1 e o bubble de Hammond e baixe o MIDI para a sua DAW.">
 <style>
 :root{
@@ -77,6 +77,9 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 .loop .seg{border-radius:3px;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--amber);font-size:13px;letter-spacing:.06em;min-width:0;overflow:hidden;
   background:rgba(255,169,40,.1);box-shadow:inset 0 0 0 1px rgba(255,169,40,.5);border-bottom:3px solid var(--chord)}
 .loop .head{position:absolute;top:2px;bottom:2px;width:2px;background:#ffe3a0;box-shadow:0 0 8px var(--amber);display:none}
+.presets{width:100%;margin:0 0 10px;padding:12px;border:0;border-radius:6px;font:800 13px/1 inherit;letter-spacing:.12em;color:var(--gold);cursor:pointer;
+  background:linear-gradient(180deg,#1e9c4c,#0b5a26);box-shadow:0 0 0 3px var(--label);font-family:inherit}
+.presets option,.presets optgroup{color:#1b140c;background:#efe5cc;letter-spacing:0}
 .hint{font-size:10px;letter-spacing:.1em;color:var(--ink2);font-weight:700;margin:8px 2px 0;line-height:1.5}
 .dock{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:rgba(46,26,13,.95);display:flex;gap:10px;z-index:5;backdrop-filter:blur(6px)}
 .dock .preview{padding:13px;font-size:16px}
@@ -89,7 +92,7 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE CHORD MACHINE MRCM-1240 <span id="ver">1.6</span></h1><div class="sub">RIDDIM CHORD GENERATOR · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE CHORD MACHINE MRCM-1240 <span id="ver">1.7</span></h1><div class="sub">RIDDIM CHORD GENERATOR · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -128,6 +131,7 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 </div>
 
 <section class="mod" style="margin-top:16px"><div class="tag">LOOP</div>
+  <select class="presets" id="presets" aria-label="Presets de harmonia"></select>
   <div class="loop" id="loop"><div class="head" id="head"></div></div>
   <div class="hint" id="loopInfo"></div>
 </section>
@@ -140,11 +144,12 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
   <button class="green" id="export2">⬇ MIDI</button></div>
 
 <script src="engine.js"></script>
+<script src="presets.js"></script>
 <script>
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '1.6';
+const VERSION = '1.7';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)
@@ -464,6 +469,30 @@ slider('pianoLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
 slider('organLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
 for (const id of ['preview', 'preview2']) $(id).onclick = () => setPreview(!audio.isPlaying());
 for (const id of ['export', 'export2']) $(id).onclick = download;
+// PRESETS: harmonias clássicas do reggae por estilo (o mesmo banco do plugin)
+(function presets() {
+  const P = window.DUB_PRESETS, sel = $('presets');
+  sel.innerHTML = '<option value="">PRESETS ▾  harmonias clássicas</option>';
+  P.folders.forEach((f) => {
+    const g = document.createElement('optgroup'); g.label = f;
+    P.presets.forEach((p, i) => {
+      if (p.folder !== f) return;
+      const o = document.createElement('option'); o.value = i;
+      o.textContent = `${p.name} (${p.era})  ${p.chords.map((c) => M.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')}`;
+      g.appendChild(o);
+    });
+    sel.appendChild(g);
+  });
+  sel.onchange = () => {
+    const p = P.presets[+sel.value]; if (!p) return;
+    st.slots.forEach((s, k) => {
+      const c = p.chords[k];
+      if (c) Object.assign(s, { root: c.root, quality: c.quality, dur: c.dur, inv: -1, on: true });
+      else s.on = false;
+    });
+    sel.value = ''; changed();
+  };
+})();
 render();
 
 (function anim() {

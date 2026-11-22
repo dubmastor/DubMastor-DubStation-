@@ -373,6 +373,36 @@ void DubChordsProcessor::renderSound (juce::AudioBuffer<float>& buffer, const ju
 }
 
 //==============================================================================
+// PRESETS de harmonia
+void DubChordsProcessor::applyPreset (int index)
+{
+    if (index < 0 || index >= dubpresets::numPresets) return;
+    const auto& pr = dubpresets::presets[index];
+    auto set = [this] (const juce::String& id, float v)
+    {
+        if (auto* p = apvts.getParameter (id))
+        {
+            p->beginChangeGesture();
+            p->setValueNotifyingHost (p->convertTo0to1 (v));
+            p->endChangeGesture();
+        }
+    };
+    for (int i = 0; i < numSlots; ++i)
+    {
+        const bool used = i < pr.numChords;
+        if (used)
+        {
+            set (rootId (i), (float) pr.chords[i].root);
+            set (qualId (i), (float) (pr.chords[i].minor ? dub::Min : dub::Maj));
+            set (durId (i),  (float) pr.chords[i].dur);
+            set (invId (i),  0.0f);   // AUTO
+        }
+        if (i > 0) set (onId (i), used ? 1.0f : 0.0f);
+    }
+    lastPreset.store (index);
+}
+
+//==============================================================================
 // MIDI editável
 juce::String DubChordsProcessor::settingsKey() const
 {

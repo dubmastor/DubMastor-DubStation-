@@ -179,12 +179,14 @@ private:
     PreviewButton previewBtn;
     std::unique_ptr<ButtonAttach> previewAtt;
     juce::TextButton exportBtn { "EXPORTAR" };
+    juce::TextButton presetBtn { juce::String::fromUTF8 ("PRESETS \xe2\x96\xbe") };
+    void showPresets();
     MidiDragZone dragZone;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
     juce::Rectangle<int> woodL, woodR, plate;
-    juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline;
+    juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline, loopRow;
     std::array<bool, DubChordsProcessor::numSlots> lastOn {};
     dub::Voicings voicings;   // atualizado pelo timer (inversões sugeridas/usadas)
 

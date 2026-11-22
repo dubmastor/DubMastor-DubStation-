@@ -634,6 +634,9 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     reps.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     exportBtn.onClick = [this] { exportMidi(); };
     addAndMakeVisible (exportBtn);
+    presetBtn.onClick = [this] { showPresets(); };
+    presetBtn.setTooltip (juce::String::fromUTF8 ("Harmonias clássicas por estilo: roots, rockers, rub a dub, lovers rock, dancehall digital e new roots"));
+    addAndMakeVisible (presetBtn);
     addAndMakeVisible (dragZone);
 
     voicings = proc.getVoicings();
@@ -1000,7 +1003,7 @@ void DubChordsPanel::renderBackground()
     section (rhythmPanel, "RITMO");
     section (soundPanel,  "SOM");
     section (midiPanel,   "MIDI");
-    section (timeline.expanded (10, 14).withTrimmedBottom (2), "LOOP");
+    section (loopRow.expanded (10, 14).withTrimmedBottom (2), "LOOP");
 
     // --- escalas
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
@@ -1196,6 +1199,33 @@ void DubChordsPanel::resized()
         dragZone.setBounds (a.removeFromTop (60));
     }
 
-    timeline = { 62, 788, W - 124, 34 };
+    loopRow  = { 62, 788, W - 124, 34 };
+    presetBtn.setBounds (loopRow.withWidth (150));
+    timeline = loopRow.withTrimmedLeft (162);
     renderBackground();
+}
+
+//==============================================================================
+// PRESETS: um submenu por estilo, com a década e os acordes de cada preset
+void DubChordsPanel::showPresets()
+{
+    juce::PopupMenu menu;
+    menu.addSectionHeader (juce::String::fromUTF8 ("HARMONIAS CLÁSSICAS DO REGGAE"));
+    for (int f = 0; f < dubpresets::numFolders; ++f)
+    {
+        juce::PopupMenu sub;
+        for (int i = 0; i < dubpresets::numPresets; ++i)
+        {
+            const auto& pr = dubpresets::presets[i];
+            if (juce::String (pr.folder) != dubpresets::folders[f]) continue;
+            juce::StringArray ch;
+            for (int k = 0; k < pr.numChords; ++k)
+                ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
+            sub.addItem (i + 1, juce::String::fromUTF8 (pr.name) + "   (" + pr.era + ")   " + ch.joinIntoString (" - "),
+                         true, proc.getLastPreset() == i);
+        }
+        menu.addSubMenu (dubpresets::folders[f], sub);
+    }
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presetBtn),
+                        [this] (int r) { if (r > 0) { proc.applyPreset (r - 1); repaint(); } });
 }

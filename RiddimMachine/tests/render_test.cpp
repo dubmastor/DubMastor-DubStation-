@@ -1,5 +1,6 @@
 // Teste do MRM-0420 sem DAW.
 //   mrm_render riddim.png 0            -> imagem da aba (0 RIDDIM, 1 HARMONIA, 2 BATERIA, 3 BAIXO, 4 BIG KNOB)
+//   mrm_render riddim.png 0 alavanca   -> a mesma imagem depois de puxar a ALAVANCA (riddim 100% aleatório)
 //   mrm_render riddim.mid [intro]      -> o MIDI do ARRASTE O RIDDIM (faixas, tamanho, harmonia e baixo depois da intro)
 //   mrm_render play.wav [intro]        -> 12 s do PLAY RIDDIM com as três máquinas e o Big Knob
 //   mrm_render daw.wav intro           -> DAW tocando do zero: harmonia e baixo entram depois da intro
@@ -8,6 +9,7 @@
 //   mrm_render maquinas                -> ARRASTE de cada máquina e máquina desligada fora do riddim
 //   mrm_render samples                 -> o kit da bateria é o dos samples DM (os WAVs de DubDrums/Samples)
 //   mrm_render estado                  -> salva e recarrega o estado (aba, BPM, harmonia, edições, Big Knob)
+#include "../../DubChords/Source/HarmonyPresets.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/MrmProcessor.h"
 #include "../Source/MrmEditor.h"
@@ -98,6 +100,77 @@ int main (int argc, char** argv)
         ok = ok && s != 42 && (int) get (proc.getDrums().apvts, "seed") == s && (int) get (b, "seed") == s;
         ok = ok && get (b, "drumsOn") < 0.5f && get (b, "keysOn") < 0.5f;
         std::printf ("links: %s (semente nova %d)\n", ok ? "ok" : "FALHOU", s);
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "inicial")
+    {
+        // configuração inicial: Lá menor e Ré menor, meio compasso cada (2 acordes)
+        auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
+        bool ok = (int) get (c, "root0") == 9 && (int) get (c, "qual0") == dub::Min && (int) get (c, "root1") == 2 && (int) get (c, "qual1") == dub::Min
+               && get (c, "on1") > 0.5f && get (c, "on2") < 0.5f && get (c, "on3") < 0.5f
+               && (int) get (b, "root0") == 9 && (int) get (b, "root1") == 2 && get (b, "on2") < 0.5f;
+        std::printf ("inicial: %s (Am %s, Dm %s)\n", ok ? "ok" : "FALHOU",
+                     proc.getChords().apvts.getParameter ("dur0")->getCurrentValueAsText().toRawUTF8(),
+                     proc.getChords().apvts.getParameter ("dur1")->getCurrentValueAsText().toRawUTF8());
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "presets")
+    {
+        // banco de presets: cada um aplica raiz/qualidade/duração e liga só os acordes do preset; o baixo segue
+        auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
+        bool ok = dubpresets::numPresets >= 30 && dubpresets::numFolders >= 4;
+        for (int i = 0; i < dubpresets::numPresets && ok; ++i)
+        {
+            const auto& pr = dubpresets::presets[i];
+            proc.getChords().applyPreset (i);
+            pump();
+            for (int k = 0; k < 4; ++k)
+            {
+                const juce::String n (k);
+                const bool on = k == 0 || get (c, "on" + n) > 0.5f;
+                if (on != (k < pr.numChords)) ok = false;
+                if (k < pr.numChords && ((int) get (c, "root" + n) != pr.chords[k].root || (int) get (b, "root" + n) != pr.chords[k].root
+                                         || ((int) get (c, "qual" + n) == dub::Min) != pr.chords[k].minor)) ok = false;
+            }
+            if (! ok) std::printf ("preset %d (%s) FALHOU\n", i, pr.name);
+        }
+        std::printf ("presets: %s (%d presets em %d pastas)\n", ok ? "ok" : "FALHOU", dubpresets::numPresets, dubpresets::numFolders);
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "aleatorio")
+    {
+        // ALAVANCA: sorteia harmonia, durações, baterista e estilo; tudo fica nos parâmetros (na tela) e o baixo segue
+        auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts; auto& d = proc.getDrums().apvts;
+        auto snap = [&] { juce::String s; for (int k = 0; k < 4; ++k) s << get (c, "root" + juce::String (k)) << get (c, "dur" + juce::String (k)) << (k == 0 ? 1.0f : get (c, "on" + juce::String (k)));
+                          return s + juce::String (get (d, "style")) + juce::String (get (d, "drummer")) + juce::String (get (proc.apvts, "seed")); };
+        juce::StringArray seen;
+        bool linked = true;
+        int harmonyChanges = 0, drumChanges = 0;
+        const auto start = snap();
+        float lastStyle = get (d, "style"), lastDrummer = get (d, "drummer");
+        juce::String lastHarm = start.substring (0, 12);
+        for (int i = 0; i < 12; ++i)
+        {
+            proc.randomRiddim();
+            pump();
+            const auto s = snap();
+            seen.addIfNotAlreadyThere (s);
+            if (s.substring (0, 12) != lastHarm) ++harmonyChanges;
+            if (get (d, "style") != lastStyle || get (d, "drummer") != lastDrummer) ++drumChanges;
+            lastHarm = s.substring (0, 12); lastStyle = get (d, "style"); lastDrummer = get (d, "drummer");
+            for (int k = 0; k < 4; ++k)
+            {
+                const juce::String n (k);
+                if ((int) get (b, "root" + n) != (int) get (c, "root" + n) || (int) get (b, "dur" + n) != (int) get (c, "dur" + n)) linked = false;
+            }
+            if ((int) get (b, "seed") != (int) get (proc.apvts, "seed")) linked = false;
+        }
+        const bool ok = seen.size() >= 10 && harmonyChanges >= 8 && drumChanges >= 6 && linked && get (proc.apvts, "play") < 0.5f;
+        std::printf ("aleatorio: %s (%d riddims diferentes, harmonia mudou %d/12, bateria mudou %d/12, baixo ligado: %s)\n",
+                     ok ? "ok" : "FALHOU", seen.size(), harmonyChanges, drumChanges, linked ? "sim" : "nao");
         return ok ? 0 : 1;
     }
 
@@ -330,6 +403,7 @@ int main (int argc, char** argv)
 
     // imagem de uma aba
     proc.setCurrentTab (arg2.getIntValue());
+    if (argc > 3 && juce::String (argv[3]) == "alavanca") { proc.randomRiddim(); pump(); }   // imagem depois de puxar a ALAVANCA
     std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditor());
     ed->setSize (MrmRoot::baseW, MrmRoot::baseH);
     pump (14);

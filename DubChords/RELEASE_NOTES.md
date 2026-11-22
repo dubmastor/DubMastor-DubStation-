@@ -1,3 +1,18 @@
+## Mastor Reggae Chord Machine MRCM-1240 1.7 🟢🟡⚫
+
+- **PRESETS de harmonia:** botão verde **PRESETS ▾** na faixa do LOOP, com 39 progressões clássicas do reggae em pastas por estilo: **ROOTS**, **ROCKERS**, **RUB A DUB**, **LOVERS ROCK**, **DANCEHALL DIGITAL** e **NEW ROOTS 2000** (anos 70, 80, 90 e 2000). Ajusta acordes, durações e quais ficam ligados
+- **Configuração inicial** continua Lá menor e Ré menor, meio compasso cada
+- O mesmo banco de presets na versão para celular e no **Mastor Riddim Machine MRM-0420**
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+No Mac, depois de copiar o `.vst3`:
+```
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
+```
+
+---
+
 ## Mastor Reggae Chord Machine MRCM-1240 1.6 🟢🟡⚫
 
 - **Bubble de Hammond com as duas mãos (MIDI melhorado):** em cada tempo, mão esquerda no "e" e no "a" (grave) e mão direita no contratempo, junto do skank, como os organistas de reggae tocam

@@ -1,5 +1,6 @@
 #include "MrmMain.h"
 #include "MrmStyle.h"
+#include "../../DubChords/Source/HarmonyPresets.h"
 
 #ifndef MRM_DRUMS_VER
  #define MRM_DRUMS_VER ""
@@ -312,6 +313,17 @@ void DrumLane::paint (juce::Graphics& g)
 {
     const double intro = pattern.introLengthInBeats, total = intro + pattern.lengthInBeats;
     paintFrame (g, total, intro, proc.getDrums().getPlayheadBeat(), drumRowNames());
+    {
+        // estilo e hi-hat da bateria (a ALAVANCA sorteia os dois): sempre à vista
+        auto& d = proc.getDrums().apvts;
+        const char* hats[] = { "HI-HAT 1/8", "HI-HAT 1/16", "HI-HAT CONTRATEMPO", "HI-HAT TERCINAS" };
+        const auto style = (dubdrums::Style) juce::roundToInt (d.getRawParameterValue ("style")->load());
+        const int hat = juce::jlimit (0, 3, juce::roundToInt (d.getRawParameterValue ("hatPattern")->load()));
+        g.setColour (col::amber.withAlpha (0.85f));
+        g.setFont (stencil (8.0f, 0.15f));
+        g.drawText (juce::String (dubdrums::styleName (style)).toUpperCase() + u8 ("  \xc2\xb7  ") + hats[hat],
+                    getLocalBounds().toFloat().reduced (8.0f, 3.0f).withHeight (10.0f), juce::Justification::centredRight);
+    }
     if (total <= 0.0) return;
     const float cellW = xOfBeat (0.25, total) - xOfBeat (0.0, total);
     auto draw = [&] (const dubdrums::NoteEvent& e, double at)
@@ -607,14 +619,98 @@ void JackpotButton::paint (juce::Graphics& g)
     g.drawRoundedRectangle (cap, cap.getHeight() * 0.5f, 1.2f);
 
     auto txt = cap.reduced (10.0f, 6.0f);
-    g.setFont (stencil (juce::jmin (25.0f, txt.getHeight() * 0.42f), 0.12f));
+    g.setFont (stencil (juce::jmin (25.0f, txt.getHeight() * 0.42f, txt.getWidth() * 0.115f), 0.08f));
     g.setColour (juce::Colour (0xff4a0d05));
-    g.drawText ("NOVO RIDDIM", txt.withTrimmedBottom (txt.getHeight() * 0.3f).translated (0, 1.5f), juce::Justification::centred);
+    g.drawText ("NOVO RIDDIM", txt.withTrimmedBottom (txt.getHeight() * 0.3f).translated (0, 1.5f), juce::Justification::centred, false);
     g.setColour (juce::Colour (0xfffff3d6));
-    g.drawText ("NOVO RIDDIM", txt.withTrimmedBottom (txt.getHeight() * 0.3f), juce::Justification::centred);
+    g.drawText ("NOVO RIDDIM", txt.withTrimmedBottom (txt.getHeight() * 0.3f), juce::Justification::centred, false);
     g.setFont (stencil (9.5f, 0.3f));
     g.setColour (col::jamGold.withAlpha (0.95f));
-    g.drawText (spinning ? "GIRANDO..." : "GIRAR O JACKPOT", txt.withTrimmedTop (txt.getHeight() * 0.68f), juce::Justification::centred);
+    g.drawText (spinning ? "GIRANDO..." : "NOVA SEMENTE", txt.withTrimmedTop (txt.getHeight() * 0.68f), juce::Justification::centred);
+}
+
+//==============================================================================
+// JackpotLever
+void JackpotLever::mouseDown (const juce::MouseEvent&)
+{
+    if (state == State::Going || state == State::Returning) return;
+    state = State::Dragging;
+    dragStartPull = pull;
+    fired = false;
+}
+
+void JackpotLever::mouseDrag (const juce::MouseEvent& e)
+{
+    if (state != State::Dragging) return;
+    pull = juce::jlimit (0.0f, 1.0f, dragStartPull + (float) e.getDistanceFromDragStartY() / ((float) getHeight() * 0.6f));
+    if (pull >= 0.98f && ! fired) { fired = true; if (onPull) onPull(); }
+    repaint();
+}
+
+void JackpotLever::mouseUp (const juce::MouseEvent&)
+{
+    if (state != State::Dragging) return;
+    state = fired ? State::Returning : State::Going;   // clique (ou puxada curta): a alavanca desce sozinha
+}
+
+void JackpotLever::tick (double dt)
+{
+    const float before = pull;
+    if (state == State::Going)
+    {
+        pull = juce::jmin (1.0f, pull + (float) dt * 6.0f);
+        if (pull >= 1.0f) { if (! fired && onPull) onPull(); fired = true; state = State::Returning; }
+    }
+    else if (state == State::Returning)
+    {
+        pull = juce::jmax (0.0f, pull - (float) dt * 3.2f);
+        if (pull <= 0.0f) state = State::Idle;
+    }
+    if (pull != before) repaint();
+}
+
+void JackpotLever::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat();
+    const float cx = r.getCentreX();
+    // caixa da alavanca (cromada) presa no lado da máquina
+    auto base = juce::Rectangle<float> (juce::jmin (r.getWidth() - 10.0f, 76.0f), 44.0f).withCentre ({ cx, r.getBottom() - 26.0f });
+    juce::ColourGradient chrome (juce::Colour (0xfff2f0ea), base.getX(), base.getY(), juce::Colour (0xff5e5a52), base.getX(), base.getBottom(), false);
+    chrome.addColour (0.5, juce::Colour (0xffbab6ad));
+    g.setColour (juce::Colours::black.withAlpha (0.4f));
+    g.fillRoundedRectangle (base.translated (1.5f, 3.0f), 8.0f);
+    g.setGradientFill (chrome);
+    g.fillRoundedRectangle (base, 8.0f);
+    auto slot = juce::Rectangle<float> (10.0f, base.getHeight() - 12.0f).withCentre (base.getCentre());
+    g.setColour (juce::Colour (0xff141210));
+    g.fillRoundedRectangle (slot, 4.0f);
+
+    // haste: gira na frente da caixa (em cima -> para a frente/baixo)
+    const float pivotY = base.getY() + 10.0f;
+    const float L = pivotY - r.getY() - 20.0f;
+    const float ballY = pivotY - L + pull * (L + 18.0f);
+    const float ballR = 17.0f + pull * 5.0f;   // a bola chega mais perto quando desce
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.drawLine (cx + 2.0f, pivotY + 2.0f, cx + 2.0f, ballY + 2.0f, 6.0f);
+    juce::ColourGradient rod (juce::Colour (0xff8d897f), cx - 3.0f, 0, juce::Colour (0xfff5f3ee), cx + 1.0f, 0, false);
+    rod.addColour (1.0, juce::Colour (0xff6e6a62));
+    g.setGradientFill (rod);
+    g.fillRect (juce::Rectangle<float> (cx - 3.0f, juce::jmin (pivotY, ballY), 6.0f, std::abs (ballY - pivotY)));
+    g.setColour (juce::Colour (0xff3a3632));
+    g.fillEllipse (juce::Rectangle<float> (12.0f, 12.0f).withCentre ({ cx, pivotY }));
+
+    // bola vermelha brilhante
+    auto ball = juce::Rectangle<float> (ballR * 2.0f, ballR * 2.0f).withCentre ({ cx, ballY });
+    g.setColour (col::jamRed.withAlpha (isMouseOver() ? 0.45f : 0.25f));
+    g.fillEllipse (ball.expanded (5.0f));
+    juce::ColourGradient bg (juce::Colour (0xffff8a6a), ball.getX() + ballR * 0.6f, ball.getY() + ballR * 0.5f,
+                             juce::Colour (0xff7e1a0e), ball.getRight(), ball.getBottom(), true);
+    g.setGradientFill (bg);
+    g.fillEllipse (ball);
+    g.setColour (juce::Colours::white.withAlpha (0.6f));
+    g.fillEllipse (juce::Rectangle<float> (ballR * 0.7f, ballR * 0.45f).withCentre ({ ball.getX() + ballR * 0.75f, ball.getY() + ballR * 0.55f }));
+    g.setColour (juce::Colours::black.withAlpha (0.4f));
+    g.drawEllipse (ball, 1.0f);
 }
 
 //==============================================================================
@@ -783,6 +879,10 @@ MainPage::MainPage (MrmProcessor& p)
     addAndMakeVisible (reels);
     addAndMakeVisible (jackpot);
     jackpot.onClick = [this] { proc.newRiddim(); };
+    addAndMakeVisible (lever);
+    lever.onPull = [this] { proc.randomRiddim(); };
+    presets.onClick = [this] { showPresets(); };
+    addAndMakeVisible (presets);
 
     // --- RIDDIM
     length = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("riddimBars"), [] (int i) -> std::pair<juce::String, juce::String>
@@ -827,6 +927,29 @@ void MainPage::exportRiddim()
                           });
 }
 
+void MainPage::showPresets()
+{
+    auto& c = proc.getChords();
+    juce::PopupMenu menu;
+    menu.addSectionHeader (u8 ("HARMONIAS CL\xc3\x81SSICAS DO REGGAE  \xc2\xb7  VALEM PARA O SKANK E O BAIXO"));
+    for (int f = 0; f < dubpresets::numFolders; ++f)
+    {
+        juce::PopupMenu sub;
+        for (int i = 0; i < dubpresets::numPresets; ++i)
+        {
+            const auto& pr = dubpresets::presets[i];
+            if (juce::String (pr.folder) != dubpresets::folders[f]) continue;
+            juce::StringArray ch;
+            for (int k = 0; k < pr.numChords; ++k)
+                ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
+            sub.addItem (i + 1, u8 (pr.name) + "   (" + pr.era + ")   " + ch.joinIntoString (" - "), true, c.getLastPreset() == i);
+        }
+        menu.addSubMenu (dubpresets::folders[f], sub);
+    }
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presets),
+                        [this] (int r) { if (r > 0) proc.getChords().applyPreset (r - 1); });
+}
+
 void MainPage::timerCallback()
 {
     // lanes e visores
@@ -845,7 +968,8 @@ void MainPage::timerCallback()
         row.lane->setAlpha (dim ? 0.45f : 1.0f);
     }
 
-    // JACKPOT: luzes sempre correndo; rolos girando depois do NOVO RIDDIM
+    // JACKPOT: luzes sempre correndo; rolos girando depois do NOVO RIDDIM; alavanca com mola
+    lever.tick (1.0 / 30.0);
     jackpot.phase += 1.0 / 30.0;
     jackpot.spinning = reels.animating();
     jackpot.repaint();
@@ -897,8 +1021,10 @@ void MainPage::resized()
     }
 
     // jackpot
-    reels.setBounds (68, 688, 226, 126);
-    jackpot.setBounds (306, 682, 252, 138);
+    reels.setBounds (64, 688, 156, 126);
+    jackpot.setBounds (226, 682, 196, 138);
+    lever.setBounds (432, 664, 96, 158);
+    presets.setBounds (1074, 8, 154, 28);
 
     // riddim
     length->setBounds (606, 686, 170, 40);
@@ -954,7 +1080,22 @@ void MainPage::renderBackground()
 
     section (g, harmonySection, u8 ("HARMONIA  \xc2\xb7  VALE PARA O SKANK E PARA O BAIXO"));
     section (g, machineSection, u8 ("M\xc3\x81QUINAS"));
-    section (g, jackpotSection, u8 ("JACKPOT  \xc2\xb7  SEMENTE"));
+    section (g, jackpotSection, u8 ("JACKPOT  \xc2\xb7  SEMENTE  \xc2\xb7  ALAVANCA"));
+    {
+        // placa da alavanca: o que ela sorteia
+        auto plate = juce::Rectangle<float> (526.0f, 688.0f, 40.0f, 126.0f);
+        g.setColour (juce::Colour (0xff1c1915));
+        g.fillRoundedRectangle (plate, 5.0f);
+        g.setColour (col::jamGold.withAlpha (0.8f));
+        g.drawRoundedRectangle (plate.reduced (2.0f), 4.0f, 1.0f);
+        const char* words[] = { "PUXE", "", "HAR", "MO", "NIA", "", "BATE", "RIA", "", "TUDO" };
+        g.setFont (stencil (8.5f, 0.12f));
+        for (int i = 0; i < 10; ++i)
+        {
+            g.setColour (i == 0 || i == 9 ? col::jamRed.brighter (0.4f) : col::jamGold);
+            g.drawText (words[i], plate.withHeight (11.0f).translated (0.0f, 8.0f + i * 11.0f), juce::Justification::centred);
+        }
+    }
     section (g, riddimSection, "RIDDIM");
 
     // plaquetas de cada máquina

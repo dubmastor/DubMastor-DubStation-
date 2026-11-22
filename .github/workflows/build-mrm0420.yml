@@ -70,6 +70,7 @@ jobs:
           $R bateria.png 2
           $R baixo.png 3
           $R control-room.png 4
+          $R alavanca.png 0 alavanca
           $R links
           $R samples
           $R edicao
@@ -80,6 +81,9 @@ jobs:
           $R play-riddim.wav intro
           $R daw-intro.wav intro
           $R estado
+          $R inicial
+          $R presets
+          $R aleatorio
 
       - uses: actions/upload-artifact@v4
         with:

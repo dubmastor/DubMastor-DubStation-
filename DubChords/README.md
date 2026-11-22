@@ -1,8 +1,8 @@
-# Mastor Reggae Chord Machine MRCM-1240 1.6
+# Mastor Reggae Chord Machine MRCM-1240 1.7
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.6/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.6/MastorReggaeChordMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-macOS.zip)**
 
 **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/chords/)**: monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
 
@@ -54,6 +54,23 @@ Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é m
 - **Cada acorde em uma cor:** no arquivo, as notas do acorde 1 vão no canal MIDI 1, as do acorde 2 no canal 2, e assim por diante. Na DAW, peça para colorir as notas por canal: no Cubase, no Key Editor, **Cores › Canal**; no REAPER, *Color notes by channel*; no FL Studio as cores já vêm separadas.
 - **EXPORTAR:** salva o `.mid` (padrão: Documentos/Mastor Reggae Chord Machine). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
+
+## PRESETS (banco de harmonias clássicas)
+O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de progressões clássicas do reggae, separadas em pastas por estilo.
+Escolher um preset ajusta os acordes, a duração de cada um e quais ficam ligados (inversão em AUTO); depois é só mexer à vontade.
+As progressões estão no tom em que costumam aparecer nos riddims citados (dá para transpor no teclado de cada acorde).
+
+| Pasta | Época | Exemplos |
+|---|---|---|
+| **ROOTS** | anos 70 | Satta (Am-Dm-Am-Em), Marcus Garvey (Am-G), Studio One I-IV, Wailers i-VII-VI, Real Rock (Bm-F#m), Nyabinghi de um acorde |
+| **ROCKERS** | anos 70 | Stalag (Cm-Bb), Channel One i-VII, Revolutionaries I-IV-V, dórico (Dm-G), melodica (Am-Em) |
+| **RUB A DUB** | anos 80 | Night Nurse (Am-G) e a ponte, Cuss Cuss (Dm-F-G), Roots Radics (Fm-Eb), Volcano (Cm-Fm-Bb) |
+| **LOVERS ROCK** | 70 a 90 | I-vi-IV-V, I-IV-V, ii-V-I soul, vi-IV-I-V, IV-V-iii-vi, crossover I-V-vi-IV |
+| **DANCEHALL DIGITAL** | 80 e 90 | Digital 85 de um acorde, Ring the Alarm (Stalag 85), ragga i-VII, Dancehall 92, Real Rock 94 |
+| **NEW ROOTS 2000** | anos 2000 | Full Up (Am-Dm), one drop i-VI-VII, juggling (Gm-Eb-F), conscious (Bm-G-A), pop reggae I-V-vi-IV |
+
+São 39 presets. O mesmo banco está no **MRM-0420** e nas versões para celular. Fonte única: `tools/harmony_presets.py`
+(gera `Source/HarmonyPresets.h` e `site/chords/presets.js`).
 
 ## Para desenvolvedores
 

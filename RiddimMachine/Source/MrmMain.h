@@ -155,6 +155,24 @@ private:
     bool down = false;
 };
 
+// ALAVANCA do JACKPOT: puxe (ou clique) e ela desce, solta e volta com mola; no fundo do curso sorteia tudo
+class JackpotLever : public juce::Component
+{
+public:
+    JackpotLever() { setMouseCursor (juce::MouseCursor::PointingHandCursor); setRepaintsOnMouseActivity (true); }
+    std::function<void()> onPull;
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void tick (double dt);          // animação (chamada pelo timer da página)
+    float pull = 0.0f;              // 0 = em cima, 1 = no fundo
+private:
+    enum class State { Idle, Dragging, Going, Returning } state = State::Idle;
+    float dragStartPull = 0.0f;
+    bool fired = false;
+};
+
 // Alto-falante antigo: caixa de madeira com grade de metal perfurada; o cone mexe com o som
 class GrilleSpeaker : public juce::Component
 {
@@ -222,6 +240,9 @@ private:
 
     JackpotReels reels;
     JackpotButton jackpot;
+    JackpotLever lever;
+    juce::TextButton presets { juce::String::fromUTF8 ("PRESETS \xe2\x96\xbe") };
+    void showPresets();
     std::unique_ptr<ChoiceWindow> length;
     DragZone riddimDrag;
     juce::TextButton exportBtn { "EXPORTAR" };
