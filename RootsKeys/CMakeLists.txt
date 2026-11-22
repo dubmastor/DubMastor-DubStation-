@@ -22,12 +22,15 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(RootsKeys
     COMPANY_NAME "DubMastor"
     BUNDLE_ID com.dubmastor.rootskeys
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Rtky
-    FORMATS VST3 AU Standalone
+    FORMATS VST3 AU Standalone ${DM_AAX}
     PRODUCT_NAME "Mastor Roots Keys MRK-80"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE

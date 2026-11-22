@@ -35,6 +35,7 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+
 juce_add_plugin(MastorRiddimMachine
     COMPANY_NAME                "DubStation"
     BUNDLE_ID                   com.dubmastor.mrm0420

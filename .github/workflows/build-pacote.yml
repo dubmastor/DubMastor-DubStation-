@@ -1,0 +1,251 @@
+name: Build Dub Station — instalador completo
+
+# Um instalador só com todos os plugins do plugins.json:
+#   DubStation-Windows-Instalador.exe  (VST3 + standalone; AAX quando assinado)
+#   DubStation-macOS-Instalador.pkg    (VST3 + AU + standalone; AAX quando assinado)
+# A versão do pacote fica no plugins.json ("pacote" → "versao") e a release é DubStation-<versão>.
+# Pro Tools: o AAX é compilado sempre (SDK do JUCE 8), mas só entra no instalador depois de
+# assinado pela PACE (secrets em PROTOOLS.md); sem assinatura vai para o artefato AAX-nao-assinado-*.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins.json'
+      - '.github/scripts/pacote.py'
+      - '.github/cmake/**'
+      - '.github/installer/**'
+      - '.github/workflows/build-pacote.yml'
+    tags:
+      - 'DubStation-*'
+  pull_request:
+    paths:
+      - 'plugins.json'
+      - '.github/scripts/pacote.py'
+      - '.github/cmake/**'
+      - '.github/installer/**'
+      - '.github/workflows/build-pacote.yml'
+  workflow_dispatch:
+    inputs:
+      publicar:
+        description: 'Publicar a release DubStation-<versão do plugins.json>'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  lista:
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.l.outputs.plugins }}
+      versao: ${{ steps.l.outputs.versao }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: l
+        run: |
+          echo "plugins=$(python3 .github/scripts/pacote.py lista)" >> "$GITHUB_OUTPUT"
+          V=$(python3 -c "import json;print(json.load(open('plugins.json'))['pacote']['versao'])")
+          test -n "$V"; echo "versao=$V" >> "$GITHUB_OUTPUT"; echo "Pacote $V"
+
+  build:
+    needs: lista
+    name: ${{ matrix.plugin.sigla }} (${{ matrix.os.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJson(needs.lista.outputs.plugins) }}
+        os:
+          - { runner: windows-latest, name: Windows }
+          - { runner: macos-latest, name: macOS }
+    runs-on: ${{ matrix.os.runner }}
+    env:
+      PACE_TOOLS_URL: ${{ secrets.PACE_TOOLS_URL }}
+      PACE_USERNAME: ${{ secrets.PACE_USERNAME }}
+      PACE_PASSWORD: ${{ secrets.PACE_PASSWORD }}
+      PACE_WCGUID: ${{ secrets.PACE_WCGUID }}
+      PACE_KEYFILE_B64: ${{ secrets.PACE_KEYFILE_B64 }}
+      PACE_KEYPASSWORD: ${{ secrets.PACE_KEYPASSWORD }}
+      MAC_CERT_P12_B64: ${{ secrets.MAC_CERT_P12_B64 }}
+      MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+      MAC_SIGN_ID: ${{ secrets.MAC_SIGN_ID }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout JUCE 8.0.4
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: 8.0.4
+          path: JUCE
+
+      - name: Configure
+        working-directory: ${{ matrix.plugin.pasta }}
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_DIR="$GITHUB_WORKSPACE/JUCE"
+
+      - name: Build
+        working-directory: ${{ matrix.plugin.pasta }}
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Coletar
+        run: python3 .github/scripts/pacote.py coletar "${{ matrix.plugin.pasta }}" "${{ matrix.plugin.sigla }}" dist
+
+      - name: Conferir runtime embutido (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m pip install --quiet pefile
+          python .github/scripts/conferir-runtime-windows.py "dist/${{ matrix.plugin.sigla }}"
+
+      # Assinatura PACE (obrigatória para o Pro Tools normal abrir o AAX)
+      - name: Assinar AAX (PACE wraptool)
+        run: |
+          D="dist/${{ matrix.plugin.sigla }}"; AAX="$D/${{ matrix.plugin.nome }}.aaxplugin"
+          if [ ! -d "$AAX" ]; then echo "sem-aax" > "$D/aax.txt"; echo "::warning::Sem AAX neste build."; exit 0; fi
+          if [ -z "$PACE_TOOLS_URL" ] || [ -z "$PACE_USERNAME" ] || [ -z "$PACE_WCGUID" ]; then
+            echo "nao-assinado" > "$D/aax.txt"
+            echo "::warning::AAX de ${{ matrix.plugin.sigla }} compilado mas NÃO assinado: só abre no Pro Tools Developer."
+            exit 0
+          fi
+          TMPD="$RUNNER_TEMP"; [ "$RUNNER_OS" = Windows ] && TMPD=$(cygpath -u "$RUNNER_TEMP")
+          curl -fsSL "$PACE_TOOLS_URL" -o pace.zip && mkdir -p "$TMPD/pace" && unzip -q pace.zip -d "$TMPD/pace"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            WT=$(find "$TMPD/pace" -iname 'wraptool.exe' | head -1)
+            echo "$PACE_KEYFILE_B64" | base64 -d > "$TMPD/pace.p12"
+            "$WT" sign --verbose --account "$PACE_USERNAME" --password "$PACE_PASSWORD" --wcguid "$PACE_WCGUID" \
+              --keyfile "$(cygpath -w "$TMPD/pace.p12")" --keypassword "$PACE_KEYPASSWORD" --in "$AAX" --out "$AAX"
+          else
+            WT=$(find "$TMPD/pace" -name 'wraptool' -type f | head -1); chmod +x "$WT"
+            KC="$RUNNER_TEMP/assinar.keychain-db"
+            security create-keychain -p temp "$KC" && security set-keychain-settings "$KC" && security unlock-keychain -p temp "$KC"
+            echo "$MAC_CERT_P12_B64" | base64 -d > "$RUNNER_TEMP/mac.p12"
+            security import "$RUNNER_TEMP/mac.p12" -k "$KC" -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -s -k temp "$KC" >/dev/null
+            security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+            "$WT" sign --verbose --account "$PACE_USERNAME" --password "$PACE_PASSWORD" --wcguid "$PACE_WCGUID" \
+              --signid "$MAC_SIGN_ID" --in "$AAX" --out "$AAX"
+          fi
+          echo "assinado" > "$D/aax.txt"
+
+      - name: Assinatura ad-hoc (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd "dist/${{ matrix.plugin.sigla }}"
+          for f in *.vst3 *.component *.app; do [ -e "$f" ] && codesign --force --deep -s - "$f"; done
+          for a in *.aaxplugin; do
+            [ -e "$a" ] && [ "$(cat aax.txt)" != "assinado" ] && codesign --force --deep -s - "$a"
+          done
+          lipo -info "${{ matrix.plugin.nome }}.vst3/Contents/MacOS/${{ matrix.plugin.nome }}"
+
+      # tar guarda permissões, links e assinatura dos bundles do Mac (o upload-artifact sozinho perde)
+      - name: Empacotar
+        run: tar -cf "pacote-${{ matrix.plugin.sigla }}.tar" -C dist "${{ matrix.plugin.sigla }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pacote-${{ matrix.os.name }}-${{ matrix.plugin.sigla }}
+          path: pacote-${{ matrix.plugin.sigla }}.tar
+          retention-days: 7
+
+  instalador:
+    needs: [lista, build]
+    if: ${{ !cancelled() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-latest, name: Windows, ext: exe }
+          - { runner: macos-latest, name: macOS, ext: pkg }
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: tars
+          pattern: pacote-${{ matrix.name }}-*
+          merge-multiple: true
+
+      - name: Abrir e separar o AAX
+        run: |
+          mkdir -p dist aax-teste
+          for t in tars/*.tar; do tar -xf "$t" -C dist; done
+          ls dist
+          ST=assinado; N=0
+          for d in dist/*/; do
+            s=$(cat "$d/aax.txt" 2>/dev/null || echo sem-aax)
+            for a in "$d"*.aaxplugin; do
+              [ -e "$a" ] || continue; N=$((N+1))
+              # AAX sem assinatura PACE não abre no Pro Tools normal: fica fora do instalador público
+              if [ "$s" != "assinado" ]; then mv "$a" aax-teste/; ST=nao-assinado; fi
+            done
+            [ "$s" = "sem-aax" ] && ST=sem-aax
+          done
+          [ "$N" = 0 ] && ST=sem-aax
+          echo "AAX_STATUS=$ST" >> "$GITHUB_ENV"; echo "AAX: $ST"
+
+      - name: Instalador completo
+        run: |
+          OUT="$GITHUB_WORKSPACE/DubStation-${{ matrix.name }}-Instalador.${{ matrix.ext }}"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            python .github/scripts/pacote.py windows dist "${{ needs.lista.outputs.versao }}" "$(cygpath -w "$OUT")"
+          else
+            python3 .github/scripts/pacote.py macos dist "${{ needs.lista.outputs.versao }}" "$OUT"
+            pkgutil --payload-files "$OUT" | grep -E '\.(vst3|component|aaxplugin|app)$' | sort -u
+          fi
+          ls -la "$OUT"
+          echo "$AAX_STATUS" > "aax-${{ matrix.name }}.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DubStation-${{ matrix.name }}
+          path: |
+            DubStation-${{ matrix.name }}-Instalador.${{ matrix.ext }}
+            aax-${{ matrix.name }}.txt
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ hashFiles('aax-teste/**') != '' }}
+        with:
+          name: AAX-nao-assinado-${{ matrix.name }}
+          path: aax-teste
+          retention-days: 7
+
+  release:
+    needs: [lista, instalador]
+    if: ${{ !cancelled() && needs.instalador.result == 'success' && github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/DubStation-') || inputs.publicar) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: DubStation-*
+          merge-multiple: true
+
+      - name: Conferir e escrever as notas
+        run: |
+          ls -la dist
+          test -f dist/DubStation-Windows-Instalador.exe
+          test -f dist/DubStation-macOS-Instalador.pkg
+          ST=assinado
+          for f in dist/aax-*.txt; do [ "$(cat "$f")" = assinado ] || ST=$(cat "$f"); done
+          AAX_STATUS=$ST python3 .github/scripts/pacote.py notas "${{ needs.lista.outputs.versao }}" > notas.md
+          cat notas.md
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: DubStation-${{ needs.lista.outputs.versao }}
+          target_commitish: ${{ github.sha }}
+          name: DubMastor Dub Station ${{ needs.lista.outputs.versao }} — instalador completo
+          body_path: notas.md
+          make_latest: 'false'
+          overwrite_files: true
+          files: |
+            dist/DubStation-Windows-Instalador.exe
+            dist/DubStation-macOS-Instalador.pkg

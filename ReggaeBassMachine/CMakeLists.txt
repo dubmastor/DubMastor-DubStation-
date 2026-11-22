@@ -26,6 +26,9 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 if(BASSMACHINE_PLUGIN)
     juce_add_plugin(BassMachine
         COMPANY_NAME               "DubMastor"
@@ -33,7 +36,7 @@ if(BASSMACHINE_PLUGIN)
         PRODUCT_NAME               "Mastor Reggae Bass Machine MRBM-69"
         PLUGIN_MANUFACTURER_CODE   Dblb
         PLUGIN_CODE                Mbm7
-        FORMATS                    VST3 AU Standalone
+        FORMATS                    VST3 AU Standalone ${DM_AAX}
         IS_SYNTH                   TRUE
         NEEDS_MIDI_INPUT           TRUE
         NEEDS_MIDI_OUTPUT          TRUE
