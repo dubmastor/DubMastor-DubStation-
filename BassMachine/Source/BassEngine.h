@@ -366,6 +366,14 @@ struct Settings
 
 inline int pc (int n) { return ((n % 12) + 12) % 12; }
 
+// c + a*b sempre em dois arredondamentos de float: impede que o compilador funda numa FMA
+// (cada compilador decide diferente), para o plugin dar a mesma linha no Windows, no Mac e no navegador
+inline float addMul (float c, float a, float b)
+{
+    volatile float p = a * b;
+    return c + p;
+}
+
 inline int fitRange (int n)
 {
     while (n < 28) n += 12;   // E1 (corda solta mais grave)
@@ -404,7 +412,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
     Rng rng ((uint64_t) (s.seed * 7919 + s.style * 104729 + 17));
     const float var = std::clamp (s.variation, 0.0f, 1.0f) * bk.varScale;
     const float swing = std::clamp (s.swing + bk.swing, 0.0f, 1.0f);
-    const float sustain = 0.35f + 0.85f * std::clamp (s.gate, 0.0f, 1.0f);
+    const float sustain = addMul (0.35f, 0.85f, std::clamp (s.gate, 0.0f, 1.0f));
 
     const int riff = rng.pick ((int) bk.main.size());   // identidade da linha (a mesma em todos os acordes)
     double pos = 0;
@@ -430,7 +438,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
             const bool phraseEnd = ((barCounter + 1) % bk.phraseBars) == 0;
 
             bool useFill = (lastBar && changes) || (phraseEnd && rng.uniform() < var);
-            if (lastBar && changes && rng.uniform() > 0.35f + 0.65f * var) useFill = false;  // nem toda troca tem virada
+            if (lastBar && changes && rng.uniform() > addMul (0.35f, 0.65f, var)) useFill = false;  // nem toda troca tem virada
             const Bar& bar = useFill ? bk.fills[(size_t) rng.pick ((int) bk.fills.size())] : bk.main[(size_t) cellIdx];
 
             const size_t firstOfBar = ev.size();
@@ -456,7 +464,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
                 else if (std::abs (frac - 0.25) < 1e-6 || std::abs (frac - 0.75) < 1e-6) st += swing * (1.0 / 12.0);
 
                 st += bk.lag;   // microtempo do estilo (Leroy Sibbles atrás do tempo)
-                const float human = 0.92f + 0.16f * rng.uniform();
+                const float human = addMul (0.92f, 0.16f, rng.uniform());
                 const int vel = std::clamp ((int) std::lround (c.vel * s.velocity * human * 127.0f), 1, 127);
                 ev.push_back ({ barStart + st, c.len * sustain, note, vel, slotIdx, useFill });
                 prevNote = note;
