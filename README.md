@@ -29,6 +29,14 @@ bubble, já alinhados, de 4 a 64 compassos) para a timeline. Um projeto começa 
 
 Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest)**. Não precisa de conta no GitHub para baixar.
 
+## Instalador completo (todos os plugins)
+
+Um instalador só com a coleção inteira — na instalação dá para desmarcar os que não quiser:
+
+- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-1.0/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
+- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-1.0/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
+- **Pro Tools (AAX):** em preparação — veja [PROTOOLS.md](PROTOOLS.md).
+
 ## Instalação no Cubase
 
 **Mac**

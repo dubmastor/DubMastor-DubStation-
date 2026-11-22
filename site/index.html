@@ -185,6 +185,11 @@
   }
   code { padding: 1px 5px; }
   pre { padding: 10px 12px; overflow-x: auto; margin: 8px 0 0; white-space: pre; }
+  .completo { background: linear-gradient(#2a2d2b, #1d201e); border: 1px solid #000; border-radius: 10px; padding: 20px 22px; margin: 0 0 26px; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  .completo h3 { margin: 0 0 6px; font-family: "Plate", Impact, sans-serif; font-weight: 400; font-size: 24px; letter-spacing: .03em; color: var(--cream); }
+  .completo h3 small { font-family: system-ui, sans-serif; font-weight: 700; font-size: 13px; color: var(--amber); letter-spacing: .08em; margin-left: 6px; }
+  .completo p { margin: 0 0 12px; color: #cfc8b4; }
+  .completo .dl { max-width: 560px; }
   .note { margin: 22px 0 0; color: #bdb6a2; font-size: 15px; }
 
   section { margin-bottom: 40px; }
@@ -220,6 +225,14 @@
   <main>
     <section id="downloads">
       <h2>DOWNLOADS</h2>
+      <div class="completo">
+        <h3>TODOS OS PLUGINS · INSTALADOR COMPLETO <small>1.0</small></h3>
+        <p>Um instalador só com a coleção inteira: Cubase, Ableton Live, FL Studio, Reaper, Studio One e Bitwig (VST3) e, no Mac, Logic e GarageBand (AU). Na instalação dá para desmarcar os que não quiser.</p>
+        <div class="dl">
+          <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-1.0/DubStation-Windows-Instalador.exe">⬇ Windows<span>todos os plugins · VST3</span></a>
+          <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-1.0/DubStation-macOS-Instalador.pkg">⬇ Mac<span>todos os plugins · VST3 + AU</span></a>
+        </div>
+      </div>
       <div class="plugins">
 
         <article class="card">
@@ -467,7 +480,7 @@
             <tr><td>Bitwig</td><td>VST3</td><td><em>Settings → Locations</em>: a pasta VST3 padrão deve estar ativa. Reinicie o Bitwig para escanear.</td></tr>
             <tr><td>Logic Pro</td><td>AU (só Mac)</td><td><em>Logic Pro → Settings → Plug-in Manager</em>: selecione o plugin e clique em <strong>Reset &amp; Rescan Selection</strong>. Instrumentos ficam em <em>AU Instruments → DubMastor</em>.</td></tr>
             <tr><td>GarageBand</td><td>AU (só Mac)</td><td>Reinicie o GarageBand depois de instalar. Instrumentos em <em>Plug-ins → AU Instruments → DubMastor</em>.</td></tr>
-            <tr><td>Pro Tools</td><td>AAX</td><td>Ainda não tem versão para Pro Tools (precisa do formato AAX). Use o programa standalone ou a versão para celular/navegador.</td></tr>
+            <tr><td>Pro Tools</td><td>AAX</td><td>A versão AAX está em preparação: o instalador completo já vem pronto para ela e vai incluir o Pro Tools assim que a assinatura da Avid for liberada. Por enquanto, use o programa standalone ou a versão para celular/navegador.</td></tr>
           </tbody>
         </table>
       </div>

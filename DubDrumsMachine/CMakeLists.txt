@@ -29,13 +29,16 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(DubDrums
     COMPANY_NAME                "DubMastor"
     BUNDLE_ID                   com.dubmastor.dubdrums
     PRODUCT_NAME                "Mastor Dub Drums Machine MDDM-12"
     PLUGIN_MANUFACTURER_CODE    Dblb
     PLUGIN_CODE                 Dbd1
-    FORMATS                     ${DD_FORMATS}
+    FORMATS                     ${DD_FORMATS} ${DM_AAX}
     IS_SYNTH                    TRUE
     NEEDS_MIDI_INPUT            TRUE
     NEEDS_MIDI_OUTPUT           TRUE
