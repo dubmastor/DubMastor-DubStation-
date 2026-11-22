@@ -7,13 +7,13 @@
 //   mrm_render links                   -> harmonia ligada (MRCM-1240 <-> MRBM-69), BPM único, semente do JACKPOT
 //   mrm_render edicao                  -> MIDI editável da harmonia, da bateria e do baixo vai para o riddim
 //   mrm_render maquinas                -> ARRASTE de cada máquina e máquina desligada fora do riddim
-//   mrm_render samples                 -> o kit da bateria é o dos samples DM (os WAVs de DubDrums/Samples)
+//   mrm_render samples                 -> o kit da bateria é o dos samples DM (os WAVs de ReggaeDrumMachine/Samples)
 //   mrm_render estado                  -> salva e recarrega o estado (aba, BPM, harmonia, edições, Big Knob)
 #include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/MrmProcessor.h"
 #include "../Source/MrmEditor.h"
-#include "../../DubDrumsMachine/Source/DMSamples.h"
+#include "../../ReggaeDrumMachine/Source/DMSamples.h"
 
 namespace
 {
@@ -214,7 +214,7 @@ int main (int argc, char** argv)
 
     if (arg1 == "samples")
     {
-        // kit 0 = "Anos 70 (samples DM)": os WAVs de DubDrums/Samples, embutidos em DMSamples.h
+        // kit 0 = "Anos 70 (samples DM)": os WAVs de ReggaeDrumMachine/Samples, embutidos em DMSamples.h
         const bool ok = (int) get (proc.getDrums().apvts, "kit") == 0
                      && dubdrums::dmsamples::kickSize > 1000 && dubdrums::dmsamples::snareSize > 1000 && dubdrums::dmsamples::hatSize > 1000;
         std::printf ("samples: kit %s, DM-KICKS1 %d bytes, DM-SNARES6 %d bytes, DM-HATs6 %d bytes\n",

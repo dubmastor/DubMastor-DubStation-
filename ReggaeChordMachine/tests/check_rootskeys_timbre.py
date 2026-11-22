@@ -3,10 +3,10 @@
 
 Lê RootsKeys/Source/PluginProcessor.cpp (valores de abertura dos parâmetros + presets
 "Piano: M1 Classic" e "Organ: Roots Percussion") e compara com as constantes de
-DubChords/Source/RootsKeysSound.h (rkdefaults::RootsKeysPiano / RootsKeysOrgan).
+ReggaeChordMachine/Source/RootsKeysSound.h (rkdefaults::RootsKeysPiano / RootsKeysOrgan).
 Se alguém mudar o timbre do Roots Keys e esquecer o MRCM-1240, o CI falha aqui.
 
-Uso (da raiz do repositório):  python3 DubChords/tests/check_rootskeys_timbre.py
+Uso (da raiz do repositório):  python3 ReggaeChordMachine/tests/check_rootskeys_timbre.py
 """
 import pathlib
 import re
@@ -118,6 +118,6 @@ if errors:
     print("\nO TIMBRE DO MRCM-1240 ESTÁ DESATUALIZADO EM RELAÇÃO AO ROOTS KEYS:")
     for e in errors:
         print("  -", e)
-    print("Atualize DubChords/Source/RootsKeysSound.h (rkdefaults).")
+    print("Atualize ReggaeChordMachine/Source/RootsKeysSound.h (rkdefaults).")
     sys.exit(1)
 print("OK: o MRCM-1240 usa o timbre atual do Roots Keys")

@@ -97,7 +97,7 @@ for p in presets:
 h += ['};', '}', '']
 open(os.path.join(here, '..', 'Source', 'HarmonyPresets.h'), 'w', encoding='utf-8').write('\n'.join(h))
 
-js = ('// Gerado por DubChords/tools/harmony_presets.py — não editar à mão.\n'
+js = ('// Gerado por ReggaeChordMachine/tools/harmony_presets.py — não editar à mão.\n'
       '// Banco de PRESETS de harmonia da DubStation (MRCM-1240 e MRM-0420), por estilo e década.\n'
       '(function (root) {\n  root.DUB_PRESETS = ' +
       json.dumps({'folders': folders, 'presets': [{'folder': p['folder'], 'era': p['era'], 'name': p['name'],

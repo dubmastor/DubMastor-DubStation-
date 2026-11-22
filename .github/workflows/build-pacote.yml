@@ -93,8 +93,10 @@ jobs:
       - name: Coletar
         run: python3 .github/scripts/pacote.py coletar "${{ matrix.plugin.pasta }}" "${{ matrix.plugin.sigla }}" dist
 
+      # plugin fora do padrão ('padrao': false, ex.: Dub Battery) entra mesmo sem o runtime embutido, com aviso
       - name: Conferir runtime embutido (Windows)
         if: runner.os == 'Windows'
+        continue-on-error: ${{ matrix.plugin.padrao == false }}
         run: |
           python -m pip install --quiet pefile
           python .github/scripts/conferir-runtime-windows.py "dist/${{ matrix.plugin.sigla }}"

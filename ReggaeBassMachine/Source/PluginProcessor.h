@@ -3,7 +3,7 @@
 #include "BassEngine.h"
 #include "DubBassTimbre.h"
 #include "AccompEngine.h"
-#include "../../DubDrumsMachine/Source/DrumSynth.h"      // bateria acústica do Dub Drums
+#include "../../ReggaeDrumMachine/Source/DrumSynth.h"      // bateria acústica do Dub Drums
 #include "../../ReggaeChordMachine/Source/DubSynth.h"      // piano M1 + Hammond do Roots Keys
 
 class BassMachineProcessor : public juce::AudioProcessor,

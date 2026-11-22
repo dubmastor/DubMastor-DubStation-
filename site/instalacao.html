@@ -7,7 +7,7 @@
 <meta name="description" content="Como instalar os plugins DubMastor no Windows e no Mac.">
 <meta property="og:title" content="Instalação — Reggae Dub Plugins VST3">
 <meta property="og:description" content="Como instalar os plugins DubMastor no Windows e no Mac.">
-<meta property="og:image" content="img/dubstation21.jpg">
+<meta property="og:image" content="img/tapeecho.jpg">
 <style>
   @font-face { font-family: "Plate"; src: url("fonts/ArchivoBlack-Regular.ttf") format("truetype"); font-display: swap; }
   @font-face { font-family: "Signature"; src: url("fonts/texgyrechorus-mediumitalic.otf") format("opentype"); font-display: swap; }
@@ -218,6 +218,26 @@
   .hint { margin: -6px 0 20px; color: #bdb6a2; font-size: 15px; }
   .install-link { margin-top: 30px; }
 
+  .btn.web { grid-column: 1 / -1; background: linear-gradient(#5fae68, var(--green) 60%, #24683a); color: #fff; box-shadow: 0 3px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
+  .btn.web:active { box-shadow: 0 1px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
+  .zips { font-size: 13px; color: #a59f8d; text-align: center; }
+  .zips a { color: #cfc8b4; }
+  table.daws { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  table.daws th, table.daws td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid #2c2722; }
+  table.daws th { color: var(--amber); font-size: 13px; letter-spacing: .06em; }
+  table.daws td:first-child { color: var(--cream); font-weight: 700; white-space: nowrap; }
+  table.daws td { color: #cfc8b4; }
+  .dawwrap { overflow-x: auto; background: #0f0e0c; border-radius: var(--radius); padding: 6px 12px 10px; box-shadow: inset 0 0 0 1px #000; }
+  details.manual { margin-top: 22px; }
+  details.manual summary { cursor: pointer; color: var(--amber); font-weight: 700; }
+  /* --- destaque: Mastor Riddim Machine MRM-0420 */
+  .card.featured { grid-column: 1 / -1; box-shadow: 0 0 0 1px #000, 0 0 0 3px #8a6d2c, inset 0 1px 0 rgba(255,255,255,.06), 0 14px 34px rgba(0,0,0,.6); }
+  .card.featured .shot { aspect-ratio: auto; object-fit: contain; }
+  .card.featured h3 { font-size: 30px; }
+  .model { display: inline-block; vertical-align: 4px; margin-left: 10px; padding: 4px 14px 3px; font-family: "Plate", Impact, sans-serif; font-size: 18px; letter-spacing: .14em; color: #2a1d06;
+    border-radius: 4px; background: linear-gradient(#e8d390, #caab5c 45%, #b39446 55%, #86692a); box-shadow: 1px 2px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6); }
+  .badge { align-self: flex-start; font: 800 11px/1 system-ui, sans-serif; letter-spacing: .16em; color: #1a1205; background: var(--amber); padding: 5px 9px; border-radius: 3px; }
+  @media (min-width: 900px) { .card.featured .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; } }
 </style>
 </head>
 <body>
@@ -231,7 +251,7 @@
       </div>
     </div>
     <p class="signature">DubMastor</p>
-    <p class="lead"><span class="lamp" aria-hidden="true"></span>Filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Mastor Reggae Dub Bass Instrument (MRDBI-07), baixo de senoide e 808, o Mastor Reggae Drum Machine, que monta a bateria do riddim, e o Mastor Reggae Bass Machine MRBM-69, gerador de reggae bass lines, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
+    <p class="lead"><span class="lamp" aria-hidden="true"></span>A coleção Dub Station: filtro big knob estilo King Tubby, eco de fita de três cabeças com reverb de mola, voz de rádio, o teclado Mastor Roots Keys com piano M1 e órgão Hammond, baixo de senoide e 808, naipe de metais anos 70, sampler de bateria e as machines que montam a harmonia, a bateria, o baixo e o riddim inteiro, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Funcionam no Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig (VST3) e no Logic e GarageBand (AU).</p>
   </header>
 
   <main>
@@ -246,34 +266,77 @@
       <h2>INSTALAÇÃO</h2>
       <div class="install">
         <div class="box">
-          <h3>WINDOWS</h3>
+          <h3>WINDOWS · INSTALADOR .EXE</h3>
           <ol>
-            <li>Descompacte o zip (botão direito → <em>Extrair tudo</em>).</li>
-            <li>Copie a pasta <code>.vst3</code> do plugin para <code>C:\Program Files\Common Files\VST3\</code></li>
-            <li>Abra o Cubase (ou sua DAW).</li>
+            <li>Feche a sua DAW.</li>
+            <li>Abra o instalador baixado. Se aparecer <em>"O Windows protegeu o computador"</em>, clique em <strong>Mais informações → Executar assim mesmo</strong> (o plugin é gratuito e não tem certificado pago).</li>
+            <li>Clique em <em>Avançar</em> até o fim. O plugin vai para <code>C:\Program Files\Common Files\VST3</code>, a pasta que todas as DAWs procuram, e o programa standalone fica no menu Iniciar.</li>
+            <li>Abra a DAW e, se ela pedir, faça um novo scan (veja a tabela abaixo).</li>
           </ol>
         </div>
         <div class="box">
-          <h3>MAC</h3>
+          <h3>MAC · INSTALADOR .PKG</h3>
           <ol>
-            <li>Baixe o zip. O Mac descompacta sozinho.</li>
-            <li>Feche o Cubase.</li>
-            <li>No Finder, aperte <strong>Cmd+Shift+G</strong>, cole <code>~/Library/Audio/Plug-Ins/VST3/</code> e copie o <code>.vst3</code> para lá (o AU vai em <code>~/Library/Audio/Plug-Ins/Components/</code>).</li>
-            <li>No Terminal, libere o plugin:
-<pre>xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Big Knob.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"FitaEco TE-12.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Roots Keys.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Phone Vox MPV-01.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Dub Bass Instrument MRDBI-07.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Drum Machine MRDM-12.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Bass Machine MRBM-69.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Battery Reggae.vst3"</pre></li>
-            <li>Abra o Cubase.</li>
+            <li>Feche a sua DAW.</li>
+            <li>Abra o <code>.pkg</code>. Se o Mac disser que <em>não pode abrir</em>, vá em <strong>Ajustes do Sistema → Privacidade e Segurança</strong>, role até o fim e clique em <strong>Abrir Mesmo Assim</strong>. Abra o <code>.pkg</code> de novo.</li>
+            <li>Siga o instalador e digite a senha do Mac. Ele instala o VST3 e o AU em <code>/Library/Audio/Plug-Ins</code>, já liberados (sem precisar do Terminal), e apaga versões com nomes antigos.</li>
+            <li>Abra a DAW. Funciona em Mac Intel e Apple Silicon (M1 a M4), macOS 10.13 ou mais novo.</li>
           </ol>
         </div>
       </div>
-      <p class="note"><strong>O plugin não apareceu?</strong> No Cubase, abra <em>Studio → VST Plug-in Manager</em> e faça um novo scan; se ele estiver na lista de bloqueados, clique em <em>Reactivate</em>. Na lista de plugins, o Dub Station aparece como <strong>FitaEco TE-12</strong>, do fabricante DubMastor. O <strong>DubMastor Roots Keys</strong>, o <strong>Dub Chords</strong>, o <strong>Mastor Reggae Dub Bass Instrument</strong>, o <strong>Mastor Reggae Drum Machine</strong> e o <strong>Mastor Reggae Bass Machine MRBM-69</strong> são instrumentos: carregue-os numa <em>Instrument Track</em>, não como efeito.</p>
+
+      <h3 style="color:var(--amber);margin:28px 0 6px;letter-spacing:.04em">EM CADA DAW</h3>
+      <div class="dawwrap">
+        <table class="daws">
+          <thead><tr><th>DAW</th><th>Formato</th><th>Se o plugin não aparecer</th></tr></thead>
+          <tbody>
+            <tr><td>Cubase / Nuendo</td><td>VST3</td><td><em>Studio → VST Plug-in Manager</em>: clique em atualizar. Se estiver em <em>Blocklist</em>, clique em <em>Reactivate</em>.</td></tr>
+            <tr><td>Ableton Live</td><td>VST3 / AU</td><td><em>Settings → Plug-Ins</em>: ligue <strong>Use VST3 Plug-in System Folders</strong> (e <em>Use Audio Units</em> no Mac) e clique em <em>Rescan</em>. Os plugins ficam no navegador, em <em>Plug-Ins → DubMastor</em>.</td></tr>
+            <tr><td>FL Studio</td><td>VST3</td><td><em>Options → Manage plugins</em> → <strong>Find installed plugins</strong>. Depois marque a estrela do plugin para ele aparecer na lista de instrumentos/efeitos.</td></tr>
+            <tr><td>Reaper</td><td>VST3 / AU</td><td><em>Options → Preferences → Plug-ins → VST</em> → <strong>Re-scan</strong>.</td></tr>
+            <tr><td>Studio One</td><td>VST3 / AU</td><td><em>Options → Locations → VST Plug-ins</em>: confira se a pasta VST3 padrão está na lista e reinicie. Se ele estiver bloqueado, use <em>Reset Blocklist</em>.</td></tr>
+            <tr><td>Bitwig</td><td>VST3</td><td><em>Settings → Locations</em>: a pasta VST3 padrão deve estar ativa. Reinicie o Bitwig para escanear.</td></tr>
+            <tr><td>Logic Pro</td><td>AU (só Mac)</td><td><em>Logic Pro → Settings → Plug-in Manager</em>: selecione o plugin e clique em <strong>Reset &amp; Rescan Selection</strong>. Instrumentos ficam em <em>AU Instruments → DubMastor</em>.</td></tr>
+            <tr><td>GarageBand</td><td>AU (só Mac)</td><td>Reinicie o GarageBand depois de instalar. Instrumentos em <em>Plug-ins → AU Instruments → DubMastor</em>.</td></tr>
+            <tr><td>Pro Tools</td><td>AAX</td><td>A versão AAX está em preparação: o instalador completo já vem pronto para ela e vai incluir o Pro Tools assim que a assinatura da Avid for liberada. Por enquanto, use o programa standalone ou a versão para celular/navegador.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note"><strong>Instrumento ou efeito?</strong> Roots Keys, Chord Machine, Dub Bass, Dub Drums, Bass Machine, Riddim Machine e Dub Horns são <strong>instrumentos</strong>: carregue numa trilha de instrumento/MIDI, não como efeito. Big Knob, Tape Echo e Phone Vox são <strong>efeitos</strong>: vão no insert de uma trilha de áudio. Os geradores de MIDI (Chord, Drums, Bass e Riddim Machine) funcionam em todas as DAWs arrastando o MIDI da tela do plugin para a timeline.</p>
+      <p class="note"><strong>Atualizou e apareceu duplicado?</strong> Alguns plugins mudaram de nome (DubMastor Big Knob, FitaEco TE-12, DubMastor Roots Keys, Mastor Dub Horns…). Os instaladores já apagam os nomes antigos; os projetos antigos continuam abrindo. Todos aparecem como <strong>Mastor &lt;nome&gt; &lt;sigla&gt;</strong>, do fabricante <strong>DubMastor</strong>.</p>
+
+      <details class="manual">
+        <summary>Instalação manual pelo zip</summary>
+        <div class="install" style="margin-top:12px">
+          <div class="box">
+            <h3>WINDOWS</h3>
+            <ol>
+              <li>Clique com o botão direito no zip → <em>Extrair tudo</em>.</li>
+              <li>Copie a <strong>pasta inteira</strong> <code>Mastor ….vst3</code> (não o arquivo de dentro dela) para <code>C:\Program Files\Common Files\VST3\</code>.</li>
+              <li>Abra a DAW e faça um novo scan.</li>
+            </ol>
+          </div>
+          <div class="box">
+            <h3>MAC</h3>
+            <ol>
+              <li>Feche a DAW. No Finder, aperte <strong>Cmd+Shift+G</strong> e cole <code>~/Library/Audio/Plug-Ins/</code>.</li>
+              <li>Copie o <code>.vst3</code> para a pasta <code>VST3</code> e o <code>.component</code> para a pasta <code>Components</code> (Logic e GarageBand usam o <code>.component</code>).</li>
+              <li>No Terminal, libere os plugins (sem isso o Mac bloqueia):
+<pre>xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Big Knob MBK-76".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Tape Echo MTE-12".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Roots Keys MRK-80".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Reggae Chord Machine MRCM-1240".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Reggae Dub Bass Instrument MRDBI-07".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Dub Drums Machine MDDM-12".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Reggae Bass Machine MRBM-69".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Riddim Machine MRM-0420".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Dub Horns MDH-70".*
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/*/"Mastor Phone Vox MPV-01".*</pre></li>
+              <li>Abra a DAW.</li>
+            </ol>
+          </div>
+        </div>
+      </details>
     </section>
   </main>
 

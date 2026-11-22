@@ -1,7 +1,7 @@
 ; Instalador Windows do Mastor Reggae Dub Bass Instrument MRDBI-07 (Inno Setup 6)
 ; Coloca o VST3 na pasta padrão (C:\Program Files\Common Files\VST3), onde Cubase, FL Studio,
 ; Ableton Live, Reaper, Studio One, Bitwig e as outras DAWs VST3 procuram plugins.
-; Compilar: ISCC /DAppVersion=1.6 MRDBI-07.iss   (a partir da pasta DubBass/installer)
+; Compilar: ISCC /DAppVersion=1.6 MRDBI-07.iss   (a partir da pasta ReggaeDubBassInstrument/installer)
 
 #define AppName "Mastor Reggae Dub Bass Instrument MRDBI-07"
 #ifndef AppVersion

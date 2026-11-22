@@ -3,4 +3,4 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "DrumsNames.h"
 #define createPluginFilter dbrUnused_createDubDrums
-#include "../../DubDrumsMachine/Source/PluginProcessor.cpp"
+#include "../../ReggaeDrumMachine/Source/PluginProcessor.cpp"

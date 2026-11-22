@@ -93,4 +93,4 @@ Coloque os WAVs em `Samples/`, ajuste a lista em `tools/make_samples_header.py` 
 - `Source/BatteryProcessor.*`: sampler (vozes, envelope, filtro, choke), samples, presets, estado e o MRDM-12 embutido.
 - `Source/BatteryEditor.*`: interface (cabeçalho, visor, envelope, pads, knobs) e a aba DUB DRUMS.
 - `Source/PadKit.h`: pads, notas, parâmetros e presets de fábrica.
-- `Source/DrumsProcessorUnit.cpp`, `Source/DrumsEditorUnit.cpp`: compilam o código do `DubDrums/` sem copiar.
+- `Source/DrumsProcessorUnit.cpp`, `Source/DrumsEditorUnit.cpp`: compilam o código do `ReggaeDrumMachine/` sem copiar.

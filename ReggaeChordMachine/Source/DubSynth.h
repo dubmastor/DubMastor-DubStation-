@@ -1,5 +1,5 @@
 // Som de teclado LEGADO (era o som interno do MRCM-1240 até a 1.5). Continua aqui porque o
-// Mastor Reggae Bass Machine MRBM-69 usa (BassMachine/Source/PluginProcessor.h), com os volumes
+// Mastor Reggae Bass Machine MRBM-69 usa (ReggaeBassMachine/Source/PluginProcessor.h), com os volumes
 // ajustados para ele. O MRCM-1240 agora toca pelo RootsKeysSound.h (motor do próprio Roots Keys).
 // Os mesmos timbres do Dub Station Roots Keys
 //  - skank (canal 1): piano estilo Korg M1 com chorus estéreo

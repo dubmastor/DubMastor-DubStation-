@@ -7,7 +7,7 @@
 <meta name="description" content="Plugins gratuitos de reggae e dub para Windows e Mac (VST3 / AU): instrumentos virtuais, efeitos e machines.">
 <meta property="og:title" content="Reggae Dub Plugins VST3">
 <meta property="og:description" content="Plugins gratuitos de reggae e dub para Windows e Mac (VST3 / AU): instrumentos virtuais, efeitos e machines.">
-<meta property="og:image" content="img/dubstation21.jpg">
+<meta property="og:image" content="img/tapeecho.jpg">
 <style>
   @font-face { font-family: "Plate"; src: url("fonts/ArchivoBlack-Regular.ttf") format("truetype"); font-display: swap; }
   @font-face { font-family: "Signature"; src: url("fonts/texgyrechorus-mediumitalic.otf") format("opentype"); font-display: swap; }
@@ -223,6 +223,26 @@
   .hint { margin: -6px 0 20px; color: #bdb6a2; font-size: 15px; }
   .install-link { margin-top: 30px; }
 
+  .btn.web { grid-column: 1 / -1; background: linear-gradient(#5fae68, var(--green) 60%, #24683a); color: #fff; box-shadow: 0 3px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
+  .btn.web:active { box-shadow: 0 1px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
+  .zips { font-size: 13px; color: #a59f8d; text-align: center; }
+  .zips a { color: #cfc8b4; }
+  table.daws { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  table.daws th, table.daws td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid #2c2722; }
+  table.daws th { color: var(--amber); font-size: 13px; letter-spacing: .06em; }
+  table.daws td:first-child { color: var(--cream); font-weight: 700; white-space: nowrap; }
+  table.daws td { color: #cfc8b4; }
+  .dawwrap { overflow-x: auto; background: #0f0e0c; border-radius: var(--radius); padding: 6px 12px 10px; box-shadow: inset 0 0 0 1px #000; }
+  details.manual { margin-top: 22px; }
+  details.manual summary { cursor: pointer; color: var(--amber); font-weight: 700; }
+  /* --- destaque: Mastor Riddim Machine MRM-0420 */
+  .card.featured { grid-column: 1 / -1; box-shadow: 0 0 0 1px #000, 0 0 0 3px #8a6d2c, inset 0 1px 0 rgba(255,255,255,.06), 0 14px 34px rgba(0,0,0,.6); }
+  .card.featured .shot { aspect-ratio: auto; object-fit: contain; }
+  .card.featured h3 { font-size: 30px; }
+  .model { display: inline-block; vertical-align: 4px; margin-left: 10px; padding: 4px 14px 3px; font-family: "Plate", Impact, sans-serif; font-size: 18px; letter-spacing: .14em; color: #2a1d06;
+    border-radius: 4px; background: linear-gradient(#e8d390, #caab5c 45%, #b39446 55%, #86692a); box-shadow: 1px 2px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6); }
+  .badge { align-self: flex-start; font: 800 11px/1 system-ui, sans-serif; letter-spacing: .16em; color: #1a1205; background: var(--amber); padding: 5px 9px; border-radius: 3px; }
+  @media (min-width: 900px) { .card.featured .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; } }
 </style>
 </head>
 <body>
@@ -236,41 +256,50 @@
       </div>
     </div>
     <p class="signature">DubMastor</p>
-    <p class="lead"><span class="lamp" aria-hidden="true"></span>Filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Mastor Reggae Dub Bass Instrument (MRDBI-07), baixo de senoide e 808, o Mastor Reggae Drum Machine, que monta a bateria do riddim, e o Mastor Reggae Bass Machine MRBM-69, gerador de reggae bass lines, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
+    <p class="lead"><span class="lamp" aria-hidden="true"></span>A coleção Dub Station: filtro big knob estilo King Tubby, eco de fita de três cabeças com reverb de mola, voz de rádio, o teclado Mastor Roots Keys com piano M1 e órgão Hammond, baixo de senoide e 808, naipe de metais anos 70, sampler de bateria e as machines que montam a harmonia, a bateria, o baixo e o riddim inteiro, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Funcionam no Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig (VST3) e no Logic e GarageBand (AU).</p>
   </header>
 
   <main>
     <section id="categorias">
       <h2>ESCOLHA O TIPO DE PLUGIN</h2>
+      <div class="completo">
+        <h3>TODOS OS PLUGINS · INSTALADOR COMPLETO <small>1.0</small></h3>
+        <p>Um instalador só com a coleção inteira: Cubase, Ableton Live, FL Studio, Reaper, Studio One e Bitwig (VST3) e, no Mac, Logic e GarageBand (AU). Na instalação dá para desmarcar os que não quiser.</p>
+        <div class="dl">
+          <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-1.0/DubStation-Windows-Instalador.exe">⬇ Windows<span>todos os plugins · VST3</span></a>
+          <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-1.0/DubStation-macOS-Instalador.pkg">⬇ Mac<span>todos os plugins · VST3 + AU</span></a>
+        </div>
+      </div>
       <div class="cats">
         <a class="cat" href="instrumentos.html">
-          <div class="thumbs" aria-hidden="true"><img src="img/rootskeys.jpg" alt="" loading="lazy"><img src="img/dubbass.jpg" alt="" loading="lazy"><img src="img/dubbattery.jpg" alt="" loading="lazy"></div>
+          <div class="thumbs" aria-hidden="true"><img src="img/rootskeys.jpg" alt="" loading="lazy"><img src="img/reggaedubbassinstrument.jpg" alt="" loading="lazy"><img src="img/dubbattery.jpg" alt="" loading="lazy"></div>
           <div class="body">
             <h3>🎹 INSTRUMENTOS VIRTUAIS</h3>
             <p>Instrumentos que fazem som: teclado, baixo e bateria para tocar pelo MIDI ou pelo teclado da tela.</p>
             <ul>
-              <li>DubMastor Roots Keys</li>
+              <li>Mastor Roots Keys MRK-80</li>
               <li>Mastor Reggae Dub Bass Instrument MRDBI-07</li>
+              <li>Mastor Dub Horns MDH-70</li>
               <li>Dub Battery Reggae</li>
             </ul>
-            <div class="go"><span class="btn">VER 3 PLUGINS ▶</span></div>
+            <div class="go"><span class="btn">VER 4 PLUGINS ▶</span></div>
           </div>
         </a>
         <a class="cat" href="efeitos.html">
-          <div class="thumbs" aria-hidden="true"><img src="img/bigknob.jpg" alt="" loading="lazy"><img src="img/dubstation21.jpg" alt="" loading="lazy"><img src="img/mastorfone.jpg" alt="" loading="lazy"></div>
+          <div class="thumbs" aria-hidden="true"><img src="img/bigknob.jpg" alt="" loading="lazy"><img src="img/tapeecho.jpg" alt="" loading="lazy"><img src="img/phonevox.jpg" alt="" loading="lazy"></div>
           <div class="body">
             <h3>🎛️ EFEITOS</h3>
             <p>Efeitos para colocar no canal ou no envio: filtro estilo King Tubby, eco de fita, reverb de mola e voz de rádio, telefone e megafone.</p>
             <ul>
-              <li>Big Knob</li>
-              <li>Dub Station</li>
+              <li>Mastor Big Knob MBK-76</li>
+              <li>Mastor Tape Echo MTE-12</li>
               <li>Mastor Phone Vox MPV-01</li>
             </ul>
             <div class="go"><span class="btn">VER 3 PLUGINS ▶</span></div>
           </div>
         </a>
         <a class="cat" href="machines.html">
-          <div class="thumbs" aria-hidden="true"><img src="img/dubchords.jpg" alt="" loading="lazy"><img src="img/dubdrums.jpg" alt="" loading="lazy"><img src="img/bassmachine.jpg" alt="" loading="lazy"></div>
+          <div class="thumbs" aria-hidden="true"><img src="img/reggaechordmachine.jpg" alt="" loading="lazy"><img src="img/reggaedrummachine.jpg" alt="" loading="lazy"><img src="img/reggaebassmachine.jpg" alt="" loading="lazy"></div>
           <div class="body">
             <h3>🥁 MACHINES</h3>
             <p>Geradores do riddim: escolha acordes, estilo e músico, e a machine monta a harmonia, a bateria ou a linha de baixo em MIDI para arrastar para a timeline.</p>
@@ -278,8 +307,9 @@
               <li>Mastor Reggae Chord Machine MRCM-1240</li>
               <li>Mastor Reggae Drum Machine MRDM-12</li>
               <li>Mastor Reggae Bass Machine MRBM-69</li>
+              <li>Mastor Riddim Machine MRM-0420</li>
             </ul>
-            <div class="go"><span class="btn">VER 3 PLUGINS ▶</span></div>
+            <div class="go"><span class="btn">VER 4 PLUGINS ▶</span></div>
           </div>
         </a>
       </div>

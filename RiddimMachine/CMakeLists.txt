@@ -79,7 +79,7 @@ set(MRM_SOURCES
     Source/BassEditorUnit.cpp
     Source/KnobProcessorUnit.cpp
     Source/KnobEditorUnit.cpp
-    ../DubDrumsMachine/Source/PatternGenerator.cpp)
+    ../ReggaeDrumMachine/Source/PatternGenerator.cpp)
 set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
     ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)     # timbres do piano M1 / Hammond

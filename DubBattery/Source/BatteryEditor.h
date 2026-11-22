@@ -10,7 +10,7 @@
 #include "BatteryProcessor.h"
 
 #include "DrumsNames.h"
-#include "../../DubDrumsMachine/Source/PluginEditor.h"
+#include "../../ReggaeDrumMachine/Source/PluginEditor.h"
 #include "DrumsNamesEnd.h"
 
 namespace dbrui

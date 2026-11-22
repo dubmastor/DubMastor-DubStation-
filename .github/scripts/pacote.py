@@ -74,7 +74,7 @@ def tipo_txt(p):
 
 # ---------------------------------------------------------------- lista / coletar
 def cmd_lista():
-    m = [{"sigla": p["sigla"], "pasta": p["pasta"], "nome": p["nome"]} for p in PLUGINS]
+    m = [{"sigla": p["sigla"], "pasta": p["pasta"], "nome": p["nome"], "padrao": p.get("padrao", True)} for p in PLUGINS]
     print(json.dumps(m))
 
 

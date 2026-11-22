@@ -1,6 +1,6 @@
 // Confere se a versão de celular (site/chords/engine.js) gera exatamente o mesmo MIDI que o plugin.
 // Uso (da raiz do repositório):
-//   g++ -std=c++17 -O2 DubChords/tests/dump_loop.cpp -o dump_loop && node DubChords/tests/web_engine_test.js ./dump_loop
+//   g++ -std=c++17 -O2 ReggaeChordMachine/tests/dump_loop.cpp -o dump_loop && node ReggaeChordMachine/tests/web_engine_test.js ./dump_loop
 'use strict';
 const { execFileSync } = require('child_process');
 const path = require('path');

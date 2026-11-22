@@ -2,7 +2,7 @@
 ; Coloca o VST3 na pasta padrão (C:\Program Files\Common Files\VST3), onde Cubase, FL Studio,
 ; Ableton Live, Reaper, Studio One, Bitwig e as outras DAWs VST3 procuram plugins, e apaga as versões
 ; antigas (MDDM-12 / Dub Drums), que têm o mesmo código de plugin e apareceriam duplicadas.
-; Compilar: ISCC /DAppVersion=2.3 MRDM.iss   (a partir da pasta DubDrums/installer)
+; Compilar: ISCC /DAppVersion=2.3 MRDM.iss   (a partir da pasta ReggaeDrumMachine/installer)
 
 #define AppName "Mastor Reggae Drum Machine MRDM-12"
 #ifndef AppVersion

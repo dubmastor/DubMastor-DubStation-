@@ -12,11 +12,11 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
    Toda alteração sobe o número (1.0 → 1.1 → 1.2).
 2. **Mesma versão em todos os lugares:**
    - `RELEASE_NOTES.md` do plugin começa com `Nome SIGLA x.y`
-   - card do plugin em `site/index.html`: título `<h3>Nome SIGLA <small>x.y</small></h3>` e os links
+   - card do plugin na página da categoria (`site/efeitos.html`, `site/instrumentos.html` ou `site/machines.html`, campo `categoria` do `plugins.json`): título `<h3>Nome SIGLA <small>x.y</small></h3>` e os links
      `releases/download/SIGLA-x.y/SIGLA-Windows-Instalador.exe`, `SIGLA-macOS-Instalador.pkg`, `SIGLA-Windows.zip`, `SIGLA-macOS.zip`
    - `README.md` cita `Nome SIGLA x.y`
-   - versão para celular (`site/web/<nome>/index.html`) com `const VERSION = 'x.y'`
-3. **Versão para celular / navegador.** Todo plugin tem uma versão web em `site/web/<pasta em minúsculas>/index.html`,
+   - versão para celular (pasta do campo `web` no `plugins.json`) com `const VERSION = 'x.y'` ou a versão no `<title>`
+3. **Versão para celular / navegador.** Todo plugin tem uma versão web em `site/<pasta>/index.html` (plugin novo: `site/web/<pasta em minúsculas>/`),
    no estilo da do Dub Horns (`site/web/dubhorns/`): um arquivo só, Web Audio, botão para liberar o áudio,
    teclado na tela que funciona no toque, layout de celular, link "← Dub Station" e a mesma versão do plugin.
    No card do site, o botão verde "▶ Tocar no celular / navegador". Plugin novo sem versão web não passa na checagem.
@@ -30,6 +30,8 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
 
 ## Padrão de nomes
 
+- O Dub Battery Reggae (`DubBattery/`) ainda está fora do padrão (`"padrao": false` no `plugins.json`); quando for atualizado, ganha nome `Mastor <Nome> <SIGLA>`, pasta e workflow no padrão.
+
 - Nome no Cubase (`PRODUCT_NAME`): `Mastor <Nome> <SIGLA>`. Pasta: o nome em CamelCase, sem "Mastor" e sem sigla.
 - Release `SIGLA-x.y`; arquivos `SIGLA-Windows-Instalador.exe`, `SIGLA-macOS-Instalador.pkg`, `SIGLA-Windows.zip`, `SIGLA-macOS.zip`.
 - Imagem do card: `site/img/<pasta em minúsculas>.jpg`.
@@ -39,7 +41,7 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
 
 ## Compatibilidade com as DAWs
 
-- Formatos: VST3 (Windows e Mac), AU (Mac, para Logic e GarageBand) e standalone. Sem AAX (Pro Tools).
+- Formatos: VST3 (Windows e Mac), AU (Mac, para Logic e GarageBand), AAX (Pro Tools, com o SDK do JUCE 8; só abre no Pro Tools normal depois da assinatura PACE, veja `PROTOOLS.md`) e standalone.
 - Windows: runtime do C++ embutido (`CMAKE_MSVC_RUNTIME_LIBRARY` MultiThreaded) — o plugin não pode depender
   do Visual C++ Redistributable. A release confere isso.
 - Mac: binário universal (arm64 + x86_64), macOS 10.13+, assinatura ad-hoc; o `.pkg` instala em `/Library/Audio/Plug-Ins`.
@@ -48,9 +50,9 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
 
 ## Mastor Riddim Machine MRM-0420 (RiddimMachine/)
 O MRM-0420 compila o código destas pastas direto, sem cópia:
-- `DubDrums/` — Mastor Reggae Drum Machine MRDM-12 (samples DM em `DubDrums/Samples`)
-- `DubChords/` — Mastor Reggae Chord Machine MRCM-1240
-- `BassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `DubBass/Source`)
+- `ReggaeDrumMachine/` — Mastor Reggae Drum Machine MRDM-12 (samples DM em `ReggaeDrumMachine/Samples`)
+- `ReggaeChordMachine/` — Mastor Reggae Chord Machine MRCM-1240
+- `ReggaeBassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `ReggaeDubBassInstrument/Source`)
 - `BigKnob/` — Mastor Big Knob (aba CONTROL ROOM)
 - `RootsKeys/Source/` — timbres do piano M1 / Hammond
 
@@ -60,7 +62,7 @@ O MRM-0420 compila o código destas pastas direto, sem cópia:
 3. Se mudar parâmetros de harmonia (`root`, `qual`, `dur`, `inv`, `on`), BPM, `seed`, músicos (`drummer`, `pattern`, `style`) ou o tamanho do painel, ajuste `MrmProcessor::buildLinks`, a aba RIDDIM (`MrmMain.cpp`) ou o corte do título (`kCrop*` em `MrmEditor.cpp`).
 4. Atualize as imagens em `RiddimMachine/docs/`, o `RiddimMachine/RELEASE_NOTES.md` e, se for o caso, a versão para celular `site/riddim/`.
 
-O workflow `.github/workflows/build-mrm0420.yml` já roda quando qualquer uma dessas pastas muda.
+O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer uma dessas pastas muda.
 
 ## Instalador completo (Dub Station, todos os plugins)
 - Workflow `.github/workflows/build-pacote.yml`, script `.github/scripts/pacote.py`. Lê a lista do `plugins.json`: plugin novo entra sozinho.

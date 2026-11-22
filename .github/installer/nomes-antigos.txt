@@ -7,6 +7,6 @@ MDH-70|Mastor Dub Horns
 MPV-01|Mastor Fone
 MRCM-1240|Mastor Dub Chords Machine MDCM-404|DubMastor Dub Chords
 MRDBI-07|Dub Bass - Dub Station
-MDDM-12|DubMastor Dub Drums
+MRDM-12|DubMastor Dub Drums|Mastor Dub Drums Machine MDDM-12
 MRBM-69|Mastor Bass Machine MBM-710
 MRM-0420|

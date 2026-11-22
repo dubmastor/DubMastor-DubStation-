@@ -77,7 +77,7 @@ São 39 presets. O mesmo banco está no **MRM-0420** e nas versões para celular
 ### Checklist de toda atualização
 1. **Versão:** só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece no **título** do plugin ("MASTOR REGGAE CHORD MACHINE x.y"); a placa de latão mostra **só "DUB STATION"**.
 2. **Nome:** "Mastor Reggae Chord Machine MRCM-1240" em tudo (plugin, zips `MastorReggaeChordMachine-*`, tag `MRCM-1240-x.y`, release "Mastor Reggae Chord Machine MRCM-1240 x.y").
-3. **Timbre do piano:** o som interno usa o timbre **inicial** do Roots Keys (e o órgão Roots Percussion). Confira com `python3 DubChords/tests/check_rootskeys_timbre.py` (o CI roda e falha se estiver desatualizado).
+3. **Timbre do piano:** o som interno usa o timbre **inicial** do Roots Keys (e o órgão Roots Percussion). Confira com `python3 ReggaeChordMachine/tests/check_rootskeys_timbre.py` (o CI roda e falha se estiver desatualizado).
 4. **Versão para celular:** atualize `site/chords/` junto (o `engine.js` é o porte do `DubEngine.h`; o número da versão fica no `<title>`, no `<h1>` e em `VERSION`). O CI compara o MIDI do JS com o do C++ (`tests/web_engine_test.js`).
 5. **Notas:** `RELEASE_NOTES.md`. Cada push na `main` publica a release com elas.
 6. **Links:** quando a release sair, troque os links de download do site e dos READMEs para `MRCM-1240-x.y`.

@@ -34,7 +34,8 @@ def versao(pasta):
     return None
 
 reg = json.loads((RAIZ / "plugins.json").read_text())["plugins"]
-site = (RAIZ / "site/index.html").read_text()
+# o site tem uma página por categoria (efeitos, instrumentos, machines), a home e a instalação
+site = "\n".join(f.read_text() for f in sorted((RAIZ / "site").glob("*.html")))
 readme = (RAIZ / "README.md").read_text()
 
 for p in reg:
@@ -47,18 +48,24 @@ for p in reg:
     m = re.search(r'PRODUCT_NAME\s+"([^"]+)"', cm)
     if not m or m.group(1) != nome:
         err(sig, f"PRODUCT_NAME no CMakeLists é {m.group(1) if m else '(nenhum)'!r}, o registro diz {nome!r}")
-    if not nome.startswith("Mastor ") or not nome.endswith(" " + sig):
+    if p.get("padrao") is not False and (not nome.startswith("Mastor ") or not nome.endswith(" " + sig)):
         err(sig, f"nome fora do padrão 'Mastor <Nome> <SIGLA>': {nome!r}")
 
     v = versao(pasta)
     if not v:
         err(sig, "versão não encontrada no CMakeLists nem em Source/Version.h"); continue
 
+    if p.get("padrao") is False:
+        warn(sig, "plugin ainda fora do padrão de nomes e releases ('padrao': false no plugins.json)")
+        if not re.search(r'<h3>' + re.escape(nome) + r' <small>' + re.escape(v) + r'</small></h3>', site):
+            err(sig, f"o site não mostra '{nome}' na versão {v}")
+        continue
+
     if not (RAIZ / f".github/workflows/build-{pasta.lower()}.yml").exists():
         err(sig, f"falta o workflow .github/workflows/build-{pasta.lower()}.yml")
 
     # site: card com nome + versão e links da versão atual
-    card = re.search(r'(?s)<article class="card">(?:(?!</article>).)*?<h3>' + re.escape(nome) + r' <small>([^<]+)</small></h3>.*?</article>', site)
+    card = re.search(r'(?s)<article class="card[^"]*"[^>]*>(?:(?!</article>).)*?<h3>' + re.escape(nome) + r' <small>([^<]+)</small></h3>.*?</article>', site)
     if not card:
         err(sig, "o site não tem o card deste plugin (título '<h3>nome <small>versão</small></h3>')")
     else:
@@ -93,9 +100,9 @@ for p in reg:
             err(sig, f"versão para celular não encontrada em site/{web}/index.html")
         else:
             h = idx.read_text()
-            mv = re.search(r"VERSION\s*=\s*['\"](\d+\.\d+)", h)
+            mv = re.search(r"VERSION\s*=\s*['\"](\d+\.\d+)", h) or re.search(r"<title>[^<]*" + re.escape(sig) + r"\s+(\d+\.\d+)", h)
             if not mv:
-                err(sig, f"site/{web}/index.html sem 'const VERSION = \"x.y\"'")
+                err(sig, f"site/{web}/index.html sem 'const VERSION = \"x.y\"' (ou a versão no <title>)")
             elif mv.group(1) != v:
                 err(sig, f"versão para celular está na {mv.group(1)}, o plugin está na {v}")
             if sig not in h:

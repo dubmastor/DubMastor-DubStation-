@@ -10,7 +10,7 @@ As máquinas da DubStation num instrumento só, para começar um riddim em segun
 
 | Máquina | Parte | Aba |
 |---|---|---|
-| **Mastor Reggae Drum Machine MRDM-12** | bateria, com os samples DM (`DubDrums/Samples`) | BATERIA |
+| **Mastor Reggae Drum Machine MRDM-12** | bateria, com os samples DM (`ReggaeDrumMachine/Samples`) | BATERIA |
 | **Mastor Reggae Chord Machine MRCM-1240** | skank de piano M1 e bubble de órgão | HARMONIA |
 | **Mastor Reggae Bass Machine MRBM-69** | linha de baixo, com os timbres do MRDBI-07 | BAIXO |
 | **Mastor Big Knob** | filtro, tape echo, sirene e maximizer no master | CONTROL ROOM |
@@ -75,7 +75,7 @@ BIG KNOB (filtro HIGH/LOW PASS), CONTROL ROOM e TAPE ECHO, estilo de reggae na b
 - `Source/MrmMain.*`: aba RIDDIM. `Source/MrmEditor.*`: cabeçalho, abas e CONTROL ROOM. `Source/MrmStyle.h`: desenho DubStation.
 - `Source/*Unit.cpp` e `*Names.h`: compilam o código das máquinas direto das pastas delas, renomeando as classes com nomes repetidos.
 - `tests/render_test.cpp`: PNG das 5 abas, MIDI do riddim e de cada máquina, harmonia/BPM/semente ligados, edições, mute, intro alinhada, samples DM e estado. Roda no CI antes do build.
-- **Regra do repositório:** mudou o MRCM-1240, o MRDM-12, o MRBM-69, o MRDBI-07 ou o Big Knob? O workflow do MRM-0420 roda junto (veja `paths` em `.github/workflows/build-mrm0420.yml`); confira as abas e atualize as notas do MRM-0420.
+- **Regra do repositório:** mudou o MRCM-1240, o MRDM-12, o MRBM-69, o MRDBI-07 ou o Big Knob? O workflow do MRM-0420 roda junto (veja `paths` em `.github/workflows/build-riddimmachine.yml`); confira as abas e atualize as notas do MRM-0420.
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
