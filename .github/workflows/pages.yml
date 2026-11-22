@@ -6,9 +6,21 @@ on:
     paths:
       - 'site/**'
       - '.github/workflows/pages.yml'
-  # depois de cada build do MRDM-12 e do Dub Battery Reggae, publica os instaladores no site (site/downloads)
+  # depois de cada build de plugin: se a release ainda não tiver os instaladores, o site serve os do build (site/downloads)
   workflow_run:
-    workflows: ['Build Mastor Reggae Drum Machine MRDM-12', 'Build Dub Battery Reggae DBR']
+    workflows:
+      - 'Build Mastor Big Knob MBK-76'
+      - 'Build Dub Battery Reggae DBR'
+      - 'Build Mastor Dub Horns MDH-70'
+      - 'Build Dub Station — instalador completo'
+      - 'Build Mastor Phone Vox MPV-01'
+      - 'Build Mastor Reggae Bass Machine MRBM-69'
+      - 'Build Mastor Reggae Chord Machine MRCM-1240'
+      - 'Build Mastor Reggae Drum Machine MRDM-12'
+      - 'Build Mastor Reggae Dub Bass Instrument MRDBI-07'
+      - 'Build Mastor Riddim Machine MRM-0420'
+      - 'Build Mastor Roots Keys MRK-80'
+      - 'Build Mastor Tape Echo MTE-12'
     types: [completed]
   workflow_dispatch:
 
@@ -30,23 +42,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      # Instaladores do Mastor Reggae Drum Machine MRDM-12 servidos pelo próprio site
-      # (downloads/MRDM-12-*.zip), pegos do último build do MRDM-12 que gerou os zips.
-      # Não derruba o site se não achar nada.
-      - name: Instaladores do MRDM-12
+      # Link de release que ainda não existe (o Actions pode não ter permissão de criar release):
+      # o site serve o instalador do último build da main e esconde o zip que faltar.
+      - name: Instaladores sem release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p site/downloads
-          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow build-reggaedrummachine.yml --branch main -L 15 --json databaseId,status --jq '.[] | select(.status=="completed") | .databaseId'); do
-            rm -rf dl
-            if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'MRDM-12-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
-              echo "Instaladores do build $id"
-              find dl \( -name '*.zip' -o -name '*.pkg' -o -name '*.exe' \) -exec cp {} site/downloads/ \;
-              break
-            fi
-          done
-          ls -la site/downloads
+        run: python3 .github/scripts/links-site.py
       # Instaladores do Dub Battery Reggae (downloads/DubBatteryReggae-*.zip), do último build que gerou os zips
       - name: Instaladores do Dub Battery Reggae
         env:

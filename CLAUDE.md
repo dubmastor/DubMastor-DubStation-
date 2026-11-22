@@ -27,6 +27,8 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
    roda em todo push e PR e falha se nome, versão, links ou versão para celular estiverem fora do padrão.
 6. **Release.** Depois do merge na `main`, o workflow do plugin publica a release `SIGLA-x.y` com os
    instaladores e os zips. Conferir que a release existe antes de dizer que o site está atualizado.
+   Se o Actions não puder criar a release (erro 403), o deploy do site (`pages.yml` + `.github/scripts/links-site.py`)
+   serve os instaladores do último build em `site/downloads/` e esconde os zips que faltarem — o link nunca fica quebrado.
 
 ## Padrão de nomes
 
