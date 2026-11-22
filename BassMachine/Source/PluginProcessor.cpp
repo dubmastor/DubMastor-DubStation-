@@ -168,11 +168,86 @@ double BassMachineProcessor::getExportBpm() const
     return h > 0.0 ? h : (double) param ("bpm");
 }
 
+uint64_t BassMachineProcessor::settingsKey() const
+{
+    uint64_t h = 1469598103934665603ull;   // FNV-1a
+    auto mix = [&h] (int64_t v) { for (int i = 0; i < 8; ++i) { h ^= (uint64_t) ((v >> (i * 8)) & 0xff); h *= 1099511628211ull; } };
+    for (const char* id : { "style", "seed", "density", "variation", "swing", "base", "velocity", "gate" })
+        mix ((int64_t) std::llround (param (id) * 10000.0f));
+    for (int i = 0; i < numSlots; ++i)
+    {
+        mix ((int64_t) param (rootId (i))); mix ((int64_t) param (qualId (i))); mix ((int64_t) param (durId (i)));
+        mix (i == 0 ? 1 : (param (onId (i)) > 0.5f ? 1 : 0));
+    }
+    return h;
+}
+
+std::vector<mbm::NoteEvent> BassMachineProcessor::getCurrentLine (double& lb) const
+{
+    {
+        const juce::SpinLock::ScopedLockType sl (editLock);
+        if (editsOn && editsKey == settingsKey()) { lb = editsLoopBeats; return edits; }
+    }
+    return mbm::buildLoop (getSlots(), getSettings(), lb);
+}
+
+void BassMachineProcessor::setEdits (std::vector<mbm::NoteEvent> ev, double lb)
+{
+    if (lb <= 0.0) return;
+    for (auto& e : ev)
+    {
+        e.note = juce::jlimit (24, 72, e.note);
+        e.velocity = juce::jlimit (1, 127, e.velocity);
+        e.start = juce::jlimit (0.0, lb - 0.0625, e.start);
+    }
+    mbm::monophonic (ev, lb);
+    {
+        const juce::SpinLock::ScopedLockType sl (editLock);
+        edits = std::move (ev);
+        editsLoopBeats = lb;
+        editsKey = settingsKey();
+        editsOn = true;
+    }
+    dirty.store (true);
+}
+
+bool BassMachineProcessor::hasEdits() const
+{
+    const juce::SpinLock::ScopedLockType sl (editLock);
+    return editsOn && editsKey == settingsKey();
+}
+
+void BassMachineProcessor::clearEdits()
+{
+    {
+        const juce::SpinLock::ScopedLockType sl (editLock);
+        editsOn = false;
+        edits.clear();
+    }
+    dirty.store (true);
+}
+
+void BassMachineProcessor::dropStaleEdits()
+{
+    bool stale;
+    {
+        const juce::SpinLock::ScopedLockType sl (editLock);
+        stale = editsOn && editsKey != settingsKey();
+    }
+    if (stale) clearEdits();
+}
+
 void BassMachineProcessor::rebuild()
 {
     const auto slots = getSlots();
     const auto s = getSettings();
     loop = mbm::buildLoop (slots, s, loopBeats);
+    {
+        // linha editada pela interface (se ainda vale para estes controles)
+        const juce::SpinLock::ScopedTryLockType tl (editLock);
+        if (! tl.isLocked()) dirty.store (true);
+        else if (editsOn && editsKey == settingsKey()) { loop = edits; loopBeats = editsLoopBeats; }
+    }
     accLoop.clear();
     if (param ("drumsOn") > 0.5f)
         accLoop = mbm::buildDrums (loopBeats, (int) param ("drumStyle"), s.swing);
@@ -369,9 +444,10 @@ void BassMachineProcessor::renderAccomp (juce::AudioBuffer<float>& buffer, int n
     keys.master = 2.2f * param ("keysVol");
     keys.pianoLevel = 0.8f;
     keys.organLevel = 0.55f;
+    float scratchR[512];   // o motor do teclado soma em estéreo: em mono, soma num rascunho
 
     // o motor do teclado soma em estéreo: em mono, soma num rascunho e copia
-    float scratchR[512];
+
     auto renderSeg = [&] (int from, int to)
     {
         if (to <= from) return;
@@ -436,7 +512,7 @@ bool BassMachineProcessor::writeMidiFile (const juce::File& file) const
 {
     double lb = 0.0;
     const auto s = getSettings();
-    const auto events = mbm::buildLoop (getSlots(), s, lb);
+    const auto events = getCurrentLine (lb);
     if (lb <= 0.0 || events.empty()) return false;
 
     const int tpq = 960;
@@ -475,7 +551,27 @@ bool BassMachineProcessor::writeMidiFile (const juce::File& file) const
 //==============================================================================
 void BassMachineProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    if (auto xml = apvts.copyState().createXml())
+    auto state = apvts.copyState();
+    {
+        // linha editada vai junto no projeto
+        const juce::SpinLock::ScopedLockType sl (editLock);
+        if (editsOn && editsKey == settingsKey())
+        {
+            juce::ValueTree ed ("EDITS");
+            ed.setProperty ("loopBeats", editsLoopBeats, nullptr);
+            for (const auto& e : edits)
+            {
+                juce::ValueTree n ("N");
+                n.setProperty ("s", e.start, nullptr);
+                n.setProperty ("l", e.length, nullptr);
+                n.setProperty ("n", e.note, nullptr);
+                n.setProperty ("v", e.velocity, nullptr);
+                ed.appendChild (n, nullptr);
+            }
+            state.appendChild (ed, nullptr);
+        }
+    }
+    if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
 
@@ -483,7 +579,21 @@ void BassMachineProcessor::setStateInformation (const void* data, int sizeInByte
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         if (xml->hasTagName (apvts.state.getType()))
-            apvts.replaceState (juce::ValueTree::fromXml (*xml));
+        {
+            auto tree = juce::ValueTree::fromXml (*xml);
+            auto ed = tree.getChildWithName ("EDITS");
+            if (ed.isValid()) tree.removeChild (ed, nullptr);
+            apvts.replaceState (tree);
+            if (ed.isValid())
+            {
+                std::vector<mbm::NoteEvent> ev;
+                for (const auto& n : ed)
+                    ev.push_back ({ (double) n.getProperty ("s"), (double) n.getProperty ("l"), (int) n.getProperty ("n"),
+                                    (int) n.getProperty ("v"), 0, false });
+                setEdits (std::move (ev), (double) ed.getProperty ("loopBeats"));
+            }
+            else clearEdits();
+        }
     dirty.store (true);
 }
 

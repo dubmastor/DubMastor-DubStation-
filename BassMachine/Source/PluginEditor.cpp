@@ -2,7 +2,7 @@
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
- #define JucePlugin_VersionString "2.4.0"
+ #define JucePlugin_VersionString "2.5.0"
 #endif
 static juce::String versionShort() { return juce::String (JucePlugin_VersionString).upToLastOccurrenceOf (".", false, false); }
 
@@ -525,7 +525,9 @@ void InterlockKeys::paint (juce::Graphics& g)
         {
             lampAt (g, juce::Rectangle<float> (7.0f, 7.0f).withCentre ({ cap.getCentreX(), cap.getY() + 9.0f }), on);
             g.setColour (on ? colours::cream : colours::cream.withAlpha (0.55f));
-            g.setFont (stencil (labels[i].length() > 7 ? 9.0f : 10.0f, 0.1f));
+            float fs = labels[i].length() > 7 ? 9.0f : 10.0f;      // encolhe até caber na tecla
+            while (fs > 7.0f && juce::GlyphArrangement::getStringWidth (stencil (fs, 0.1f), labels[i]) > cap.getWidth() - 6.0f) fs -= 0.5f;
+            g.setFont (stencil (fs, 0.1f));
             g.drawText (labels[i], cap.withTrimmedTop (15.0f), juce::Justification::centred);
         }
     }
@@ -537,6 +539,17 @@ void PlayButton::paint (juce::Graphics& g)
     const bool on = index() != 0;
     const bool over = isMouseOver();
     auto r = getLocalBounds().toFloat().reduced (3.0f);
+    const double now = juce::Time::getMillisecondCounterHiRes() * 0.001;
+
+    // tocando: pulso no tempo (forte na cabeça de cada tempo, decaindo); parado: respira devagar
+    float pulse = 0.0f, beatFrac = 0.0f;
+    if (on)
+    {
+        const double pos = beatPosition ? beatPosition() : -1.0;
+        beatFrac = pos >= 0.0 ? (float) (pos - std::floor (pos)) : (float) std::fmod (now * 1.25, 1.0);
+        pulse = std::pow (1.0f - beatFrac, 2.2f);
+    }
+    const float breathe = on ? 0.0f : 0.5f + 0.5f * (float) std::sin (now * 2.4);
 
     g.setColour (juce::Colours::black.withAlpha (0.35f));
     g.fillRoundedRectangle (r.translated (0, 3.0f), 8.0f);
@@ -545,36 +558,50 @@ void PlayButton::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white.withAlpha (0.08f));
     g.drawRoundedRectangle (r.reduced (0.5f), 8.0f, 1.0f);
 
+    // halo dourado que pulsa no tempo
+    if (on)
+    {
+        g.setColour (colours::jamGold.withAlpha (0.18f + 0.45f * pulse));
+        g.drawRoundedRectangle (r.expanded (2.0f + 2.0f * pulse), 10.0f, 2.0f + 2.5f * pulse);
+    }
+
     auto cap = r.reduced (6.0f).translated (0, on ? 2.0f : 0.0f);
-    const auto base = on ? colours::jamGreen.brighter (0.25f) : colours::jamGreen;
+    const auto base = on ? colours::jamGreen.brighter (0.15f + 0.45f * pulse) : colours::jamGreen.brighter (0.06f * breathe);
     juce::ColourGradient cg (base.brighter (over ? 0.12f : 0.0f), cap.getX(), cap.getY(),
                              colours::jamGreen.darker (0.8f), cap.getX(), cap.getBottom(), false);
     g.setGradientFill (cg);
     g.fillRoundedRectangle (cap, 6.0f);
     g.setColour (juce::Colours::white.withAlpha (on ? 0.10f : 0.22f));
     g.fillRoundedRectangle (cap.withHeight (cap.getHeight() * 0.36f).reduced (6, 3), 4.0f);
-    if (on)
-    {
-        g.setColour (colours::jamGold.withAlpha (0.5f));
-        g.drawRoundedRectangle (r.expanded (2.0f), 10.0f, 3.0f);
-    }
 
     // ícone + texto
     const float iconS = 16.0f;
-    auto content = cap.withSizeKeepingCentre (cap.getWidth(), cap.getHeight());
     g.setFont (stencil (17.0f, 0.2f));
     const juce::String text = on ? "STOP" : "PLAY";
     const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), text);
     const float total = iconS + 12.0f + tw;
-    const float x0 = content.getCentreX() - total * 0.5f, cy = content.getCentreY() + 1.0f;
+    const float x0 = cap.getCentreX() - total * 0.5f - (on ? 8.0f : 0.0f), cy = cap.getCentreY() + 1.0f;
     juce::Path icon;
     if (on) icon.addRoundedRectangle (x0, cy - iconS * 0.45f, iconS * 0.9f, iconS * 0.9f, 2.0f);
     else    icon.addTriangle (x0, cy - iconS * 0.55f, x0, cy + iconS * 0.55f, x0 + iconS, cy);
-    g.setColour (colours::jamGold);
+    g.setColour (colours::jamGold.withAlpha (on ? 1.0f : 0.75f + 0.25f * breathe));
     g.fillPath (icon);
     g.drawText (text, juce::Rectangle<float> (x0 + iconS + 12.0f, cy - 12.0f, tw + 4.0f, 24.0f), juce::Justification::centredLeft);
 
-    lampAt (g, juce::Rectangle<float> (10.0f, 10.0f).withCentre ({ cap.getRight() - 14.0f, cap.getY() + 13.0f }), on);
+    // tocando: três barrinhas de VU dançando no tempo ao lado do texto
+    if (on)
+    {
+        const float bx = x0 + iconS + 12.0f + tw + 9.0f, bottom = cy + 8.0f;
+        for (int i = 0; i < 3; ++i)
+        {
+            const float wob = 0.5f + 0.5f * (float) std::sin (now * (7.0 + 2.3 * i) + i * 1.7);
+            const float h = 4.0f + 12.0f * juce::jlimit (0.0f, 1.0f, 0.55f * pulse + 0.45f * wob);
+            g.setColour (colours::jamGold.withAlpha (0.85f));
+            g.fillRoundedRectangle (bx + (float) i * 5.0f, bottom - h, 3.0f, h, 1.0f);
+        }
+    }
+
+    lampAt (g, juce::Rectangle<float> (10.0f, 10.0f).withCentre ({ cap.getRight() - 14.0f, cap.getY() + 13.0f }), on && beatFrac < 0.35f);
 }
 
 //==============================================================================
@@ -612,34 +639,153 @@ void MidiDragZone::mouseDrag (const juce::MouseEvent&)
 //==============================================================================
 void BassRoll::update()
 {
+    if (drag != Drag::None) { repaint(); return; }   // durante o arraste a cópia local manda
     slots = proc.getSlots();
-    events = mbm::buildLoop (slots, proc.getSettings(), loopBeats);
+    events = proc.getCurrentLine (loopBeats);
+    editedLine = proc.hasEdits();
+    computeGeometry();
     repaint();
+}
+
+void BassRoll::computeGeometry()
+{
+    auto r = getLocalBounds().toFloat().reduced (3.0f);
+    area = r.reduced (8.0f, 6.0f);
+    header = area.removeFromTop (16.0f);
+    keysCol = area.removeFromLeft (30.0f);
+
+    // faixa de notas: em volta da linha, com pelo menos duas oitavas para ter onde pôr nota nova
+    int mn = 127, mx = 0;
+    for (const auto& e : events) { mn = std::min (mn, e.note); mx = std::max (mx, e.note); }
+    if (events.empty()) { mn = 31; mx = 43; }
+    lo = mn - 3; hi = mx + 3;
+    if (hi - lo < 24) { const int mid = (hi + lo) / 2; lo = mid - 12; hi = mid + 12; }
+    lo = juce::jmax (24, lo); hi = juce::jmin (72, hi);
+    rowH = area.getHeight() / (float) (hi - lo + 1);
+}
+
+double BassRoll::beatAt (float x) const
+{
+    return loopBeats * (double) ((x - area.getX()) / juce::jmax (1.0f, area.getWidth()));
+}
+
+int BassRoll::pitchAt (float y) const
+{
+    return juce::jlimit (lo, hi, lo + (int) std::floor ((area.getBottom() - y) / rowH));
+}
+
+juce::Rectangle<float> BassRoll::noteRect (const mbm::NoteEvent& e) const
+{
+    auto xOf = [&] (double beat) { return area.getX() + (float) (beat / loopBeats) * area.getWidth(); };
+    return juce::Rectangle<float> (xOf (e.start), area.getBottom() - (float) (e.note - lo + 1) * rowH,
+                                   juce::jmax (4.0f, xOf (e.start + e.length) - xOf (e.start)), rowH);
+}
+
+int BassRoll::noteAt (juce::Point<float> p, bool& onRightEdge) const
+{
+    onRightEdge = false;
+    for (int i = (int) events.size() - 1; i >= 0; --i)
+    {
+        const auto nr = noteRect (events[(size_t) i]).expanded (1.0f, 1.5f);
+        if (nr.contains (p))
+        {
+            onRightEdge = p.x > nr.getRight() - juce::jmin (7.0f, nr.getWidth() * 0.4f);
+            return i;
+        }
+    }
+    return -1;
+}
+
+void BassRoll::mouseMove (const juce::MouseEvent& e)
+{
+    bool edge = false;
+    const int i = area.contains (e.position) ? noteAt (e.position, edge) : -1;
+    setMouseCursor (i < 0 ? juce::MouseCursor::CrosshairCursor
+                          : (edge ? juce::MouseCursor::LeftRightResizeCursor : juce::MouseCursor::DraggingHandCursor));
+}
+
+void BassRoll::mouseDown (const juce::MouseEvent& e)
+{
+    if (loopBeats <= 0.0 || ! area.expanded (0, 2).contains (e.position)) return;
+    bool edge = false;
+    const int i = noteAt (e.position, edge);
+    dragChanged = false;
+    dragFrom = e.position;
+
+    if (e.mods.isPopupMenu())                       // botão direito apaga
+    {
+        if (i >= 0) { events.erase (events.begin() + i); proc.setEdits (events, loopBeats); }
+        return;
+    }
+    if (i >= 0)
+    {
+        dragIndex = i;
+        dragOrig = events[(size_t) i];
+        drag = edge ? Drag::Resize : Drag::Move;
+        return;
+    }
+    // espaço vazio: põe uma nota de colcheia no 1/16 mais próximo, na altura do clique
+    const double grid = e.mods.isShiftDown() ? 0.125 : 0.25;
+    const double start = juce::jlimit (0.0, loopBeats - grid, std::floor (beatAt (e.position.x) / grid) * grid);
+    events.push_back ({ start, 0.5, pitchAt (e.position.y), 100, 0, false });
+    dragIndex = (int) events.size() - 1;
+    dragOrig = events.back();
+    drag = Drag::Resize;
+    dragChanged = true;
+    repaint();
+}
+
+void BassRoll::mouseDrag (const juce::MouseEvent& e)
+{
+    if (drag == Drag::None || dragIndex < 0 || dragIndex >= (int) events.size()) return;
+    const double grid = e.mods.isShiftDown() ? 0.125 : 0.25;
+    const double dBeat = beatAt (e.position.x) - beatAt (dragFrom.x);
+    auto& n = events[(size_t) dragIndex];
+    if (drag == Drag::Move)
+    {
+        n.start = juce::jlimit (0.0, loopBeats - grid, std::round ((dragOrig.start + dBeat) / grid) * grid);
+        n.note  = juce::jlimit (24, 72, dragOrig.note + (int) std::round ((dragFrom.y - e.position.y) / rowH));
+    }
+    else
+        n.length = juce::jlimit (grid * 0.5, loopBeats, std::round ((dragOrig.length + dBeat) / grid) * grid);
+    dragChanged = dragChanged || ! juce::exactlyEqual (n.start, dragOrig.start) || n.note != dragOrig.note || ! juce::exactlyEqual (n.length, dragOrig.length);
+    repaint();
+}
+
+void BassRoll::mouseUp (const juce::MouseEvent&)
+{
+    if (drag != Drag::None && dragChanged)
+        proc.setEdits (events, loopBeats);
+    drag = Drag::None;
+    dragIndex = -1;
+    update();
+}
+
+void BassRoll::mouseDoubleClick (const juce::MouseEvent& e)
+{
+    bool edge = false;
+    const int i = noteAt (e.position, edge);
+    if (i < 0) return;
+    events.erase (events.begin() + i);
+    drag = Drag::None;
+    proc.setEdits (events, loopBeats);
+    update();
 }
 
 void BassRoll::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds().toFloat().reduced (3.0f);
     glassBox (g, r);
-    if (loopBeats <= 0.0 || events.empty()) return;
+    if (area.isEmpty()) computeGeometry();
+    if (loopBeats <= 0.0) return;
 
-    auto area = r.reduced (8.0f, 6.0f);
-    auto header = area.removeFromTop (16.0f);
-    auto keys = area.removeFromLeft (30.0f);
-
-    int lo = 127, hi = 0;
-    for (const auto& e : events) { lo = std::min (lo, e.note); hi = std::max (hi, e.note); }
-    lo -= 2; hi += 2;
-    if (hi - lo < 14) { const int mid = (hi + lo) / 2; lo = mid - 7; hi = mid + 7; }
-    const float rowH = area.getHeight() / (float) (hi - lo + 1);
     auto yOf = [&] (int n) { return area.getBottom() - (float) (n - lo + 1) * rowH; };
     auto xOf = [&] (double beat) { return area.getX() + (float) (beat / loopBeats) * area.getWidth(); };
 
-    // faixas de oitava/semitom e nomes das notas Cs e Es à esquerda
+    // faixas de semitom e nomes das notas C, E e A à esquerda
     for (int n = lo; n <= hi; ++n)
     {
-        const bool blackKey = isBlack (n % 12);
-        if (blackKey)
+        if (isBlack (n % 12))
         {
             g.setColour (juce::Colours::black.withAlpha (0.22f));
             g.fillRect (area.getX(), yOf (n), area.getWidth(), rowH);
@@ -648,12 +794,12 @@ void BassRoll::paint (juce::Graphics& g)
         {
             g.setColour (colours::amber.withAlpha (0.45f));
             g.setFont (stencil (8.5f, 0.0f));
-            g.drawText (juce::MidiMessage::getMidiNoteName (n, true, true, 4), keys.withY (yOf (n) - 4.0f).withHeight (rowH + 8.0f),
+            g.drawText (juce::MidiMessage::getMidiNoteName (n, true, true, 4), keysCol.withY (yOf (n) - 4.0f).withHeight (rowH + 8.0f),
                         juce::Justification::centredLeft);
         }
     }
 
-    // acordes: faixas e rótulos
+    // acordes
     double x = 0;
     for (int i = 0; i < (int) slots.size(); ++i)
     {
@@ -670,33 +816,36 @@ void BassRoll::paint (juce::Graphics& g)
                     juce::Justification::centredLeft);
         x += s.beats;
     }
-    // compassos e tempos
-    for (double b = 1; b < loopBeats; b += 1)
+    // grade: compassos, tempos e semicolcheias
+    for (double b = 0.25; b < loopBeats; b += 0.25)
     {
-        const bool bar = std::fmod (b, 4.0) < 1e-6;
-        g.setColour (colours::amber.withAlpha (bar ? 0.16f : 0.06f));
+        const bool bar = std::fmod (b, 4.0) < 1e-6, beat = std::fmod (b, 1.0) < 1e-6;
+        g.setColour (colours::amber.withAlpha (bar ? 0.18f : (beat ? 0.08f : 0.03f)));
         g.drawVerticalLine ((int) xOf (b), area.getY(), area.getBottom());
     }
 
     const double pos = proc.getPlayPositionInLoop();
     const int sounding = pos >= 0.0 ? proc.getSoundingNote() : -1;
 
-    for (const auto& e : events)
+    for (int i = 0; i < (int) events.size(); ++i)
     {
-        auto nr = juce::Rectangle<float> (xOf (e.start), yOf (e.note), juce::jmax (3.0f, xOf (e.start + e.length) - xOf (e.start)), rowH)
-                      .reduced (0.0f, rowH > 6.0f ? 1.0f : 0.0f);
+        const auto& e = events[(size_t) i];
+        auto nr = noteRect (e).reduced (0.0f, rowH > 6.0f ? 1.0f : 0.0f);
         const bool now = pos >= 0.0 && pos >= e.start && pos < e.start + e.length && e.note == sounding;
+        const bool held = i == dragIndex && drag != Drag::None;
         const float a = 0.45f + 0.55f * (float) e.velocity / 127.0f;
         const auto c = e.fill ? colours::jamGold : colours::amber;
-        if (now)
+        if (now || held)
         {
             g.setColour (c.withAlpha (0.35f));
             g.fillRoundedRectangle (nr.expanded (3.0f), 3.0f);
         }
-        g.setColour ((now ? juce::Colour (0xffffe3a0) : c).withAlpha (now ? 1.0f : a));
+        g.setColour ((now || held ? juce::Colour (0xffffe3a0) : c).withAlpha (now || held ? 1.0f : a));
         g.fillRoundedRectangle (nr, 2.0f);
         g.setColour (juce::Colours::black.withAlpha (0.5f));
         g.drawRoundedRectangle (nr, 2.0f, 0.6f);
+        g.setColour (juce::Colour (0xff2a1a05).withAlpha (0.55f));                // pegador da borda direita
+        g.fillRect (nr.getRight() - 2.5f, nr.getY() + 1.5f, 1.2f, juce::jmax (1.0f, nr.getHeight() - 3.0f));
         if (nr.getWidth() > 22.0f && rowH >= 7.0f)
         {
             g.setColour (juce::Colour (0xff2a1a05));
@@ -712,6 +861,16 @@ void BassRoll::paint (juce::Graphics& g)
         g.fillRect (px - 3.0f, header.getY(), 6.0f, area.getBottom() - header.getY());
         g.setColour (juce::Colour (0xffffe3a0));
         g.fillRect (px - 1.0f, header.getY(), 2.0f, area.getBottom() - header.getY());
+    }
+
+    // carimbo de linha editada
+    if (editedLine)
+    {
+        auto stamp = juce::Rectangle<float> (r.getRight() - 96.0f, r.getY() + 5.0f, 86.0f, 15.0f);
+        g.setColour (colours::cream.withAlpha (0.9f));
+        g.drawRoundedRectangle (stamp, 2.0f, 1.0f);
+        g.setFont (stencil (9.0f, 0.2f));
+        g.drawText ("EDITADA", stamp, juce::Justification::centred);
     }
 
     g.setColour (juce::Colours::white.withAlpha (0.04f));
@@ -880,6 +1039,9 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     addAndMakeVisible (newIdeaBtn);
 
     play = std::make_unique<PlayButton> (*proc.apvts.getParameter ("preview"));
+    play->beatPosition = [this] { return proc.getPlayPositionInLoop(); };
+    clearEditsBtn.onClick = [this] { proc.clearEdits(); roll.update(); };
+    addAndMakeVisible (clearEditsBtn);
     addAndMakeVisible (*play);
     setupKnob (bpm, "bpm", "BPM");
 
@@ -997,9 +1159,81 @@ void BassMachinePanel::timerCallback()
                 c->setAlpha (on ? 1.0f : 0.38f);
         }
     }
+    proc.dropStaleEdits();
+    const bool edited = proc.hasEdits();
+    clearEditsBtn.setEnabled (edited);
+    clearEditsBtn.setAlpha (edited ? 1.0f : 0.4f);
+
+    const int st = (int) proc.apvts.getRawParameterValue ("style")->load();
+    if (st != flapStyle)            // baixista trocado: as palhetas do letreiro giram até o nome novo
+    {
+        flapStart = flapStyle < 0 ? -10.0 : juce::Time::getMillisecondCounterHiRes() * 0.001;
+        flapStyle = st;
+    }
+
     roll.update();
     scope.update();
     repaint();
+}
+
+// Letreiro de palhetas (split-flap) como os painéis de estação e aeroporto: cada letra é uma
+// plaquinha preta dividida ao meio; ao trocar de baixista as palhetas giram, uma depois da outra,
+// passando pelo alfabeto até parar na letra certa.
+void BassMachinePanel::drawFlapBoard (juce::Graphics& g, juce::Rectangle<float> r)
+{
+    static const char* alphabet = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    constexpr int cells = 15;
+    juce::String name (mbm::styleName (juce::jmax (0, flapStyle)));
+    const int pad = (cells - name.length()) / 2;
+    name = juce::String::repeatedString (" ", pad) + name + juce::String::repeatedString (" ", cells - pad - name.length());
+
+    const double now = juce::Time::getMillisecondCounterHiRes() * 0.001;
+    const double t = now - flapStart;
+    const float gap = 2.0f, cw = (r.getWidth() - gap * (cells - 1)) / (float) cells;
+
+    g.setColour (juce::Colour (0xff0c0907));
+    g.fillRoundedRectangle (r.expanded (3.0f), 4.0f);
+    for (int i = 0; i < cells; ++i)
+    {
+        auto c = juce::Rectangle<float> (r.getX() + (float) i * (cw + gap), r.getY(), cw, r.getHeight());
+        const double settle = 0.18 + 0.045 * i;                 // cada palheta para um pouco depois da anterior
+        const bool spinning = t < settle;
+        juce::juce_wchar ch = name[i];
+        float flap = 0.0f;                                      // 0..1: meia palheta caindo
+        if (spinning)
+        {
+            const double rate = 26.0;                           // trocas por segundo
+            const int k = (int) (t * rate);
+            ch = (juce::juce_wchar) alphabet[(k * 7 + i * 3) % 27];
+            flap = (float) std::fmod (t * rate, 1.0);
+        }
+
+        juce::ColourGradient pg (juce::Colour (0xff2b2723), c.getX(), c.getY(), juce::Colour (0xff12100e), c.getX(), c.getBottom(), false);
+        g.setGradientFill (pg);
+        g.fillRoundedRectangle (c, 2.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.06f));
+        g.fillRoundedRectangle (c.withHeight (c.getHeight() * 0.5f), 2.0f);
+
+        g.setFont (stencil (c.getHeight() * 0.54f, 0.0f));
+        g.setColour (juce::Colour (0xfff3e6c0).withAlpha (spinning ? 0.85f : 1.0f));
+        g.drawText (juce::String::charToString (ch), c.translated (0, 0.5f), juce::Justification::centred);
+
+        if (spinning && flap > 0.05f)                           // meia palheta de cima caindo
+        {
+            const float h = c.getHeight() * 0.5f * (1.0f - flap);
+            auto top = c.withHeight (h).withY (c.getCentreY() - h);
+            g.setColour (juce::Colour (0xff1d1a17));
+            g.fillRect (top);
+            g.setColour (juce::Colours::black.withAlpha (0.45f * (1.0f - flap)));
+            g.fillRect (top.withY (c.getCentreY()).withHeight (juce::jmin (3.0f, c.getHeight() * 0.1f)));
+        }
+
+        g.setColour (juce::Colours::black.withAlpha (0.85f));    // fresta do meio e pinos laterais
+        g.fillRect (c.getX(), c.getCentreY() - 0.6f, c.getWidth(), 1.2f);
+        g.setColour (juce::Colour (0xff6d6a64));
+        g.fillRect (c.getX() - 0.5f, c.getCentreY() - 1.5f, 1.5f, 3.0f);
+        g.fillRect (c.getRight() - 1.0f, c.getCentreY() - 1.5f, 1.5f, 3.0f);
+    }
 }
 
 //==============================================================================
@@ -1141,8 +1375,8 @@ void BassMachinePanel::renderBackground()
 
     // --- cabeçalho
     g.setColour (colours::ink);
-    g.setFont (stencil (25.0f, 0.15f));
-    const juce::String title ("MASTOR REGGAE BASS MACHINE " + versionShort());
+    g.setFont (stencil (22.0f, 0.12f));
+    const juce::String title ("MASTOR REGGAE BASS MACHINE MRBM-69 " + versionShort());
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
@@ -1183,7 +1417,7 @@ void BassMachinePanel::renderBackground()
     }
     g.setColour (colours::inkSoft);
     g.setFont (stencil (10.5f, 0.25f));
-    g.drawText (juce::String::fromUTF8 ("MRBM-69  \xc2\xb7  GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
+    g.drawText (juce::String::fromUTF8 ("GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
         const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
@@ -1226,7 +1460,7 @@ void BassMachinePanel::renderBackground()
     section (harmonyPanel, "HARMONIA");
     section (linePanel,    "LINHA DE BAIXO");
     section (previewPanel, "PREVIEW");
-    section (timbrePanel,  juce::String::fromUTF8 ("TIMBRE  \xc2\xb7  DUB BASS"));
+    section (timbrePanel,  "SOM DO BAIXO");
     section (scopePanel,   juce::String::fromUTF8 ("OSCILOSCÓPIO"));
     section (midiPanel,    "MIDI");
     section (drumsPanel,   "BATERIA DE ACOMPANHAMENTO");
@@ -1281,7 +1515,9 @@ void BassMachinePanel::renderBackground()
     // dicas gravadas
     g.setColour (colours::inkSoft);
     g.setFont (stencil (8.5f, 0.12f));
-    g.drawFittedText (juce::String::fromUTF8 ("CLIQUE NAS SETAS PARA VOLTAR A UMA IDEIA  \xc2\xb7  SHIFT = DE 10 EM 10"), ideaHint, juce::Justification::centred, 2);
+    g.drawFittedText (juce::String::fromUTF8 ("EDITE NO VISOR: CLIQUE PÕE NOTA, ARRASTE MOVE, BORDA ESTICA, DUPLO CLIQUE APAGA"), ideaHint, juce::Justification::centred, 3);
+    g.setFont (stencil (8.5f, 0.3f));
+    g.drawText (juce::String::fromUTF8 ("TIMBRE  \xc2\xb7  MRDBI-07"), timbreKeysLabel, juce::Justification::centred);
 }
 
 void BassMachinePanel::paint (juce::Graphics& g)
@@ -1303,15 +1539,12 @@ void BassMachinePanel::paint (juce::Graphics& g)
     const int st = (int) proc.apvts.getRawParameterValue ("style")->load();
     {
         auto r = styleDisplay.toFloat();
-        glassBox (g, r);
-        g.setColour (colours::amber);
-        g.setFont (stencil (17.0f, 0.14f));
-        g.drawText (mbm::styleName (st), r.withTrimmedBottom (r.getHeight() * 0.42f), juce::Justification::centredBottom);
-        g.setColour (colours::amber.withAlpha (0.65f));
-        g.setFont (stencil (9.5f, 0.2f));
-        g.drawText (mbm::styleTagline (st), r.withTrimmedTop (r.getHeight() * 0.6f), juce::Justification::centredTop);
-        g.setColour (juce::Colours::white.withAlpha (0.05f));
-        g.fillRoundedRectangle (r.withHeight (r.getHeight() * 0.45f), 3.0f);
+        drawFlapBoard (g, r.removeFromTop (30.0f));
+        r.removeFromTop (5.0f);
+        const bool settled = juce::Time::getMillisecondCounterHiRes() * 0.001 - flapStart > 0.9;
+        g.setColour (colours::ink.withAlpha (settled ? 0.85f : 0.35f));
+        g.setFont (stencil (9.5f, 0.24f));
+        g.drawText (mbm::styleTagline (st), r, juce::Justification::centred);
     }
 
     const int tb = (int) proc.apvts.getRawParameterValue ("timbre")->load();
@@ -1375,8 +1608,8 @@ void BassMachinePanel::resized()
         }
     }
 
-    // --- linha 2: LINHA DE BAIXO (ideia | visor | toque)
-    linePanel = { 52, 476, W - 104, 172 };
+    // --- linha 2: LINHA DE BAIXO (ideia | visor editável | toque)
+    linePanel = { 52, 476, W - 104, 236 };
     {
         auto a = linePanel.reduced (14, 0);
         a.removeFromTop (18);
@@ -1385,45 +1618,50 @@ void BassMachinePanel::resized()
         idea->setBounds (left.removeFromTop (46));
         left.removeFromTop (8);
         newIdeaBtn.setBounds (left.removeFromTop (54));
+        left.removeFromTop (8);
+        clearEditsBtn.setBounds (left.removeFromTop (44));
         ideaHint = left.reduced (0, 2);
         a.removeFromLeft (12);
         auto right = a.removeFromRight (170);
         const int kw = right.getWidth() / 2;
-        placeKnob (velocity, right.removeFromLeft (kw));
-        placeKnob (gate, right);
+        auto knobs = right.withSizeKeepingCentre (right.getWidth(), 120);
+        placeKnob (velocity, knobs.removeFromLeft (kw));
+        placeKnob (gate, knobs);
         a.removeFromRight (10);
         roll.setBounds (a);
     }
 
-    // --- linha 3: PREVIEW | TIMBRE | OSCILOSCÓPIO | MIDI
-    const int y3 = 670, h3 = 168;
-    previewPanel = { 52, y3, 214, h3 };
-    timbrePanel  = { 280, y3, 470, h3 };
-    scopePanel   = { 764, y3, 226, h3 };
+    // --- linha 3: PREVIEW (play, bpm, timbre) | SOM DO BAIXO | OSCILOSCÓPIO | MIDI
+    const int y3 = 734, h3 = 172;
+    previewPanel = { 52, y3, 420, h3 };
+    timbrePanel  = { 486, y3, 290, h3 };
+    scopePanel   = { 790, y3, 200, h3 };
     midiPanel    = { 1004, y3, W - 52 - 1004, h3 };
     {
         auto a = previewPanel.reduced (12, 0);
         a.removeFromTop (20);
         a.removeFromBottom (10);
-        play->setBounds (a.removeFromLeft (118).withSizeKeepingCentre (118, 84));
+        play->setBounds (a.removeFromLeft (122).withSizeKeepingCentre (122, 84));
         a.removeFromLeft (4);
-        placeKnob (bpm, a.withTrimmedTop (10).withTrimmedBottom (10));
+        placeKnob (bpm, a.removeFromLeft (74).withTrimmedTop (10).withTrimmedBottom (10));
+        a.removeFromLeft (8);
+        auto t = a.withSizeKeepingCentre (a.getWidth(), 80);
+        timbreKeysLabel = t.removeFromTop (14);
+        t.removeFromTop (4);
+        timbreKeys->setBounds (t);
     }
     {
         auto a = timbrePanel.reduced (12, 0);
         a.removeFromTop (18);
-        a.removeFromBottom (8);
-        auto left = a.removeFromLeft (164);
-        timbreDisplay = left.removeFromTop (38).reduced (2, 0);
-        left.removeFromTop (14);
-        timbreKeys->setBounds (left.removeFromTop (60));
-        a.removeFromLeft (12);
-        auto knobs = a.removeFromTop (96);
+        a.removeFromBottom (6);
+        timbreDisplay = a.removeFromTop (34).reduced (2, 0);
+        a.removeFromTop (4);
+        auto knobs = a.removeFromTop (84);
         const int kw = knobs.getWidth() / 4;
         for (auto* k : { &inGain, &tone, &drive, &volume })
             placeKnob (*k, knobs.removeFromLeft (kw));
-        a.removeFromTop (8);
-        sound.button.setBounds (a.removeFromTop (32).reduced (24, 0));
+        a.removeFromTop (2);
+        sound.button.setBounds (a.removeFromTop (28).reduced (50, 0));
     }
     scope.setBounds (scopePanel.reduced (8, 0).withTrimmedTop (16).withTrimmedBottom (6));
     {
@@ -1439,7 +1677,7 @@ void BassMachinePanel::resized()
     }
 
     // --- linha 4: ACOMPANHAMENTO (bateria | teclado do Roots Keys)
-    const int y4 = 862, h4 = 116;
+    const int y4 = 928, h4 = 116;
     drumsPanel = { 52, y4, 560, h4 };
     keysPanel  = { 626, y4, W - 52 - 626, h4 };
     for (auto [panel, onBtn, sel, vol] : { std::tuple<juce::Rectangle<int>, Toggle*, InterlockKeys*, Knob*> { drumsPanel, &drumsOn, drumKeys.get(), &drumVol },

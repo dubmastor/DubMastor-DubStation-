@@ -117,22 +117,48 @@ class PlayButton : public ParamControl
 {
 public:
     using ParamControl::ParamControl;
+    std::function<double()> beatPosition;   // posição no loop (tempos); -1 = parado: pulsa no tempo
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override { select (index() == 0 ? 1 : 0); }
 };
 
 // Visor da linha de baixo: rolo de piano âmbar com os acordes e o cursor de reprodução
+// Visor editável: clique num espaço vazio põe nota; arraste a nota para mover (tempo e altura),
+// arraste a borda direita para esticar; duplo clique (ou botão direito) apaga. Grade de 1/16 (Shift = 1/32).
 class BassRoll : public juce::Component
 {
 public:
-    explicit BassRoll (BassMachineProcessor& p) : proc (p) { setInterceptsMouseClicks (false, false); }
+    explicit BassRoll (BassMachineProcessor& p) : proc (p) { setMouseCursor (juce::MouseCursor::CrosshairCursor); }
     void update();   // chamado pelo timer do painel
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseMove (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
 private:
+    void computeGeometry();
+    int noteAt (juce::Point<float>, bool& onRightEdge) const;
+    double beatAt (float x) const;
+    int pitchAt (float y) const;
+    juce::Rectangle<float> noteRect (const mbm::NoteEvent&) const;
+
     BassMachineProcessor& proc;
     std::vector<mbm::NoteEvent> events;
     std::vector<mbm::ChordSlot> slots;
     double loopBeats = 0.0;
+    bool editedLine = false;
+
+    // geometria do visor (congelada durante um arraste)
+    juce::Rectangle<float> area, header, keysCol;
+    int lo = 28, hi = 52;
+    float rowH = 6.0f;
+
+    enum class Drag { None, Move, Resize } drag = Drag::None;
+    int dragIndex = -1;
+    mbm::NoteEvent dragOrig {};
+    juce::Point<float> dragFrom;
+    bool dragChanged = false;
 };
 
 // Osciloscópio de tubo verde: mostra a onda que sai do som interno
@@ -158,7 +184,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    static constexpr int kW = 1240, kH = 1000;
+    static constexpr int kW = 1240, kH = 1064;
 
 private:
     using SliderAttach = juce::AudioProcessorValueTreeState::SliderAttachment;
@@ -198,6 +224,12 @@ private:
 
     std::array<ChordModule, BassMachineProcessor::numSlots> mods;
     std::unique_ptr<InterlockKeys> styleKeys, drumKeys, keysKeys, timbreKeys;
+    juce::TextButton clearEditsBtn { juce::String::fromUTF8 ("DESFAZER EDIÇÃO") };
+
+    // letreiro de palhetas (split-flap) com o nome do baixista
+    void drawFlapBoard (juce::Graphics&, juce::Rectangle<float>);
+    int flapStyle = -1;
+    double flapStart = 0.0;
     Knob density, variation, swing, base;
     Knob velocity, gate;
     Knob bpm;
@@ -217,7 +249,7 @@ private:
     juce::Image background;
     juce::Rectangle<int> woodL, woodR, plate;
     juce::Rectangle<int> stylePanel, harmonyPanel, linePanel, previewPanel, timbrePanel, scopePanel, midiPanel, drumsPanel, keysPanel;
-    juce::Rectangle<int> styleDisplay, timbreDisplay, ideaHint;
+    juce::Rectangle<int> styleDisplay, timbreDisplay, ideaHint, timbreKeysLabel;
     std::array<bool, BassMachineProcessor::numSlots> lastOn {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BassMachinePanel)

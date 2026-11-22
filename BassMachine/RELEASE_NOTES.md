@@ -1,4 +1,14 @@
-# Mastor Reggae Bass Machine MRBM-69 — 2.4 · Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 — 2.5 · Gerador de Reggae Bass Lines
+
+- **MIDI editável** no visor: põe, move, estica e apaga notas (grade 1/16, Shift = 1/32); DESFAZER EDIÇÃO; a linha editada fica salva no projeto e sai no MIDI
+- **Timbre no PREVIEW** com os timbres do MRDBI-07: Roots (Sine), Super Tone e 808 (preset MÉDIO)
+- **PLAY animado**: halo, lâmpada e barrinhas de VU pulsam no tempo; parado, o botão respira
+- **Letreiro de palhetas** (split-flap) com o nome do baixista, que gira ao trocar de estilo
+- Nome completo no título: MASTOR REGGAE BASS MACHINE MRBM-69
+- **Versão para navegador** (site/bassmachine), com o mesmo gerador do plugin conferido nota a nota no CI
+- Compila com o Mastor Reggae Chord Machine MRCM-1240 1.6
+
+## 2.4
 
 - Novo nome: **Mastor Reggae Bass Machine MRBM-69** (antes Mastor Bass Machine MBM-710) no título, na DAW, nos instaladores, na release e no site
 - Os códigos do plugin continuam os mesmos: projetos que usavam o nome antigo abrem com o novo

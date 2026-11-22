@@ -8,6 +8,47 @@
 int main (int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI gui;
+
+    // autoteste da edição de MIDI: editar, salvar o projeto, reabrir, conferir; mexer no gerador apaga
+    if (argc > 1 && juce::String (argv[1]) == "--edit-test")
+    {
+        int fails = 0;
+        BassMachineProcessor a;
+        a.prepareToPlay (48000.0, 512);
+        double lb = 0; auto line = a.getCurrentLine (lb);
+        line.push_back ({ 1.25, 0.5, 45, 110, 0, false });     // nota nova
+        line.erase (line.begin());                             // apaga a primeira
+        a.setEdits (line, lb);
+        if (! a.hasEdits()) { std::printf ("FALHOU: setEdits\n"); ++fails; }
+        double lb2 = 0; const auto got = a.getCurrentLine (lb2);
+        bool found = false; for (const auto& e : got) found |= (e.note == 45 && std::abs (e.start - 1.25) < 1e-9);
+        if (! found || std::abs (lb2 - lb) > 1e-9) { std::printf ("FALHOU: linha editada\n"); ++fails; }
+        for (size_t i = 0; i + 1 < got.size(); ++i)
+            if (got[i].start + got[i].length > got[i + 1].start + 1e-9) { std::printf ("FALHOU: sobreposicao\n"); ++fails; }
+
+        juce::MemoryBlock mb; a.getStateInformation (mb);
+        BassMachineProcessor b; b.prepareToPlay (48000.0, 512);
+        b.setStateInformation (mb.getData(), (int) mb.getSize());
+        double lb3 = 0; const auto back = b.getCurrentLine (lb3);
+        if (! b.hasEdits() || back.size() != got.size()) { std::printf ("FALHOU: edicao nao voltou com o projeto\n"); ++fails; }
+
+        auto f = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("mrbm_edit_test.mid");
+        if (! b.writeMidiFile (f)) { std::printf ("FALHOU: export\n"); ++fails; }
+        else
+        {
+            juce::FileInputStream in (f); juce::MidiFile mf; mf.readFrom (in);
+            int ons = 0; for (auto* ev : *mf.getTrack (1)) ons += ev->message.isNoteOn();
+            const int reps = 2;   // REPETIR padrão = 2x
+            if (ons != (int) got.size() * reps) { std::printf ("FALHOU: MIDI exportado sem a edicao (%d notas)\n", ons); ++fails; }
+        }
+
+        if (auto* p = b.apvts.getParameter ("seed")) p->setValueNotifyingHost (p->convertTo0to1 (7.0f));
+        b.dropStaleEdits();
+        if (b.hasEdits()) { std::printf ("FALHOU: edicao deveria sumir ao mexer no gerador\n"); ++fails; }
+        if (auto* p = b.apvts.getParameter ("timbre")) p->setValueNotifyingHost (p->convertTo0to1 (2.0f));
+        std::printf (fails == 0 ? "EDICAO OK\n" : "%d FALHAS NA EDICAO\n", fails);
+        return fails == 0 ? 0 : 1;
+    }
     const juce::String out = argc > 1 ? juce::String (argv[1]) : juce::String ("interface.png");
 
     BassMachineProcessor proc;

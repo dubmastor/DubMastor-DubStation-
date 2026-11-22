@@ -387,6 +387,8 @@ inline int approachNote (int prevNote, int nextRoot, int base, Rng& rng)
 }
 
 //==============================================================================
+inline void monophonic (std::vector<NoteEvent>& ev, double loopBeats);
+
 // Gera o loop completo a partir dos acordes ativos
 inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, const Settings& s, double& loopBeats)
 {
@@ -475,7 +477,13 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
     }
     loopBeats = pos;
 
-    // baixo é monofônico: cada nota termina antes da próxima começar (inclusive na volta do loop)
+    monophonic (ev, loopBeats);
+    return ev;
+}
+
+// baixo é monofônico: ordena e faz cada nota terminar antes da próxima começar (inclusive na volta do loop)
+inline void monophonic (std::vector<NoteEvent>& ev, double loopBeats)
+{
     std::sort (ev.begin(), ev.end(), [] (const NoteEvent& a, const NoteEvent& b) { return a.start < b.start; });
     for (size_t i = 0; i < ev.size(); ++i)
     {
@@ -483,7 +491,6 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slotsIn, 
         const double maxLen = nextStart - ev[i].start - 0.02;
         ev[i].length = std::max (0.04, std::min (ev[i].length, maxLen));
     }
-    return ev;
 }
 
 } // namespace mbm

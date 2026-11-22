@@ -1,4 +1,4 @@
-// Mastor Reggae Bass Machine MRBM-69 — som do preview com o sistema de timbres do Dub Bass
+// Mastor Reggae Bass Machine MRBM-69 — som do preview com o sistema de timbres do MRDBI-07 (Dub Bass)
 //
 // Usa as mesmas peças do Dub Bass (pasta ../../DubBass/Source): a voz BassVoice (Classic Sine com
 // harmônicos ou 808), o filtro passa-baixa, as saturações TUBE / TAPE / FUZZ e o Maximizer.
@@ -23,18 +23,20 @@ struct DubBassPreset
     float driveDb, drvToneHz, drvMix;
 };
 
-enum TimbreId { RootsSine, SuperTone, NumTimbres };
+enum TimbreId { RootsSine, SuperTone, Eight08, NumTimbres };
 
-// Os dois timbres com os valores iniciais do Dub Bass 1.3: Harm 2 15 %, Harm 3 8 %, Glide 20 ms,
-// ataque 3 ms, decay 600 ms, sustain 85 %, release 180 ms, cutoff 900 Hz, ressonância 0,8,
-// válvula (saturação) e reverb desligados, EQ plano, sem bass boost, maximizer +3 dB / teto -0,3 dB.
+// Os timbres do Mastor Reggae Dub Bass Instrument MRDBI-07 com os valores de fábrica dele:
+// Harm 2 15 %, Harm 3 8 %, Glide 20 ms, ataque 3 ms, decay 600 ms, sustain 85 %, release 180 ms,
+// cutoff 900 Hz, ressonância 0,8, válvula (saturação) e reverb desligados, maximizer +3 dB / teto -0,3 dB.
+// O 808 usa o preset MÉDIO do MRDBI-07 (ataque 1 ms, decay 750 ms, release 220 ms, drop de 12 st em 70 ms).
 inline const DubBassPreset& timbre (int i)
 {
     using M = BassVoice::Mode;
     static const DubBassPreset t[NumTimbres] = {
         //  nome            descrição                         modo            h2     h3     808p   808t   A     D       S      R       cutoff  reso  tipo drive tone     mix
-        { "ROOTS (SINE)",  "CLASSIC SINE DO DUB BASS",       M::ClassicSine, 0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
-        { "SUPER TONE",    "DIGITAL KING JAMMY (DUB BASS)",  M::SuperTone,   0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
+        { "ROOTS (SINE)",  "BASS / CLASSIC SINE DO MRDBI-07", M::ClassicSine, 0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
+        { "SUPER TONE",    "DIGITAL KING JAMMY (MRDBI-07)",   M::SuperTone,   0.15f, 0.08f, 12.0f, 70.0f, 3.0f, 600.0f, 0.85f, 180.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
+        { "808",           "808 MEDIO DO MRDBI-07",           M::Eight08,     0.15f, 0.08f, 12.0f, 70.0f, 1.0f, 750.0f, 0.0f,  220.0f, 900.0f, 0.8f, 0, 6.0f, 5000.0f, 0.50f },
     };
     return t[std::clamp (i, 0, NumTimbres - 1)];
 }

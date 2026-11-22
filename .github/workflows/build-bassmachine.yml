@@ -11,6 +11,7 @@ on:
       - 'DubDrums/Source/PatternGenerator.h'
       - 'DubChords/Source/DubSynth.h'
       - 'RootsKeys/Source/RootsKeysEngine.h'
+      - 'site/bassmachine/engine.js'
       - '.github/workflows/build-bassmachine.yml'
     tags:
       - 'MRBM-69-*'
@@ -38,6 +39,13 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -Wall tests/engine_test.cpp -o engine_test
           ./engine_test
+      - name: Versão para navegador = plugin (site/bassmachine/engine.js, nota a nota)
+        run: |
+          g++ -std=c++17 -O2 -Wall tests/dump_engine.cpp -o dump_engine
+          ./dump_engine book > book.json
+          ./dump_engine lines > lines.json
+          ./dump_engine drums > drums.json
+          node tests/web_engine_test.js book.json lines.json drums.json
 
   build:
     needs: engine-test

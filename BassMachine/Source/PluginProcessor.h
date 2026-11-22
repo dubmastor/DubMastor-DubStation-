@@ -48,6 +48,14 @@ public:
     int getSoundingNote() const { return soundingNote.load(); }          // -1 = nenhuma
     void newIdea();                                                      // sorteia outra IDEIA
 
+    // MIDI editável (thread da interface). A linha editada fica salva no projeto e vale até um
+    // controle do gerador (estilo, ideia, harmonia, densidade...) ser mexido, como no MRDM-12.
+    std::vector<mbm::NoteEvent> getCurrentLine (double& loopBeatsOut) const;   // editada, se houver
+    void setEdits (std::vector<mbm::NoteEvent> events, double loopBeatsIn);
+    bool hasEdits() const;
+    void clearEdits();
+    void dropStaleEdits();                                               // chamada pelo timer da interface
+
     // osciloscópio: últimas amostras da saída (mono)
     static constexpr int kScopeSize = 8192;
     void copyScope (float* dest, int n) const
@@ -70,6 +78,13 @@ private:
     juce::AudioBuffer<float> monoBuf;
 
     float param (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
+    uint64_t settingsKey() const;   // impressão digital dos controles do gerador (sem alocar)
+
+    mutable juce::SpinLock editLock;
+    std::vector<mbm::NoteEvent> edits;
+    double editsLoopBeats = 0.0;
+    uint64_t editsKey = 0;
+    bool editsOn = false;
 
     mbm::DubBassPreview synth;   // sistema de timbres do Dub Bass
 

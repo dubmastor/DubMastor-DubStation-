@@ -1,8 +1,8 @@
-# Mastor Reggae Bass Machine MRBM-69 2.4 — Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 2.5 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.5/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.5/MRBM-69-macOS.zip)**
 
 ![Interface do Reggae Bass Machine](docs/interface.png)
 
@@ -13,7 +13,7 @@ Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um **ins
 carregue numa *Instrument Track*.
 
 ## ESTILO (botoeira de 7 teclas)
-Teclas intertravadas como as de um rádio valvulado: apertar uma solta a outra.
+Teclas intertravadas como as de um rádio valvulado: apertar uma solta a outra. O nome do baixista aparece num **letreiro de palhetas** (split-flap, como os painéis de estação): ao trocar, as palhetas giram passando pelo alfabeto até parar no nome novo.
 
 | Tecla | Baixista | O que o gerador faz |
 |---|---|---|
@@ -41,14 +41,15 @@ e **ON** nos acordes 2 a 4. O plugin abre com **dois acordes ligados, Am e Dm, d
 |---|---|
 | **IDEIA** | Número da sugestão. A mesma ideia gera sempre a mesma linha: clique nas setas para voltar a uma de que você gostou (Shift = de 10 em 10) |
 | **NOVA IDEIA** | Sorteia outra linha com os mesmos acordes e o mesmo estilo |
-| **Visor** | Rolo de piano âmbar com as notas, os acordes e o cursor. Notas douradas são de virada |
+| **Visor (MIDI editável)** | Rolo de piano âmbar com as notas, os acordes e o cursor. **Clique num espaço vazio** põe nota, **arraste a nota** para mover (tempo e altura), **arraste a borda direita** para esticar, **duplo clique** (ou botão direito) apaga. Grade de 1/16 (Shift = 1/32). Notas douradas são de virada |
+| **DESFAZER EDIÇÃO** | Volta para a linha que o gerador sugeriu. A linha editada fica salva no projeto e vale até um controle do gerador (estilo, ideia, harmonia, densidade...) ser mexido, como no MRDM-12. O MIDI arrastado/exportado sai com as edições |
 | **VELOCITY / SUSTENTA** | Força das notas e quanto cada nota segura |
 
-## PREVIEW e TIMBRE (Dub Bass)
+## PREVIEW e SOM DO BAIXO (MRDBI-07)
 | Controle | O que faz |
 |---|---|
-| **PLAY / STOP** | Toca o loop sem a DAW, no **BPM** do knob. Com a DAW tocando, segue o andamento dela |
-| **TIMBRE** | Duas teclas com os timbres do **Dub Bass 1.3**: **ROOTS (SINE)** (Classic Sine) e **SUPER TONE** (o baixo digital da era King Jammy). O preview usa a mesma voz, filtro e maximizer do Dub Bass com os valores iniciais dele: Harm 2 15 %, Harm 3 8 %, Glide 20 ms, ataque 3 ms, decay 600 ms, sustain 85 %, release 180 ms, cutoff 900 Hz, ressonância 0,8, **sem saturação e sem reverb**, EQ plano, sem bass boost, maximizer +3 dB com teto −0,3 dB |
+| **PLAY / STOP** | Toca o loop sem a DAW, no **BPM** do knob. Com a DAW tocando, segue o andamento dela. Tocando, o botão pulsa no tempo (halo dourado, lâmpada e barrinhas de VU) |
+| **TIMBRE** (no PREVIEW) | Três teclas com os timbres do **Mastor Reggae Dub Bass Instrument MRDBI-07**: **ROOTS (SINE)** (Bass / Classic Sine), **SUPER TONE** (o baixo digital da era King Jammy) e **808** (preset MÉDIO do MRDBI-07: ataque 1 ms, decay 750 ms, release 220 ms, drop de 12 semitons em 70 ms). Mesma voz, filtro e maximizer do MRDBI-07 com os valores de fábrica dele: cutoff 900 Hz, ressonância 0,8, sem saturação e sem reverb |
 | **GANHO** | Ganho de entrada (−12 a +12 dB) antes da saturação e do maximizer. Duplo clique volta a 0 dB |
 | **TONE / DRIVE / VOLUME** | Cutoff (±1,5 oitava; 50 % = 900 Hz, como no Dub Bass), saturação da válvula TUBE do Dub Bass (começa em 0 = desligada, como nele) e volume geral do preview |
 | **SOM INTERNO** | Desligue quando mandar o MIDI para o seu próprio baixo |
@@ -63,6 +64,9 @@ e **ON** nos acordes 2 a 4. O plugin abre com **dois acordes ligados, Am e Dm, d
 
 O MIDI arrastado/exportado continua sendo **só o baixo**. O nível do baixo fica 5 dB abaixo do Dub Bass, e um limitador suave segura os picos da mistura.
 
+## Versão para navegador
+**[▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/bassmachine/)**, sem instalar nada, também no celular: os 7 baixistas com o letreiro de palhetas, a harmonia, IDEIA / NOVA IDEIA, o visor editável (mouse e toque: toque longo apaga), PLAY no tempo, os timbres Roots (Sine), Super Tone e 808, a bateria de acompanhamento, osciloscópio e download do `.mid`. O gerador do navegador (`site/bassmachine/engine.js`) é o mesmo do plugin: o CI compara os dois nota a nota. O teclado do Roots Keys fica só no plugin.
+
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. Vem a faixa de baixo no BPM do projeto.
 - **EXPORTAR:** salva o `.mid` (padrão: Documentos/Reggae Bass Machine). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
@@ -76,4 +80,5 @@ O MIDI arrastado/exportado continua sendo **só o baixo**. O nível do baixo fic
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, PLAY, MIDI, mixagem do preview.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob / Dub Chords, osciloscópio do Mastor Fone, botoeira intertravada).
 - `tests/engine_test.cpp`: teste dos 7 estilos e do acompanhamento.
-- `tests/snapshot.cpp`: gera o PNG da interface e um WAV do preview, sem DAW (`-DBASSMACHINE_SNAPSHOT=ON -DBASSMACHINE_PLUGIN=OFF`).
+- `tests/dump_engine.cpp` + `tests/web_engine_test.js`: exportam o motor em JSON e conferem que `site/bassmachine/engine.js` gera as mesmas linhas e a mesma bateria (9.450 linhas, mais de 300 mil notas).
+- `tests/snapshot.cpp`: gera o PNG da interface e um WAV do preview, sem DAW; `--edit-test` confere a edição de MIDI (salvar/reabrir/exportar) (`-DBASSMACHINE_SNAPSHOT=ON -DBASSMACHINE_PLUGIN=OFF`).
