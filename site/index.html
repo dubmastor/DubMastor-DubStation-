@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reggae Dub Plugins VST3</title>
-<meta name="description" content="Baixe os plugins Dub Battery Reggae, DubMastor Big Knob, Dub Station 2.6, DubMastor Roots Keys, Mastor Reggae Chord Machine, Mastor Reggae Dub Bass Instrument, Mastor Reggae Drum Machine, Mastor Reggae Bass Machine MRBM-69 e Mastor Phone Vox MPV-01 — VST3 para Windows e Mac, AU para Mac. Grátis.">
+<meta name="description" content="Plugins gratuitos de reggae e dub para Windows e Mac (VST3 / AU): instrumentos virtuais, efeitos e machines.">
 <meta property="og:title" content="Reggae Dub Plugins VST3">
-<meta property="og:description" content="Big Knob 3.2, Dub Station 2.6, DubMastor Roots Keys, Mastor Reggae Chord Machine, Mastor Reggae Dub Bass Instrument MRDBI-07 1.6 e Mastor Phone Vox MPV-01: filtro estilo King Tubby, eco de fita, reverb de mola, piano M1, órgão Hammond, baixo de senoide e 808 e voz de rádio, telefone e megafone. VST3 / AU, Windows e Mac.">
+<meta property="og:description" content="Plugins gratuitos de reggae e dub para Windows e Mac (VST3 / AU): instrumentos virtuais, efeitos e machines.">
 <meta property="og:image" content="img/dubstation21.jpg">
 <style>
   @font-face { font-family: "Plate"; src: url("fonts/ArchivoBlack-Regular.ttf") format("truetype"); font-display: swap; }
@@ -155,20 +155,6 @@
   .btn.alt { background: linear-gradient(#f2f2ef, #b9b9b4); box-shadow: 0 3px 0 #5f5f5b, inset 0 1px 0 #fff; }
   .btn.alt:active { box-shadow: 0 1px 0 #5f5f5b, inset 0 1px 0 #fff; }
   .btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-  .btn.web { grid-column: 1 / -1; background: linear-gradient(#5fae68, var(--green) 60%, #24683a); color: #fff; box-shadow: 0 3px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
-  .btn.web:active { box-shadow: 0 1px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
-  .zips { font-size: 13px; color: #a59f8d; text-align: center; }
-  .zips a { color: #cfc8b4; }
-  table.daws { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
-  table.daws th, table.daws td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid #2c2722; }
-  table.daws th { color: var(--amber); font-size: 13px; letter-spacing: .06em; }
-  table.daws td:first-child { color: var(--cream); font-weight: 700; white-space: nowrap; }
-  table.daws td { color: #cfc8b4; }
-  .dawwrap { overflow-x: auto; background: #0f0e0c; border-radius: var(--radius); padding: 6px 12px 10px; box-shadow: inset 0 0 0 1px #000; }
-  .box ul { margin: 0; padding-left: 20px; }
-  .box li { margin: 6px 0; }
-  details.manual { margin-top: 22px; }
-  details.manual summary { cursor: pointer; color: var(--amber); font-weight: 700; }
 
   /* --- install */
   .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 8px; }
@@ -201,14 +187,37 @@
     footer { padding: 20px 16px 28px; }
     .dl { grid-template-columns: 1fr; }
   }
-  /* --- destaque: Mastor Riddim Machine MRM-0420 */
-  .card.featured { grid-column: 1 / -1; box-shadow: 0 0 0 1px #000, 0 0 0 3px #8a6d2c, inset 0 1px 0 rgba(255,255,255,.06), 0 14px 34px rgba(0,0,0,.6); }
-  .card.featured .shot { aspect-ratio: auto; object-fit: contain; }
-  .card.featured h3 { font-size: 30px; }
-  .model { display: inline-block; vertical-align: 4px; margin-left: 10px; padding: 4px 14px 3px; font-family: "Plate", Impact, sans-serif; font-size: 18px; letter-spacing: .14em; color: #2a1d06;
-    border-radius: 4px; background: linear-gradient(#e8d390, #caab5c 45%, #b39446 55%, #86692a); box-shadow: 1px 2px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6); }
-  .badge { align-self: flex-start; font: 800 11px/1 system-ui, sans-serif; letter-spacing: .16em; color: #1a1205; background: var(--amber); padding: 5px 9px; border-radius: 3px; }
-  @media (min-width: 900px) { .card.featured .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; } }
+
+  /* --- página inicial: as três categorias */
+  .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 26px; }
+  .cat {
+    display: flex; flex-direction: column; text-decoration: none; color: inherit;
+    background: linear-gradient(var(--panel-2), #181512); border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.45);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .cat:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--amber), 0 14px 28px rgba(0,0,0,.55); }
+  .cat:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .cat .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: #000; border-bottom: 1px solid #000; }
+  .cat .thumbs img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+  .cat .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .cat h3 { margin: 0; font-family: "Plate", Impact, "Arial Black", sans-serif; font-weight: 400; font-size: 24px; letter-spacing: .04em; color: var(--cream); }
+  .cat p { margin: 0; color: #cfc8b4; }
+  .cat ul { margin: 0; padding-left: 18px; color: #bdb6a2; font-size: 15px; }
+  .cat .go { margin-top: auto; padding-top: 6px; }
+  .cat .go span.btn { flex-direction: row; gap: 8px; }
+
+  /* --- navegação entre as categorias */
+  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 24px; }
+  .crumbs a.home { color: var(--amber); text-decoration: none; font-weight: 700; margin-right: 8px; }
+  .tab {
+    text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: 800; font-size: 14px; letter-spacing: .04em;
+    color: var(--cream); background: #0f0e0c; box-shadow: inset 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .tab[aria-current="page"] { color: #1a1205; background: linear-gradient(#ffc061, var(--amber) 55%, #d9861a); }
+  .hint { margin: -6px 0 20px; color: #bdb6a2; font-size: 15px; }
+  .install-link { margin-top: 30px; }
+
 </style>
 </head>
 <body>
@@ -222,316 +231,54 @@
       </div>
     </div>
     <p class="signature">DubMastor</p>
-    <p class="lead"><span class="lamp" aria-hidden="true"></span>Novo: o <strong>Mastor Riddim Machine MRM-0420</strong>, bateria, harmonia, baixo e Big Knob num instrumento só. E mais: filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Mastor Reggae Dub Bass Instrument (MRDBI-07), baixo de senoide e 808, o Mastor Reggae Drum Machine, que monta a bateria do riddim, e o Mastor Reggae Bass Machine MRBM-69, gerador de reggae bass lines, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
+    <p class="lead"><span class="lamp" aria-hidden="true"></span>Filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Mastor Reggae Dub Bass Instrument (MRDBI-07), baixo de senoide e 808, o Mastor Reggae Drum Machine, que monta a bateria do riddim, e o Mastor Reggae Bass Machine MRBM-69, gerador de reggae bass lines, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
   </header>
 
   <main>
-    <section id="downloads">
-      <h2>DOWNLOADS</h2>
-      <div class="plugins">
-
-        <article class="card featured" id="mrm-0420">
-          <img class="shot" src="img/mrm0420.jpg" alt="Interface do Mastor Riddim Machine MRM-0420 1.0, aba RIDDIM: placa de latão MRM-0420 e a marca DubStation no alto, abas RIDDIM, HARMONIA, BATERIA, BAIXO e CONTROL ROOM, os quatro acordes com teclado mecânico, as três máquinas com chave liga/desliga, músicos e MIDI âmbar editável, os rolos do JACKPOT com o botão vermelho NOVO RIDDIM e um alto-falante de madeira com grade de metal" width="1400" height="1260" loading="lazy">
+    <section id="categorias">
+      <h2>ESCOLHA O TIPO DE PLUGIN</h2>
+      <div class="cats">
+        <a class="cat" href="instrumentos.html">
+          <div class="thumbs" aria-hidden="true"><img src="img/rootskeys.jpg" alt="" loading="lazy"><img src="img/dubbass.jpg" alt="" loading="lazy"><img src="img/dubbattery.jpg" alt="" loading="lazy"></div>
           <div class="body">
-            <span class="badge">NOVO · DUBSTATION</span>
-            <h3>Mastor Riddim Machine <span class="model">MRM-0420</span> <small>1.0</small></h3>
-            <div class="cols">
-              <div>
-                <p><strong>Bateria, harmonia, baixo e o Big Knob num instrumento só.</strong> O MRDM-12, o MRCM-1240 e o MRBM-69 tocam juntos com uma harmonia e um BPM; a aba RIDDIM resume tudo e o riddim começa em segundos.</p>
-              </div>
-              <ul>
-                <li>Aba RIDDIM: acordes, chave e músicos de cada máquina, MIDI editável e arrastável por máquina</li>
-                <li>JACKPOT com o botão NOVO RIDDIM e a ALAVANCA: riddim 100% aleatório (harmonia, durações, bateria, músicos) pronto para o PLAY</li>
-                <li>PRESETS com 39 harmonias clássicas do reggae (roots, rockers, rub a dub, lovers rock, dancehall, new roots) e alto-falante antigo com grade de metal</li>
-                <li>Uma máquina por aba, completa; na aba RIDDIM o Big Knob (filtro HIGH/LOW PASS), mute DRUMS / BASS / RIDDIM e TAPE ECHO (começa desligado)</li>
-                <li>Estilo de reggae na bateria: Rockers, One Drop e Boom Bap</li>
-                <li>Bateria com os samples DM e os timbres atuais de cada máquina</li>
-              </ul>
-            </div>
-            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon) · também toca no celular</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip">⬇ Windows<span>VST3 · zip · 1.0</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip">⬇ Mac<span>VST3 + AU · zip · 1.0</span></a>
-            </div>
-            <a class="btn alt" href="riddim/" style="margin-top:2px">📱 Tocar no celular<span>versão 1.0, sem instalar nada</span></a>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/bigknob.jpg" alt="Interface do Mastor Big Knob MBK-76: painel creme com o grande botão do filtro, eco de fita, VUs de ponteiro, maximizer e sirene de dub" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Big Knob MBK-76 <small>3.2</small></h3>
-            <p>Estação de dub num plugin só, com o filtro high-pass por degraus inspirado no King Tubby.</p>
+            <h3>🎹 INSTRUMENTOS VIRTUAIS</h3>
+            <p>Instrumentos que fazem som: teclado, baixo e bateria para tocar pelo MIDI ou pelo teclado da tela.</p>
             <ul>
-              <li>Filtro big knob (passos de mesa ou contínuo), ressonância e drive</li>
-              <li>Eco de fita com cabeçotes, sync com o andamento e THROW</li>
-              <li>Sirene de dub, VUs, maximizer e BYPASS</li>
+              <li>DubMastor Roots Keys</li>
+              <li>Mastor Reggae Dub Bass Instrument MRDBI-07</li>
+              <li>Dub Battery Reggae</li>
             </ul>
-            <div class="formats">Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS.zip">zip Mac</a></div>
+            <div class="go"><span class="btn">VER 3 PLUGINS ▶</span></div>
           </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/tapeecho.jpg" alt="Interface do Mastor Tape Echo MTE-12: painel creme com placa metálica, janela da fita e botões de alumínio" width="1400" height="786" loading="lazy">
+        </a>
+        <a class="cat" href="efeitos.html">
+          <div class="thumbs" aria-hidden="true"><img src="img/bigknob.jpg" alt="" loading="lazy"><img src="img/dubstation21.jpg" alt="" loading="lazy"><img src="img/mastorfone.jpg" alt="" loading="lazy"></div>
           <div class="body">
-            <h3>Mastor Tape Echo MTE-12 <small>2.6</small></h3>
-            <p>O antigo Dub Station 2.6 (FitaEco TE-12). Eco de fita de três cabeças com reverb de mola, no visual de equipamento de estúdio dos anos 70.</p>
+            <h3>🎛️ EFEITOS</h3>
+            <p>Efeitos para colocar no canal ou no envio: filtro estilo King Tubby, eco de fita, reverb de mola e voz de rádio, telefone e megafone.</p>
             <ul>
-              <li>Seletor de 12 modos e Repeat Rate com o pitch da fita</li>
-              <li>VU analógico do nível de gravação, saturação, wow &amp; flutter e desgaste de fita</li>
-              <li>Reverb de mola e EQ gráfico de 6 bandas com presets HPF / LPF</li>
-              <li>Chave de bypass com lâmpada EFFECT ON</li>
+              <li>Big Knob</li>
+              <li>Dub Station</li>
+              <li>Mastor Phone Vox MPV-01</li>
             </ul>
-            <div class="formats">Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS.zip">zip Mac</a></div>
+            <div class="go"><span class="btn">VER 3 PLUGINS ▶</span></div>
           </div>
-        </article>
-
-        <article class="card">
-            <img class="shot" src="img/rootskeys.jpg" alt="Interface do Mastor Roots Keys MRK-80: à esquerda o modo piano, teclado preto anos 80 com caixas de som e visor LCD verde; à direita a aba Dub Chords no visual de madeira, com os cartões de acorde e a grade de notas para arrastar para a DAW" width="1400" height="786" loading="lazy">
+        </a>
+        <a class="cat" href="machines.html">
+          <div class="thumbs" aria-hidden="true"><img src="img/dubchords.jpg" alt="" loading="lazy"><img src="img/dubdrums.jpg" alt="" loading="lazy"><img src="img/bassmachine.jpg" alt="" loading="lazy"></div>
           <div class="body">
-            <h3>DubMastor Roots Keys <small>2.4</small></h3>
-            <p>Instrumento com o piano brilhante estilo Korg M1 e o órgão tonewheel estilo Hammond. O visual muda com o instrumento: teclado preto anos 80 com visor LCD verde no piano, gabinete de madeira e marfim no órgão. Nova aba Dub Chords para montar o riddim e arrastar o MIDI para a DAW.</p>
+            <h3>🥁 MACHINES</h3>
+            <p>Geradores do riddim: escolha acordes, estilo e músico, e a machine monta a harmonia, a bateria ou a linha de baixo em MIDI para arrastar para a timeline.</p>
             <ul>
-              <li>Piano M1 e órgão com 9 drawbars, percussão, key click e Leslie</li>
-              <li>4 presets de piano e 4 de órgão, separados; escolher um preset troca o visual</li>
-              <li>Piano com 4 timbres: M1, Grand Piano, MT-40 (estilo Casio) e FM EP (estilo Yamaha DX); rodas de pitch e mod que funcionam com o mouse</li>
-              <li>Aba Dub Chords: até 4 acordes ou riddims prontos, com 6 notas em duas oitavas (duas mãos) e tamanho da nota a partir de 1/32; arraste a grade ou um acorde para a timeline</li>
-              <li>Flanger dub estilo Mad Professor: o "avião a jato" passando pela mistura e pelos ecos</li>
-              <li>Eco de fita Mastor Tape Echo, maximizer, VUs analógicos e teclado que acende com o MIDI</li>
+              <li>Mastor Reggae Chord Machine MRCM-1240</li>
+              <li>Mastor Reggae Drum Machine MRDM-12</li>
+              <li>Mastor Reggae Bass Machine MRBM-69</li>
             </ul>
-            <div class="formats">Instrumento · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-Windows.zip">⬇ Windows<span>VST3 · zip</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-2.3/MRK-80-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-2.3/MRK-80-macOS.zip">zip Mac</a></div>
+            <div class="go"><span class="btn">VER 3 PLUGINS ▶</span></div>
           </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/dubchords.jpg" alt="Interface do Mastor Reggae Chord Machine MRCM-1240: painel creme com quatro módulos de acorde, cada um com display âmbar, teclado mecânico de uma oitava, botões maior e menor, seletor de inversão e contador de compassos; abaixo, seções de ritmo com padrão (notas sempre 1/32), som com botão preview, chaves bubble e som interno e níveis de piano e Hammond, MIDI e o visor do loop" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Reggae Chord Machine MRCM-1240 <small>1.7</small></h3>
-            <p>Gerador de harmonia para começar um riddim: escolha até 4 acordes e quantos compassos cada um dura, e o skank sai pronto no andamento da DAW.</p>
-            <ul>
-              <li>Teclado mecânico para a tônica, botões MAIOR / MENOR e contador de compassos (de 1/2 a 8)</li>
-              <li>PRESETS: 39 harmonias clássicas do reggae em pastas (roots, rockers, rub a dub, lovers rock, dancehall, new roots), dos anos 70 aos 2000</li>
-              <li>Inversões AUTO, FUND, 1ª e 2ª, com a sugestão de notas mais próximas marcada</li>
-              <li>Skank de piano com as duas mãos e bubble de Hammond com as duas mãos (mão esquerda no "e" e no "a", direita no contratempo), notas sempre 1/32</li>
-              <li>Som interno pelo motor do Roots Keys: piano M1 e Hammond Roots Percussion, e botão PREVIEW</li>
-              <li>Versão para celular: monte os acordes, ouça e baixe o MIDI direto no navegador</li>
-              <li>Arraste o MIDI para a timeline com cada acorde em uma cor (canal MIDI)</li>
-            </ul>
-            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-Windows.zip">⬇ Windows<span>VST3 · zip</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
-              <a class="btn alt" href="chords/">📱 Celular<span>abre no navegador</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-macOS.zip">zip Mac</a></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/reggaedubbassinstrument.jpg" alt="Interface do Mastor Reggae Dub Bass Instrument MRDBI-07: painel creme com laterais de madeira e plaqueta de latão; seções de oscilador, envelope e filtro, osciloscópio verde, válvula 12AX7 acesa ao lado dos knobs de saturação, EQ gráfico com faders, reverb, botão verde de bass boost, teclado de marfim de C1 a C4 e, na lateral direita, o maximizer com VU digital" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Reggae Dub Bass Instrument MRDBI-07 <small>1.6</small></h3>
-            <p>O antigo Dub Bass. Sintetizador de baixo de reggae: a senoide redonda do roots clássico, o Super Tone digital da era King Jammy ou o 808 com o pitch caindo. Mono, com glide entre as notas.</p>
-            <ul>
-              <li>Timbres Bass (senoide com harmônicos), Super Tone (o baixo digital Sleng Teng do King Jammy) e 808 com knock e clique de bumbo</li>
-              <li>Envelope gráfico e EQ editáveis com o mouse na tela verde; 3 presets de envelope no 808 (curto, médio e longo)</li>
-              <li>Saturação Tube / Soft / Fuzz com válvula animada que muda de cor conforme esquenta, ou Fita com gravador de rolo girando (válvula e reverb começam desligados)</li>
-              <li>EQ gráfico de 10 bandas, reverb com low cut e BASS BOOST de +4 dB em 60 Hz</li>
-              <li>Maximizer na lateral com VU digital estilo Ozone (entrada, GR e saída) e BYPASS</li>
-              <li>Teclado de C1 a C4 no padrão Dub Station: toca clicando e acende com o MIDI</li>
-            </ul>
-            <div class="formats">Instrumento · Instalador para Windows (VST3 + standalone: Cubase, FL Studio, Ableton, Reaper, Studio One, Bitwig) e Mac (VST3 + AU: também Logic e GarageBand; Intel e Apple Silicon) · também toca no navegador</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDBI-07-1.6/MastorReggaeDubBassInstrument-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · 1.6</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDBI-07-1.6/MastorReggaeDubBassInstrument-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · 1.6</span></a>
-            </div>
-            <a class="btn alt" href="bass/" style="margin-top:2px">▶ Tocar no navegador<span>versão 1.6, sem instalar nada</span></a>
-            <div class="formats">Sem instalador: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDBI-07-1.6/MastorReggaeDubBassInstrument-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDBI-07-1.6/MastorReggaeDubBassInstrument-macOS.zip">zip Mac</a></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/dubbattery.jpg" alt="Interface do Dub Battery Reggae 1.1: painel creme com laterais de madeira e plaqueta dourada Dub Station; visor âmbar com a forma de onda do sample e os marcadores de início e fim, envelope gráfico AHDSR, 16 pads de borracha estilo MPC que acendem em âmbar, knobs do pad, choke e master" width="1280" height="870" loading="lazy">
-          <div class="body">
-            <h3>Dub Battery Reggae <small>1.1</small></h3>
-            <p>Sampler de bateria com 16 pads, no espírito do Battery, da MPC e da SP-404, já com os timbres DM e presets de reggae. Na aba <strong>DUB DRUMS</strong>, o MRDM-12 inteiro sugere o groove e ele toca direto nos pads.</p>
-            <ul>
-              <li>16 pads de borracha que acendem com o MIDI, nas notas C1 (36) a D#2 (51), o mesmo mapa do MRDM-12</li>
-              <li>Visor do sample com início e fim arrastáveis e envelope AHDSR editável no gráfico (ONE SHOT ou GATE)</li>
-              <li>Volume, pan, afinação, filtro, velocity e reverse por pad; choke de hi-hat e grupos A/B; fita e VU no master</li>
-              <li>Presets de fábrica (Roots DM, Steppers, One Drop Aro, Digital 85, Dub Layer, Dub Pesado) e GRAVAR os seus</li>
-              <li>LAYER: um segundo timbre tocando junto no mesmo pad (volume e afinação próprios) ou JUNTAR dois pads num toque só</li>
-              <li>Biblioteca com 34 timbres, incluindo 16 hi-hats e 5 pratos DM; arraste um WAV/AIFF para qualquer pad</li>
-              <li>Aba DUB DRUMS: estilos, bateristas, viradas, PLAY GROOVE, exportar o MIDI e arrastar cada compasso com a sua cor</li>
-            </ul>
-            <div class="formats">Instrumento · Instalador para Windows (VST3 + standalone: Cubase, FL Studio, Ableton, Reaper, Studio One, Bitwig) e Mac (VST3 + AU: também Logic e GarageBand; Intel e Apple Silicon) · também toca no navegador</div>
-            <div class="dl">
-              <a class="btn" href="downloads/DubBatteryReggae-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · 1.1</span></a>
-              <a class="btn alt" href="downloads/DubBatteryReggae-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · 1.1</span></a>
-            </div>
-            <a class="btn alt" href="battery/" style="margin-top:2px">▶ Tocar no navegador<span>versão 1.1, sem instalar nada</span></a>
-            <div class="formats">Sem instalador: <a href="downloads/DubBatteryReggae-Windows.zip">zip Windows</a> · <a href="downloads/DubBatteryReggae-macOS.zip">zip Mac</a> · No Mac, se abrir o .pkg der aviso, clique com o botão direito → Abrir</div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/dubdrums.jpg" alt="Interface do Mastor Reggae Drum Machine MRDM-12: painel creme com módulos de estilo, loop, hi-hat com a chave do baterista e dinâmica; abaixo, aleatoriedade, som e MIDI, e a grade da bateria com uma cor para cada compasso" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Reggae Drum Machine MRDM-12 <small>2.3</small></h3>
-            <p>Gerador do esqueleto da bateria de reggae: escolha o estilo, os compassos e o baterista, e o groove sai pronto, com viradas, no andamento da DAW.</p>
-            <ul>
-              <li>Rockers, One Drop e Boom Bap anos 90, com caixa no 2 e no 4 e bumbo/caixa editáveis por colcheia</li>
-              <li>Chave de baterista: Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL (Casio MT-40 do Sleng Teng / Oberheim DMX), com o hi-hat, o bumbo, a caixa e as viradas de cada um</li>
-              <li>Kit anos 70 com os samples DM ou digital estilo King Jammy / Sleng Teng</li>
-              <li>Grade editável, virada de intro, preview e uma cor por compasso, na grade e no MIDI</li>
-              <li>Arraste o MIDI inteiro ou um compasso só, exporte o .mid e ajuste a nota de cada peça para o seu kit</li>
-              <li>Alto-falante vintage de 1959 na seção SOM, com o cone mexendo com o som</li>
-              <li>📱 Também roda no celular, direto no navegador</li>
-            </ul>
-            <div class="formats">Instrumento / gerador MIDI · Instalador para Windows (VST3 + standalone: Cubase, FL Studio, Ableton, Reaper, Studio One, Bitwig) e Mac (VST3 + AU: também Logic e GarageBand; Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="downloads/MastorReggaeDrumMachine-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · 2.3</span></a>
-              <a class="btn alt" href="downloads/MastorReggaeDrumMachine-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · 2.3</span></a>
-              <a class="btn alt" href="drums/">📱 Celular<span>abre no navegador</span></a>
-            </div>
-            <div class="formats">Sem instalador: <a href="downloads/MastorReggaeDrumMachine-Windows.zip">zip Windows</a> · <a href="downloads/MastorReggaeDrumMachine-macOS.zip">zip Mac</a> · No Mac, se o instalador não abrir: clique com o botão direito no .pkg › Abrir (ou Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim)</div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/bassmachine.jpg" alt="Interface do Mastor Reggae Bass Machine MRBM-69 2.6: painel creme com laterais de madeira e plaqueta dourada Dub Station; letreiro de palhetas com o nome do baixista e a botoeira de sete teclas, quatro módulos de acorde com teclado mecânico, visor âmbar editável com a linha de baixo, botão verde de PLAY, timbres Roots, Super Tone e 808, osciloscópio verde e, embaixo, a bateria de acompanhamento e o teclado do Roots Keys" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Reggae Bass Machine MRBM-69 <small>2.7</small></h3>
-            <p><strong>Gerador de Reggae Bass Lines.</strong> Escolha os acordes e o baixista, ouça com os timbres do MRDBI-07, a bateria e o teclado do Roots Keys, edite as notas no visor e arraste a linha de baixo em MIDI para a timeline.</p>
-            <ul>
-              <li>Botoeira com 7 baixistas (Family Man, Flabba, Derrick Barnett, Robbie, Leroy Sibbles, Fully Fullwood e Jammys) e o nome num letreiro de palhetas que gira ao trocar</li>
-              <li>MIDI editável no visor, só com as notas da pentatônica (maior ou menor) de cada acorde; a linha editada fica salva no projeto e sai no MIDI</li>
-              <li>Harmonia de até 4 acordes (maior, menor, 7, m7), IDEIA numerada e NOVA IDEIA</li>
-              <li>PREVIEW com PLAY de lâmpada e os timbres do MRDBI-07: Roots (Sine), Super Tone e 808 de cauda longa</li>
-              <li>Bateria de acompanhamento Roots, One Drop, Digital e Dancehall, sempre com a caixa no 2 e no 4, e o teclado do DubMastor Roots Keys</li>
-            </ul>
-            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon) · também toca no navegador</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-Windows.zip">⬇ Windows<span>VST3 · zip · 2.7</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-macOS.zip">⬇ Mac<span>VST3 + AU · zip · 2.7</span></a>
-            </div>
-            <a class="btn alt" href="bassmachine/" style="margin-top:2px">▶ Tocar no navegador<span>versão 2.7, sem instalar nada</span></a>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/riddimmachine.jpg" alt="Interface do Mastor Riddim Machine MRM-0420 na aba HARMONIA: painel creme com os módulos de acorde, o botão PLAY RIDDIM e a área de arrastar o riddim para a DAW" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Riddim Machine MRM-0420 <small>1.2</small></h3>
-            <p>O Chord Machine e o Dub Drums Machine num instrumento só: monte os acordes e a bateria, ouça tudo junto e arraste o riddim inteiro para a timeline.</p>
-            <ul>
-              <li>Abas HARMONIA e BATERIA, com o BPM ligado ao da DAW</li>
-              <li>PLAY RIDDIM para ouvir bateria, skank e bubble juntos</li>
-              <li>Arraste o riddim inteiro (de 4 a 64 compassos), já alinhado, com os acordes entrando depois da intro</li>
-            </ul>
-            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS.zip">zip Mac</a></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/dubhorns.jpg" alt="Interface do Mastor Dub Horns MDH-70 na aba NAIPE: seis instrumentos de sopro com volume, pan, harmonia e oitava, VU analógico e teclado de C2 a C7" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Dub Horns MDH-70 <small>1.1</small></h3>
-            <p>Naipe de metais anos 70 para sessão de dub: cada nota vira um acorde de metais no tom, com som de estúdio jamaicano.</p>
-            <ul>
-              <li>Trompete, flugelhorn, saxes alto, tenor e barítono e trombone, com harmonia no tom e na escala</li>
-              <li>Timbres '70s de estúdio e Mastor Tape Echo com Dub Throw</li>
-              <li>EQ gráfico de 10 bandas com Filtro Tubby</li>
-              <li>Frases MIDI (ataques estilo Dean Fraser e introduções) com as notas que você escolher</li>
-            </ul>
-            <div class="formats">Instrumento · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
-              <a class="btn web" href="web/dubhorns/">▶ Tocar no celular / navegador<span>sem instalar nada · versão 1.1</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-macOS.zip">zip Mac</a></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="shot" src="img/phonevox.jpg" alt="Interface do Mastor Phone Vox MPV-01: painel creme com plaqueta de alumínio, VU, janela da fita, teclas de rádio, telefone e megafone, dial de ondas médias e botões de alumínio" width="1400" height="786" loading="lazy">
-          <div class="body">
-            <h3>Mastor Phone Vox MPV-01 <small>1.6</small></h3>
-            <p>Efeito para voz (antigo Mastor Fone) que imita rádio AM, telefone antigo e megafone, com o mesmo eco de fita do Big Knob.</p>
-            <ul>
-              <li>Rádio AM com válvula e chiado, telefone de central antiga e megafone estourado</li>
-              <li>Teclas dos aparelhos, Sintonia, Banda, Drive, Chiado, Defeito e Mix</li>
-              <li>Eco de fita com Sync, cabeçotes, ping-pong e THROW, VU e lâmpada NO AR</li>
-              <li>Dial de ondas médias que gira, osciloscópio e curva de equalização em tela verde</li>
-              <li>Maximizer com VU digital de LEDs e BYPASS em destaque</li>
-            </ul>
-            <div class="formats">Efeito · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
-            <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
-            </div>
-            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS.zip">zip Mac</a></div>
-          </div>
-        </article>
-
+        </a>
       </div>
-    </section>
-
-    <section id="instalacao">
-      <h2>INSTALAÇÃO</h2>
-      <div class="install">
-        <div class="box">
-          <h3>WINDOWS · INSTALADOR .EXE</h3>
-          <ol>
-            <li>Feche a sua DAW.</li>
-            <li>Abra o instalador baixado. Se aparecer <em>"O Windows protegeu o computador"</em>, clique em <strong>Mais informações → Executar assim mesmo</strong> (o plugin é gratuito e não tem certificado pago).</li>
-            <li>Clique em <em>Avançar</em> até o fim. O plugin vai para <code>C:\Program Files\Common Files\VST3</code>, a pasta que todas as DAWs procuram, e o programa standalone fica no menu Iniciar.</li>
-            <li>Abra a DAW e, se ela pedir, faça um novo scan (veja a tabela abaixo).</li>
-          </ol>
-        </div>
-        <div class="box">
-          <h3>MAC · INSTALADOR .PKG</h3>
-          <ol>
-            <li>Baixe o zip. O Mac descompacta sozinho.</li>
-            <li>Feche o Cubase.</li>
-            <li>No Finder, aperte <strong>Cmd+Shift+G</strong>, cole <code>~/Library/Audio/Plug-Ins/VST3/</code> e copie o <code>.vst3</code> para lá (o AU vai em <code>~/Library/Audio/Plug-Ins/Components/</code>).</li>
-            <li>No Terminal, libere o plugin:
-<pre>xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Big Knob.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"FitaEco TE-12.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Roots Keys.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Phone Vox MPV-01.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Dub Bass Instrument MRDBI-07.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Drum Machine MRDM-12.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Bass Machine MRBM-69.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Battery Reggae.vst3"
-xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"</pre></li>
-            <li>Abra o Cubase.</li>
-          </ol>
-        </div>
-      </div>
-      <p class="note"><strong>O plugin não apareceu?</strong> No Cubase, abra <em>Studio → VST Plug-in Manager</em> e faça um novo scan; se ele estiver na lista de bloqueados, clique em <em>Reactivate</em>. Na lista de plugins, o Dub Station aparece como <strong>FitaEco TE-12</strong>, do fabricante DubMastor. O <strong>DubMastor Roots Keys</strong>, o <strong>Dub Chords</strong>, o <strong>Mastor Reggae Dub Bass Instrument</strong>, o <strong>Mastor Reggae Drum Machine</strong> e o <strong>Mastor Reggae Bass Machine MRBM-69</strong> são instrumentos: carregue-os numa <em>Instrument Track</em>, não como efeito.</p>
+      <p class="note install-link">Já baixou? Veja <a href="instalacao.html">como instalar no Windows e no Mac</a>.</p>
     </section>
   </main>
 

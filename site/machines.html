@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machines — Reggae Dub Plugins VST3</title>
+<meta name="description" content="Machines DubMastor: Mastor Reggae Chord Machine MRCM-1240, Mastor Reggae Drum Machine MRDM-12, Mastor Reggae Bass Machine MRBM-69. VST3 para Windows e Mac, AU para Mac. Grátis.">
+<meta property="og:title" content="Machines — Reggae Dub Plugins VST3">
+<meta property="og:description" content="Machines DubMastor: Mastor Reggae Chord Machine MRCM-1240, Mastor Reggae Drum Machine MRDM-12, Mastor Reggae Bass Machine MRBM-69. VST3 para Windows e Mac, AU para Mac. Grátis.">
+<meta property="og:image" content="img/dubstation21.jpg">
+<style>
+  @font-face { font-family: "Plate"; src: url("fonts/ArchivoBlack-Regular.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Signature"; src: url("fonts/texgyrechorus-mediumitalic.otf") format("opentype"); font-display: swap; }
+
+  :root {
+    --cream: #e9e2cc;
+    --enamel: #d8cdb0;
+    --ink: #3a2a1c;
+    --amber: #ffa630;
+    --panel: #1d1a17;
+    --panel-2: #26221e;
+    --green: #2f8f4e;
+    --gold: #e8b923;
+    --steel-hi: #e2e2de;
+    --steel-lo: #9c9c97;
+    --wood: #5b3519;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--cream);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 2px, transparent 2px 9px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 23px),
+      linear-gradient(90deg, #3b2210, var(--wood) 30%, #6b4022 55%, #4a2b14);
+    min-height: 100vh;
+  }
+  a { color: var(--amber); }
+
+  /* the "rack": a dark metal panel framed by wooden cheeks (the body background) */
+  .rack {
+    max-width: 1080px;
+    margin: 0 auto;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at 50% 0%, #2c2824 0%, var(--panel) 70%);
+    box-shadow: 0 0 0 1px #000, 0 0 40px rgba(0,0,0,.7);
+    min-height: 100vh;
+  }
+
+  /* --- top enamel panel */
+  header {
+    background:
+      radial-gradient(circle at 20% 30%, rgba(138,106,58,.12), transparent 40%),
+      radial-gradient(circle at 85% 70%, rgba(138,106,58,.10), transparent 35%),
+      linear-gradient(#ddd2b5, #cfc3a4);
+    color: var(--ink);
+    padding: 36px 28px 30px;
+    border-bottom: 4px solid #111;
+    box-shadow: inset 0 -3px 0 #8f8a7c;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px 36px;
+    align-items: center;
+  }
+  .plate {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 22px 14px 24px;
+    border-radius: 5px;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0 1px, rgba(0,0,0,.05) 1px 2px, transparent 2px 3px),
+      linear-gradient(var(--steel-hi), var(--steel-lo));
+    box-shadow: 2px 3px 0 rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.8), inset 0 0 0 1px rgba(0,0,0,.45);
+  }
+  .plate::before, .plate::after {
+    content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fafafa, #6a6a6a);
+    top: 6px; left: 6px;
+  }
+  .plate::after { left: auto; right: 6px; }
+  .plate .name {
+    font-family: "Plate", Impact, "Arial Black", sans-serif;
+    font-size: clamp(26px, 4.6vw, 40px);
+    letter-spacing: .04em;
+    color: #262626;
+    text-shadow: 0 1px 0 rgba(255,255,255,.55);
+    line-height: 1;
+  }
+  .plate .sub {
+    display: block;
+    font: 700 10px/1.2 system-ui, sans-serif;
+    letter-spacing: .14em;
+    color: #3a3a3a;
+    margin-top: 6px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.55);
+  }
+  .signature {
+    font-family: "Signature", "Brush Script MT", cursive;
+    font-size: clamp(40px, 6vw, 58px);
+    color: var(--ink);
+    transform: rotate(-3deg);
+    line-height: 1;
+    margin: 0;
+    padding-bottom: 6px;
+    background: linear-gradient(var(--ink), var(--ink)) no-repeat 12px 100% / 78% 2px;
+    justify-self: start;
+  }
+  header p.lead { grid-column: 1 / -1; margin: 6px 0 0; font-size: 17px; max-width: 62ch; }
+  header .lamp {
+    display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px;
+    background: radial-gradient(circle at 35% 35%, #ffe0a0, #d2560c); box-shadow: 0 0 0 3px #8a8a8a, 0 0 10px #ff9d3a;
+  }
+
+  main { padding: 34px 28px 10px; }
+  h2 {
+    font-family: "Plate", Impact, sans-serif; font-weight: 400;
+    letter-spacing: .05em; color: var(--amber); font-size: 22px; margin: 0 0 18px;
+  }
+
+  /* --- plugin cards */
+  .plugins { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 26px; }
+  .card {
+    background: linear-gradient(var(--panel-2), #181512);
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.45);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .card .shot { aspect-ratio: 16 / 9; height: auto; background: #0d0f0e; display: block; width: 100%; object-fit: cover; border-bottom: 1px solid #000; }
+  .card .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .card h3 { margin: 0; font-family: "Plate", Impact, sans-serif; font-weight: 400; font-size: 24px; letter-spacing: .03em; color: var(--cream); }
+  .card h3 small { font-family: system-ui, sans-serif; font-weight: 700; font-size: 13px; color: var(--amber); letter-spacing: .08em; margin-left: 6px; }
+  .card p { margin: 0; color: #cfc8b4; }
+  .card ul { margin: 0; padding-left: 18px; color: #bdb6a2; font-size: 15px; }
+  .formats { font-size: 13px; color: #a59f8d; letter-spacing: .02em; }
+  .dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-top: 6px; }
+  .btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-decoration: none; text-align: center;
+    padding: 12px 10px; border-radius: 6px;
+    font-weight: 800; letter-spacing: .03em; color: #1a1205;
+    background: linear-gradient(#ffc061, var(--amber) 55%, #d9861a);
+    box-shadow: 0 3px 0 #8a5410, inset 0 1px 0 rgba(255,255,255,.6);
+    transition: transform .08s ease, box-shadow .08s ease, filter .15s;
+  }
+  .btn span { font-weight: 600; font-size: 12px; opacity: .8; letter-spacing: 0; }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #8a5410, inset 0 1px 0 rgba(255,255,255,.6); }
+  .btn.alt { background: linear-gradient(#f2f2ef, #b9b9b4); box-shadow: 0 3px 0 #5f5f5b, inset 0 1px 0 #fff; }
+  .btn.alt:active { box-shadow: 0 1px 0 #5f5f5b, inset 0 1px 0 #fff; }
+  .btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+  /* --- install */
+  .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 8px; }
+  .box {
+    background: #0f0e0c; border-radius: var(--radius); padding: 18px 22px;
+    box-shadow: inset 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .box h3 { margin: 0 0 8px; font-size: 17px; color: var(--amber); letter-spacing: .04em; }
+  .box ol { margin: 0; padding-left: 20px; }
+  .box li { margin: 6px 0; }
+  code, pre {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+    background: #000; color: #ffcf8a; border-radius: 4px;
+  }
+  code { padding: 1px 5px; }
+  pre { padding: 10px 12px; overflow-x: auto; margin: 8px 0 0; white-space: pre; }
+  .note { margin: 22px 0 0; color: #bdb6a2; font-size: 15px; }
+
+  section { margin-bottom: 40px; }
+
+  footer {
+    border-top: 2px solid #000; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    padding: 22px 28px 30px; color: #a59f8d; font-size: 14px;
+    display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: space-between;
+  }
+
+  @media (max-width: 640px) {
+    header { grid-template-columns: 1fr; padding: 26px 18px 22px; }
+    main { padding: 26px 16px 4px; }
+    footer { padding: 20px 16px 28px; }
+    .dl { grid-template-columns: 1fr; }
+  }
+
+  /* --- página inicial: as três categorias */
+  .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 26px; }
+  .cat {
+    display: flex; flex-direction: column; text-decoration: none; color: inherit;
+    background: linear-gradient(var(--panel-2), #181512); border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.45);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .cat:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--amber), 0 14px 28px rgba(0,0,0,.55); }
+  .cat:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .cat .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: #000; border-bottom: 1px solid #000; }
+  .cat .thumbs img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+  .cat .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .cat h3 { margin: 0; font-family: "Plate", Impact, "Arial Black", sans-serif; font-weight: 400; font-size: 24px; letter-spacing: .04em; color: var(--cream); }
+  .cat p { margin: 0; color: #cfc8b4; }
+  .cat ul { margin: 0; padding-left: 18px; color: #bdb6a2; font-size: 15px; }
+  .cat .go { margin-top: auto; padding-top: 6px; }
+  .cat .go span.btn { flex-direction: row; gap: 8px; }
+
+  /* --- navegação entre as categorias */
+  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 24px; }
+  .crumbs a.home { color: var(--amber); text-decoration: none; font-weight: 700; margin-right: 8px; }
+  .tab {
+    text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: 800; font-size: 14px; letter-spacing: .04em;
+    color: var(--cream); background: #0f0e0c; box-shadow: inset 0 0 0 1px #000, inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .tab[aria-current="page"] { color: #1a1205; background: linear-gradient(#ffc061, var(--amber) 55%, #d9861a); }
+  .hint { margin: -6px 0 20px; color: #bdb6a2; font-size: 15px; }
+  .install-link { margin-top: 30px; }
+
+</style>
+</head>
+<body>
+<div class="rack">
+
+  <header>
+    <div class="plate" aria-label="DubMastor">
+      <div>
+        <div class="name">DUB STATION</div>
+        <span class="sub">PLUGINS DE DUB · VST3 / AU</span>
+      </div>
+    </div>
+    <p class="signature">DubMastor</p>
+    <p class="lead"><span class="lamp" aria-hidden="true"></span>Filtro big knob estilo King Tubby, eco de fita de três cabeças, reverb de mola, o teclado DubMastor Roots Keys com piano M1 e órgão Hammond, o Dub Chords, que monta a harmonia do riddim, o Mastor Reggae Dub Bass Instrument (MRDBI-07), baixo de senoide e 808, o Mastor Reggae Drum Machine, que monta a bateria do riddim, e o Mastor Reggae Bass Machine MRBM-69, gerador de reggae bass lines, em plugins gratuitos para <strong>Windows</strong> e <strong>Mac</strong>. Feitos e testados para o Cubase.</p>
+  </header>
+
+  <main>
+      <nav class="crumbs" aria-label="Categorias">
+        <a class="home" href="./">◀ Início</a>
+        <a class="tab" href="instrumentos.html">INSTRUMENTOS VIRTUAIS</a>
+        <a class="tab" href="efeitos.html">EFEITOS</a>
+        <a class="tab" href="machines.html" aria-current="page">MACHINES</a>
+        <a class="tab" href="instalacao.html">INSTALAÇÃO</a>
+      </nav>
+    <section id="downloads">
+      <h2>MACHINES</h2>
+      <p class="hint">Geradores do riddim: escolha acordes, estilo e músico, e a machine monta a harmonia, a bateria ou a linha de baixo em MIDI para arrastar para a timeline. Carregue numa <em>Instrument Track</em> e arraste o MIDI gerado para a timeline.</p>
+      <div class="plugins">
+
+        <article class="card">
+          <img class="shot" src="img/dubchords.jpg" alt="Interface do Mastor Reggae Chord Machine MRCM-1240: painel creme com quatro módulos de acorde, cada um com display âmbar, teclado mecânico de uma oitava, botões maior e menor, seletor de inversão e contador de compassos; abaixo, seções de ritmo com padrão (notas sempre 1/32), som com botão preview, chaves bubble e som interno e níveis de piano e Hammond, MIDI e o visor do loop" width="1400" height="786" loading="lazy">
+          <div class="body">
+            <h3>Mastor Reggae Chord Machine MRCM-1240 <small>1.6</small></h3>
+            <p>Gerador de harmonia para começar um riddim: escolha até 4 acordes e quantos compassos cada um dura, e o skank sai pronto no andamento da DAW.</p>
+            <ul>
+              <li>Teclado mecânico para a tônica, botões MAIOR / MENOR e contador de compassos (de 1/2 a 8)</li>
+              <li>Inversões AUTO, FUND, 1ª e 2ª, com a sugestão de notas mais próximas marcada</li>
+              <li>Skank de piano com as duas mãos e bubble de Hammond com as duas mãos (mão esquerda no "e" e no "a", direita no contratempo), notas sempre 1/32</li>
+              <li>Som interno pelo motor do Roots Keys: piano M1 e Hammond Roots Percussion, e botão PREVIEW</li>
+              <li>Versão para celular: monte os acordes, ouça e baixe o MIDI direto no navegador</li>
+              <li>Arraste o MIDI para a timeline com cada acorde em uma cor (canal MIDI)</li>
+            </ul>
+            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
+            <div class="dl">
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.6/MastorReggaeChordMachine-Windows.zip">⬇ Windows<span>VST3 · zip</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.6/MastorReggaeChordMachine-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
+              <a class="btn alt" href="chords/">📱 Celular<span>abre no navegador</span></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="shot" src="img/dubdrums.jpg" alt="Interface do Mastor Reggae Drum Machine MRDM-12: painel creme com módulos de estilo, loop, hi-hat com a chave do baterista e dinâmica; abaixo, aleatoriedade, som e MIDI, e a grade da bateria com uma cor para cada compasso" width="1400" height="786" loading="lazy">
+          <div class="body">
+            <h3>Mastor Reggae Drum Machine MRDM-12 <small>2.3</small></h3>
+            <p>Gerador do esqueleto da bateria de reggae: escolha o estilo, os compassos e o baterista, e o groove sai pronto, com viradas, no andamento da DAW.</p>
+            <ul>
+              <li>Rockers, One Drop e Boom Bap anos 90, com caixa no 2 e no 4 e bumbo/caixa editáveis por colcheia</li>
+              <li>Chave de baterista: Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL (Casio MT-40 do Sleng Teng / Oberheim DMX), com o hi-hat, o bumbo, a caixa e as viradas de cada um</li>
+              <li>Kit anos 70 com os samples DM ou digital estilo King Jammy / Sleng Teng</li>
+              <li>Grade editável, virada de intro, preview e uma cor por compasso, na grade e no MIDI</li>
+              <li>Arraste o MIDI inteiro ou um compasso só, exporte o .mid e ajuste a nota de cada peça para o seu kit</li>
+              <li>Alto-falante vintage de 1959 na seção SOM, com o cone mexendo com o som</li>
+              <li>📱 Também roda no celular, direto no navegador</li>
+            </ul>
+            <div class="formats">Instrumento / gerador MIDI · Instalador para Windows (VST3 + standalone: Cubase, FL Studio, Ableton, Reaper, Studio One, Bitwig) e Mac (VST3 + AU: também Logic e GarageBand; Intel e Apple Silicon)</div>
+            <div class="dl">
+              <a class="btn" href="downloads/MastorReggaeDrumMachine-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · 2.3</span></a>
+              <a class="btn alt" href="downloads/MastorReggaeDrumMachine-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · 2.3</span></a>
+              <a class="btn alt" href="drums/">📱 Celular<span>abre no navegador</span></a>
+            </div>
+            <div class="formats">Sem instalador: <a href="downloads/MastorReggaeDrumMachine-Windows.zip">zip Windows</a> · <a href="downloads/MastorReggaeDrumMachine-macOS.zip">zip Mac</a> · No Mac, se o instalador não abrir: clique com o botão direito no .pkg › Abrir (ou Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim)</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="shot" src="img/bassmachine.jpg" alt="Interface do Mastor Reggae Bass Machine MRBM-69 2.6: painel creme com laterais de madeira e plaqueta dourada Dub Station; letreiro de palhetas com o nome do baixista e a botoeira de sete teclas, quatro módulos de acorde com teclado mecânico, visor âmbar editável com a linha de baixo, botão verde de PLAY, timbres Roots, Super Tone e 808, osciloscópio verde e, embaixo, a bateria de acompanhamento e o teclado do Roots Keys" width="1400" height="786" loading="lazy">
+          <div class="body">
+            <h3>Mastor Reggae Bass Machine MRBM-69 <small>2.7</small></h3>
+            <p><strong>Gerador de Reggae Bass Lines.</strong> Escolha os acordes e o baixista, ouça com os timbres do MRDBI-07, a bateria e o teclado do Roots Keys, edite as notas no visor e arraste a linha de baixo em MIDI para a timeline.</p>
+            <ul>
+              <li>Botoeira com 7 baixistas (Family Man, Flabba, Derrick Barnett, Robbie, Leroy Sibbles, Fully Fullwood e Jammys) e o nome num letreiro de palhetas que gira ao trocar</li>
+              <li>MIDI editável no visor, só com as notas da pentatônica (maior ou menor) de cada acorde; a linha editada fica salva no projeto e sai no MIDI</li>
+              <li>Harmonia de até 4 acordes (maior, menor, 7, m7), IDEIA numerada e NOVA IDEIA</li>
+              <li>PREVIEW com PLAY de lâmpada e os timbres do MRDBI-07: Roots (Sine), Super Tone e 808 de cauda longa</li>
+              <li>Bateria de acompanhamento Roots, One Drop, Digital e Dancehall, sempre com a caixa no 2 e no 4, e o teclado do DubMastor Roots Keys</li>
+            </ul>
+            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon) · também toca no navegador</div>
+            <div class="dl">
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-Windows.zip">⬇ Windows<span>VST3 · zip · 2.7</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-macOS.zip">⬇ Mac<span>VST3 + AU · zip · 2.7</span></a>
+            </div>
+            <a class="btn alt" href="bassmachine/" style="margin-top:2px">▶ Tocar no navegador<span>versão 2.7, sem instalar nada</span></a>
+          </div>
+        </article>
+
+      </div>
+      <p class="note install-link">Depois de baixar: <a href="instalacao.html">como instalar no Windows e no Mac</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>DubMastor · Feito no Brasil</span>
+    <span><a href="https://github.com/dubmastor/DubMastor-DubStation-/releases">Todas as versões</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-">Código-fonte no GitHub</a></span>
+  </footer>
+
+</div>
+</body>
+</html>
