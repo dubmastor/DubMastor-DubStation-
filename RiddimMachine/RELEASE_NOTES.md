@@ -1,3 +1,10 @@
+## Mastor Riddim Machine MRM-0420 1.4
+
+A aba **BATERIA** traz o **Mastor Reggae Drum Machine MRDM-12 2.1** (novo nome do MDDM-12):
+
+- Alto-falante vintage de 1959 na seção SOM, com o cone mexendo com o som
+- Preset inicial da bateria: hi-hat em 1/16 e Style Scott
+
 ## Mastor Riddim Machine MRM-0420 1.3
 
 A aba **BATERIA** traz o **Mastor Dub Drums Machine MDDM-12 2.0**:

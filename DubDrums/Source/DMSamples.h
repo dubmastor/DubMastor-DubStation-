@@ -1,5 +1,5 @@
 // Gerado por tools/make_samples_header.py a partir de Samples/*.wav — não editar à mão.
-// Kit SAMPLES DM do preview do Mastor Dub Drums Machine MDDM-12.
+// Kit SAMPLES DM do preview do Mastor Reggae Drum Machine MRDM-12.
 #pragma once
 #include <cstddef>
 

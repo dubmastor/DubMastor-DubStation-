@@ -22,7 +22,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "Mastor Dub Drums Machine MDDM-12"; }
+    const juce::String getName() const override { return "Mastor Reggae Drum Machine MRDM-12"; }
     bool acceptsMidi() const override  { return true; }
     bool producesMidi() const override { return true; }
     bool isMidiEffect() const override { return false; }
@@ -31,7 +31,7 @@ public:
     int getNumPrograms() override { return 1; }
     int getCurrentProgram() override { return 0; }
     void setCurrentProgram (int) override {}
-    const juce::String getProgramName (int) override { return "MDDM-12"; }   // nome vazio reprova no validador da Steinberg
+    const juce::String getProgramName (int) override { return "MRDM-12"; }   // nome vazio reprova no validador da Steinberg
     void changeProgramName (int, const juce::String&) override {}
 
     void getStateInformation (juce::MemoryBlock&) override;
@@ -61,6 +61,7 @@ public:
     double getPlayheadBeat() const noexcept       { return playheadBeat.load(); }
     bool isHostPlaying() const noexcept           { return hostPlaying.load(); }
     bool isPreviewing() const noexcept            { return previewing.load(); }
+    float getOutputLevel() const noexcept         { return outLevel.load(); }   // 0..1, para o alto-falante da interface
 
     void newVariation();                          // sorteia uma nova semente (e o preview recomeça do início)
     void applyStyleDefaults (int styleIndex);     // bumbo e caixa do estilo na BATIDA PRINCIPAL
@@ -99,6 +100,7 @@ private:
     std::atomic<double> playheadBeat { -1.0 };
     std::atomic<bool>   hostPlaying  { false };
     std::atomic<bool>   previewing   { false };
+    std::atomic<float>  outLevel     { 0.0f };
     bool wasPlaying = false, wasPreviewing = false;
     double previewPos = 0.0;
     double sr = 44100.0;

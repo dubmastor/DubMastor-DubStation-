@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-project(DubDrums VERSION 2.0.0)
+project(DubDrums VERSION 2.1.0)
 
 # versão curta para a plaqueta (ex.: "1.0")
 set(DD_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
@@ -30,7 +30,7 @@ endif()
 juce_add_plugin(DubDrums
     COMPANY_NAME                "DubMastor"
     BUNDLE_ID                   com.dubmastor.dubdrums
-    PRODUCT_NAME                "Mastor Dub Drums Machine MDDM-12"
+    PRODUCT_NAME                "Mastor Reggae Drum Machine MRDM-12"
     PLUGIN_MANUFACTURER_CODE    Dblb
     PLUGIN_CODE                 Dbd1
     FORMATS                     ${DD_FORMATS}

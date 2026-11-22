@@ -1,4 +1,4 @@
-// Dub Drums / MDDM-12 — bateria interna para o PREVIEW
+// Dub Drums / MRDM-12 — bateria interna para o PREVIEW
 // Kits: ANOS 70 toca as amostras carregadas com setSample() (bumbo, aro, caixa, hi-hat fechado e aberto)
 // e sintetiza o resto (tons e prato) e tudo quando não há amostra; DIGITAL é todo sintetizado (MT-40).
 // Sem alocação na thread de áudio: vozes fixas; as amostras são carregadas antes de tocar.

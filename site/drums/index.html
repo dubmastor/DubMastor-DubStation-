@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Dub Drums Machine MDDM-12 2.0 — Dub Station</title>
+<title>Mastor Reggae Drum Machine MRDM-12 2.1 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -83,6 +83,16 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
 .dock .redbtn{padding:13px;font-size:12px;animation:none}
 @media (min-width:900px){.dock{display:none}body{padding-bottom:20px}}
 .btns.c3 .b,.btns.c6 .b{letter-spacing:.05em;font-size:11.5px}
+.somtop{display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center}
+/* alto-falante de gabinete valvulado de 1959: madeira, tweed dourado, aro de latão e tweeter em cima */
+.spk{height:96px;border-radius:8px;position:relative;box-shadow:2px 3px 4px rgba(0,0,0,.35);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px),linear-gradient(135deg,#7a4a22,#3b2110)}
+.spk .tw{position:absolute;left:50%;top:6px;width:44%;height:12px;transform:translateX(-50%);border-radius:7px;border:1.5px solid #c9a24a;
+  background:repeating-linear-gradient(45deg,#c49a50 0 1px,#8a6430 1px 3px)}
+.spk .wf{position:absolute;left:50%;top:24px;width:66px;height:66px;transform:translateX(-50%);border-radius:50%;border:2.5px solid #c9a24a;overflow:hidden;
+  background:repeating-linear-gradient(45deg,rgba(255,230,170,.25) 0 1px,transparent 1px 3px),repeating-linear-gradient(-45deg,rgba(60,35,5,.3) 0 1px,transparent 1px 3px),radial-gradient(circle at 40% 30%,#d2a95c,#8a6430)}
+.spk .cone{position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,rgba(0,0,0,.35) 0 18%,rgba(0,0,0,.18) 30%,transparent 70%);transition:transform .05s}
+.spk .sc{position:absolute;width:5px;height:5px;border-radius:50%;background:radial-gradient(#e0dccf,#4d4636)}
 .foot{text-align:center;font-size:11px;color:var(--ink2);margin-top:16px}
 .foot a{color:var(--ink)}
 .clear{display:none;margin-left:auto}
@@ -92,7 +102,7 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR DUB DRUMS MACHINE MDDM-12 <span id="ver">2.0</span></h1><div class="sub">RIDDIM DRUM GENERATOR · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE DRUM MACHINE MRDM-12 <span id="ver">2.1</span></h1><div class="sub">RIDDIM DRUM GENERATOR · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -119,14 +129,14 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
   </section>
 
   <section class="mod"><div class="tag">BATERISTA</div>
-    <div class="display" id="drumDisp">CARLTON BARRETT</div>
+    <div class="display" id="drumDisp">STYLE SCOTT</div>
     <div class="lbl">CHAVE SELETORA</div>
     <div class="btns c5" id="drummer"></div>
     <div class="info" id="drumInfo"></div>
   </section>
 
   <section class="mod"><div class="tag">HI-HAT</div>
-    <div class="display" id="hatDisp">COLCHEIAS</div>
+    <div class="display" id="hatDisp">SEMICOLCHEIAS</div>
     <div class="lbl">FIGURA</div>
     <div class="btns c2" id="hat"></div>
     <div class="lbl">SWING</div>
@@ -149,7 +159,9 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
   </section>
 
   <section class="mod"><div class="tag">SOM</div>
-    <button class="preview" id="preview"><span class="lamp"></span><span>▶ PREVIEW</span></button>
+    <div class="somtop"><button class="preview" id="preview"><span class="lamp"></span><span>▶ PREVIEW</span></button>
+      <div class="spk" aria-hidden="true"><div class="tw"></div><div class="wf"><div class="cone" id="cone"></div></div>
+        <i class="sc" style="left:22px;top:28px"></i><i class="sc" style="right:22px;top:28px"></i><i class="sc" style="left:22px;bottom:8px"></i><i class="sc" style="right:22px;bottom:8px"></i></div></div>
     <div class="slider" style="margin-top:12px"><span>BPM</span><input type="range" min="60" max="180" id="bpm"><output id="o_bpm"></output></div>
     <div class="slider"><span>VOLUME</span><input type="range" min="0" max="100" id="volume"><output id="o_volume"></output></div>
     <div class="lbl">KIT</div>
@@ -185,8 +197,8 @@ const G = window.MDDM, gm = G.gm;
 const $ = (id) => document.getElementById(id);
 
 // ---------------------------------------------------------------- estado (igual aos parâmetros do plugin)
-const st = Object.assign({ style: 0, kickMask: 0x11, snareMask: 0x44, bars: 4, hatPattern: 0, swing: 0, swingAll: true, dynamics: 1,
-  rndKick: 15, rndSnare: 25, rndHat: 30, rndPerc: 20, drummer: 2, backbeat: 0, kit: 0, fill: false, intro: false, seed: 1,
+const st = Object.assign({ style: 0, kickMask: 0x11, snareMask: 0x44, bars: 4, hatPattern: 1, swing: 0, swingAll: true, dynamics: 1,
+  rndKick: 15, rndSnare: 25, rndHat: 30, rndPerc: 20, drummer: 0, backbeat: 0, kit: 0, fill: false, intro: false, seed: 1,
   bpm: 75, volume: 70, channel: 10, colorMidi: true }, load());
 function load() { try { return JSON.parse(localStorage.getItem('mddm12') || '{}'); } catch (e) { return {}; } }
 function save() { try { localStorage.setItem('mddm12', JSON.stringify(st)); } catch (e) {} }
@@ -227,7 +239,7 @@ function publish() { engine.setPending(pattern); $('clearEdits').classList.toggl
 
 // ---------------------------------------------------------------- áudio (Web Audio)
 const engine = (() => {
-  let ctx = null, master = null, buffers = {}, active = null, pending = null, playing = false;
+  let analyser = null, ctx = null, master = null, buffers = {}, active = null, pending = null, playing = false;
   let startTime = 0, nextBeat = 0, timer = null, voices = [];
   const LOOKAHEAD = 0.12;
 
@@ -236,7 +248,8 @@ const engine = (() => {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain(); master.gain.value = st.volume / 100;
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -6; comp.ratio.value = 6;
-    master.connect(comp).connect(ctx.destination);
+    analyser = ctx.createAnalyser(); analyser.fftSize = 512;
+    master.connect(comp).connect(ctx.destination); comp.connect(analyser);
     // iOS: um buffer mudo destrava o áudio
     const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0);
     loadSamples();
@@ -358,6 +371,11 @@ const engine = (() => {
     voices = [];
   }
   return {
+    level() {
+      if (!analyser) return 0;
+      const d = new Float32Array(analyser.fftSize); analyser.getFloatTimeDomainData(d);
+      let pk = 0; for (const x of d) pk = Math.max(pk, Math.abs(x)); return pk;
+    },
     setPending(p) { if (playing) pending = p; else active = p; },
     start, stop, isPlaying: () => playing,
     restart() { if (!playing) return; stop(); active = pattern; pending = null; start(); },   // NOVA VARIAÇÃO: para e volta do começo
@@ -387,7 +405,7 @@ function midiFile(onlyBar) {
   const ppq = 960, chFor = (bar) => !st.colorMidi ? st.channel : (bar < 0 ? 5 : Math.min(4, bar + 1));
   const raw = [];
   const meta = (tick, type, text) => { const b = [...new TextEncoder().encode(text)]; raw.push({ tick, ord: 0, bytes: [0xff, type, ...vlq(b.length), ...b] }); };
-  meta(0, 3, onlyBar === undefined ? 'MDDM-12' : onlyBar < 0 ? 'MDDM-12 Intro' : 'MDDM-12 Compasso ' + (onlyBar + 1));
+  meta(0, 3, onlyBar === undefined ? 'MRDM-12' : onlyBar < 0 ? 'MRDM-12 Intro' : 'MRDM-12 Compasso ' + (onlyBar + 1));
   raw.push({ tick: 0, ord: 0, bytes: [0xff, 0x58, 4, 4, 2, 24, 8] });
   if (onlyBar === undefined) {
     if (intro > 0) meta(0, 6, 'Intro');
@@ -409,7 +427,7 @@ function midiFile(onlyBar) {
 }
 function vlq(n) { const out = [n & 0x7f]; while ((n >>= 7)) out.unshift((n & 0x7f) | 0x80); return out; }
 function fileName(onlyBar) {
-  let n = 'MDDM-12_' + STYLE_NAMES[st.style] + '_' + DRUMMERS[st.drummer];
+  let n = 'MRDM-12_' + STYLE_NAMES[st.style] + '_' + DRUMMERS[st.drummer];
   n += onlyBar === undefined ? '_' + st.bars + 'comp' + (st.intro ? '_intro' : '') : onlyBar < 0 ? '_intro' : '_compasso' + (onlyBar + 1);
   return (n + '_s' + st.seed).replace(/ /g, '-') + '.mid';
 }
@@ -582,7 +600,13 @@ cv.addEventListener('click', (ev) => {
   }
   pattern = p; storeEdits(); refresh();
 });
-(function loop() { if (engine.isPlaying()) drawPattern(); requestAnimationFrame(loop); })();
+let coneLv = 0;
+(function loop() {
+  if (engine.isPlaying()) drawPattern();
+  coneLv = Math.max(engine.level(), coneLv * 0.85);   // o cone do alto-falante mexe com o som
+  $('cone').style.transform = 'scale(' + (1 + 0.35 * Math.sqrt(Math.min(1, coneLv * 1.6))) + ')';
+  requestAnimationFrame(loop);
+})();
 window.addEventListener('resize', drawPattern);
 
 regenerate(); refresh();

@@ -1,12 +1,12 @@
-# Mastor Dub Drums Machine MDDM-12 2.0
+# Mastor Reggae Drum Machine MRDM-12 2.1
 
-*(antigo DubMastor Dub Drums)*
+*(antigo Mastor Dub Drums Machine MDDM-12 e DubMastor Dub Drums)*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-2.0/MastorDubDrumsMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-2.0/MastorDubDrumsMachine-macOS.zip)** · **[📱 Abrir no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/drums/)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDM-12-2.1/MastorReggaeDrumMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDM-12-2.1/MastorReggaeDrumMachine-macOS.zip)** · **[📱 Abrir no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/drums/)**
 
-![Interface do MDDM-12](docs/interface.png)
+![Interface do MRDM-12](docs/interface.png)
 
 Gerador do esqueleto da bateria de reggae. Você escolhe o estilo (Rockers, One Drop ou Boom Bap), quantos
 compassos, o baterista de referência e o balanço, e o plugin monta o groove com viradas, sincronizado com
@@ -31,9 +31,9 @@ a versão não sai:
 
 | DAW | Formato | Como usar |
 |---|---|---|
-| Cubase / Nuendo | VST3 | *Instrument Track*; a saída MIDI pode ir para outra faixa (MIDI Input = MDDM-12) |
+| Cubase / Nuendo | VST3 | *Instrument Track*; a saída MIDI pode ir para outra faixa (MIDI Input = MRDM-12) |
 | Studio One | VST3 | Instrumento; arraste o MIDI ou roteie a saída MIDI do instrumento |
-| Ableton Live | VST3 / AU | Faixa MIDI com o plugin; em outra faixa, *MIDI From* = a faixa do MDDM-12 |
+| Ableton Live | VST3 / AU | Faixa MIDI com o plugin; em outra faixa, *MIDI From* = a faixa do MRDM-12 |
 | FL Studio | VST3 | Canal do Channel Rack; para a saída MIDI, ajuste a porta de saída no wrapper |
 | Reaper | VST3 / AU | Instrumento; a saída MIDI vai pelos *sends* MIDI da faixa |
 | Bitwig | VST3 | Instrumento; a saída MIDI pode alimentar outra faixa |
@@ -64,7 +64,7 @@ apaga várias de uma vez). O groove, o preview e o MIDI seguem a grade.
 | **NOVA VARIAÇÃO** (botão vermelho) | Sorteia outra semente |
 
 ## BATERISTA
-Chave seletora de cinco posições (knob "cabeça de galinha" com lâmpada e nome em cada posição): clique no nome,
+Começa no **Style Scott** com o hi-hat em **1/16** (preset inicial). Chave seletora de cinco posições (knob "cabeça de galinha" com lâmpada e nome em cada posição): clique no nome,
 arraste o knob ou use a rodinha. O display mostra o baterista e embaixo vêm a banda e a assinatura.
 
 | | Hi-hat (assinatura) | Sensação | Viradas características |
@@ -95,6 +95,7 @@ pouco mais balançado, Carlton bem mais). Ele também atrasa ou adianta cada pe�
 ## SOM
 | Controle | O que faz |
 |---|---|
+| **ALTO-FALANTE** | No meio do SOM, no estilo dos gabinetes de bateria eletrônica valvulada de 1959 (madeira, tweed dourado, aro de latão, tweeter em cima). O cone mexe com o som que sai do plugin |
 | **PREVIEW** | Botão verde grande: toca o groove sem a DAW rodando, no **BPM** do knob, começando pela intro. Com o preview tocando, **NOVA VARIAÇÃO** para o som e o loop novo começa do início; trocar baterista, swing ou estilo entra na virada do próximo tempo, sem notas dobradas |
 | **SOM INTERNO / VOLUME** | Bateria interna, toca junto com a DAW. Desligue quando mandar o MIDI para a sua bateria |
 | **KIT: ANOS 70** | Os **samples DM**: bumbo (DM-KICKS1), caixa (DM-SNARES6), aro (DM-SNARES28), hi-hat fechado (DM-HATs6) e aberto (DM-HATs39). Tons e prato são sintetizados no timbre de estúdio jamaicano dos anos 70 |
@@ -102,7 +103,7 @@ pouco mais balançado, Carlton bem mais). Ele também atrasa ou adianta cada pe�
 
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. O clipe vem com a intro (se ligada) e os compassos do loop, com marcadores "Intro", "Compasso 1", "Compasso 2"...
-- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Mastor Dub Drums Machine).
+- **EXPORTAR:** salva o `.mid` (padrão: Documentos/Mastor Reggae Drum Machine).
 - **CANAL:** canal MIDI da saída ao vivo (padrão 10) e do arquivo quando o MIDI COLORIDO está desligado.
 - **MIDI COLORIDO:** cada compasso vai num canal MIDI no arquivo (compasso 1 no canal 1 ... compasso 4 no canal 4, intro no canal 5), como no Dub Chords. Na DAW, peça para colorir as notas por canal: no Cubase, no Key Editor, **Cores › Canal**; no REAPER, *Color notes by channel*. Desligue para mandar tudo no CANAL.
 - **NOTAS (opção avançada):** abre o mapa de notas: qual nota MIDI cada peça envia (bumbo, aro, caixa, HH fechado, HH aberto, tom 1, tom 2, surdo, prato). Use as setas, arraste ou a rodinha. **PADRÃO GM** volta para o General MIDI (C1 = 36). Vale para a saída ao vivo, o arrastar e o exportar.
@@ -118,7 +119,7 @@ A grade mostra o groove inteiro, com uma cor para cada compasso: **intro em azul
   **DESFAZER EDIÇÃO** volta ao padrão gerado.
 - **Arraste um compasso só:** clique na faixa **COMPASSO 1**, **2**... (ou **INTRO**) em cima da grade e arraste
   para a DAW: vem só aquele compasso, com 4 tempos, no canal dele (compasso 1 no canal 1, 2 no 2...) e com o nome
-  "MDDM-12 Compasso N". Com o Cubase colorindo as notas por canal (Key Editor › Cores › Canal), cada compasso
+  "MRDM-12 Compasso N". Com o Cubase colorindo as notas por canal (Key Editor › Cores › Canal), cada compasso
   cai sempre na mesma cor. O arquivo MIDI não guarda a cor do clipe (cada DAW escolhe a sua), então a cor
   vem do canal.
 

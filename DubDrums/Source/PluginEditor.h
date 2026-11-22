@@ -209,6 +209,19 @@ public:
     float pulse = 0.0f;   // 0..1, animado pelo painel enquanto toca
 };
 
+// Alto-falante vintage no meio do SOM: o cone mexe com o som que sai do plugin.
+// Três desenhos de época: 0 = gabinete de bateria eletrônica valvulada de 1959 (tweed + tweeter em cima),
+// 1 = rádio valvulado de mesa dos anos 50 (baquelite, frisos cromados e olho mágico verde),
+// 2 = rádio transistorizado dos anos 60 (alumínio perfurado).
+class VintageSpeaker : public juce::Component
+{
+public:
+    VintageSpeaker() { setInterceptsMouseClicks (false, false); }
+    void paint (juce::Graphics&) override;
+    int design = 0;
+    float level = 0.0f;   // 0..1
+};
+
 //==============================================================================
 // Opção avançada: qual nota MIDI cada peça da bateria usa
 class NoteMapPanel : public juce::Component
@@ -291,6 +304,9 @@ private:
     PushButton notesButton { "NOTAS" };
     Toggle fill, intro, swingAll, sound, colorMidi;
     DrumsPreviewButton previewButton;
+  public:
+    VintageSpeaker speaker;
+  private:
     std::unique_ptr<ButtonAttach> previewAtt;
     PushButton clearEdits { "DESFAZER EDICAO" };
     bool showingEdits = false;

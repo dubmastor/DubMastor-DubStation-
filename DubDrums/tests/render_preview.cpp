@@ -3,6 +3,7 @@
 // ./render_preview troca.txt   -> toca 60 s trocando variação e baterista no meio do tempo e procura notas dobradas
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <cstdlib>
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -24,7 +25,7 @@ int main (int argc, char** argv)
     set ("rndHat", 40.0f);
     set ("rndSnare", 35.0f);
     set ("intro", argc > 5 && juce::String (argv[5]).contains ("intro") ? 1.0f : 0.0f);
-    set ("drummer", argc > 6 ? (float) juce::String (argv[6]).getIntValue() : 2.0f);
+    set ("drummer", argc > 6 ? (float) juce::String (argv[6]).getIntValue() : 0.0f);
     set ("kit", argc > 7 ? (float) juce::String (argv[7]).getIntValue() : 0.0f);
 
     // "algo.txt": teste da troca de padrão tocando (o "embolado" da 1.3)
@@ -152,6 +153,17 @@ int main (int argc, char** argv)
         proc.toggleNote (dubdrums::gm::Kick, 1.51, true);
         for (int i = 0; i < 4; ++i) juce::MessageManager::getInstance()->runDispatchLoopUntil (40);
         std::printf ("edicoes: %s\n", proc.hasEdits() ? "sim" : "nao");
+    }
+
+    // MRDM_SPEAKER=0/1/2: escolhe o desenho do alto-falante (e mostra o cone tocando)
+    if (const char* sp = std::getenv ("MRDM_SPEAKER"))
+    {
+        std::function<void (juce::Component&)> setSpeaker = [&] (juce::Component& c)
+        {
+            if (auto* v = dynamic_cast<VintageSpeaker*> (&c)) { v->design = juce::String (sp).getIntValue(); v->level = 0.55f; v->repaint(); }
+            for (auto* child : c.getChildren()) setSpeaker (*child);
+        };
+        setSpeaker (*ed);
     }
 
     auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 2.0f);

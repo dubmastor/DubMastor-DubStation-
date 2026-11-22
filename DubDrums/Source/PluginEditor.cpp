@@ -1,4 +1,4 @@
-// Interface do Mastor Dub Drums Machine MDDM-12 (antigo Dub Drums) — visual copiado do DubMastor Dub Chords
+// Interface do Mastor Reggae Drum Machine MRDM-12 (antigo Dub Drums) — visual copiado do DubMastor Dub Chords
 #include "PluginEditor.h"
 
 #ifndef DD_VERSION_SHORT
@@ -396,7 +396,7 @@ void DubDrumsPanel::renderBackground()
 
     // --- cabeçalho
     g.setColour (colours::ink);
-    const juce::String title ("MASTOR DUB DRUMS MACHINE MDDM-12 " DD_VERSION_SHORT);   // padrão: versão logo depois do nome
+    const juce::String title ("MASTOR REGGAE DRUM MACHINE MRDM-12 " DD_VERSION_SHORT);   // padrão: versão logo depois do nome
     {   // nome comprido: diminui a fonte até o título + a placa DUB STATION caberem antes das faixas da bandeira
         float fs = 30.0f;
         const float maxW = (float) plate.getWidth() - 330.0f - 32.0f - 26.0f - 250.0f;
@@ -980,6 +980,7 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     noteMap.onClose = [this] { noteMap.setVisible (false); };
 
     addAndMakeVisible (previewButton);
+    addAndMakeVisible (speaker);
     previewAtt = std::make_unique<ButtonAttach> (proc.apvts, "preview", previewButton);
     addChildComponent (clearEdits);
     clearEdits.onClick = [this] { proc.clearEdits(); };
@@ -1032,7 +1033,7 @@ int DubDrumsPanel::choice (const char* id) const
 
 void DubDrumsPanel::exportMidi()
 {
-    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Mastor Dub Drums Machine");
+    auto dir = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Mastor Reggae Drum Machine");
     dir.createDirectory();
     chooser = std::make_unique<juce::FileChooser> ("Salvar bateria em MIDI", dir.getChildFile (proc.suggestedFileName()), "*.mid");
     chooser->launchAsync (juce::FileBrowserComponent::saveMode
@@ -1067,6 +1068,10 @@ void DubDrumsPanel::timerCallback()
     }
     previewButton.pulse = playing ? 0.5f + 0.5f * std::sin ((float) juce::Time::getMillisecondCounterHiRes() * 0.0063f) : 0.0f;
     if (playing || previewButton.getToggleState()) previewButton.repaint();
+    {   // cone do alto-falante acompanha o som
+        const float lv = std::sqrt (juce::jlimit (0.0f, 1.0f, proc.getOutputLevel() * 1.6f));
+        if (std::abs (lv - speaker.level) > 0.004f) { speaker.level = lv; speaker.repaint(); }
+    }
     if (v != lastVersion)
     {
         lastVersion = v;
@@ -1282,7 +1287,7 @@ void DrumsPreviewButton::paintButton (juce::Graphics& g, bool over, bool down)
     g.drawRoundedRectangle (cap, 5.0f, 1.2f);
 
     // lâmpada à esquerda e símbolo play / stop
-    auto content = cap.reduced (12.0f, 0);
+    auto content = cap.reduced (10.0f, 0);
     const auto lamp = content.removeFromLeft (16.0f).withSizeKeepingCentre (14.0f, 14.0f);
     g.setColour (on ? juce::Colour (0xffd8ffb0).withAlpha (0.55f + 0.45f * pulse) : juce::Colour (0xff20301f));
     g.fillEllipse (lamp);
@@ -1296,7 +1301,7 @@ void DrumsPreviewButton::paintButton (juce::Graphics& g, bool over, bool down)
     g.setColour (colours::cream);
     g.fillPath (sym);
     content.removeFromLeft (8.0f);
-    g.setFont (stencil (16.0f, 0.10f));
+    g.setFont (stencil (14.5f, 0.06f));
     g.drawText (on ? "PARAR" : "PREVIEW", content, juce::Justification::centredLeft);
 }
 
@@ -1475,8 +1480,8 @@ void DubDrumsPanel::resized()
 
     // --- linha do meio: ALEATORIEDADE | SOM | MIDI
     const int by = 432, bh = 158;
-    randPanel  = { 52, by, 430, bh };
-    soundPanel = { randPanel.getRight() + 14, by, 346, bh };
+    randPanel  = { 52, by, 324, bh };
+    soundPanel = { randPanel.getRight() + 14, by, 452, bh };
     midiPanel  = { soundPanel.getRight() + 14, by, W - 52 - (soundPanel.getRight() + 14), bh };
     {
         auto a = randPanel.reduced (10, 0);
@@ -1490,8 +1495,10 @@ void DubDrumsPanel::resized()
         auto a = soundPanel.reduced (12, 0);
         a.removeFromTop (18);
         auto top = a.removeFromTop (80);
-        previewButton.setBounds (top.removeFromLeft (164).withSizeKeepingCentre (164, 62));
-        top.removeFromLeft (6);
+        previewButton.setBounds (top.removeFromLeft (156).withSizeKeepingCentre (156, 62));
+        top.removeFromLeft (8);
+        speaker.setBounds (top.removeFromLeft (112).withSizeKeepingCentre (112, 80).translated (0, -1));   // alto-falante no meio
+        top.removeFromLeft (4);
         const int kw = top.getWidth() / 2;
         placeKnob (bpm, top.removeFromLeft (kw));
         placeKnob (volume, top);
@@ -1780,4 +1787,180 @@ void DrummerSwitch::paint (juce::Graphics& g)
     juce::ColourGradient sg (juce::Colour (0xffe0ded8), sc.getX(), sc.getY(), juce::Colour (0xff5e5b55), sc.getRight(), sc.getBottom(), false);
     g.setGradientFill (sg);
     g.fillEllipse (sc);
+}
+
+//==============================================================================
+// Alto-falante vintage (três desenhos de época), com desgaste: verniz gasto, pano amarelado, riscos e parafusos
+namespace
+{
+    // pano de alto-falante: trama em diagonal, cor de tweed envelhecido
+    void grilleCloth (juce::Graphics& g, juce::Rectangle<float> r, juce::Colour base, float level)
+    {
+        juce::ColourGradient cg (base.brighter (0.15f), r.getCentreX(), r.getY(), base.darker (0.35f), r.getCentreX(), r.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRect (r);
+        // o cone por trás do pano: aparece como uma sombra que "respira" com o som
+        const float cr = juce::jmin (r.getWidth(), r.getHeight()) * (0.36f + 0.05f * level);
+        juce::ColourGradient cone (juce::Colours::black.withAlpha (0.10f + 0.22f * level), r.getCentreX(), r.getCentreY(),
+                                   juce::Colours::transparentBlack, r.getCentreX() + cr, r.getCentreY(), true);
+        g.setGradientFill (cone);
+        g.fillEllipse (juce::Rectangle<float> (cr * 2, cr * 2).withCentre (r.getCentre()));
+        g.setColour (juce::Colours::black.withAlpha (0.20f + 0.18f * level));
+        g.fillEllipse (juce::Rectangle<float> (cr * 0.42f, cr * 0.42f).withCentre (r.getCentre()));   // calota
+        // trama
+        g.setColour (base.brighter (0.45f).withAlpha (0.35f));
+        for (float x = r.getX() - r.getHeight(); x < r.getRight(); x += 3.0f)
+            g.drawLine (x, r.getBottom(), x + r.getHeight(), r.getY(), 0.6f);
+        g.setColour (base.darker (0.6f).withAlpha (0.35f));
+        for (float x = r.getX(); x < r.getRight() + r.getHeight(); x += 3.0f)
+            g.drawLine (x, r.getBottom(), x - r.getHeight(), r.getY(), 0.6f);
+        // manchas de tempo (amarelado / sujeira), sempre no mesmo lugar
+        juce::Random rnd (1959);
+        for (int i = 0; i < 9; ++i)
+        {
+            const float w = r.getWidth() * (0.15f + 0.25f * rnd.nextFloat());
+            const auto spot = juce::Rectangle<float> (w, w * 0.7f).withCentre ({ r.getX() + r.getWidth() * rnd.nextFloat(), r.getY() + r.getHeight() * rnd.nextFloat() });
+            g.setColour ((i % 2 ? juce::Colour (0xff6b4a12) : juce::Colours::black).withAlpha (0.07f));
+            g.fillEllipse (spot);
+        }
+    }
+
+    void screw (juce::Graphics& g, juce::Point<float> c, float r, float angle)
+    {
+        juce::ColourGradient sg (juce::Colour (0xffd8cfb8), c.x - r, c.y - r, juce::Colour (0xff4d4636), c.x + r, c.y + r, false);
+        g.setGradientFill (sg);
+        g.fillEllipse (juce::Rectangle<float> (r * 2, r * 2).withCentre (c));
+        g.setColour (juce::Colours::black.withAlpha (0.6f));
+        g.drawLine (c.x - std::cos (angle) * r * 0.75f, c.y - std::sin (angle) * r * 0.75f,
+                    c.x + std::cos (angle) * r * 0.75f, c.y + std::sin (angle) * r * 0.75f, 1.0f);
+    }
+
+    void scratches (juce::Graphics& g, juce::Rectangle<float> r, int seed)
+    {
+        juce::Random rnd (seed);
+        g.setColour (juce::Colours::white.withAlpha (0.10f));
+        for (int i = 0; i < 7; ++i)
+        {
+            const float x = r.getX() + r.getWidth() * rnd.nextFloat(), y = r.getY() + r.getHeight() * rnd.nextFloat();
+            g.drawLine (x, y, x + 6.0f + 10.0f * rnd.nextFloat(), y + (rnd.nextFloat() - 0.5f) * 4.0f, 0.5f);
+        }
+    }
+}
+
+void VintageSpeaker::paint (juce::Graphics& g)
+{
+    auto b = getLocalBounds().toFloat().reduced (1.0f);
+    const float lv = juce::jlimit (0.0f, 1.0f, level);
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.fillRoundedRectangle (b.translated (1.5f, 2.5f), 7.0f);
+
+    if (design == 0)
+    {
+        // 1959: gabinete de madeira de bateria eletrônica valvulada, tweed dourado, tweeter em cima do 12"
+        juce::ColourGradient wood (juce::Colour (0xff7a4a22), b.getX(), b.getY(), juce::Colour (0xff3b2110), b.getRight(), b.getBottom(), false);
+        g.setGradientFill (wood);
+        g.fillRoundedRectangle (b, 7.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.18f));
+        for (float y = b.getY() + 2.0f; y < b.getBottom(); y += 2.6f)   // veio da madeira
+            g.drawHorizontalLine ((int) y, b.getX() + 3.0f, b.getRight() - 3.0f);
+        auto inner = b.reduced (5.0f);
+        auto tweet = inner.removeFromTop (inner.getHeight() * 0.17f).withSizeKeepingCentre (inner.getWidth() * 0.40f, inner.getHeight() * 0.15f);
+        inner.removeFromTop (3.0f);
+        const float d = juce::jmin (inner.getWidth(), inner.getHeight());
+        auto woofer = inner.withSizeKeepingCentre (d, d);
+        for (auto [area, round] : { std::pair<juce::Rectangle<float>, bool> { woofer, true }, { tweet, false } })
+        {
+            juce::Graphics::ScopedSaveState ss (g);
+            juce::Path hole;
+            if (round) hole.addEllipse (area); else hole.addRoundedRectangle (area, area.getHeight() * 0.5f);
+            g.reduceClipRegion (hole);
+            grilleCloth (g, area, juce::Colour (0xffb48a42), round ? lv : lv * 0.6f);
+        }
+        g.setColour (juce::Colour (0xffc9a24a).withAlpha (0.9f));   // aro de latão gasto
+        g.drawEllipse (woofer, 2.2f);
+        g.drawRoundedRectangle (tweet, tweet.getHeight() * 0.5f, 1.6f);
+        g.setColour (juce::Colours::black.withAlpha (0.35f));
+        g.drawEllipse (woofer.expanded (1.6f), 0.8f);
+        for (int k = 0; k < 4; ++k)
+        {
+            const float a = juce::MathConstants<float>::pi * (0.25f + 0.5f * (float) k);
+            screw (g, woofer.getCentre() + juce::Point<float> (std::cos (a), std::sin (a)) * (d * 0.5f + 4.0f), 2.2f, 0.4f + (float) k);
+        }
+        scratches (g, b, 7);
+    }
+    else if (design == 1)
+    {
+        // anos 50: rádio de mesa de baquelite marfim, frisos cromados e o olho mágico verde
+        juce::ColourGradient bak (juce::Colour (0xffeee3c6), b.getX(), b.getY(), juce::Colour (0xffb7a47a), b.getRight(), b.getBottom(), false);
+        g.setGradientFill (bak);
+        g.fillRoundedRectangle (b, 12.0f);
+        g.setColour (juce::Colour (0xff8a6a2a).withAlpha (0.25f));   // amarelado do tempo nas bordas
+        g.drawRoundedRectangle (b.reduced (1.5f), 11.0f, 3.0f);
+        auto inner = b.reduced (8.0f);
+        auto eye = inner.removeFromTop (16.0f).withSizeKeepingCentre (16.0f, 16.0f);
+        inner.removeFromTop (3.0f);
+        {
+            juce::Graphics::ScopedSaveState ss (g);
+            juce::Path hole; hole.addRoundedRectangle (inner, 6.0f);
+            g.reduceClipRegion (hole);
+            grilleCloth (g, inner, juce::Colour (0xff8a5a2a), lv);
+        }
+        // frisos cromados na frente do pano
+        const int bars = 5;
+        for (int i = 0; i < bars; ++i)
+        {
+            const float y = inner.getY() + inner.getHeight() * ((float) i + 0.5f) / (float) bars;
+            auto bar = juce::Rectangle<float> (inner.getX() - 2.0f, y - 1.6f, inner.getWidth() + 4.0f, 3.2f);
+            juce::ColourGradient chrome (juce::Colours::white, bar.getX(), bar.getY(), juce::Colour (0xff6d6a64), bar.getX(), bar.getBottom(), false);
+            g.setGradientFill (chrome);
+            g.fillRoundedRectangle (bar, 1.5f);
+        }
+        g.setColour (juce::Colours::black.withAlpha (0.4f));
+        g.drawRoundedRectangle (inner, 6.0f, 1.0f);
+        // olho mágico (válvula 6E5): o leque verde fecha com o volume
+        g.setColour (juce::Colour (0xff14180f));
+        g.fillEllipse (eye.expanded (2.0f));
+        juce::Path fan;
+        const float open = juce::MathConstants<float>::pi * (0.9f - 0.75f * lv);
+        fan.addPieSegment (eye, open * 0.5f, juce::MathConstants<float>::twoPi - open * 0.5f, 0.28f);
+        g.setColour (juce::Colour (0xff6dff8a).withAlpha (0.55f + 0.4f * lv));
+        g.fillPath (fan);
+        g.setColour (juce::Colour (0xffc7c2b5));
+        g.drawEllipse (eye.expanded (2.0f), 1.4f);
+        scratches (g, b, 55);
+    }
+    else
+    {
+        // anos 60: rádio transistorizado, alumínio escovado perfurado e calota cromada
+        juce::ColourGradient al (juce::Colour (0xffd9d6cf), b.getX(), b.getY(), juce::Colour (0xff8b8880), b.getRight(), b.getBottom(), false);
+        g.setGradientFill (al);
+        g.fillRoundedRectangle (b, 6.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.06f));
+        for (float y = b.getY() + 1.0f; y < b.getBottom(); y += 1.5f) g.drawHorizontalLine ((int) y, b.getX() + 2.0f, b.getRight() - 2.0f);
+        const float d = juce::jmin (b.getWidth(), b.getHeight()) - 12.0f;
+        auto disc = b.withSizeKeepingCentre (d, d);
+        const auto c = disc.getCentre();
+        // furos em anéis: o cone escuro mexendo atrás aparece mais forte nos furos do meio
+        for (int ring = 0; ring < 6; ++ring)
+        {
+            const float rr = d * 0.5f * ((float) ring + 0.6f) / 6.2f;
+            const int holes = ring == 0 ? 1 : ring * 8;
+            for (int k = 0; k < holes; ++k)
+            {
+                const float a = juce::MathConstants<float>::twoPi * (float) k / (float) holes + (float) ring * 0.3f;
+                const auto p = c + juce::Point<float> (std::cos (a), std::sin (a)) * (ring == 0 ? 0.0f : rr);
+                const float pulse = lv * (1.0f - (float) ring / 6.0f);
+                g.setColour (juce::Colour (0xff15120e).withAlpha (0.75f + 0.25f * pulse));
+                g.fillEllipse (juce::Rectangle<float> (3.4f + 0.8f * pulse, 3.4f + 0.8f * pulse).withCentre (p));
+            }
+        }
+        g.setColour (juce::Colours::black.withAlpha (0.35f));
+        g.drawEllipse (disc.expanded (2.0f), 1.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.35f));
+        g.drawEllipse (disc.expanded (3.0f), 0.6f);
+        for (auto p : { b.getTopLeft() + juce::Point<float> (6, 6), b.getTopRight() + juce::Point<float> (-6, 6),
+                        b.getBottomLeft() + juce::Point<float> (6, -6), b.getBottomRight() + juce::Point<float> (-6, -6) })
+            screw (g, p, 2.2f, p.x * 0.1f);
+        scratches (g, b, 63);
+    }
 }

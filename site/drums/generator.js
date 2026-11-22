@@ -1,4 +1,4 @@
-// Mastor Dub Drums Machine MDDM-12 — gerador de bateria (porte fiel de DubDrums/Source/PatternGenerator.cpp)
+// Mastor Reggae Drum Machine MRDM-12 — gerador de bateria (porte fiel de DubDrums/Source/PatternGenerator.cpp)
 // Mesmo gerador aleatório do plugin (mt19937 + distribuições da libstdc++): com a mesma semente e os mesmos
 // controles, sai o mesmo padrão. O teste DubDrums/tests/web_generator_test.js compara com o C++ nota a nota.
 (function (root) {

@@ -5,7 +5,7 @@ import os
 pieces = [("kick", "DM-KICKS1.wav"), ("snare", "DM-SNARES6.wav"), ("rim", "DM-SNARES28.wav"),
           ("hat", "DM-HATs6.wav"), ("openHat", "DM-HATs39.wav")]
 out = ["// Gerado por tools/make_samples_header.py a partir de Samples/*.wav — não editar à mão.",
-       "// Kit SAMPLES DM do preview do Mastor Dub Drums Machine MDDM-12.",
+       "// Kit SAMPLES DM do preview do Mastor Reggae Drum Machine MRDM-12.",
        "#pragma once", "#include <cstddef>", "", "namespace dubdrums::dmsamples", "{"]
 for name, f in pieces:
     data = open(os.path.join("Samples", f), "rb").read()

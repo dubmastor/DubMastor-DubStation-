@@ -50,7 +50,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
     layout.add (std::make_unique<AudioParameterInt> (ParameterID { "snareBeats", 1 }, "Caixa (colcheias)", 0, 255,
                                                      dubdrums::defaultSnareMask (dubdrums::Style::Rockers)));
     choice ("bars", "Compassos", { "1", "2", "3", "4" }, 3);
-    choice ("hatPattern", "Hi-hat", { "Colcheias", "Semicolcheias", "Contratempo", "Tercinas" }, 0);
+    choice ("hatPattern", "Hi-hat", { "Colcheias", "Semicolcheias", "Contratempo", "Tercinas" }, 1);   // preset inicial: 1/16
     choice ("swing", "Swing do hi-hat",
             { "Reto", "Leve (54%)", "Médio (58%)", "Pesado (62%)", "Shuffle (tercina)" }, 0);
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "swingAll", 1 }, "Swing em tudo", true));
@@ -67,7 +67,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
     layout.add (std::make_unique<AudioParameterInt>  (ParameterID { "channel", 1 }, "Canal MIDI", 1, 16, 10));
 
     // 1.0: baterista, introdução, preview / som interno e mapa de notas
-    choice ("drummer", "Baterista", { "Style Scott", "Santa Davis", "Carlton Barrett", "Sly Dunbar", "Digikal" }, 2);
+    choice ("drummer", "Baterista", { "Style Scott", "Santa Davis", "Carlton Barrett", "Sly Dunbar", "Digikal" }, 0);   // preset inicial: Style Scott
     choice ("backbeat", "Batida principal", { "Caixa", "Aro", "Caixa + aro" }, 0);
     choice ("kit", "Kit", { "Anos 70 (samples DM)", "Digital (King Jammy / Sleng Teng)" }, 0);
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "intro", 1 }, u8s ("Virada de introdução"), false));
@@ -542,6 +542,7 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         adoptPending();   // parado: troca na hora
         playheadBeat = -1.0;
         synth.render (left, right, 0, numSamples, volume);   // deixa os pratos terminarem
+        outLevel = outLevel.load() * 0.8f;
         return;
     }
     if (starting)
@@ -623,18 +624,20 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     synth.render (left, right, pos, numSamples - pos, volume);
 
     // limitador suave para nunca estourar
+    float peak = 0.0f;
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         auto* d = buffer.getWritePointer (ch);
-        for (int i = 0; i < numSamples; ++i) d[i] = std::tanh (d[i]);
+        for (int i = 0; i < numSamples; ++i) { d[i] = std::tanh (d[i]); peak = std::max (peak, std::abs (d[i])); }
     }
+    outLevel = std::max (peak, outLevel.load() * 0.82f);   // nível com queda suave para o cone do alto-falante
 }
 
 // ------------------------------------------------------------------ arquivo MIDI
 juce::String DubDrumsProcessor::suggestedFileName (int bar) const
 {
     const auto s = readSettings();
-    juce::String name = juce::String ("MDDM-12_") + dubdrums::styleName (s.style)
+    juce::String name = juce::String ("MRDM-12_") + dubdrums::styleName (s.style)
                       + "_" + dubdrums::drummerName (s.drummer);
     if (bar == kAllBars) name << "_" << s.bars << "comp" << (s.intro ? "_intro" : "");
     else                 name << (bar < 0 ? juce::String ("_intro") : "_compasso" + juce::String (bar + 1));
@@ -660,9 +663,9 @@ bool DubDrumsProcessor::writeMidiFile (const juce::File& target, int onlyBar) co
     const double intro = p.introLengthInBeats;
 
     juce::MidiMessageSequence seq;
-    seq.addEvent (juce::MidiMessage::textMetaEvent (3, onlyBar == kAllBars ? juce::String ("MDDM-12")
-                                                     : onlyBar < 0 ? juce::String ("MDDM-12 Intro")
-                                                                   : "MDDM-12 Compasso " + juce::String (onlyBar + 1)), 0.0);
+    seq.addEvent (juce::MidiMessage::textMetaEvent (3, onlyBar == kAllBars ? juce::String ("MRDM-12")
+                                                     : onlyBar < 0 ? juce::String ("MRDM-12 Intro")
+                                                                   : "MRDM-12 Compasso " + juce::String (onlyBar + 1)), 0.0);
     seq.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
     // marcadores com o nome de cada compasso (aparecem na régua de DAWs que importam marcadores)

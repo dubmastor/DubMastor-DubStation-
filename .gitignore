@@ -3,6 +3,6 @@ JUCE/
 *.wav
 .DS_Store
 
-# samples do kit ANOS 70 do MDDM-12 (plugin e versão do navegador)
+# samples do kit ANOS 70 do MRDM-12 (plugin e versão do navegador)
 !DubDrums/Samples/*.wav
 !site/drums/samples/*.wav
