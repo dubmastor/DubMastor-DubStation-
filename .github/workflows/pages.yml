@@ -6,9 +6,9 @@ on:
     paths:
       - 'site/**'
       - '.github/workflows/pages.yml'
-  # depois de cada build do MRDM-12, publica os instaladores dele no site (site/downloads)
+  # depois de cada build do MRDM-12 e do Dub Battery Reggae, publica os instaladores no site (site/downloads)
   workflow_run:
-    workflows: ['Build Mastor Reggae Drum Machine MRDM-12']
+    workflows: ['Build Mastor Reggae Drum Machine MRDM-12', 'Build Dub Battery Reggae DBR']
     types: [completed]
   workflow_dispatch:
 
@@ -41,6 +41,21 @@ jobs:
           for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow build-dubdrums.yml --branch main -L 15 --json databaseId,status --jq '.[] | select(.status=="completed") | .databaseId'); do
             rm -rf dl
             if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'MastorReggaeDrumMachine-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
+              echo "Instaladores do build $id"
+              find dl -name '*.zip' -exec cp {} site/downloads/ \;
+              break
+            fi
+          done
+          ls -la site/downloads
+      # Instaladores do Dub Battery Reggae (downloads/DubBatteryReggae-*.zip), do último build que gerou os zips
+      - name: Instaladores do Dub Battery Reggae
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p site/downloads
+          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow build-dubbattery.yml --branch main -L 15 --json databaseId,status --jq '.[] | select(.status=="completed") | .databaseId'); do
+            rm -rf dl
+            if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'DubBatteryReggae-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
               echo "Instaladores do build $id"
               find dl -name '*.zip' -exec cp {} site/downloads/ \;
               break
