@@ -5,7 +5,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # versão: aparece no título da interface ("... MRDBI-07 1.5") e no plugin
-project(DubBass VERSION 1.5.0)
+project(DubBass VERSION 1.6.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

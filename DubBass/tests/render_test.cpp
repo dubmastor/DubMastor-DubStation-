@@ -137,6 +137,15 @@ int main (int argc, char** argv)
     juce::FileOutputStream os (png);
     juce::PNGImageFormat fmt;
     check (os.openedOk() && fmt.writeImageToStream (img, os), "interface salva em " + png.getFullPathName());
+    // segunda foto: modo 808 com o preset MÉDIO (as teclas de preset aparecem no envelope)
+    setP (p, ParamID::mode, 1); setP (p, ParamID::attack, 1.0f); setP (p, ParamID::decay, 750.0f);
+    setP (p, ParamID::release, 220.0f); setP (p, ParamID::pitchTime, 70.0f);
+    for (int f = 0; f < 6; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+    auto img808 = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale * (float) ed->getChildComponent (0)->getWidth() / (float) ed->getWidth());
+    auto png808 = dir.getChildFile ("interface_808.png");
+    png808.deleteFile();
+    juce::FileOutputStream os808 (png808);
+    check (os808.openedOk() && fmt.writeImageToStream (img808, os808), "interface 808 salva em " + png808.getFullPathName());
     ed.reset();
 
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");

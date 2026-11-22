@@ -87,6 +87,22 @@ private:
 };
 
 //==============================================================================
+// Presets de envelope do 808: CURTO (punch), MÉDIO e LONGO (boom). Aparecem no modo 808;
+// a tecla acende quando o envelope atual bate com o preset
+class EnvPresetKeys : public juce::Component
+{
+public:
+    explicit EnvPresetKeys (DubBassAudioProcessor& p);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    struct Preset { const char* name; float attackMs, decayMs, releaseMs, pitchTimeMs; };
+    static const Preset presets[3];
+private:
+    int current() const;
+    DubBassAudioProcessor& proc;
+};
+
+//==============================================================================
 // VU digital do maximizer no estilo Ozone: entrada L/R, redução de ganho e saída L/R,
 // com leitura numérica, pico retido e marca do teto (ceiling)
 class OzoneMeter : public juce::Component
@@ -201,6 +217,7 @@ private:
     Knob harm2, harm3, glide, pitchAmt, pitchTime;
     // ENVELOPE / FILTRO
     EnvelopeEditor envEditor;
+    EnvPresetKeys env808Presets;
     Knob cutoff, reso;
     // VÁLVULA / DRIVE
     Toggle drvOn;

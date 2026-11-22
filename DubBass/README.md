@@ -1,4 +1,4 @@
-# Mastor Reggae Dub Bass Instrument MRDBI-07 1.5
+# Mastor Reggae Dub Bass Instrument MRDBI-07 1.6
 
 O antigo **Dub Bass**.
 
@@ -19,7 +19,7 @@ OSCILADOR (Bass + harmônicos | Super Tone | 808) → FILTRO → ENVELOPE → V�
 | Seção | O que tem |
 |---|---|
 | **Oscilador** | Teclas BASS / SUPER TONE / 808. **Bass** é a senoide clássica com Harm 2 e Harm 3. **Super Tone** é o baixo digital da era Super Power do King Jammy (Sleng Teng): quadrada sem aliasing, peso de senoide e grão de 7 bits. **808** tem drop de pitch (808 Pitch / 808 Tempo), "knock" no ataque, clique de bumbo e saturação assimétrica que deixa o grave gordo e audível até em caixa pequena. Glide |
-| **Envelope / Filtro** | Envelope gráfico em tela verde: arraste o ponto **A** (ataque), **D/S** (decay na horizontal, sustain na vertical) e **R** (release); duplo clique volta ao padrão. No 808 o som decai até zero. Abaixo, Cutoff e Ressonância |
+| **Envelope / Filtro** | Envelope gráfico em tela verde: arraste o ponto **A** (ataque), **D/S** (decay na horizontal, sustain na vertical) e **R** (release); duplo clique volta ao padrão. No 808 o som decai até zero e aparecem 3 presets de envelope: **CURTO** (punch seco), **MÉDIO** (808 clássico) e **LONGO** (boom que segura o compasso). Abaixo, Cutoff e Ressonância |
 | **Osciloscópio** | Tela de fósforo verde com a onda da saída, parada no cruzamento por zero |
 | **Válvula / Saturação** | ON (começa desligada), teclas TUBE / SOFT / FUZZ / FITA, Drive, Tom e Mix. A válvula 12AX7 esquenta com o DRIVE e com o sinal: vai do vermelho apagado ao laranja, âmbar e branco quente, com o brilho azul de válvula forçada no limite. Esquenta rápido e esfria devagar. Na **FITA** o berço vira um gravador de rolo em pé: os rolos giram, o de cima esvazia e o de baixo enche, a fenda da cabeça acende com a saturação; o som é o joelho macio da fita com o "head bump" de grave em 90 Hz |
 | **EQ gráfico** | ON, 10 faders ±12 dB (32 Hz a 16 kHz) e a curva em tela verde, **editável com o mouse**: arraste perto de uma banda para subir ou baixar, duplo clique zera (mostra o Bass Boost também) |
@@ -34,6 +34,14 @@ Mono/legato: no Classic Sine as notas ligadas deslizam com o glide; no 808 cada 
 ## Versão
 
 A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha no título da interface. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site. O push na `main` publica a release `MRDBI-07-x.y` sozinho.
+
+## Instalar
+
+- **Windows:** `MastorReggaeDubBassInstrument-Windows-Instalador.exe` coloca o VST3 em `C:\Program Files\Common Files\VST3`, a pasta que Cubase, FL Studio, Ableton Live, Reaper, Studio One, Bitwig e as outras DAWs VST3 leem. O programa standalone é opcional. Ele também apaga a cópia antiga "Dub Bass - Dub Station.vst3", para não duplicar.
+- **Mac:** `MastorReggaeDubBassInstrument-macOS-Instalador.pkg` instala o VST3 e o AU em `/Library/Audio/Plug-Ins` (o AU é o que Logic e GarageBand usam) e o app em `/Applications`; tira a quarentena e faz o macOS reler os Audio Units. Como o instalador não é assinado pela Apple, abra com **botão direito → Abrir** na primeira vez.
+- **Navegador:** `site/bass/` (no site, "Tocar no navegador") toca o instrumento direto no navegador, sem instalar nada.
+
+Pro Tools usa AAX, formato que precisa do kit e da assinatura da Avid; não está incluído.
 
 ## Compilar
 

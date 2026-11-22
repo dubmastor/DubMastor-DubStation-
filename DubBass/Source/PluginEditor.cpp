@@ -493,6 +493,72 @@ void TubeGlow::paint (juce::Graphics& g)
 }
 
 //==============================================================================
+const EnvPresetKeys::Preset EnvPresetKeys::presets[3] = {
+    { "CURTO", 0.5f,  260.0f,  80.0f, 35.0f },    // punch seco, para riddim rápido
+    { "MEDIO", 1.0f,  750.0f, 220.0f, 70.0f },    // o 808 clássico
+    { "LONGO", 2.0f, 2200.0f, 700.0f, 110.0f },   // boom longo que segura o compasso
+};
+
+EnvPresetKeys::EnvPresetKeys (DubBassAudioProcessor& p) : proc (p)
+{
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
+    setRepaintsOnMouseActivity (true);
+}
+
+int EnvPresetKeys::current() const
+{
+    auto near = [this] (const char* id, float v)
+    {
+        return std::abs (proc.apvts.getRawParameterValue (id)->load() - v) <= juce::jmax (0.6f, v * 0.03f);
+    };
+    for (int i = 0; i < 3; ++i)
+        if (near (ParamID::attack, presets[i].attackMs) && near (ParamID::decay, presets[i].decayMs)
+            && near (ParamID::release, presets[i].releaseMs))
+            return i;
+    return -1;
+}
+
+void EnvPresetKeys::mouseDown (const juce::MouseEvent& e)
+{
+    const int i = juce::jlimit (0, 2, (int) (e.position.x / (float) getWidth() * 3.0f));
+    auto set = [this] (const char* id, float v)
+    {
+        if (auto* prm = proc.apvts.getParameter (id))
+        {
+            prm->beginChangeGesture();
+            prm->setValueNotifyingHost (prm->convertTo0to1 (v));
+            prm->endChangeGesture();
+        }
+    };
+    set (ParamID::attack,    presets[i].attackMs);
+    set (ParamID::decay,     presets[i].decayMs);
+    set (ParamID::release,   presets[i].releaseMs);
+    set (ParamID::pitchTime, presets[i].pitchTimeMs);
+    repaint();
+}
+
+void EnvPresetKeys::paint (juce::Graphics& g)
+{
+    auto b = getLocalBounds().toFloat();
+    g.setColour (juce::Colour (0xff1a1714));
+    g.fillRoundedRectangle (b, 5.0f);
+    auto inner = b.reduced (3.0f);
+    auto lbl = inner.removeFromLeft (34.0f);
+    g.setColour (colours::amber);
+    g.setFont (stencil (10.0f, 0.1f));
+    g.drawText ("808", lbl, juce::Justification::centred);
+    const int cur = current();
+    const auto mouse = getMouseXYRelative().toFloat();
+    const float w = inner.getWidth() / 3.0f;
+    for (int i = 0; i < 3; ++i)
+    {
+        auto r = juce::Rectangle<float> (inner.getX() + w * (float) i, inner.getY(), w, inner.getHeight()).reduced (1.5f, 0.0f);
+        pushButtonCap (g, r.withTrimmedBottom (2.0f), cur == i, isMouseOver() && r.contains (mouse),
+                       i == 1 ? juce::String::fromUTF8 ("MÉDIO") : juce::String (presets[i].name));
+    }
+}
+
+//==============================================================================
 void OzoneMeter::update()
 {
     auto ballistic = [] (float& lvl, float& hold, int& holdT, float now)
@@ -1281,6 +1347,7 @@ DubBassPanel::DubBassPanel (DubBassAudioProcessor& p)
     : proc (p),
       modeKeys (*p.apvts.getParameter (ParamID::mode), { "BASS", "SUPER TONE", "808" }, { 0, 2, 1 }),
       envEditor (p),
+      env808Presets (p),
       drvTypeKeys (*p.apvts.getParameter (ParamID::drvType), { "TUBE", "SOFT", "FUZZ", "FITA" }),
       eqCurve (p), scope (p), keyboard (p.keyboardState), meter (p)
 {
@@ -1294,6 +1361,7 @@ DubBassPanel::DubBassPanel (DubBassAudioProcessor& p)
     setupKnob (pitchTime, ParamID::pitchTime, "808 TEMPO");
 
     addAndMakeVisible (envEditor);
+    addChildComponent (env808Presets);
     setupKnob (cutoff,  ParamID::cutoff,  "CUTOFF");
     setupKnob (reso,    ParamID::reso,    "RESSON.");
 
@@ -1400,6 +1468,11 @@ void DubBassPanel::timerCallback()
         else      tube.update (on, drvDb, proc.driveLevel.load());
     }
     envEditor.repaint();
+    {
+        const bool show808 = juce::roundToInt (proc.apvts.getRawParameterValue (ParamID::mode)->load()) == 1;
+        if (env808Presets.isVisible() != show808) env808Presets.setVisible (show808);
+        if (show808) env808Presets.repaint();
+    }
 
     // knobs do 808 só valem no modo 808; sustain não existe no 808
     const int  mode  = juce::roundToInt (proc.apvts.getRawParameterValue (ParamID::mode)->load());
@@ -1869,9 +1942,10 @@ void DubBassPanel::resized()
         auto a = envPanel.reduced (10, 0);
         a.removeFromTop (16);
         a.removeFromBottom (6);
-        a.removeFromTop (4);
-        envEditor.setBounds (a.removeFromTop (128).reduced (4, 0));
-        a.removeFromTop (12);
+        env808Presets.setBounds (a.removeFromTop (28).removeFromRight (250).reduced (4, 1));
+        a.removeFromTop (2);
+        envEditor.setBounds (a.removeFromTop (112).reduced (4, 0));
+        a.removeFromTop (10);
         rowOf (a.withSizeKeepingCentre (a.getWidth() / 2, a.getHeight()), { &cutoff, &reso });
     }
     scope.setBounds (scopePanel.reduced (12, 0).withTrimmedTop (18).withTrimmedBottom (12));

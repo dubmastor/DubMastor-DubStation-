@@ -1,8 +1,13 @@
-## Mastor Reggae Dub Bass Instrument MRDBI-07 1.5 🟢🟡⚫
+## Mastor Reggae Dub Bass Instrument MRDBI-07 1.6 🟢🟡⚫
 
 Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, o 808 com o pitch caindo, ou o Super Tone digital da era King Jammy.
 
-**Novo na 1.5**
+**Novo na 1.6**
+- **Instaladores**: `.exe` para Windows (VST3 na pasta padrão de todas as DAWs VST3 + standalone) e `.pkg` para Mac (VST3 + AU para Logic e GarageBand + app). Removem a cópia antiga do Dub Bass para não duplicar na DAW
+- **3 presets de envelope no 808**: CURTO, MÉDIO e LONGO, no topo do envelope
+- **Versão para navegador** no site: toca sem instalar nada
+
+**Na 1.5**
 - Novo nome: **Mastor Reggae Dub Bass Instrument MRDBI-07** (antigo Dub Bass). Projetos salvos com o Dub Bass abrem normalmente: o plugin é o mesmo por dentro
 - Nome e versão no título da interface; plaqueta de latão DUB STATION
 
@@ -36,7 +41,7 @@ Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico c
 - BASS BOOST: +4 dB em 60 Hz, antes do maximizer
 
 É um instrumento: no Cubase, carregue numa *Instrument Track*.
-Downloads: `MastorReggaeDubBassInstrument-Windows.zip` e `MastorReggaeDubBassInstrument-macOS.zip`.
+Downloads: instaladores `MastorReggaeDubBassInstrument-Windows-Instalador.exe` e `MastorReggaeDubBassInstrument-macOS-Instalador.pkg` (no Mac, botão direito → Abrir na primeira vez); zips `MastorReggaeDubBassInstrument-Windows.zip` e `-macOS.zip` para instalar à mão.
 
 No Mac, depois de copiar o `.vst3`:
 ```
