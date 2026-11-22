@@ -183,7 +183,15 @@ jobs:
           cp -R out/*.vst3 pkgroot/Library/Audio/Plug-Ins/VST3/
           cp -R out/*.component pkgroot/Library/Audio/Plug-Ins/Components/
           cp -R out/*.app pkgroot/Applications/
-          pkgbuild --root pkgroot --identifier com.dubmastor.dubbatteryreggae.pkg --version "$V" \
+          # sem "relocate": se existir outra cópia do plugin no disco (zip descompactado, pasta de build),
+          # o macOS instalaria em cima dela em vez de em /Library/Audio/Plug-Ins
+          pkgbuild --analyze --root pkgroot component.plist
+          N=$(/usr/libexec/PlistBuddy -c "Print" component.plist | grep -c "RootRelativeBundlePath")
+          for i in $(seq 0 $((N - 1))); do
+            /usr/libexec/PlistBuddy -c "Set :$i:BundleIsRelocatable false" component.plist
+          done
+          grep -c "<false/>" component.plist
+          pkgbuild --root pkgroot --component-plist component.plist --identifier com.dubmastor.dubbatteryreggae.pkg --version "$V" \
                    --scripts installer/macos-scripts --install-location / \
                    ../DubBatteryReggae-macOS-Instalador.pkg
           pkgutil --payload-files ../DubBatteryReggae-macOS-Instalador.pkg | grep -E "\.vst3$|\.component$|\.app$"
@@ -192,6 +200,7 @@ jobs:
           lipo -info "out/Dub Battery Reggae.component/Contents/MacOS/Dub Battery Reggae"
           # instala o .pkg de verdade e confere o que a DAW vai achar
           sudo installer -pkg ../DubBatteryReggae-macOS-Instalador.pkg -target /
+          ls -la /Library/Audio/Plug-Ins/VST3 /Library/Audio/Plug-Ins/Components | grep -i battery || true
           test -d "/Library/Audio/Plug-Ins/VST3/Dub Battery Reggae.vst3"
           test -d "/Library/Audio/Plug-Ins/Components/Dub Battery Reggae.component"
           ! xattr -p com.apple.quarantine "/Library/Audio/Plug-Ins/VST3/Dub Battery Reggae.vst3" 2>/dev/null

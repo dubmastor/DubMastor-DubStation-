@@ -188,16 +188,39 @@ static void paintPlate (juce::Graphics& g, juce::Rectangle<int> plate, juce::Ran
     }
 }
 
-static void screw (juce::Graphics& g, float sx, float sy, juce::Random& rng)
+// Parafuso estilizado dos cantos: arruela de latão, cabeça cromada abaulada e fenda Phillips
+static void fancyScrew (juce::Graphics& g, juce::Point<float> c, float r, float angle)
 {
-    const auto r = juce::Rectangle<float> (11, 11).withCentre ({ sx, sy });
-    juce::ColourGradient sg (juce::Colour (0xffe0ded8), r.getX(), r.getY(), juce::Colour (0xff5e5b55), r.getRight(), r.getBottom(), false);
-    g.setGradientFill (sg);
-    g.fillEllipse (r);
-    g.setColour (juce::Colours::black.withAlpha (0.55f));
-    g.drawEllipse (r, 0.8f);
-    const float a = rng.nextFloat() * 3.14f;
-    g.drawLine (sx - std::cos (a) * 4.0f, sy - std::sin (a) * 4.0f, sx + std::cos (a) * 4.0f, sy + std::sin (a) * 4.0f, 1.4f);
+    auto circle = [&] (float rr) { return juce::Rectangle<float> (rr * 2.0f, rr * 2.0f).withCentre (c); };
+    g.setColour (juce::Colours::black.withAlpha (0.35f));                      // sombra no painel
+    g.fillEllipse (circle (r + 4.0f).translated (1.5f, 2.5f));
+    juce::ColourGradient washer (juce::Colour (0xffe8d28c), c.x - r, c.y - r, juce::Colour (0xff6b5220), c.x + r, c.y + r, false);
+    washer.addColour (0.5, juce::Colour (0xffb8963f));
+    g.setGradientFill (washer);                                               // arruela de latão
+    g.fillEllipse (circle (r + 4.0f));
+    g.setColour (juce::Colour (0xff3d2c0c).withAlpha (0.7f));
+    g.drawEllipse (circle (r + 4.0f), 0.8f);
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.fillEllipse (circle (r + 0.8f));
+    juce::ColourGradient head (juce::Colour (0xfffbfaf6), c.x - r * 0.45f, c.y - r * 0.55f,
+                               juce::Colour (0xff4d4a44), c.x + r * 0.7f, c.y + r * 0.8f, true);
+    head.addColour (0.35, juce::Colour (0xffd2d0ca));
+    head.addColour (0.75, juce::Colour (0xff8a8780));
+    g.setGradientFill (head);                                                 // cabeça cromada
+    g.fillEllipse (circle (r));
+    auto rot = juce::AffineTransform::rotation (angle).translated (c.x, c.y);
+    for (int k = 0; k < 2; ++k)                                               // fenda Phillips
+    {
+        juce::Path slot;
+        if (k == 0) slot.addRoundedRectangle (-r * 0.62f, -r * 0.13f, r * 1.24f, r * 0.26f, r * 0.1f);
+        else        slot.addRoundedRectangle (-r * 0.13f, -r * 0.62f, r * 0.26f, r * 1.24f, r * 0.1f);
+        g.setColour (juce::Colours::white.withAlpha (0.55f));
+        g.fillPath (slot, rot.translated (0.6f, 0.8f));
+        g.setColour (juce::Colour (0xff24211d));
+        g.fillPath (slot, rot);
+    }
+    g.setColour (juce::Colours::white.withAlpha (0.75f));                      // brilho
+    g.fillEllipse (juce::Rectangle<float> (r * 0.55f, r * 0.35f).withCentre ({ c.x - r * 0.38f, c.y - r * 0.5f }));
 }
 
 // moldura gravada + plaqueta preta com o nome da seção
@@ -205,9 +228,9 @@ static void section (juce::Graphics& g, juce::Rectangle<int> r, const juce::Stri
 {
     auto rf = r.toFloat();
     g.setColour (juce::Colours::white.withAlpha (0.45f));
-    g.drawRoundedRectangle (rf.translated (1, 1), 4.0f, 1.0f);
+    g.drawRoundedRectangle (rf.translated (1, 1), 9.0f, 1.0f);
     g.setColour (col::ink.withAlpha (0.55f));
-    g.drawRoundedRectangle (rf, 4.0f, 1.2f);
+    g.drawRoundedRectangle (rf, 9.0f, 1.2f);
     g.setFont (stencil (11.5f, 0.22f));
     const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t) + 22.0f;
     auto tag = juce::Rectangle<float> (rf.getX() + 12, rf.getY() - 9, tw, 18);
@@ -1021,8 +1044,6 @@ void Header::renderBackground()
     paintWood (g, { W - 28, 0, 28, H }, rng);
     const juce::Rectangle<int> plate (28, 0, W - 56, H);
     paintPlate (g, plate, rng, true, false);
-    screw (g, (float) plate.getX() + 12.0f, 12.0f, rng);
-    screw (g, (float) plate.getRight() - 12.0f, 12.0f, rng);
 
     // título (padrão da casa: versão logo depois do nome)
     g.setColour (col::ink);
@@ -1321,8 +1342,6 @@ void BatteryPanel::renderBackground()
                               juce::Colours::black.withAlpha (0.22f), (float) plate.getX(), (float) plate.getBottom(), true);
     g.setGradientFill (vig);
     g.fillRect (plate);
-    screw (g, (float) plate.getX() + 12.0f, (float) plate.getBottom() - 12.0f, rng);
-    screw (g, (float) plate.getRight() - 12.0f, (float) plate.getBottom() - 12.0f, rng);
 
     section (g, sampleSec, "SAMPLE");
     section (g, envSec, "ENVELOPE");
@@ -1381,10 +1400,31 @@ BatteryRoot::BatteryRoot (BatteryProcessor& p)
 
 void BatteryRoot::paintOverChildren (juce::Graphics& g)
 {
+    const float W = (float) getWidth(), H = (float) getHeight();
     const float y = (float) dbrui::Header::height;
     juce::ColourGradient sh (juce::Colours::black.withAlpha (0.25f), 0.0f, y, juce::Colours::transparentBlack, 0.0f, y + 10.0f, false);
     g.setGradientFill (sh);
-    g.fillRect (28.0f, y, (float) getWidth() - 56.0f, 10.0f);
+    g.fillRect (28.0f, y, W - 56.0f, 10.0f);
+
+    // bordas arredondadas: o gabinete inteiro (madeira + painel) com cantos redondos
+    const auto outer = juce::Rectangle<float> (0.0f, 0.0f, W, H);
+    constexpr float radius = 22.0f;
+    juce::Path mask;
+    mask.addRectangle (outer);
+    mask.addRoundedRectangle (outer, radius);
+    mask.setUsingNonZeroWinding (false);
+    g.setColour (juce::Colour (0xff0d0906));
+    g.fillPath (mask);
+    g.setColour (juce::Colours::white.withAlpha (0.12f));                      // fio de luz na borda
+    g.drawRoundedRectangle (outer.reduced (1.0f), radius - 1.0f, 1.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.7f));
+    g.drawRoundedRectangle (outer.reduced (0.5f), radius, 1.0f);
+
+    // parafusos estilizados nos cantos do painel (e nas pontas da emenda do cabeçalho)
+    const float m = 18.0f, xl = 28.0f + m, xr = W - 28.0f - m;
+    const juce::Point<float> spots[] = { { xl, m }, { xr, m }, { xl, H - m }, { xr, H - m }, { xl, y }, { xr, y } };
+    float a = 0.35f;
+    for (auto p : spots) { dbrui::fancyScrew (g, p, p.y == y ? 6.0f : 8.0f, a); a += 0.9f; }
 }
 
 void BatteryRoot::showTab (int t)

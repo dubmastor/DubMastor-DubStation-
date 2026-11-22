@@ -14,16 +14,28 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--wood);color:var(--ink);font-family:"Helvetica Neue",Arial,sans-serif}
 body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.rack{max-width:1280px;margin:0 auto;display:flex;min-height:100vh}
+.rack{max-width:1280px;margin:10px auto;display:flex;min-height:calc(100vh - 20px);border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px #000,0 6px 24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12)}
+@media (max-width:560px){.rack{margin:6px;border-radius:18px}}
 .wood{width:14px;flex:none;background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 7px),linear-gradient(90deg,#5b3519,#8a5428 40%,#6a3d1c 70%,#4a2a12)}
-.unit{flex:1;min-width:0;background:radial-gradient(900px 500px at 30% 0%,#efe4c9,var(--plate) 55%,#d8c9a6);padding:12px 12px 24px}
+.unit{flex:1;min-width:0;position:relative;background:radial-gradient(900px 500px at 30% 0%,#efe4c9,var(--plate) 55%,#d8c9a6);padding:16px 30px 34px}
+@media (max-width:560px){.unit{padding:30px 12px 34px}}
+/* parafusos estilizados: arruela de latão, cabeça cromada e fenda Phillips */
+.screw{position:absolute;width:16px;height:16px;border-radius:50%;z-index:2;pointer-events:none;
+  background:radial-gradient(circle at 34% 28%,#fbfaf6 0,#d2d0ca 30%,#8a8780 70%,#4d4a44 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.45),0 0 0 4px #b8963f,0 0 0 5px rgba(61,44,12,.7),2px 3px 4px 3px rgba(0,0,0,.35)}
+.screw::before,.screw::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:2.6px;margin:-1.3px 0 0 -5.5px;border-radius:1px;
+  background:#24211d;box-shadow:.6px .8px 0 rgba(255,255,255,.55);transform:rotate(var(--a,20deg))}
+.screw::after{transform:rotate(calc(var(--a,20deg) + 90deg))}
+.screw.tl{left:10px;top:10px;--a:20deg}.screw.tr{right:10px;top:10px;--a:72deg}
+.screw.bl{left:10px;bottom:10px;--a:-35deg}.screw.br{right:10px;bottom:10px;--a:115deg}
+@media (max-width:560px){.screw{transform:scale(.8)}.screw.tl,.screw.bl{left:5px}.screw.tr,.screw.br{right:5px}}
 header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:24px}
 h1{margin:0;font-size:clamp(16px,2.6vw,28px);letter-spacing:.16em;font-weight:800}
 .sub{font-size:10px;letter-spacing:.3em;color:var(--ink2);margin-top:4px}
 .plaque{padding:6px 16px;border-radius:5px;font-weight:800;letter-spacing:.35em;font-size:13px;color:#3a2a10;
   background:linear-gradient(180deg,#f3d27a,#c99a33 55%,#a87c22);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.35)}
 .flag{flex:1;min-width:80px;height:14px;border-radius:3px;background:linear-gradient(180deg,var(--green) 0 33%,var(--gold) 33% 66%,#222 66%);opacity:.85}
-.mod{position:relative;border:1.2px solid rgba(43,36,29,.55);border-radius:6px;padding:18px 12px 12px;box-shadow:1px 1px 0 rgba(255,255,255,.45);min-width:0}
+.mod{position:relative;border:1.2px solid rgba(43,36,29,.55);border-radius:12px;padding:18px 12px 12px;box-shadow:1px 1px 0 rgba(255,255,255,.45);min-width:0}
 .mod>.tag{position:absolute;top:-10px;left:12px;background:var(--label);color:var(--cream);font-weight:800;font-size:11px;letter-spacing:.22em;padding:3px 10px;border-radius:2px}
 .lbl{font-size:9px;letter-spacing:.3em;color:var(--ink2);text-align:center;margin:10px 0 5px;font-weight:700}
 .hint{font-size:9.5px;letter-spacing:.14em;color:var(--ink2);font-weight:700;margin:8px 2px 0;text-align:center}
@@ -130,6 +142,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 </head>
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
+<i class="screw tl"></i><i class="screw tr"></i><i class="screw bl"></i><i class="screw br"></i>
 <header>
   <div><h1>DUB BATTERY REGGAE&nbsp;1.1</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
