@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Bass Machine MRBM-69 2.6 — Dub Station</title>
+<title>Mastor Reggae Bass Machine MRBM-69 2.7 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -101,7 +101,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.6</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.7</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -134,7 +134,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
       </div>
       <div>
         <div class="rollwrap"><canvas id="roll"></canvas><div class="stamp" id="stamp">EDITADA</div></div>
-        <div class="hint">EDITE NO VISOR: TOQUE/CLIQUE NUM ESPAÇO VAZIO PÕE NOTA · ARRASTE A NOTA PARA MOVER (TEMPO E ALTURA) · ARRASTE A BORDA DIREITA PARA ESTICAR · DUPLO CLIQUE OU TOQUE LONGO APAGA. GRADE DE 1/16.</div>
+        <div class="hint">EDITE NO VISOR: TOQUE/CLIQUE NUM ESPAÇO VAZIO PÕE NOTA · ARRASTE A NOTA PARA MOVER (TEMPO E ALTURA) · ARRASTE A BORDA DIREITA PARA ESTICAR · DUPLO CLIQUE OU TOQUE LONGO APAGA. GRADE DE 1/16. SÓ NOTAS DA PENTATÔNICA DO ACORDE (MAIOR OU MENOR); AS LINHAS ESCURAS FICAM DESABILITADAS.</div>
       </div>
     </div>
   </section>
@@ -469,7 +469,15 @@ function drawRoll() {
     const x0 = xOf(x), x1 = xOf(x + s.beats);
     c.fillStyle = i % 2 ? 'rgba(255,169,40,.03)' : 'rgba(255,169,40,.07)'; c.fillRect(x0, G.y0, x1 - x0, G.h);
     c.fillStyle = 'rgba(255,169,40,.45)'; c.fillRect(Math.round(x0), 4, 1, G.y0 + G.h - 4);
-    c.fillStyle = '#ffa928'; c.fillText(M.chordLabel(s), x0 + 6, 15); x += s.beats;
+    c.fillStyle = '#ffa928'; c.fillText(M.chordLabel(s) + (M.isMinorQuality(s.quality) ? '  PENTA m' : '  PENTA'), x0 + 6, 15);
+    // linhas fora da pentatônica deste acorde: desabilitadas (escurecidas, com tracinhas)
+    for (let n = G.lo; n <= G.hi; n++) if (!M.inPentatonic(n, s)) {
+      c.fillStyle = 'rgba(0,0,0,.42)'; c.fillRect(x0, yOf(n), x1 - x0, G.rowH);
+      c.strokeStyle = 'rgba(255,169,40,.06)'; c.lineWidth = .6; c.beginPath();
+      for (let hx = x0 + 3; hx < x1; hx += 9) { c.moveTo(hx, yOf(n) + G.rowH); c.lineTo(Math.min(x1, hx + G.rowH), yOf(n)); }
+      c.stroke();
+    }
+    x += s.beats;
   });
   for (let b = .25; b < line.loopBeats; b += .25) {
     const bar = Math.abs(b % 4) < 1e-6, beat = Math.abs(b % 1) < 1e-6;
@@ -506,7 +514,7 @@ cv.addEventListener('pointerdown', ev => {
     longPress = setTimeout(() => { if (drag && !drag.changed) { line.events.splice(drag.i, 1); drag = null; storeEdits(); } }, 550);   // toque longo apaga
   } else {
     const start = Math.max(0, Math.min(line.loopBeats - grid, Math.floor(beatAt(px) / grid) * grid));
-    line.events.push({ start, length: .5, note: pitchAt(py), velocity: 100, slot: 0, fill: false });
+    line.events.push({ start, length: .5, note: M.snapToPentatonic(pitchAt(py), M.chordAtBeat(slots(), start), G.lo, G.hi), velocity: 100, slot: 0, fill: false });
     const i = line.events.length - 1;
     drag = { i, mode: 'resize', from: [px, py], orig: { ...line.events[i] }, changed: true };
   }
@@ -519,7 +527,8 @@ cv.addEventListener('pointermove', ev => {
   if (Math.abs(px - drag.from[0]) + Math.abs(py - drag.from[1]) > 4) clearTimeout(longPress);
   if (drag.mode === 'move') {
     n.start = Math.max(0, Math.min(line.loopBeats - grid, Math.round((drag.orig.start + dB) / grid) * grid));
-    n.note = Math.max(24, Math.min(72, drag.orig.note + Math.round((drag.from[1] - py) / G.rowH)));
+    const steps = Math.round((drag.from[1] - py) / G.rowH);   // só notas da pentatônica do acorde onde a nota cai
+    n.note = M.snapToPentatonic(drag.orig.note + steps, M.chordAtBeat(slots(), n.start), 24, 72, steps);
   } else n.length = Math.max(grid * .5, Math.min(line.loopBeats, Math.round((drag.orig.length + dB) / grid) * grid));
   drag.changed = drag.changed || n.start !== drag.orig.start || n.note !== drag.orig.note || n.length !== drag.orig.length;
   drawRoll();

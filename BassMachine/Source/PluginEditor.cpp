@@ -695,7 +695,7 @@ void BassRoll::mouseDown (const juce::MouseEvent& e)
     // espaço vazio: põe uma nota de colcheia no 1/16 mais próximo, na altura do clique
     const double grid = e.mods.isShiftDown() ? 0.125 : 0.25;
     const double start = juce::jlimit (0.0, loopBeats - grid, std::floor (beatAt (e.position.x) / grid) * grid);
-    events.push_back ({ start, 0.5, pitchAt (e.position.y), 100, 0, false });
+    events.push_back ({ start, 0.5, mbm::snapToPentatonic (pitchAt (e.position.y), mbm::chordAtBeat (slots, start), lo, hi), 100, 0, false });
     dragIndex = (int) events.size() - 1;
     dragOrig = events.back();
     drag = Drag::Resize;
@@ -712,7 +712,9 @@ void BassRoll::mouseDrag (const juce::MouseEvent& e)
     if (drag == Drag::Move)
     {
         n.start = juce::jlimit (0.0, loopBeats - grid, std::round ((dragOrig.start + dBeat) / grid) * grid);
-        n.note  = juce::jlimit (24, 72, dragOrig.note + (int) std::round ((dragFrom.y - e.position.y) / rowH));
+        const int steps = (int) std::round ((dragFrom.y - e.position.y) / rowH);
+        // só notas da pentatônica do acorde onde a nota cai (as outras linhas ficam desabilitadas)
+        n.note  = mbm::snapToPentatonic (dragOrig.note + steps, mbm::chordAtBeat (slots, n.start), 24, 72, steps);
     }
     else
         n.length = juce::jlimit (grid * 0.5, loopBeats, std::round ((dragOrig.length + dBeat) / grid) * grid);
@@ -780,8 +782,19 @@ void BassRoll::paint (juce::Graphics& g)
         g.drawVerticalLine ((int) x0, header.getY(), area.getBottom());
         g.setColour (colours::amber);
         g.setFont (stencil (11.0f, 0.08f));
-        g.drawText (juce::String (mbm::chordLabel (s)), juce::Rectangle<float> (x0 + 5.0f, header.getY(), x1 - x0 - 6.0f, header.getHeight()),
+        g.drawText (juce::String (mbm::chordLabel (s)) + (mbm::isMinorQuality (s.quality) ? "  PENTA m" : "  PENTA"),
+                    juce::Rectangle<float> (x0 + 5.0f, header.getY(), x1 - x0 - 6.0f, header.getHeight()),
                     juce::Justification::centredLeft);
+        // linhas fora da pentatônica deste acorde: desabilitadas (escurecidas, com tracinhas)
+        for (int n = lo; n <= hi; ++n)
+            if (! mbm::inPentatonic (n, s))
+            {
+                g.setColour (juce::Colours::black.withAlpha (0.42f));
+                g.fillRect (x0, yOf (n), x1 - x0, rowH);
+                g.setColour (colours::amber.withAlpha (0.06f));
+                for (float hx = x0 + 3.0f; hx < x1; hx += 9.0f)
+                    g.drawLine (hx, yOf (n) + rowH, juce::jmin (x1, hx + rowH), yOf (n), 0.6f);
+            }
         x += s.beats;
     }
     // grade: compassos, tempos e semicolcheias
@@ -1482,7 +1495,7 @@ void BassMachinePanel::renderBackground()
     // dicas gravadas
     g.setColour (colours::inkSoft);
     g.setFont (stencil (8.5f, 0.12f));
-    g.drawFittedText (juce::String::fromUTF8 ("EDITE NO VISOR: CLIQUE PÕE NOTA, ARRASTE MOVE, BORDA ESTICA, DUPLO CLIQUE APAGA"), ideaHint, juce::Justification::centred, 3);
+    g.drawFittedText (juce::String::fromUTF8 ("EDITE NO VISOR: CLIQUE PÕE NOTA, ARRASTE MOVE, BORDA ESTICA, DUPLO CLIQUE APAGA · SÓ PENTATÔNICA DO ACORDE"), ideaHint, juce::Justification::centred, 3);
     g.setFont (stencil (8.5f, 0.3f));
     g.drawText (juce::String::fromUTF8 ("TIMBRE  \xc2\xb7  MRDBI-07"), timbreKeysLabel, juce::Justification::centred);
 }

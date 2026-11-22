@@ -86,6 +86,49 @@ struct ChordSlot { int root = 9; int quality = Min; double beats = 8; };
 inline std::string chordLabel (const ChordSlot& c) { return std::string (rootName (c.root)) + qualityName (c.quality); }
 
 //==============================================================================
+// Escala da edição: pentatônica maior (acordes maior e 7) ou menor (menor e m7) a partir da tônica
+inline bool isMinorQuality (int q) { return q == Min || q == Min7; }
+
+inline bool inPentatonic (int note, const ChordSlot& c)
+{
+    const int iv = ((note - c.root) % 12 + 12) % 12;
+    return isMinorQuality (c.quality) ? (iv == 0 || iv == 3 || iv == 5 || iv == 7 || iv == 10)
+                                      : (iv == 0 || iv == 2 || iv == 4 || iv == 7 || iv == 9);
+}
+
+// Acorde que soa no tempo 'beat' (só os acordes ligados, beats > 0)
+inline ChordSlot chordAtBeat (const std::vector<ChordSlot>& slots, double beat)
+{
+    double x = 0;
+    ChordSlot last {};
+    bool any = false;
+    for (const auto& c : slots)
+    {
+        if (c.beats <= 0) continue;
+        last = c; any = true;
+        if (beat < x + c.beats - 1e-9) return c;
+        x += c.beats;
+    }
+    return any ? last : ChordSlot {};
+}
+
+// Nota da pentatônica mais próxima dentro de [lo, hi] (empate: a de baixo, ou na direção 'dir' se dado)
+inline int snapToPentatonic (int note, const ChordSlot& c, int lo, int hi, int dir = 0)
+{
+    note = std::clamp (note, lo, hi);
+    if (inPentatonic (note, c)) return note;
+    for (int d = 1; d < 12; ++d)
+    {
+        const int a = note - d, b = note + d;
+        const bool okA = a >= lo && inPentatonic (a, c), okB = b <= hi && inPentatonic (b, c);
+        if (okA && okB) return dir > 0 ? b : a;
+        if (okA) return a;
+        if (okB) return b;
+    }
+    return note;
+}
+
+//==============================================================================
 // Graus usados nas células (resolvidos pelo tipo do acorde)
 enum Tok
 {

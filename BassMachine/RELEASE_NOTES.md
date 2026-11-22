@@ -1,4 +1,9 @@
-# Mastor Reggae Bass Machine MRBM-69 — 2.6 · Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 — 2.7 · Gerador de Reggae Bass Lines
+
+- **Edição só na pentatônica do acorde**: no visor, as linhas fora da pentatônica do acorde de cada trecho ficam escurecidas e desabilitadas; nota nova ou arrastada encaixa na nota permitida mais próxima (pentatônica menor em acordes menor e m7, maior em maior e 7). O nome da escala aparece ao lado do acorde (PENTA / PENTA m)
+- Mesma regra na versão para navegador
+
+## 2.6
 
 - **Bateria corrigida**: em todos os estilos (Roots, One Drop, Digital e Dancehall) a caixa cai sempre no 2 e no 4; teste novo no CI confere isso em todo compasso
 - **PLAY sem animação**: só a lâmpada, acesa tocando e apagada parado

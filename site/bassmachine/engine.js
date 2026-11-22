@@ -205,8 +205,26 @@
   }
 
   const chordLabel = c => ROOT_NAMES[pc(c.root)] + QUALITY_NAMES[c.quality];
+  // escala da edição: pentatônica maior (maior, 7) ou menor (menor, m7), igual ao plugin
+  const isMinorQuality = q => q === 1 || q === 3;
+  const inPentatonic = (note, c) => { const iv = (((note - c.root) % 12) + 12) % 12; return (isMinorQuality(c.quality) ? [0, 3, 5, 7, 10] : [0, 2, 4, 7, 9]).includes(iv); };
+  function chordAtBeat(slots, beat) {
+    let x = 0, last = null;
+    for (const c of slots) { if (c.beats <= 0) continue; last = c; if (beat < x + c.beats - 1e-9) return c; x += c.beats; }
+    return last || { root: 9, quality: 1, beats: 8 };
+  }
+  function snapToPentatonic(note, c, lo, hi, dir = 0) {
+    note = Math.max(lo, Math.min(hi, note));
+    if (inPentatonic(note, c)) return note;
+    for (let d = 1; d < 12; d++) {
+      const a = note - d, b = note + d, okA = a >= lo && inPentatonic(a, c), okB = b <= hi && inPentatonic(b, c);
+      if (okA && okB) return dir > 0 ? b : a;
+      if (okA) return a; if (okB) return b;
+    }
+    return note;
+  }
 
   root.MRBM = { BOOK, Q, QUALITY_NAMES, QUALITY_LONG, ROOT_NAMES, DURATIONS, DURATION_NAMES, DrumStyles, drum,
-                buildLoop, buildDrums, monophonic, chordLabel, isDigitalKit, styleNames: BOOK.map(b => b.name),
+                buildLoop, buildDrums, monophonic, chordLabel, isMinorQuality, inPentatonic, chordAtBeat, snapToPentatonic, isDigitalKit, styleNames: BOOK.map(b => b.name),
                 taglines: BOOK.map(b => b.tagline) };
 })(typeof window !== 'undefined' ? window : globalThis);

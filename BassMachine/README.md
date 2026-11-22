@@ -1,8 +1,8 @@
-# Mastor Reggae Bass Machine MRBM-69 2.6 — Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 2.7 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.6/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.6/MRBM-69-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-macOS.zip)**
 
 ![Interface do Reggae Bass Machine](docs/interface.png)
 
@@ -41,7 +41,7 @@ e **ON** nos acordes 2 a 4. O plugin abre com **dois acordes ligados, Am e Dm, d
 |---|---|
 | **IDEIA** | Número da sugestão. A mesma ideia gera sempre a mesma linha: clique nas setas para voltar a uma de que você gostou (Shift = de 10 em 10) |
 | **NOVA IDEIA** | Sorteia outra linha com os mesmos acordes e o mesmo estilo |
-| **Visor (MIDI editável)** | Rolo de piano âmbar com as notas, os acordes e o cursor. **Clique num espaço vazio** põe nota, **arraste a nota** para mover (tempo e altura), **arraste a borda direita** para esticar, **duplo clique** (ou botão direito) apaga. Grade de 1/16 (Shift = 1/32). Notas douradas são de virada |
+| **Visor (MIDI editável)** | Rolo de piano âmbar com as notas, os acordes e o cursor. **Clique num espaço vazio** põe nota, **arraste a nota** para mover (tempo e altura), **arraste a borda direita** para esticar, **duplo clique** (ou botão direito) apaga. Grade de 1/16 (Shift = 1/32). Só entram notas da **pentatônica do acorde** daquele trecho (menor em acordes menor e m7, maior em maior e 7): as outras linhas ficam escuras e desabilitadas, e a nota encaixa na permitida mais próxima. Notas douradas são de virada |
 | **DESFAZER EDIÇÃO** | Volta para a linha que o gerador sugeriu. A linha editada fica salva no projeto e vale até um controle do gerador (estilo, ideia, harmonia, densidade...) ser mexido, como no MRDM-12. O MIDI arrastado/exportado sai com as edições |
 | **VELOCITY / SUSTENTA** | Força das notas e quanto cada nota segura |
 

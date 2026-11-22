@@ -193,6 +193,22 @@ int main()
         CHECK (piano == (km != KeysOrgan) && organ == (km != KeysPiano), "modo do teclado errado (%s)", keysModeName (km));
     }
 
+    // edição: escala pentatônica maior/menor por acorde e encaixe na nota permitida mais próxima
+    {
+        const ChordSlot am { 9, Min, 2 }, c7 { 0, Dom7, 2 }, g { 7, Maj, 4 };
+        CHECK (inPentatonic (57, am) && inPentatonic (60, am) && inPentatonic (62, am) && ! inPentatonic (59, am) && ! inPentatonic (61, am), "penta menor de A");
+        CHECK (inPentatonic (64, c7) && inPentatonic (69, c7) && ! inPentatonic (70, c7) && ! inPentatonic (65, c7), "penta maior de C7");
+        for (int n = 24; n <= 72; ++n)
+            for (const auto& c : { am, c7, g })
+            {
+                const int sn = snapToPentatonic (n, c, 24, 72);
+                CHECK (inPentatonic (sn, c) && std::abs (sn - n) <= 2, "encaixe na penta (%d -> %d)", n, sn);
+            }
+        const std::vector<ChordSlot> sl { am, { 2, Min, 0 }, c7, g };
+        CHECK (chordAtBeat (sl, 0.0).root == 9 && chordAtBeat (sl, 2.5).root == 0 && chordAtBeat (sl, 7.9).root == 7 && chordAtBeat (sl, 99).root == 7, "acorde no tempo");
+        std::printf ("edicao: so pentatonica do acorde OK\n");
+    }
+
     std::printf (failures == 0 ? "\nTODOS OS TESTES PASSARAM\n" : "\n%d FALHAS\n", failures);
     return failures == 0 ? 0 : 1;
 }
