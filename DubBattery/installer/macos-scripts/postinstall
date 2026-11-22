@@ -1,0 +1,17 @@
+#!/bin/sh
+# Pós-instalação do Dub Battery Reggae no Mac: libera os plugins da quarentena do Gatekeeper,
+# remove cópias soltas na pasta do usuário (instaladas à mão pelo zip) que ficariam duplicadas
+# na DAW, e faz o macOS reler a lista de Audio Units (Logic / GarageBand).
+NAME="Dub Battery Reggae"
+USER_HOME=$(dscl . -read "/Users/$(stat -f%Su /dev/console)" NFSHomeDirectory 2>/dev/null | awk '{print $2}')
+
+if [ -n "$USER_HOME" ]; then
+  rm -rf "$USER_HOME/Library/Audio/Plug-Ins/VST3/$NAME.vst3" "$USER_HOME/Library/Audio/Plug-Ins/Components/$NAME.component"
+fi
+
+for p in "/Library/Audio/Plug-Ins/VST3/$NAME.vst3" "/Library/Audio/Plug-Ins/Components/$NAME.component" "/Applications/$NAME.app"; do
+  [ -e "$p" ] && xattr -dr com.apple.quarantine "$p" 2>/dev/null
+done
+
+killall -9 AudioComponentRegistrar 2>/dev/null
+exit 0

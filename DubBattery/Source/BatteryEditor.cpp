@@ -727,7 +727,8 @@ void EnvelopeView::paint (juce::Graphics& g)
     }
     g.setFont (stencil (9.5f, 0.1f));
     g.setColour (col::amber.withAlpha (0.85f));
-    g.drawText ("S", juce::Rectangle<float> (20, 12).withCentre ({ (s.d.x + s.s.x) * 0.5f, s.s.y - 10.0f }), juce::Justification::centred);
+    g.drawText ("S", juce::Rectangle<float> (20, 12).withCentre ({ (s.d.x + s.s.x) * 0.5f, s.s.y < s.area.getY() + 14.0f ? s.s.y + 13.0f : s.s.y - 10.0f }),
+                juce::Justification::centred);   // sustain no alto: a letra vai para baixo da linha
 
     auto bottom = r.reduced (16.0f, 0.0f).removeFromBottom (26.0f).withTrimmedBottom (6.0f);
     glow (g, "A " + msText (val (P::attack)) + "   H " + msText (val (P::hold)) + "   D " + msText (val (P::decay))

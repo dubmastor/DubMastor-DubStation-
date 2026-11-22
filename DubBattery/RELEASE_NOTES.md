@@ -11,6 +11,6 @@ Primeira versão para teste.
 - Aba DUB DRUMS: o MRDM-12 inteiro (bateristas, estilos, viradas, nova variação) tocando nos pads, com PLAY GROOVE,
   EXPORTAR, ARRASTE O MIDI, arrastar um compasso só e MIDI colorido por compasso
 
-**Instalação:** Windows, copie `Dub Battery Reggae.vst3` para `C:\Program Files\Common Files\VST3\`.
-Mac, copie para `~/Library/Audio/Plug-Ins/VST3/` e rode
-`xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Battery Reggae.vst3"`.
+- Instaladores: `.pkg` no Mac (VST3 + AU em /Library/Audio/Plug-Ins, tira a quarentena e relê os Audio Units)
+  e `.exe` no Windows (VST3 na pasta padrão + standalone)
+- Versão no navegador: https://dubmastor.github.io/DubMastor-DubStation-/battery/

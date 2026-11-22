@@ -138,6 +138,69 @@ int main (int argc, char** argv)
         return ok ? 0 : 1;
     }
 
+    // O que as DAWs fazem de diferente: taxas de 44,1 a 192 kHz, blocos de tamanho variável (FL Studio, Reaper),
+    // blocos maiores que o anunciado (Logic), saída mono, salvar/abrir o projeto tocando, DAW tocando com MIDI saindo
+    if (arg1 == "daws")
+    {
+        struct FakeDaw : juce::AudioPlayHead
+        {
+            double ppq = 0.0, bpm = 92.0; bool playing = true;
+            juce::Optional<PositionInfo> getPosition() const override
+            {
+                PositionInfo p; p.setIsPlaying (playing); p.setBpm (bpm); p.setPpqPosition (ppq);
+                p.setTimeSignature (TimeSignature { 4, 4 }); return p;
+            }
+        } daw;
+        juce::Random rng (7);
+        int failures = 0;
+        for (double rate : { 44100.0, 48000.0, 88200.0, 96000.0, 192000.0 })
+            for (int chans : { 2, 1 })
+            {
+                BatteryProcessor p;
+                set (p.getDrums().apvts, "seed", 42.0f);
+                p.setPlayHead (&daw);
+                daw.ppq = 0.0; daw.playing = true;
+                const int announced = 512;
+                p.setPlayConfigDetails (0, chans, rate, announced);
+                p.prepareToPlay (rate, announced);
+                juce::AudioBuffer<float> buf (chans, 4096);
+                int notesOut = 0; float peak = 0.0f; bool bad = false;
+                const int total = (int) (rate * 6.0);
+                for (int pos = 0, k = 0; pos < total; ++k)
+                {
+                    const int n = (k % 7 == 3) ? 4096 : (k % 5 == 1 ? 1 : 1 + rng.nextInt (1500));   // 1 amostra, irregulares e maiores
+                    juce::AudioBuffer<float> view (buf.getArrayOfWritePointers(), chans, 0, n);
+                    juce::MidiBuffer m;
+                    if (k % 40 == 0) m.addEvent (juce::MidiMessage::noteOn (1, 36 + rng.nextInt (16), (juce::uint8) 100), 0);
+                    p.processBlock (view, m);
+                    for (const auto meta : m) if (meta.getMessage().isNoteOn()) ++notesOut;
+                    for (int c = 0; c < chans; ++c)
+                        for (int i = 0; i < n; ++i)
+                        {
+                            const float x = view.getSample (c, i);
+                            if (! std::isfinite (x) || std::abs (x) > 1.0f) bad = true;
+                            peak = std::max (peak, std::abs (x));
+                        }
+                    daw.ppq += n / rate * daw.bpm / 60.0;
+                    pos += n;
+                    if (k == 300)                                  // salvar e reabrir o projeto com a DAW tocando
+                    {
+                        juce::MemoryBlock mb; p.getStateInformation (mb);
+                        p.setStateInformation (mb.getData(), (int) mb.getSize());
+                    }
+                }
+                daw.playing = false;
+                juce::AudioBuffer<float> view (buf.getArrayOfWritePointers(), chans, 0, 256);
+                juce::MidiBuffer m; p.processBlock (view, m);
+                p.releaseResources();
+                const bool ok = ! bad && peak > 0.05f && notesOut > 20;
+                std::printf ("%6.0f Hz  %s  pico %.3f  notas MIDI saindo %4d  %s\n", rate, chans == 2 ? "estereo" : "mono   ",
+                             peak, notesOut, ok ? "ok" : "FALHOU");
+                if (! ok) ++failures;
+            }
+        return failures == 0 ? 0 : fail ("daws");
+    }
+
     if (arg1 == "presets")
     {
         const auto names = proc.getPresetNames();

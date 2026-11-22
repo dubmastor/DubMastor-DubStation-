@@ -7,3 +7,4 @@ JUCE/
 !DubDrums/Samples/*.wav
 !site/drums/samples/*.wav
 !DubBattery/Samples/*.wav
+!site/battery/samples/*.wav

@@ -419,7 +419,7 @@ function midiFile(onlyBar) {
     for (const e of p.events) evs.push({ t: intro + e.beat, e });
   } else {
     const src = onlyBar < 0 ? p.intro : p.events;
-    for (const e of src) if (e.bar === onlyBar) evs.push({ t: e.beat - (onlyBar < 0 ? 0 : onlyBar * 4), e });
+    for (const e of src) if (e.bar === onlyBar) evs.push({ t: Math.max(0, e.beat - (onlyBar < 0 ? 0 : onlyBar * 4)), e });
     intro = 0; len = 4;
   }
   const ppq = 960, chFor = (bar) => !st.colorMidi ? st.channel : (bar < 0 ? 5 : Math.min(4, bar + 1));
@@ -445,7 +445,8 @@ function midiFile(onlyBar) {
   const tl = track.length;
   return new Uint8Array([...hdr, 0x4d, 0x54, 0x72, 0x6b, tl >>> 24, (tl >> 16) & 255, (tl >> 8) & 255, tl & 255, ...track]);
 }
-function vlq(n) { const out = [n & 0x7f]; while ((n >>= 7)) out.unshift((n & 0x7f) | 0x80); return out; }
+function vlq(n) { n = Math.max(0, Math.round(n)); const out = [n & 0x7f];   // nunca negativo (nota adiantada no começo do compasso)
+  while ((n >>= 7)) out.unshift((n & 0x7f) | 0x80); return out; }
 function fileName(onlyBar) {
   let n = 'MRDM-12_' + STYLE_NAMES[st.style] + '_' + DRUMMERS[st.drummer];
   n += onlyBar === undefined ? '_' + st.bars + 'comp' + (st.intro ? '_intro' : '') : onlyBar < 0 ? '_intro' : '_compasso' + (onlyBar + 1);

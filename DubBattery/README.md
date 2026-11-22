@@ -6,8 +6,18 @@ Dub Station (painel creme, laterais de madeira, plaquetas pretas). Já vem com o
 
 ![Aba BATTERY](docs/interface.png)
 
-**[⬇️ Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-Windows.zip)** ·
-**[⬇️ macOS](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-macOS.zip)**
+**[⬇️ Windows (instalador .exe)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-Windows-Instalador.exe)** ·
+**[⬇️ macOS (instalador .pkg)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-macOS-Instalador.pkg)** ·
+**[▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/battery/)**
+
+Sem instalador: [zip Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-Windows.zip) · [zip Mac](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-macOS.zip)
+
+## Instalação
+- **Mac:** abra o `.pkg` (se o macOS avisar que é de desenvolvedor não identificado, clique com o botão direito → **Abrir**).
+  Ele instala o VST3 e o AU em `/Library/Audio/Plug-Ins` (Cubase, Ableton, Studio One, Reaper, Bitwig, FL Studio,
+  Logic e GarageBand), o programa standalone em Aplicativos, tira a quarentena e faz o Mac reler os Audio Units.
+- **Windows:** rode o `.exe`. O VST3 vai para `C:\Program Files\Common Files\VST3`.
+- Depois, faça um novo scan de plugins na DAW, se ela não achar sozinha.
 
 ## Pads e notas MIDI
 Pad 1 fica embaixo à esquerda, como na MPC. As notas seguem em sequência de **C1 (36) a D#2 (51)**, então todas as
@@ -50,12 +60,18 @@ desligado). **PLAY GROOVE** no cabeçalho toca com a DAW parada; com a DAW tocan
 - Arraste a faixa **COMPASSO n** da grade para levar só aquele compasso.
 - **MIDI COLORIDO:** cada compasso vai num canal (1 a 4, intro no 5) para a DAW pintar cada um de uma cor.
 
+## Versão no navegador
+`site/battery/`: os mesmos 16 pads, visor, envelope, presets (salvos no navegador) e a aba DUB DRUMS com o gerador
+do MRDM-12 (`site/drums/generator.js`), MIDI por compasso, teclado do computador (Z X C V = pads 1–4) e controlador
+MIDI pelo Web MIDI.
+
 ## Compilar
 ```
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
-Teste sem DAW (imagens das abas, áudio dos pads e do groove, choke, estado e presets):
+Teste sem DAW (imagens das abas, áudio dos pads e do groove, choke, estado, presets e `daws`: 44,1 a 192 kHz,
+estéreo e mono, blocos irregulares, salvar o projeto tocando e MIDI saindo):
 ```
 cmake -B build-test -DDBR_FORMATS=VST3 -DDBR_RENDER_TEST=ON && cmake --build build-test --target dbr_render
 ```

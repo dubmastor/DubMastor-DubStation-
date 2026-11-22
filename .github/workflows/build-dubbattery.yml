@@ -61,6 +61,7 @@ jobs:
           $R choke
           $R estado
           $R presets
+          $R daws
 
       - uses: actions/upload-artifact@v4
         with:
@@ -150,6 +151,19 @@ jobs:
           Copy-Item "build/DubBatteryReggae_artefacts/Release/Standalone/Dub Battery Reggae.exe" out/ -ErrorAction SilentlyContinue
           Compress-Archive -Path out/* -DestinationPath ../DubBatteryReggae-Windows.zip
 
+      # Instalador .exe (Inno Setup): VST3 em C:\Program Files\Common Files\VST3 + standalone opcional
+      - name: Installer (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          $v = (Select-String -Path CMakeLists.txt -Pattern 'project\(DubBatteryReggae VERSION (\d+\.\d+)').Matches[0].Groups[1].Value
+          Write-Host "Versão do instalador: $v"
+          & $iscc "/DAppVersion=$v" installer/DBR.iss
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Move-Item DubBatteryReggae-Windows-Instalador.exe ../
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -159,12 +173,29 @@ jobs:
           cp -R "build/DubBatteryReggae_artefacts/Release/Standalone/Dub Battery Reggae.app" out/
           # assinatura ad-hoc para o macOS aceitar o plugin localmente
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
-          cd out && ditto -c -k --sequesterRsrc . ../../DubBatteryReggae-macOS.zip
+          (cd out && ditto -c -k --sequesterRsrc . ../../DubBatteryReggae-macOS.zip)
+
+          # Instalador .pkg: VST3 e AU em /Library/Audio/Plug-Ins (todas as DAWs, Logic e GarageBand
+          # incluídos) e o app em /Applications; o postinstall tira a quarentena e relê os Audio Units
+          V=$(sed -n 's/^project(DubBatteryReggae VERSION \([0-9]*\.[0-9]*\).*/\1/p' CMakeLists.txt)
+          mkdir -p pkgroot/Library/Audio/Plug-Ins/VST3 pkgroot/Library/Audio/Plug-Ins/Components pkgroot/Applications
+          cp -R out/*.vst3 pkgroot/Library/Audio/Plug-Ins/VST3/
+          cp -R out/*.component pkgroot/Library/Audio/Plug-Ins/Components/
+          cp -R out/*.app pkgroot/Applications/
+          pkgbuild --root pkgroot --identifier com.dubmastor.dubbatteryreggae.pkg --version "$V" \
+                   --scripts installer/macos-scripts --install-location / \
+                   ../DubBatteryReggae-macOS-Instalador.pkg
+          pkgutil --payload-files ../DubBatteryReggae-macOS-Instalador.pkg | grep -E "\.vst3$|\.component$|\.app$"
+          # confere o pacote: assinatura do plugin e binário universal dentro do .pkg
+          codesign --verify --deep --strict out/*.vst3 out/*.component
+          lipo -info "out/Dub Battery Reggae.component/Contents/MacOS/Dub Battery Reggae"
 
       - uses: actions/upload-artifact@v4
         with:
           name: DubBatteryReggae-${{ matrix.name }}
-          path: DubBatteryReggae-${{ matrix.name }}.zip
+          path: |
+            DubBatteryReggae-${{ matrix.name }}.zip
+            DubBatteryReggae-${{ matrix.name }}-Instalador.*
 
   # Release própria: DBR-<versão do CMakeLists>, criada/atualizada a cada push na main que mexa
   # no DUB BATTERY REGGAE (ou por tag DBR-x.y). Não vira a "latest", para não mexer nos links
@@ -206,6 +237,9 @@ jobs:
           tag_name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: ${{ inputs.tag && inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || format('Dub Battery Reggae {0}', steps.ver.outputs.tag) }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*.exe
+            dist/*.pkg
           body_path: DubBattery/RELEASE_NOTES.md
           make_latest: 'false'
