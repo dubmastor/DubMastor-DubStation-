@@ -4,7 +4,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # Mastor Riddim Machine MRM-0420: Dub Chords + Dub Drums num só instrumento
-project(MastorRiddimMachine VERSION 1.2.0)
+project(MastorRiddimMachine VERSION 1.3.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,7 +54,7 @@ set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
     ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)     # timbres do piano M1 / Hammond
 set(MRM_DEFINES
-    DD_VERSION_SHORT="1.2"
+    DD_VERSION_SHORT="1.3"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0

@@ -46,33 +46,55 @@ public:
     static constexpr int numPieces = 9;
     static const Piece pieces[numPieces];
 
-    dubdrums::Pattern getPatternCopy() const;     // thread da interface
+    dubdrums::Pattern getPatternCopy() const;     // thread da interface: o padrão que aparece na grade
     int  getPatternVersion() const noexcept       { return patternVersion.load(); }
+
+    // Grade PADRÃO editável (thread da interface). beat = posição na linha do tempo "intro + loop".
+    // As edições ficam salvas no projeto e valem até um controle que muda o padrão ser mexido.
+    bool toggleNote (int gmNote, double beat, bool add);       // add=true põe, false tira; devolve se mudou
+    bool noteAt (int gmNote, double beat) const;
+    void changeVelocity (int gmNote, double beat, int delta);
+    bool hasEdits() const;
+    void clearEdits();
 
     // posição tocando agora, na linha do tempo "intro + loop" (em semínimas); -1 = parado
     double getPlayheadBeat() const noexcept       { return playheadBeat.load(); }
     bool isHostPlaying() const noexcept           { return hostPlaying.load(); }
     bool isPreviewing() const noexcept            { return previewing.load(); }
 
-    void newVariation();                          // sorteia uma nova semente
+    void newVariation();                          // sorteia uma nova semente (e o preview recomeça do início)
     void applyStyleDefaults (int styleIndex);     // bumbo e caixa do estilo na BATIDA PRINCIPAL
-    bool writeMidiFile (const juce::File& target) const;
-    juce::String suggestedFileName() const;
+    static constexpr int kAllBars = -2;           // bar: -1 = intro, 0..3 = compasso, kAllBars = tudo
+    bool writeMidiFile (const juce::File& target, int bar = kAllBars) const;
+    juce::String suggestedFileName (int bar = kAllBars) const;
     int mapNote (int gmNote) const;               // nota GM -> nota escolhida pelo usuário
 
 private:
     void parameterChanged (const juce::String&, float) override;
     void timerCallback() override;
     void regenerate();
+    void publish (const dubdrums::Pattern&);      // mostra na grade e entrega para a thread de áudio
+    void storeEdits (const dubdrums::Pattern&);
+    juce::String settingsKey() const;
+    void loadSamples();
     dubdrums::Settings readSettings() const;
 
     // agenda as notas de [start, end) da linha do tempo "intro + loop"
-    template <typename Fn> void forEachEventIn (double start, double end, Fn&& fn) const;
+    template <typename Fn> static void forEachEventIn (const dubdrums::Pattern&, double start, double end, Fn&& fn);
 
-    mutable juce::SpinLock patternLock;
-    dubdrums::Pattern pattern;
+    // Padrão em três lugares, para a interface nunca travar o áudio:
+    //  - display: o que a grade mostra (thread da interface, protegido por displayLock)
+    //  - pending: o próximo padrão para o áudio (trocado com std::swap, sem alocar no áudio)
+    //  - active : o que está tocando (só a thread de áudio mexe)
+    // O áudio só adota o pendente na virada de um tempo: assim uma nova variação ou outro baterista
+    // nunca toca a mesma nota duas vezes nem "embola" o groove no meio do tempo.
+    mutable juce::SpinLock displayLock, pendingLock;
+    dubdrums::Pattern display, pending, active, generated;
+    std::atomic<bool> pendingReady { false };
+    std::atomic<bool> restartRequested { false };   // NOVA VARIAÇÃO: o preview volta do começo
     std::atomic<bool> dirty { true };
     std::atomic<int>  patternVersion { 0 };
+    std::array<bool, 128> held {};      // notas MIDI ligadas na saída (para desligar na troca)
 
     std::atomic<double> playheadBeat { -1.0 };
     std::atomic<bool>   hostPlaying  { false };

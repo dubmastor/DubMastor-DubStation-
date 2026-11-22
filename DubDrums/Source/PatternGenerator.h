@@ -40,7 +40,14 @@ enum class Dynamics   { Soft = 0, Medium, Loud, Accented, Crescendo, Breathing }
 //  - Style Scott (Roots Radics): reto e em cima do tempo, aro estalado, viradas de semicolcheia
 //  - Santa Davis (Soul Syndicate): cheio de enfeites, rufos de fusa e flams
 //  - Carlton Barrett (Wailers): atrás do tempo, balanço de tercina, rufos em tercina no 4
-enum class Drummer    { StyleScott = 0, SantaDavis, CarltonBarrett };
+//  - Sly Dunbar (Sly & Robbie, Black Uhuru): o rockers de 1976, em cima do tempo, hi-hat de
+//    semicolcheia com "swish" antes da caixa, bumbo dobrado puxando o 3, aro seco e syndrum
+//  - DIGIKAL: o "baterista" máquina do dancehall digital. Semente ímpar: Casio MT-40 (o preset
+//    "Rock" do Under Mi Sleng Teng, com o fill de semicolcheias de caixa); semente par: Oberheim DMX
+//    (hi-hat de semicolcheia, caixa com aro, viradas de tom em semicolcheia). Sempre no tempo de máquina.
+// (ordem fixa: o índice é salvo nos projetos; Sly entrou na 1.4 e o DIGIKAL na 2.0)
+enum class Drummer    { StyleScott = 0, SantaDavis, CarltonBarrett, SlyDunbar, Digikal };
+constexpr int numDrummers = 5;
 
 // Batida principal (o "3" do one drop/rockers/steppa): caixa, aro (cross-stick) ou os dois juntos
 enum class Backbeat   { Snare = 0, Rim, Both };
@@ -95,5 +102,7 @@ Pattern generate (const Settings& s);
 const char* styleName (Style);
 const char* swingName (Swing);
 const char* drummerName (Drummer);
+bool isMT40 (const Settings&);                   // DIGIKAL: semente ímpar = MT-40, par = DMX
+const char* digikalMachineName (const Settings&);
 
 } // namespace dubdrums

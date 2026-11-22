@@ -1,13 +1,14 @@
-// Dub Drums — bateria interna para o PREVIEW
-// Timbre de reggae limpo, todo sintetizado (sem samples): bumbo redondo e curto,
-// aro seco, caixa afinada alta, hi-hats metálicos, tons cantando e prato suave.
-// Sem alocação na thread de áudio: vozes fixas.
+// Dub Drums / MDDM-12 — bateria interna para o PREVIEW
+// Kits: ANOS 70 toca as amostras carregadas com setSample() (bumbo, aro, caixa, hi-hat fechado e aberto)
+// e sintetiza o resto (tons e prato) e tudo quando não há amostra; DIGITAL é todo sintetizado (MT-40).
+// Sem alocação na thread de áudio: vozes fixas; as amostras são carregadas antes de tocar.
 #pragma once
 
 #include <array>
 #include <cmath>
 #include <cstdint>
 #include <algorithm>
+#include <vector>
 #include "PatternGenerator.h"
 
 namespace dubdrums
@@ -18,6 +19,17 @@ class DrumSynth
 public:
     enum class Kit { Acoustic = 0, Digital };
     void setKit (Kit k) noexcept { kit = k; }
+
+    // Amostra mono para uma peça (nota GM). Chamar fora da thread de áudio, antes de tocar.
+    void setSample (int gmNote, std::vector<float> data, double rate, float gain)
+    {
+        if (auto* sl = slotFor (gmNote))
+        {
+            sl->data = std::move (data);
+            sl->rate = rate > 0 ? rate : 44100.0;
+            sl->gain = gain;
+        }
+    }
 
     void prepare (double sampleRate)
     {
@@ -48,6 +60,12 @@ public:
         slot->note = gmNote;
         slot->vel = vel * vel * 0.9f + 0.1f * vel;  // curva de força mais natural
         slot->noiseState = 0x9E3779B9u ^ ((uint32_t) gmNote * 7919u + counter++);
+        if (kit == Kit::Acoustic)
+            if (auto* sl = slotFor (gmNote); sl != nullptr && ! sl->data.empty())
+            {
+                slot->smp = sl;
+                slot->inc = sl->rate / sr;
+            }
 
         switch (gmNote)
         {
@@ -84,8 +102,26 @@ public:
     }
 
 private:
+    struct SampleSlot { std::vector<float> data; double rate = 44100.0; float gain = 1.0f; };
+    SampleSlot slots[5];   // bumbo, aro, caixa, hi-hat fechado (e pedal), hi-hat aberto
+
+    SampleSlot* slotFor (int gmNote)
+    {
+        switch (gmNote)
+        {
+            case gm::Kick:      return &slots[0];
+            case gm::SideStick: return &slots[1];
+            case gm::Snare:     return &slots[2];
+            case gm::ClosedHat: case gm::PedalHat: return &slots[3];
+            case gm::OpenHat:   return &slots[4];
+            default:            return nullptr;
+        }
+    }
+
     struct Voice
     {
+        const SampleSlot* smp = nullptr;   // kit SAMPLES: amostra desta voz
+        double pos = 0.0, inc = 1.0;
         bool active = false, choke = false;
         int note = 0;
         float vel = 1.0f, pan = 0.0f;
@@ -229,6 +265,19 @@ private:
 
     float next (Voice& v)
     {
+        if (v.smp != nullptr)
+        {
+            const auto& d = v.smp->data;
+            const auto i = (size_t) v.pos;
+            if (i + 1 >= d.size()) { v.active = false; return 0.0f; }
+            const float f = (float) (v.pos - (double) i);
+            float o = (d[i] + (d[i + 1] - d[i]) * f) * v.smp->gain * v.vel;
+            if (v.choke) { v.chokeGain *= 0.9975f; if (v.chokeGain < 0.001f) v.active = false; }
+            o *= v.chokeGain;
+            v.pos += v.inc;
+            ++v.age;
+            return o;
+        }
         if (kit == Kit::Digital)
         {
             const float o = nextDigital (v);

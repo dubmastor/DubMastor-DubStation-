@@ -1,3 +1,13 @@
+## Mastor Riddim Machine MRM-0420 1.3
+
+A aba **BATERIA** traz o **Mastor Dub Drums Machine MDDM-12 2.0**:
+
+- Baterista **SLY DUNBAR** (rockers de Sly & Robbie) e **DIGIKAL** (Casio MT-40 do Sleng Teng / Oberheim DMX), com grooves revisados para Style Scott, Santa Davis e Carlton Barrett
+- Kit **ANOS 70** com os samples DM (bumbo, caixa, aro, hi-hat fechado e aberto)
+- Grade **PADRÃO** editável (clique põe/tira nota, rodinha muda a força) e arraste de um compasso só, no canal dele
+- **NOVA VARIAÇÃO** com o preview recomeçando do início, letreiro no estilo e semente em jackpot
+- Corrigido: notas dobradas ("embolado") ao trocar variação ou baterista com o preview tocando
+
 ## Mastor Riddim Machine MRM-0420 1.2
 
 A aba **BATERIA** traz o **Dub Drums 1.2**:

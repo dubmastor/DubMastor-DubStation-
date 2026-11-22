@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'DubDrums/**'
+      - 'site/drums/generator.js'
       - '.github/workflows/build-dubdrums.yml'
     tags:
       - 'MDDM-12-*'
@@ -47,6 +48,12 @@ jobs:
           g++ -std=c++17 -O2 -Wall -ISource Source/PatternGenerator.cpp tests/test_generator.cpp -o test_generator
           ./test_generator
 
+      - name: Versão do navegador/celular toca igual ao plugin (site/drums/generator.js x C++)
+        run: |
+          g++ -std=c++17 -O2 -ISource Source/PatternGenerator.cpp tests/dump_patterns.cpp -o dump_patterns
+          ./dump_patterns > padroes.jsonl
+          node tests/web_generator_test.js padroes.jsonl
+
       - name: Interface, MIDI exportado e áudio do preview, sem DAW
         run: |
           cmake -B build-test -DCMAKE_BUILD_TYPE=Release -DDD_FORMATS=VST3 -DDD_RENDER_PREVIEW=ON -DJUCE_DIR="${{ github.workspace }}/JUCE"
@@ -60,6 +67,12 @@ jobs:
           $R test-out/preview-santa.wav 0 2 42 intro 1
           $R test-out/preview-digital.wav 1 2 42 intro 0 1
           $R test-out/onedrop-intro.mid 0 4 42 intro 2
+          $R test-out/sly.png 0 4 7 editado 3
+          $R test-out/preview-sly.wav 0 2 42 x 3
+          $R test-out/preview-digikal-mt40.wav 0 2 43 x 4 1
+          $R test-out/preview-digikal-dmx.wav 0 2 44 x 4 0
+          # troca de variação / baterista / swing tocando: nenhuma nota pode sair dobrada
+          $R test-out/troca.txt 0 4 5
 
       - uses: actions/upload-artifact@v4
         with:
@@ -100,10 +113,27 @@ jobs:
         run: |
           Invoke-WebRequest -Uri https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip -OutFile pluginval.zip
           Expand-Archive pluginval.zip -DestinationPath pluginval
-          ./pluginval/pluginval.exe --strictness-level 5 --timeout-ms 600000 --validate "build/DubDrums_artefacts/Release/VST3/Mastor Dub Drums Machine MDDM-12.vst3" 2>&1 | Tee-Object -Variable pvlog
+          # nível 10 (o mais rigoroso): estado, automação, buses, tempo real, várias taxas e tamanhos de bloco
+          ./pluginval/pluginval.exe --strictness-level 10 --timeout-ms 900000 --validate "build/DubDrums_artefacts/Release/VST3/Mastor Dub Drums Machine MDDM-12.vst3" 2>&1 | Tee-Object -Variable pvlog
           $code = $LASTEXITCODE
           Write-Host "pluginval exit code: $code"
           if ($code -ne 0) { exit 1 }
+
+      # --- Validador oficial da Steinberg (o mesmo teste de conformidade VST3 usado por Cubase, Studio One,
+      #     Reaper, Ableton Live, FL Studio e Bitwig para carregar plugins VST3)
+      - name: Validate VST3 with Steinberg validator (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: .
+        run: |
+          git clone --depth 1 --branch v3.7.14_build_55 https://github.com/steinbergmedia/vst3sdk.git vst3sdk
+          cd vst3sdk
+          git submodule update --init --depth 1 base pluginterfaces public.sdk cmake
+          cmake -B build -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF -DSMTG_ADD_VSTGUI=OFF -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=ON -DSMTG_RUN_VST_VALIDATOR=OFF
+          cmake --build build --config Release --target validator --parallel 4
+          $v = Get-ChildItem -Recurse -Filter validator.exe build | Select-Object -First 1
+          & $v.FullName "${{ github.workspace }}/DubDrums/build/DubDrums_artefacts/Release/VST3/Mastor Dub Drums Machine MDDM-12.vst3" 2>&1 | Tee-Object -Variable vlog | Select-Object -Last 40
+          if ($LASTEXITCODE -ne 0) { Write-Host "validator falhou: $LASTEXITCODE"; exit 1 }
 
       - name: Check universal binary + validate (macOS)
         if: runner.os == 'macOS'
@@ -114,13 +144,15 @@ jobs:
           lipo -info "$BIN" | grep -q x86_64 && lipo -info "$BIN" | grep -q arm64
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
           unzip -q pluginval.zip
-          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --timeout-ms 900000 --validate "$VST3"
-          echo "== auval (validador da Apple para AU)"
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate "$VST3"
+          echo "== auval (validador da Apple para AU: Logic, GarageBand, Ableton e outros no Mac)"
           mkdir -p ~/Library/Audio/Plug-Ins/Components
           cp -R "build/DubDrums_artefacts/Release/AU/Mastor Dub Drums Machine MDDM-12.component" ~/Library/Audio/Plug-Ins/Components/
           killall -9 AudioComponentRegistrar 2>/dev/null || true
           sleep 2
           auval -v aumu Dbd1 Dblb
+          echo "== pluginval no AU (o formato que o Logic usa)"
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate ~/Library/Audio/Plug-Ins/Components/"Mastor Dub Drums Machine MDDM-12.component"
 
       - name: Collect + package (Windows)
         if: runner.os == 'Windows'

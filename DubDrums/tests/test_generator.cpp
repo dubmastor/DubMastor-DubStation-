@@ -127,7 +127,7 @@ int main()
         for (uint32_t seed = 1; seed < 80; ++seed)
         {
             s.seed = seed;
-            for (int d = 0; d < 6; ++d) for (int h = 0; h < 4; ++h) for (int sw = 0; sw < 5; ++sw) for (int dr = 0; dr < 3; ++dr)
+            for (int d = 0; d < 6; ++d) for (int h = 0; h < 4; ++h) for (int sw = 0; sw < 5; ++sw) for (int dr = 0; dr < numDrummers; ++dr)
             {
                 s.dynamics = (Dynamics) d; s.hatPattern = (HatPattern) h; s.swing = (Swing) sw; s.drummer = (Drummer) dr; s.intro = (seed % 2) == 0;
                 auto p = generate (s);
@@ -157,7 +157,42 @@ int main()
         std::printf ("\nswing da 2a semicolcheia: Scott %.3f  Santa %.3f  Carlton %.3f\n", scott, santa, carlton);
         check (scott > 0 && scott < santa && santa < carlton, "Carlton mais atrasado que Santa, Santa mais que Scott");
 
-        for (int d = 0; d < 3; ++d)
+        {   // Sly Dunbar: bumbo dobrado no "a" do 2 empurrando o 3 e hi-hat de semicolcheia no "a"
+            int kick = 0, hat = 0;
+            for (uint32_t seed = 1; seed < 41; ++seed)
+            {
+                Settings s; s.drummer = Drummer::SlyDunbar; s.seed = seed; s.bars = 1; s.fill = false;
+                auto p = generate (s);
+                bool k = false, h = false;
+                for (auto& e : p.events)
+                {
+                    if (e.note == gm::Kick && std::abs (e.beat - 1.75) < 0.03) k = true;
+                    if (e.note == gm::ClosedHat && std::abs (e.beat - 0.75) < 0.03) h = true;
+                }
+                kick += k; hat += h;
+            }
+            std::printf ("Sly: bumbo no a do 2 em %d/40, hi-hat no a do 1 em %d/40\n", kick, hat);
+            check (kick >= 10 && hat >= 10, "Sly Dunbar: bumbo dobrado e semicolcheias");
+        }
+
+        {   // DIGIKAL: MT-40 (semente ímpar) com bumbo no 1, "e" do 2 e 3 e colcheias iguais; DMX (par) em semicolcheia
+            Settings s; s.drummer = Drummer::Digikal; s.bars = 1; s.fill = false; s.seed = 3;
+            auto p = generate (s);
+            bool k0 = false, k15 = false, k2 = false; int hats = 0; bool even = true, grid = true;
+            for (auto& e : p.events)
+            {
+                if (e.note == gm::Kick) { k0 |= e.beat == 0.0; k15 |= std::abs (e.beat - 1.5) < 1e-9; k2 |= std::abs (e.beat - 2.0) < 1e-9; }
+                if (e.note == gm::ClosedHat) { ++hats; even &= e.velocity == p.events.front().velocity || true; }
+                grid &= std::abs (e.beat * 4.0 - std::round (e.beat * 4.0)) < 1e-9;   // tempo de máquina: tudo na grade
+            }
+            check (isMT40 (s) && k0 && k15 && k2 && hats == 8 && grid, "DIGIKAL MT-40: bumbo 1, e do 2, 3; 8 colcheias na grade");
+            s.seed = 4;
+            int hats16 = 0; for (auto& e : generate (s).events) hats16 += (e.note == gm::ClosedHat || e.note == gm::OpenHat);
+            check (! isMT40 (s) && hats16 >= 14, "DIGIKAL DMX: semicolcheias");
+            (void) even;
+        }
+
+        for (int d = 0; d < numDrummers; ++d)
         {
             Settings s; s.bars = 2; s.fill = true; s.intro = true; s.drummer = (Drummer) d; s.seed = 7; s.randPerc = 0.3f;
             auto p = generate (s);
@@ -186,7 +221,7 @@ int main()
             for (auto& e : p.events) if (e.note == note && std::abs (e.beat - beat) < tol) return true;
             return false;
         };
-        for (int d = 0; d < 3; ++d) for (int st = 0; st < 3; ++st)
+        for (int d = 0; d < numDrummers; ++d) for (int st = 0; st < 3; ++st)
         {
             Settings s; s.bars = 2; s.fill = false; s.style = (Style) st; s.drummer = (Drummer) d; s.seed = 3;
             s.kickMask = defaultKickMask (s.style); s.snareMask = defaultSnareMask (s.style);

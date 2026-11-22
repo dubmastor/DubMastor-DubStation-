@@ -1,5 +1,6 @@
 // Salva uma imagem da interface sem abrir a DAW:
-// ./render_preview interface.png [estilo] [compassos] [semente] [intro|notas] [baterista 0-2] [kit 0-1]
+// ./render_preview interface.png [estilo] [compassos] [semente] [intro|notas|editado] [baterista 0-3] [kit 0-2]
+// ./render_preview troca.txt   -> toca 60 s trocando variação e baterista no meio do tempo e procura notas dobradas
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "PluginProcessor.h"
@@ -25,6 +26,70 @@ int main (int argc, char** argv)
     set ("intro", argc > 5 && juce::String (argv[5]).contains ("intro") ? 1.0f : 0.0f);
     set ("drummer", argc > 6 ? (float) juce::String (argv[6]).getIntValue() : 2.0f);
     set ("kit", argc > 7 ? (float) juce::String (argv[7]).getIntValue() : 0.0f);
+
+    // "algo.txt": teste da troca de padrão tocando (o "embolado" da 1.3)
+    if (out.hasFileExtension ("txt"))
+    {
+        struct Head : juce::AudioPlayHead
+        {
+            double ppq = 0.0, bpm = 100.0;
+            juce::Optional<PositionInfo> getPosition() const override
+            {
+                PositionInfo i; i.setIsPlaying (true); i.setPpqPosition (ppq); i.setBpm (bpm);
+                return i;
+            }
+        } head;
+        set ("intro", 0.0f); set ("fill", 1.0f); set ("rndHat", 60.0f); set ("rndSnare", 60.0f); set ("rndKick", 60.0f);
+        proc.setPlayHead (&head);
+        const double sr = 44100.0; const int block = 256;
+        proc.setPlayConfigDetails (0, 2, sr, block);
+        proc.prepareToPlay (sr, block);
+        juce::AudioBuffer<float> buf (2, block);
+        juce::MidiBuffer midi;
+        struct On { double beat; int note, vel; };
+        std::vector<On> ons;
+        juce::Random rnd (7);
+        int changes = 0, hanging = 0;
+        std::array<int, 128> open {};
+        const double beatsPerBlock = block / sr * head.bpm / 60.0;
+        for (int b = 0; b < (int) (60.0 * sr / block); ++b)
+        {
+            proc.processBlock (buf, midi);
+            for (const auto m : midi)
+            {
+                const auto msg = m.getMessage();
+                const double t = head.ppq + m.samplePosition / (double) block * beatsPerBlock;
+                if (msg.isNoteOn()) { ons.push_back ({ t, msg.getNoteNumber(), msg.getVelocity() }); ++open[(size_t) msg.getNoteNumber()]; }
+                else if (msg.isNoteOff()) open[(size_t) msg.getNoteNumber()] = 0;
+            }
+            head.ppq += beatsPerBlock;
+            if (b % 37 == 36)   // ~0,2 s: nova variação, outro baterista ou outro estilo, em qualquer ponto do tempo
+            {
+                const int what = rnd.nextInt (3);
+                if (what == 0) proc.newVariation();
+                else if (what == 1) set ("drummer", (float) rnd.nextInt (4));
+                else set ("swing", changes % 2 == 0 ? 4.0f : 0.0f);   // reto <-> shuffle: o contratempo pula de 0,5 para 0,667
+                ++changes;
+                juce::MessageManager::getInstance()->runDispatchLoopUntil (60);   // o timer gera o padrão novo
+            }
+        }
+        for (int n : open) hanging += n > 1 ? 1 : 0;
+        // nota dobrada: a mesma peça, duas vezes forte, a menos de 0,1 tempo (flam e arrasto têm a 1a nota fraca)
+        int doubles = 0;
+        for (size_t i = 0; i < ons.size(); ++i)
+            for (size_t j = i + 1; j < ons.size() && ons[j].beat - ons[i].beat < 0.10; ++j)
+                if (ons[j].note == ons[i].note && ons[i].vel > 64 && ons[j].vel > 64)
+                {
+                    ++doubles;
+                    std::printf ("  dobrada: nota %d em %.3f e %.3f\n", ons[i].note, ons[i].beat, ons[j].beat);
+                }
+        juce::String rep;
+        rep << "versoes do padrao: " << proc.getPatternVersion() << "  trocas: " << changes << "  notas: " << (int) ons.size() << "  dobradas: " << doubles << "\n";
+        out.replaceWithText (rep);
+        std::printf ("%s", rep.toRawUTF8());
+        proc.setPlayHead (nullptr);
+        return doubles == 0 ? 0 : 1;
+    }
 
     // "algo.mid": salva o MIDI que o EXPORTAR/arrastar gera
     if (out.hasFileExtension ("mid"))
@@ -78,6 +143,15 @@ int main (int argc, char** argv)
         };
         openNoteMap (*ed);
         ed->repaint();
+    }
+
+    // "editado" no 5º argumento: tira o hi-hat do 1 e põe um tom, como um clique na grade PADRÃO
+    if (argc > 5 && juce::String (argv[5]).contains ("editado"))
+    {
+        proc.toggleNote (dubdrums::gm::TomHigh, 3.76, true);
+        proc.toggleNote (dubdrums::gm::Kick, 1.51, true);
+        for (int i = 0; i < 4; ++i) juce::MessageManager::getInstance()->runDispatchLoopUntil (40);
+        std::printf ("edicoes: %s\n", proc.hasEdits() ? "sim" : "nao");
     }
 
     auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 2.0f);

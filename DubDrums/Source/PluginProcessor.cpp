@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "DMSamples.h"
 
 namespace
 {
@@ -66,9 +67,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
     layout.add (std::make_unique<AudioParameterInt>  (ParameterID { "channel", 1 }, "Canal MIDI", 1, 16, 10));
 
     // 1.0: baterista, introdução, preview / som interno e mapa de notas
-    choice ("drummer", "Baterista", { "Style Scott", "Santa Davis", "Carlton Barrett" }, 2);
+    choice ("drummer", "Baterista", { "Style Scott", "Santa Davis", "Carlton Barrett", "Sly Dunbar", "Digikal" }, 2);
     choice ("backbeat", "Batida principal", { "Caixa", "Aro", "Caixa + aro" }, 0);
-    choice ("kit", "Kit", { "Acustico (anos 70)", "Digital (King Jammy / Sleng Teng)" }, 0);
+    choice ("kit", "Kit", { "Anos 70 (samples DM)", "Digital (King Jammy / Sleng Teng)" }, 0);
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "intro", 1 }, u8s ("Virada de introdução"), false));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "preview", 1 }, "Preview", false));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "colorMidi", 1 }, "MIDI colorido (um canal por compasso)", true));
@@ -94,8 +95,50 @@ DubDrumsProcessor::DubDrumsProcessor()
     for (auto* id : kParamIds)
         apvts.addParameterListener (id, this);
 
+    loadSamples();
     regenerate();
     startTimerHz (20);
+}
+
+// Kit SAMPLES DM: WAVs embutidos (Source/DMSamples.h). Mono, sem o silêncio do começo, normalizados.
+void DubDrumsProcessor::loadSamples()
+{
+    struct S { int note; const unsigned char* data; size_t size; float gain; };
+    using namespace dubdrums;
+    const S list[] = {
+        { gm::Kick,      dmsamples::kick,    dmsamples::kickSize,    1.50f },
+        { gm::Snare,     dmsamples::snare,   dmsamples::snareSize,   1.25f },
+        { gm::SideStick, dmsamples::rim,     dmsamples::rimSize,     1.00f },
+        { gm::ClosedHat, dmsamples::hat,     dmsamples::hatSize,     0.72f },
+        { gm::OpenHat,   dmsamples::openHat, dmsamples::openHatSize, 0.66f },
+    };
+    juce::WavAudioFormat wav;
+    for (const auto& it : list)
+    {
+        std::unique_ptr<juce::AudioFormatReader> r (wav.createReaderFor (new juce::MemoryInputStream (it.data, it.size, false), true));
+        if (r == nullptr || r->lengthInSamples <= 0) continue;
+        const int n = (int) r->lengthInSamples, chs = (int) r->numChannels;
+        juce::AudioBuffer<float> buf (chs, n);
+        r->read (&buf, 0, n, 0, true, true);
+        std::vector<float> mono ((size_t) n);
+        float peak = 0.0f;
+        for (int i = 0; i < n; ++i)
+        {
+            float v = 0.0f;
+            for (int c = 0; c < chs; ++c) v += buf.getSample (c, i);
+            mono[(size_t) i] = v / (float) chs;
+            peak = std::max (peak, std::abs (mono[(size_t) i]));
+        }
+        if (peak <= 0.0f) continue;
+        int start = 0;                                   // corta o silêncio antes do ataque
+        while (start < n && std::abs (mono[(size_t) start]) < peak * 0.02f) ++start;
+        start = std::max (0, start - 8);
+        std::vector<float> data (mono.begin() + start, mono.end());
+        for (auto& v : data) v /= peak;
+        const int fade = std::min ((int) data.size(), 64);  // final sem clique
+        for (int i = 0; i < fade; ++i) data[data.size() - 1 - (size_t) i] *= (float) i / (float) fade;
+        synth.setSample (it.note, std::move (data), r->sampleRate, it.gain);
+    }
 }
 
 DubDrumsProcessor::~DubDrumsProcessor()
@@ -115,6 +158,7 @@ void DubDrumsProcessor::prepareToPlay (double sampleRate, int)
 {
     sr = sampleRate > 0 ? sampleRate : 44100.0;
     wasPlaying = wasPreviewing = false;
+    held.fill (false);
     synth.prepare (sr);
 }
 
@@ -156,21 +200,210 @@ dubdrums::Settings DubDrumsProcessor::readSettings() const
     return s;
 }
 
+namespace
+{
+    const juce::Identifier kEdits ("EDITS"), kNote ("N");
+
+    juce::ValueTree patternToTree (const dubdrums::Pattern& p, const juce::String& key)
+    {
+        juce::ValueTree t (kEdits);
+        t.setProperty ("key", key, nullptr);
+        t.setProperty ("len", p.lengthInBeats, nullptr);
+        t.setProperty ("introLen", p.introLengthInBeats, nullptr);
+        auto add = [&] (const dubdrums::NoteEvent& e, bool intro)
+        {
+            juce::ValueTree n (kNote);
+            n.setProperty ("b", e.beat, nullptr);   n.setProperty ("l", e.length, nullptr);
+            n.setProperty ("n", e.note, nullptr);   n.setProperty ("v", e.velocity, nullptr);
+            n.setProperty ("i", intro, nullptr);
+            t.appendChild (n, nullptr);
+        };
+        for (auto& e : p.intro)  add (e, true);
+        for (auto& e : p.events) add (e, false);
+        return t;
+    }
+
+    dubdrums::Pattern treeToPattern (const juce::ValueTree& t)
+    {
+        dubdrums::Pattern p;
+        p.lengthInBeats = juce::jlimit (4.0, 16.0, (double) t.getProperty ("len", 4.0));
+        p.introLengthInBeats = juce::jlimit (0.0, 4.0, (double) t.getProperty ("introLen", 0.0));
+        for (const auto& n : t)
+        {
+            dubdrums::NoteEvent e;
+            const bool intro = (bool) n.getProperty ("i", false);
+            const double lim = intro ? p.introLengthInBeats : p.lengthInBeats;
+            e.beat = (double) n.getProperty ("b", 0.0);
+            if (e.beat < 0.0 || e.beat >= lim) continue;
+            e.length   = juce::jlimit (0.01, 4.0, (double) n.getProperty ("l", 0.1));
+            e.note     = juce::jlimit (0, 127, (int) n.getProperty ("n", 36));
+            e.velocity = juce::jlimit (1, 127, (int) n.getProperty ("v", 100));
+            e.bar      = intro ? -1 : (int) std::floor (e.beat / 4.0);
+            (intro ? p.intro : p.events).push_back (e);
+        }
+        auto byBeat = [] (const dubdrums::NoteEvent& a, const dubdrums::NoteEvent& b) { return a.beat < b.beat; };
+        std::stable_sort (p.intro.begin(), p.intro.end(), byBeat);
+        std::stable_sort (p.events.begin(), p.events.end(), byBeat);
+        return p;
+    }
+}
+
+// Tudo que muda o padrão gerado (as edições na grade valem só para esta combinação)
+juce::String DubDrumsProcessor::settingsKey() const
+{
+    const auto s = readSettings();
+    juce::String k;
+    k << (int) s.style << "/" << (int) s.kickMask << "/" << (int) s.snareMask << "/" << s.bars << "/" << (int) s.hatPattern
+      << "/" << (int) s.swing << "/" << (int) s.swingAll << "/" << (int) s.dynamics << "/" << juce::roundToInt (s.randKick * 100.0f)
+      << "/" << juce::roundToInt (s.randSnare * 100.0f) << "/" << juce::roundToInt (s.randHat * 100.0f) << "/" << juce::roundToInt (s.randPerc * 100.0f)
+      << "/" << (int) s.drummer << "/" << (int) s.backbeat << "/" << (int) s.machine << "/" << (int) s.fill << "/" << (int) s.intro << "/" << (int) s.seed;
+    return k;
+}
+
 void DubDrumsProcessor::regenerate()
 {
-    auto p = dubdrums::generate (readSettings());
+    generated = dubdrums::generate (readSettings());
+    auto edits = apvts.state.getChildWithName (kEdits);
+    if (edits.isValid() && edits.getProperty ("key").toString() == settingsKey())
     {
-        const juce::SpinLock::ScopedLockType lock (patternLock);
-        std::swap (pattern, p);
+        publish (treeToPattern (edits));      // projeto salvo com edições: volta como estava
+        return;
+    }
+    if (edits.isValid())
+        apvts.state.removeChild (edits, nullptr);   // mexeu num controle do gerador: as edições saem
+    publish (generated);
+}
+
+void DubDrumsProcessor::publish (const dubdrums::Pattern& p)
+{
+    {
+        const juce::SpinLock::ScopedLockType lock (displayLock);
+        display = p;
+    }
+    auto copy = p;   // aloca aqui, na thread da interface
+    {
+        const juce::SpinLock::ScopedLockType lock (pendingLock);
+        std::swap (pending, copy);
+        pendingReady = true;
     }
     ++patternVersion;
-    // p (o padrão antigo) é liberado aqui, fora da thread de áudio
+    // copy (o pendente antigo) é liberado aqui, fora da thread de áudio
 }
 
 dubdrums::Pattern DubDrumsProcessor::getPatternCopy() const
 {
-    const juce::SpinLock::ScopedLockType lock (patternLock);
-    return pattern;
+    const juce::SpinLock::ScopedLockType lock (displayLock);
+    return display;
+}
+
+void DubDrumsProcessor::storeEdits (const dubdrums::Pattern& p)
+{
+    auto old = apvts.state.getChildWithName (kEdits);
+    if (old.isValid()) apvts.state.removeChild (old, nullptr);
+    apvts.state.appendChild (patternToTree (p, settingsKey()), nullptr);
+    publish (p);
+}
+
+bool DubDrumsProcessor::hasEdits() const   { return apvts.state.getChildWithName (kEdits).isValid(); }
+
+void DubDrumsProcessor::clearEdits()
+{
+    auto old = apvts.state.getChildWithName (kEdits);
+    if (! old.isValid()) return;
+    apvts.state.removeChild (old, nullptr);
+    publish (generated);
+}
+
+namespace
+{
+    // nota da peça perto da posição clicada (a nota desenhada ocupa ~2/3 da semicolcheia)
+    dubdrums::NoteEvent* findNote (dubdrums::Pattern& p, int gmNote, double beat)
+    {
+        dubdrums::NoteEvent* best = nullptr;
+        double bestD = 0.17;
+        auto scan = [&] (std::vector<dubdrums::NoteEvent>& evs, double offset)
+        {
+            for (auto& e : evs)
+            {
+                if (e.note != gmNote) continue;
+                const double d = std::abs (beat - (offset + e.beat + 0.085));
+                if (d < bestD) { bestD = d; best = &e; }
+            }
+        };
+        scan (p.intro, 0.0);
+        scan (p.events, p.introLengthInBeats);
+        return best;
+    }
+
+    int defaultVelocity (int gmNote, double beatInBar)
+    {
+        using namespace dubdrums;
+        const double frac = beatInBar - std::floor (beatInBar);
+        switch (gmNote)
+        {
+            case gm::Kick:      return 108;
+            case gm::Snare:     return 108;
+            case gm::SideStick: return 100;
+            case gm::ClosedHat: return frac < 0.01 ? 80 : std::abs (frac - 0.5) < 0.01 ? 98 : 58;
+            case gm::OpenHat:   return 98;
+            case gm::Crash:     return 104;
+            default:            return 96;
+        }
+    }
+}
+
+bool DubDrumsProcessor::noteAt (int gmNote, double beat) const
+{
+    auto p = getPatternCopy();
+    return findNote (p, gmNote, beat) != nullptr;
+}
+
+bool DubDrumsProcessor::toggleNote (int gmNote, double beat, bool add)
+{
+    auto p = getPatternCopy();
+    const double total = p.introLengthInBeats + p.lengthInBeats;
+    if (beat < 0.0 || beat >= total) return false;
+
+    if (auto* e = findNote (p, gmNote, beat))
+    {
+        if (add) return false;
+        auto erase = [&] (std::vector<dubdrums::NoteEvent>& evs)
+        {
+            for (auto it = evs.begin(); it != evs.end(); ++it)
+                if (&*it == e) { evs.erase (it); return true; }
+            return false;
+        };
+        if (! erase (p.intro)) erase (p.events);
+    }
+    else
+    {
+        if (! add) return false;
+        const double snapped = std::floor (beat * 4.0) / 4.0;   // cai na semicolcheia clicada
+        const bool intro = snapped < p.introLengthInBeats;
+        dubdrums::NoteEvent ne;
+        ne.beat = intro ? snapped : snapped - p.introLengthInBeats;
+        ne.note = gmNote;
+        ne.length = gmNote == dubdrums::gm::OpenHat ? 0.4 : gmNote == dubdrums::gm::Crash ? 1.0 : 0.1;
+        ne.velocity = defaultVelocity (gmNote, ne.beat);
+        ne.bar = intro ? -1 : (int) std::floor (ne.beat / 4.0);
+        auto& evs = intro ? p.intro : p.events;
+        evs.insert (std::upper_bound (evs.begin(), evs.end(), ne,
+                                      [] (const dubdrums::NoteEvent& a, const dubdrums::NoteEvent& b) { return a.beat < b.beat; }), ne);
+    }
+    storeEdits (p);
+    return true;
+}
+
+void DubDrumsProcessor::changeVelocity (int gmNote, double beat, int delta)
+{
+    auto p = getPatternCopy();
+    if (auto* e = findNote (p, gmNote, beat))
+    {
+        const int v = juce::jlimit (1, 127, e->velocity + delta);
+        if (v == e->velocity) return;
+        e->velocity = v;
+        storeEdits (p);
+    }
 }
 
 void DubDrumsProcessor::applyStyleDefaults (int styleIndex)
@@ -198,6 +431,9 @@ void DubDrumsProcessor::newVariation()
         p->setValueNotifyingHost (p->convertTo0to1 ((float) newSeed));
         p->endChangeGesture();
     }
+    dirty = false;
+    regenerate();              // gera já, para o preview recomeçar com o padrão novo
+    restartRequested = true;
 }
 
 // ------------------------------------------------------------------ áudio / MIDI
@@ -211,7 +447,7 @@ int DubDrumsProcessor::mapNote (int gmNote) const
 
 // Linha do tempo: [intro (toca uma vez)] [loop] [loop] [loop] ...
 template <typename Fn>
-void DubDrumsProcessor::forEachEventIn (double start, double end, Fn&& fn) const
+void DubDrumsProcessor::forEachEventIn (const dubdrums::Pattern& pattern, double start, double end, Fn&& fn)
 {
     const double intro = pattern.introLengthInBeats, loopLen = pattern.lengthInBeats;
     for (int pass = 0; pass < 2; ++pass)      // note-offs antes dos note-ons
@@ -222,6 +458,7 @@ void DubDrumsProcessor::forEachEventIn (double start, double end, Fn&& fn) const
             const double t = e.beat + (off ? e.length : 0.0);
             if (t >= start && t < end) fn (t, e, off);
         }
+        if (loopLen <= 0.0) continue;
         for (const auto& e : pattern.events)
         {
             const double t0 = intro + e.beat + (off ? e.length : 0.0);
@@ -244,8 +481,8 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     const bool soundOn   = apvts.getRawParameterValue ("sound")->load() > 0.5f;
     const bool previewOn = apvts.getRawParameterValue ("preview")->load() > 0.5f;
     const float volume   = apvts.getRawParameterValue ("volume")->load();
-    synth.setKit (apvts.getRawParameterValue ("kit")->load() > 0.5f ? dubdrums::DrumSynth::Kit::Digital
-                                                                   : dubdrums::DrumSynth::Kit::Acoustic);
+    const int kitIndex   = juce::roundToInt (apvts.getRawParameterValue ("kit")->load());
+    synth.setKit (kitIndex == 1 ? dubdrums::DrumSynth::Kit::Digital : dubdrums::DrumSynth::Kit::Acoustic);
 
     bool playing = false;
     double ppq = 0.0, bpm = 120.0;
@@ -258,8 +495,30 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
         }
     hostPlaying = playing;
 
+    auto* left  = buffer.getWritePointer (0);
+    auto* right = buffer.getNumChannels() > 1 ? buffer.getWritePointer (1) : nullptr;
+
+    // troca o padrão tocando pelo pendente (nunca espera a interface: se ela estiver escrevendo, tenta no próximo bloco)
+    auto adoptPending = [this]() -> bool
+    {
+        if (! pendingReady.load()) return false;
+        const juce::SpinLock::ScopedTryLockType lock (pendingLock);
+        if (! lock.isLocked()) return false;
+        std::swap (active, pending);
+        pendingReady = false;
+        return true;
+    };
+
     // PREVIEW: com a DAW parada, o plugin toca sozinho no BPM do painel, começando pela intro
     const bool preview = previewOn && ! playing;
+    bool starting = (preview && ! wasPreviewing) || (playing && ! wasPlaying);
+    if (restartRequested.exchange (false) && preview && wasPreviewing)
+    {
+        // NOVA VARIAÇÃO com o preview tocando: para tudo e o loop novo começa do início
+        previewPos = 0.0;
+        synth.stopAll();
+        starting = true;
+    }
     if (preview)
     {
         if (! wasPreviewing) { previewPos = 0.0; synth.stopAll(); }
@@ -272,49 +531,87 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
     previewing = preview;
 
     if (playing != wasPlaying && ! playing)
+    {
         midi.addEvent (juce::MidiMessage::allNotesOff (channel), 0);
+        held.fill (false);
+    }
     wasPlaying = playing;
 
     if (! playing && ! preview)
     {
+        adoptPending();   // parado: troca na hora
         playheadBeat = -1.0;
-        synth.render (buffer.getWritePointer (0), buffer.getNumChannels() > 1 ? buffer.getWritePointer (1) : nullptr,
-                      0, numSamples, volume);   // deixa os pratos terminarem
+        synth.render (left, right, 0, numSamples, volume);   // deixa os pratos terminarem
         return;
     }
+    if (starting)
+        adoptPending();   // começando a tocar: já entra com o padrão novo
 
+    bpm = juce::jlimit (20.0, 400.0, bpm);
     const double blockBeats = (double) numSamples / sr * bpm / 60.0;
     if (preview) previewPos += blockBeats;
-
-    const juce::SpinLock::ScopedTryLockType lock (patternLock);
-    if (! lock.isLocked())
-        return; // a interface está trocando o padrão neste instante
-
-    const double intro = pattern.introLengthInBeats, loopLen = pattern.lengthInBeats;
-    {
-        double pos = std::max (0.0, ppq);
-        if (pos >= intro) pos = intro + std::fmod (pos - intro, loopLen);
-        playheadBeat = pos;
-    }
+    const double blockEnd = ppq + blockBeats;
 
     struct Trigger { int offset; int note; int vel; };
     std::array<Trigger, 256> triggers;
     int numTriggers = 0;
     const bool makeSound = preview || soundOn;
+    auto offsetOf = [&] (double t) { return juce::jlimit (0, numSamples - 1, (int) ((t - ppq) / blockBeats * numSamples)); };
 
-    forEachEventIn (ppq, ppq + blockBeats, [&] (double t, const dubdrums::NoteEvent& e, bool off)
+    auto schedule = [&] (double from, double to)
     {
-        const int offset = juce::jlimit (0, numSamples - 1, (int) ((t - ppq) / blockBeats * numSamples));
-        if (playing)
-            midi.addEvent (off ? juce::MidiMessage::noteOff (channel, mapNote (e.note))
-                               : juce::MidiMessage::noteOn (channel, mapNote (e.note), (juce::uint8) e.velocity), offset);
-        if (makeSound && ! off && numTriggers < (int) triggers.size())
-            triggers[(size_t) numTriggers++] = { offset, e.note, e.velocity };
-    });
+        if (to <= from) return;
+        forEachEventIn (active, from, to, [&] (double t, const dubdrums::NoteEvent& e, bool off)
+        {
+            const int offset = offsetOf (t);
+            const int n = mapNote (e.note);
+            if (playing)
+            {
+                if (off)
+                {
+                    if (held[(size_t) n]) { midi.addEvent (juce::MidiMessage::noteOff (channel, n), offset); held[(size_t) n] = false; }
+                }
+                else
+                {
+                    if (held[(size_t) n]) midi.addEvent (juce::MidiMessage::noteOff (channel, n), offset);
+                    midi.addEvent (juce::MidiMessage::noteOn (channel, n, (juce::uint8) e.velocity), offset);
+                    held[(size_t) n] = true;
+                }
+            }
+            if (makeSound && ! off && numTriggers < (int) triggers.size())
+                triggers[(size_t) numTriggers++] = { offset, e.note, e.velocity };
+        });
+    };
+
+    // Com um padrão novo esperando, toca o antigo até pouco antes da virada do próximo tempo e troca ali.
+    // (a margem pega as notas adiantadas do baterista que pertencem ao tempo seguinte)
+    constexpr double kMargin = 0.06;
+    double from = std::max (0.0, ppq);
+    if (pendingReady.load())
+    {
+        const double switchAt = std::ceil (from + kMargin) - kMargin;
+        if (switchAt < blockEnd)
+        {
+            schedule (from, switchAt);
+            if (adoptPending())
+            {
+                const int at = offsetOf (switchAt);
+                for (int n = 0; n < 128; ++n)
+                    if (held[(size_t) n]) { midi.addEvent (juce::MidiMessage::noteOff (channel, n), at); held[(size_t) n] = false; }
+            }
+            from = switchAt;
+        }
+    }
+    schedule (from, blockEnd);
+
+    {
+        const double intro = active.introLengthInBeats, loopLen = active.lengthInBeats;
+        double pos = std::max (0.0, ppq);
+        if (pos >= intro && loopLen > 0.0) pos = intro + std::fmod (pos - intro, loopLen);
+        playheadBeat = pos;
+    }
 
     // bateria interna: renderiza em pedaços entre os toques
-    auto* left  = buffer.getWritePointer (0);
-    auto* right = buffer.getNumChannels() > 1 ? buffer.getWritePointer (1) : nullptr;
     std::sort (triggers.begin(), triggers.begin() + numTriggers, [] (const Trigger& a, const Trigger& b) { return a.offset < b.offset; });
     int pos = 0;
     for (int i = 0; i < numTriggers; ++i)
@@ -334,30 +631,50 @@ void DubDrumsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 }
 
 // ------------------------------------------------------------------ arquivo MIDI
-juce::String DubDrumsProcessor::suggestedFileName() const
+juce::String DubDrumsProcessor::suggestedFileName (int bar) const
 {
     const auto s = readSettings();
     juce::String name = juce::String ("MDDM-12_") + dubdrums::styleName (s.style)
-                      + "_" + dubdrums::drummerName (s.drummer)
-                      + "_" + juce::String (s.bars) + "comp" + (s.intro ? "_intro" : "") + "_s" + juce::String ((int) s.seed);
+                      + "_" + dubdrums::drummerName (s.drummer);
+    if (bar == kAllBars) name << "_" << s.bars << "comp" << (s.intro ? "_intro" : "");
+    else                 name << (bar < 0 ? juce::String ("_intro") : "_compasso" + juce::String (bar + 1));
+    name << "_s" << (int) s.seed;
     return name.replaceCharacter (' ', '-') + ".mid";
 }
 
-bool DubDrumsProcessor::writeMidiFile (const juce::File& target) const
+bool DubDrumsProcessor::writeMidiFile (const juce::File& target, int onlyBar) const
 {
-    const auto p = getPatternCopy();
+    auto p = getPatternCopy();
+    if (onlyBar != kAllBars)
+    {
+        // só um compasso (arrastado pela faixa dele no PADRÃO): vira um arquivo de 4 tempos começando no 0
+        std::vector<dubdrums::NoteEvent> one;
+        for (auto e : (onlyBar < 0 ? p.intro : p.events))
+            if (e.bar == onlyBar) { e.beat -= onlyBar < 0 ? 0.0 : onlyBar * 4.0; one.push_back (e); }
+        p.intro.clear();
+        p.introLengthInBeats = 0.0;
+        p.events = std::move (one);
+        p.lengthInBeats = 4.0;
+    }
     const int channel = juce::jlimit (1, 16, juce::roundToInt (apvts.getRawParameterValue ("channel")->load()));
     const double intro = p.introLengthInBeats;
 
     juce::MidiMessageSequence seq;
-    seq.addEvent (juce::MidiMessage::textMetaEvent (3, "MDDM-12"), 0.0);
+    seq.addEvent (juce::MidiMessage::textMetaEvent (3, onlyBar == kAllBars ? juce::String ("MDDM-12")
+                                                     : onlyBar < 0 ? juce::String ("MDDM-12 Intro")
+                                                                   : "MDDM-12 Compasso " + juce::String (onlyBar + 1)), 0.0);
     seq.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
     // marcadores com o nome de cada compasso (aparecem na régua de DAWs que importam marcadores)
-    if (intro > 0.0)
-        seq.addEvent (juce::MidiMessage::textMetaEvent (6, "Intro"), 0.0);
-    for (int bar = 0; bar < juce::roundToInt (p.lengthInBeats / 4.0); ++bar)
-        seq.addEvent (juce::MidiMessage::textMetaEvent (6, "Compasso " + juce::String (bar + 1)), (intro + bar * 4.0) * kTicksPerQuarter);
+    if (onlyBar != kAllBars)
+        seq.addEvent (juce::MidiMessage::textMetaEvent (6, onlyBar < 0 ? juce::String ("Intro") : "Compasso " + juce::String (onlyBar + 1)), 0.0);
+    else
+    {
+        if (intro > 0.0)
+            seq.addEvent (juce::MidiMessage::textMetaEvent (6, "Intro"), 0.0);
+        for (int bar = 0; bar < juce::roundToInt (p.lengthInBeats / 4.0); ++bar)
+            seq.addEvent (juce::MidiMessage::textMetaEvent (6, "Compasso " + juce::String (bar + 1)), (intro + bar * 4.0) * kTicksPerQuarter);
+    }
 
     // MIDI colorido (como no Dub Chords): compasso 1 no canal 1 ... compasso 4 no canal 4, intro no canal 5.
     // Na DAW, colorir as notas por canal (Cubase: Key Editor > Cores > Canal) deixa cada compasso de uma cor.

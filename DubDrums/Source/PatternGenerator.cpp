@@ -84,6 +84,10 @@ namespace
             case Drummer::SantaDavis:     return {  0.02, { 0.000,  0.006,  0.000, 0.004 }, 1.7, 0.06, 0.05, 1.4 };
             // Wailers: atrás do tempo, balanço de tercina, hi-hat econômico
             case Drummer::CarltonBarrett: return {  0.04, { 0.006,  0.018,  0.006, 0.010 }, 0.6, 0.00, 0.00, 1.2 };
+            // Sly & Robbie: rockers em cima do tempo (até um tiquinho na frente), hi-hat de semicolcheia
+            case Drummer::SlyDunbar:      return {  0.00, {-0.003, -0.005, -0.002, -0.003 }, 1.3, 0.05, 0.08, 0.9 };
+            // máquina: sem balanço, sem enfeites, sem ghost notes
+            case Drummer::Digikal:        return {  0.00, { 0.000,  0.000,  0.000, 0.000 }, 0.0, 0.00, 0.00, 0.0 };
         }
         return { 0.0, { 0, 0, 0, 0 }, 1.0, 0.0, 0.0, 1.0 };
     }
@@ -139,10 +143,12 @@ namespace
                 }
 
             // notas de passagem, no jeito de cada estilo (só onde não há bumbo marcado)
+            const double busy = s.drummer == Drummer::CarltonBarrett ? 0.5 : s.drummer == Drummer::StyleScott ? 0.7
+                              : s.drummer == Drummer::Digikal ? 0.0 : 1.0;
             auto pickup = [&] (int st, double p, int vel)
             {
                 if (st % 2 == 0 && maskHas (s.kickMask, st / 2)) return;
-                if (rng.chance (p)) b.add (stepPos (bar, st), gm::Kick, vel);
+                if (rng.chance (p * busy)) b.add (stepPos (bar, st), gm::Kick, vel);
             };
             switch (s.style)
             {
@@ -156,6 +162,36 @@ namespace
                 case Style::BoomBap:
                     // bumbos "sujos" de MPC: semicolcheia antes da caixa e no fim do compasso
                     for (int st : { 7, 10, 15 }) pickup (st, r * 0.30, 88);
+                    break;
+            }
+
+            // assinatura de bumbo do baterista (fora do Boom Bap, que é de máquina)
+            if (s.style == Style::BoomBap) continue;
+            auto extra = [&] (int st, double p, int vel)
+            {
+                if (st % 2 == 0 && maskHas (s.kickMask, st / 2)) return;
+                if (! b.has (stepPos (bar, st), gm::Kick) && rng.chance (p)) b.add (stepPos (bar, st), gm::Kick, vel);
+            };
+            switch (s.drummer)
+            {
+                case Drummer::SlyDunbar:
+                    // o bumbo dobrado do rockers: semicolcheia no "a" do 2 empurrando o 3
+                    extra (7, 0.30 + r * 0.40, 86);
+                    extra (15, 0.10 + r * 0.25, 78);
+                    break;
+                case Drummer::SantaDavis:
+                    // bumbo de soul de Filadélfia: semicolcheia "funky" no fim do 3
+                    extra (11, 0.15 + r * 0.30, 80);
+                    break;
+                case Drummer::StyleScott:
+                    // rub-a-dub dos Roots Radics: às vezes um bumbo no "e" do 4 chamando o 1
+                    extra (14, 0.08 + r * 0.20, 82);
+                    break;
+                case Drummer::CarltonBarrett:
+                    break;   // bumbo econômico: só a BATIDA PRINCIPAL
+                case Drummer::Digikal:
+                    if (isMT40 (s)) extra (6, 1.0, 104);            // MT-40 "Rock": bumbo também no "e" do 2
+                    else            extra (7, 0.5 + r * 0.4, 100);  // DMX: semicolcheia empurrando o 3
                     break;
             }
         }
@@ -189,7 +225,7 @@ namespace
             for (int st : backbeats)
             {
                 // no compasso final, às vezes a caixa vem "cheia" com flam
-                if (lastBar && s.bars > 1 && ! backbeats.empty() && st == backbeats.back() && rng.chance (r * 0.5))
+                if (lastBar && s.bars > 1 && ! backbeats.empty() && st == backbeats.back() && s.drummer != Drummer::Digikal && rng.chance (r * 0.5))
                 {
                     b.add (stepPos (bar, st) - 0.03, gm::Snare, 60);
                     b.add (stepPos (bar, st), gm::Snare, 114);
@@ -214,6 +250,44 @@ namespace
             if (s.style == Style::BoomBap)
                 for (int st : { 7, 9, 15 })
                     if (rng.chance (0.15 + r * 0.35)) b.add (stepPos (bar, st), gm::Snare, (int) rng.range (34, 52));
+            if (s.style == Style::BoomBap || (s.machine && s.drummer != Drummer::Digikal)) continue;
+
+            // assinatura de caixa do baterista
+            switch (s.drummer)
+            {
+                case Drummer::CarltonBarrett:
+                    // ghost na última nota da tercina, "puxando" a batida principal
+                    for (int st : backbeats)
+                        if (st > 0 && rng.chance (0.22 + r * 0.40))
+                            b.add (stepPos (bar, st) - 1.0 / 3.0, gm::Snare, (int) rng.range (30, 44));
+                    break;
+                case Drummer::SantaDavis:
+                    // flam na caixa do 4
+                    if (! backbeats.empty() && rng.chance (0.20 + r * 0.40))
+                        b.add (stepPos (bar, backbeats.back()) - 0.03, gm::Snare, 54);
+                    break;
+                case Drummer::StyleScott:
+                    // estalo extra no "a" do 4, entrando no compasso seguinte
+                    if (! lastBar && rng.chance (0.10 + r * 0.25))
+                        b.add (stepPos (bar, 15), gm::Snare, 84);
+                    break;
+                case Drummer::Digikal:
+                    // DMX: caixa dobrada com o aro (o "clap" do dancehall dos anos 80)
+                    if (! isMT40 (s))
+                        for (int st : backbeats) if (! b.has (stepPos (bar, st), gm::SideStick)) b.add (stepPos (bar, st), gm::SideStick, 96);
+                    break;
+                case Drummer::SlyDunbar:
+                    // arrasto (drag) de duas notas antes da caixa e um "chip" de aro no "e" do 4
+                    if (! backbeats.empty() && rng.chance (0.15 + r * 0.35))
+                    {
+                        const double at = stepPos (bar, backbeats.front());
+                        b.add (at - 0.0625, gm::Snare, 40);
+                        b.add (at - 0.03125, gm::Snare, 46);
+                    }
+                    if (rng.chance (0.12 + r * 0.30))
+                        b.add (stepPos (bar, 14), gm::SideStick, 78);
+                    break;
+            }
         }
     }
 
@@ -283,6 +357,52 @@ namespace
                     b.add (t0 + beat + 0.5, gm::OpenHat, 100, 0.40);
                     if (! hatAt (beat)) b.add (t0 + beat, gm::ClosedHat, 60);   // o pé fecha
                 }
+                break;
+            }
+
+            case Drummer::Digikal:
+            {
+                removeHats (0.0, 4.0);
+                if (isMT40 (s))
+                {
+                    // MT-40: colcheias fechadas, todas iguais (a caixinha não tem dinâmica)
+                    for (int e8 = 0; e8 < 8; ++e8) b.add (t0 + e8 * 0.5, gm::ClosedHat, 90);
+                }
+                else
+                {
+                    // DMX: semicolcheias com acento no contratempo e hi-hat aberto no "e" do 4
+                    for (int st = 0; st < kStepsPerBar; ++st)
+                    {
+                        if (st == 14 && rng.chance (0.6 + r * 0.3)) { b.add (t0 + st * kStep, gm::OpenHat, 100, 0.22); ++st; continue; }
+                        b.add (t0 + st * kStep, gm::ClosedHat, st % 4 == 2 ? 104 : (st % 4 == 0 ? 80 : 60));
+                    }
+                }
+                break;
+            }
+
+            case Drummer::SlyDunbar:
+            {
+                // semicolcheias "andando": acento no contratempo, o "a" de cada tempo leve antecipando,
+                // e um "swish" curto de hi-hat aberto no "e" do 1 e do 3, entrando na caixa
+                for (auto& e : b.ev)
+                {
+                    if (! isHat (e.note) || e.beat < t0 || e.beat >= t0 + 4.0) continue;
+                    const double frac = e.beat - std::floor (e.beat);
+                    if (nearly (frac, 0.5))       e.velocity = 100;
+                    else if (nearly (frac, 0.0))  e.velocity = 72;
+                    else                          e.velocity = 46;
+                }
+                for (int st = 3; st < kStepsPerBar; st += 4)
+                    if (! hatAt (st * kStep) && rng.chance (0.45 + r * 0.35))
+                        b.add (t0 + st * kStep, gm::ClosedHat, (int) rng.range (40, 52));
+                for (double beat : { 0.5, 2.5 })
+                    if (rng.chance (0.35 + r * 0.35))
+                    {
+                        removeHats (beat, beat + 0.26);
+                        b.add (t0 + beat, gm::OpenHat, 96, 0.14);
+                    }
+                for (double beat : { 1.5, 3.5 })
+                    if (! hatAt (beat)) b.add (t0 + beat, gm::ClosedHat, 100);
                 break;
             }
 
@@ -440,10 +560,31 @@ namespace
             // entrada do one drop: caixa do "e" do 3 até o surdo
             { {2.667, gm::Snare, 60}, {2.97, gm::Snare, 48}, {3.0, gm::Snare, 84}, {3.333, gm::TomMid, 92}, {3.667, gm::TomLow, 106} },
         };
+        static const std::vector<Fill> sly =
+        {
+            // arrasto na caixa e syndrum "pew" no tom agudo
+            { {3.0, gm::Snare, 104}, {3.125, gm::Snare, 58}, {3.25, gm::Snare, 106}, {3.5, gm::TomHigh, 112}, {3.75, gm::TomHigh, 116} },
+            // rufo de semicolcheias com acento no aro, resolvendo no surdo
+            { {2.5, gm::Snare, 70}, {2.75, gm::Snare, 78}, {3.0, gm::SideStick, 104}, {3.25, gm::Snare, 88},
+              {3.5, gm::Snare, 96}, {3.625, gm::Snare, 70}, {3.75, gm::TomLow, 114} },
+            // toques duplos "militantes" na caixa e nos tons
+            { {3.0, gm::Snare, 100}, {3.125, gm::Snare, 76}, {3.5, gm::TomMid, 104}, {3.625, gm::TomMid, 80}, {3.75, gm::TomLow, 114} },
+        };
+        static const std::vector<Fill> digikal =
+        {
+            // botão FILL do MT-40: semicolcheias de caixa até o 1
+            { {3.0, gm::Snare, 100}, {3.25, gm::Snare, 100}, {3.5, gm::Snare, 100}, {3.75, gm::Snare, 100} },
+            // FILL do MT-40 no bumbo
+            { {3.0, gm::Kick, 100}, {3.25, gm::Kick, 100}, {3.5, gm::Kick, 100}, {3.75, gm::Kick, 100} },
+            // DMX: tons descendo em semicolcheia
+            { {3.0, gm::TomHigh, 110}, {3.25, gm::TomHigh, 100}, {3.5, gm::TomMid, 110}, {3.75, gm::TomLow, 118} },
+        };
         switch (d)
         {
             case Drummer::StyleScott: return scott;
             case Drummer::SantaDavis: return santa;
+            case Drummer::SlyDunbar:  return sly;
+            case Drummer::Digikal:    return digikal;
             default:                  return carlton;
         }
     }
@@ -453,9 +594,11 @@ namespace
     {
         const auto& all = fillsOf (b.s.drummer);
         Fill f = all[(size_t) rng.pick ((int) all.size())];
+        if (b.s.drummer == Drummer::Digikal)
+            f = isMT40 (b.s) ? all[(size_t) rng.pick (2)] : all[2];
 
-        // virada longa: começa meio tempo antes
-        if (rng.chance (0.20 + r * 0.5))
+        // virada longa: começa meio tempo antes (a máquina não improvisa)
+        if (b.s.drummer != Drummer::Digikal && rng.chance (0.20 + r * 0.5))
             f.insert (f.begin(), { 2.5, gm::Snare, 66 });
 
         double first = 4.0;
@@ -468,6 +611,7 @@ namespace
         for (size_t i = 0; i < f.size(); ++i)
         {
             const auto& h = f[i];
+            if (b.s.drummer == Drummer::Digikal) { b.add (barStart (bar) + h.beat, h.note, h.vel); continue; }
             if (i > 0 && i + 1 < f.size() && rng.chance (r * 0.12)) continue; // deixa um buraco
             b.add (barStart (bar) + h.beat, h.note, h.vel + (int) rng.range (-6, 6));
         }
@@ -483,12 +627,18 @@ namespace
         for (int bar = 0; bar < s.bars; ++bar)
         {
             const bool fillBar = s.fill && bar == s.bars - 1;
-            if (! fillBar && rng.chance (r * 0.30))
+            if (! fillBar && s.drummer != Drummer::Digikal && rng.chance (r * 0.30))
             {
                 b.add (stepPos (bar, 6), gm::TomHigh, (int) rng.range (70, 90));
                 if (rng.chance (0.5)) b.add (stepPos (bar, 7), gm::TomMid, (int) rng.range (70, 90));
             }
         }
+
+        // Sly Dunbar: o syndrum "pew" no "a" do 4 de alguns compassos
+        if (s.drummer == Drummer::SlyDunbar && ! s.machine && s.drummer != Drummer::Digikal)
+            for (int bar = 0; bar < s.bars; ++bar)
+                if (! (s.fill && bar == s.bars - 1) && rng.chance (0.10 + r * 0.35))
+                    b.add (stepPos (bar, 15), gm::TomHigh, (int) rng.range (96, 112));
 
         if (s.fill)
             placeFill (b, s.bars - 1, rng, r);
@@ -539,6 +689,7 @@ Pattern generate (const Settings& in)
 {
     Settings s = in;
     s.bars = std::clamp (s.bars, 1, 4);
+    if (s.drummer == Drummer::Digikal) { s.machine = true; s.swing = Swing::Straight; }   // tempo de máquina
 
     Builder b { s, {} };
 
@@ -651,9 +802,15 @@ const char* drummerName (Drummer d)
         case Drummer::StyleScott:     return "Style Scott";
         case Drummer::SantaDavis:     return "Santa Davis";
         case Drummer::CarltonBarrett: return "Carlton Barrett";
+        case Drummer::SlyDunbar:      return "Sly Dunbar";
+        case Drummer::Digikal:        return "Digikal";
     }
     return "";
 }
+
+bool isMT40 (const Settings& s) { return (s.seed % 2u) == 1u; }
+
+const char* digikalMachineName (const Settings& s) { return isMT40 (s) ? "Casio MT-40" : "Oberheim DMX"; }
 
 const char* swingName (Swing s)
 {

@@ -118,7 +118,7 @@ private:
     juce::Point<float> centre() const;
     float radius() const;
     juce::Rectangle<float> labelArea (int i) const;
-    static float angleOf (int i) { return juce::MathConstants<float>::pi * 0.29f * (float) (i - 1); }
+    static float angleOf (int i) { return juce::MathConstants<float>::pi * 0.21f * ((float) i - 2.0f); }   // 5 posições
     bool dragging = false;
     int dragStartIndex = 0;
 };
@@ -147,9 +147,13 @@ public:
     void mouseDrag (const juce::MouseEvent&) override;
     void mouseUp (const juce::MouseEvent&) override   { endGesture(); }
     void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+    bool animating() const;   // JACKPOT: os números rodam quando a semente muda
 
 private:
     int dragStart = 1;
+    int shown = -1;
+    double animStart = -10000.0;
+    bool userDrag = false;
 };
 
 // Nota MIDI de uma peça (opção avançada): display âmbar com setas; clique nas setas, arraste ou use a rodinha
@@ -179,6 +183,8 @@ public:
         setRepaintsOnMouseActivity (true);
     }
     std::function<void()> onClick;
+    float attention = 0.0f;   // 0..1: brilho pulsando para chamar atenção (NOVA VARIAÇÃO)
+    float sheen = -1.0f;      // posição do reflexo que passa pelo botão (-1 = sem reflexo)
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override { down = true; repaint(); }
     void mouseUp (const juce::MouseEvent& e) override
@@ -192,6 +198,15 @@ private:
     juce::String text;
     bool red = false;
     bool down = false;
+};
+
+// PREVIEW: botão grande iluminado (verde tocando, com a lâmpada pulsando)
+class DrumsPreviewButton : public juce::ToggleButton
+{
+public:
+    DrumsPreviewButton() { setMouseCursor (juce::MouseCursor::PointingHandCursor); setClickingTogglesState (true); }
+    void paintButton (juce::Graphics&, bool over, bool down) override;
+    float pulse = 0.0f;   // 0..1, animado pelo painel enquanto toca
 };
 
 //==============================================================================
@@ -223,7 +238,22 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    // grade PADRÃO editável: clique põe/tira nota, arrastar pinta, rodinha muda a força
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseMove (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+
 private:
+    bool gridHit (juce::Point<float>, int& row, double& beat) const;
+    int  barTagAt (juce::Point<float>) const;          // faixa "COMPASSO n" / "INTRO" no PADRÃO (-3 = nenhuma)
+    void dragBar (int bar);                            // arrasta só esse compasso para a DAW
+    std::vector<std::pair<juce::Rectangle<float>, int>> barTags;
+    int pressedBar = -3;
+    bool barDragged = false;
+    bool dragAdd = true, dragging = false;
+    int lastRow = -1, lastCell = -1;
+
     using SliderAttach = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ButtonAttach = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
@@ -259,7 +289,11 @@ private:
     PushButton variation { "NOVA VARIACAO", true };
     BeatGrid beatGrid;
     PushButton notesButton { "NOTAS" };
-    Toggle fill, intro, swingAll, preview, sound, colorMidi;
+    Toggle fill, intro, swingAll, sound, colorMidi;
+    DrumsPreviewButton previewButton;
+    std::unique_ptr<ButtonAttach> previewAtt;
+    PushButton clearEdits { "DESFAZER EDICAO" };
+    bool showingEdits = false;
     Knob swing, dynamics;
     Knob rndKick, rndSnare, rndHat, rndPerc, channel, bpm, volume;
     NoteMapPanel noteMap;
