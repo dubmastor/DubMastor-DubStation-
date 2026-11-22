@@ -1,4 +1,9 @@
-## Mastor Reggae Drum Machine MRDM-12 2.1 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.2 🟢🟡⚫
+
+- **Versão do navegador/celular com layout novo**: na ordem do plugin, em 3 colunas no computador, 2 no tablet e 1 no celular; módulos alinhados, alto-falante e PREVIEW lado a lado sem invadir o MIDI, botões que completam as linhas e nada mais largo que a tela
+- O plugin é o mesmo da 2.1
+
+### Da 2.1
 
 O **Mastor Dub Drums Machine MDDM-12** agora se chama **Mastor Reggae Drum Machine MRDM-12**.
 

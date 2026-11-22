@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Drum Machine MRDM-12 2.1 — Dub Station</title>
+<title>Mastor Reggae Drum Machine MRDM-12 2.2 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -18,25 +18,43 @@ body{padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 90px)
 .rack{max-width:1180px;margin:0 auto;display:flex;min-height:100vh}
 .wood{width:14px;flex:none;background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 7px),linear-gradient(90deg,#5b3519,#8a5428 40%,#6a3d1c 70%,#4a2a12)}
 .unit{flex:1;min-width:0;background:radial-gradient(900px 500px at 30% 0%,#efe4c9,var(--plate) 55%,#d8c9a6);padding:12px 12px 24px}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:10px}
-h1{margin:0;font-size:clamp(15px,3.6vw,26px);letter-spacing:.18em;font-weight:800;color:var(--ink)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:26px}
+h1{margin:0;font-size:clamp(15px,2.6vw,26px);letter-spacing:.14em;font-weight:800;color:var(--ink)}
 .sub{font-size:10px;letter-spacing:.3em;color:var(--ink2);margin-top:4px}
 .plaque{padding:6px 16px;border-radius:5px;font-weight:800;letter-spacing:.35em;font-size:13px;color:#3a2a10;
   background:linear-gradient(180deg,#f3d27a,#c99a33 55%,#a87c22);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.35)}
 .flag{flex:1;min-width:80px;height:14px;border-radius:3px;background:linear-gradient(180deg,var(--green) 0 33%,var(--gold) 33% 66%,#222 66%);opacity:.85}
-.grid-mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid-mods{display:grid;gap:22px 14px;grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"estilo" "bat" "loop" "hat" "din" "ale" "som" "midi" "pad"}
+@media (min-width:720px){.grid-mods{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"estilo loop" "bat hat" "din ale" "som som" "midi midi" "pad pad"}}
+@media (min-width:1100px){.grid-mods{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"estilo loop bat" "hat din ale" "som som midi" "pad pad pad"}}
+.a-estilo{grid-area:estilo}.a-loop{grid-area:loop}.a-bat{grid-area:bat}.a-hat{grid-area:hat}.a-din{grid-area:din}.a-ale{grid-area:ale}
+.a-som{grid-area:som}.a-midi{grid-area:midi}.a-pad{grid-area:pad}
+.mod{display:flex;flex-direction:column;min-width:0}
+.a-loop{justify-content:space-between}
+.a-bat,.a-din,.a-ale{justify-content:center;gap:4px}
+.a-ale .slider{margin:8px 0}
+/* SOM: PREVIEW | alto-falante | BPM e VOLUME */
+.a-som .somtop{display:grid;grid-template-columns:minmax(0,1fr) 122px;gap:14px;align-items:center}
+.somctl{margin-top:12px}
+@media (min-width:720px){.a-som{display:grid;grid-template-columns:minmax(0,1.1fr) 122px minmax(0,1fr);grid-template-areas:"top top ctl" "lbl lbl lbl" "kit kit kit";column-gap:16px}
+  .a-som .somtop{grid-area:top}.a-som .somctl{grid-area:ctl;margin-top:0;align-self:center}
+  .a-som>.lbl{grid-area:lbl}.a-som>#kit{grid-area:kit}}
+.midirow{gap:10px}
+.midirow .green{flex:1 1 auto}
 .mod{position:relative;border:1.2px solid rgba(43,36,29,.55);border-radius:6px;padding:18px 12px 12px;box-shadow:1px 1px 0 rgba(255,255,255,.45)}
 .mod>.tag{position:absolute;top:-10px;left:12px;background:var(--label);color:var(--cream);font-weight:800;font-size:11px;letter-spacing:.22em;padding:3px 10px;border-radius:2px}
 .lbl{font-size:9px;letter-spacing:.3em;color:var(--ink2);text-align:center;margin:10px 0 5px;font-weight:700}
 .display{height:40px;border-radius:4px;background:linear-gradient(180deg,#2a2219,var(--glass));box-shadow:0 0 0 3px #0c0907;
   display:flex;align-items:center;justify-content:center;color:var(--amber);font-weight:800;font-size:18px;letter-spacing:.08em;
   text-shadow:0 0 6px rgba(255,169,40,.55);overflow:hidden;position:relative;white-space:nowrap}
-.display.marquee span{position:absolute;left:0;animation:marq 16s linear infinite;padding-left:100%}
+.display.marquee span{position:absolute;left:0;white-space:nowrap;animation:marq 22s linear infinite}
 .display.marquee::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)}
-@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .btns{display:grid;gap:6px;background:var(--label);padding:6px;border-radius:5px}
-.btns.c2{grid-template-columns:1fr 1fr}.btns.c3{grid-template-columns:repeat(3,1fr)}.btns.c5{grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}.btns.c6{grid-template-columns:repeat(3,1fr)}
+.btns.c2{grid-template-columns:1fr 1fr}.btns.c3{grid-template-columns:repeat(3,1fr)}.btns.c5{display:flex;flex-wrap:wrap}.btns.c5 .b{flex:1 1 calc(33% - 6px)}
+@media (min-width:1100px){.a-hat .btns.c5 .b{flex-basis:calc(33% - 6px)}}.btns.c6{grid-template-columns:repeat(3,1fr)}
 .b{appearance:none;border:0;border-radius:4px;padding:10px 6px;font-weight:800;font-size:12px;letter-spacing:.1em;min-width:0;overflow:hidden;cursor:pointer;
   color:#cfc2a6;background:linear-gradient(180deg,#3a332b,#221d18);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;gap:7px;min-height:40px}
 .b::before{content:"";width:9px;height:9px;border-radius:50%;background:#4a3a22;box-shadow:0 0 0 1px #000;flex:none}
@@ -63,9 +81,9 @@ h1{margin:0;font-size:clamp(15px,3.6vw,26px);letter-spacing:.18em;font-weight:80
 input[type=range]{width:100%;accent-color:var(--amber)}
 .slider{display:grid;grid-template-columns:70px 1fr 44px;gap:8px;align-items:center;font-size:11px;font-weight:800;letter-spacing:.12em}
 .slider output{text-align:right;color:var(--ink2)}
-.preview{width:100%;padding:18px;border:0;border-radius:8px;cursor:pointer;color:var(--cream);font-weight:800;font-size:20px;letter-spacing:.18em;
+.preview{width:100%;padding:16px 10px;white-space:nowrap;border:0;border-radius:8px;cursor:pointer;color:var(--cream);font-weight:800;font-size:20px;letter-spacing:.18em;
   background:linear-gradient(180deg,#2c7c45,#0f3f1f);box-shadow:0 0 0 4px var(--label);display:flex;align-items:center;justify-content:center;gap:14px}
-.preview .lamp{width:16px;height:16px;border-radius:50%;background:#20301f;box-shadow:0 0 0 1px #000}
+.preview .lamp{flex:none;width:16px;height:16px;border-radius:50%;background:#20301f;box-shadow:0 0 0 1px #000}
 .preview.on{background:linear-gradient(180deg,#27c45e,#0b6a2c);box-shadow:0 0 0 4px var(--label),0 0 20px rgba(39,196,94,.6)}
 .preview.on .lamp{background:#d8ffb0;animation:blink .9s ease-in-out infinite}
 @keyframes blink{50%{opacity:.35}}
@@ -76,13 +94,13 @@ input[type=range]{width:100%;accent-color:var(--amber)}
 .barbtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;margin-top:10px}
 .barbtns button{border:0;border-radius:5px;padding:10px 6px;font-weight:800;font-size:11px;letter-spacing:.12em;cursor:pointer;color:#111}
 .pattern-wrap{overflow-x:auto;border-radius:6px;background:#0c0907;padding:4px;-webkit-overflow-scrolling:touch}
-canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pan-x}
+canvas#pat{display:block;min-width:760px;width:100%;height:250px;touch-action:pan-x}
 .hint{font-size:10px;letter-spacing:.12em;color:var(--ink2);font-weight:700;margin:6px 2px 0}
 .dock{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:rgba(46,26,13,.95);display:flex;gap:10px;z-index:5;backdrop-filter:blur(6px)}
 .dock .preview{padding:13px;font-size:17px}
 .dock .redbtn{padding:13px;font-size:12px;animation:none}
 @media (min-width:900px){.dock{display:none}body{padding-bottom:20px}}
-.btns.c3 .b,.btns.c6 .b{letter-spacing:.05em;font-size:11.5px}
+.btns.c3 .b,.btns.c6 .b,.btns.c5 .b{letter-spacing:.04em;font-size:11.5px;padding:10px 4px;white-space:nowrap}
 .somtop{display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center}
 /* alto-falante de gabinete valvulado de 1959: madeira, tweed dourado, aro de latão e tweeter em cima */
 .spk{height:96px;border-radius:8px;position:relative;box-shadow:2px 3px 4px rgba(0,0,0,.35);
@@ -102,12 +120,12 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE DRUM MACHINE MRDM-12 <span id="ver">2.1</span></h1><div class="sub">RIDDIM DRUM GENERATOR · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE DRUM MACHINE MRDM-12&nbsp;<span id="ver">2.2</span></h1><div class="sub">RIDDIM DRUM GENERATOR · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
 <div class="grid-mods">
-  <section class="mod"><div class="tag">ESTILO</div>
+  <section class="mod a-estilo"><div class="tag">ESTILO</div>
     <div class="display marquee" id="styleDisp"><span id="marq"></span></div>
     <div class="lbl">ESCOLHA O ESTILO</div>
     <div class="btns c3" id="style"></div>
@@ -117,10 +135,10 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
     <div class="btns c3" id="backbeat"></div>
   </section>
 
-  <section class="mod"><div class="tag">LOOP</div>
+  <section class="mod a-loop"><div class="tag">LOOP</div>
     <div class="lbl" style="margin-top:2px">COMPASSOS</div>
     <div class="stepper"><button id="barsDn">◀</button><div class="val" id="barsVal">4 COMPASSOS</div><button id="barsUp">▶</button></div>
-    <div class="row" style="margin-top:12px;justify-content:center">
+    <div class="row" style="margin-top:12px;justify-content:center;flex-wrap:wrap">
       <div class="toggle" id="fill"><i></i>VIRADA NO FIM</div><div class="toggle" id="intro"><i></i>VIRADA DE INTRO</div>
     </div>
     <div class="lbl">SEMENTE</div>
@@ -128,14 +146,14 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
     <div style="margin-top:14px"><button class="redbtn" id="variation">NOVA VARIAÇÃO</button></div>
   </section>
 
-  <section class="mod"><div class="tag">BATERISTA</div>
+  <section class="mod a-bat"><div class="tag">BATERISTA</div>
     <div class="display" id="drumDisp">STYLE SCOTT</div>
     <div class="lbl">CHAVE SELETORA</div>
     <div class="btns c5" id="drummer"></div>
     <div class="info" id="drumInfo"></div>
   </section>
 
-  <section class="mod"><div class="tag">HI-HAT</div>
+  <section class="mod a-hat"><div class="tag">HI-HAT</div>
     <div class="display" id="hatDisp">SEMICOLCHEIAS</div>
     <div class="lbl">FIGURA</div>
     <div class="btns c2" id="hat"></div>
@@ -144,13 +162,13 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
     <div class="row" style="margin-top:10px;justify-content:center"><div class="toggle" id="swingAll"><i></i>SWING EM TUDO</div></div>
   </section>
 
-  <section class="mod"><div class="tag">DINÂMICA</div>
+  <section class="mod a-din"><div class="tag">DINÂMICA</div>
     <div class="display" id="dynDisp">MÉDIA</div>
     <div class="lbl">FORÇA</div>
     <div class="btns c6" id="dyn"></div>
   </section>
 
-  <section class="mod"><div class="tag">ALEATORIEDADE</div>
+  <section class="mod a-ale"><div class="tag">ALEATORIEDADE</div>
     <div class="slider"><span>BUMBO</span><input type="range" min="0" max="100" id="rndKick"><output id="o_rndKick"></output></div>
     <div class="slider"><span>CAIXA</span><input type="range" min="0" max="100" id="rndSnare"><output id="o_rndSnare"></output></div>
     <div class="slider"><span>HI-HAT</span><input type="range" min="0" max="100" id="rndHat"><output id="o_rndHat"></output></div>
@@ -158,30 +176,32 @@ canvas#pat{display:block;min-width:880px;width:100%;height:240px;touch-action:pa
     <div class="hint" style="text-align:right">HUMANIZA FORÇA E TEMPO</div>
   </section>
 
-  <section class="mod"><div class="tag">SOM</div>
+  <section class="mod a-som"><div class="tag">SOM</div>
     <div class="somtop"><button class="preview" id="preview"><span class="lamp"></span><span>▶ PREVIEW</span></button>
       <div class="spk" aria-hidden="true"><div class="tw"></div><div class="wf"><div class="cone" id="cone"></div></div>
         <i class="sc" style="left:22px;top:28px"></i><i class="sc" style="right:22px;top:28px"></i><i class="sc" style="left:22px;bottom:8px"></i><i class="sc" style="right:22px;bottom:8px"></i></div></div>
-    <div class="slider" style="margin-top:12px"><span>BPM</span><input type="range" min="60" max="180" id="bpm"><output id="o_bpm"></output></div>
-    <div class="slider"><span>VOLUME</span><input type="range" min="0" max="100" id="volume"><output id="o_volume"></output></div>
+    <div class="somctl"><div class="slider"><span>BPM</span><input type="range" min="60" max="180" id="bpm"><output id="o_bpm"></output></div>
+    <div class="slider"><span>VOLUME</span><input type="range" min="0" max="100" id="volume"><output id="o_volume"></output></div></div>
     <div class="lbl">KIT</div>
     <div class="btns c2" id="kit"></div>
   </section>
 
-  <section class="mod"><div class="tag">MIDI</div>
-    <div class="row"><button class="green" id="export">⬇ BAIXAR MIDI</button>
+  <section class="mod a-midi"><div class="tag">MIDI</div>
+    <div class="row midirow"><button class="green" id="export">⬇ BAIXAR MIDI</button>
       <div class="toggle" id="colorMidi"><i></i>MIDI COLORIDO</div></div>
     <div class="slider" style="margin-top:10px"><span>CANAL</span><input type="range" min="1" max="16" id="channel"><output id="o_channel"></output></div>
-    <div class="lbl">BAIXAR SÓ UM COMPASSO (NA COR DELE)</div>
+    <div class="lbl">BAIXAR SÓ UM COMPASSO, NA COR DELE</div>
     <div class="barbtns" id="barDownloads"></div>
   </section>
-</div>
 
-<section class="mod" style="margin-top:14px"><div class="tag">PADRÃO</div>
+<section class="mod a-pad"><div class="tag">PADRÃO</div>
   <div class="row" style="margin-bottom:6px"><div class="hint">TOQUE NA GRADE PARA PÔR OU TIRAR NOTAS · DESLIZE PARA OS LADOS NO CELULAR</div>
     <button class="b nolamp clear" id="clearEdits">DESFAZER EDIÇÃO</button></div>
   <div class="pattern-wrap"><canvas id="pat"></canvas></div>
 </section>
+</div>
+
+
 
 <div class="foot">Versão para celular e navegador do plugin VST3/AU · mesmos grooves, mesma semente ·
   <a href="../">baixar o plugin para a DAW</a></div>
@@ -518,7 +538,7 @@ function refresh() {
   sel('style', st.style); sel('backbeat', st.backbeat); sel('drummer', st.drummer); sel('hat', st.hatPattern);
   sel('swing', st.swing); sel('dyn', st.dynamics); sel('kit', st.kit);
   for (const id of ['fill', 'intro', 'swingAll', 'colorMidi']) $(id).classList.toggle('on', st[id]);
-  $('marq').textContent = MARQUEE[st.style] + '   ' + MARQUEE[st.style];
+  $('marq').textContent = (MARQUEE[st.style] + '   ').repeat(2);
   $('drumDisp').textContent = DRUMMERS[st.drummer];
   $('hatDisp').textContent = HATS[st.hatPattern]; $('dynDisp').textContent = DYNS[st.dynamics];
   $('barsVal').textContent = st.bars + (st.bars === 1 ? ' COMPASSO' : ' COMPASSOS');
