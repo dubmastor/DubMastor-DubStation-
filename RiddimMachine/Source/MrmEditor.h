@@ -110,21 +110,6 @@ private:
     juce::Image background;
     std::vector<std::pair<juce::Rectangle<int>, std::unique_ptr<Cover>>> covers;
 };
-// Tecla de MUTE de uma máquina na CONTROL ROOM: tampa colorida acesa enquanto a máquina soa,
-// apagada com a lâmpada MUTE vermelha quando está mutada
-class MuteKey : public juce::Component
-{
-public:
-    MuteKey (juce::RangedAudioParameter&, juce::String title, juce::String sub, juce::Colour);
-    void paint (juce::Graphics&) override;
-    void mouseDown (const juce::MouseEvent&) override;
-private:
-    juce::ParameterAttachment att;
-    juce::String title, sub;
-    juce::Colour colour;
-    bool muted = false;
-};
-
 // Aba CONTROL ROOM: o Mastor Big Knob inteiro (filtro, tape echo, sirene, maximizer) no master,
 // o mute de cada máquina (DRUMS, BASS, RIDDIM) e as chaves CONTROL ROOM e TAPE ECHO
 class ControlRoomPage : public juce::Component

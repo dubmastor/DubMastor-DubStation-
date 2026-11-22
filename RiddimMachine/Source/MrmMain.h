@@ -31,6 +31,7 @@ class MusicianKeys : public juce::Component
 {
 public:
     MusicianKeys (juce::RangedAudioParameter&, juce::StringArray names, int columns);
+    std::function<void (int)> onSelect;   // chamado quando o usuário clica numa tecla
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override;
     void mouseMove (const juce::MouseEvent&) override { repaint(); }
@@ -42,6 +43,39 @@ private:
     juce::ParameterAttachment att;
     juce::StringArray names;
     int cols = 3, selected = 0;
+};
+
+// Tecla de MUTE de uma máquina na CONTROL ROOM: tampa colorida acesa enquanto a máquina soa,
+// apagada com a lâmpada MUTE vermelha quando está mutada
+class MuteKey : public juce::Component
+{
+public:
+    MuteKey (juce::RangedAudioParameter&, juce::String title, juce::String sub, juce::Colour);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+private:
+    juce::ParameterAttachment att;
+    juce::String title, sub;
+    juce::Colour colour;
+    bool muted = false;
+};
+
+// BIG KNOB na aba RIDDIM: o botão grande do filtro do Mastor Big Knob (arraste para cima/baixo,
+// rodinha, duplo clique volta para 0 = filtro aberto)
+class BigDial : public juce::Component
+{
+public:
+    explicit BigDial (juce::RangedAudioParameter&);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+private:
+    juce::RangedAudioParameter& param;
+    juce::ParameterAttachment att;
+    float value = 0.0f, dragStart = 0.0f;
 };
 
 // Arraste para a timeline: uma máquina só (machine >= 0) ou o riddim inteiro (machine = -1)
@@ -189,7 +223,7 @@ private:
 class MainPage : public juce::Component, private juce::Timer
 {
 public:
-    static constexpr int kW = 1280, kH = 850;
+    static constexpr int kW = 1280, kH = 1002;
     explicit MainPage (MrmProcessor&);
     ~MainPage() override;
     void paint (juce::Graphics&) override;
@@ -247,11 +281,14 @@ private:
     DragZone riddimDrag;
     juce::TextButton exportBtn { "EXPORTAR" };
     std::unique_ptr<PowerSwitch> fxPower, echoPower;
+    std::unique_ptr<MusicianKeys> drumStyle, filterMode;   // estilo de reggae da bateria; HIGH/LOW PASS do Big Knob
+    std::unique_ptr<BigDial> bigKnob;
+    std::unique_ptr<MuteKey> muteDrums, muteBass, muteRiddim;
     GrilleSpeaker speaker;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
-    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea;
+    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPage)
 };

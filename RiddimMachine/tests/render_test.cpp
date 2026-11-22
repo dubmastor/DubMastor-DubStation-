@@ -109,8 +109,9 @@ int main (int argc, char** argv)
         auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
         bool ok = (int) get (c, "root0") == 9 && (int) get (c, "qual0") == dub::Min && (int) get (c, "root1") == 2 && (int) get (c, "qual1") == dub::Min
                && get (c, "on1") > 0.5f && get (c, "on2") < 0.5f && get (c, "on3") < 0.5f
-               && (int) get (b, "root0") == 9 && (int) get (b, "root1") == 2 && get (b, "on2") < 0.5f;
-        std::printf ("inicial: %s (Am %s, Dm %s)\n", ok ? "ok" : "FALHOU",
+               && (int) get (b, "root0") == 9 && (int) get (b, "root1") == 2 && get (b, "on2") < 0.5f
+               && get (proc.getKnob().apvts, "echoOn") < 0.5f;   // TAPE ECHO começa desligado
+        std::printf ("inicial: %s (Am %s, Dm %s, tape echo desligado)\n", ok ? "ok" : "FALHOU",
                      proc.getChords().apvts.getParameter ("dur0")->getCurrentValueAsText().toRawUTF8(),
                      proc.getChords().apvts.getParameter ("dur1")->getCurrentValueAsText().toRawUTF8());
         return ok ? 0 : 1;

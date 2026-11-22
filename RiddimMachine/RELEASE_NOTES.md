@@ -11,6 +11,9 @@ Nova geração do MRM-0420: as máquinas da DubStation num instrumento só.
 - **ALAVANCA do JACKPOT**: riddim 100% aleatório (harmonia, durações, estilo e baterista, hi-hat, baixista e semente), tudo já na tela, é só dar PLAY
 - **PRESETS de harmonia**: 39 progressões clássicas do reggae em pastas (ROOTS, ROCKERS, RUB A DUB, LOVERS ROCK, DANCEHALL DIGITAL, NEW ROOTS 2000), o mesmo banco do MRCM-1240 1.7
 - Harmonia com o skank sempre no **contratempo** (os outros padrões saíram, como no MRCM-1240 1.7)
+- **Uma máquina por aba, completa**; a aba RIDDIM resume tudo e ganhou a seção **BIG KNOB · CONTROL ROOM** (botão grande do filtro HIGH/LOW PASS, CONTROL ROOM, TAPE ECHO e mute de cada máquina)
+- **ESTILO DE REGGAE** na bateria da aba RIDDIM: ROCKERS, ONE DROP e BOOM BAP (com o bumbo e a caixa de cada estilo)
+- **TAPE ECHO começa desligado** no preset inicial
 - Configuração inicial: Lá menor e Ré menor, meio compasso cada
 - Alto-falante antigo com grade de metal na aba RIDDIM
 - Versão para celular: https://dubmastor.github.io/DubMastor-DubStation-/riddim/

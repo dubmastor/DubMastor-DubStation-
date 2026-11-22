@@ -24,10 +24,11 @@ A **harmonia é uma só** para o MRCM-1240 e o MRBM-69 (mexer nos acordes em qua
 |---|---|
 | **HARMONIA** | Os 4 acordes no padrão do MRCM-1240: teclado, MAIOR/MENOR, inversão (com a sugestão automática) e duração. Valem para o skank e para o baixo. Ao abrir: **Lá menor e Ré menor, meio compasso cada** |
 | **PRESETS ▾** | O banco de harmonias clássicas do MRCM-1240 (39 progressões em pastas ROOTS, ROCKERS, RUB A DUB, LOVERS ROCK, DANCEHALL DIGITAL e NEW ROOTS 2000, dos anos 70 aos 2000). Vale para o skank e para o baixo |
-| **MÁQUINAS** | Cada máquina com a chave **LIGADA/DESLIGADA**, os músicos clicáveis (bateristas e baixistas; o skank é sempre no contratempo), o **MIDI na tela, editável**, e o **ARRASTE** só daquela máquina |
+| **MÁQUINAS** | Cada máquina com a chave **LIGADA/DESLIGADA**, os músicos clicáveis (na bateria, o **ESTILO DE REGGAE** ROCKERS / ONE DROP / BOOM BAP, que carrega o bumbo e a caixa do estilo, e o baterista; os baixistas; o skank é sempre no contratempo), o **MIDI na tela, editável**, e o **ARRASTE** só daquela máquina |
 | **JACKPOT** | A semente nos rolos de caça-níquel e o botão vermelho **NOVO RIDDIM**: sorteia outra semente para a bateria e o baixo (os rolos giram e param um a um, como no MRDM-12). Arraste os rolos ou use a rodinha para escolher a semente na mão |
-| **ALAVANCA** | Alavanca de caça-níquel com bola vermelha: puxe (ou clique) e ela desce e volta com mola. Sorteia **o riddim inteiro**: a harmonia (um preset clássico ou uma progressão nova, maior ou menor, de 2 a 4 acordes), a duração de cada acorde, o estilo da bateria (com bumbo e caixa do estilo), o baterista, o hi-hat, o baixista e a semente. Tudo aparece na tela na hora (o estilo e o hi-hat no visor da bateria): é só apertar **PLAY RIDDIM** |
-| **RIDDIM** | Tamanho (4 a 64 compassos), **ARRASTE O RIDDIM** (as máquinas ligadas num `.mid` só, alinhadas), **EXPORTAR**, a chave **CONTROL ROOM** e a chave **TAPE ECHO** |
+| **ALAVANCA** | Alavanca de caça-níquel com bola vermelha: puxe (ou clique) e ela desce e volta com mola. Sorteia **o riddim inteiro**: a harmonia (um preset clássico ou uma progressão nova, maior ou menor, de 2 a 4 acordes), a duração de cada acorde, o estilo da bateria (com bumbo e caixa do estilo), o baterista, o hi-hat, o baixista e a semente. Tudo aparece na tela na hora (o estilo nas teclas ESTILO DE REGGAE, o hi-hat no visor da bateria): é só apertar **PLAY RIDDIM** |
+| **BIG KNOB · CONTROL ROOM** | O essencial do Mastor Big Knob no master: o **botão grande do filtro** (arraste, rodinha; duplo clique abre) com **HIGH PASS / LOW PASS**, as chaves **CONTROL ROOM** e **TAPE ECHO** (começa **desligado**) e o **MUTE** de cada máquina (DRUMS verde, BASS amarelo, RIDDIM vermelho). O Big Knob completo fica na aba CONTROL ROOM |
+| **RIDDIM** | Tamanho (4 a 64 compassos), **ARRASTE O RIDDIM** (as máquinas ligadas num `.mid` só, alinhadas) e **EXPORTAR** |
 | Alto-falante | Caixa de madeira com grade de metal perfurada; o cone mexe com o som |
 
 ### MIDI editável na tela
@@ -45,9 +46,10 @@ A **harmonia é uma só** para o MRCM-1240 e o MRBM-69 (mexer nos acordes em qua
 | **BPM** | Um BPM para todas. Com a DAW tocando, mostra o BPM da DAW |
 
 ## Abas das máquinas
-Cada aba mostra o painel completo da máquina, igual ao plugin separado (com o mesmo código: o que muda nas
-máquinas entra no MRM-0420 no próximo build). Na aba BAIXO, o acompanhamento interno do MRBM-69 fica desligado:
-no MRM-0420 a bateria e o teclado tocam de verdade.
+Uma máquina por aba, cada uma com o painel **completo**, igual ao plugin separado (com o mesmo código: o que muda nas
+máquinas entra no MRM-0420 no próximo build). Só a primeira aba (RIDDIM) é diferente: ela junta o principal de cada
+máquina e do Big Knob. Na aba BAIXO até o acompanhamento interno do MRBM-69 (bateria e teclado) está à mão; ele
+começa desligado, porque no MRM-0420 a bateria e o teclado já tocam de verdade.
 
 ## Aba CONTROL ROOM
 ![MRM-0420, aba CONTROL ROOM](docs/interface-control-room.png)
@@ -66,7 +68,7 @@ no MRM-0420 a bateria e o teclado tocam de verdade.
 ## No celular
 A [versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/) tem a aba RIDDIM: harmonia,
 PRESETS, máquinas com músicos e MIDI editável (toque para pôr/tirar), JACKPOT com a ALAVANCA (e o painel do que foi sorteado), tamanho, mute DRUMS / BASS / RIDDIM,
-CONTROL ROOM e TAPE ECHO, e baixa o MIDI de cada máquina ou do riddim inteiro. A bateria usa os mesmos samples DM.
+BIG KNOB (filtro HIGH/LOW PASS), CONTROL ROOM e TAPE ECHO, estilo de reggae na bateria, e baixa o MIDI de cada máquina ou do riddim inteiro. A bateria usa os mesmos samples DM.
 
 ## Para desenvolvedores
 - `Source/MrmProcessor.*`: roda as quatro máquinas no mesmo relógio, atrasa harmonia e baixo pela intro (dividindo o bloco na amostra exata), liga harmonia/BPM entre as máquinas, aplica chaves e mutes, passa a mistura pelo Big Knob, salva o estado e escreve o MIDI.

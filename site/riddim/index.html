@@ -103,6 +103,11 @@ canvas.lane{width:100%;height:118px;border-radius:5px;background:#120d08;box-sha
 .luck b{color:#ffe3a0}
 .luck.flash{animation:flash .9s ease-out}
 @keyframes flash{0%{box-shadow:0 0 0 3px #0c0907,0 0 26px var(--amber)}100%{box-shadow:0 0 0 3px #0c0907}}
+.knobrow{display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px;align-items:center}
+.bigknob{text-align:center}
+.dial{width:110px;height:110px;margin:0 auto;border-radius:50%;position:relative;background:radial-gradient(circle at 35% 30%,#f4f2ec,#b9b5ac 45%,#5e5a52 75%);box-shadow:0 0 0 12px #1a1612,0 5px 8px 12px rgba(0,0,0,.35)}
+.dial i{position:absolute;left:50%;top:50%;width:5px;height:44px;margin-left:-2.5px;border-radius:3px;background:var(--m-riddim);transform-origin:50% 0;transform:rotate(var(--a,45deg))}
+.bigknob input{width:120px;margin-top:16px;accent-color:var(--amber)}
 .mutes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .mute{appearance:none;border:0;border-radius:6px;padding:14px 4px 10px;font-weight:900;letter-spacing:.14em;font-size:15px;cursor:pointer;color:#1a1208;box-shadow:0 0 14px var(--c),inset 0 1px 0 rgba(255,255,255,.4);background:linear-gradient(180deg,var(--c),color-mix(in srgb,var(--c) 55%,#000))}
 .mute small{display:block;font-size:8px;letter-spacing:.2em;margin-top:4px;opacity:.8}
@@ -144,6 +149,24 @@ footer a{color:var(--ink)}
   <div class="lbl" style="margin-top:2px">TOQUE NO VISOR PARA PÔR OU TIRAR NOTA · O MIDI QUE VOCÊ VÊ É O QUE BAIXA</div>
 </section>
 
+<section class="mod"><div class="tag">BIG KNOB · CONTROL ROOM · MASTER</div>
+  <div class="knobrow">
+    <div class="bigknob"><div class="dial" id="dial"><i></i></div><input type="range" id="knob" min="0" max="100" value="0" aria-label="Big Knob"><div class="lbl" style="margin:4px 0 0" id="knobVal">FILTRO ABERTO</div></div>
+    <div>
+      <div class="lbl" style="margin-top:0">FILTRO</div>
+      <div class="btns c2" id="fmode"><button class="b" data-m="1">HIGH PASS</button><button class="b" data-m="0">LOW PASS</button></div>
+      <div class="row" style="margin-top:10px"><button class="power" id="fxOn" style="flex:1"><i></i><span>CONTROL ROOM</span><em></em></button>
+        <button class="power" id="echoOn" style="flex:1"><i></i><span>TAPE ECHO</span><em></em></button></div>
+    </div>
+  </div>
+  <div class="lbl">MUTE DAS MÁQUINAS</div>
+  <div class="mutes">
+    <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRDM-12</small></button>
+    <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRBM-69</small></button>
+    <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRCM-1240</small></button>
+  </div>
+</section>
+
 <div class="grid3">
   <section class="mod"><div class="tag">JACKPOT · SEMENTE · ALAVANCA</div>
     <div class="jack">
@@ -156,14 +179,6 @@ footer a{color:var(--ink)}
   <section class="mod"><div class="tag">RIDDIM</div>
     <div class="dur"><button id="lenDown">◀</button><span id="len">16<small>COMPASSOS</small></span><button id="lenUp">▶</button></div>
     <div class="row" style="margin-top:10px"><button class="drag" id="dlRiddim" style="flex:1">⬇ BAIXAR O RIDDIM<small>BATERIA + HARMONIA + BAIXO, ALINHADOS</small></button></div>
-    <div class="lbl">CONTROL ROOM · MUTE</div>
-    <div class="mutes">
-      <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRDM-12</small></button>
-      <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRBM-69</small></button>
-      <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRCM-1240</small></button>
-    </div>
-    <div class="row" style="margin-top:8px"><button class="power" id="fxOn" style="flex:1"><i></i><span>CONTROL ROOM</span><em></em></button>
-      <button class="power" id="echoOn" style="flex:1"><i></i><span>TAPE ECHO</span><em></em></button></div>
   </section>
   <div class="speaker"><div class="grille"><div class="cone" id="cone"></div><div class="mesh"></div></div><div class="badge">DUBSTATION</div></div>
 </div>
@@ -190,7 +205,7 @@ const DEFAULTS = {
   slots: [{ root: 9, quality: 1, dur: 0, inv: -1, on: true }, { root: 2, quality: 1, dur: 0, inv: -1, on: true },
           { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false }],
   bpm: 75, seed: 420, bars: 2, drummer: 0, pattern: 0, bassist: 0, style: 0, hat: 1,
-  on: [true, true, true], mute: [false, false, false], fxOn: true, echoOn: true,
+  on: [true, true, true], mute: [false, false, false], fxOn: true, echoOn: false, knob: 0, hp: true,
 };
 function load() { try { const s = JSON.parse(localStorage.getItem('mrm0420') || 'null'); if (s && s.slots) return Object.assign(structuredClone(DEFAULTS), s); } catch (e) {} return structuredClone(DEFAULTS); }
 const st = load(); st.slots[0].on = true; st.pattern = 0;   // skank sempre no contratempo
@@ -218,6 +233,7 @@ function rebuild(which = [0, 1, 2]) {
 
 // ---------------------------------------------------------------- som: samples DM na bateria, piano M1 + órgão, baixo do MRDBI-07, CONTROL ROOM
 const audio = (() => {
+  let filt = null;
   let ctx = null, buses = [], master, dry, echoSend, fxIn, analyser, buffers = {}, wave = {};
   let playing = false, anchorTime = 0, anchorBeat = 0, scheduled = 0, timer = 0, lastBass = null;
   const hz = (n) => 440 * Math.pow(2, (n - 69) / 12);
@@ -231,13 +247,14 @@ const audio = (() => {
     const safety = ctx.createDynamicsCompressor(); safety.threshold.value = -2; safety.ratio.value = 12;
     analyser = ctx.createAnalyser(); analyser.fftSize = 512;
     fxIn = g(1); dry = g(1);
-    master.connect(fxIn);
+    filt = ctx.createBiquadFilter(); filt.Q.value = 1.2;   // BIG KNOB: filtro HP/LP no master
+    master.connect(filt).connect(fxIn);
     fxIn.connect(maxi).connect(safety);
     safety.connect(ctx.destination); safety.connect(analyser);
     echoSend = g(0.32);
     const delay = ctx.createDelay(2); delay.delayTime.value = 0.75 * 60 / st.bpm;
     const fb = g(0.42), tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 2400;
-    master.connect(echoSend).connect(delay).connect(tone).connect(fb).connect(delay);
+    filt.connect(echoSend).connect(delay).connect(tone).connect(fb).connect(delay);
     tone.connect(fxIn);
     audio.delay = delay;
     for (let m = 0; m < 3; m++) { const b = g(1); b.connect(master); buses.push(b); }
@@ -272,6 +289,9 @@ const audio = (() => {
     for (let m = 0; m < 3; m++) buses[m].gain.setTargetAtTime(st.on[m] && !st.mute[m] ? 1 : 0, t, 0.01);
     echoSend.gain.setTargetAtTime(st.fxOn && st.echoOn ? 0.32 : 0, t, 0.02);
     audio.delay.delayTime.setTargetAtTime(0.75 * 60 / st.bpm, t, 0.05);
+    const k = st.fxOn ? st.knob / 100 : 0;
+    filt.type = st.hp ? 'highpass' : 'lowpass';
+    filt.frequency.setTargetAtTime(st.hp ? 20 * Math.pow(400, k) : 20000 * Math.pow(1 / 130, k), t, 0.03);
   }
   function drum(t, note, vel) {
     const sm = buffers[note === gm.PedalHat ? gm.ClosedHat : note], v = Math.pow(vel / 127, 1.6);
@@ -370,7 +390,7 @@ function drawChords() {
 
 // ---------------------------------------------------------------- máquinas: liga/desliga, músicos, MIDI editável, baixar
 const MACHINES = [
-  { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3',
+  { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3', extra: { who: 'ESTILO DE REGGAE', key: 'style', names: ['ROCKERS', 'ONE DROP', 'BOOM BAP'] },
     names: ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL'] },
   { id: CHORDS, name: 'HARMONIA', model: 'MRCM-1240', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
     names: ['CONTRATEMPO'] },
@@ -384,11 +404,12 @@ function buildMachines() {
     el.innerHTML = `<div><div class="mname">${m.name}<small>${m.model}</small></div>
         <button class="power" data-k="power"><i></i><span>LIGADA</span><em></em></button>
         <button class="b nolamp undo" data-k="undo">DESFAZER EDIÇÃO</button></div>
-      <div><div class="lbl" style="margin-top:0">${m.who}</div><div class="btns ${m.cols}" data-k="who">${m.names.map((n, i) => `<button class="b" data-w="${i}">${n}</button>`).join('')}</div></div>
+      <div>${m.extra ? `<div class="lbl" style="margin-top:0">${m.extra.who}</div><div class="btns c3" data-k="extra" style="margin-bottom:8px">${m.extra.names.map((n, i) => `<button class="b" data-x="${i}">${n}</button>`).join('')}</div>` : ''}<div class="lbl" style="margin-top:0">${m.who}</div><div class="btns ${m.cols}" data-k="who">${m.names.map((n, i) => `<button class="b" data-w="${i}">${n}</button>`).join('')}</div></div>
       <canvas class="lane" data-k="lane"></canvas>
       <button class="drag" data-k="dl">⬇ BAIXAR ${m.name}<small>SÓ ESTA MÁQUINA</small></button>`;
     el.querySelector('[data-k=power]').onclick = () => { st.on[m.id] = !st.on[m.id]; save(); audio.applyMix(); drawAll(); };
     el.querySelector('[data-k=undo]').onclick = () => rebuild([m.id]);
+    if (m.extra) el.querySelector('[data-k=extra]').onclick = (ev) => { const b = ev.target.closest('[data-x]'); if (!b) return; st[m.extra.key] = +b.dataset.x; save(); rebuild([m.id]); };
     el.querySelector('[data-k=who]').onclick = (ev) => { const b = ev.target.closest('[data-w]'); if (!b) return; st[m.key] = +b.dataset.w; save(); rebuild([m.id]); };
     el.querySelector('[data-k=dl]').onclick = () => download(midiFile([m.id], 1, false), `MRM-0420 ${m.name} ${chordText()}.mid`);
     const cv = el.querySelector('[data-k=lane]');
@@ -481,10 +502,14 @@ function drawAll() {
     const p = m.el.querySelector('[data-k=power]'); p.classList.toggle('on', st.on[m.id]); p.querySelector('span').textContent = st.on[m.id] ? 'LIGADA' : 'DESLIGADA';
     m.el.querySelector('[data-k=undo]').classList.toggle('show', edited[m.id]);
     m.el.querySelectorAll('[data-w]').forEach((b) => b.classList.toggle('on', +b.dataset.w === st[m.key]));
+    if (m.extra) m.el.querySelectorAll('[data-x]').forEach((b) => b.classList.toggle('on', +b.dataset.x === st[m.extra.key]));
     drawLane(m);
   });
   [0, 1, 2].forEach((i) => $('mute' + i).classList.toggle('muted', st.mute[i]));
   $('fxOn').classList.toggle('on', st.fxOn); $('echoOn').classList.toggle('on', st.echoOn);
+  $('knob').value = st.knob; $('dial').style.setProperty('--a', `${45 + st.knob * 2.7}deg`);
+  $('knobVal').textContent = st.knob ? `${st.hp ? 'HIGH' : 'LOW'} PASS ${st.knob}%` : 'FILTRO ABERTO';
+  $('fmode').querySelectorAll('[data-m]').forEach((b) => b.classList.toggle('on', (b.dataset.m === '1') === st.hp));
   $('len').innerHTML = `${LENGTHS[st.bars]}<small>COMPASSOS</small>`;
   $('bpm').textContent = st.bpm;
   const d = String(st.seed).padStart(3, '0'); [...$('reels').children].forEach((r, i) => { if (!spinning) r.textContent = d[i]; });
@@ -595,6 +620,8 @@ $('lenDown').onclick = () => { st.bars = Math.max(0, st.bars - 1); save(); drawA
 $('lenUp').onclick = () => { st.bars = Math.min(LENGTHS.length - 1, st.bars + 1); save(); drawAll(); };
 $('dlRiddim').onclick = () => download(midiFile([DRUMS, CHORDS, BASS], 1, true), `MRM-0420 Riddim ${chordText()} ${st.bpm}bpm.mid`);
 [0, 1, 2].forEach((i) => { $('mute' + i).onclick = () => { st.mute[i] = !st.mute[i]; save(); audio.applyMix(); drawAll(); }; });
+$('knob').oninput = () => { st.knob = +$('knob').value; save(); audio.applyMix(); drawAll(); };
+$('fmode').onclick = (ev) => { const b = ev.target.closest('[data-m]'); if (!b) return; st.hp = b.dataset.m === '1'; save(); audio.applyMix(); drawAll(); };
 $('fxOn').onclick = () => { st.fxOn = !st.fxOn; save(); audio.applyMix(); drawAll(); };
 $('echoOn').onclick = () => { st.echoOn = !st.echoOn; save(); audio.applyMix(); drawAll(); };
 

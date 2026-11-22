@@ -90,7 +90,11 @@ int MusicianKeys::keyAt (juce::Point<float> p) const
 void MusicianKeys::mouseDown (const juce::MouseEvent& e)
 {
     const int k = keyAt (e.position);
-    if (k >= 0) att.setValueAsCompleteGesture ((float) k);
+    if (k >= 0)
+    {
+        att.setValueAsCompleteGesture ((float) k);
+        if (onSelect) onSelect (k);
+    }
 }
 
 void MusicianKeys::paint (juce::Graphics& g)
@@ -118,6 +122,75 @@ void MusicianKeys::paint (juce::Graphics& g)
         g.drawFittedText (names[i], cap.withTrimmedLeft (16.0f).withTrimmedRight (3.0f).toNearestInt(),
                           juce::Justification::centred, 2, 0.75f);
     }
+}
+
+//==============================================================================
+// BigDial
+BigDial::BigDial (juce::RangedAudioParameter& p)
+    : param (p), att (p, [this] (float v) { value = param.convertTo0to1 (v); repaint(); }, nullptr)
+{
+    att.sendInitialUpdate();
+    setMouseCursor (juce::MouseCursor::UpDownResizeCursor);
+}
+
+void BigDial::mouseDown (const juce::MouseEvent&) { dragStart = value; att.beginGesture(); }
+void BigDial::mouseUp (const juce::MouseEvent&)   { att.endGesture(); }
+void BigDial::mouseDrag (const juce::MouseEvent& e)
+{
+    const float v = juce::jlimit (0.0f, 1.0f, dragStart - (float) e.getDistanceFromDragStartY() / 220.0f);
+    att.setValueAsPartOfGesture (param.convertFrom0to1 (v));
+}
+void BigDial::mouseDoubleClick (const juce::MouseEvent&) { att.setValueAsCompleteGesture (param.convertFrom0to1 (0.0f)); }
+void BigDial::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
+{
+    att.setValueAsCompleteGesture (param.convertFrom0to1 (juce::jlimit (0.0f, 1.0f, value + w.deltaY * 0.15f)));
+}
+
+void BigDial::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat();
+    const float size = juce::jmin (r.getWidth(), r.getHeight());
+    auto c = r.withSizeKeepingCentre (size, size);
+    const float a0 = juce::MathConstants<float>::pi * 1.25f, a1 = juce::MathConstants<float>::pi * 2.75f;
+    const float ang = a0 + (a1 - a0) * value;
+    const auto ctr = c.getCentre();
+    const float rOut = size * 0.5f - 3.0f;
+
+    // escala: traços e o arco âmbar até o valor
+    for (int i = 0; i <= 10; ++i)
+    {
+        const float a = a0 + (a1 - a0) * (float) i / 10.0f;
+        const float r1 = rOut, r2 = rOut - (i % 5 == 0 ? 8.0f : 5.0f);
+        g.setColour (col::ink.withAlpha (0.7f));
+        g.drawLine (ctr.x + std::sin (a) * r1, ctr.y - std::cos (a) * r1, ctr.x + std::sin (a) * r2, ctr.y - std::cos (a) * r2, i % 5 == 0 ? 1.8f : 1.1f);
+    }
+    juce::Path arc;
+    arc.addCentredArc (ctr.x, ctr.y, rOut - 12.0f, rOut - 12.0f, 0.0f, a0, ang, true);
+    if (value > 0.001f)
+    {
+        g.setColour (col::amber.withAlpha (0.9f));
+        g.strokePath (arc, juce::PathStrokeType (4.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+    }
+
+    // botão grande cromado com saia preta
+    const float kr = rOut - 18.0f;
+    auto knob = juce::Rectangle<float> (kr * 2.0f, kr * 2.0f).withCentre (ctr);
+    g.setColour (juce::Colours::black.withAlpha (0.45f));
+    g.fillEllipse (knob.translated (2.0f, 4.0f));
+    juce::ColourGradient skirt (juce::Colour (0xff3a3632), knob.getX(), knob.getY(), juce::Colour (0xff0e0c0a), knob.getX(), knob.getBottom(), false);
+    g.setGradientFill (skirt);
+    g.fillEllipse (knob);
+    auto cap = knob.reduced (kr * 0.2f);
+    juce::ColourGradient chrome (juce::Colour (0xfff4f2ec), cap.getX(), cap.getY(), juce::Colour (0xff5e5a52), cap.getRight(), cap.getBottom(), false);
+    chrome.addColour (0.5, juce::Colour (0xffb9b5ac));
+    g.setGradientFill (chrome);
+    g.fillEllipse (cap);
+    g.setColour (juce::Colours::black.withAlpha (0.4f));
+    g.drawEllipse (cap, 1.0f);
+    // ponteiro
+    const float p1 = kr * 0.25f, p2 = kr * 0.92f;
+    g.setColour (col::jamRed);
+    g.drawLine (ctr.x + std::sin (ang) * p1, ctr.y - std::cos (ang) * p1, ctr.x + std::sin (ang) * p2, ctr.y - std::cos (ang) * p2, 4.0f);
 }
 
 //==============================================================================
@@ -321,7 +394,8 @@ void DrumLane::paint (juce::Graphics& g)
         const int hat = juce::jlimit (0, 3, juce::roundToInt (d.getRawParameterValue ("hatPattern")->load()));
         g.setColour (col::amber.withAlpha (0.85f));
         g.setFont (stencil (8.0f, 0.15f));
-        g.drawText (juce::String (dubdrums::styleName (style)).toUpperCase() + u8 ("  \xc2\xb7  ") + hats[hat],
+        juce::ignoreUnused (style);   // o estilo fica nas teclas ESTILO DE REGGAE
+        g.drawText (hats[hat],
                     getLocalBounds().toFloat().reduced (8.0f, 3.0f).withHeight (10.0f), juce::Justification::centredRight);
     }
     if (total <= 0.0) return;
@@ -847,6 +921,10 @@ MainPage::MainPage (MrmProcessor& p)
     rows[MrmProcessor::Drums].musicians  = std::make_unique<MusicianKeys> (*d.apvts.getParameter ("drummer"),
         juce::StringArray { "STYLE SCOTT", "SANTA DAVIS", "CARLTON BARRETT", "SLY DUNBAR", "DIGIKAL" }, 3);
     // harmonia: o skank é sempre no contratempo (sem seletor; a janela fixa é desenhada no paint)
+    // bateria: o estilo de reggae (com o bumbo e a caixa dele, como no MRDM-12)
+    drumStyle = std::make_unique<MusicianKeys> (*d.apvts.getParameter ("style"), juce::StringArray { "ROCKERS", "ONE DROP", "BOOM BAP" }, 3);
+    drumStyle->onSelect = [this] (int st) { proc.getDrums().applyStyleDefaults (st); };
+    addAndMakeVisible (*drumStyle);
     {
         juce::StringArray bassists;
         for (int s = 0; s < mbm::NumStyles; ++s) bassists.add (mbm::styleName (s));
@@ -892,6 +970,16 @@ MainPage::MainPage (MrmProcessor& p)
     addAndMakeVisible (riddimDrag);
     exportBtn.onClick = [this] { exportRiddim(); };
     addAndMakeVisible (exportBtn);
+    // --- BIG KNOB · CONTROL ROOM
+    auto& k = proc.getKnob().apvts;
+    bigKnob = std::make_unique<BigDial> (*k.getParameter ("knob"));
+    addAndMakeVisible (*bigKnob);
+    filterMode = std::make_unique<MusicianKeys> (*k.getParameter ("mode"), juce::StringArray { "HIGH PASS", "LOW PASS" }, 2);
+    addAndMakeVisible (*filterMode);
+    muteDrums  = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Drums)),  "DRUMS",  "MRDM-12",   juce::Colour (0xff2fbf55));
+    muteBass   = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Bass)),   "BASS",   "MRBM-69",   col::jamGold);
+    muteRiddim = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Chords)), "RIDDIM", "MRCM-1240", juce::Colour (0xffe8432c));
+    for (auto* m : { muteDrums.get(), muteBass.get(), muteRiddim.get() }) addAndMakeVisible (*m);
     fxPower = std::make_unique<PowerSwitch> (*proc.apvts.getParameter ("fxOn"), "CONTROL ROOM", "CONTROL ROOM");
     echoPower = std::make_unique<PowerSwitch> (*proc.getKnob().apvts.getParameter ("echoOn"), "TAPE ECHO", "TAPE ECHO");
     addAndMakeVisible (*fxPower);
@@ -986,9 +1074,10 @@ void MainPage::resized()
 
     harmonySection = { 52, 22, 1176, 272 };
     machineSection = { 52, 316, 1176, 330 };
-    jackpotSection = { 52, 668, 520, 162 };
-    riddimSection  = { 592, 668, 386, 162 };
-    speakerArea    = { 992, 656, 236, 186 };
+    knobSection    = { 52, 668, 1176, 130 };
+    jackpotSection = { 52, 820, 520, 162 };
+    riddimSection  = { 592, 820, 386, 162 };
+    speakerArea    = { 992, 808, 236, 186 };
 
     // harmonia: 4 acordes
     const int sw = (1176 - 24 - 36) / 4;
@@ -1014,23 +1103,33 @@ void MainPage::resized()
         row.plateArea = { 64, y, 160, 96 };
         row.power->setBounds (70, y + 42, 148, 28);
         row.undo.setBounds (70, y + 74, 148, 18);
-        if (row.musicians) row.musicians->setBounds (234, y + 16, 290, 78);
+        if (row.musicians)
+            row.musicians->setBounds (m == MrmProcessor::Drums ? juce::Rectangle<int> (234, y + 46, 290, 48) : juce::Rectangle<int> (234, y + 16, 290, 78));
         row.lane->setBounds (534, y, 550, 96);
         row.drag->setBounds (1094, y + 4, 122, 88);
     }
 
+    drumStyle->setBounds (234, 330 + 14, 290, 26);
+
+    // big knob · control room
+    bigKnob->setBounds (70, 684, 112, 108);
+    filterMode->setBounds (196, 706, 220, 34);
+    fxPower->setBounds (436, 692, 186, 40);
+    echoPower->setBounds (436, 742, 186, 40);
+    muteDrums->setBounds (644, 688, 184, 98);
+    muteBass->setBounds (838, 688, 184, 98);
+    muteRiddim->setBounds (1032, 688, 184, 98);
+
     // jackpot
-    reels.setBounds (64, 688, 156, 126);
-    jackpot.setBounds (226, 682, 196, 138);
-    lever.setBounds (432, 664, 96, 158);
+    reels.setBounds (64, 688 + 152, 156, 126);
+    jackpot.setBounds (226, 682 + 152, 196, 138);
+    lever.setBounds (432, 664 + 152, 96, 158);
     presets.setBounds (1074, 8, 154, 28);
 
     // riddim
-    length->setBounds (606, 686, 170, 40);
-    exportBtn.setBounds (786, 686, 178, 40);
-    riddimDrag.setBounds (606, 734, 170, 84);
-    fxPower->setBounds (786, 734, 178, 38);
-    echoPower->setBounds (786, 780, 178, 38);
+    length->setBounds (606, 838, 170, 40);
+    exportBtn.setBounds (786, 838, 178, 40);
+    riddimDrag.setBounds (606, 886, 358, 84);
 
     speaker.setBounds (speakerArea);
     renderBackground();
@@ -1082,7 +1181,7 @@ void MainPage::renderBackground()
     section (g, jackpotSection, u8 ("JACKPOT  \xc2\xb7  SEMENTE  \xc2\xb7  ALAVANCA"));
     {
         // placa da alavanca: o que ela sorteia
-        auto plate = juce::Rectangle<float> (526.0f, 688.0f, 40.0f, 126.0f);
+        auto plate = juce::Rectangle<float> (526.0f, 840.0f, 40.0f, 126.0f);
         g.setColour (juce::Colour (0xff1c1915));
         g.fillRoundedRectangle (plate, 5.0f);
         g.setColour (col::jamGold.withAlpha (0.8f));
@@ -1096,12 +1195,16 @@ void MainPage::renderBackground()
         }
     }
     section (g, riddimSection, "RIDDIM");
+    section (g, knobSection, u8 ("BIG KNOB  \xc2\xb7  CONTROL ROOM  \xc2\xb7  MASTER"));
+    engraved (g, "FILTRO", juce::Rectangle<float> (196.0f, 688.0f, 220.0f, 13.0f), juce::Justification::centred, 9.0f, 0.3f);
+    engraved (g, u8 ("ARRASTE O BOT\xc3\x83O  \xc2\xb7  DUPLO CLIQUE ABRE"), juce::Rectangle<float> (196.0f, 748.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
+    engraved (g, u8 ("TUDO NA ABA CONTROL ROOM"), juce::Rectangle<float> (196.0f, 764.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
 
     // plaquetas de cada máquina
     const char* names[]  = { "BATERIA", "HARMONIA", "BAIXO" };
     const juce::String models[] = { juce::String ("MRDM-12 ") + MRM_DRUMS_VER, juce::String ("MRCM-1240 ") + MRM_CHORDS_VER,
                                     juce::String ("MRBM-69 ") + MRM_BASS_VER };
-    const char* players[] = { "BATERISTA", "PADR\xc3\x83O DO SKANK", "BAIXISTA" };
+    const char* players[] = { "ESTILO DE REGGAE  \xc2\xb7  BATERISTA", "PADR\xc3\x83O DO SKANK", "BAIXISTA" };
     for (int m = 0; m < MrmProcessor::NumMachines; ++m)
     {
         const auto& row = rows[(size_t) m];
@@ -1139,6 +1242,6 @@ void MainPage::renderBackground()
     }
 
     // gravações da seção RIDDIM
-    engraved (g, "ARRASTE PARA A TIMELINE DA DAW", juce::Rectangle<float> (606.0f, 820.0f, 170.0f, 10.0f), juce::Justification::centred, 7.0f, 0.2f);
+    engraved (g, "ARRASTE PARA A TIMELINE DA DAW", juce::Rectangle<float> (606.0f, 972.0f, 358.0f, 10.0f), juce::Justification::centred, 7.0f, 0.2f);
 }
 } // namespace mrmui

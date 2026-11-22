@@ -288,8 +288,9 @@ void PanelHolder::resized()
     const float pw = (float) panel.getWidth(), ph = (float) (panel.getHeight() - cropTop);
     scale = juce::jmin ((float) getWidth() / pw, (float) getHeight() / ph);
     const float x = ((float) getWidth() - pw * scale) * 0.5f;
-    shown = { x, 0.0f, pw * scale, ph * scale };
-    const auto t = juce::AffineTransform::scale (scale).translated (x, -(float) cropTop * scale);
+    const float y = std::floor (((float) getHeight() - ph * scale) * 0.5f);   // painel centralizado na aba
+    shown = { x, y, pw * scale, ph * scale };
+    const auto t = juce::AffineTransform::scale (scale).translated (x, y - (float) cropTop * scale);
     panel.setTransform (t);
     for (auto& [area, c] : covers)
         c->setBounds (area.toFloat().transformedBy (t).getSmallestIntegerContainer());
@@ -307,8 +308,12 @@ void PanelHolder::resized()
     screw (g, 40.0f, (float) H - 12.0f, rng);
     screw (g, (float) W - 40.0f, (float) H - 12.0f, rng);
     const float free = (float) H - shown.getBottom();
-    if (free > 34.0f)
+    if (shown.getY() > 34.0f)
         engraved (g, u8 ("MASTOR RIDDIM MACHINE MRM-0420  \xc2\xb7  DUBSTATION"),
+                  juce::Rectangle<float> (28.0f, shown.getY() * 0.5f - 8.0f, (float) W - 56.0f, 16.0f),
+                  juce::Justification::centred, 11.0f, 0.4f);
+    if (free > 34.0f)
+        engraved (g, u8 ("UMA M\xc3\x81QUINA POR ABA  \xc2\xb7  A ABA RIDDIM RESUME TODAS"),
                   juce::Rectangle<float> (28.0f, shown.getBottom() + free * 0.5f - 8.0f, (float) W - 56.0f, 16.0f),
                   juce::Justification::centred, 11.0f, 0.4f);
 }
@@ -321,6 +326,11 @@ void PanelHolder::paint (juce::Graphics& g)
     // sombra do painel da máquina sobre o painel creme
     g.setColour (juce::Colours::black.withAlpha (0.25f));
     g.fillRect (shown.withY (shown.getBottom()).withHeight (4.0f));
+    if (shown.getY() > 1.0f)
+    {
+        g.setColour (juce::Colours::black.withAlpha (0.18f));
+        g.fillRect (shown.withY (shown.getY() - 3.0f).withHeight (3.0f));
+    }
 }
 //==============================================================================
 MuteKey::MuteKey (juce::RangedAudioParameter& p, juce::String t, juce::String sb, juce::Colour c)
@@ -441,10 +451,6 @@ MrmRoot::MrmRoot (MrmProcessor& p)
         addChildComponent (c);
     addAndMakeVisible (header);
 
-    // no MRM-0420 a bateria e a harmonia tocam de verdade: o acompanhamento interno do MRBM-69 fica desligado
-    bassHolder.addCover ({ 0, 912, BassMachinePanel::kW, 142 },
-                         mrmui::u8 ("NO MRM-0420 A BATERIA (MRDM-12) E O TECLADO (MRCM-1240) TOCAM DE VERDADE, NAS ABAS DELES:\n"
-                             "O ACOMPANHAMENTO INTERNO DO MRBM-69 FICA DESLIGADO"));
     setSize (baseW, baseH);
     showTab (proc.getCurrentTab());
 }

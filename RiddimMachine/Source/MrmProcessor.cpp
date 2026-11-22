@@ -80,9 +80,11 @@ MrmProcessor::MrmProcessor()
     bass.setPlayHead (&bassHead);
     knob.setPlayHead (&knobHead);
 
-    // o baixo toca junto com a bateria e a harmonia de verdade: o acompanhamento interno dele fica desligado
+    // preset inicial: o baixo toca junto com a bateria e a harmonia de verdade (o acompanhamento interno
+    // dele começa desligado, mas fica à mão na aba BAIXO) e o TAPE ECHO começa desligado
     setParam (bass.apvts, "drumsOn", 0.0f);
     setParam (bass.apvts, "keysOn", 0.0f);
+    setParam (knob.apvts, "echoOn", 0.0f);
 
     buildLinks();
     syncLinks();
@@ -364,10 +366,6 @@ void MrmProcessor::timerCallback()
         setParam (drums.apvts, "seed", (float) seed);
         setParam (bass.apvts,  "seed", (float) seed);
     }
-
-    // o baixo não usa o acompanhamento interno dele (a bateria e a harmonia já tocam de verdade)
-    setParam (bass.apvts, "drumsOn", 0.0f);
-    setParam (bass.apvts, "keysOn", 0.0f);
 
     // um relógio por vez: PREVIEW de uma máquina ligado durante o PLAY RIDDIM para o PLAY RIDDIM;
     // PLAY RIDDIM ligado ou DAW tocando desligam os PREVIEWs separados
