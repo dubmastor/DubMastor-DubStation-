@@ -4,7 +4,8 @@
 #include "DubSynth.h"
 
 class DubChordsProcessor : public juce::AudioProcessor,
-                           private juce::AudioProcessorValueTreeState::Listener
+                           private juce::AudioProcessorValueTreeState::Listener,
+                           private juce::Timer
 {
 public:
     static constexpr int numSlots = 4;
@@ -29,7 +30,7 @@ public:
     int getNumPrograms() override { return 1; }
     int getCurrentProgram() override { return 0; }
     void setCurrentProgram (int) override {}
-    const juce::String getProgramName (int) override { return {}; }
+    const juce::String getProgramName (int) override { return "MRCM-1240"; }   // nome vazio reprova no validador da Steinberg
     void changeProgramName (int, const juce::String&) override {}
 
     void getStateInformation (juce::MemoryBlock& destData) override;
@@ -51,7 +52,9 @@ public:
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
     void parameterChanged (const juce::String&, float) override { dirty.store (true); }
-    void rebuild();
+    void timerCallback() override;            // monta o loop novo fora da thread de áudio
+    void publishLoop();                       // (thread de mensagens) monta e entrega o loop
+    bool takeNewLoop();                       // (thread de áudio) pega o loop novo sem alocar
     void allNotesOff (juce::MidiBuffer& midi, int sample);
     void renderSound (juce::AudioBuffer<float>&, const juce::MidiBuffer&);
 
@@ -60,9 +63,14 @@ private:
     DubSoundEngine sound;
     std::vector<float> renderL, renderR;
 
-    std::vector<dub::NoteEvent> loop;
+    std::vector<dub::NoteEvent> loop;         // só a thread de áudio mexe
     double loopBeats = 0.0;
+    std::vector<dub::NoteEvent> incoming;     // loop novo esperando a troca (protegido por swapLock)
+    double incomingBeats = 0.0;
+    juce::SpinLock swapLock;
+    std::atomic<bool> hasIncoming { false };
     std::atomic<bool> dirty { true };
+    float pianoGain = 0.0f, organGain = 0.0f;  // últimos ganhos aplicados (rampas sem estalo)
 
     struct Pending { int sample; bool on; int channel; int note; int vel; };
     std::vector<Pending> pending;

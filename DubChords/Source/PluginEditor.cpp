@@ -880,7 +880,12 @@ void DubChordsPanel::renderBackground()
 
     // --- cabeçalho
     g.setColour (colours::ink);
-    const juce::String title ("MASTOR REGGAE CHORD MACHINE");
+    // padrão da família: versão no título (vem do CMake: project(DubChords VERSION x.y.z) -> "x.y"),
+    // e a placa de latão só com "DUB STATION"
+    juce::String ver (JucePlugin_VersionString);
+    if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
+        ver = ver.upToLastOccurrenceOf (".", false, false);
+    const juce::String title ("MASTOR REGGAE CHORD MACHINE " + ver);
     {   // nome comprido: diminui a fonte se o título + a placa de latão não couberem antes das faixas da bandeira
         float fs = 30.0f;
         const float maxW = (float) plate.getWidth() - 330.0f - 32.0f - 26.0f - 260.0f;
@@ -893,11 +898,7 @@ void DubChordsPanel::renderBackground()
 
     {   // placa de latão "DUB STATION"
         g.setFont (stencil (15.0f, 0.34f));
-        // versão vem do CMake (project(DubChords VERSION x.y.z)) -> "DUB STATION x.y"
-        juce::String ver (JucePlugin_VersionString);
-        if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
-            ver = ver.upToLastOccurrenceOf (".", false, false);
-        const juce::String t ("DUB STATION " + ver);
+        const juce::String t ("DUB STATION");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));

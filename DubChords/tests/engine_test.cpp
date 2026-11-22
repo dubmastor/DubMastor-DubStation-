@@ -80,9 +80,25 @@ int main()
         std::printf ("skank:"); for (int n : sk) std::printf (" %d", n);
         std::printf ("   bubble:"); for (int n : org) std::printf (" %d", n); std::printf ("\n");
         CHECK (sk.size() == 6, "skank deveria ter 6 notas (duas maos), tem %zu", sk.size());
-        CHECK (org.size() == 3, "bubble deveria ter 3 notas, tem %zu", org.size());
+        CHECK (org.size() == 6, "bubble deveria ter 6 notas (duas maos), tem %zu", org.size());
         if (sk.size() == 6) CHECK (sk[3] == sk[0] + 12 && sk[4] == sk[1] + 12 && sk[5] == sk[2] + 12, "mao direita deveria ser a esquerda + 12");
-        if (sk.size() == 6 && org.size() == 3) CHECK (org[0] == sk[0] - 12, "bubble deveria ficar uma oitava abaixo do skank");
+        if (sk.size() == 6 && org.size() == 6)
+        {
+            CHECK (org[3] == sk[0] && org[4] == sk[1] && org[5] == sk[2], "mao direita do bubble = mao esquerda do skank");
+            CHECK (org[0] == sk[0] - 12, "mao esquerda do bubble uma oitava abaixo da direita");
+        }
+        // ritmo do bubble no 1º tempo: "e" (mão esquerda), "&" (mão direita), "a" (mão esquerda)
+        std::vector<std::pair<double, int>> b1;
+        for (auto& e : ev) if (e.channel == ChBubble && e.start < 1.0) b1.push_back ({ e.start, e.note });
+        int le = 0, ri = 0;
+        for (auto& [t, n] : b1)
+        {
+            const bool right = std::find (sk.begin(), sk.begin() + 3, n) != sk.begin() + 3;
+            if (std::abs (t - 0.5) < 1e-9) { CHECK (right, "no & tem que ser a mao direita"); ++ri; }
+            else if (std::abs (t - 0.25) < 1e-9 || std::abs (t - 0.75) < 1e-9) { CHECK (! right, "no e/a tem que ser a mao esquerda"); ++le; }
+            else CHECK (false, "nota de bubble fora do e/&/a (t=%g)", t);
+        }
+        CHECK (ri == 3 && le == 6, "bubble do 1o tempo: esperado 3 notas da direita e 6 da esquerda (%d/%d)", ri, le);
         // meio compasso: o acorde 4 (G, 1/2 compasso) começa no tempo 16 e tem skank
         bool g = false;
         for (auto& e : ev) if (e.slot == 3 && e.channel == ChSkank && e.start >= 16.0 && e.start < 18.0) g = true;

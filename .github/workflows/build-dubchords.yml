@@ -7,6 +7,8 @@ on:
       - 'DubChords/**'
       - 'RootsKeys/Source/RootsKeysEngine.h'
       - 'RootsKeys/Source/TapeEchoDSP.h'
+      - 'RootsKeys/Source/PluginProcessor.cpp'
+      - 'site/chords/**'
       - '.github/workflows/build-dubchords.yml'
     tags:
       - 'MRCM-1240-*'
@@ -36,6 +38,16 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -Wall tests/engine_test.cpp -o engine_test
           ./engine_test
+
+      - name: Timbre igual ao do Roots Keys (piano inicial e órgão Roots Percussion)
+        working-directory: .
+        run: python3 DubChords/tests/check_rootskeys_timbre.py
+
+      - name: Versão de celular (site/chords) gera o mesmo MIDI que o plugin
+        working-directory: .
+        run: |
+          g++ -std=c++17 -O2 -Wall DubChords/tests/dump_loop.cpp -o dump_loop
+          node DubChords/tests/web_engine_test.js ./dump_loop
 
   build:
     needs: engine-test
@@ -75,6 +87,24 @@ jobs:
           $code = $LASTEXITCODE
           Write-Host "pluginval exit code: $code"
           if ($code -ne 0) { exit 1 }
+
+      # --- Validador oficial da Steinberg (conformidade VST3: Cubase, Studio One, Reaper, Ableton, FL Studio, Bitwig)
+      - name: Validate VST3 with Steinberg validator (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: .
+        run: |
+          git clone --depth 1 --branch v3.7.14_build_55 https://github.com/steinbergmedia/vst3sdk.git vst3sdk
+          cd vst3sdk
+          git submodule update --init --depth 1 base pluginterfaces public.sdk cmake
+          Set-Content public.sdk/samples/vst-hosting/CMakeLists.txt "add_subdirectory(validator)"
+          cmake -B build -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=ON -DSMTG_RUN_VST_VALIDATOR=OFF
+          cmake --build build --config Release --target validator --parallel 4
+          $v = Get-ChildItem -Recurse -Filter validator.exe build | Select-Object -First 1
+          & $v.FullName "${{ github.workspace }}/DubChords/build/DubChords_artefacts/Release/VST3/Mastor Reggae Chord Machine MRCM-1240.vst3" 2>&1 | Tee-Object -Variable vlog
+          $code = $LASTEXITCODE
+          $vlog | Select-String -Pattern "Failed|ERROR" -Context 6,0 | ForEach-Object { Write-Host $_ }
+          if ($code -ne 0) { Write-Host "validator falhou: $code"; exit 1 }
 
       - name: Check universal binary + validate (macOS)
         if: runner.os == 'macOS'

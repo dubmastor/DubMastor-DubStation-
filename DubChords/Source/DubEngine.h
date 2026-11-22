@@ -1,6 +1,6 @@
 // Mastor Reggae Chord Machine (MRCM-1240) — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
 //  - skank de piano "com as duas mãos": a mesma inversão em duas oitavas (canal 1)
-//  - bubble de órgão uma oitava abaixo do skank (canal 3)
+//  - bubble de órgão com as duas mãos, uma oitava abaixo do skank (canal 3)
 #pragma once
 #include <algorithm>
 #include <cmath>
@@ -84,15 +84,28 @@ inline std::vector<Hit> patternHits (int p)
     }
 }
 
-// Bubble de órgão: semicolcheias fora dos tempos, com acento no contratempo
-inline std::vector<Hit> bubbleHits()
+// Bubble de órgão com as duas mãos (o "bubble" clássico do reggae), em cada tempo:
+//   "e"  -> mão esquerda (grave, staccato)
+//   "&"  -> mão direita (o acorde, junto com o skank, acentuado)
+//   "a"  -> mão esquerda (mais leve)
+// A mão esquerda fica uma oitava abaixo da direita; a direita fica uma oitava abaixo
+// da mão direita do skank. Os comprimentos são próprios do órgão (curtos e marcados),
+// independentes do TAMANHO DA NOTA do skank.
+struct BubbleHit { int step; float vel; bool rightHand; };
+
+inline std::vector<BubbleHit> bubbleHits()
 {
-    std::vector<Hit> h;
-    for (int s = 0; s < 16; ++s)
-        if (s % 4 != 0)
-            h.push_back ({ s, (s % 4 == 2) ? 0.9f : 0.55f });
+    std::vector<BubbleHit> h;
+    for (int beat = 0; beat < 4; ++beat)
+    {
+        h.push_back ({ beat * 4 + 1, 0.72f, false });
+        h.push_back ({ beat * 4 + 2, 0.95f, true  });
+        h.push_back ({ beat * 4 + 3, 0.62f, false });
+    }
     return h;
 }
+inline constexpr double kBubbleLeftLen  = 0.16;   // em tempos (~2/3 de semicolcheia)
+inline constexpr double kBubbleRightLen = 0.20;
 
 //==============================================================================
 // inversion: -1 = AUTO (a mais próxima do acorde anterior), 0 = fundamental, 1 = 1ª, 2 = 2ª
@@ -104,7 +117,7 @@ inline const char* inversionName (int inv)
     return names[std::clamp (inv, 0, 2)];
 }
 
-enum Channel { ChSkank = 1, ChBass = 2, ChBubble = 3 };
+enum Channel { ChSkank = 1, ChBubble = 3 };   // canal 2 era o baixo guia (removido na 1.3)
 
 struct NoteEvent
 {
@@ -112,7 +125,7 @@ struct NoteEvent
     double length;  // em tempos
     int note;
     int velocity;   // 1..127
-    int channel;    // instrumento: 1 = skank (piano), 2 = baixo guia, 3 = bubble (órgão)
+    int channel;    // instrumento: 1 = skank (piano), 3 = bubble (órgão)
     int slot;       // índice do acorde (0..3) — usado para colorir o MIDI exportado
 };
 
@@ -124,8 +137,6 @@ struct Settings
     int noteSize = 1;        // índice em noteSizeBeats (padrão 1/16)
     float swing = 0.0f;      // 0..1 (atrasa as semicolcheias pares)
     bool bubble = true;      // órgão uma oitava abaixo do skank
-    bool bass = false;       // baixo guia (removido da interface na 1.3)
-    int bassBase = 36;       // C2: a fundamental do baixo fica entre C2 e B2
 };
 
 //==============================================================================
@@ -236,7 +247,8 @@ inline Voicings voiceProgression (const std::vector<ChordSlot>& slots, int cente
 
 //==============================================================================
 // Comprimento de um ataque: o tamanho de nota escolhido, mas nunca encostando no próximo ataque
-inline double hitLength (const std::vector<Hit>& hits, size_t index, double noteBeats, double swingOffset)
+template <typename HitT>
+inline double hitLength (const std::vector<HitT>& hits, size_t index, double noteBeats, double swingOffset)
 {
     const int step = hits[index].step;
     int gapSteps = 16;
@@ -271,8 +283,9 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
         const auto& left = voicings.notes[(size_t) si];
         std::vector<int> skank = left;
         for (int n : left) skank.push_back (n + 12);
-        std::vector<int> organ;
-        for (int n : left) organ.push_back (n - 12);           // bubble uma oitava abaixo do skank
+        const std::vector<int>& organRight = left;              // bubble: mão direita = mão esquerda do skank
+        std::vector<int> organLeft;                              //         mão esquerda uma oitava abaixo
+        for (int n : left) organLeft.push_back (n - 12);
 
         const int firstStep = (int) std::lround (pos * 4.0);
         const int numSteps  = (int) std::lround (slot.beats * 4.0);
@@ -292,21 +305,25 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
             }
         };
 
+        auto emitBubble = [&] (int st)
+        {
+            const int stepInBar = st % 16;
+            for (size_t h = 0; h < bub.size(); ++h)
+            {
+                if (bub[h].step != stepInBar) continue;
+                const double swingOffset = (stepInBar % 2 == 1) ? s.swing * 0.125 : 0.0;
+                const double start = st * 0.25 + swingOffset;
+                const double len = hitLength (bub, h, bub[h].rightHand ? kBubbleRightLen : kBubbleLeftLen, swingOffset);
+                const int vel = std::clamp ((int) std::lround (bub[h].vel * s.velocity * 0.9f * 127.0f), 1, 127);
+                for (int note : (bub[h].rightHand ? organRight : organLeft))
+                    events.push_back ({ start, len, std::clamp (note, 0, 127), vel, ChBubble, si });
+            }
+        };
+
         for (int st = firstStep; st < firstStep + numSteps; ++st)
         {
             emit (hits, skank, ChSkank, 1.0f, st);
-            if (s.bubble) emit (bub, organ, ChBubble, 0.85f, st);
-
-            // baixo guia: tônica no 1 e no "e" do 3 (one drop simples)
-            const int stepInBar = st % 16;
-            if (s.bass && (stepInBar == 0 || stepInBar == 10))
-            {
-                const int note = s.bassBase + ((slot.root % 12) + 12) % 12;
-                const double maxLen = (firstStep + numSteps - st) * 0.25 - 0.02;   // não invade o próximo acorde
-                const double len = std::min (stepInBar == 0 ? 1.4 : 0.9, maxLen);
-                const int vel = std::clamp ((int) std::lround (s.velocity * 127.0f * 0.9f), 1, 127);
-                events.push_back ({ st * 0.25, len, note, vel, ChBass, si });
-            }
+            if (s.bubble) emitBubble (st);
         }
         pos += slot.beats;
     }

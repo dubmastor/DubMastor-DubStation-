@@ -42,6 +42,79 @@ int main (int argc, char** argv)
         return fails == 0 ? 0 : 1;
     }
 
+    // modo "mexer": com o PREVIEW tocando, muda acordes, inversões, padrão, nota, bubble e volumes
+    // a cada ~0,15 s (200 vezes). Confere: MIDI sem nota presa, som que para ao parar o preview
+    // e nenhum estalo (salto entre amostras muito maior que o normal do próprio timbre).
+    if (out == "mexer")
+    {
+        proc.setNonRealtime (true);   // monta o loop novo no próprio bloco (sem thread de mensagens no teste)
+        auto set = [&] (const juce::String& id, float norm) { if (auto* p = proc.apvts.getParameter (id)) p->setValueNotifyingHost (norm); };
+        juce::AudioBuffer<float> b (2, 512);
+        juce::MidiBuffer m;
+        bool on[17][128] {};
+        double onSince[17][128] {};
+        double now = 0, longest = 0;   // nota mais longa (s) enquanto toca: o maior tamanho de nota é 1/2 = 2 tempos
+        float prevL = 0, maxJump = 0, peak = 0;
+        auto run = [&] (double secs)
+        {
+            for (int n = 0; n < (int) (secs * 48000 / 512); ++n)
+            {
+                m.clear();
+                proc.processBlock (b, m);
+                for (const auto meta : m)
+                {
+                    const auto msg = meta.getMessage();
+                    const double t = now + meta.samplePosition / 48000.0;
+                    const int c = msg.getChannel(), nn = msg.getNoteNumber();
+                    if (msg.isNoteOn()) { if (! on[c][nn]) onSince[c][nn] = t; on[c][nn] = true; }
+                    else if (msg.isNoteOff() && on[c][nn]) { longest = std::max (longest, t - onSince[c][nn]); on[c][nn] = false; }
+                }
+                now += 512 / 48000.0;
+                const float* L = b.getReadPointer (0);
+                for (int i = 0; i < 512; ++i) { maxJump = juce::jmax (maxJump, std::abs (L[i] - prevL)); prevL = L[i]; peak = juce::jmax (peak, std::abs (L[i])); }
+            }
+        };
+        // referência: o mesmo tipo de loop tocando sem mexer em nada
+        set ("on2", 1.0f); set ("on3", 1.0f); set ("bubble", 1.0f); set ("preview", 1.0f);
+        run (4.0);
+        const float baseJump = maxJump;
+        maxJump = 0;
+
+        juce::Random rnd (1240);
+        for (int k = 0; k < 200; ++k)
+        {
+            const int i = rnd.nextInt (4);
+            const juce::String n (i);
+            switch (rnd.nextInt (9))
+            {
+                case 0: set ("root" + n, rnd.nextFloat()); break;
+                case 1: set ("qual" + n, rnd.nextBool() ? 1.0f : 0.0f); break;
+                case 2: set ("dur" + n, rnd.nextFloat()); break;
+                case 3: set ("inv" + n, rnd.nextFloat()); break;
+                case 4: set ("pattern", rnd.nextFloat()); break;
+                case 5: set ("noteSize", rnd.nextFloat()); break;
+                case 6: set ("bubble", rnd.nextBool() ? 1.0f : 0.0f); break;
+                case 7: if (i > 0) set ("on" + n, rnd.nextBool() ? 1.0f : 0.0f); break;
+                default: set (rnd.nextBool() ? "pianoLvl" : "organLvl", rnd.nextFloat()); break;
+            }
+            run (0.15);
+        }
+        const float changeJump = maxJump;
+        set ("preview", 0.0f);
+        run (3.0);
+        peak = 0;
+        run (1.0);
+        int stuck = 0;
+        for (auto& ch : on) for (bool x : ch) stuck += x;
+        std::printf ("salto max entre amostras: tocando parado=%.4f  mexendo=%.4f\n", baseJump, changeJump);
+        std::printf ("notas MIDI presas depois de parar: %d   som depois de parar: %.5f\n", stuck, peak);
+        const double maxNote = 2.0 * 60.0 / 75.0 + 0.05;   // 1/2 (2 tempos) a 75 BPM
+        std::printf ("nota mais longa enquanto tocava: %.2f s (limite %.2f s)\n", longest, maxNote);
+        const bool ok = stuck == 0 && peak < 0.001f && longest <= maxNote && changeJump < baseJump * 1.5f + 0.02f;
+        std::printf (ok ? "MEXER DURANTE O PREVIEW: OK\n" : "MEXER DURANTE O PREVIEW: PROBLEMA\n");
+        return ok ? 0 : 1;
+    }
+
     // modo áudio: "snapshot saida.wav" grava 8 compassos do PREVIEW e um .mid exportado ao lado
     if (out.endsWithIgnoreCase (".wav"))
     {

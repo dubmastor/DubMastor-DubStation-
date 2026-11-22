@@ -1,8 +1,10 @@
-# Mastor Reggae Chord Machine MRCM-1240 1.5
+# Mastor Reggae Chord Machine MRCM-1240 1.6
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
 **[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-macOS.zip)**
+
+**📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/chords/)**: monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
 
 ![Interface do Mastor Reggae Chord Machine MRCM-1240](docs/interface.png)
 
@@ -10,8 +12,9 @@
 
 Gerador de harmonia para começar a programar um riddim de reggae. Você escolhe até 4 acordes e quanto
 tempo cada um dura, e o plugin toca o skank de piano **com as duas mãos** (o acorde em duas oitavas) e o
-**bubble de órgão uma oitava abaixo**, sincronizados com o andamento da DAW. Sai como MIDI (arrastar para a
-timeline, exportar ou MIDI ao vivo) e tem som interno com o **piano Korg M1** e o **Hammond** do Roots Keys.
+**bubble de Hammond com as duas mãos**, sincronizados com o andamento da DAW. Sai como MIDI (arrastar para a
+timeline, exportar ou MIDI ao vivo) e tem som interno tocado pelo próprio motor do **Roots Keys**: o piano
+**Korg M1** com o timbre inicial do Roots Keys e o Hammond **Roots Percussion**.
 Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um **instrumento**: no Cubase,
 carregue numa *Instrument Track*.
 
@@ -40,9 +43,11 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 | Controle | O que faz |
 |---|---|
 | **PREVIEW** | Botão grande: toca o loop sem a DAW rodando, no **BPM** do knob. Aperte de novo para parar |
-| **BUBBLE** | Liga o bubble de órgão Hammond (semicolcheias fora do tempo, uma oitava abaixo do skank). Vem desligado. No som interno, usa o timbre **Roots Percussion** do Roots Keys (com percussão) |
+| **BUBBLE** | Liga o bubble de órgão Hammond **com as duas mãos**, como os organistas de reggae tocam: em cada tempo, **mão esquerda** no "e" e no "a" (grave e curta) e **mão direita** no contratempo ("&", com o acorde, junto do skank). A mão direita fica uma oitava abaixo da mão direita do skank e a esquerda uma oitava abaixo dela. Vem desligado. No som interno, usa o timbre **Roots Percussion** do Roots Keys (com percussão) |
 | **SOM INTERNO** | Liga/desliga o som. Desligue quando mandar o MIDI para os seus instrumentos |
-| **PIANO M1 / HAMMOND** | Volume de cada timbre (os mesmos do Dub Station Roots Keys, sintetizados, sem samples) |
+| **PIANO M1 / HAMMOND** | Volume de cada timbre (com rampa: girar o knob com o preview tocando não estala) |
+
+Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é montado fora da thread de áudio e, na troca, as notas do loop antigo são soltas (nada fica soando por cima).
 
 ## MIDI
 - **ARRASTE O MIDI:** clique e arraste a área âmbar para a timeline. Vêm duas faixas (skank e bubble), no BPM do projeto, com o nome de cada acorde como marcador.
@@ -51,10 +56,22 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
 
 ## Para desenvolvedores
-- **Versão:** muda só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece na plaqueta do plugin, e cada push na `main` publica a release **Mastor Reggae Chord Machine MRCM-1240 x.y** (tag `MRCM-1240-x.y`) com as notas de `RELEASE_NOTES.md`. Lembre de atualizar os links `MRCM-1240-x.y` no site e nos READMEs.
+
+### Checklist de toda atualização
+1. **Versão:** só em `CMakeLists.txt` (`project(DubChords VERSION x.y.z)`). Ela aparece no **título** do plugin ("MASTOR REGGAE CHORD MACHINE x.y"); a placa de latão mostra **só "DUB STATION"**.
+2. **Nome:** "Mastor Reggae Chord Machine MRCM-1240" em tudo (plugin, zips `MastorReggaeChordMachine-*`, tag `MRCM-1240-x.y`, release "Mastor Reggae Chord Machine MRCM-1240 x.y").
+3. **Timbre do piano:** o som interno usa o timbre **inicial** do Roots Keys (e o órgão Roots Percussion). Confira com `python3 DubChords/tests/check_rootskeys_timbre.py` (o CI roda e falha se estiver desatualizado).
+4. **Versão para celular:** atualize `site/chords/` junto (o `engine.js` é o porte do `DubEngine.h`; o número da versão fica no `<title>`, no `<h1>` e em `VERSION`). O CI compara o MIDI do JS com o do C++ (`tests/web_engine_test.js`).
+5. **Notas:** `RELEASE_NOTES.md`. Cada push na `main` publica a release com elas.
+6. **Links:** quando a release sair, troque os links de download do site e dos READMEs para `MRCM-1240-x.y`.
+
+### Arquivos
 - `Source/DubEngine.h`: lógica da harmonia (C++ puro). É aqui que se adiciona padrão novo.
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, saída MIDI, exportação.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob + teclado, botões e contadores clicáveis).
-- `Source/DubSynth.h`: som interno; usa o motor do Roots Keys (`../RootsKeys/Source/RootsKeysEngine.h`).
+- `Source/DubSynth.h`: som interno; toca pelo `rk::Engine` do Roots Keys (`../RootsKeys/Source/RootsKeysEngine.h`) com os valores de `rkdefaults`.
 - `tests/engine_test.cpp`: teste do motor (roda no CI antes do build).
-- `tests/snapshot.cpp`: gera o PNG da interface sem DAW (`-DDUBCHORDS_SNAPSHOT=ON`); com um nome `.wav`, grava o PREVIEW e um `.mid` exportado.
+- `tests/snapshot.cpp`: gera o PNG da interface sem DAW (`-DDUBCHORDS_SNAPSHOT=ON`); com um nome `.wav`, grava o PREVIEW e um `.mid` exportado; `ruido` e `mexer` testam som preso ao alternar o SOM INTERNO e ao mexer nos controles com o preview tocando.
+- `tests/check_rootskeys_timbre.py`: confere o timbre com o do Roots Keys.
+- `tests/dump_loop.cpp` + `tests/web_engine_test.js`: comparam a versão de celular com o plugin, nota a nota.
+- `../site/chords/`: versão para celular (`index.html` + `engine.js`).
