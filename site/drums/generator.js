@@ -430,12 +430,8 @@
         const gap = out[j].beat - out[i].beat, piece = pieceOf(out[i].note);
         const fill = inFill(out[i].beat) || inFill(out[j].beat);
         const main = out[j].velocity > out[i].velocity ? j : i, weak = main === i ? j : i;
-        const ghostVel = Math.max(1, Math.round(out[main].velocity * 0.30));
         if (gap < 0.09) {
-          const flam = piece === 1 && weak === i && gap >= 0.015 && gap <= 0.06;
-          if (gap < 0.012) drop[weak] = true;
-          else if (flam || fill) out[weak].velocity = Math.min(out[weak].velocity, ghostVel);
-          else drop[weak] = true;
+          drop[weak] = true;   // colada, duplicada ou flam: fica só a nota no tempo certo
         } else if (piece !== 2 && !fill) {
           out[weak].velocity = Math.min(out[weak].velocity, Math.max(1, Math.round(out[main].velocity * 0.35)));
         }

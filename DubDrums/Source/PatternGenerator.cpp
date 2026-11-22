@@ -688,9 +688,7 @@ namespace
 
     // Mesma peça batendo muito perto dela mesma (ghost da aleatoriedade em cima da nota principal, nota
     // duplicada, flam): fica só a principal, a mais forte.
-    //  - no mesmo instante (nota duplicada): sempre sai.
-    //  - menos de 0,09 tempo: a mais fraca sai. O flam da caixa (nota fraca logo antes da forte) e as viradas
-    //    ficam, mas com a nota de enfeite bem baixa (30% da principal).
+    //  - menos de 0,09 tempo (nota duplicada, ghost colada ou flam, também nas viradas): a mais fraca sai.
     //  - de 0,09 a 0,2 tempo (bumbo, caixa, aro e tons, fora das viradas): a mais fraca cai para 35% da principal.
     //  - hi-hat: só a regra das notas coladas (o swing aproxima as semicolcheias de propósito).
     void cleanCloseHits (std::vector<NoteEvent>& out, const std::vector<std::pair<double, double>>& fills)
@@ -712,13 +710,9 @@ namespace
                 const bool fill = inFill (out[i].beat) || inFill (out[j].beat);
                 const size_t main = out[j].velocity > out[i].velocity ? j : i;
                 const size_t weak = main == i ? j : i;
-                const int ghostVel = std::max (1, (int) std::lround (out[main].velocity * 0.30));
                 if (gap < 0.09)
                 {
-                    const bool flam = piece == 1 && weak == i && gap >= 0.015 && gap <= 0.06;
-                    if (gap < 0.012)    drop[weak] = true;   // duplicada no mesmo instante: sempre sai
-                    else if (flam || fill) out[weak].velocity = std::min (out[weak].velocity, ghostVel);
-                    else              drop[weak] = true;
+                    drop[weak] = true;   // colada, duplicada ou flam: fica só a nota no tempo certo
                 }
                 else if (piece != 2 && ! fill)
                 {

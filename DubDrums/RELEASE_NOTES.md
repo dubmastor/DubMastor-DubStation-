@@ -6,7 +6,7 @@
 - Antes de publicar, o GitHub instala o .pkg num Mac de verdade e confere o AU com o validador da Apple
 - Downloads: `MastorReggaeDrumMachine-macOS-Instalador.pkg`, `MastorReggaeDrumMachine-Windows-Instalador.exe` (e os zips)
 - No Mac, se o instalador não abrir: botão direito › Abrir, ou Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim
-- **Groove mais limpo**: quando a aleatoriedade joga uma ghost em cima da mesma peça, fica só a nota principal (a mais forte). Colada (menos de 0,09 tempo) ou duplicada, a fraca sai; o flam da caixa fica, bem baixo. Próxima (até 0,2 tempo) no bumbo, caixa e tons, a fraca cai para 35% da principal. As viradas ficam como estão
+- **Groove mais limpo**: quando a aleatoriedade joga uma ghost em cima da mesma peça, fica só a nota principal, no tempo certo. Colada (menos de 0,09 tempo), duplicada ou flam (também nas viradas): a fraca sai. Próxima (até 0,2 tempo) no bumbo, caixa e tons, a fraca cai para 35% da principal. Os rufos das viradas ficam como estão
 
 ### Da 2.2
 

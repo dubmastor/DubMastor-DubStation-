@@ -65,8 +65,8 @@ desligado). **PLAY GROOVE** no cabeçalho toca com a DAW parada; com a DAW tocan
 - Arraste a faixa **COMPASSO n** da grade para levar só aquele compasso.
 - **MIDI COLORIDO:** cada compasso vai num canal (1 a 4, intro no 5) para a DAW pintar cada um de uma cor.
 - **Notas iguais muito próximas:** quando a aleatoriedade joga uma ghost em cima da mesma peça, fica só a nota
-  principal (a mais forte). Colada (menos de 0,09 tempo) ou duplicada, a fraca sai; o flam da caixa fica, bem baixo.
-  Próxima (até 0,2 tempo) no bumbo, caixa e tons, a fraca cai para 35% da principal. As viradas ficam como estão.
+  principal, no tempo certo. Colada (menos de 0,09 tempo), duplicada ou flam (também nas viradas): a fraca sai.
+  Próxima (até 0,2 tempo) no bumbo, caixa e tons, a fraca cai para 35% da principal. Os rufos das viradas ficam.
 
 ## Versão no navegador
 `site/battery/`: os mesmos 16 pads, visor, envelope, presets (salvos no navegador) e a aba DUB DRUMS com o gerador
