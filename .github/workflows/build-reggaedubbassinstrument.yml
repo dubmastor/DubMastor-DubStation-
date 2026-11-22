@@ -138,19 +138,6 @@ jobs:
           python -m pip install --quiet pefile
           python "${{ github.workspace }}/.github/scripts/conferir-runtime-windows.py" out
 
-      # Instalador .exe (Inno Setup): VST3 em C:\Program Files\Common Files\VST3 + standalone opcional
-      - name: Installer (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
-          $v = (Select-String -Path CMakeLists.txt -Pattern 'project\(DubBass VERSION (\d+\.\d+)').Matches[0].Groups[1].Value
-          Write-Host "Versão do instalador: $v"
-          & $iscc "/DAppVersion=$v" installer/MRDBI-07.iss
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          Move-Item MastorReggaeDubBassInstrument-Windows-Instalador.exe ../
-
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
