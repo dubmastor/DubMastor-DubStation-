@@ -1,0 +1,29 @@
+#!/bin/sh
+# Pós-instalação do Mastor Reggae Drum Machine MRDM-12 no Mac:
+#  - tira os plugins da quarentena do Gatekeeper (é isso que faz o macOS dizer "está danificado");
+#  - apaga as versões antigas (DubMastor Dub Drums / Mastor Dub Drums Machine MDDM-12): elas têm o mesmo
+#    código de plugin (Dblb/Dbd1) e, instaladas junto, confundem o Logic e as outras DAWs;
+#  - apaga cópias soltas na pasta do usuário (instaladas à mão pelo zip), que ficariam duplicadas;
+#  - faz o macOS reler a lista de Audio Units (Logic / GarageBand).
+NAME="Mastor Reggae Drum Machine MRDM-12"
+OLD1="Mastor Dub Drums Machine MDDM-12"
+OLD2="DubMastor Dub Drums"
+USER_HOME=$(dscl . -read "/Users/$(stat -f%Su /dev/console)" NFSHomeDirectory 2>/dev/null | awk '{print $2}')
+
+for base in "/Library/Audio/Plug-Ins" "$USER_HOME/Library/Audio/Plug-Ins"; do
+  [ -n "$base" ] || continue
+  for old in "$OLD1" "$OLD2"; do
+    rm -rf "$base/VST3/$old.vst3" "$base/Components/$old.component"
+  done
+done
+rm -rf "/Applications/$OLD1.app" "/Applications/$OLD2.app"
+if [ -n "$USER_HOME" ]; then
+  rm -rf "$USER_HOME/Library/Audio/Plug-Ins/VST3/$NAME.vst3" "$USER_HOME/Library/Audio/Plug-Ins/Components/$NAME.component"
+fi
+
+for p in "/Library/Audio/Plug-Ins/VST3/$NAME.vst3" "/Library/Audio/Plug-Ins/Components/$NAME.component" "/Applications/$NAME.app"; do
+  [ -e "$p" ] && xattr -dr com.apple.quarantine "$p" 2>/dev/null
+done
+
+killall -9 AudioComponentRegistrar 2>/dev/null
+exit 0

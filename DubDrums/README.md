@@ -1,10 +1,10 @@
-# Mastor Reggae Drum Machine MRDM-12 2.2
+# Mastor Reggae Drum Machine MRDM-12 2.3
 
 *(antigo Mastor Dub Drums Machine MDDM-12 e DubMastor Dub Drums)*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-Windows.zip)** · **[⬇️ macOS](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-macOS.zip)** · **[📱 Abrir no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/drums/)**
+**[⬇️ Windows (instalador .exe)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-Windows-Instalador.exe)** · **[⬇️ macOS (instalador .pkg)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-macOS-Instalador.pkg)** · **[📱 Abrir no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/drums/)** · zips: [Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-Windows.zip) · [macOS](https://dubmastor.github.io/DubMastor-DubStation-/downloads/MastorReggaeDrumMachine-macOS.zip)
 
 ![Interface do MRDM-12](docs/interface.png)
 
@@ -19,6 +19,11 @@ carregue numa *Instrument Track*.
 [dubmastor.github.io/DubMastor-DubStation-/drums](https://dubmastor.github.io/DubMastor-DubStation-/drums/),
 sem instalar nada: mesmos grooves (o gerador é testado nota a nota contra o do plugin), PREVIEW com os samples,
 grade editável e download do MIDI inteiro ou de um compasso só.
+
+## Instalação
+- **Windows:** rode o `MastorReggaeDrumMachine-Windows-Instalador.exe`. Ele põe o VST3 em `C:\Program Files\Common Files\VST3` (a pasta que todas as DAWs leem) e apaga as versões antigas (MDDM-12 / Dub Drums).
+- **Mac:** abra o `MastorReggaeDrumMachine-macOS-Instalador.pkg`. Ele põe o VST3 e o AU em `/Library/Audio/Plug-Ins`, o app em `/Applications`, tira a quarentena (o aviso de "danificado") e apaga as versões antigas. Como o plugin não é assinado pela Apple, o Mac pode dizer que não consegue abrir o instalador: clique com o **botão direito › Abrir**, ou vá em **Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim**.
+- **Importante:** as versões antigas (*DubMastor Dub Drums* e *Mastor Dub Drums Machine MDDM-12*) usam o mesmo código de plugin. Se você instalar pelo zip, apague as antigas, senão o Logic e as outras DAWs podem abrir a errada ou acusar erro.
 
 ## Funciona em quais DAWs
 A cada versão, antes de publicar, o GitHub compila e testa o plugin em Windows e macOS. Se algum teste falha,

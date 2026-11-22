@@ -42,7 +42,7 @@ jobs:
             rm -rf dl
             if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'MastorReggaeDrumMachine-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
               echo "Instaladores do build $id"
-              find dl -name '*.zip' -exec cp {} site/downloads/ \;
+              find dl \( -name '*.zip' -o -name '*.pkg' -o -name '*.exe' \) -exec cp {} site/downloads/ \;
               break
             fi
           done

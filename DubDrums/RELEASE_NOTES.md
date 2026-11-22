@@ -1,4 +1,13 @@
-## Mastor Reggae Drum Machine MRDM-12 2.2 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.3 🟢🟡⚫
+
+- **Instaladores**: `.pkg` para Mac (VST3 + AU em /Library/Audio/Plug-Ins, app em /Applications) e `.exe` para Windows (VST3 na pasta comum de todas as DAWs)
+- O instalador do Mac **tira a quarentena** (o aviso de "danificado") e relê os Audio Units para o Logic/GarageBand
+- Os dois instaladores **apagam as versões antigas** (DubMastor Dub Drums / MDDM-12), que têm o mesmo código de plugin e confundiam as DAWs
+- Antes de publicar, o GitHub instala o .pkg num Mac de verdade e confere o AU com o validador da Apple
+- Downloads: `MastorReggaeDrumMachine-macOS-Instalador.pkg`, `MastorReggaeDrumMachine-Windows-Instalador.exe` (e os zips)
+- No Mac, se o instalador não abrir: botão direito › Abrir, ou Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim
+
+### Da 2.2
 
 - **Versão do navegador/celular com layout novo**: na ordem do plugin, em 3 colunas no computador, 2 no tablet e 1 no celular; módulos alinhados, alto-falante e PREVIEW lado a lado sem invadir o MIDI, botões que completam as linhas e nada mais largo que a tela
 - O plugin é o mesmo da 2.1
