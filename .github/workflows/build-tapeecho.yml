@@ -111,6 +111,13 @@ jobs:
         shell: pwsh
         run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Tape Echo MTE-12" -Sigla MTE-12 -Saida ../MTE-12-Windows-Instalador.exe
 
+      - name: Conferir runtime embutido (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --quiet pefile
+          python "${{ github.workspace }}/.github/scripts/conferir-runtime-windows.py" out
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |

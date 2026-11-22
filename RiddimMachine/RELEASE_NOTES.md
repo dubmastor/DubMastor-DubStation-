@@ -30,3 +30,8 @@ O **Dub Chords** e o **Dub Drums** num instrumento só, no visual Dub Station, p
 **Instalação:** Windows: copie `Mastor Riddim Machine MRM-0420.vst3` para `C:\Program Files\Common Files\VST3\`.
 Mac: copie o `.vst3` para `~/Library/Audio/Plug-Ins/VST3/` e rode no Terminal:
 `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"`
+
+## Como instalar
+- **Windows:** baixe o `…-Windows-Instalador.exe` e siga o instalador (se o Windows avisar, clique em *Mais informações → Executar assim mesmo*).
+- **Mac:** baixe o `…-macOS-Instalador.pkg` (VST3 + AU, Intel e Apple Silicon). Se o Mac bloquear, vá em *Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim*.
+- Os zips são para instalação manual. Passo a passo para cada DAW: https://dubmastor.github.io/DubMastor-DubStation-/#instalacao

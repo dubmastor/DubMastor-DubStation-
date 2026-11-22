@@ -1,0 +1,15 @@
+{
+  "_leia": "Registro dos plugins. Todo plugin novo entra aqui. A checagem automática (.github/checagem/checar.py) compara este arquivo com o CMakeLists, o site, o README e as notas de release em todo push e pull request. 'web' é a pasta da versão para celular/navegador dentro de site/ ('pendente' só para os plugins antigos que ainda não têm).",
+  "plugins": [
+    {"sigla": "MBK-76",    "pasta": "BigKnob",                 "nome": "Mastor Big Knob MBK-76",                    "tipo": "efeito",      "web": "pendente"},
+    {"sigla": "MTE-12",    "pasta": "TapeEcho",                "nome": "Mastor Tape Echo MTE-12",                   "tipo": "efeito",      "web": "pendente"},
+    {"sigla": "MRK-80",    "pasta": "RootsKeys",               "nome": "Mastor Roots Keys MRK-80",                  "tipo": "instrumento", "web": "pendente"},
+    {"sigla": "MRCM-1240", "pasta": "ReggaeChordMachine",      "nome": "Mastor Reggae Chord Machine MRCM-1240",     "tipo": "instrumento", "web": "pendente"},
+    {"sigla": "MRDBI-07",  "pasta": "ReggaeDubBassInstrument", "nome": "Mastor Reggae Dub Bass Instrument MRDBI-07","tipo": "instrumento", "web": "pendente"},
+    {"sigla": "MDDM-12",   "pasta": "DubDrumsMachine",         "nome": "Mastor Dub Drums Machine MDDM-12",          "tipo": "instrumento", "web": "pendente"},
+    {"sigla": "MRBM-69",   "pasta": "ReggaeBassMachine",       "nome": "Mastor Reggae Bass Machine MRBM-69",        "tipo": "instrumento", "web": "pendente"},
+    {"sigla": "MRM-0420",  "pasta": "RiddimMachine",           "nome": "Mastor Riddim Machine MRM-0420",            "tipo": "instrumento", "web": "pendente"},
+    {"sigla": "MDH-70",    "pasta": "DubHorns",                "nome": "Mastor Dub Horns MDH-70",                   "tipo": "instrumento", "web": "web/dubhorns"},
+    {"sigla": "MPV-01",    "pasta": "PhoneVox",                "nome": "Mastor Phone Vox MPV-01",                   "tipo": "efeito",      "web": "pendente"}
+  ]
+}

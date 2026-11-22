@@ -1,0 +1,16 @@
+name: Checagem (nomes, versões, site e versão para celular)
+
+# Roda em todo push e pull request: confere se cada plugin do plugins.json está com o mesmo
+# nome e a mesma versão no código, no site, no README, nas notas de release e na versão
+# para celular, e se os links de download seguem o padrão SIGLA-versão.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 .github/checagem/checar.py

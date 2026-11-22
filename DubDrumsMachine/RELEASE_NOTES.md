@@ -15,3 +15,8 @@ No Mac, depois de copiar o `.vst3`:
 xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Drums Machine MDDM-12.vst3"
 xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/"Mastor Dub Drums Machine MDDM-12.component"
 ```
+
+## Como instalar
+- **Windows:** baixe o `…-Windows-Instalador.exe` e siga o instalador (se o Windows avisar, clique em *Mais informações → Executar assim mesmo*).
+- **Mac:** baixe o `…-macOS-Instalador.pkg` (VST3 + AU, Intel e Apple Silicon). Se o Mac bloquear, vá em *Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim*.
+- Os zips são para instalação manual. Passo a passo para cada DAW: https://dubmastor.github.io/DubMastor-DubStation-/#instalacao

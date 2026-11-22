@@ -113,6 +113,13 @@ jobs:
         shell: pwsh
         run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Big Knob MBK-76" -Sigla MBK-76 -Saida ../MBK-76-Windows-Instalador.exe
 
+      - name: Conferir runtime embutido (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --quiet pefile
+          python "${{ github.workspace }}/.github/scripts/conferir-runtime-windows.py" out
+
       - name: Collect + package (macOS)
         if: runner.os == 'macOS'
         run: |
