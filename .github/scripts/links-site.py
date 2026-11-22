@@ -53,13 +53,23 @@ for sigla, pasta, padrao in itens:
         m = re.search(r'"(\d+)\.(\d+)', (RAIZ / pasta / "Source/Version.h").read_text())
     tag = f"{sigla}-{m.group(1)}.{m.group(2)}"
     tem = assets(tag)
+    # a release pode existir com os arquivos no nome antigo (ex.: MastorReggaeDubBassInstrument-Windows.zip)
+    def antigo(arq):
+        fim = arq[len(sigla):]
+        return next((a for a in sorted(tem) if a.endswith(fim)), None)
+    for arq in (f"{sigla}-Windows.zip", f"{sigla}-macOS.zip"):
+        if arq not in tem:
+            if antigo(arq): trocas[f"{REL}/{tag}/{arq}"] = f"{REL}/{tag}/{antigo(arq)}"
+            else: sem_zip.append(f"{REL}/{tag}/{arq}")
     faltam = [f for f in (f"{sigla}-Windows-Instalador.exe", f"{sigla}-macOS-Instalador.pkg") if f not in tem]
-    sem_zip += [f"{REL}/{tag}/{f}" for f in (f"{sigla}-Windows.zip", f"{sigla}-macOS.zip") if f not in tem]
     if faltam:
         for f in do_build(f"build-{pasta.lower()}.yml", f"{sigla}-*"):
             if f.name in faltam:
                 DL.mkdir(exist_ok=True); shutil.copy2(f, DL / f.name)
                 trocas[f"{REL}/{tag}/{f.name}"] = f"downloads/{f.name}"
+        for arq in faltam:
+            if f"{REL}/{tag}/{arq}" not in trocas and antigo(arq):
+                trocas[f"{REL}/{tag}/{arq}"] = f"{REL}/{tag}/{antigo(arq)}"
     print(tag, "release:", sorted(tem) or "não existe", "| servidos pelo site:", [t for t in trocas if f"/{tag}/" in t])
 
 # instalador completo
@@ -86,6 +96,6 @@ for h in SITE.glob("*.html"):
 for h in SITE.glob("*.html"):
     for a in set(re.findall(re.escape(REL) + r'/[^"]+', h.read_text())):
         tag, arq = a[len(REL) + 1:].split("/", 1)
-        if arq not in assets(tag):
+        if arq not in assets(tag):  # (links já trocados para o nome antigo existem na release)
             print(f"::warning::{h.name}: {arq} ainda não existe na release {tag} nem num build da main")
 print("trocados:", len(trocas), "| zips escondidos:", len(sem_zip))
