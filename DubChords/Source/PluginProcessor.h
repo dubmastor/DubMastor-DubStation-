@@ -1,7 +1,7 @@
 #pragma once
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "DubEngine.h"
-#include "DubSynth.h"
+#include "RootsKeysSound.h"
 
 class DubChordsProcessor : public juce::AudioProcessor,
                            private juce::AudioProcessorValueTreeState::Listener,
@@ -60,7 +60,7 @@ private:
 
     float param (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
 
-    DubSoundEngine sound;
+    RootsKeysSoundEngine sound;
     std::vector<float> renderL, renderR;
 
     std::vector<dub::NoteEvent> loop;         // só a thread de áudio mexe

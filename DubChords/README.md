@@ -35,7 +35,7 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 | Controle | O que faz |
 |---|---|
 | **PADRÃO DO SKANK** | Contador clicável: Contratempo · One drop (2 e 4) · Double skank · Steppers |
-| **TAMANHO DA NOTA** | Contador clicável: 1/32 (padrão), 1/16, 1/8, 1/4 ou 1/2. A nota nunca encosta no próximo ataque |
+| **DURAÇÃO DAS NOTAS** | Sempre **1/32 (fusa)**, no skank e nas duas mãos do bubble |
 | **REGISTRO** | Onde fica a mão esquerda do skank (C3 a C5). A direita fica uma oitava acima, o bubble uma abaixo |
 | **VELOCITY / SWING** | Força das notas e atraso das semicolcheias |
 
@@ -43,7 +43,7 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 | Controle | O que faz |
 |---|---|
 | **PREVIEW** | Botão grande: toca o loop sem a DAW rodando, no **BPM** do knob. Aperte de novo para parar |
-| **BUBBLE** | Liga o bubble de órgão Hammond **com as duas mãos**, como os organistas de reggae tocam: em cada tempo, **mão esquerda** no "e" e no "a" (grave e curta) e **mão direita** no contratempo ("&", com o acorde, junto do skank). A mão direita fica uma oitava abaixo da mão direita do skank e a esquerda uma oitava abaixo dela. Vem desligado. No som interno, usa o timbre **Roots Percussion** do Roots Keys (com percussão) |
+| **BUBBLE** | Liga o bubble de órgão Hammond **com as duas mãos**, como os organistas de reggae tocam: em cada tempo, **mão esquerda** no "e" e no "a" (grave) e **mão direita** no contratempo ("&", com o acorde, junto do skank). A mão direita fica uma oitava abaixo da mão direita do skank e a esquerda uma oitava abaixo dela. Vem desligado. No som interno, usa o timbre **Roots Percussion** do Roots Keys (com percussão) |
 | **SOM INTERNO** | Liga/desliga o som. Desligue quando mandar o MIDI para os seus instrumentos |
 | **PIANO M1 / HAMMOND** | Volume de cada timbre (com rampa: girar o knob com o preview tocando não estala) |
 
@@ -69,7 +69,8 @@ Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é m
 - `Source/DubEngine.h`: lógica da harmonia (C++ puro). É aqui que se adiciona padrão novo.
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, saída MIDI, exportação.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob + teclado, botões e contadores clicáveis).
-- `Source/DubSynth.h`: som interno; toca pelo `rk::Engine` do Roots Keys (`../RootsKeys/Source/RootsKeysEngine.h`) com os valores de `rkdefaults`.
+- `Source/RootsKeysSound.h`: som interno; toca pelo `rk::Engine` do Roots Keys (`../RootsKeys/Source/RootsKeysEngine.h`) com os valores de `rkdefaults`.
+- `Source/DubSynth.h`: som de teclado antigo, mantido porque o Mastor Reggae Bass Machine MRBM-69 usa.
 - `tests/engine_test.cpp`: teste do motor (roda no CI antes do build).
 - `tests/snapshot.cpp`: gera o PNG da interface sem DAW (`-DDUBCHORDS_SNAPSHOT=ON`); com um nome `.wav`, grava o PREVIEW e um `.mid` exportado; `ruido` e `mexer` testam som preso ao alternar o SOM INTERNO e ao mexer nos controles com o preview tocando.
 - `tests/check_rootskeys_timbre.py`: confere o timbre com o do Roots Keys.

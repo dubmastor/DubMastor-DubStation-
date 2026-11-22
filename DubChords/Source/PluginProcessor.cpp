@@ -133,7 +133,7 @@ dub::Settings DubChordsProcessor::getSettings() const
     s.pattern    = (int) param ("pattern");
     s.centerNote = (int) param ("center");
     s.velocity   = param ("velocity");
-    s.noteSize   = (int) param ("noteSize");
+    s.noteSize   = 0;   // todas as notas sempre 1/32 (o parâmetro "noteSize" ficou só para abrir projetos antigos)
     s.bubble     = param ("bubble") > 0.5f;
     s.swing      = param ("swing");
     return s;

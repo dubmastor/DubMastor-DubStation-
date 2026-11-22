@@ -89,8 +89,7 @@ inline std::vector<Hit> patternHits (int p)
 //   "&"  -> mão direita (o acorde, junto com o skank, acentuado)
 //   "a"  -> mão esquerda (mais leve)
 // A mão esquerda fica uma oitava abaixo da direita; a direita fica uma oitava abaixo
-// da mão direita do skank. Os comprimentos são próprios do órgão (curtos e marcados),
-// independentes do TAMANHO DA NOTA do skank.
+// da mão direita do skank. Todas as notas duram 1/32 (fusa), como as do skank.
 struct BubbleHit { int step; float vel; bool rightHand; };
 
 inline std::vector<BubbleHit> bubbleHits()
@@ -104,8 +103,8 @@ inline std::vector<BubbleHit> bubbleHits()
     }
     return h;
 }
-inline constexpr double kBubbleLeftLen  = 0.16;   // em tempos (~2/3 de semicolcheia)
-inline constexpr double kBubbleRightLen = 0.20;
+inline constexpr double kBubbleLeftLen  = 0.125;  // 1/32 (em tempos)
+inline constexpr double kBubbleRightLen = 0.125;  // 1/32
 
 //==============================================================================
 // inversion: -1 = AUTO (a mais próxima do acorde anterior), 0 = fundamental, 1 = 1ª, 2 = 2ª
@@ -117,7 +116,7 @@ inline const char* inversionName (int inv)
     return names[std::clamp (inv, 0, 2)];
 }
 
-enum Channel { ChSkank = 1, ChBubble = 3 };   // canal 2 era o baixo guia (removido na 1.3)
+enum Channel { ChSkank = 1, ChBass = 2, ChBubble = 3 };   // ChBass: baixo guia, removido na 1.3 (o MRM-0420 ainda separa a faixa)
 
 struct NoteEvent
 {
@@ -134,7 +133,7 @@ struct Settings
     int pattern = SkankOffbeat;
     int centerNote = 60;     // centro da mão esquerda do skank (C4)
     float velocity = 0.8f;   // 0..1
-    int noteSize = 1;        // índice em noteSizeBeats (padrão 1/16)
+    int noteSize = 0;        // índice em noteSizeBeats; o MRCM-1240 usa sempre 0 (1/32)
     float swing = 0.0f;      // 0..1 (atrasa as semicolcheias pares)
     bool bubble = true;      // órgão uma oitava abaixo do skank
 };

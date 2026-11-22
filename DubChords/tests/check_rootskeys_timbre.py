@@ -3,7 +3,7 @@
 
 Lê RootsKeys/Source/PluginProcessor.cpp (valores de abertura dos parâmetros + presets
 "Piano: M1 Classic" e "Organ: Roots Percussion") e compara com as constantes de
-DubChords/Source/DubSynth.h (rkdefaults::RootsKeysPiano / RootsKeysOrgan).
+DubChords/Source/RootsKeysSound.h (rkdefaults::RootsKeysPiano / RootsKeysOrgan).
 Se alguém mudar o timbre do Roots Keys e esquecer o MRCM-1240, o CI falha aqui.
 
 Uso (da raiz do repositório):  python3 DubChords/tests/check_rootskeys_timbre.py
@@ -14,7 +14,7 @@ import sys
 
 root = pathlib.Path(__file__).resolve().parents[2]
 rk = (root / "RootsKeys/Source/PluginProcessor.cpp").read_text(encoding="utf-8")
-syn = (root / "DubChords/Source/DubSynth.h").read_text(encoding="utf-8")
+syn = (root / "DubChords/Source/RootsKeysSound.h").read_text(encoding="utf-8")
 
 def num(x):
     x = x.strip().rstrip("f").strip()
@@ -56,11 +56,11 @@ def preset(name):
                 perc=perc, perc3rd=p3, fast=fast, click=click, drive=drive, lesMix=lesMix,
                 levelO=levelO, lesFast=lesFast, reverb=reverb)
 
-# ---- MRCM-1240: constantes do DubSynth.h
+# ---- MRCM-1240: constantes do RootsKeysSound.h
 def block(struct):
     m = re.search(r"struct %s\s*\{(.*?)\n\s*\};" % struct, syn, re.S)
     if not m:
-        sys.exit(f"não achei {struct} no DubSynth.h")
+        sys.exit(f"não achei {struct} no RootsKeysSound.h")
     out = {}
     for name, val in re.findall(r"static constexpr \w+\s+(\w+)(?:\[\d+\])?\s*=\s*([^;]+);", m.group(1)):
         val = val.strip()
@@ -111,6 +111,6 @@ if errors:
     print("\nO TIMBRE DO MRCM-1240 ESTÁ DESATUALIZADO EM RELAÇÃO AO ROOTS KEYS:")
     for e in errors:
         print("  -", e)
-    print("Atualize DubChords/Source/DubSynth.h (rkdefaults).")
+    print("Atualize DubChords/Source/RootsKeysSound.h (rkdefaults).")
     sys.exit(1)
 print("OK: o MRCM-1240 usa o timbre atual do Roots Keys")

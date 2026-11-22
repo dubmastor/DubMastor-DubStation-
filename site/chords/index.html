@@ -99,8 +99,8 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
   <section class="mod"><div class="tag">RITMO</div>
     <div class="lbl" style="margin-top:2px">PADRÃO DO SKANK</div>
     <div class="stepper"><button id="patDn">◀</button><div class="val" id="patVal"></div><button id="patUp">▶</button></div>
-    <div class="lbl">TAMANHO DA NOTA</div>
-    <div class="stepper"><button id="nsDn">◀</button><div class="val" id="nsVal"></div><button id="nsUp">▶</button></div>
+    <div class="lbl">DURAÇÃO DAS NOTAS</div>
+    <div class="stepper"><div class="val"><b>1/32</b><small>FUSA · SEMPRE</small></div></div>
     <div style="margin-top:12px">
       <div class="slider"><span>REGISTRO</span><input type="range" min="48" max="72" step="1" id="center"><output id="o_center"></output></div>
       <div class="slider"><span>VELOCITY</span><input type="range" min="10" max="100" step="1" id="velocity"><output id="o_velocity"></output></div>
@@ -170,7 +170,7 @@ function slotsForEngine() {
 }
 function settings() {
   return { pattern: st.pattern, centerNote: st.center, velocity: Math.fround(st.velocity / 100),
-           noteSize: st.noteSize, swing: Math.fround(st.swing / 100), bubble: st.bubble };
+           noteSize: 0, swing: Math.fround(st.swing / 100), bubble: st.bubble };
 }
 let loop = M.buildLoop(slotsForEngine(), settings());
 
@@ -424,9 +424,6 @@ function render() {
   });
   $('patVal').innerHTML = `<b style="font-size:15px">${M.PATTERNS[st.pattern]}</b>${st.pattern === 1 ? '<small>2 E 4</small>' : ''}`;
   $('patDn').disabled = st.pattern === 0; $('patUp').disabled = st.pattern === M.PATTERNS.length - 1;
-  const ns = M.NOTE_SIZES[st.noteSize];
-  $('nsVal').innerHTML = `<b>${ns.name}</b><small>${ns.sub}</small>`;
-  $('nsDn').disabled = st.noteSize === 0; $('nsUp').disabled = st.noteSize === M.NOTE_SIZES.length - 1;
   $('bubble').classList.toggle('on', st.bubble);
   [...$('reps').children].forEach((b, k) => b.classList.toggle('on', k === st.reps));
   // loop
@@ -457,8 +454,6 @@ function setPreview(on) {
 buildChords();
 $('patDn').onclick = () => { st.pattern = Math.max(0, st.pattern - 1); changed(); };
 $('patUp').onclick = () => { st.pattern = Math.min(M.PATTERNS.length - 1, st.pattern + 1); changed(); };
-$('nsDn').onclick = () => { st.noteSize = Math.max(0, st.noteSize - 1); changed(); };
-$('nsUp').onclick = () => { st.noteSize = Math.min(M.NOTE_SIZES.length - 1, st.noteSize + 1); changed(); };
 $('bubble').onclick = () => { st.bubble = !st.bubble; changed(); };
 ['1x', '2x', '4x', '8x'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t; b.onclick = () => { st.reps = k; save(); render(); }; $('reps').appendChild(b); });
 slider('center', noteName);

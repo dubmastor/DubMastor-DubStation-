@@ -603,13 +603,8 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
         static const char* sub[dub::NumPatterns]   = { "", "2 E 4", "", "" };
         return { names[juce::jlimit (0, dub::NumPatterns - 1, i)], sub[juce::jlimit (0, dub::NumPatterns - 1, i)] };
     });
-    noteSize = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("noteSize"), [] (int i) -> std::pair<juce::String, juce::String>
-    {
-        static const char* sub[dub::numNoteSizes] = { "FUSA", "SEMICOLCHEIA", "COLCHEIA", "SEM\xc3\x8dNIMA", "M\xc3\x8dNIMA" };
-        return { dub::noteSizeName (i), juce::String::fromUTF8 (sub[juce::jlimit (0, dub::numNoteSizes - 1, i)]) };
-    });
     addAndMakeVisible (*pattern);
-    addAndMakeVisible (*noteSize);
+
 
     setupKnob (center,   "center",   "REGISTRO");
     setupKnob (velocity, "velocity", "VELOCITY");
@@ -1036,7 +1031,19 @@ void DubChordsPanel::renderBackground()
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
     g.drawText (juce::String::fromUTF8 ("PADR\xc3\x83O DO SKANK"), pattern->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
-    g.drawText ("TAMANHO DA NOTA", noteSize->getBounds().translated (0, -15).withHeight (12), juce::Justification::centred);
+    {   // notas sempre 1/32: plaqueta gravada no lugar do antigo seletor
+        auto r = pattern->getBounds().translated (0, pattern->getHeight() + 30).withHeight (44).toFloat();
+        g.setColour (juce::Colours::white.withAlpha (0.45f));
+        g.drawRoundedRectangle (r.translated (1, 1), 4.0f, 1.0f);
+        g.setColour (colours::ink.withAlpha (0.55f));
+        g.drawRoundedRectangle (r, 4.0f, 1.2f);
+        g.setColour (colours::inkSoft);
+        g.setFont (stencil (9.0f, 0.3f));
+        g.drawText (juce::String::fromUTF8 ("DURA\xc3\x87\xc3\x83O DAS NOTAS"), r.withHeight (r.getHeight() * 0.45f).translated (0, 4), juce::Justification::centred);
+        g.setColour (colours::ink);
+        g.setFont (stencil (14.0f, 0.12f));
+        g.drawText ("1/32  FUSA", r.withTrimmedTop (r.getHeight() * 0.42f), juce::Justification::centred);
+    }
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" });
 }
 
@@ -1158,8 +1165,6 @@ void DubChordsPanel::resized()
         a.removeFromTop (34);
         auto left = a.removeFromLeft (190);
         pattern->setBounds (left.removeFromTop (52));
-        left.removeFromTop (34);
-        noteSize->setBounds (left.removeFromTop (52));
         a.removeFromLeft (8);
         const int kw = a.getWidth() / 3;
         for (auto* k : { &center, &velocity, &swing })

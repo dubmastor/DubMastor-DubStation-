@@ -105,6 +105,16 @@ int main()
         CHECK (g, "acorde de meio compasso sem skank");
     }
 
+    // 2b) com o padrão do plugin (noteSize 0), TODAS as notas (skank e bubble) duram no máximo 1/32
+    for (int pat = 0; pat < NumPatterns; ++pat)
+    {
+        Settings s; s.pattern = pat; s.bubble = true; s.swing = 0.5f;
+        double L = 0; const auto ev = buildLoop (slots, s, L);
+        double longest = 0;
+        for (auto& e : ev) longest = std::max (longest, e.length);
+        CHECK (longest <= 0.125 + 1e-9, "nota maior que 1/32 (%g tempos) no padrao %d", longest, pat);
+    }
+
     // 3) padrões x gate x swing: simula a DAW tocando em blocos de 512 amostras
     for (int pat = 0; pat < NumPatterns; ++pat)
         for (int ns = 0; ns < numNoteSizes; ++ns)

@@ -50,7 +50,7 @@
     }
     return h;
   }
-  const BUBBLE_LEFT_LEN = 0.16, BUBBLE_RIGHT_LEN = 0.20;
+  const BUBBLE_LEFT_LEN = 0.125, BUBBLE_RIGHT_LEN = 0.125;   // 1/32, como no plugin
 
   // voicing com condução de vozes (igual ao C++)
   function voiceChord(rootPc, quality, center, prev, forced = -1) {
