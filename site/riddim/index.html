@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2e1a0d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
+<title>Mastor Riddim Machine MRM-0420 1.0 — DubStation</title>
+<style>
+:root{
+  --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
+  --green:#0b8a3c; --gold:#eabd12; --red:#d8442c; --amber:#ffa928; --glass:#17110a; --wood:#2e1a0d;
+  --m-drums:#2fbf55; --m-bass:#eabd12; --m-riddim:#e8432c;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--wood);color:var(--ink);font-family:"Helvetica Neue",Arial,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 96px)}
+.rack{max-width:1180px;margin:0 auto;display:flex;min-height:100vh}
+.wood{width:14px;flex:none;background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 7px),linear-gradient(90deg,#5b3519,#8a5428 40%,#6a3d1c 70%,#4a2a12)}
+.unit{flex:1;min-width:0;background:radial-gradient(900px 500px at 30% 0%,#efe4c9,var(--plate) 55%,#d8c9a6);padding:12px 12px 24px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:26px}
+h1{margin:0;font-size:clamp(17px,3vw,28px);letter-spacing:.14em;font-weight:900;color:var(--ink)}
+.sub{font-size:10px;letter-spacing:.28em;color:var(--ink2);margin-top:4px;font-weight:700}
+.plaque{padding:8px 22px;border-radius:5px;font-weight:900;letter-spacing:.32em;font-size:clamp(16px,2.6vw,22px);color:#2a1d06;
+  background:linear-gradient(180deg,#e8d390,#caab5c 45%,#b39446 55%,#86692a);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 3px 5px rgba(0,0,0,.35);text-shadow:0 1px 0 rgba(255,255,255,.45)}
+.brand{margin-left:auto;text-align:right}
+.flag{width:150px;height:14px;border-radius:3px;background:linear-gradient(180deg,var(--green) 0 33%,var(--gold) 33% 66%,#222 66%);opacity:.85;margin-left:auto}
+.brand b{display:block;font-size:15px;letter-spacing:.42em;margin-top:5px}
+.mod{position:relative;border:1.2px solid rgba(43,36,29,.55);border-radius:6px;padding:20px 12px 12px;box-shadow:1px 1px 0 rgba(255,255,255,.45);margin-bottom:24px;min-width:0}
+.mod>.tag{position:absolute;top:-10px;left:12px;background:var(--label);color:var(--cream);font-weight:800;font-size:11px;letter-spacing:.22em;padding:3px 10px;border-radius:2px;white-space:nowrap}
+.lbl{font-size:9px;letter-spacing:.3em;color:var(--ink2);text-align:center;margin:10px 0 5px;font-weight:800}
+.row{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+.display{height:40px;border-radius:4px;background:linear-gradient(180deg,#2a2219,var(--glass));box-shadow:0 0 0 3px #0c0907;
+  display:flex;align-items:center;justify-content:center;color:var(--amber);font-weight:800;font-size:16px;letter-spacing:.08em;
+  text-shadow:0 0 6px rgba(255,169,40,.55);overflow:hidden;white-space:nowrap;padding:0 8px}
+.display.off{opacity:.35}
+.btns{display:grid;gap:6px;background:var(--label);padding:6px;border-radius:5px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}.c6{grid-template-columns:repeat(6,1fr)}
+.b{appearance:none;border:0;border-radius:4px;padding:9px 5px;font-weight:800;font-size:11px;letter-spacing:.08em;min-width:0;overflow:hidden;cursor:pointer;
+  color:#cfc2a6;background:linear-gradient(180deg,#3a332b,#221d18);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;gap:6px;min-height:38px;line-height:1.15;text-align:center}
+.b::before{content:"";width:8px;height:8px;border-radius:50%;background:#4a3a22;box-shadow:0 0 0 1px #000;flex:none}
+.b.on{color:var(--amber);background:linear-gradient(180deg,#2c2925,#141210);box-shadow:inset 0 -3px 0 rgba(255,169,40,.75)}
+.b.on::before{background:radial-gradient(circle,#fff3c0,var(--amber));box-shadow:0 0 6px var(--amber),0 0 0 1px #000}
+.b.nolamp::before{display:none}
+/* harmonia */
+.chords{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:640px){.chords{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1040px){.chords{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.chord{display:flex;flex-direction:column;gap:7px}
+.chord .top{display:flex;gap:6px}.chord .top .display{flex:1}
+.keys{position:relative;height:74px;background:#1a1714;border-radius:5px;padding:4px;display:flex}
+.keys .w{flex:1;margin:0 1px;border-radius:0 0 4px 4px;background:linear-gradient(180deg,#f8f1de,#e2d6b8);display:flex;align-items:flex-end;justify-content:center;font-size:10px;font-weight:800;color:#6b5f4c;padding-bottom:4px;cursor:pointer}
+.keys .k{position:absolute;top:4px;width:9%;height:58%;border-radius:0 0 3px 3px;background:linear-gradient(180deg,#3a332b,#0e0c0a);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;font-size:8px;color:#8c7f69;padding-bottom:3px}
+.keys .sel{background:linear-gradient(180deg,#f3d27a,#e2a93a)!important;color:#3a2a10!important}
+.dur{display:flex;align-items:center;gap:4px;background:var(--label);border-radius:5px;padding:4px}
+.dur button{appearance:none;border:0;background:none;color:var(--cream);font-size:18px;width:34px;height:32px;cursor:pointer}
+.dur span{flex:1;text-align:center;background:linear-gradient(180deg,#fbf6e8,#e6dcc2);border-radius:3px;padding:6px 0;font-weight:900;font-size:15px;color:var(--ink)}
+.dur span small{font-size:9px;letter-spacing:.25em;margin-left:6px}
+/* máquinas */
+.machine{display:grid;gap:10px;grid-template-columns:minmax(0,1fr);border-top:1px solid rgba(43,36,29,.18);padding:12px 0}
+.machine:first-of-type{border-top:0;padding-top:0}
+@media (min-width:900px){.machine{grid-template-columns:150px 250px minmax(0,1fr) 120px;align-items:center}}
+.mname{font-weight:900;letter-spacing:.2em;font-size:17px;text-align:center}
+.mname small{display:block;font-size:9px;letter-spacing:.3em;color:var(--ink2);margin-top:2px}
+.power{display:flex;align-items:center;gap:10px;justify-content:center;background:linear-gradient(180deg,#3a3632,#141210);border-radius:6px;padding:7px 10px;color:var(--amber);font-weight:800;letter-spacing:.14em;font-size:12px;cursor:pointer;margin-top:6px;border:0;width:100%}
+.power i{width:34px;height:16px;border-radius:8px;background:#0a0807;position:relative;flex:none}
+.power i::after{content:"";position:absolute;top:-2px;left:-2px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#efe9dc,#8d8576)}
+.power.on i::after{left:16px}
+.power em{width:9px;height:9px;border-radius:50%;background:#2b3a2b;box-shadow:0 0 0 1px #000;flex:none}
+.power.on em{background:#5cff7a;box-shadow:0 0 8px #5cff7a,0 0 0 1px #000}
+.power:not(.on){color:rgba(239,229,204,.4)}
+canvas.lane{width:100%;height:118px;border-radius:5px;background:#120d08;box-shadow:0 0 0 3px #0c0907;touch-action:none;display:block}
+.drag{appearance:none;border:1.5px dashed rgba(255,169,40,.7);border-radius:6px;background:linear-gradient(180deg,#2a2219,var(--glass));color:var(--amber);font-weight:900;letter-spacing:.1em;font-size:11px;padding:12px 6px;cursor:pointer;width:100%;min-height:56px}
+.drag small{display:block;font-size:8px;letter-spacing:.2em;opacity:.7;margin-top:3px}
+.undo{display:none;margin-top:6px;width:100%}.undo.show{display:flex}
+/* jackpot, riddim, control room */
+.grid3{display:grid;gap:0 16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.grid3{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) 250px}}
+.jack{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px;align-items:center}
+.reels{display:flex;gap:6px;padding:8px;border-radius:10px;background:linear-gradient(180deg,#f2f0ea,#b9b5ac 50%,#6e6a62);box-shadow:0 2px 5px rgba(0,0,0,.4)}
+.reels div{flex:1;height:84px;border-radius:4px;background:linear-gradient(180deg,#0a0705,#4a3826 50%,#0a0705);color:var(--amber);font-weight:900;font-size:48px;display:flex;align-items:center;justify-content:center;text-shadow:0 0 10px rgba(255,169,40,.7);overflow:hidden}
+.jackbtn{appearance:none;border:0;cursor:pointer;border-radius:16px;padding:14px;background:#14110e;position:relative;box-shadow:0 3px 0 #000;width:100%}
+.jackbtn span{display:block;border-radius:999px;padding:18px 8px 14px;background:radial-gradient(120% 90% at 50% 15%,#ff7a5a,#ee4a30 45%,#8e1c0f);color:#fff3d6;font-weight:900;font-size:clamp(17px,3.4vw,22px);letter-spacing:.1em;box-shadow:0 0 0 2px #1a0806,0 0 22px rgba(232,67,44,.55);animation:pulse 1.2s ease-in-out infinite}
+.jackbtn span small{display:block;font-size:9px;letter-spacing:.3em;color:var(--gold);margin-top:5px}
+.jackbtn::before{content:"";position:absolute;inset:6px;border-radius:12px;background:radial-gradient(circle,var(--gold) 0 2.5px,transparent 3.5px) 0 0/16px 16px;opacity:.85;animation:chase .6s steps(2) infinite;pointer-events:none}
+.jackbtn span{position:relative}
+@keyframes pulse{50%{box-shadow:0 0 0 2px #1a0806,0 0 34px rgba(255,90,60,.9)}}
+@keyframes chase{50%{background-position:8px 0;opacity:.45}}
+.mutes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mute{appearance:none;border:0;border-radius:6px;padding:14px 4px 10px;font-weight:900;letter-spacing:.14em;font-size:15px;cursor:pointer;color:#1a1208;box-shadow:0 0 14px var(--c),inset 0 1px 0 rgba(255,255,255,.4);background:linear-gradient(180deg,var(--c),color-mix(in srgb,var(--c) 55%,#000))}
+.mute small{display:block;font-size:8px;letter-spacing:.2em;margin-top:4px;opacity:.8}
+.mute.muted{box-shadow:inset 0 0 0 2px #ff3a2a;background:linear-gradient(180deg,#3a332b,#1a1612);color:rgba(239,229,204,.45)}
+.mute.muted small::after{content:" · MUTE";color:#ff6a5a}
+.speaker{border-radius:16px;padding:12px 14px 30px;position:relative;background:linear-gradient(135deg,#7a4a22,#5a3316 45%,#2e170a);box-shadow:0 4px 8px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.12);margin-top:6px}
+.grille{position:relative;height:150px;border-radius:8px;padding:4px;background:linear-gradient(180deg,#f2f0ea,#bab6ad 50%,#5e5a52)}
+.grille .cone{position:absolute;inset:4px;border-radius:5px;background:radial-gradient(circle,#6a5d4c 0 12%,#3a332b 13%,#1a1612 50%,#0d0b09 70%);transition:transform .06s}
+.grille .mesh{position:absolute;inset:4px;border-radius:5px;background:radial-gradient(circle at 3px 3px,transparent 0 2.1px,#c9c5bc 2.3px) 0 0/6.4px 6.4px,linear-gradient(180deg,#d9d6cf,#7d7870);background-blend-mode:normal;-webkit-mask:radial-gradient(circle at 3.2px 3.2px,transparent 0 2.1px,#000 2.3px) 0 0/6.4px 6.4px;mask:radial-gradient(circle at 3.2px 3.2px,transparent 0 2.1px,#000 2.3px) 0 0/6.4px 6.4px}
+.speaker .badge{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:linear-gradient(180deg,#e8d390,#86692a);color:#2a1d06;font-weight:900;font-size:10px;letter-spacing:.32em;padding:2px 12px;border-radius:3px}
+/* barra de transporte fixa no celular */
+.transport{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;gap:8px;align-items:center;justify-content:center;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);
+  background:linear-gradient(180deg,#3a2414,#1e1007);box-shadow:0 -3px 10px rgba(0,0,0,.5)}
+.play{appearance:none;border:0;border-radius:8px;padding:12px 18px;font-weight:900;letter-spacing:.12em;font-size:15px;cursor:pointer;color:var(--gold);background:linear-gradient(180deg,#0b8a3c,#05391a);box-shadow:0 0 0 3px #1a1714;min-width:170px}
+.play.on{color:#2e2108;background:linear-gradient(180deg,#eabd12,#7a5f06)}
+.bpm{display:flex;align-items:center;gap:6px;background:#1a1714;border-radius:8px;padding:4px 6px}
+.bpm button{appearance:none;border:0;background:#2c2925;color:var(--cream);width:34px;height:36px;border-radius:5px;font-size:18px;cursor:pointer}
+.bpm .display{height:36px;min-width:84px;font-size:20px}
+footer{text-align:center;font-size:10px;letter-spacing:.25em;color:var(--ink2);margin-top:10px}
+footer a{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="rack"><div class="wood"></div><div class="unit">
+<header>
+  <div><h1>MASTOR RIDDIM MACHINE 1.0</h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
+  <div class="plaque">MRM-0420</div>
+  <div class="brand"><div class="flag"></div><b>DUBSTATION</b></div>
+</header>
+
+<section class="mod"><div class="tag">HARMONIA</div>
+  <div class="lbl" style="margin-top:0">VALE PARA O SKANK (MRCM-1240) E PARA O BAIXO (MRBM-69)</div>
+  <div class="chords" id="chords"></div>
+</section>
+
+<section class="mod"><div class="tag">MÁQUINAS</div>
+  <div id="machines"></div>
+  <div class="lbl" style="margin-top:2px">TOQUE NO VISOR PARA PÔR OU TIRAR NOTA · O MIDI QUE VOCÊ VÊ É O QUE BAIXA</div>
+</section>
+
+<div class="grid3">
+  <section class="mod"><div class="tag">JACKPOT · SEMENTE</div>
+    <div class="jack">
+      <div class="reels" id="reels"><div>0</div><div>4</div><div>2</div></div>
+      <button class="jackbtn" id="jackpot"><span>NOVO RIDDIM<small>GIRAR O JACKPOT</small></span></button>
+    </div>
+  </section>
+  <section class="mod"><div class="tag">RIDDIM</div>
+    <div class="dur"><button id="lenDown">◀</button><span id="len">16<small>COMPASSOS</small></span><button id="lenUp">▶</button></div>
+    <div class="row" style="margin-top:10px"><button class="drag" id="dlRiddim" style="flex:1">⬇ BAIXAR O RIDDIM<small>BATERIA + HARMONIA + BAIXO, ALINHADOS</small></button></div>
+    <div class="lbl">CONTROL ROOM · MUTE</div>
+    <div class="mutes">
+      <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRDM-12</small></button>
+      <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRBM-69</small></button>
+      <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRCM-1240</small></button>
+    </div>
+    <div class="row" style="margin-top:8px"><button class="power" id="fxOn" style="flex:1"><i></i><span>CONTROL ROOM</span><em></em></button>
+      <button class="power" id="echoOn" style="flex:1"><i></i><span>TAPE ECHO</span><em></em></button></div>
+  </section>
+  <div class="speaker"><div class="grille"><div class="cone" id="cone"></div><div class="mesh"></div></div><div class="badge">DUBSTATION</div></div>
+</div>
+<footer>MASTOR RIDDIM MACHINE MRM-0420 · VERSÃO PARA CELULAR · <a href="../">TODOS OS PLUGINS</a></footer>
+</div><div class="wood"></div></div>
+
+<div class="transport">
+  <button class="play" id="play">▶ PLAY RIDDIM</button>
+  <div class="bpm"><button id="bpmDown">−</button><div class="display" id="bpm">75</div><button id="bpmUp">+</button></div>
+</div>
+
+<script src="../chords/engine.js"></script>
+<script src="../drums/generator.js"></script>
+<script src="../bassmachine/engine.js"></script>
+<script>
+'use strict';
+const C = window.MRCM, D = window.MDDM, B = window.MRBM;
+const $ = (id) => document.getElementById(id);
+const gm = D.gm;
+
+// ---------------------------------------------------------------- estado (os mesmos padrões do plugin)
+const DEFAULTS = {
+  slots: [{ root: 9, quality: 1, dur: 0, inv: -1, on: true }, { root: 2, quality: 1, dur: 0, inv: -1, on: true },
+          { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false }],
+  bpm: 75, seed: 420, bars: 2, drummer: 0, pattern: 0, bassist: 0,
+  on: [true, true, true], mute: [false, false, false], fxOn: true, echoOn: true,
+};
+function load() { try { const s = JSON.parse(localStorage.getItem('mrm0420') || 'null'); if (s && s.slots) return Object.assign(structuredClone(DEFAULTS), s); } catch (e) {} return structuredClone(DEFAULTS); }
+const st = load(); st.slots[0].on = true;
+function save() { try { localStorage.setItem('mrm0420', JSON.stringify(st)); } catch (e) {} }
+const LENGTHS = [4, 8, 16, 32, 64];
+const DRUMS = 0, CHORDS = 1, BASS = 2;
+
+// ---------------------------------------------------------------- as três máquinas (motores das versões do navegador)
+const chordSlots = () => st.slots.map((s, i) => ({ root: s.root, quality: s.quality, beats: (i === 0 || s.on) ? C.DURATIONS[s.dur].beats : 0, inversion: s.inv }));
+const chordSettings = () => ({ pattern: st.pattern, centerNote: 60, velocity: Math.fround(0.8), noteSize: 0, swing: 0, bubble: false });
+const bassSlots = () => st.slots.map((s, i) => ({ root: s.root, quality: s.quality, beats: (i === 0 || s.on) ? B.DURATIONS[s.dur] : 0 }));
+const bassSettings = () => ({ style: st.bassist, seed: st.seed, density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7 });
+const drumSettings = () => Object.assign(D.defaults(), { style: D.Style.Rockers, hatPattern: 1, drummer: st.drummer, seed: st.seed, bars: 4 });
+
+let drums, chords, bass;            // { events, loopBeats } de cada máquina (com as edições)
+let edited = [false, false, false];
+function rebuild(which = [0, 1, 2]) {
+  if (which.includes(DRUMS))  { const p = D.generate(drumSettings()); drums = { events: p.events.map(e => Object.assign({}, e)), loopBeats: p.lengthInBeats }; edited[DRUMS] = false; }
+  if (which.includes(CHORDS)) { const r = C.buildLoop(chordSlots(), chordSettings()); chords = { events: r.events, loopBeats: r.loopBeats }; edited[CHORDS] = false; }
+  if (which.includes(BASS))   { const r = B.buildLoop(bassSlots(), bassSettings()); bass = { events: r.events, loopBeats: r.loopBeats }; edited[BASS] = false; }
+  drawAll();
+}
+
+// ---------------------------------------------------------------- som: samples DM na bateria, piano M1 + órgão, baixo do MRDBI-07, CONTROL ROOM
+const audio = (() => {
+  let ctx = null, buses = [], master, dry, echoSend, fxIn, analyser, buffers = {}, wave = {};
+  let playing = false, anchorTime = 0, anchorBeat = 0, scheduled = 0, timer = 0, lastBass = null;
+  const hz = (n) => 440 * Math.pow(2, (n - 69) / 12);
+  const g = (v) => { const n = ctx.createGain(); n.gain.value = v; return n; };
+  function ensure() {
+    if (ctx) return ctx;
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+    master = g(0.85);
+    // CONTROL ROOM: tape echo (atraso de 3/16 com realimentação e fita escurecendo) + maximizer
+    const maxi = ctx.createDynamicsCompressor(); maxi.threshold.value = -10; maxi.ratio.value = 10; maxi.attack.value = .002; maxi.release.value = .12;
+    const safety = ctx.createDynamicsCompressor(); safety.threshold.value = -2; safety.ratio.value = 12;
+    analyser = ctx.createAnalyser(); analyser.fftSize = 512;
+    fxIn = g(1); dry = g(1);
+    master.connect(fxIn);
+    fxIn.connect(maxi).connect(safety);
+    safety.connect(ctx.destination); safety.connect(analyser);
+    echoSend = g(0.32);
+    const delay = ctx.createDelay(2); delay.delayTime.value = 0.75 * 60 / st.bpm;
+    const fb = g(0.42), tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 2400;
+    master.connect(echoSend).connect(delay).connect(tone).connect(fb).connect(delay);
+    tone.connect(fxIn);
+    audio.delay = delay;
+    for (let m = 0; m < 3; m++) { const b = g(1); b.connect(master); buses.push(b); }
+    const pr = new Float32Array([0, 1, 0.55, 0.34, 0.22, 0.14, 0.1, 0.06, 0.05, 0.03, 0.02]);
+    wave.piano = ctx.createPeriodicWave(pr, new Float32Array(pr.length));
+    const N = 16, bassH = new Float32Array(N); bassH[1] = 1; bassH[2] = .075; bassH[3] = .026;
+    wave.bass = ctx.createPeriodicWave(new Float32Array(N), bassH);
+    const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0);   // destrava o iOS
+    loadSamples(); applyMix();
+    return ctx;
+  }
+  async function loadSamples() {   // os samples DM do MRDM-12 (DubDrums/Samples), igual ao plugin
+    const files = { [gm.Kick]: ['DM-KICKS1.wav', 1.5], [gm.Snare]: ['DM-SNARES6.wav', 1.25], [gm.SideStick]: ['DM-SNARES28.wav', 1.0],
+                    [gm.ClosedHat]: ['DM-HATs6.wav', 0.72], [gm.OpenHat]: ['DM-HATs39.wav', 0.66] };
+    for (const [note, [f, gain]] of Object.entries(files)) {
+      try {
+        const data = await (await fetch('../drums/samples/' + f)).arrayBuffer();
+        const buf = await new Promise((res, rej) => ctx.decodeAudioData(data, res, rej));
+        const n = buf.length, mono = new Float32Array(n);
+        for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < n; i++) mono[i] += d[i] / buf.numberOfChannels; }
+        let peak = 0; for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(mono[i]));
+        let start = 0; while (start < n && Math.abs(mono[start]) < peak * 0.02) start++; start = Math.max(0, start - 8);
+        const out = ctx.createBuffer(1, n - start, buf.sampleRate), od = out.getChannelData(0);
+        for (let i = start; i < n; i++) od[i - start] = mono[i] / peak;
+        buffers[note] = { buf: out, gain };
+      } catch (e) { console.warn('sample', f, e); }
+    }
+  }
+  function applyMix() {
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    for (let m = 0; m < 3; m++) buses[m].gain.setTargetAtTime(st.on[m] && !st.mute[m] ? 1 : 0, t, 0.01);
+    echoSend.gain.setTargetAtTime(st.fxOn && st.echoOn ? 0.32 : 0, t, 0.02);
+    audio.delay.delayTime.setTargetAtTime(0.75 * 60 / st.bpm, t, 0.05);
+  }
+  function drum(t, note, vel) {
+    const sm = buffers[note === gm.PedalHat ? gm.ClosedHat : note], v = Math.pow(vel / 127, 1.6);
+    const out = g(0); out.connect(buses[DRUMS]);
+    if (sm) { const s = ctx.createBufferSource(); s.buffer = sm.buf; out.gain.value = sm.gain * v * 0.6; s.connect(out); s.start(t); return; }
+    const o = ctx.createOscillator(); const f0 = note === gm.TomHigh ? 260 : note === gm.TomMid ? 190 : 130;
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 0.7, t + 0.3);
+    out.gain.setValueAtTime(0.5 * v, t); out.gain.exponentialRampToValueAtTime(0.0001, t + 0.4); o.connect(out); o.start(t); o.stop(t + 0.45);
+  }
+  function piano(t, note, vel, len) {
+    const f = hz(note), v = Math.pow(vel / 127, 1.4) * 0.18;
+    const o = ctx.createOscillator(); o.setPeriodicWave(wave.piano); o.frequency.value = f;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(Math.min(14000, f * 12), t); lp.frequency.exponentialRampToValueAtTime(Math.max(600, f * 3), t + 0.3);
+    const a = g(0); a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(v, t + 0.003); a.gain.setTargetAtTime(v * 0.3, t + 0.003, 0.25);
+    const off = t + Math.max(len, 0.04); a.gain.setTargetAtTime(0.0001, off, 0.05);
+    o.connect(lp).connect(a).connect(buses[CHORDS]); o.start(t); o.stop(off + 0.4);
+  }
+  function bassNote(t, note, vel, len) {
+    if (lastBass && lastBass.end > t) { lastBass.amp.gain.cancelScheduledValues(t); lastBass.amp.gain.setTargetAtTime(0, t, .004); }
+    const o = ctx.createOscillator(); o.setPeriodicWave(wave.bass); o.frequency.value = hz(note);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+    const amp = g(0), peak = (.35 + .65 * vel / 127) * .55, off = t + len;
+    amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(peak, t + .003); amp.gain.setTargetAtTime(peak * .85, t + .003, .09); amp.gain.setTargetAtTime(0, off, .026);
+    o.connect(lp).connect(amp).connect(buses[BASS]); o.start(t); o.stop(off + .3);
+    lastBass = { amp, end: off + .3 };
+  }
+  const spb = () => 60 / st.bpm;
+  function each(loop, from, to, fn) {
+    if (!loop || loop.loopBeats <= 0) return;
+    for (const e of loop.events) {
+      const s = e.start !== undefined ? e.start : e.beat;
+      const k = Math.max(0, Math.ceil((from - s) / loop.loopBeats));
+      for (let b = s + k * loop.loopBeats; b < to; b += loop.loopBeats) if (b >= from) fn(e, b);
+    }
+  }
+  function tick() {
+    const horizon = ctx.currentTime + 0.15, to = anchorBeat + (horizon - anchorTime) / spb();
+    const time = (b) => anchorTime + (b - anchorBeat) * spb();
+    each(drums, scheduled, to, (e, b) => drum(time(b), e.note, e.velocity));
+    each(chords, scheduled, to, (e, b) => piano(time(b), e.note, e.velocity, e.length * spb()));
+    each(bass, scheduled, to, (e, b) => bassNote(time(b), e.note, e.velocity, e.length * spb()));
+    scheduled = to;
+  }
+  function start() { ensure(); ctx.resume(); anchorTime = ctx.currentTime + 0.08; anchorBeat = 0; scheduled = 0; playing = true; tick(); timer = setInterval(tick, 25); }
+  function stop() { playing = false; clearInterval(timer); if (ctx) { const t = ctx.currentTime; buses.forEach(b => { b.gain.cancelScheduledValues(t); b.gain.setTargetAtTime(0, t, 0.02); }); setTimeout(applyMix, 120); } }
+  function beat() { return playing ? anchorBeat + (ctx.currentTime - anchorTime) / spb() : -1; }
+  function setBpm() { if (playing) { const b = beat(); anchorTime = ctx.currentTime; anchorBeat = b; } applyMix(); }
+  function level() { if (!analyser) return 0; const d = new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(d); let p = 0; for (const x of d) p = Math.max(p, Math.abs(x - 128)); return p / 128; }
+  return { start, stop, beat, setBpm, applyMix, level, get playing() { return playing; }, delay: null };
+})();
+
+// ---------------------------------------------------------------- harmonia
+const BLACK = { 1: 'C#', 3: 'Eb', 6: 'F#', 8: 'Ab', 10: 'Bb' }, WHITE = [0, 2, 4, 5, 7, 9, 11];
+function buildChords() {
+  const box = $('chords'); box.innerHTML = '';
+  st.slots.forEach((s, i) => {
+    const el = document.createElement('div'); el.className = 'chord';
+    el.innerHTML = `<div class="top"><div class="display" data-k="name"></div>${i ? '<button class="b" data-k="on">ON</button>' : ''}</div>
+      <div class="keys" data-k="keys"></div>
+      <div class="btns c2" data-k="q"><button class="b" data-q="0">MAIOR</button><button class="b" data-q="1">MENOR</button></div>
+      <div class="btns c4" data-k="inv"><button class="b" data-i="-1">AUTO</button><button class="b" data-i="0">FUND</button><button class="b" data-i="1">1ª</button><button class="b" data-i="2">2ª</button></div>
+      <div class="dur"><button data-d="-1">◀</button><span data-k="dur"></span><button data-d="1">▶</button></div>`;
+    const keys = el.querySelector('[data-k=keys]');
+    WHITE.forEach((n) => { const k = document.createElement('div'); k.className = 'w'; k.dataset.n = n; k.textContent = C.ROOTS[n]; keys.appendChild(k); });
+    Object.entries(BLACK).forEach(([n, name]) => {
+      const k = document.createElement('div'); k.className = 'k'; k.dataset.n = n; k.textContent = name;
+      const wi = WHITE.filter((w) => w < n).length; k.style.left = `calc(${(wi / 7) * 100}% - 4.5%)`; keys.appendChild(k);
+    });
+    el.onclick = (ev) => {
+      const t = ev.target.closest('[data-n],[data-q],[data-i],[data-d],[data-k=on]'); if (!t) return;
+      if (t.dataset.n !== undefined) s.root = +t.dataset.n;
+      else if (t.dataset.q !== undefined) s.quality = +t.dataset.q;
+      else if (t.dataset.i !== undefined) s.inv = +t.dataset.i;
+      else if (t.dataset.d !== undefined) s.dur = Math.max(0, Math.min(5, s.dur + +t.dataset.d));
+      else s.on = !s.on;
+      save(); rebuild([CHORDS, BASS]);
+    };
+    box.appendChild(el);
+  });
+}
+function drawChords() {
+  const used = C.buildLoop(chordSlots(), chordSettings()).voicings;
+  [...$('chords').children].forEach((el, i) => {
+    const s = st.slots[i], on = i === 0 || s.on;
+    const name = el.querySelector('[data-k=name]');
+    name.textContent = on ? `${C.ROOTS[s.root]} ${s.quality ? 'MENOR' : 'MAIOR'}${used && used.used ? ' · ' + C.INVERSIONS[used.used[i] || 0] : ''}` : 'OFF';
+    name.classList.toggle('off', !on);
+    el.querySelectorAll('[data-n]').forEach((k) => k.classList.toggle('sel', +k.dataset.n === s.root));
+    el.querySelectorAll('[data-q]').forEach((k) => k.classList.toggle('on', +k.dataset.q === s.quality));
+    el.querySelectorAll('[data-i]').forEach((k) => k.classList.toggle('on', +k.dataset.i === s.inv));
+    const onb = el.querySelector('[data-k=on]'); if (onb) onb.classList.toggle('on', s.on);
+    const d = C.DURATIONS[s.dur]; el.querySelector('[data-k=dur]').innerHTML = `${d.name}<small>${s.dur <= 1 ? 'COMPASSO' : 'COMPASSOS'}</small>`;
+    el.style.opacity = on ? 1 : .55;
+  });
+}
+
+// ---------------------------------------------------------------- máquinas: liga/desliga, músicos, MIDI editável, baixar
+const MACHINES = [
+  { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3',
+    names: ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL'] },
+  { id: CHORDS, name: 'HARMONIA', model: 'MRCM-1240', who: 'PADRÃO DO SKANK', key: 'pattern', cols: 'c2',
+    names: ['CONTRATEMPO', 'ONE DROP', 'DOUBLE SKANK', 'STEPPERS'] },
+  { id: BASS, name: 'BAIXO', model: 'MRBM-69', who: 'BAIXISTA', key: 'bassist', cols: 'c3', names: B.styleNames },
+];
+const DRUM_ROWS = [gm.OpenHat, gm.ClosedHat, gm.SideStick, gm.Snare, gm.Kick], DRUM_NAMES = ['HH AB.', 'HI-HAT', 'ARO', 'CAIXA', 'BUMBO'];
+function buildMachines() {
+  const box = $('machines');
+  MACHINES.forEach((m) => {
+    const el = document.createElement('div'); el.className = 'machine';
+    el.innerHTML = `<div><div class="mname">${m.name}<small>${m.model}</small></div>
+        <button class="power" data-k="power"><i></i><span>LIGADA</span><em></em></button>
+        <button class="b nolamp undo" data-k="undo">DESFAZER EDIÇÃO</button></div>
+      <div><div class="lbl" style="margin-top:0">${m.who}</div><div class="btns ${m.cols}" data-k="who">${m.names.map((n, i) => `<button class="b" data-w="${i}">${n}</button>`).join('')}</div></div>
+      <canvas class="lane" data-k="lane"></canvas>
+      <button class="drag" data-k="dl">⬇ BAIXAR ${m.name}<small>SÓ ESTA MÁQUINA</small></button>`;
+    el.querySelector('[data-k=power]').onclick = () => { st.on[m.id] = !st.on[m.id]; save(); audio.applyMix(); drawAll(); };
+    el.querySelector('[data-k=undo]').onclick = () => rebuild([m.id]);
+    el.querySelector('[data-k=who]').onclick = (ev) => { const b = ev.target.closest('[data-w]'); if (!b) return; st[m.key] = +b.dataset.w; save(); rebuild([m.id]); };
+    el.querySelector('[data-k=dl]').onclick = () => download(midiFile([m.id], 1, false), `MRM-0420 ${m.name} ${chordText()}.mid`);
+    const cv = el.querySelector('[data-k=lane]');
+    cv.addEventListener('pointerdown', (ev) => editLane(m.id, cv, ev));
+    m.el = el; m.canvas = cv;
+    box.appendChild(el);
+  });
+}
+function laneGeo(cv) { const r = cv.getBoundingClientRect(); return { w: r.width, h: r.height, x0: 46, y0: 14 }; }
+function editLane(id, cv, ev) {
+  const g = laneGeo(cv), r = cv.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+  const loop = id === DRUMS ? drums : id === CHORDS ? chords : bass;
+  if (!loop || loop.loopBeats <= 0 || x < g.x0 || y < g.y0) return;
+  const beat = Math.floor((x - g.x0) / (g.w - g.x0 - 4) * loop.loopBeats * 4) / 4;
+  if (beat < 0 || beat >= loop.loopBeats) return;
+  const inCell = (s) => s >= beat - 1e-6 && s < beat + 0.25 - 1e-6;
+  if (id === DRUMS) {
+    const row = Math.min(4, Math.floor((y - g.y0) / ((g.h - g.y0 - 4) / 5))), note = DRUM_ROWS[row];
+    const i = drums.events.findIndex((e) => (e.note === note || (row === 1 && e.note === gm.PedalHat)) && inCell(e.beat));
+    if (i >= 0) drums.events.splice(i, 1);
+    else drums.events.push({ beat, length: note === gm.OpenHat ? 0.4 : 0.1, note, velocity: note === gm.Kick ? 110 : note === gm.Snare ? 105 : 80, bar: Math.floor(beat / 4) });
+    drums.events.sort((a, b) => a.beat - b.beat);
+  } else if (id === CHORDS) {
+    const before = chords.events.length;
+    chords.events = chords.events.filter((e) => !inCell(e.start));
+    if (chords.events.length === before) {   // copia o ataque mais próximo do mesmo acorde
+      let pos = 0, slot = -1; const sl = chordSlots();
+      for (let i = 0; i < 4; i++) { if (sl[i].beats <= 0) continue; if (beat >= pos && beat < pos + sl[i].beats) { slot = i; break; } pos += sl[i].beats; }
+      const all = C.buildLoop(chordSlots(), chordSettings()).events.filter((e) => e.slot === slot);
+      if (!all.length) return;
+      let best = all[0]; for (const e of all) if (Math.abs(e.start - beat) < Math.abs(best.start - beat)) best = e;
+      for (const e of all) if (Math.abs(e.start - best.start) < 1e-6) chords.events.push(Object.assign({}, e, { start: beat }));
+      chords.events.sort((a, b) => a.start - b.start);
+    }
+  } else {
+    const i = bass.events.findIndex((e) => beat >= e.start - 1e-6 && beat < e.start + Math.max(0.25, e.length));
+    if (i >= 0) bass.events.splice(i, 1);
+    else {   // nota nova na pentatônica do acorde, na altura tocada
+      const lo = 28, hi = 52, frac = 1 - (y - g.y0) / (g.h - g.y0 - 4);
+      const c = B.chordAtBeat(bassSlots(), beat);
+      const note = B.snapToPentatonic(Math.round(lo + frac * (hi - lo)), c, lo, hi);
+      const slot = st.slots.findIndex((s) => s.root === c.root);
+      bass.events.push({ start: beat, length: 0.5, note, velocity: 100, slot: Math.max(0, slot), fill: false });
+      bass.events.sort((a, b) => a.start - b.start);
+    }
+  }
+  edited[id] = true; drawAll();
+}
+function drawLane(m) {
+  const cv = m.canvas, g = laneGeo(cv), dpr = window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(g.w * dpr)) { cv.width = Math.round(g.w * dpr); cv.height = Math.round(g.h * dpr); }
+  const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, g.w, g.h);
+  const loop = m.id === DRUMS ? drums : m.id === CHORDS ? chords : bass;
+  const L = loop ? loop.loopBeats : 0; if (L <= 0) return;
+  const W = g.w - g.x0 - 4, H = g.h - g.y0 - 4, X = (b) => g.x0 + b / L * W;
+  for (let s = 0; s <= L * 4; s++) { x.fillStyle = `rgba(255,169,40,${s % 16 === 0 ? .4 : s % 4 === 0 ? .16 : .05})`; x.fillRect(Math.round(X(s / 4)), g.y0, 1, H); }
+  x.font = 'bold 8px Helvetica, Arial'; x.fillStyle = 'rgba(255,169,40,.8)';
+  const amber = (a) => `rgba(255,169,40,${a})`;
+  if (m.id === DRUMS) {
+    DRUM_NAMES.forEach((n, r) => x.fillText(n, 4, g.y0 + (r + .65) * H / 5));
+    for (const e of drums.events) {
+      const r = DRUM_ROWS.indexOf(e.note === gm.PedalHat ? gm.ClosedHat : e.note); if (r < 0) continue;
+      x.fillStyle = amber(.25 + .75 * e.velocity / 127); x.fillRect(X(e.beat) + .5, g.y0 + r * H / 5 + 1, Math.max(2, W / L / 4 - 1), H / 5 - 2);
+    }
+    for (let b = 0; b < L / 4; b++) x.fillText(String(b + 1), X(b * 4) + 2, 10);
+  } else if (m.id === CHORDS) {
+    x.fillText('SKANK', 4, g.y0 + H * .55);
+    let pos = 0; for (const s of chordSlots()) { if (s.beats <= 0) continue; x.fillText(C.chordLabel(s), X(pos) + 4, 10); pos += s.beats; }
+    const lo = Math.min(...chords.events.map(e => e.note)), hi = Math.max(...chords.events.map(e => e.note));
+    for (const e of chords.events) {
+      x.fillStyle = amber(.12 + .25 * e.velocity / 127); x.fillRect(X(e.start) + .5, g.y0 + 2, Math.max(3, W / L / 4 * .9), H - 4);
+      const y = g.y0 + H - 4 - (hi > lo ? (e.note - lo) / (hi - lo) : .5) * (H - 8);
+      x.fillStyle = amber(.5 + .5 * e.velocity / 127); x.fillRect(X(e.start) + .5, y - 1, Math.max(3, W / L / 4 * .9), 2);
+    }
+  } else {
+    let pos = 0; for (const s of bassSlots()) { if (s.beats <= 0) continue; x.fillText(B.chordLabel(s), X(pos) + 4, 10); pos += s.beats; }
+    x.fillText('E1', 4, g.y0 + H); x.fillText('E3', 4, g.y0 + 8);
+    for (const e of bass.events) {
+      const y = g.y0 + H - (e.note - 28) / 24 * H;
+      x.fillStyle = amber(.55 + .45 * e.velocity / 127); x.fillRect(X(e.start), y - 2, Math.max(3, e.length / L * W), 4);
+    }
+  }
+  const b = audio.beat();
+  if (b >= 0) { x.fillStyle = 'rgba(255,255,255,.75)'; x.fillRect(X(b % L), g.y0 - 2, 1.5, H + 2); }
+  if (!st.on[m.id]) { x.fillStyle = 'rgba(18,13,8,.55)'; x.fillRect(0, 0, g.w, g.h); }
+}
+function drawAll() {
+  drawChords();
+  MACHINES.forEach((m) => {
+    const p = m.el.querySelector('[data-k=power]'); p.classList.toggle('on', st.on[m.id]); p.querySelector('span').textContent = st.on[m.id] ? 'LIGADA' : 'DESLIGADA';
+    m.el.querySelector('[data-k=undo]').classList.toggle('show', edited[m.id]);
+    m.el.querySelectorAll('[data-w]').forEach((b) => b.classList.toggle('on', +b.dataset.w === st[m.key]));
+    drawLane(m);
+  });
+  [0, 1, 2].forEach((i) => $('mute' + i).classList.toggle('muted', st.mute[i]));
+  $('fxOn').classList.toggle('on', st.fxOn); $('echoOn').classList.toggle('on', st.echoOn);
+  $('len').innerHTML = `${LENGTHS[st.bars]}<small>COMPASSOS</small>`;
+  $('bpm').textContent = st.bpm;
+  const d = String(st.seed).padStart(3, '0'); [...$('reels').children].forEach((r, i) => { if (!spinning) r.textContent = d[i]; });
+}
+
+// ---------------------------------------------------------------- MIDI (um arquivo por máquina ou o riddim inteiro, alinhado)
+const vlq = (n) => { const b = [n & 127]; while ((n >>= 7)) b.unshift((n & 127) | 128); return b; };
+const chordText = () => chordSlots().filter((s) => s.beats > 0).map(C.chordLabel).join('-').replace(/#/g, 's');
+function track(name, evs) {
+  const nb = Array.from(new TextEncoder().encode(name));
+  let tr = [0, 0xff, 0x03, ...vlq(nb.length), ...nb], last = 0;
+  evs.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  for (const [t, on, ch, n, v] of evs) { tr.push(...vlq(t - last), (on ? 0x90 : 0x80) | (ch - 1), n, on ? v : 0); last = t; }
+  tr.push(0, 0xff, 0x2f, 0);
+  return [0x4d, 0x54, 0x72, 0x6b, (tr.length >>> 24) & 255, (tr.length >> 16) & 255, (tr.length >> 8) & 255, tr.length & 255, ...tr];
+}
+function midiFile(which, reps, riddim) {
+  const tpq = 960, tempo = Math.round(60000000 / st.bpm), endBeat = riddim ? LENGTHS[st.bars] * 4 : null;
+  const meta = [0, 0xff, 0x51, 3, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255, 0, 0xff, 0x58, 4, 4, 2, 24, 8, 0, 0xff, 0x2f, 0];
+  const tracks = [[0x4d, 0x54, 0x72, 0x6b, 0, 0, 0, meta.length, ...meta]];
+  const add = (name, loop, ch, startOf, chOf) => {
+    if (!loop || loop.loopBeats <= 0) return;
+    const end = endBeat || loop.loopBeats * reps, evs = [];
+    for (let t0 = 0; t0 < end - 1e-9; t0 += loop.loopBeats)
+      for (const e of loop.events) {
+        const on = t0 + startOf(e); if (on >= end - 1e-9) continue;
+        const off = Math.min(on + Math.max(0.01, e.length), end), c = chOf ? chOf(e) : ch;
+        evs.push([Math.round(on * tpq), 1, c, e.note, e.velocity], [Math.round(off * tpq), 0, c, e.note, 0]);
+      }
+    tracks.push(track(name, evs));
+  };
+  if (which.includes(DRUMS) && st.on[DRUMS]) add('MRM-0420 Bateria (MRDM-12)', drums, 10, (e) => e.beat, (e) => 1 + (e.bar % 4));
+  if (which.includes(CHORDS) && st.on[CHORDS]) add('MRM-0420 Skank (MRCM-1240)', chords, 1, (e) => e.start, (e) => 1 + e.slot);
+  if (which.includes(BASS) && st.on[BASS]) add('MRM-0420 Baixo (MRBM-69)', bass, 1, (e) => e.start, (e) => 1 + (e.slot || 0));
+  return new Uint8Array([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length, tpq >> 8, tpq & 255, ...tracks.flat()]);
+}
+function download(bytes, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' })); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+// ---------------------------------------------------------------- JACKPOT, transporte, CONTROL ROOM
+let spinning = false;
+$('jackpot').onclick = () => {
+  let s = st.seed; while (s === st.seed) s = 1 + Math.floor(Math.random() * 999);
+  st.seed = s; save(); spinning = true;
+  const reels = [...$('reels').children], digits = String(s).padStart(3, '0'), t0 = performance.now();
+  (function spin() {
+    const t = performance.now() - t0; let done = true;
+    reels.forEach((r, k) => { if (t < 520 + 280 * k) { r.textContent = Math.floor(t / 34 + k * 3.7) * 7 % 10; done = false; } else r.textContent = digits[k]; });
+    if (!done) requestAnimationFrame(spin); else spinning = false;
+  })();
+  rebuild([DRUMS, BASS]);
+};
+$('play').onclick = () => { if (audio.playing) audio.stop(); else audio.start(); $('play').classList.toggle('on', audio.playing); $('play').textContent = audio.playing ? '■ PARAR' : '▶ PLAY RIDDIM'; };
+$('bpmDown').onclick = () => { st.bpm = Math.max(60, st.bpm - 1); save(); audio.setBpm(); drawAll(); };
+$('bpmUp').onclick = () => { st.bpm = Math.min(180, st.bpm + 1); save(); audio.setBpm(); drawAll(); };
+$('lenDown').onclick = () => { st.bars = Math.max(0, st.bars - 1); save(); drawAll(); };
+$('lenUp').onclick = () => { st.bars = Math.min(LENGTHS.length - 1, st.bars + 1); save(); drawAll(); };
+$('dlRiddim').onclick = () => download(midiFile([DRUMS, CHORDS, BASS], 1, true), `MRM-0420 Riddim ${chordText()} ${st.bpm}bpm.mid`);
+[0, 1, 2].forEach((i) => { $('mute' + i).onclick = () => { st.mute[i] = !st.mute[i]; save(); audio.applyMix(); drawAll(); }; });
+$('fxOn').onclick = () => { st.fxOn = !st.fxOn; save(); audio.applyMix(); drawAll(); };
+$('echoOn').onclick = () => { st.echoOn = !st.echoOn; save(); audio.applyMix(); drawAll(); };
+
+(function frame() {   // cursor nos visores e o cone do alto-falante mexendo com o som
+  if (audio.playing) MACHINES.forEach(drawLane);
+  const lv = audio.level(); $('cone').style.transform = `scale(${1 + lv * 0.06})`;
+  requestAnimationFrame(frame);
+})();
+window.addEventListener('resize', () => MACHINES.forEach(drawLane));
+
+buildChords(); buildMachines(); rebuild();
+</script>
+</body>
+</html>

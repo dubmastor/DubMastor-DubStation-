@@ -4,20 +4,22 @@
 
 Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e testados para o **Cubase**.
 
-## 🎛️ Novo: Mastor Riddim Machine MRM-0420
+## 🎛️ Novo: Mastor Riddim Machine MRM-0420 1.0 — DubStation
 
-[![Mastor Riddim Machine MRM-0420](RiddimMachine/docs/interface-harmonia.png)](RiddimMachine/)
+[![Mastor Riddim Machine MRM-0420](RiddimMachine/docs/interface-riddim.png)](RiddimMachine/)
 
-**O Dub Chords e o Mastor Reggae Drum Machine num instrumento só.** Monte os acordes na aba **HARMONIA**, a bateria na aba
-**BATERIA**, aperte **PLAY RIDDIM** para ouvir tudo junto e **arraste o riddim inteiro** (bateria, skank e
-bubble, já alinhados, de 4 a 64 compassos) para a timeline. Um projeto começa em segundos.
+**Bateria (MRDM-12), harmonia (MRCM-1240), baixo (MRBM-69) e o Mastor Big Knob num instrumento só.** A aba
+**RIDDIM** resume tudo: os 4 acordes (que valem para o skank e para o baixo), uma chave para ligar e desligar
+cada máquina, os músicos de cada uma num clique, o MIDI de cada máquina na tela (editável) e arrastável
+separadamente, o **JACKPOT** com o botão **NOVO RIDDIM** e o alto-falante antigo com grade de metal. Um BPM
+só para tudo, e a aba **CONTROL ROOM** com o Big Knob no master, o mute de cada máquina e o TAPE ECHO.
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.4/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.4/MRM-0420-macOS.zip)** · [Detalhes](RiddimMachine/)
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)** · [Detalhes](RiddimMachine/)
 
 | Plugin | O que é | Mac | Windows | Detalhes |
 |---|---|---|---|---|
 | **Dub Battery Reggae 1.1** | Instrumento: sampler de bateria com 16 pads estilo MPC / SP-404 (notas 36–51, mapa do MRDM-12), visor do sample com início e fim, envelope AHDSR gráfico, LAYER (timbre 2 e juntar pads), 34 timbres DM, choke, presets de fábrica e GRAVAR; aba **DUB DRUMS** com o MRDM-12 inteiro (bateristas, groove nos pads, MIDI colorido por compasso). [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/battery/) | [⬇️ macOS (.pkg)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-macOS-Instalador.pkg) | [⬇️ Windows (.exe)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-Windows-Instalador.exe) | [DubBattery/](DubBattery/) |
-| **Mastor Riddim Machine MRM-0420 1.4** | Instrumento / gerador MIDI: Dub Chords + MRDM-12 num só, em abas (HARMONIA e BATERIA), com PLAY RIDDIM, BPM ligado e ARRASTE O RIDDIM com bateria, skank e bubble alinhados (os acordes entram depois da intro) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.4/MRM-0420-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.4/MRM-0420-Windows.zip) | [RiddimMachine/](RiddimMachine/) |
+| **Mastor Riddim Machine MRM-0420 1.0** | Instrumento / gerador MIDI da DubStation: MRDM-12 + MRCM-1240 + MRBM-69 + Mastor Big Knob num só. Aba RIDDIM com a harmonia única (skank e baixo), chave e músicos de cada máquina, MIDI editável e arrastável por máquina, JACKPOT (NOVO RIDDIM) e alto-falante; abas de cada máquina completas e CONTROL ROOM (Big Knob no master, mute DRUMS / BASS / RIDDIM e TAPE ECHO) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip) | [RiddimMachine/](RiddimMachine/) · [📱](https://dubmastor.github.io/DubMastor-DubStation-/riddim/) |
 | **DubMastor Big Knob 3.2** | Estação de dub: filtro big knob estilo King Tubby (com bypass), eco de fita com cabeçotes, presets de EQ e liga/desliga, sirene de dub, VUs e maximizer | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-Windows.zip) | [BigKnob/](BigKnob/) |
 | **DubMastor Roots Keys 2.4** | Instrumento: piano (timbres M1, Grand, MT-40 e FM EP) e órgão estilo Hammond com Leslie, eco de fita FitaEco, flanger dub, maximizer, VUs e teclado que acende com o MIDI; aba **Dub Chords** com acordes de duas mãos (6 notas) para montar o riddim e arrastar o MIDI para a DAW; visual de teclado anos 80 no piano e de madeira e marfim no órgão | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-Windows.zip) | [RootsKeys/](RootsKeys/) |
 | **Mastor Reggae Chord Machine MRCM-1240 1.6** | Instrumento / gerador MIDI: escolha até 4 acordes (teclado mecânico, maior/menor, inversões com sugestão automática, contador de compassos) e ele toca o skank de piano M1 com as duas mãos e o bubble de Hammond no andamento da DAW; arraste o MIDI colorido por acorde para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.6/MastorReggaeChordMachine-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.6/MastorReggaeChordMachine-Windows.zip) | [DubChords/](DubChords/) |
@@ -73,7 +75,8 @@ DubBass/                         Mastor Reggae Dub Bass Instrument MRDBI-07 — 
 DubDrums/                        Mastor Reggae Drum Machine MRDM-12 — gerador de bateria de reggae com bateria interna (C++ / JUCE 8)
 BassMachine/                     Mastor Reggae Bass Machine MRBM-69 — gerador de reggae bass lines (preview com Dub Bass, Mastor Reggae Drum Machine e Roots Keys) (C++ / JUCE 8)
 MastorDubHorns/                  Mastor Dub Horns — naipe de metais anos 70 + Mastor Tape Echo (C++ / JUCE 8)
-RiddimMachine/                   Mastor Riddim Machine MRM-0420 — Dub Chords + MRDM-12 em abas (C++ / JUCE 8)
+RiddimMachine/                   Mastor Riddim Machine MRM-0420 — MRDM-12 + MRCM-1240 + MRBM-69 + Big Knob em abas (C++ / JUCE 8)
+site/riddim/                     Mastor Riddim Machine MRM-0420 no navegador / celular (Web Audio)
 DubBattery/                      Dub Battery Reggae — sampler de bateria com 16 pads + aba Dub Drums (C++ / JUCE 8)
 .github/workflows/
   build-bigknob.yml              compila, valida e publica o Big Knob

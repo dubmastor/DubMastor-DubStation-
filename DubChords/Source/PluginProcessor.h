@@ -47,6 +47,13 @@ public:
     double getPlayPositionInLoop() const { return displayPos.load(); }   // -1 = parado
     double getLoopBeatsForDisplay() const { return displayLoop.load(); }
 
+    // MIDI editável (usado pelo Mastor Riddim Machine MRM-0420). Thread da interface.
+    // A edição fica salva no projeto e vale até um controle do gerador (acordes, padrão...) ser mexido.
+    std::vector<dub::NoteEvent> getCurrentLoop (double& loopBeatsOut) const;   // editado, se houver
+    void setEdits (std::vector<dub::NoteEvent> events, double loopBeatsIn);
+    bool hasEdits() const;
+    void clearEdits();
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:
@@ -59,6 +66,13 @@ private:
     void renderSound (juce::AudioBuffer<float>&, const juce::MidiBuffer&);
 
     float param (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
+    juce::String settingsKey() const;         // impressão digital dos controles que montam o loop
+
+    mutable juce::SpinLock editLock;
+    std::vector<dub::NoteEvent> edits;
+    double editsLoopBeats = 0.0;
+    juce::String editsKey;
+    bool editsOn = false;
 
     RootsKeysSoundEngine sound;
     std::vector<float> renderL, renderR;

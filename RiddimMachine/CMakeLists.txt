@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-# Mastor Riddim Machine MRM-0420: Dub Chords + Dub Drums num só instrumento
-project(MastorRiddimMachine VERSION 1.4.0)
+# Mastor Riddim Machine MRM-0420 (DubStation): MRDM-12 + MRCM-1240 + MRBM-69 + Mastor Big Knob num só instrumento
+project(MastorRiddimMachine VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,7 +25,7 @@ else()
 endif()
 
 juce_add_plugin(MastorRiddimMachine
-    COMPANY_NAME                "DubMastor"
+    COMPANY_NAME                "DubStation"
     BUNDLE_ID                   com.dubmastor.mrm0420
     PRODUCT_NAME                "Mastor Riddim Machine MRM-0420"
     PLUGIN_MANUFACTURER_CODE    Dblb
@@ -40,21 +40,41 @@ juce_add_plugin(MastorRiddimMachine
     VST3_CATEGORIES             Instrument Generator
     AU_MAIN_TYPE                kAudioUnitType_MusicDevice)
 
-# O código do Dub Chords e do Dub Drums é usado direto das pastas deles (nada copiado):
-# o que mudar lá entra aqui no próximo build.
+# O código de cada máquina é usado direto da pasta dela (nada copiado): o que mudar no MRCM-1240, no
+# MRDM-12, no MRBM-69 ou no Big Knob entra aqui no próximo build. As versões aparecem na aba RIDDIM.
+function(mrm_version dir out)
+    file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../${dir}/CMakeLists.txt" line REGEX "^project\\(")
+    string(REGEX MATCH "VERSION ([0-9]+)\\.([0-9]+)" _ "${line}")
+    set(${out} "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}" PARENT_SCOPE)
+endfunction()
+mrm_version(DubDrums    MRM_DRUMS_VER)
+mrm_version(DubChords   MRM_CHORDS_VER)
+mrm_version(BassMachine MRM_BASS_VER)
+mrm_version(BigKnob     MRM_KNOB_VER)
+message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRDM-12 ${MRM_DRUMS_VER}, MRCM-1240 ${MRM_CHORDS_VER}, MRBM-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
+
 set(MRM_SOURCES
     Source/MrmProcessor.cpp
     Source/MrmEditor.cpp
+    Source/MrmMain.cpp
     Source/ChordsProcessorUnit.cpp
     Source/ChordsEditorUnit.cpp
     Source/DrumsProcessorUnit.cpp
     Source/DrumsEditorUnit.cpp
+    Source/BassProcessorUnit.cpp
+    Source/BassEditorUnit.cpp
+    Source/KnobProcessorUnit.cpp
+    Source/KnobEditorUnit.cpp
     ../DubDrums/Source/PatternGenerator.cpp)
 set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
     ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)     # timbres do piano M1 / Hammond
 set(MRM_DEFINES
-    DD_VERSION_SHORT="1.4"
+    DD_VERSION_SHORT="${MRM_DRUMS_VER}"
+    MRM_DRUMS_VER="${MRM_DRUMS_VER}"
+    MRM_CHORDS_VER="${MRM_CHORDS_VER}"
+    MRM_BASS_VER="${MRM_BASS_VER}"
+    MRM_KNOB_VER="${MRM_KNOB_VER}"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -72,6 +92,7 @@ endif()
 target_link_libraries(MastorRiddimMachine
     PRIVATE
         juce::juce_audio_utils
+        juce::juce_dsp
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
@@ -89,5 +110,5 @@ if(MRM_RENDER_TEST)
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="MRM-0420" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1
         JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
-    target_link_libraries(mrm_render PRIVATE juce::juce_audio_utils juce::juce_recommended_config_flags)
+    target_link_libraries(mrm_render PRIVATE juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
 endif()

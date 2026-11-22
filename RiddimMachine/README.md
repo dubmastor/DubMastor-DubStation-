@@ -1,72 +1,77 @@
-# Mastor Riddim Machine MRM-0420
+# Mastor Riddim Machine MRM-0420 1.0 — DubStation
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.4/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.4/MRM-0420-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
 
-![MRM-0420, aba HARMONIA (Dub Chords)](docs/interface-harmonia.png)
+![MRM-0420, aba RIDDIM](docs/interface-riddim.png)
 
-O **Dub Chords** e o **Dub Drums** num instrumento só, para começar um riddim em segundos: monte os acordes,
-escolha a bateria, aperte **PLAY RIDDIM** para ouvir os dois juntos e **arraste o riddim inteiro** (bateria,
-skank e bubble, já alinhados) para a timeline da DAW.
-Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um **instrumento**: no Cubase,
-carregue numa *Instrument Track*.
+As máquinas da DubStation num instrumento só, para começar um riddim em segundos:
 
-## Como começar um riddim
-1. Na aba **HARMONIA**, escolha até 4 acordes e o padrão do skank.
-2. Na aba **BATERIA**, escolha o estilo (Rockers, One Drop ou Boom Bap), ajuste bumbo e caixa na BATIDA PRINCIPAL, o baterista e, se quiser, a **VIRADA DE INTRO**.
-3. Aperte **PLAY RIDDIM** e ajuste o **BPM**.
-4. Escolha o tamanho (4 a 64 compassos) e **arraste o riddim** para a timeline. No Cubase, o arquivo vira
-   uma faixa para cada parte: bateria, skank e bubble.
+| Máquina | Parte | Aba |
+|---|---|---|
+| **Mastor Reggae Drum Machine MRDM-12** | bateria, com os samples DM (`DubDrums/Samples`) | BATERIA |
+| **Mastor Reggae Chord Machine MRCM-1240** | skank de piano M1 e bubble de órgão | HARMONIA |
+| **Mastor Reggae Bass Machine MRBM-69** | linha de baixo, com os timbres do MRDBI-07 | BAIXO |
+| **Mastor Big Knob** | filtro, tape echo, sirene e maximizer no master | CONTROL ROOM |
 
-## Cabeçalho (vale para as duas abas)
+A **harmonia é uma só** para o MRCM-1240 e o MRBM-69 (mexer nos acordes em qualquer aba muda as duas) e o
+**BPM é um só** para todas. Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um
+**instrumento**: no Cubase, carregue numa *Instrument Track*.
+
+## Aba RIDDIM (a principal)
+| Parte | O que faz |
+|---|---|
+| **HARMONIA** | Os 4 acordes no padrão do MRCM-1240: teclado, MAIOR/MENOR, inversão (com a sugestão automática) e duração. Valem para o skank e para o baixo |
+| **MÁQUINAS** | Cada máquina com a chave **LIGADA/DESLIGADA**, os músicos clicáveis (bateristas, padrões do skank e baixistas), o **MIDI na tela, editável**, e o **ARRASTE** só daquela máquina |
+| **JACKPOT** | A semente nos rolos de caça-níquel e o botão vermelho **NOVO RIDDIM**: sorteia outra semente para a bateria e o baixo (os rolos giram e param um a um, como no MRDM-12). Arraste os rolos ou use a rodinha para escolher a semente na mão |
+| **RIDDIM** | Tamanho (4 a 64 compassos), **ARRASTE O RIDDIM** (as máquinas ligadas num `.mid` só, alinhadas), **EXPORTAR**, a chave **CONTROL ROOM** e a chave **TAPE ECHO** |
+| Alto-falante | Caixa de madeira com grade de metal perfurada; o cone mexe com o som |
+
+### MIDI editável na tela
+- **Bateria:** clique numa semicolcheia para pôr/tirar bumbo, caixa, aro, hi-hat ou hi-hat aberto; arrastar pinta várias; a rodinha muda a força. São as mesmas edições da grade PADRÃO do MRDM-12.
+- **Harmonia:** clique num espaço vazio do SKANK ou do BUBBLE para pôr um ataque do acorde (com as mesmas notas do ataque mais próximo); clique num ataque para tirar; a rodinha muda a força.
+- **Baixo:** o visor do MRBM-69: clique põe nota (na pentatônica do acorde), arraste move, borda estica, duplo clique apaga.
+- **DESFAZER EDIÇÃO** aparece na máquina editada. A edição fica salva no projeto e vale até um controle do gerador daquela máquina ser mexido (como nas máquinas separadas).
+- O que você vê é o que toca e o que é arrastado.
+
+## Cabeçalho (vale para todas as abas)
 | Controle | O que faz |
 |---|---|
-| **MÓDULO: HARMONIA / BATERIA** | Troca a aba. A outra continua tocando e guardando tudo |
-| **PLAY RIDDIM** | Toca harmonia e bateria juntas, sem a DAW rodando, começando pela intro. Aperte de novo para parar |
-| **BPM** | Um BPM só para tudo (**LINK**): mexer no BPM de uma aba muda o das outras. Arraste para cima/baixo, use a rodinha, duplo clique volta para 75. Com a DAW tocando, mostra o BPM da DAW |
-| **COMP.** | Tamanho do riddim arrastado/exportado: 4, 8, 16, 32 ou 64 compassos (sem contar a intro) |
-| **ARRASTE O RIDDIM** | Clique e arraste para a timeline: um `.mid` com a bateria e a harmonia juntas |
-| **EXPORTAR** | Salva o mesmo `.mid` (padrão: Documentos/MRM-0420) |
+| **ABAS** | RIDDIM, HARMONIA, BATERIA, BAIXO e CONTROL ROOM |
+| **PLAY RIDDIM** | Toca todas as máquinas juntas, sem a DAW rodando, começando pela intro |
+| **BPM** | Um BPM para todas. Com a DAW tocando, mostra o BPM da DAW |
 
-## Aba HARMONIA (Dub Chords)
-O painel completo do [Dub Chords](../DubChords/README.md): 4 acordes com teclado, maior/menor, inversão e
-duração; padrão do skank, tamanho da nota, registro, velocity e swing; bubble de Hammond e som
-interno com o piano M1 e o Hammond. O **ARRASTE O MIDI** desta aba continua mandando só a harmonia.
+## Abas das máquinas
+Cada aba mostra o painel completo da máquina, igual ao plugin separado (com o mesmo código: o que muda nas
+máquinas entra no MRM-0420 no próximo build). Na aba BAIXO, o acompanhamento interno do MRBM-69 fica desligado:
+no MRM-0420 a bateria e o teclado tocam de verdade.
 
-## Aba BATERIA (Dub Drums)
-![MRM-0420, aba BATERIA (Dub Drums)](docs/interface-bateria.png)
+## Aba CONTROL ROOM
+![MRM-0420, aba CONTROL ROOM](docs/interface-control-room.png)
 
-O painel completo do [Dub Drums](../DubDrums/README.md): estilo, compassos, viradas, semente, hi-hat, os três
-bateristas, swing, dinâmica, aleatoriedade, bateria interna, canal, MIDI colorido e mapa de notas. O
-**ARRASTE O MIDI** desta aba continua mandando só a bateria.
+- O **Mastor Big Knob** inteiro no master: filtro big knob, tape echo, sirene de dub, VUs e maximizer.
+- **MUTE DAS MÁQUINAS**, na ordem **DRUMS** (verde), **BASS** (amarelo) e **RIDDIM** (vermelho, o skank e o bubble do MRCM-1240). O mute tira só o som: o MIDI continua saindo e a máquina continua no riddim arrastado.
+- **CONTROL ROOM** liga/desliga o Big Knob no master; **TAPE ECHO** liga/desliga o eco de fita.
 
-## Como as duas partes andam juntas
-- **Intro:** com a **VIRADA DE INTRO** ligada, a bateria toca um compasso sozinha e os acordes entram no
-  compasso seguinte, tanto no PLAY RIDDIM quanto com a DAW tocando do começo, e no MIDI arrastado.
-- **Loops de tamanhos diferentes:** a bateria (1 a 4 compassos) e a progressão de acordes se repetem cada
-  uma no seu tamanho até completar o riddim; a última nota é cortada no fim.
-- **Cores no MIDI:** a harmonia sai com um canal por acorde e a bateria com um canal por compasso (com o
-  MIDI COLORIDO ligado), como nos plugins separados. No Cubase: Key Editor, **Cores › Canal**.
-- **MIDI ao vivo** (DAW tocando): skank no canal 1, bubble no 3 e a bateria no CANAL do
-  Dub Drums (10). No PLAY RIDDIM nada sai, como no PREVIEW.
-- **Som interno:** a soma do piano/órgão com a bateria tem um teto suave e nunca estoura. Desligue o
-  SOM INTERNO de cada aba quando for usar os seus instrumentos.
-- **Projeto salvo:** a aba aberta, o BPM e todos os ajustes das duas abas voltam quando o projeto abre.
-  Na DAW, a automação vê o **Play riddim**, o **BPM** e o **Tamanho do riddim**.
+## Como as máquinas andam juntas
+- **Intro:** com a VIRADA DE INTRO do MRDM-12 ligada, a bateria toca um compasso sozinha e a harmonia e o baixo entram no compasso seguinte (no PLAY RIDDIM, com a DAW e no MIDI).
+- **Loops de tamanhos diferentes** se repetem cada um no seu tamanho até completar o riddim.
+- **Cores no MIDI:** harmonia e baixo com um canal por acorde, bateria com um canal por compasso (MIDI COLORIDO). No Cubase: Key Editor, Cores › Canal.
+- **MIDI ao vivo** (DAW tocando): skank no canal 1, baixo no 2, bubble no 3 e a bateria no canal do MRDM-12 (10).
+- **Projeto salvo:** a aba aberta, o BPM, a semente, as chaves, os mutes, as edições e os ajustes de cada máquina (inclusive o Big Knob).
+
+## No celular
+A [versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/) tem a aba RIDDIM: harmonia,
+máquinas com músicos e MIDI editável (toque para pôr/tirar), JACKPOT, tamanho, mute DRUMS / BASS / RIDDIM,
+CONTROL ROOM e TAPE ECHO, e baixa o MIDI de cada máquina ou do riddim inteiro. A bateria usa os mesmos samples DM.
 
 ## Para desenvolvedores
-O MRM-0420 não copia o código: ele compila os arquivos do `DubChords/Source` e do `DubDrums/Source` direto
-das pastas deles, então melhorias nos dois plugins entram aqui no próximo build.
-- `Source/MrmProcessor.*`: roda os dois geradores no mesmo relógio (DAW ou PLAY RIDDIM), atrasa a
-  harmonia pela intro (dividindo o bloco de áudio na amostra exata), soma o áudio, junta o MIDI, liga os
-  BPMs, salva o estado e escreve o `.mid` do riddim.
-- `Source/MrmEditor.*`: cabeçalho MRM-0420 e as abas; os painéis do Dub Chords e do Dub Drums aparecem
-  inteiros abaixo dele.
-- `Source/*Unit.cpp`, `DrumsNames.h`: compilam o código original; as classes de interface que têm o mesmo
-  nome nos dois plugins ganham outro nome no lado do Dub Drums.
-- `tests/render_test.cpp`: PNG de cada aba, MIDI do riddim (faixas, tamanho, acordes depois da intro),
-  áudio do PLAY RIDDIM, DAW tocando com intro e estado salvo/recarregado. Roda no CI antes do build.
+- `Source/MrmProcessor.*`: roda as quatro máquinas no mesmo relógio, atrasa harmonia e baixo pela intro (dividindo o bloco na amostra exata), liga harmonia/BPM entre as máquinas, aplica chaves e mutes, passa a mistura pelo Big Knob, salva o estado e escreve o MIDI.
+- `Source/MrmMain.*`: aba RIDDIM. `Source/MrmEditor.*`: cabeçalho, abas e CONTROL ROOM. `Source/MrmStyle.h`: desenho DubStation.
+- `Source/*Unit.cpp` e `*Names.h`: compilam o código das máquinas direto das pastas delas, renomeando as classes com nomes repetidos.
+- `tests/render_test.cpp`: PNG das 5 abas, MIDI do riddim e de cada máquina, harmonia/BPM/semente ligados, edições, mute, intro alinhada, samples DM e estado. Roda no CI antes do build.
+- **Regra do repositório:** mudou o MRCM-1240, o MRDM-12, o MRBM-69, o MRDBI-07 ou o Big Knob? O workflow do MRM-0420 roda junto (veja `paths` em `.github/workflows/build-mrm0420.yml`); confira as abas e atualize as notas do MRM-0420.
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release

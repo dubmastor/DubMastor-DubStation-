@@ -100,7 +100,7 @@ void DubChordsProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     renderR.assign ((size_t) maxBlock, 0.0f);
     pending.reserve (8192);
     // fora do tempo real: pode montar o loop aqui mesmo
-    loop = dub::buildLoop (getSlots(), getSettings(), loopBeats);
+    loop = getCurrentLoop (loopBeats);
     displayLoop.store (loopBeats);
     hasIncoming.store (false);
     dirty.store (false);
@@ -174,7 +174,7 @@ void DubChordsProcessor::timerCallback()
 void DubChordsProcessor::publishLoop()
 {
     double beats = 0.0;
-    auto fresh = dub::buildLoop (getSlots(), getSettings(), beats);
+    auto fresh = getCurrentLoop (beats);
     {
         const juce::SpinLock::ScopedLockType lock (swapLock);
         incoming.swap (fresh);            // o loop antigo que estava esperando é liberado aqui, fora do áudio
@@ -373,10 +373,63 @@ void DubChordsProcessor::renderSound (juce::AudioBuffer<float>& buffer, const ju
 }
 
 //==============================================================================
+// MIDI editável
+juce::String DubChordsProcessor::settingsKey() const
+{
+    juce::String k;
+    for (int i = 0; i < numSlots; ++i)
+    {
+        k << (int) param (rootId (i)) << ',' << (int) param (qualId (i)) << ',' << (int) param (durId (i)) << ','
+          << (int) param (invId (i)) << ',' << (i == 0 ? 1 : (param (onId (i)) > 0.5f ? 1 : 0)) << ';';
+    }
+    k << (int) param ("pattern") << ',' << (int) param ("center") << ',' << juce::roundToInt (param ("velocity") * 1000.0f) << ','
+      << (param ("bubble") > 0.5f ? 1 : 0) << ',' << juce::roundToInt (param ("swing") * 1000.0f);
+    return k;
+}
+
+std::vector<dub::NoteEvent> DubChordsProcessor::getCurrentLoop (double& lb) const
+{
+    {
+        const juce::SpinLock::ScopedLockType lock (editLock);
+        if (editsOn && editsKey == settingsKey()) { lb = editsLoopBeats; return edits; }
+    }
+    return dub::buildLoop (getSlots(), getSettings(), lb);
+}
+
+void DubChordsProcessor::setEdits (std::vector<dub::NoteEvent> ev, double lb)
+{
+    std::sort (ev.begin(), ev.end(), [] (const dub::NoteEvent& a, const dub::NoteEvent& b) { return a.start < b.start; });
+    {
+        const juce::SpinLock::ScopedLockType lock (editLock);
+        edits = std::move (ev);
+        editsLoopBeats = lb;
+        editsKey = settingsKey();
+        editsOn = true;
+    }
+    dirty.store (true);
+}
+
+bool DubChordsProcessor::hasEdits() const
+{
+    const juce::SpinLock::ScopedLockType lock (editLock);
+    return editsOn && editsKey == settingsKey();
+}
+
+void DubChordsProcessor::clearEdits()
+{
+    {
+        const juce::SpinLock::ScopedLockType lock (editLock);
+        editsOn = false;
+        edits.clear();
+    }
+    dirty.store (true);
+}
+
+//==============================================================================
 bool DubChordsProcessor::writeMidiFile (const juce::File& file) const
 {
     double lb = 0.0;
-    const auto events = dub::buildLoop (getSlots(), getSettings(), lb);
+    const auto events = getCurrentLoop (lb);
     if (lb <= 0.0 || events.empty()) return false;
 
     const int tpq = 960;
@@ -440,7 +493,25 @@ bool DubChordsProcessor::writeMidiFile (const juce::File& file) const
 //==============================================================================
 void DubChordsProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    if (auto xml = apvts.copyState().createXml())
+    auto state = apvts.copyState();
+    {   // MIDI editado (só se ainda vale para os controles atuais)
+        const juce::SpinLock::ScopedLockType lock (editLock);
+        if (editsOn && editsKey == settingsKey())
+        {
+            juce::ValueTree ed ("Edits");
+            ed.setProperty ("loopBeats", editsLoopBeats, nullptr);
+            for (const auto& e : edits)
+            {
+                juce::ValueTree n ("N");
+                n.setProperty ("s", e.start, nullptr);    n.setProperty ("l", e.length, nullptr);
+                n.setProperty ("n", e.note, nullptr);     n.setProperty ("v", e.velocity, nullptr);
+                n.setProperty ("c", e.channel, nullptr);  n.setProperty ("k", e.slot, nullptr);
+                ed.appendChild (n, nullptr);
+            }
+            state.appendChild (ed, nullptr);
+        }
+    }
+    if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
 
@@ -448,7 +519,21 @@ void DubChordsProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         if (xml->hasTagName (apvts.state.getType()))
-            apvts.replaceState (juce::ValueTree::fromXml (*xml));
+        {
+            auto tree = juce::ValueTree::fromXml (*xml);
+            auto ed = tree.getChildWithName ("Edits");
+            if (ed.isValid()) tree.removeChild (ed, nullptr);
+            apvts.replaceState (tree);
+            if (ed.isValid())
+            {
+                std::vector<dub::NoteEvent> ev;
+                for (const auto& n : ed)
+                    ev.push_back ({ (double) n.getProperty ("s"), (double) n.getProperty ("l"), (int) n.getProperty ("n"),
+                                    (int) n.getProperty ("v"), (int) n.getProperty ("c"), (int) n.getProperty ("k") });
+                setEdits (std::move (ev), (double) ed.getProperty ("loopBeats"));
+            }
+            else clearEdits();
+        }
     dirty.store (true);
 }
 

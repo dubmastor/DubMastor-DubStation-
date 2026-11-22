@@ -1,15 +1,24 @@
 name: Build Mastor Riddim Machine MRM-0420
 
-# O MRM-0420 usa o código do Dub Chords e do Dub Drums direto das pastas deles:
-# quando um dos dois muda, o MRM-0420 é recompilado e testado também.
+# O MRM-0420 usa o código do MRCM-1240 (DubChords), do MRDM-12 (DubDrums), do MRBM-69 (BassMachine, com os
+# timbres do MRDBI-07 em DubBass) e do Mastor Big Knob (BigKnob) direto das pastas deles: quando qualquer um
+# muda, o MRM-0420 é recompilado, testado e publicado também (sempre com os timbres e samples atuais).
 on:
   push:
     branches: [main]
     paths:
       - 'RiddimMachine/**'
       - 'DubChords/Source/**'
+      - 'DubChords/CMakeLists.txt'
       - 'DubDrums/Source/**'
-      - 'RootsKeys/Source/RootsKeysEngine.h'
+      - 'DubDrums/Samples/**'
+      - 'DubDrums/CMakeLists.txt'
+      - 'BassMachine/Source/**'
+      - 'BassMachine/CMakeLists.txt'
+      - 'DubBass/Source/**'
+      - 'BigKnob/Source/**'
+      - 'BigKnob/CMakeLists.txt'
+      - 'RootsKeys/Source/**'
       - '.github/workflows/build-mrm0420.yml'
     tags:
       - 'MRM-0420-*'
@@ -29,7 +38,7 @@ defaults:
 
 jobs:
   render-test:
-    name: Teste offline (abas, MIDI do riddim, intro alinhada, PLAY RIDDIM e estado)
+    name: Teste offline (5 abas, MIDI do riddim e de cada máquina, harmonia ligada, edições, intro alinhada, samples DM e estado)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,8 +65,16 @@ jobs:
         run: |
           mkdir -p test-out && cd test-out
           R=../build-test/mrm_render_artefacts/Release/mrm_render
-          $R harmonia.png 0
-          $R bateria.png 1
+          $R riddim.png 0
+          $R harmonia.png 1
+          $R bateria.png 2
+          $R baixo.png 3
+          $R control-room.png 4
+          $R links
+          $R samples
+          $R edicao
+          $R maquinas
+          $R mute
           $R riddim.mid
           $R riddim-intro.mid intro
           $R play-riddim.wav intro

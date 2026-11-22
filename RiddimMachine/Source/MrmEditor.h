@@ -1,10 +1,10 @@
-// Interface do Mastor Riddim Machine MRM-0420, no visual Dub Station:
-// cabeçalho com o nome em destaque, as abas HARMONIA (Dub Chords) e BATERIA (Dub Drums) e a seção RIDDIM
-// (PLAY RIDDIM, BPM ligado, tamanho, ARRASTE O RIDDIM e EXPORTAR). Abaixo, o painel da aba escolhida,
-// igualzinho ao plugin separado.
+// Interface do Mastor Riddim Machine MRM-0420 (DubStation):
+// cabeçalho com o nome em destaque, as abas RIDDIM (resumo), HARMONIA (MRCM-1240), BATERIA (MRDM-12),
+// BAIXO (MRBM-69) e BIG KNOB, o PLAY RIDDIM e o BPM único. Cada aba de máquina mostra o painel
+// completo dela, igualzinho ao plugin separado.
 #pragma once
 
-#include "MrmProcessor.h"
+#include "MrmMain.h"
 
 namespace mrmui
 {
@@ -27,7 +27,7 @@ private:
     bool selected = false;
 };
 
-// PLAY RIDDIM: tampa de pedal verde (dourada tocando), toca harmonia e bateria juntas
+// PLAY RIDDIM: tampa de pedal verde (dourada tocando), toca todas as máquinas juntas
 class PlayKey : public juce::Button
 {
 public:
@@ -50,71 +50,105 @@ public:
 
 private:
     MrmProcessor& proc;
-    juce::RangedAudioParameter& param;
     juce::ParameterAttachment att;
     float value = 75.0f, dragStart = 75.0f;
     bool dawShown = false;
     double dawBpm = 0.0;
 };
 
-// ARRASTE O RIDDIM: a bateria e a harmonia num arquivo só, já alinhadas
-class RiddimDragZone : public juce::Component
-{
-public:
-    explicit RiddimDragZone (MrmProcessor& p) : proc (p)
-    {
-        setMouseCursor (juce::MouseCursor::DraggingHandCursor);
-        setRepaintsOnMouseActivity (true);
-    }
-    void paint (juce::Graphics&) override;
-    void mouseDrag (const juce::MouseEvent&) override;
-    void mouseUp (const juce::MouseEvent&) override { dragging = false; }
-
-private:
-    MrmProcessor& proc;
-    bool dragging = false;
-};
-
 // Cabeçalho completo (fundo pintado uma vez, controles por cima)
 class Header : public juce::Component, private juce::Timer
 {
 public:
-    static constexpr int height = 170;
+    static constexpr int height = 150;
     Header (MrmProcessor&, std::function<void (int)> onTab);
     ~Header() override;
     void paint (juce::Graphics&) override;
     void resized() override;
-    void setTab (int t) { harmony.setSelected (t == 0); drumsTab.setSelected (t == 1); }
+    void setTab (int t);
 
 private:
     void timerCallback() override;
     void renderBackground();
-    void exportRiddim();
 
     MrmProcessor& proc;
-    DubLookAndFeel lnf;                    // o mesmo LookAndFeel do Dub Chords (botão EXPORTAR)
-    TabKey harmony { "HARMONIA", "DUB CHORDS" }, drumsTab { "BATERIA", "DUB DRUMS" };
+    std::array<std::unique_ptr<TabKey>, MrmProcessor::numTabs> tabs;
     PlayKey play;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> playAtt;
     BpmWindow bpm;
-    std::unique_ptr<ChoiceWindow> length;
-    RiddimDragZone dragZone;
-    juce::TextButton exportBtn { "EXPORTAR" };
-    std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
-    juce::Rectangle<int> woodL, woodR, plate, tabSection, riddimSection;
+    juce::Rectangle<int> woodL, woodR, plate, tabSection, transportSection;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Header)
+};
+
+// Mostra o painel completo de uma máquina, sem o título dela (o cabeçalho do MRM-0420 já tem o nome),
+// escalado para caber na área das abas e centralizado num fundo de rack
+class PanelHolder : public juce::Component
+{
+public:
+    PanelHolder (juce::Component& panelIn, int cropTopIn) : panel (panelIn), cropTop (cropTopIn)
+    {
+        addAndMakeVisible (panel);
+        setOpaque (true);
+    }
+    // cobre uma parte do painel (em coordenadas do painel) com uma plaqueta de aviso, sem deixar clicar
+    void addCover (juce::Rectangle<int> panelArea, juce::String text);
+    void paint (juce::Graphics&) override;
+    void resized() override;
+private:
+    struct Cover : juce::Component
+    {
+        juce::String text;
+        void paint (juce::Graphics&) override;
+    };
+    juce::Component& panel;
+    int cropTop;
+    float scale = 1.0f;
+    juce::Rectangle<float> shown;
+    juce::Image background;
+    std::vector<std::pair<juce::Rectangle<int>, std::unique_ptr<Cover>>> covers;
+};
+// Tecla de MUTE de uma máquina na CONTROL ROOM: tampa colorida acesa enquanto a máquina soa,
+// apagada com a lâmpada MUTE vermelha quando está mutada
+class MuteKey : public juce::Component
+{
+public:
+    MuteKey (juce::RangedAudioParameter&, juce::String title, juce::String sub, juce::Colour);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+private:
+    juce::ParameterAttachment att;
+    juce::String title, sub;
+    juce::Colour colour;
+    bool muted = false;
+};
+
+// Aba CONTROL ROOM: o Mastor Big Knob inteiro (filtro, tape echo, sirene, maximizer) no master,
+// o mute de cada máquina (DRUMS, BASS, RIDDIM) e as chaves CONTROL ROOM e TAPE ECHO
+class ControlRoomPage : public juce::Component
+{
+public:
+    ControlRoomPage (MrmProcessor&, juce::Component& knobPanel, int cropTop);
+    void paint (juce::Graphics&) override;
+    void resized() override;
+private:
+    PanelHolder holder;
+    MuteKey drums, bass, riddim;
+    PowerSwitch fx, echo;
+    juce::Image background;
+    juce::Rectangle<int> muteSection, masterSection;
 };
 } // namespace mrmui
 
 //==============================================================================
-// Tudo no tamanho base (1280 x 967); o editor escala para a janela redimensionável
+// Tudo no tamanho base (1280 x 1000); o editor escala para a janela redimensionável
 class MrmRoot : public juce::Component
 {
 public:
-    static constexpr int baseW = 1280;
+    static constexpr int baseW = mrmui::MainPage::kW;
+    static constexpr int baseH = mrmui::Header::height + mrmui::MainPage::kH;
     explicit MrmRoot (MrmProcessor&);
     void resized() override;
     void paintOverChildren (juce::Graphics&) override;
@@ -122,9 +156,14 @@ public:
 
 private:
     MrmProcessor& proc;
-    DubChordsPanel chordsPanel;
-    DubDrumsPanel  drumsPanel;
-    mrmui::Header  header;
+    mrmui::MainPage mainPage;
+    DubChordsPanel   chordsPanel;
+    DubDrumsPanel    drumsPanel;
+    BassMachinePanel bassPanel;
+    DubPanel         knobPanel;
+    mrmui::PanelHolder chordsHolder, drumsHolder, bassHolder;
+    mrmui::ControlRoomPage controlRoom;
+    mrmui::Header header;
 };
 
 class MrmEditor : public juce::AudioProcessorEditor
