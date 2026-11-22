@@ -186,11 +186,10 @@ jobs:
           # sem "relocate": se existir outra cópia do plugin no disco (zip descompactado, pasta de build),
           # o macOS instalaria em cima dela em vez de em /Library/Audio/Plug-Ins
           pkgbuild --analyze --root pkgroot component.plist
-          N=$(/usr/libexec/PlistBuddy -c "Print" component.plist | grep -c "RootRelativeBundlePath")
-          for i in $(seq 0 $((N - 1))); do
-            /usr/libexec/PlistBuddy -c "Set :$i:BundleIsRelocatable false" component.plist
-          done
-          grep -c "<false/>" component.plist
+          plutil -convert xml1 component.plist
+          sed -i '' -e '/<key>BundleIsRelocatable<\/key>/{n;s/<true\/>/<false\/>/;}' component.plist
+          echo "== bundles sem relocate:"; grep -A1 "BundleIsRelocatable" component.plist
+          ! grep -A1 "BundleIsRelocatable" component.plist | grep -q "<true/>"
           pkgbuild --root pkgroot --component-plist component.plist --identifier com.dubmastor.dubbatteryreggae.pkg --version "$V" \
                    --scripts installer/macos-scripts --install-location / \
                    ../DubBatteryReggae-macOS-Instalador.pkg
