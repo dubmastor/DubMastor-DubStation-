@@ -119,8 +119,7 @@ jobs:
           Write-Host "pluginval exit code: $code"
           if ($code -ne 0) { exit 1 }
 
-      # --- Validador oficial da Steinberg (o mesmo teste de conformidade VST3 usado por Cubase, Studio One,
-      #     Reaper, Ableton Live, FL Studio e Bitwig para carregar plugins VST3)
+      # --- Validador oficial da Steinberg (conformidade VST3: Cubase, Studio One, Reaper, Ableton, FL Studio, Bitwig)
       - name: Validate VST3 with Steinberg validator (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -129,11 +128,14 @@ jobs:
           git clone --depth 1 --branch v3.7.14_build_55 https://github.com/steinbergmedia/vst3sdk.git vst3sdk
           cd vst3sdk
           git submodule update --init --depth 1 base pluginterfaces public.sdk cmake
-          cmake -B build -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF -DSMTG_ADD_VSTGUI=OFF -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=ON -DSMTG_RUN_VST_VALIDATOR=OFF
+          Set-Content public.sdk/samples/vst-hosting/CMakeLists.txt "add_subdirectory(validator)"
+          cmake -B build -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=ON -DSMTG_RUN_VST_VALIDATOR=OFF
           cmake --build build --config Release --target validator --parallel 4
           $v = Get-ChildItem -Recurse -Filter validator.exe build | Select-Object -First 1
-          & $v.FullName "${{ github.workspace }}/DubDrums/build/DubDrums_artefacts/Release/VST3/Mastor Dub Drums Machine MDDM-12.vst3" 2>&1 | Tee-Object -Variable vlog | Select-Object -Last 40
-          if ($LASTEXITCODE -ne 0) { Write-Host "validator falhou: $LASTEXITCODE"; exit 1 }
+          & $v.FullName "${{ github.workspace }}/DubDrums/build/DubDrums_artefacts/Release/VST3/Mastor Dub Drums Machine MDDM-12.vst3" 2>&1 | Tee-Object -Variable vlog
+          $code = $LASTEXITCODE
+          $vlog | Select-String -Pattern "Failed|ERROR" -Context 6,0 | ForEach-Object { Write-Host $_ }
+          if ($code -ne 0) { Write-Host "validator falhou: $code"; exit 1 }
 
       - name: Check universal binary + validate (macOS)
         if: runner.os == 'macOS'
