@@ -18,11 +18,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     using namespace juce;
     AudioProcessorValueTreeState::ParameterLayout layout;
 
-    StringArray roots, quals, durs, pats;
+    StringArray roots, quals, durs;
     for (int r = 0; r < 12; ++r) roots.add (dub::rootName (r));
     quals.add ("maior"); quals.add ("menor");   // dub::Maj = 0, dub::Min = 1
     for (int d = 0; d < dub::numDurations; ++d) durs.add (dub::durationName (d));
-    for (int p = 0; p < dub::NumPatterns; ++p) pats.add (dub::patternName (p));
 
     // Progressão padrão: Am (1 comp.) | Dm (1 comp.); acordes 3 (Em) e 4 (G) desligados
     const int  defRoot[numSlots] = { 9, 2, 4, 7 };
@@ -42,7 +41,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
             layout.add (std::make_unique<AudioParameterBool> (ParameterID { onId (i), 1 }, n + " ligado", defOn[i]));
     }
 
-    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pattern", 1 }, "Padrao", pats, 0));
     layout.add (std::make_unique<AudioParameterInt>    (ParameterID { "center", 1 }, "Registro", 48, 72, 60));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "velocity", 1 }, "Velocity", 0.1f, 1.0f, 0.8f));
     {
@@ -130,7 +128,7 @@ std::vector<dub::ChordSlot> DubChordsProcessor::getSlots() const
 dub::Settings DubChordsProcessor::getSettings() const
 {
     dub::Settings s;
-    s.pattern    = (int) param ("pattern");
+    s.pattern    = dub::SkankOffbeat;   // skank sempre no contratempo
     s.centerNote = (int) param ("center");
     s.velocity   = param ("velocity");
     s.noteSize   = 0;   // todas as notas sempre 1/32 (o parâmetro "noteSize" ficou só para abrir projetos antigos)
@@ -412,7 +410,7 @@ juce::String DubChordsProcessor::settingsKey() const
         k << (int) param (rootId (i)) << ',' << (int) param (qualId (i)) << ',' << (int) param (durId (i)) << ','
           << (int) param (invId (i)) << ',' << (i == 0 ? 1 : (param (onId (i)) > 0.5f ? 1 : 0)) << ';';
     }
-    k << (int) param ("pattern") << ',' << (int) param ("center") << ',' << juce::roundToInt (param ("velocity") * 1000.0f) << ','
+    k << 0 << ',' << (int) param ("center") << ',' << juce::roundToInt (param ("velocity") * 1000.0f) << ','
       << (param ("bubble") > 0.5f ? 1 : 0) << ',' << juce::roundToInt (param ("swing") * 1000.0f);
     return k;
 }

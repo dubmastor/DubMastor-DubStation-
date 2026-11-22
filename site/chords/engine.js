@@ -27,18 +27,14 @@
     { name: '1/32', sub: 'FUSA', beats: 0.125 }, { name: '1/16', sub: 'SEMICOLCHEIA', beats: 0.25 },
     { name: '1/8', sub: 'COLCHEIA', beats: 0.5 }, { name: '1/4', sub: 'SEMÍNIMA', beats: 1.0 },
     { name: '1/2', sub: 'MÍNIMA', beats: 2.0 }];
-  const PATTERNS = ['CONTRATEMPO', 'ONE DROP', 'DOUBLE SKANK', 'STEPPERS'];
+  const PATTERNS = ['CONTRATEMPO'];
   const INVERSIONS = ['FUND', '1ª INV', '2ª INV'];
 
-  function patternHits(p) {
-    switch (p) {
-      case 1: return [{ step: 4, vel: 1.0 }, { step: 12, vel: 1.0 }];
-      case 2: return [{ step: 2, vel: 1.0 }, { step: 3, vel: 0.72 }, { step: 6, vel: 1.0 }, { step: 7, vel: 0.72 },
-                      { step: 10, vel: 1.0 }, { step: 11, vel: 0.72 }, { step: 14, vel: 1.0 }, { step: 15, vel: 0.72 }];
-      case 3: return [{ step: 2, vel: 1.0 }, { step: 6, vel: 0.85 }, { step: 10, vel: 1.0 }, { step: 14, vel: 0.85 }, { step: 15, vel: 0.6 }];
-      default: return [{ step: 2, vel: 1.0 }, { step: 6, vel: 1.0 }, { step: 10, vel: 1.0 }, { step: 14, vel: 1.0 }];
-    }
+  // só o contratempo (os outros padrões saíram na 1.7)
+  function patternHits() {
+    return [{ step: 2, vel: 1.0 }, { step: 6, vel: 1.0 }, { step: 10, vel: 1.0 }, { step: 14, vel: 1.0 }];
   }
+
 
   // bubble de órgão com as duas mãos: "e" e "a" = mão esquerda, "&" = mão direita
   function bubbleHits() {

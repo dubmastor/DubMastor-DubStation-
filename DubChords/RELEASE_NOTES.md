@@ -1,6 +1,7 @@
 ## Mastor Reggae Chord Machine MRCM-1240 1.7 🟢🟡⚫
 
 - **PRESETS de harmonia:** botão verde **PRESETS ▾** na faixa do LOOP, com 39 progressões clássicas do reggae em pastas por estilo: **ROOTS**, **ROCKERS**, **RUB A DUB**, **LOVERS ROCK**, **DANCEHALL DIGITAL** e **NEW ROOTS 2000** (anos 70, 80, 90 e 2000). Ajusta acordes, durações e quais ficam ligados
+- **Skank só no contratempo:** saíram os padrões One drop, Double skank e Steppers; a janela PADRÃO DO SKANK agora mostra fixo CONTRATEMPO (projetos antigos abrem no contratempo)
 - **Configuração inicial** continua Lá menor e Ré menor, meio compasso cada
 - O mesmo banco de presets na versão para celular e no **Mastor Riddim Machine MRM-0420**
 

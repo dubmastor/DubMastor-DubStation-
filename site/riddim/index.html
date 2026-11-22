@@ -193,7 +193,7 @@ const DEFAULTS = {
   on: [true, true, true], mute: [false, false, false], fxOn: true, echoOn: true,
 };
 function load() { try { const s = JSON.parse(localStorage.getItem('mrm0420') || 'null'); if (s && s.slots) return Object.assign(structuredClone(DEFAULTS), s); } catch (e) {} return structuredClone(DEFAULTS); }
-const st = load(); st.slots[0].on = true;
+const st = load(); st.slots[0].on = true; st.pattern = 0;   // skank sempre no contratempo
 function save() { try { localStorage.setItem('mrm0420', JSON.stringify(st)); } catch (e) {} }
 const LENGTHS = [4, 8, 16, 32, 64];
 const DRUMS = 0, CHORDS = 1, BASS = 2;
@@ -372,8 +372,8 @@ function drawChords() {
 const MACHINES = [
   { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3',
     names: ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL'] },
-  { id: CHORDS, name: 'HARMONIA', model: 'MRCM-1240', who: 'PADRÃO DO SKANK', key: 'pattern', cols: 'c2',
-    names: ['CONTRATEMPO', 'ONE DROP', 'DOUBLE SKANK', 'STEPPERS'] },
+  { id: CHORDS, name: 'HARMONIA', model: 'MRCM-1240', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
+    names: ['CONTRATEMPO'] },
   { id: BASS, name: 'BAIXO', model: 'MRBM-69', who: 'BAIXISTA', key: 'bassist', cols: 'c3', names: B.styleNames },
 ];
 const DRUM_ROWS = [gm.OpenHat, gm.ClosedHat, gm.SideStick, gm.Snare, gm.Kick], DRUM_NAMES = ['HH AB.', 'HI-HAT', 'ARO', 'CAIXA', 'BUMBO'];
@@ -573,13 +573,12 @@ function randomRiddim() {
       Object.assign(s, { root, quality: q, dur, inv: -1, on: true });
     });
   }
-  st.style = rnd(3); st.drummer = rnd(5); st.hat = rnd(4); st.pattern = rnd(4); st.bassist = rnd(B.styleNames.length);
+  st.style = rnd(3); st.drummer = rnd(5); st.hat = rnd(4); st.bassist = rnd(B.styleNames.length);
   newSeed(); rebuild(); showLuck(true);
 }
 function showLuck(flash) {
   const l = $('luck');
-  l.innerHTML = `HARMONIA <b>${chordSlots().filter((x) => x.beats > 0).map(C.chordLabel).join(' - ')}</b> · BATERIA <b>${STYLE_NAMES[st.style]}</b> · <b>${HAT_NAMES[st.hat]}</b> · BATERISTA <b>${MACHINES[0].names[st.drummer]}</b>
-    · SKANK <b>${MACHINES[1].names[st.pattern]}</b> · BAIXISTA <b>${String(B.styleNames[st.bassist]).toUpperCase()}</b> · SEMENTE <b>${st.seed}</b>`;
+  l.innerHTML = `HARMONIA <b>${chordSlots().filter((x) => x.beats > 0).map(C.chordLabel).join(' - ')}</b> · BATERIA <b>${STYLE_NAMES[st.style]}</b> · <b>${HAT_NAMES[st.hat]}</b> · BATERISTA <b>${MACHINES[0].names[st.drummer]}</b> · BAIXISTA <b>${String(B.styleNames[st.bassist]).toUpperCase()}</b> · SEMENTE <b>${st.seed}</b>`;
   if (flash) { l.classList.remove('flash'); void l.offsetWidth; l.classList.add('flash'); }
 }
 (function lever() {

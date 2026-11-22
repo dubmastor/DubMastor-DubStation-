@@ -61,27 +61,16 @@ inline double noteSizeBeats (int n)
 
 //==============================================================================
 // Padrões do skank (grade de 16 semicolcheias por compasso)
-enum Pattern { SkankOffbeat, Skank24, DoubleSkank, Steppers, NumPatterns };
+// Só o contratempo (o skank clássico nos "e" de cada tempo); os outros padrões saíram na 1.7.
+enum Pattern { SkankOffbeat, NumPatterns };
 
-inline const char* patternName (int p)
-{
-    static const char* names[NumPatterns] = { "Contratempo", "One drop (2 e 4)", "Double skank", "Steppers" };
-    return names[std::clamp (p, 0, NumPatterns - 1)];
-}
+inline const char* patternName (int) { return "Contratempo"; }
 
 struct Hit { int step; float vel; };
 
-inline std::vector<Hit> patternHits (int p)
+inline std::vector<Hit> patternHits (int)
 {
-    switch (p)
-    {
-        case Skank24:     return { { 4, 1.0f }, { 12, 1.0f } };
-        case DoubleSkank: return { { 2, 1.0f }, { 3, 0.72f }, { 6, 1.0f }, { 7, 0.72f },
-                                   { 10, 1.0f }, { 11, 0.72f }, { 14, 1.0f }, { 15, 0.72f } };
-        case Steppers:    return { { 2, 1.0f }, { 6, 0.85f }, { 10, 1.0f }, { 14, 0.85f }, { 15, 0.6f } };
-        case SkankOffbeat:
-        default:          return { { 2, 1.0f }, { 6, 1.0f }, { 10, 1.0f }, { 14, 1.0f } };
-    }
+    return { { 2, 1.0f }, { 6, 1.0f }, { 10, 1.0f }, { 14, 1.0f } };
 }
 
 // Bubble de órgão com as duas mãos (o "bubble" clássico do reggae), em cada tempo:

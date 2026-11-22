@@ -101,7 +101,7 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 <div class="grid-mods" style="margin-top:16px">
   <section class="mod"><div class="tag">RITMO</div>
     <div class="lbl" style="margin-top:2px">PADRÃO DO SKANK</div>
-    <div class="stepper"><button id="patDn">◀</button><div class="val" id="patVal"></div><button id="patUp">▶</button></div>
+    <div class="stepper"><div class="val"><b style="font-size:15px">CONTRATEMPO</b></div></div>
     <div class="lbl">DURAÇÃO DAS NOTAS</div>
     <div class="stepper"><div class="val"><b>1/32</b><small>FUSA · SEMPRE</small></div></div>
     <div style="margin-top:12px">
@@ -167,7 +167,7 @@ function load() {
   return structuredClone(DEFAULTS);
 }
 const st = load();
-st.slots[0].on = true;
+st.slots[0].on = true; st.pattern = 0;   // skank sempre no contratempo
 function save() { try { localStorage.setItem('mrcm1240', JSON.stringify(st)); } catch (e) {} }
 
 function slotsForEngine() {
@@ -427,8 +427,6 @@ function render() {
     $('dVal' + i).innerHTML = `<b>${M.DURATIONS[s.dur].name}</b><small>${s.dur <= 1 ? 'COMPASSO' : 'COMPASSOS'}</small>`;
     $('dDn' + i).disabled = s.dur === 0; $('dUp' + i).disabled = s.dur === M.DURATIONS.length - 1;
   });
-  $('patVal').innerHTML = `<b style="font-size:15px">${M.PATTERNS[st.pattern]}</b>${st.pattern === 1 ? '<small>2 E 4</small>' : ''}`;
-  $('patDn').disabled = st.pattern === 0; $('patUp').disabled = st.pattern === M.PATTERNS.length - 1;
   $('bubble').classList.toggle('on', st.bubble);
   [...$('reps').children].forEach((b, k) => b.classList.toggle('on', k === st.reps));
   // loop
@@ -457,8 +455,6 @@ function setPreview(on) {
 }
 
 buildChords();
-$('patDn').onclick = () => { st.pattern = Math.max(0, st.pattern - 1); changed(); };
-$('patUp').onclick = () => { st.pattern = Math.min(M.PATTERNS.length - 1, st.pattern + 1); changed(); };
 $('bubble').onclick = () => { st.bubble = !st.bubble; changed(); };
 ['1x', '2x', '4x', '8x'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t; b.onclick = () => { st.reps = k; save(); render(); }; $('reps').appendChild(b); });
 slider('center', noteName);

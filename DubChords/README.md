@@ -34,7 +34,7 @@ anterior (condução de vozes), inclusive do último acorde para o primeiro, par
 ## RITMO
 | Controle | O que faz |
 |---|---|
-| **PADRÃO DO SKANK** | Contador clicável: Contratempo · One drop (2 e 4) · Double skank · Steppers |
+| **PADRÃO DO SKANK** | Sempre **contratempo**: o skank nos "e" de cada tempo, o jeito clássico do reggae (os padrões One drop, Double skank e Steppers saíram na 1.7) |
 | **DURAÇÃO DAS NOTAS** | Sempre **1/32 (fusa)**, no skank e nas duas mãos do bubble |
 | **REGISTRO** | Onde fica a mão esquerda do skank (C3 a C5). A direita fica uma oitava acima, o bubble uma abaixo |
 | **VELOCITY / SWING** | Força das notas e atraso das semicolcheias |

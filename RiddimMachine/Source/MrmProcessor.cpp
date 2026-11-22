@@ -464,8 +464,7 @@ void MrmProcessor::randomRiddim()
     set (drums.apvts, "drummer", (float) rng.nextInt (5));
     set (drums.apvts, "hatPattern", (float) rng.nextInt (4));
 
-    // --- skank e baixista
-    set (chords.apvts, "pattern", (float) rng.nextInt (dub::NumPatterns));
+    // --- baixista (o skank é sempre no contratempo)
     set (bass.apvts, "style", (float) rng.nextInt (mbm::NumStyles));
 
     syncLinks();       // o baixo recebe a harmonia nova agora

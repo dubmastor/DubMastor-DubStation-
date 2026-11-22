@@ -846,8 +846,7 @@ MainPage::MainPage (MrmProcessor& p)
     auto& b = proc.getBass();
     rows[MrmProcessor::Drums].musicians  = std::make_unique<MusicianKeys> (*d.apvts.getParameter ("drummer"),
         juce::StringArray { "STYLE SCOTT", "SANTA DAVIS", "CARLTON BARRETT", "SLY DUNBAR", "DIGIKAL" }, 3);
-    rows[MrmProcessor::Chords].musicians = std::make_unique<MusicianKeys> (*c.apvts.getParameter ("pattern"),
-        juce::StringArray { "CONTRATEMPO", "ONE DROP", "DOUBLE SKANK", "STEPPERS" }, 2);
+    // harmonia: o skank é sempre no contratempo (sem seletor; a janela fixa é desenhada no paint)
     {
         juce::StringArray bassists;
         for (int s = 0; s < mbm::NumStyles; ++s) bassists.add (mbm::styleName (s));
@@ -863,7 +862,7 @@ MainPage::MainPage (MrmProcessor& p)
         row.power = std::make_unique<PowerSwitch> (*proc.apvts.getParameter (MrmProcessor::machineOnId (m)), "LIGADA", "DESLIGADA");
         row.drag  = std::make_unique<DragZone> (proc, m, dragNames[m], "SO ESTA MAQUINA");
         addAndMakeVisible (*row.power);
-        addAndMakeVisible (*row.musicians);
+        if (row.musicians) addAndMakeVisible (*row.musicians);
         addAndMakeVisible (*row.lane);
         addAndMakeVisible (*row.drag);
         addChildComponent (row.undo);
@@ -1015,7 +1014,7 @@ void MainPage::resized()
         row.plateArea = { 64, y, 160, 96 };
         row.power->setBounds (70, y + 42, 148, 28);
         row.undo.setBounds (70, y + 74, 148, 18);
-        row.musicians->setBounds (234, y + 16, 290, 78);
+        if (row.musicians) row.musicians->setBounds (234, y + 16, 290, 78);
         row.lane->setBounds (534, y, 550, 96);
         row.drag->setBounds (1094, y + 4, 122, 88);
     }
@@ -1115,6 +1114,23 @@ void MainPage::renderBackground()
         engraved (g, models[m].trim(), pa.withTrimmedTop (26.0f).withHeight (13.0f), juce::Justification::centred, 9.0f, 0.3f);
         engraved (g, u8 (players[m]), juce::Rectangle<float> (234.0f, (float) row.area.getY() + 1.0f, 290.0f, 13.0f),
                   juce::Justification::centred, 9.0f, 0.3f);
+        if (! row.musicians)
+        {
+            // CONTRATEMPO: uma tecla só, sempre acesa
+            auto cap = juce::Rectangle<float> (234.0f, (float) row.area.getY() + 26.0f, 290.0f, 40.0f).reduced (40.0f, 0.0f);
+            g.setColour (juce::Colours::black.withAlpha (0.45f));
+            g.fillRoundedRectangle (cap.translated (0, 2.0f), 3.0f);
+            cap = cap.translated (0, 1.5f);
+            juce::ColourGradient cg (juce::Colour (0xff2c2925), cap.getX(), cap.getY(), juce::Colour (0xff141210), cap.getX(), cap.getBottom(), false);
+            g.setGradientFill (cg);
+            g.fillRoundedRectangle (cap, 3.0f);
+            g.setColour (col::amber.withAlpha (0.8f));
+            g.fillRoundedRectangle (cap.withTop (cap.getBottom() - 3.0f).reduced (6.0f, 0.0f).translated (0, -1.5f), 1.0f);
+            lamp (g, juce::Rectangle<float> (8.0f, 8.0f).withCentre ({ cap.getX() + 14.0f, cap.getCentreY() }), true);
+            g.setColour (col::amber);
+            g.setFont (stencil (12.0f, 0.12f));
+            g.drawText ("CONTRATEMPO", cap.withTrimmedLeft (22.0f), juce::Justification::centred);
+        }
         if (m < MrmProcessor::NumMachines - 1)
         {
             g.setColour (col::ink.withAlpha (0.15f));
