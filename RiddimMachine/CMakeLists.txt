@@ -11,17 +11,8 @@ project(MastorRiddimMachine VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# formatos: VST3 (Cubase, FL Studio, Ableton, Reaper, Studio One, Bitwig...), AU (Logic, GarageBand),
-# AAX (Pro Tools; o SDK do AAX já vem dentro do JUCE 8) e Standalone.
-# No Linux use -DMRM_FORMATS=VST3 para testar (AU e AAX não existem no Linux).
-if(APPLE)
-    set(MRM_DEFAULT_FORMATS VST3 AU AAX Standalone)
-elseif(WIN32)
-    set(MRM_DEFAULT_FORMATS VST3 AAX Standalone)
-else()
-    set(MRM_DEFAULT_FORMATS VST3 Standalone)
-endif()
-set(MRM_FORMATS ${MRM_DEFAULT_FORMATS} CACHE STRING "Formatos do plugin")
+# formatos (no Linux use -DMRM_FORMATS=VST3 para testar)
+set(MRM_FORMATS VST3 AU Standalone CACHE STRING "Formatos do plugin")
 
 # Use -DJUCE_DIR=/caminho/JUCE para uma cópia local; senão baixa do GitHub
 if(DEFINED JUCE_DIR)
@@ -36,13 +27,16 @@ else()
 endif()
 
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake e PROTOOLS.md)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(MastorRiddimMachine
     COMPANY_NAME                "DubStation"
     BUNDLE_ID                   com.dubmastor.mrm0420
     PRODUCT_NAME                "Mastor Riddim Machine MRM-0420"
     PLUGIN_MANUFACTURER_CODE    Dblb
     PLUGIN_CODE                 M420
-    FORMATS                     ${MRM_FORMATS}
+    FORMATS                     ${MRM_FORMATS} ${DM_AAX}
     IS_SYNTH                    TRUE
     NEEDS_MIDI_INPUT            TRUE
     NEEDS_MIDI_OUTPUT           TRUE

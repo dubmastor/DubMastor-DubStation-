@@ -16,12 +16,14 @@ Nova geração do MRM-0420: as máquinas da DubStation num instrumento só.
 - **TAPE ECHO começa desligado** no preset inicial
 - Configuração inicial: Lá menor e Ré menor, meio compasso cada
 - Alto-falante antigo com grade de metal na aba RIDDIM
+- **Instaladores:** `.exe` para Windows (VST3 e standalone) e `.pkg` para Mac (VST3, AU e app, Apple Silicon e Intel): Cubase, FL Studio, Ableton, Reaper, Studio One, Bitwig (VST3), Logic e GarageBand (AU). **Pro Tools:** o AAX já compila e entra no instalador assim que for assinado pela PACE (veja PROTOOLS.md)
 - Versão para celular: https://dubmastor.github.io/DubMastor-DubStation-/riddim/
 
 Versões das máquinas neste build: veja a aba RIDDIM (cada máquina mostra a versão dela).
 
-**Instalação:** Windows: copie `Mastor Riddim Machine MRM-0420.vst3` para `C:\Program Files\Common Files\VST3\`.
-Mac: copie o `.vst3` para `~/Library/Audio/Plug-Ins/VST3/` e rode no Terminal:
+**Instalação:** Windows: rode `MRM-0420-Windows-Instalador.exe`. Mac: abra `MRM-0420-macOS-Instalador.pkg` (se o macOS reclamar, botão direito › Abrir).
+Pro Tools: o Pro Tools normal só carrega AAX assinado pela PACE; até lá o AAX sai como artefato de teste para o Pro Tools Developer.
+Sem instalador (zip), no Mac: copie o `.vst3` para `~/Library/Audio/Plug-Ins/VST3/` e rode no Terminal
 `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"`
 
 ## Como instalar

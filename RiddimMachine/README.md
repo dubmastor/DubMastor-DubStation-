@@ -2,7 +2,8 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
+**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
+(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.0/MRM-0420-macOS.zip))
 
 ![MRM-0420, aba RIDDIM](docs/interface-riddim.png)
 
@@ -18,6 +19,20 @@ As máquinas da DubStation num instrumento só, para começar um riddim em segun
 A **harmonia é uma só** para o MRCM-1240 e o MRBM-69 (mexer nos acordes em qualquer aba muda as duas) e o
 **BPM é um só** para todas. Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um
 **instrumento**: no Cubase, carregue numa *Instrument Track*.
+
+## Instalação e DAWs
+| Formato | DAWs | Onde o instalador põe |
+|---|---|---|
+| **VST3** | Cubase, Nuendo, FL Studio, Ableton Live, Reaper, Studio One, Bitwig, Cakewalk... | Windows: `C:\Program Files\Common Files\VST3` · Mac: `/Library/Audio/Plug-Ins/VST3` |
+| **AU** (Mac) | Logic Pro, GarageBand, MainStage (e FL Studio / Ableton no Mac, se preferir AU) | `/Library/Audio/Plug-Ins/Components` |
+| **AAX** | Pro Tools (quando assinado pela PACE, veja abaixo) | Windows: `C:\Program Files\Common Files\Avid\Audio\Plug-Ins` · Mac: `/Library/Application Support/Avid/Audio/Plug-Ins` |
+| **Standalone** | sem DAW | Windows: Menu Iniciar › DubStation · Mac: Aplicativos |
+
+- **Windows:** rode `MRM-0420-Windows-Instalador.exe` (VST3 e programa standalone).
+- **Mac:** abra `MRM-0420-macOS-Instalador.pkg`. Se o macOS avisar que o desenvolvedor não foi verificado, clique com o botão direito no `.pkg` › **Abrir**. O instalador já libera os plugins da quarentena e faz o Logic reler os Audio Units. Binário universal (Apple Silicon e Intel).
+- É um **instrumento**: no Cubase, *Instrument Track*; no Logic, *Software Instrument* › AU Instruments › DubStation; no FL Studio, *Add › Generators* (ou *Plugin database › Installed › Generators*), com *Manage plugins › Find installed plugins*; no Pro Tools, *Instrument Track* › plug-in › Instrument.
+- **Pro Tools:** o MRM-0420 já compila em **AAX** no Windows e no Mac, mas o Pro Tools normal só carrega AAX **assinado pela PACE** (conta de desenvolvedor Avid + iLok). Enquanto a assinatura não existe, o AAX sai só como artefato de teste (`MRM-0420-AAX-nao-assinado-*`, abre no **Pro Tools Developer**) e fica fora do instalador público. Com os secrets da PACE configurados, o instalador completo assina e inclui o AAX sozinho: passo a passo em [PROTOOLS.md](../PROTOOLS.md).
+- No CI, cada build instala o `.exe` e o `.pkg` de verdade e confere as pastas, passa o **pluginval**, o **validador da Steinberg** (VST3) e o **auval** da Apple (AU). Guia de cada DAW no site: [instalação](https://dubmastor.github.io/DubMastor-DubStation-/instalacao.html).
 
 ## Aba RIDDIM (a principal)
 | Parte | O que faz |
