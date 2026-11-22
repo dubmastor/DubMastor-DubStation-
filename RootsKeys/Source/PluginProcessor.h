@@ -60,6 +60,14 @@ public:
     std::atomic<float> meterL { 0.0f }, meterR { 0.0f }, gainReduction { 0.0f };
     // rodas de pitch/mod que chegam pelo MIDI (só para mostrar na tela)
     std::atomic<float> pitchWheel { 0.0f }, modWheel { 0.0f };
+    // rodas mexidas na tela (a thread de áudio aplica no próximo bloco)
+    static constexpr float kNoWheelReq = -9.0f;
+    std::atomic<float> uiPitchReq { kNoWheelReq }, uiModReq { kNoWheelReq };
+    void setWheelFromUI (int wheel, float value)
+    {
+        if (wheel == 0) { uiPitchReq.store (juce::jlimit (-1.0f, 1.0f, value)); pitchWheel.store (value); }
+        else            { uiModReq.store (juce::jlimit (0.0f, 1.0f, value));    modWheel.store (value); }
+    }
 
     // ---------------- aba DUB CHORDS (gerador de harmonia que toca o próprio piano/órgão)
     static constexpr int dcSlots = 4;

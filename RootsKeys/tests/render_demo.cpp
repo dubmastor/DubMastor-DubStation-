@@ -195,6 +195,48 @@ int main()
         chord (ev, 4.0, 3.5, { 55, 59, 62 }, 0.8f);
         render (fb > 0 ? "demo_flanger_dub.wav" : "demo_flanger_dub_neg.wav", p, ev, 10.0);
     }
+    // 7) Timbres novos do piano: Grand, MT-40 (Casio) e FM EP (Yamaha DX)
+    {
+        const char* names[4] = { "demo_piano_m1_ref.wav", "demo_piano_grand.wav", "demo_piano_mt40.wav", "demo_piano_fm_ep.wav" };
+        for (int t = 1; t <= 3; ++t)
+        {
+            rk::Params p; p.mode = 0; p.pianoType = t; p.reverb = 0.22f;
+            std::vector<Ev> ev;
+            int arp[] = { 48, 52, 55, 60, 64, 67, 72, 76 };
+            for (int i = 0; i < 8; ++i) chord (ev, i * 0.2, 0.5, { arp[i] }, 0.45f + 0.07f * i);
+            chord (ev, 2.0, 1.8, { 45, 57, 60, 64, 69 }, 0.85f);
+            chord (ev, 4.0, 2.4, { 50, 57, 62, 66, 69 }, 0.6f);
+            render (names[t], p, ev, 7.5);
+        }
+    }
+    // 8) Pitch bend: +1 = +2 semitons (razão 1,1225) em todos os timbres e no órgão
+    for (int t = 0; t <= 4; ++t)
+    {
+        auto pitchOf = [&] (float bend)
+        {
+            rk::Params p; p.mode = t == 4 ? 1 : 0; p.pianoType = t == 4 ? 0 : t; p.reverb = 0; p.maxOn = false;
+            float db[9] = { 0, 0, 8, 0, 0, 0, 0, 0, 0 }; std::memcpy (p.drawbar, db, sizeof db); p.leslieMix = 0; p.drive = 0;
+            rk::Engine e; e.params = p; e.prepare (48000);
+            e.setPitchBend (bend);
+            e.noteOn (57, 0.8f);   // A3 = 220 Hz
+            std::vector<float> L (24000), R (24000);
+            e.render (L.data(), R.data(), 24000);
+            double best = 0; int bestLag = 0;
+            for (int lag = 48000 / 300; lag <= 48000 / 160; ++lag)
+            {
+                double acc = 0;
+                for (int i = 4000; i < 20000; ++i) acc += (double) L[(size_t) i] * L[(size_t) (i + lag)];
+                if (acc > best) { best = acc; bestLag = lag; }
+            }
+            return bestLag > 0 ? 48000.0 / bestLag : 0.0;
+        };
+        const double f0 = pitchOf (0.0f), f1 = pitchOf (1.0f);
+        const double ratio = f0 > 0 ? f1 / f0 : 0;
+        const bool ok = std::abs (ratio - 1.1225) < 0.02;
+        std::printf ("pitch bend %-6s %.1f Hz -> %.1f Hz (razao %.3f) %s\n",
+                     t == 4 ? "orgao" : (t == 0 ? "M1" : t == 1 ? "Grand" : t == 2 ? "MT-40" : "FM EP"), f0, f1, ratio, ok ? "ok" : "FALHOU");
+        if (! ok) g_ok = false;
+    }
     std::printf (g_ok ? "OK: todos os testes passaram\n" : "ERRO: algum teste falhou\n");
     return g_ok ? 0 : 1;
 }

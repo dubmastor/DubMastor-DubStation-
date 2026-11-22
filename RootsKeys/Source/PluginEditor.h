@@ -45,18 +45,51 @@ private:
     juce::String line1, line2;
 };
 
-// Rodas de pitch e modulação (mostram o MIDI que chega)
+// Rodas de pitch e modulação: mostram o MIDI que chega e podem ser arrastadas com o mouse
+// (pitch volta ao centro ao soltar, como a roda de verdade; mod fica onde parou)
 class WheelsComponent : public juce::Component
 {
 public:
+    WheelsComponent() { setMouseCursor (juce::MouseCursor::UpDownResizeCursor); }
+    std::function<void (int wheel, float value)> onMove;   // 0 = pitch (-1..1), 1 = mod (0..1)
     void setValues (float pitch, float mod)
     {
+        if (dragWheel >= 0) return;   // durante o arraste manda a mão
         if (std::abs (pitch - pitchV) < 0.005f && std::abs (mod - modV) < 0.005f) return;
         pitchV = pitch; modV = mod; repaint();
     }
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent& e) override
+    {
+        dragWheel = e.x < 37 ? 0 : 1;
+        moveTo (e.y);
+    }
+    void mouseDrag (const juce::MouseEvent& e) override { if (dragWheel >= 0) moveTo (e.y); }
+    void mouseUp (const juce::MouseEvent&) override
+    {
+        if (dragWheel == 0)
+        {
+            pitchV = 0.0f;
+            if (onMove) onMove (0, 0.0f);
+            repaint();
+        }
+        dragWheel = -1;
+    }
+    void mouseDoubleClick (const juce::MouseEvent& e) override
+    {
+        if (e.x >= 37) { modV = 0.0f; if (onMove) onMove (1, 0.0f); repaint(); }
+    }
 private:
     float pitchV = 0.0f, modV = 0.0f;
+    int dragWheel = -1;
+    void moveTo (int y)
+    {
+        const float top = 14.0f, bottom = (float) getHeight() - 34.0f;
+        const float v = juce::jlimit (0.0f, 1.0f, (bottom - (float) y) / (bottom - top));
+        if (dragWheel == 0) pitchV = v * 2.0f - 1.0f; else modV = v;
+        if (onMove) onMove (dragWheel, dragWheel == 0 ? pitchV : modV);
+        repaint();
+    }
 };
 
 class RootsKeysEditor : public juce::AudioProcessorEditor,
@@ -71,7 +104,7 @@ public:
 
     // usado pelo gerador de capturas de tela
     void applySkin (int newSkin);
-    void setMetersForScreenshot (float l, float r) { vuL.setNeedle (l); vuR.setNeedle (r); grLabel.setText ("GR -1.2", juce::dontSendNotification); updateLcd(); if (chordsPage) chordsPage->refresh(); }
+    void setMetersForScreenshot (float l, float r) { timerCallback(); vuL.setNeedle (l); vuR.setNeedle (r); grLabel.setText ("GR -1.2", juce::dontSendNotification); updateLcd(); if (chordsPage) chordsPage->refresh(); }
 
 private:
     using APVTS = juce::AudioProcessorValueTreeState;
@@ -98,6 +131,7 @@ private:
     // piano anos 80
     LcdDisplay lcd;
     juce::TextButton pianoPreset[4];
+    juce::TextButton pianoTimbre[4];   // M1 / GRAND / MT-40 / FM EP
     Knob faderBright, faderDecay, faderChorus, faderLevel;   // faders verticais
     WheelsComponent wheels;
 

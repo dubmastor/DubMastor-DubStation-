@@ -103,6 +103,7 @@ struct Params
     int   mode = 0;            // 0 = Piano, 1 = Órgão
     // Piano
     float pianoLevel  = 0.8f;
+    int   pianoType = 0;       // 0 = M1, 1 = Grand Piano, 2 = MT-40 (Casio), 3 = FM EP (Yamaha DX)
     float pianoBright = 0.6f;
     float pianoDecay  = 0.5f;
     float pianoChorus = 0.5f;
@@ -242,11 +243,21 @@ struct PianoVoice
     float nzEnv = 0, nzCoef = 0, nzLvl = 0;
     SVF nzFilt;
     Rng rng;
+    int type = 0;
+    // Grand: batimento entre as cordas de cada nota
+    float bph[MaxP], binc[MaxP], bdep[MaxP];
+    // MT-40 (Casio) e FM EP (Yamaha DX)
+    float oPh = 0, oInc = 0, oEnv = 0, oCoef = 0, oLp = 0, oLpCoef = 0, oHold = 0, oHoldCnt = 0, oHoldLen = 1;
+    float cPh[2] {}, mPh[2] {}, cInc[2] {}, mInc[2] {}, idx[2] {}, idxCoef[2] {}, cAmp[2] {}, cE1 = 0, cE2 = 0, cC1 = 0, cC2 = 0;
 
     void start (int n, float vel, float sr, const Params& p, uint64_t stamp)
     {
         active = true; held = true; releasing = false; note = n; age = stamp;
         rng.s = 0x9e3779b9u * (uint32_t) (n + 1) + (uint32_t) stamp;
+        type = juce_clampType (p.pianoType);
+        if (type == 1) { startGrand (n, vel, sr, p); return; }
+        if (type == 2) { startCasio (n, sr, p); return; }
+        if (type == 3) { startFm (n, vel, sr, p); return; }
 
         const float f    = midiToHz ((float) n);
         const float v    = clampf (vel, 0.0f, 1.0f);
@@ -289,22 +300,150 @@ struct PianoVoice
         nzFilt.set (std::min (6.0f * f, 7000.0f), 0.9f, sr);
     }
 
+    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 3 ? 3 : t); }
+
+    // ---- GRAND PIANO: mais parciais e inarmonicidade, decaimento longo, cordas que batem
+    void startGrand (int n, float vel, float sr, const Params& p)
+    {
+        const float f  = midiToHz ((float) n);
+        const float v  = clampf (vel, 0.0f, 1.0f);
+        const float br = p.pianoBright;
+        const float B  = 0.00028f * std::pow (2.0f, ((float) n - 60.0f) / 14.0f);
+        const float pw = clampf (2.4f - 0.8f * br - 1.0f * v, 0.7f, 2.6f);
+        const float tBase = clampf ((2.5f + 14.0f * p.pianoDecay) * std::pow (2.0f, -((float) n - 60.0f) / 16.0f), 0.4f, 30.0f);
+        const float gain = 0.15f * (0.15f + 0.85f * std::pow (v, 1.5f));
+        np = 0;
+        for (int k = 1; k <= MaxP; ++k)
+        {
+            const float fk = (float) k * f * std::sqrt (1.0f + B * (float) (k * k));
+            if (fk > std::min (0.42f * sr, 14000.0f)) break;
+            float a = std::pow ((float) k, -pw);
+            a *= 0.5f + 0.5f * std::fabs (std::sin (3.14159265f * (float) k / 7.6f));   // martelo a ~1/7.6
+            const float t2 = tBase / (1.0f + 0.08f * (float) (k - 1) + 1.1f * std::pow (fk / 1000.0f, 1.3f));
+            const float t1 = std::min (0.5f, 0.06f + t2 * 0.1f);
+            const float w  = clampf (0.22f + 0.035f * (float) k, 0.0f, 0.9f);
+            ph[np] = rng.uni(); inc[np] = fk / sr;
+            e1[np] = gain * a * w; e2[np] = gain * a * (1.0f - w);
+            c1[np] = std::exp (-1.0f / (t1 * sr)); c2[np] = std::exp (-1.0f / (t2 * sr));
+            bph[np] = rng.uni(); binc[np] = (0.35f + 1.6f * rng.uni()) / sr;
+            bdep[np] = k <= 10 ? 0.22f : 0.08f;
+            ++np;
+        }
+        att = 0; attInc = 1.0f / (0.0015f * sr);
+        rel = 1; relCoef = 1;
+        nzEnv = 1; nzCoef = std::exp (-1.0f / (0.014f * sr));
+        nzLvl = 0.07f * v * v;
+        nzFilt.reset();
+        nzFilt.set (std::min (3.0f * f, 2500.0f), 0.8f, sr);
+    }
+
+    // ---- MT-40: teclado Casio de brinquedo — onda de pulso, sem sensibilidade ao toque, lo-fi
+    void startCasio (int n, float sr, const Params& p)
+    {
+        const float f = midiToHz ((float) n);
+        oPh = 0; oInc = f / sr;
+        oEnv = 0.16f;                                                   // MT-40 não tem velocity
+        oCoef = std::exp (-1.0f / ((0.35f + 1.4f * p.pianoDecay) * sr));
+        oLp = 0; oLpCoef = 1.0f - std::exp (-kTwoPi * (1800.0f + 4500.0f * p.pianoBright) / sr);
+        oHoldLen = std::max (1.0f, sr / 16000.0f);                      // ~16 kHz, como os chips da época
+        oHoldCnt = 0; oHold = 0;
+        np = 0; nzEnv = 0; nzLvl = 0;
+        att = 0; attInc = 1.0f / (0.0008f * sr);
+        rel = 1; relCoef = 1;
+    }
+
+    // ---- FM EP: piano elétrico FM estilo Yamaha DX — corpo (1:1) + "tine" brilhante (1:14)
+    void startFm (int n, float vel, float sr, const Params& p)
+    {
+        const float f = midiToHz ((float) n);
+        const float v = clampf (vel, 0.0f, 1.0f);
+        const float ks = std::pow (2.0f, -((float) n - 60.0f) / 20.0f);
+        cInc[0] = f / sr;          mInc[0] = f / sr;
+        cInc[1] = (f + 0.7f) / sr; mInc[1] = 14.0f * f / sr;
+        idx[0] = (0.4f + 1.6f * v) * (0.6f + 0.8f * p.pianoBright);
+        idx[1] = (0.6f + 2.4f * v * v) * (0.5f + p.pianoBright);
+        idxCoef[0] = std::exp (-1.0f / ((0.6f + 0.8f * p.pianoDecay) * sr));
+        idxCoef[1] = std::exp (-1.0f / (0.045f * sr));
+        cAmp[0] = 0.75f; cAmp[1] = 0.22f + 0.25f * v;
+        const float tBody = clampf ((1.2f + 6.0f * p.pianoDecay) * ks, 0.3f, 12.0f);
+        const float gain = 0.2f * (0.25f + 0.75f * v);
+        cE1 = gain * 0.35f; cE2 = gain * 0.65f;
+        cC1 = std::exp (-1.0f / (0.12f * sr)); cC2 = std::exp (-1.0f / (tBody * sr));
+        for (int i = 0; i < 2; ++i) { cPh[i] = 0; mPh[i] = rng.uni(); }
+        np = 0; nzEnv = 0; nzLvl = 0;
+        att = 0; attInc = 1.0f / (0.001f * sr);
+        rel = 1; relCoef = 1;
+    }
+
     void release (float sr)
     {
         held = false; releasing = true;
-        const float t = note > 88 ? 1.2f : 0.11f;   // notas agudas sem abafador
+        float t = note > 88 ? 1.2f : 0.11f;   // notas agudas sem abafador
+        if (type == 1) t = note > 88 ? 1.8f : 0.16f;
+        if (type == 2) t = 0.06f;
+        if (type == 3) t = 0.22f;
         relCoef = std::exp (-1.0f / (t * sr));
     }
 
-    inline float tick()
+    static inline float wrap1 (float x) { return x - std::floor (x); }
+
+    // fm = multiplicador de frequência (pitch bend / vibrato); 1.0 = afinação normal
+    inline float tick (float fm = 1.0f)
     {
         const SineTable& S = sine();
-        float s = 0;
-        for (int i = 0; i < np; ++i)
+        if (type == 2)
         {
-            s += S (ph[i]) * (e1[i] + e2[i]);
-            e1[i] *= c1[i]; e2[i] *= c2[i];
-            ph[i] += inc[i]; if (ph[i] >= 1.0f) ph[i] -= 1.0f;
+            oPh += oInc * fm; if (oPh >= 1.0f) oPh -= 1.0f;
+            const float pulse = (oPh < 0.25f ? 0.75f : -0.25f) + 0.35f * (oPh < 0.5f ? 0.5f : -0.5f);
+            oLp += (pulse - oLp) * oLpCoef;
+            if (--oHoldCnt <= 0.0f) { oHold = std::round (oLp * 48.0f) / 48.0f; oHoldCnt += oHoldLen; }   // ~6 bits + 16 kHz
+            att = std::min (1.0f, att + attInc);
+            const float out = oHold * oEnv * att * rel;
+            oEnv *= oCoef;
+            if (releasing) rel *= relCoef;
+            if (rel < 1.0e-4f || oEnv < 1.0e-4f) active = false;
+            return out;
+        }
+        if (type == 3)
+        {
+            float s = 0;
+            for (int i = 0; i < 2; ++i)
+            {
+                const float m = S (mPh[i]) * idx[i] * 0.159155f;   // índice em radianos -> ciclos
+                s += S (wrap1 (cPh[i] + m)) * cAmp[i];
+                cPh[i] += cInc[i] * fm; if (cPh[i] >= 1.0f) cPh[i] -= 1.0f;
+                mPh[i] += mInc[i] * fm; if (mPh[i] >= 1.0f) mPh[i] -= 1.0f;
+                idx[i] *= idxCoef[i];
+            }
+            att = std::min (1.0f, att + attInc);
+            const float env = cE1 + cE2;
+            cE1 *= cC1; cE2 *= cC2;
+            const float out = s * env * att * rel;
+            if (releasing) rel *= relCoef;
+            if (rel < 1.0e-4f || cE2 < 1.0e-6f) active = false;
+            return out;
+        }
+
+        float s = 0;
+        if (type == 1)
+        {
+            for (int i = 0; i < np; ++i)
+            {
+                const float beat = 1.0f + bdep[i] * (S (bph[i]) - 0.3f);
+                s += S (ph[i]) * (e1[i] + e2[i]) * beat;
+                e1[i] *= c1[i]; e2[i] *= c2[i];
+                ph[i] += inc[i] * fm; if (ph[i] >= 1.0f) ph[i] -= 1.0f;
+                bph[i] += binc[i]; if (bph[i] >= 1.0f) bph[i] -= 1.0f;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < np; ++i)
+            {
+                s += S (ph[i]) * (e1[i] + e2[i]);
+                e1[i] *= c1[i]; e2[i] *= c2[i];
+                ph[i] += inc[i] * fm; if (ph[i] >= 1.0f) ph[i] -= 1.0f;
+            }
         }
         const float nz = nzFilt.bp (rng.next()) * nzEnv * nzLvl;
         nzEnv *= nzCoef;
@@ -392,14 +531,14 @@ struct OrganVoice
         clickEnv = 0.4f; clickLvl = click * 0.35f;  // contato soltando também estala
     }
 
-    inline float tick (const float* dbGain, bool percOn)
+    inline float tick (const float* dbGain, bool percOn, float fm = 1.0f)
     {
         const SineTable& S = sine();
         float s = 0;
         for (int i = 0; i < 9; ++i)
         {
             if (dbGain[i] > 0.0f) s += S (ph[i]) * dbGain[i];
-            ph[i] += inc[i]; if (ph[i] >= 1.0f) ph[i] -= 1.0f;
+            ph[i] += inc[i] * fm; if (ph[i] >= 1.0f) ph[i] -= 1.0f;
         }
         env += (envTarget - env) * (envTarget > env ? envCoefA : envCoefR);
 
@@ -407,7 +546,7 @@ struct OrganVoice
         if (percOn && percEnv > 1.0e-4f)
         {
             perc = S (percPh) * percEnv * 0.9f;
-            percPh += percInc; if (percPh >= 1) percPh -= 1;
+            percPh += percInc * fm; if (percPh >= 1) percPh -= 1;
             percEnv *= percCoef;
         }
 
@@ -595,6 +734,9 @@ public:
     }
 
     void setModWheelLeslie (bool fast) { modLeslie = fast; }
+    // pitch bend (-1..1, ±2 semitons) e mod wheel (0..1: vibrato no piano, Leslie rápido no órgão)
+    void setPitchBend (float b) { bend = clampf (b, -1.0f, 1.0f); }
+    void setModWheel (float m) { modWheel = clampf (m, 0.0f, 1.0f); modLeslie = modWheel >= 0.5f; }
 
     void allNotesOff()
     {
@@ -630,16 +772,25 @@ public:
 
         const float maxGain = std::pow (10.0f, p.maxGainDb / 20.0f);
         const float maxCeil = std::pow (10.0f, p.maxCeilDb / 20.0f);
+        const float bendRatio = bend == 0.0f ? 1.0f : std::pow (2.0f, bend * 2.0f / 12.0f);
+        const float vibInc = 5.5f / sr;
 
         for (int s = 0; s < n; ++s)
         {
+            // pitch bend + vibrato do mod wheel (só no piano; no órgão o mod wheel liga a Leslie)
+            float fmPiano = bendRatio;
+            if (modWheel > 0.0f)
+            {
+                vibPh += vibInc; if (vibPh >= 1.0f) vibPh -= 1.0f;
+                fmPiano *= 1.0f + modWheel * 0.012f * sine() (vibPh);
+            }
             for (int i = 0; i < 9; ++i) dbSmooth[i] += (dbTarget[i] - dbSmooth[i]) * smoothCoef;
             if (percWindow > 0) --percWindow;
 
             float pin = 0;
-            for (auto& v : piano) if (v.active) pin += v.tick();
+            for (auto& v : piano) if (v.active) pin += v.tick (fmPiano);
             float oin = 0;
-            for (auto& v : organ) if (v.active) oin += v.tick (dbSmooth, p.percOn);
+            for (auto& v : organ) if (v.active) oin += v.tick (dbSmooth, p.percOn, bendRatio);
 
             // piano: chorus estéreo
             float pl, pr;
@@ -724,6 +875,7 @@ private:
     Maximizer maxi;
     float dbSmooth[9] = {};
     bool sustain = false, modLeslie = false;
+    float bend = 0.0f, modWheel = 0.0f, vibPh = 0.0f;
     int percWindow = 0, heldKeys = 0;
     uint64_t stamp = 0;
 

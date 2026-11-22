@@ -37,6 +37,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
 
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "mode", 1 }, "Mode", StringArray { "Piano", "Organ" }, 0));
 
+    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoType", 1 }, "Piano Timbre",
+                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP" }, 0));
     l.add (pct ("pianoBright", "Piano Brightness", 0.65f));
     l.add (pct ("pianoDecay",  "Piano Decay",      0.55f));
     l.add (pct ("pianoChorus", "Piano Chorus",     0.50f));
@@ -172,9 +174,18 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     for (int ch = 2; ch < buffer.getNumChannels(); ++ch) buffer.clear (ch, 0, n);
     if (buffer.getNumChannels() < 2) { buffer.clear(); return; }
 
+    // rodas mexidas na tela
+    {
+        const float pb = uiPitchReq.exchange (kNoWheelReq);
+        if (pb > kNoWheelReq + 1.0f) { engine.setPitchBend (pb); pitchWheel.store (pb); }
+        const float mw = uiModReq.exchange (kNoWheelReq);
+        if (mw > kNoWheelReq + 1.0f) { engine.setModWheel (mw); modWheel.store (mw); }
+    }
+
     // parâmetros -> motor
     rk::Params& p = engine.params;
     p.mode        = (int) get ("mode");
+    p.pianoType   = (int) get ("pianoType");
     p.pianoBright = get ("pianoBright");
     p.pianoDecay  = get ("pianoDecay");
     p.pianoChorus = get ("pianoChorus");
@@ -231,11 +242,17 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         else if (m.isSustainPedalOff())         engine.setSustain (false);
         else if (m.isController() && m.getControllerNumber() == 1)
         {
-            engine.setModWheelLeslie (m.getControllerValue() >= 64);   // mod wheel = Leslie rápido
-            modWheel.store ((float) m.getControllerValue() / 127.0f);
+            // mod wheel: vibrato no piano, Leslie rápido no órgão (acima da metade)
+            const float v = (float) m.getControllerValue() / 127.0f;
+            engine.setModWheel (v);
+            modWheel.store (v);
         }
         else if (m.isPitchWheel())
-            pitchWheel.store ((float) (m.getPitchWheelValue() - 8192) / 8192.0f);
+        {
+            const float v = juce::jlimit (-1.0f, 1.0f, (float) (m.getPitchWheelValue() - 8192) / 8192.0f);
+            engine.setPitchBend (v);
+            pitchWheel.store (v);
+        }
         else if (m.isAllNotesOff() || m.isAllSoundOff())
             engine.allNotesOff();
     }
@@ -484,6 +501,7 @@ void RootsKeysProcessor::setCurrentProgram (int index)
 
     if (pr.mode == 0)   // preset de piano: não toca nos parâmetros do órgão
     {
+        setParam ("pianoType", 0.0f);   // os presets de piano são do timbre M1
         setParam ("pianoBright", pr.pianoBright);
         setParam ("pianoDecay", pr.pianoDecay);
         setParam ("pianoChorus", pr.pianoChorus);

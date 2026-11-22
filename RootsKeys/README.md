@@ -1,8 +1,8 @@
-# DubMastor Roots Keys 2.3
+# DubMastor Roots Keys 2.4
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.3/DubMastorRootsKeys-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.3/DubMastorRootsKeys-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-macOS.zip)**
 
 | Modo piano | Modo órgão |
 |---|---|
@@ -15,6 +15,26 @@ Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cad
 - **Órgão tonewheel estilo Hammond B3** — 9 drawbars, percussão single-trigger (2º/3º harmônico, rápida/lenta), key click, overdrive valvulado e caixa Leslie com aceleração realista.
 
 Cadeia de saída: **Tape Echo FitaEco TE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
+
+## Timbres de piano
+
+Quatro botões logo abaixo do visor do modo piano (o visor mostra o timbre escolhido):
+
+| Timbre | Som |
+|---|---|
+| **M1** | o piano brilhante e "vidrado" estilo Korg M1 (o dos presets P01–P04) |
+| **GRAND** | piano de cauda: mais harmônicos, cordas mais "duras", ataque de martelo grave, sustentação longa e o leve batimento entre as cordas de cada nota |
+| **MT-40** | teclado digital de brinquedo estilo Casio MT-40: onda de pulso, sem sensibilidade ao toque, ~6 bits a 16 kHz, bem lo-fi |
+| **FM EP** | piano elétrico FM estilo Yamaha DX: corpo 1:1 + "tine" metálico 1:14 que some rápido; o toque mais forte abre o brilho |
+
+BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
+
+## Rodas de pitch e modulação
+
+As duas rodas do lado do teclado funcionam com o mouse e com o MIDI:
+
+- **PITCH**: arraste para cima/baixo — ±2 semitons em todos os timbres e no órgão; ao soltar, volta ao centro como a roda de verdade.
+- **MOD**: arraste para definir — no piano faz **vibrato**; no órgão, acima da metade, liga a **Leslie rápida**. Duplo clique zera.
 
 ## Aba DUB CHORDS — monte o riddim e arraste para a DAW
 
@@ -83,6 +103,10 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 - `Resources/` — fontes Archivo Black, Michroma e RootsKeys Display (licenças OFL em `Resources/licenses/`)
 
 "Korg" e "M1" são marcas da Korg Inc.; "Hammond" e "Leslie" são marcas da Hammond Suzuki. Este projeto não é afiliado a elas — os nomes indicam apenas o estilo de timbre emulado.
+
+## Novidades da 2.4
+- Timbres de piano **GRAND**, **MT-40** (estilo Casio) e **FM EP** (estilo Yamaha DX), além do M1.
+- Rodas **PITCH** e **MOD** usáveis com o mouse; pitch bend (±2 semitons) e vibrato agora soam (também pelo MIDI).
 
 ## Novidades da 2.3
 - Aba Dub Chords: acordes com **6 notas em duas oitavas** (duas mãos).

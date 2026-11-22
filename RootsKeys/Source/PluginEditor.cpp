@@ -38,7 +38,7 @@ const juce::Rectangle<int> kKeysBed    { 24, 636, 952, 152 };
 const juce::Rectangle<int> kSpeakerL   { 24, 86, 186, 274 };
 const juce::Rectangle<int> kSpeakerR   { 790, 86, 186, 274 };
 const juce::Rectangle<int> kPianoPanel { 222, 86, 556, 274 };
-const juce::Rectangle<int> kLcd        { 276, 98, 448, 74 };
+const juce::Rectangle<int> kLcd        { 276, 96, 448, 64 };
 // órgão
 const juce::Rectangle<int> kConsole    { 210, 94, 580, 258 };
 const juce::Rectangle<int> kLeslie     { 40, 100, 150, 110 };
@@ -192,6 +192,24 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
         organPreset[i].onClick = [this, i] { proc.setCurrentProgram (RootsKeysProcessor::getNumPianoPresets() + i); };
         addChildComponent (organPreset[i]);
     }
+
+    // piano: timbres
+    {
+        const char* names[4] = { "M1", "GRAND", "MT-40", "FM EP" };
+        for (int i = 0; i < 4; ++i)
+        {
+            pianoTimbre[i].setButtonText (names[i]);
+            pianoTimbre[i].getProperties().set ("style", "chip");
+            pianoTimbre[i].setClickingTogglesState (false);
+            pianoTimbre[i].onClick = [this, i]
+            {
+                if (auto* prm = proc.apvts.getParameter ("pianoType"))
+                    prm->setValueNotifyingHost (prm->convertTo0to1 ((float) i));
+            };
+            addChildComponent (pianoTimbre[i]);
+        }
+    }
+    wheels.onMove = [this] (int w, float v) { proc.setWheelFromUI (w, v); };
 
     // piano
     addChildComponent (lcd);
@@ -381,6 +399,7 @@ void RootsKeysEditor::updateVisibility()
     // instrumento
     lcd.setVisible (inst && piano);
     for (auto& b : pianoPreset) b.setVisible (inst && piano);
+    for (auto& b : pianoTimbre) b.setVisible (inst && piano);
     for (auto* k : { &faderBright, &faderDecay, &faderChorus, &faderLevel })
     { k->slider.setVisible (inst && piano); k->label.setVisible (inst && piano); }
     for (auto& d : drawbars) d->setVisible (inst && ! piano);
@@ -399,9 +418,12 @@ void RootsKeysEditor::updateLcd()
 {
     auto pct = [this] (const char* id) { return juce::String (juce::roundToInt (proc.apvts.getRawParameterValue (id)->load() * 100.0f)).paddedLeft (' ', 2); };
     const int prog = proc.getCurrentProgram();
-    const juce::String l1 = prog < RootsKeysProcessor::getNumPianoPresets()
-        ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
-        : juce::String ("P--  Piano: Edit");
+    const int type = (int) proc.apvts.getRawParameterValue ("pianoType")->load();
+    static const char* typeNames[4] = { "M1", "GRAND PIANO", "MT-40", "FM EP" };
+    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 3, type)]
+                          : prog < RootsKeysProcessor::getNumPianoPresets()
+                              ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
+                              : juce::String ("P--  Piano: Edit");
     lcd.setLines (l1, "BRI " + pct ("pianoBright") + "  DEC " + pct ("pianoDecay")
                     + "  CHO " + pct ("pianoChorus") + "  VOL " + pct ("pianoLevel"));
 }
@@ -418,7 +440,8 @@ void RootsKeysEditor::timerCallback()
     const int prog = proc.getCurrentProgram(), np = RootsKeysProcessor::getNumPianoPresets();
     for (int i = 0; i < 4; ++i)
     {
-        pianoPreset[i].setToggleState (prog == i, juce::dontSendNotification);
+        pianoPreset[i].setToggleState (prog == i && (int) proc.apvts.getRawParameterValue ("pianoType")->load() == 0, juce::dontSendNotification);
+        pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
         organPreset[i].setToggleState (prog == np + i, juce::dontSendNotification);
     }
     if (skin == 0)
@@ -550,7 +573,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.setFont (VintageLookAndFeel::mono (9.0f, false));
             g.setColour (juce::Colour (0xff95959a));
             for (int i = 0; i < 4; ++i)
-                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 216, 96, 12, juce::Justification::centred);
+                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 228, 96, 12, juce::Justification::centred);
 
             sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", plasticText, plasticMuted);
             sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
@@ -662,14 +685,16 @@ void RootsKeysEditor::resized()
     // piano
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
-        pianoPreset[i].setBounds (290 + i * 106, 186, 84, 26);
+        pianoPreset[i].setBounds (290 + i * 106, 198, 84, 26);
+    for (int i = 0; i < 4; ++i)
+        pianoTimbre[i].setBounds (290 + i * 106, 166, 84, 24);
     {
         Knob* fs[4] = { &faderBright, &faderDecay, &faderChorus, &faderLevel };
         for (int i = 0; i < 4; ++i)
         {
             const int cx = 318 + i * 122;
-            fs[i]->label.setBounds (cx - 45, 236, 90, 14);
-            fs[i]->slider.setBounds (cx - 22, 252, 44, 98);
+            fs[i]->label.setBounds (cx - 45, 244, 90, 14);
+            fs[i]->slider.setBounds (cx - 22, 258, 44, 92);
         }
     }
     wheels.setBounds (40, 652, 74, 128);
