@@ -29,6 +29,9 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 set(HORNS_FORMATS VST3 AU Standalone CACHE STRING "Formatos do plugin")
 
 if(NOT HORNS_SNAPSHOT_ONLY)
@@ -38,7 +41,7 @@ juce_add_plugin(MastorDubHorns
     PRODUCT_NAME               "Mastor Dub Horns MDH-70"
     PLUGIN_MANUFACTURER_CODE   Dblb
     PLUGIN_CODE                Dbhn
-    FORMATS                    ${HORNS_FORMATS}
+    FORMATS                    ${HORNS_FORMATS} ${DM_AAX}
     IS_SYNTH                   TRUE
     NEEDS_MIDI_INPUT           TRUE
     NEEDS_MIDI_OUTPUT          FALSE

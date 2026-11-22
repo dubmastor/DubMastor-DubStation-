@@ -26,13 +26,16 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(MastorRiddimMachine
     COMPANY_NAME                "DubMastor"
     BUNDLE_ID                   com.dubmastor.mrm0420
     PRODUCT_NAME                "Mastor Riddim Machine MRM-0420"
     PLUGIN_MANUFACTURER_CODE    Dblb
     PLUGIN_CODE                 M420
-    FORMATS                     ${MRM_FORMATS}
+    FORMATS                     ${MRM_FORMATS} ${DM_AAX}
     IS_SYNTH                    TRUE
     NEEDS_MIDI_INPUT            TRUE
     NEEDS_MIDI_OUTPUT           TRUE

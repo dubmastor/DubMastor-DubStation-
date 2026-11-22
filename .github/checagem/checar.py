@@ -107,6 +107,23 @@ for cm in RAIZ.glob("*/CMakeLists.txt"):
     if "juce_add_plugin" in cm.read_text() and cm.parent.name not in registradas:
         err(cm.parent.name, "plugin novo fora do plugins.json: registre sigla, nome, pasta e versão para celular")
 
+# instalador completo (todos os plugins): versão de cada plugin registrada no pacote e links no site
+pac = json.loads((RAIZ / "plugins.json").read_text()).get("pacote")
+if not pac:
+    err("DubStation", "plugins.json sem o bloco 'pacote' do instalador completo")
+else:
+    pv = pac["versao"]
+    for p in reg:
+        v = versao(p["pasta"])
+        if pac["plugins"].get(p["sigla"]) != v:
+            err("DubStation", f"{p['sigla']} está na {v}, o instalador completo registra {pac['plugins'].get(p['sigla'])}: "
+                "atualize 'pacote' → 'plugins' e suba 'pacote' → 'versao' no plugins.json")
+    for f in ("DubStation-Windows-Instalador.exe", "DubStation-macOS-Instalador.pkg"):
+        if f"{REL}/DubStation-{pv}/{f}" not in site:
+            err("DubStation", f"site sem o link do instalador completo DubStation-{pv}/{f}")
+    if not (RAIZ / ".github/workflows/build-pacote.yml").exists():
+        err("DubStation", "falta o workflow build-pacote.yml")
+
 for a in avisos:
     print(f"::warning::{a}")
 for e in erros:

@@ -25,13 +25,16 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(DubChords
     COMPANY_NAME               "DubMastor"
     BUNDLE_ID                  com.dubmastor.dubchords
     PRODUCT_NAME               "Mastor Reggae Chord Machine MRCM-1240"
     PLUGIN_MANUFACTURER_CODE   Dblb
     PLUGIN_CODE                Dbch
-    FORMATS                    VST3 AU Standalone
+    FORMATS                    VST3 AU Standalone ${DM_AAX}
     IS_SYNTH                   TRUE
     NEEDS_MIDI_INPUT           TRUE
     NEEDS_MIDI_OUTPUT          TRUE

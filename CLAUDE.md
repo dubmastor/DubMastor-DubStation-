@@ -45,3 +45,10 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
 - Mac: binário universal (arm64 + x86_64), macOS 10.13+, assinatura ad-hoc; o `.pkg` instala em `/Library/Audio/Plug-Ins`.
 - Todo build passa no pluginval (Windows e Mac) e no auval (Mac) antes de virar release.
 - Instruções por DAW ficam na seção "Instalação" do site; manter atualizadas quando mudar algo na instalação.
+
+## Instalador completo (Dub Station, todos os plugins)
+- Workflow `.github/workflows/build-pacote.yml`, script `.github/scripts/pacote.py`. Lê a lista do `plugins.json`: plugin novo entra sozinho.
+- Release `DubStation-<versão>` com `DubStation-Windows-Instalador.exe` e `DubStation-macOS-Instalador.pkg` (nunca `latest`).
+- **Sempre que a versão de um plugin subir**, atualize `plugins.json` → `pacote` → `plugins` com a nova versão, suba `pacote` → `versao` e troque `DubStation-x.y` nos links do site e do README. A checagem falha se esquecer.
+- Pro Tools (AAX): todo CMakeLists inclui `.github/cmake/aax.cmake` e põe `${DM_AAX}` no fim de `FORMATS`. Plugin novo também. O AAX é compilado sempre (SDK do JUCE 8) e só entra no instalador público quando assinado pela PACE (passo a passo em `PROTOOLS.md`).
+

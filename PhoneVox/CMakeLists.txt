@@ -25,12 +25,15 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(MastorFone
     COMPANY_NAME "DubMastor"
     BUNDLE_ID com.dubmastor.mastorfone
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Drfn
-    FORMATS ${RF_FORMATS}
+    FORMATS ${RF_FORMATS} ${DM_AAX}
     PRODUCT_NAME "Mastor Phone Vox MPV-01"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
