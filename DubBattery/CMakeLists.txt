@@ -4,7 +4,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # DUB BATTERY REGGAE: sampler de bateria com 16 pads + aba Dub Drums (MRDM-12)
-project(DubBatteryReggae VERSION 1.0.0)
+project(DubBatteryReggae VERSION 1.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -48,7 +48,7 @@ set(DBR_SOURCES
     Source/DrumsEditorUnit.cpp
     ../DubDrums/Source/PatternGenerator.cpp)
 set(DBR_DEFINES
-    DBR_VERSION_SHORT="1.0"
+    DBR_VERSION_SHORT="1.1"
     DD_VERSION_SHORT="2.1"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0

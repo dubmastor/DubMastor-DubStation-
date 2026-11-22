@@ -101,7 +101,7 @@
   }
 
   class Builder {
-    constructor(s) { this.s = s; this.ev = []; }
+    constructor(s) { this.s = s; this.ev = []; this.fills = []; }
     add(beat, note, vel, len = 0.1) {
       this.ev.push({ beat, length: len, note, velocity: clamp(vel, 1, 127), bar: Math.floor(beat / 4.0) });
     }
@@ -370,6 +370,7 @@
     for (const h of f) first = Math.min(first, h.beat);
     const from = barStart(bar) + Math.floor(first * 4.0 - 1.0e-6) / 4.0;
     b.removeRange(from, barStart(bar + 1), [gm.ClosedHat, gm.OpenHat, gm.Snare, gm.SideStick, gm.TomHigh, gm.TomMid, gm.TomLow]);
+    b.fills.push([from, barStart(bar + 1)]);
     for (let i = 0; i < f.length; ++i) {
       const h = f[i];
       if (b.s.drummer === Drummer.Digikal) { b.add(barStart(bar) + h.beat, h.note, h.vel); continue; }
@@ -419,6 +420,31 @@
   // os mesmos arredondamentos de float do C++ (aleatoriedade guardada em float)
   const f32 = Math.fround;
 
+  // Mesma peça batendo muito perto dela mesma: fica só a principal (igual a cleanCloseHits no C++)
+  function cleanCloseHits(out, fills) {
+    const inFill = (beat) => fills.some((f) => beat >= f[0] - 0.15 && beat < f[1] + 0.01);
+    const drop = new Array(out.length).fill(false);
+    for (let i = 0; i < out.length; ++i) {
+      for (let j = i + 1; j < out.length && !drop[i] && out[j].beat - out[i].beat < 0.2; ++j) {
+        if (drop[j] || out[j].note !== out[i].note) continue;
+        const gap = out[j].beat - out[i].beat, piece = pieceOf(out[i].note);
+        const fill = inFill(out[i].beat) || inFill(out[j].beat);
+        const main = out[j].velocity > out[i].velocity ? j : i, weak = main === i ? j : i;
+        const ghostVel = Math.max(1, Math.round(out[main].velocity * 0.30));
+        if (gap < 0.09) {
+          const flam = piece === 1 && weak === i && gap >= 0.015 && gap <= 0.06;
+          if (gap < 0.012) drop[weak] = true;
+          else if (flam || fill) out[weak].velocity = Math.min(out[weak].velocity, ghostVel);
+          else drop[weak] = true;
+        } else if (piece !== 2 && !fill) {
+          out[weak].velocity = Math.min(out[weak].velocity, Math.max(1, Math.round(out[main].velocity * 0.35)));
+        }
+      }
+    }
+    const kept = out.filter((_, i) => !drop[i]);
+    out.length = 0; for (const e of kept) out.push(e);
+  }
+
   function generate(input) {
     const s = Object.assign({}, defaults(), input);
     s.bars = clamp(s.bars, 1, 4);
@@ -436,7 +462,7 @@
     const rand = [s.randKick, s.randSnare, s.randHat, s.randPerc];
     const timingAmount = [0.006, 0.012, 0.014, 0.012];
 
-    const finish = (raw, len, barOverride, out) => {
+    const finish = (raw, len, barOverride, out, fills) => {
       for (const src of raw) {
         const e = Object.assign({}, src);
         const piece = pieceOf(e.note), hat = piece === 2;
@@ -459,14 +485,15 @@
         out.push(e);
       }
       out.sort((x, y) => x.beat - y.beat);
+      cleanCloseHits(out, fills);
     };
-    finish(b.ev, p.lengthInBeats, 0, p.events);
+    finish(b.ev, p.lengthInBeats, 0, p.events, b.fills);
     if (s.intro) {
       const is = Object.assign({}, s, { bars: 1 });
       const ib = new Builder(is);
       buildIntro(ib, introRng);
       p.introLengthInBeats = 4.0;
-      finish(ib.ev, p.introLengthInBeats, -1, p.intro);
+      finish(ib.ev, p.introLengthInBeats, -1, p.intro, ib.fills);
     }
     return p;
   }

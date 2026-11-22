@@ -77,6 +77,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout BatteryProcessor::createLayo
         group->addChild (std::make_unique<AudioParameterBool>  (id (P::reverse), pre + "Reverse", false));
         group->addChild (std::make_unique<AudioParameterChoice> (id (P::mode), pre + "Modo", modeNames, 0));
         group->addChild (std::make_unique<AudioParameterChoice> (id (P::choke), pre + "Choke", chokeNames, pads[i].chokeGroup));
+        StringArray linkNames { "NENHUM" };
+        for (int k = 0; k < numPads; ++k) linkNames.add ("PAD " + String (k + 1).paddedLeft ('0', 2));
+        group->addChild (std::make_unique<AudioParameterChoice> (id (P::link), pre + "Juntar com", linkNames, 0));
+        StringArray layerNames { "NENHUM" };
+        for (int k = 0; k < factory::numSamples; ++k) layerNames.add (factory::samples[k].name);
+        group->addChild (std::make_unique<AudioParameterChoice> (id (P::layer), pre + "Timbre 2", layerNames, 0));
+        group->addChild (std::make_unique<AudioParameterFloat> (id (P::layerLevel), pre + "Timbre 2 volume", NormalisableRange<float> (kMinDb, 12.0f, 0.1f), -6.0f,
+                                                               AudioParameterFloatAttributes().withLabel ("dB")));
+        group->addChild (std::make_unique<AudioParameterFloat> (id (P::layerTune), pre + u8"Timbre 2 afinação", NormalisableRange<float> (-24.0f, 24.0f, 0.01f), 0.0f,
+                                                               AudioParameterFloatAttributes().withLabel ("st")));
         layout.add (std::move (group));
     }
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "masterLevel", 1 }, "Volume geral",
@@ -241,10 +251,9 @@ void BatteryProcessor::setGroovePlaying (bool on)
 
 //==============================================================================
 // Motor do sampler
-void BatteryProcessor::startVoice (int pad, int velocity)
+void BatteryProcessor::startVoice (int pad, int velocity, int depth)
 {
     auto s = std::atomic_load (&padSamples[(size_t) pad]);
-    if (s == nullptr || s->audio.getNumSamples() < 4) return;
 
     // choke: o pad novo corta os outros do mesmo grupo (hi-hat fechado corta o aberto)
     const int group = juce::roundToInt (padValue (pad, P::choke));
@@ -256,6 +265,25 @@ void BatteryProcessor::startVoice (int pad, int velocity)
                 v.stageLeft = (float) (sr * 0.004);
             }
 
+    spawn (pad, std::move (s), velocity, false);
+
+    // TIMBRE 2: um segundo sample tocando junto no mesmo pad (mesmo envelope, filtro e pan)
+    const int layer = juce::roundToInt (padValue (pad, P::layer));
+    if (layer > 0 && layer - 1 < (int) factory.size())
+        spawn (pad, factory[(size_t) (layer - 1)], velocity, true);
+
+    hitVel[(size_t) pad].store ((float) velocity / 127.0f);
+    hitCount[(size_t) pad].fetch_add (1);
+
+    // JUNTAR COM: o outro pad toca junto (um nível só, sem cadeia)
+    const int link = juce::roundToInt (padValue (pad, P::link));
+    if (depth == 0 && link > 0 && link - 1 != pad)
+        startVoice (link - 1, velocity, 1);
+}
+
+void BatteryProcessor::spawn (int pad, dbr::SamplePtr s, int velocity, bool layer)
+{
+    if (s == nullptr || s->audio.getNumSamples() < 4) return;
     Voice* slot = nullptr;
     for (auto& v : voices) if (! v.active) { slot = &v; break; }
     if (slot == nullptr)                                 // sem voz livre: rouba a mais antiga
@@ -265,14 +293,16 @@ void BatteryProcessor::startVoice (int pad, int velocity)
     }
     auto& v = *slot;
     const int n = s->audio.getNumSamples();
-    float st = padValue (pad, P::start), en = padValue (pad, P::end);
+    float st = layer ? 0.0f : padValue (pad, P::start), en = layer ? 1.0f : padValue (pad, P::end);   // o TIMBRE 2 toca inteiro
     if (en < st) std::swap (st, en);
     v.first = juce::jlimit (0, n - 2, (int) (st * (float) n));
     v.last  = juce::jlimit (v.first + 2, n, (int) (en * (float) n));
     v.reverse = padValue (pad, P::reverse) > 0.5f;
     v.gate = juce::roundToInt (padValue (pad, P::mode)) == 1;
     v.pos = v.reverse ? (double) (v.last - 1) : (double) v.first;
-    v.step = s->rate / sr * std::pow (2.0, (double) padValue (pad, P::tune) / 12.0);
+    const double semis = padValue (pad, P::tune) + (layer ? padValue (pad, P::layerTune) : 0.0f);
+    v.step = s->rate / sr * std::pow (2.0, semis / 12.0);
+    v.layer = layer;
     v.sample = std::move (s);
     v.pad = pad;
     v.note = firstNote + pad;
@@ -285,12 +315,9 @@ void BatteryProcessor::startVoice (int pad, int velocity)
     for (int c = 0; c < 2; ++c) v.ic1[c] = v.ic2[c] = 0.0f;
     v.age = ++voiceCounter;
     v.active = true;
-
-    hitVel[(size_t) pad].store (vel);
-    hitCount[(size_t) pad].fetch_add (1);
 }
 
-void BatteryProcessor::noteOff (int pad)
+void BatteryProcessor::noteOff (int pad, int depth)
 {
     for (auto& v : voices)
         if (v.active && v.pad == pad && v.gate && ! v.released && v.stage != Voice::Choke)
@@ -298,6 +325,8 @@ void BatteryProcessor::noteOff (int pad)
             v.released = true;
             v.stage = Voice::Release;
         }
+    const int link = juce::roundToInt (padValue (pad, P::link));
+    if (depth == 0 && link > 0 && link - 1 != pad) noteOff (link - 1, 1);
 }
 
 void BatteryProcessor::renderVoices (float* l, float* r, int start, int num)
@@ -307,7 +336,7 @@ void BatteryProcessor::renderVoices (float* l, float* r, int start, int num)
     {
         if (! v.active) continue;
         const int pad = v.pad;
-        const float levelDb = padValue (pad, P::level);
+        const float levelDb = padValue (pad, v.layer ? P::layerLevel : P::level);
         const float g = levelDb <= kMinDb + 0.05f ? 0.0f : juce::Decibels::decibelsToGain (levelDb) * v.gain;
         const float pan = padValue (pad, P::pan);
         const float gl = g * std::cos ((pan + 1.0f) * juce::MathConstants<float>::pi * 0.25f) * juce::MathConstants<float>::sqrt2;
@@ -606,7 +635,7 @@ bool BatteryProcessor::savePreset (const juce::String& name)
 void BatteryProcessor::getStateInformation (juce::MemoryBlock& dest)
 {
     juce::ValueTree root ("DubBatteryReggaeState");
-    root.setProperty ("version", "1.0", nullptr);
+    root.setProperty ("version", "1.1", nullptr);
     root.setProperty ("presetIndex", presetIndex, nullptr);
     root.setProperty ("presetName", presetName, nullptr);
     root.setProperty ("selectedPad", selectedPad, nullptr);

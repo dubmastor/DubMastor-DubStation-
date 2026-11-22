@@ -83,6 +83,8 @@ int main (int argc, char** argv)
         set (proc.apvts, dbr::pid (2, dbr::P::release), 300.0f);
         set (proc.apvts, dbr::pid (2, dbr::P::cutoff), 6500.0f);
         set (proc.apvts, dbr::pid (2, dbr::P::tune), -1.5f);
+        set (proc.apvts, dbr::pid (2, dbr::P::layer), 2.0f);       // caixa 1 + aro (TIMBRE 2)
+        set (proc.apvts, dbr::pid (10, dbr::P::link), 14.0f);      // HH aberto junta com o prato
         Render r (proc);
         juce::MidiBuffer m;
         m.addEvent (juce::MidiMessage::noteOn (10, 38, (juce::uint8) 120), 0);
@@ -113,6 +115,32 @@ int main (int argc, char** argv)
         const float after = r.run (10, {});
         std::printf ("choke: aberto %.3f -> depois do fechado %.5f\n", open, after);
         return open > 0.05f && after < 0.001f ? 0 : fail ("choke");
+    }
+
+    // TIMBRE 2 e JUNTAR COM: um toque soa os dois timbres / acende os dois pads
+    if (arg1 == "layer")
+    {
+        Render r (proc);
+        auto peakOf = [&] (int note)
+        {
+            juce::MidiBuffer m; m.addEvent (juce::MidiMessage::noteOn (1, note, (juce::uint8) 110), 0);
+            const float pk = r.run (40, m);
+            r.run (200, {});
+            return pk;
+        };
+        const float a = peakOf (38);
+        set (proc.apvts, dbr::pid (2, dbr::P::layer), 1.0f);       // caixa 1 + bumbo 1 junto
+        set (proc.apvts, dbr::pid (2, dbr::P::layerLevel), 0.0f);
+        const float b = peakOf (38);
+        const auto before = proc.getHitCount (13);
+        set (proc.apvts, dbr::pid (10, dbr::P::link), 14.0f);      // HH aberto junta com o prato
+        peakOf (46);
+        const bool linked = proc.getHitCount (13) == before + 1;
+        set (proc.apvts, dbr::pid (13, dbr::P::link), 11.0f);      // um aponta para o outro: não pode entrar em laço
+        peakOf (46);
+        const bool noLoop = proc.getHitCount (13) == before + 2;
+        std::printf ("layer: caixa %.3f -> caixa + bumbo %.3f  |  juntar: %s  |  sem laco: %s\n", a, b, linked ? "ok" : "FALHOU", noLoop ? "ok" : "FALHOU");
+        return b > a * 1.05f && linked && noLoop ? 0 : fail ("layer");
     }
 
     if (arg1 == "estado")

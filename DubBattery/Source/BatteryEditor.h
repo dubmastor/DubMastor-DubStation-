@@ -166,6 +166,53 @@ private:
     juce::String lastKey;
 };
 
+// Display âmbar com setas < > ligado a um parâmetro de escolha (TIMBRE 2, JUNTAR COM). Rodinha também troca.
+class StepSelector : public juce::Component
+{
+public:
+    StepSelector (juce::String captionIn, std::function<juce::String (int)> textIn)
+        : caption (std::move (captionIn)), text (std::move (textIn))
+    {
+        setMouseCursor (juce::MouseCursor::PointingHandCursor);
+        setRepaintsOnMouseActivity (true);
+    }
+    void bind (juce::RangedAudioParameter&);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+    std::function<void()> onChange;
+
+private:
+    void step (int delta);
+    juce::String caption;
+    std::function<juce::String (int)> text;
+    juce::RangedAudioParameter* param = nullptr;
+    float value = 0.0f;
+    std::unique_ptr<juce::ParameterAttachment> att;
+};
+
+// Valor num display âmbar que se ajusta arrastando para cima/baixo (rodinha; duplo clique volta ao padrão)
+class DragValue : public juce::Component
+{
+public:
+    DragValue (juce::String captionIn, std::function<juce::String (float)> fmt)
+        : caption (std::move (captionIn)), format (std::move (fmt)) { setMouseCursor (juce::MouseCursor::UpDownResizeCursor); }
+    void bind (juce::RangedAudioParameter&);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+
+private:
+    juce::String caption;
+    std::function<juce::String (float)> format;
+    juce::RangedAudioParameter* param = nullptr;
+    float value = 0.0f, dragStart = 0.0f;
+    std::unique_ptr<juce::ParameterAttachment> att;
+};
+
 // VU de LEDs do MASTER
 class LedMeter : public juce::Component
 {
@@ -223,13 +270,15 @@ private:
     SampleVisor visor;
     EnvelopeView envelope;
     Key prevSample { "< SAMPLE" }, nextSample { "SAMPLE >" }, load { "CARREGAR" }, listen { "OUVIR" };
-    ChoiceRow reverse { { "REVERSE" }, 1 }, mode { dbr::modeNames, 2 }, choke { dbr::chokeNames, 2 };
+    ChoiceRow reverse { { "REVERSE" }, 1 }, mode { dbr::modeNames, 2 }, choke { dbr::chokeNames, 4 };
+    StepSelector layerSel, linkSel;
+    DragValue layerLevel, layerTune;
     KnobBox level, pan, tune, cutoff, velocity, masterLevel, tape;
     LedMeter meter;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
-    juce::Rectangle<int> woodL, woodR, plate, sampleSec, envSec, padSec, padCtlSec, chokeSec, masterSec, padDisplay;
+    juce::Rectangle<int> woodL, woodR, plate, sampleSec, envSec, padSec, padCtlSec, layerSec, masterSec, padDisplay;
 };
 } // namespace dbrui
 

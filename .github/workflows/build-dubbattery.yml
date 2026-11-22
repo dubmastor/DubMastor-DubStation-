@@ -62,6 +62,7 @@ jobs:
           $R estado
           $R presets
           $R daws
+          $R layer
 
       - uses: actions/upload-artifact@v4
         with:
@@ -189,6 +190,14 @@ jobs:
           # confere o pacote: assinatura do plugin e binário universal dentro do .pkg
           codesign --verify --deep --strict out/*.vst3 out/*.component
           lipo -info "out/Dub Battery Reggae.component/Contents/MacOS/Dub Battery Reggae"
+          # instala o .pkg de verdade e confere o que a DAW vai achar
+          sudo installer -pkg ../DubBatteryReggae-macOS-Instalador.pkg -target /
+          test -d "/Library/Audio/Plug-Ins/VST3/Dub Battery Reggae.vst3"
+          test -d "/Library/Audio/Plug-Ins/Components/Dub Battery Reggae.component"
+          ! xattr -p com.apple.quarantine "/Library/Audio/Plug-Ins/VST3/Dub Battery Reggae.vst3" 2>/dev/null
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 2
+          auval -v aumu Dbr1 Dblb
 
       - uses: actions/upload-artifact@v4
         with:

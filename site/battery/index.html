@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%274%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23ffa928%27/%3E%3Crect x=%2717%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%274%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%2717%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3C/svg%3E">
-<title>Dub Battery Reggae 1.0 — Dub Station (navegador)</title>
+<title>Dub Battery Reggae 1.1 — Dub Station (navegador)</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -60,8 +60,9 @@ h1{margin:0;font-size:clamp(16px,2.6vw,28px);letter-spacing:.16em;font-weight:80
 .preset .display{height:44px;justify-content:center}
 .arrow{width:44px;height:44px;border:0;border-radius:5px;background:linear-gradient(180deg,#3a332b,#221d18);color:var(--cream);font-size:16px;cursor:pointer;box-shadow:0 2px 0 #0c0907}
 /* aba BATTERY */
-.bgrid{display:grid;gap:24px 14px;grid-template-columns:minmax(0,1fr);grid-template-areas:"pads" "sample" "env" "pad" "choke" "master"}
-@media (min-width:900px){.bgrid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-template-areas:"sample env" "pads pad" "pads choke" "pads master"}}
+.bgrid{display:grid;gap:24px 14px;grid-template-columns:minmax(0,1fr);grid-template-areas:"pads" "sample" "env" "pad" "layer" "choke" "master"}
+@media (min-width:900px){.bgrid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-template-areas:"sample env" "pads pad" "pads layer" "pads choke" "pads master"}}
+.a-layer{grid-area:layer}
 .a-sample{grid-area:sample}.a-env{grid-area:env}.a-pads{grid-area:pads}.a-pad{grid-area:pad}.a-choke{grid-area:choke}.a-master{grid-area:master}
 canvas.lcd{display:block;width:100%;height:190px;border-radius:4px;box-shadow:0 0 0 4px #0c0907;touch-action:none;background:var(--glass)}
 .tools{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:12px}
@@ -75,7 +76,12 @@ canvas.lcd{display:block;width:100%;height:190px;border-radius:4px;box-shadow:0 
 .pad.sel{box-shadow:0 0 0 2px rgba(255,169,40,.7),0 1px 0 rgba(255,255,255,.4)}
 .pad.drop .rub{background:#5fae6f}
 .pad .n,.pad .k,.pad .nm{position:absolute;font-weight:800;color:rgba(43,36,29,.85);pointer-events:none}
-.pad .n{left:12px;top:9px;font-size:10px}.pad .k{right:12px;top:9px;font-size:9.5px;opacity:.65}
+.pad .n{left:12px;top:9px;font-size:10px}
+.pad .lt{position:absolute;left:50%;top:30%;transform:translateX(-50%);background:rgba(26,23,20,.85);color:var(--amber);font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap}
+.pad .lt:empty{display:none}
+.sel2{display:grid;grid-template-columns:96px 40px minmax(0,1fr) 40px;gap:6px;align-items:center;margin-bottom:8px;font-size:10.5px;font-weight:800;letter-spacing:.14em}
+.sel2 .display{height:38px;justify-content:center;font-size:12.5px}
+@media (max-width:560px){.sel2{grid-template-columns:70px 36px minmax(0,1fr) 36px}.sel2 span{font-size:9px;letter-spacing:.04em}}.pad .k{right:12px;top:9px;font-size:9.5px;opacity:.65}
 .pad .nm{left:0;right:0;bottom:9px;text-align:center;font-size:clamp(9px,1.6vw,12.5px);letter-spacing:.1em}
 .knobs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:12px}
 .knobs.k2{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -125,7 +131,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>DUB BATTERY REGGAE&nbsp;1.0</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
+  <div><h1>DUB BATTERY REGGAE&nbsp;1.1</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -175,6 +181,13 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
   <section class="mod a-pad"><div class="tag">PAD</div>
     <div class="display"><span id="padTitle">PAD 01 BUMBO 1</span><small id="padInfo"></small></div>
     <div class="knobs" id="padKnobs"></div>
+  </section>
+
+  <section class="mod a-layer"><div class="tag">LAYER</div>
+    <div class="sel2"><span>TIMBRE 2</span><button class="arrow" id="layerPrev">◀</button><div class="display" id="layerName">NENHUM</div><button class="arrow" id="layerNext">▶</button></div>
+    <div class="sel2"><span>JUNTAR COM</span><button class="arrow" id="linkPrev">◀</button><div class="display" id="linkName">NENHUM</div><button class="arrow" id="linkNext">▶</button></div>
+    <div class="knobs k2" id="layerKnobs"></div>
+    <div class="hint">TIMBRE 2 TOCA JUNTO NO MESMO PAD · JUNTAR COM DISPARA OUTRO PAD JUNTO</div>
   </section>
 
   <section class="mod a-choke"><div class="tag">CHOKE</div>
@@ -253,18 +266,23 @@ const PADS = [['BUMBO 1',0],['ARO',0],['CAIXA 1',0],['CAIXA 2',0],['CAIXA 3',0],
 const SAMPLES = [['DM-KICKS1.wav','DM KICK 1'],['DM-SNARES28.wav','DM ARO 28'],['DM-SNARES6.wav','DM CAIXA 6'],['SYN-SNARE2.wav','SINT CAIXA 2'],
   ['SYN-SNARE3.wav','SINT CAIXA 3'],['SYN-KICK2.wav','SINT BUMBO 2'],['DM-HATs6.wav','DM HAT 6'],['SYN-SURDO.wav','SINT SURDO'],
   ['DM-HATs39.wav','DM HAT 39'],['SYN-KICK3.wav','SINT BUMBO 3'],['DM-HATs17.wav','DM HAT 17 ABERTO'],['SYN-TOM2.wav','SINT TOM 2'],
-  ['SYN-SHAKER.wav','SINT SHAKER'],['SYN-PRATO.wav','SINT PRATO'],['SYN-TOM1.wav','SINT TOM 1'],['SYN-BLOCO.wav','SINT BLOCO']];
+  ['SYN-SHAKER.wav','SINT SHAKER'],['DM-PRATOS1.wav','DM PRATO 1'],['SYN-TOM1.wav','SINT TOM 1'],['SYN-BLOCO.wav','SINT BLOCO'],
+  // biblioteca: mais timbres para o < SAMPLE > e o TIMBRE 2 de qualquer pad
+  ['DM-HATs1.wav','DM HAT 1'],['DM-HATs4.wav','DM HAT 4'],['DM-HATs5.wav','DM HAT 5'],['DM-HATs7.wav','DM HAT 7'],['DM-HATs8.wav','DM HAT 8'],['DM-HATs9.wav','DM HAT 9'],['DM-HATs10.wav','DM HAT 10'],['DM-HATs11.wav','DM HAT 11'],['DM-HATs12.wav','DM HAT 12'],['DM-HATs13.wav','DM HAT 13'],['DM-HATs14.wav','DM HAT 14'],['DM-HATs15.wav','DM HAT 15'],['DM-HATs16.wav','DM HAT 16'],['DM-PRATOS2.wav','DM PRATO 2'],['DM-PRATOS3.wav','DM PRATO 3'],['DM-PRATOS4.wav','DM PRATO 4'],['DM-PRATOS5.wav','DM PRATO 5'],['SYN-PRATO.wav','SINT PRATO']];
 const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const noteName = (n) => NOTE_NAMES[n % 12] + (Math.floor(n / 12) - 2);
 const CHOKES = ['NENHUM', 'HI-HAT', 'GRUPO A', 'GRUPO B'];
 const defaults = (i) => ({ level: 0, pan: 0, tune: 0, start: 0, end: 1, attack: 0, hold: 0, decay: 400, sustain: 1, release: 120,
-                           cutoff: 20000, velocity: 0.75, reverse: false, mode: 0, choke: PADS[i][1], sample: i });
+                           cutoff: 20000, velocity: 0.75, reverse: false, mode: 0, choke: PADS[i][1], sample: i,
+                           link: 0, layer: 0, layerLevel: -6, layerTune: 0 });
 const FACTORY = [
   ['ROOTS DM', () => {}],
   ['STEPPERS', (s) => { s(0,'tune',-2); s(0,'level',2); s(5,'tune',-1); s(2,'sustain',0); s(2,'decay',180); s(6,'sustain',0); s(6,'decay',90); }],
   ['ONE DROP ARO', (s) => { s(1,'level',2); s(1,'tune',1); s(0,'tune',-3); s(0,'cutoff',2500); s(10,'sustain',0.35); s(10,'decay',300); }],
   ['DIGITAL 85', (s) => { for (let p = 0; p < 16; p++) { s(p,'sustain',0); s(p,'decay',140); s(p,'cutoff',7000); }
                           s(9,'level',2); s(4,'level',1); s(0,'decay',220); s(13,'decay',600); }],
+  ['DUB LAYER', (s) => { s(2,'layer',2); s(2,'layerLevel',-7); s(2,'layerTune',0.5); s(0,'layer',6); s(0,'layerLevel',-5); s(0,'layerTune',-2);
+                         s(10,'link',14); s(13,'level',-9); }],
   ['DUB PESADO', (s) => { for (let p = 0; p < 16; p++) s(p,'tune',-2); s(0,'tune',-4); s(0,'cutoff',1800); s(0,'level',3);
                           s(2,'cutoff',4500); s(2,'release',900); s(13,'cutoff',6000); }],
 ];
@@ -286,7 +304,7 @@ const P = () => st.pads[st.sel];
 
 // ---------------------------------------------------------------- áudio (Web Audio)
 let ctx = null, master = null, tapeNode = null, analyser = null;
-const buffers = new Array(16).fill(null);      // timbres de fábrica decodificados
+const buffers = new Array(SAMPLES.length).fill(null);   // timbres de fábrica decodificados
 const custom = new Array(16).fill(null);       // samples carregados pelo usuário (não ficam salvos)
 const peaksCache = new Map();
 let voices = [];
@@ -337,18 +355,25 @@ function cut(v, t, tc) {
     v.g.gain.setTargetAtTime(0, t, tc); v.src.stop(t + tc * 8 + 0.02);
   } catch (e) {}
 }
-function trigger(pad, vel, t) {
+function trigger(pad, vel, t, depth = 0) {
   ensureAudio();
   t = Math.max(t || 0, ctx.currentTime);
-  const p = st.pads[pad], buf = padBuffer(pad);
+  const p = st.pads[pad];
   hits[pad] = { t, vel };
-  if (!buf) return;
   if (p.choke > 0) for (const v of voices) if (st.pads[v.pad].choke === p.choke && v.t <= t) cut(v, t, 0.004);
-  const dur = buf.duration, a = Math.min(p.start, p.end) * dur, b = Math.max(p.start, p.end) * dur;
-  const rate = Math.pow(2, p.tune / 12), len = Math.max(0.002, b - a), real = len / rate;
+  spawn(pad, padBuffer(pad), vel, t, false);
+  if (p.layer > 0 && buffers[p.layer - 1]) spawn(pad, buffers[p.layer - 1], vel, t, true);      // TIMBRE 2
+  if (depth === 0 && p.link > 0 && p.link - 1 !== pad) trigger(p.link - 1, vel, t, 1);           // JUNTAR COM
+}
+function spawn(pad, buf, vel, t, layer) {
+  if (!buf) return;
+  const p = st.pads[pad];
+  const dur = buf.duration, a = layer ? 0 : Math.min(p.start, p.end) * dur, b = layer ? dur : Math.max(p.start, p.end) * dur;
+  const rate = Math.pow(2, (p.tune + (layer ? p.layerTune : 0)) / 12), len = Math.max(0.002, b - a), real = len / rate;
   const src = ctx.createBufferSource(); src.buffer = p.reverse ? reversed(buf) : buf; src.playbackRate.value = rate;
   const g = ctx.createGain(), edge = ctx.createGain();
-  const x = vel / 127, peak = Math.pow(10, p.level / 20) * ((1 - p.velocity) + p.velocity * x * x) * (p.level <= -35.95 ? 0 : 1);
+  const lv = layer ? p.layerLevel : p.level;
+  const x = vel / 127, peak = Math.pow(10, lv / 20) * ((1 - p.velocity) + p.velocity * x * x) * (lv <= -35.95 ? 0 : 1);
   // envelope AHDSR (decay exponencial até o sustain, como no plugin)
   const A = p.attack / 1000, H = p.hold / 1000, D = p.decay / 1000;
   g.gain.setValueAtTime(A > 0 ? 0 : peak, t);
@@ -364,15 +389,16 @@ function trigger(pad, vel, t) {
   if (ctx.createStereoPanner) { const pn = ctx.createStereoPanner(); pn.pan.value = p.pan; edge.connect(pn).connect(master); } else edge.connect(master);
   const offset = p.reverse ? dur - b : a;
   src.start(t, offset, len);
-  const v = { pad, g, src, t, rate, a, b, dur, reverse: p.reverse, gate: p.mode === 1, real };
+  const v = { pad, g, src, t, rate, a, b, dur, reverse: p.reverse, gate: p.mode === 1, real, layer };
   voices.push(v);
   src.onended = () => { voices = voices.filter((w) => w !== v); };
   if (voices.length > 64) cut(voices[0], t, 0.003);
 }
-function release(pad) {
+function release(pad, depth = 0) {
   if (!ctx) return;
   const p = st.pads[pad];
   for (const v of voices) if (v.pad === pad && v.gate && !v.released) { v.released = true; cut(v, ctx.currentTime, Math.max(0.002, p.release / 1000 / 6.9)); }
+  if (depth === 0 && p.link > 0 && p.link - 1 !== pad) release(p.link - 1, 1);
 }
 
 // ---------------------------------------------------------------- groove do Dub Drums (gerador do MRDM-12) tocando nos pads
@@ -507,7 +533,7 @@ function drawVisor() {
   const { g, w, h } = prep(visor), p = P(), buf = ctx ? padBuffer(st.sel) : null, ar = visorArea(w, h);
   lcdText(g, 'PAD ' + String(st.sel + 1).padStart(2, '0') + '  ' + PADS[st.sel][0] + (w >= 520 ? '  ' + noteName(FIRST + st.sel) + ' ' + (FIRST + st.sel) : ''), 14, 18, 13);
   const dur = buf ? buf.duration * 1000 : 0;
-  if (w >= 520) lcdText(g, padSampleName(st.sel) + (buf ? '  ' + Math.round(dur) + ' MS' : ''), w - 14, 18, 11, 'right', 0.75);
+  if (w >= 520) lcdText(g, padSampleName(st.sel) + (buf ? '  ' + Math.round(dur) + ' MS' : '') + (p.layer > 0 ? '  + ' + SAMPLES[p.layer - 1][1] : ''), w - 14, 18, 11, 'right', 0.75);
   else lcdText(g, buf ? Math.round(dur) + ' MS' : '', w - 14, 18, 11, 'right', 0.75);
   g.fillStyle = 'rgba(255,169,40,.06)'; for (let i = 1; i < 16; i++) g.fillRect(ar.x + ar.w * i / 16, ar.y, 1, ar.h); g.fillRect(ar.x, ar.y + ar.h / 2, ar.w, 1);
   const s = Math.min(p.start, p.end), e = Math.max(p.start, p.end);
@@ -530,7 +556,7 @@ function drawVisor() {
   // posição tocando
   if (ctx && buf) {
     const now = ctx.currentTime; let best = null;
-    for (const v of voices) if (v.pad === st.sel && v.t <= now && now < v.t + v.real && (!best || v.t > best.t)) best = v;
+    for (const v of voices) if (v.pad === st.sel && !v.layer && v.t <= now && now < v.t + v.real && (!best || v.t > best.t)) best = v;
     if (best) {
       const el = (now - best.t) * best.rate, f = best.reverse ? (best.b - el) / best.dur : (best.a + el) / best.dur;
       g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(ar.x + f * ar.w - .75, ar.y, 1.5, ar.h);
@@ -624,7 +650,7 @@ const padEls = [];
   for (let row = 3; row >= 0; row--) for (let col = 0; col < 4; col++) {
     const i = row * 4 + col, d = document.createElement('div');
     d.className = 'pad'; d.innerHTML = '<div class="rub"></div><div class="glow"></div><span class="n">' + String(i + 1).padStart(2, '0') +
-      '</span><span class="k">' + noteName(FIRST + i) + ' ' + (FIRST + i) + '</span><span class="nm">' + PADS[i][0] + '</span>';
+      '</span><span class="k">' + noteName(FIRST + i) + ' ' + (FIRST + i) + '</span><span class="lt"></span><span class="nm">' + PADS[i][0] + '</span>';
     d.addEventListener('pointerdown', (ev) => {
       ev.preventDefault(); d.setPointerCapture(ev.pointerId);
       const r = d.getBoundingClientRect(), y = clamp((ev.clientY - r.top) / r.height, 0, 1);
@@ -701,6 +727,11 @@ const PK = [['VOLUME', 'level', lin(-36, 12), fmtDb], ['PAN', 'pan', lin(-1, 1),
             ['VELOCITY', 'velocity', lin(0, 1), (v) => Math.round(v * 100) + '%']];
 for (const [label, key, [toN, fromN], fmt] of PK)
   padKnobs.push(knob($('padKnobs'), label, () => P()[key], (v) => { P()[key] = v; }, toN, fromN, fmt, () => defaults(st.sel)[key]));
+padKnobs.push(knob($('layerKnobs'), 'VOLUME 2', () => P().layerLevel, (v) => { P().layerLevel = v; }, ...lin(-36, 12), fmtDb, () => -6));
+padKnobs.push(knob($('layerKnobs'), 'AFINAÇÃO 2', () => P().layerTune, (v) => { P().layerTune = v; }, ...lin(-24, 24), (v) => (v > 0 ? '+' : '') + v.toFixed(2) + ' ST', () => 0));
+const stepParam = (key, n) => (d) => { const p = P(); p[key] = ((p[key] || 0) + d + n) % n; save(); refresh(); if (key === 'layer') audition(); };
+$('layerPrev').onclick = () => stepParam('layer', SAMPLES.length + 1)(-1); $('layerNext').onclick = () => stepParam('layer', SAMPLES.length + 1)(1);
+$('linkPrev').onclick = () => stepParam('link', 17)(-1); $('linkNext').onclick = () => stepParam('link', 17)(1);
 const showMaster = [
   knob($('mLevel'), 'VOLUME', () => st.masterLevel, (v) => { st.masterLevel = v; updateMaster(); }, ...lin(-24, 6), fmtDb, () => 0),
   knob($('mTape'), 'FITA', () => st.tape, (v) => { st.tape = v; updateMaster(); }, ...lin(0, 1), (v) => Math.round(v * 100) + '%', () => 0.15),
@@ -717,7 +748,7 @@ $('reverse').onclick = () => { P().reverse = !P().reverse; save(); refresh(); au
 $('listen').onclick = audition;
 $('prevSample').onclick = () => stepSample(-1);
 $('nextSample').onclick = () => stepSample(1);
-function stepSample(d) { const p = P(); const cur = p.sample < 0 ? (d > 0 ? -1 : 0) : p.sample; p.sample = (cur + d + 16) % 16; save(); refresh(); audition(); }
+function stepSample(d) { const p = P(), n = SAMPLES.length; const cur = p.sample < 0 ? (d > 0 ? -1 : 0) : p.sample; p.sample = (cur + d + n) % n; save(); refresh(); audition(); }
 $('loadSample').onclick = () => $('file').click();
 $('file').onchange = (ev) => { const f = ev.target.files[0]; if (f) loadFile(st.sel, f); ev.target.value = ''; };
 
@@ -823,6 +854,9 @@ function refresh() {
   $('padInfo').textContent = padSampleName(st.sel) + '  ·  ' + noteName(FIRST + st.sel) + ' ' + (FIRST + st.sel);
   padKnobs.forEach((s) => s()); showMaster.forEach((s) => s()); showMode(); showChoke();
   $('reverse').classList.toggle('on', P().reverse);
+  $('layerName').textContent = P().layer > 0 ? SAMPLES[P().layer - 1][1] : 'NENHUM';
+  $('linkName').textContent = P().link > 0 ? 'PAD ' + String(P().link).padStart(2, '0') + ' ' + PADS[P().link - 1][0] : 'NENHUM';
+  padEls.forEach((d, i) => { const q = st.pads[i]; d.querySelector('.lt').textContent = (q.layer > 0 ? '+T2' : '') + (q.link > 0 ? (q.layer > 0 ? ' ' : '') + '+' + String(q.link).padStart(2, '0') : ''); });
   showDrumGroups.forEach((s) => s());
   for (const id of ['fill', 'intro', 'swingAll', 'machine', 'colorMidi']) $(id).classList.toggle('on', !!D[id]);
   for (const id of ['rndKick', 'rndSnare', 'rndHat', 'rndPerc']) $('o_' + id).textContent = D[id] + '%';

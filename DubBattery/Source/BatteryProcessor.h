@@ -117,15 +117,16 @@ private:
         dbr::SamplePtr sample;
         double pos = 0.0, step = 1.0;
         int first = 0, last = 0;            // região tocada [first, last)
-        bool reverse = false, gate = false, released = false;
+        bool reverse = false, gate = false, released = false, layer = false;
         enum Stage { Attack, Hold, Decay, Sustain, Release, Choke } stage = Attack;
         float env = 0.0f, stageLeft = 0.0f;
         float gain = 1.0f;
         float ic1[2] {}, ic2[2] {};         // filtro (SVF passa-baixa)
         juce::uint64 age = 0;
     };
-    void startVoice (int pad, int velocity);
-    void noteOff (int pad);
+    void startVoice (int pad, int velocity, int depth = 0);
+    void spawn (int pad, dbr::SamplePtr, int velocity, bool layer);
+    void noteOff (int pad, int depth = 0);
     void renderVoices (float* l, float* r, int start, int num);
 
     std::array<std::array<std::atomic<float>*, (size_t) dbr::P::count>, dbr::numPads> raw {};

@@ -96,6 +96,7 @@ namespace
     {
         const Settings& s;
         std::vector<NoteEvent> ev;
+        std::vector<std::pair<double, double>> fills;   // trechos de virada [de, até): rufos e flams ali são de propósito
 
         void add (double beat, int note, int vel, double len = 0.1)
         {
@@ -607,6 +608,7 @@ namespace
 
         b.removeRange (from, barStart (bar + 1),
                        { gm::ClosedHat, gm::OpenHat, gm::Snare, gm::SideStick, gm::TomHigh, gm::TomMid, gm::TomLow });
+        b.fills.push_back ({ from, barStart (bar + 1) });
 
         for (size_t i = 0; i < f.size(); ++i)
         {
@@ -683,6 +685,52 @@ namespace
             default: return 3;
         }
     }
+
+    // Mesma peça batendo muito perto dela mesma (ghost da aleatoriedade em cima da nota principal, nota
+    // duplicada, flam): fica só a principal, a mais forte.
+    //  - no mesmo instante (nota duplicada): sempre sai.
+    //  - menos de 0,09 tempo: a mais fraca sai. O flam da caixa (nota fraca logo antes da forte) e as viradas
+    //    ficam, mas com a nota de enfeite bem baixa (30% da principal).
+    //  - de 0,09 a 0,2 tempo (bumbo, caixa, aro e tons, fora das viradas): a mais fraca cai para 35% da principal.
+    //  - hi-hat: só a regra das notas coladas (o swing aproxima as semicolcheias de propósito).
+    void cleanCloseHits (std::vector<NoteEvent>& out, const std::vector<std::pair<double, double>>& fills)
+    {
+        auto inFill = [&] (double beat)
+        {
+            for (auto& f : fills)
+                if (beat >= f.first - 0.15 && beat < f.second + 0.01) return true;
+            return false;
+        };
+        std::vector<bool> drop (out.size(), false);
+        for (size_t i = 0; i < out.size(); ++i)
+        {
+            for (size_t j = i + 1; j < out.size() && ! drop[i] && out[j].beat - out[i].beat < 0.2; ++j)
+            {
+                if (drop[j] || out[j].note != out[i].note) continue;
+                const double gap = out[j].beat - out[i].beat;
+                const int piece = pieceOf (out[i].note);
+                const bool fill = inFill (out[i].beat) || inFill (out[j].beat);
+                const size_t main = out[j].velocity > out[i].velocity ? j : i;
+                const size_t weak = main == i ? j : i;
+                const int ghostVel = std::max (1, (int) std::lround (out[main].velocity * 0.30));
+                if (gap < 0.09)
+                {
+                    const bool flam = piece == 1 && weak == i && gap >= 0.015 && gap <= 0.06;
+                    if (gap < 0.012)    drop[weak] = true;   // duplicada no mesmo instante: sempre sai
+                    else if (flam || fill) out[weak].velocity = std::min (out[weak].velocity, ghostVel);
+                    else              drop[weak] = true;
+                }
+                else if (piece != 2 && ! fill)
+                {
+                    out[weak].velocity = std::min (out[weak].velocity, std::max (1, (int) std::lround (out[main].velocity * 0.35)));
+                }
+            }
+        }
+        size_t k = 0;
+        for (size_t i = 0; i < out.size(); ++i)
+            if (! drop[i]) out[k++] = out[i];
+        out.resize (k);
+    }
 } // namespace
 
 Pattern generate (const Settings& in)
@@ -713,7 +761,8 @@ Pattern generate (const Settings& in)
     const float rand[4] = { s.randKick, s.randSnare, s.randHat, s.randPerc };
     const double timingAmount[4] = { 0.006, 0.012, 0.014, 0.012 }; // em semínimas, no máximo
 
-    auto finish = [&] (const std::vector<NoteEvent>& raw, double len, int barOverride, std::vector<NoteEvent>& out)
+    auto finish = [&] (const std::vector<NoteEvent>& raw, double len, int barOverride, std::vector<NoteEvent>& out,
+                       const std::vector<std::pair<double, double>>& fills)
     {
         for (auto e : raw)
         {
@@ -755,9 +804,10 @@ Pattern generate (const Settings& in)
         }
         std::stable_sort (out.begin(), out.end(),
                           [] (const NoteEvent& x, const NoteEvent& y) { return x.beat < y.beat; });
+        cleanCloseHits (out, fills);
     };
 
-    finish (b.ev, p.lengthInBeats, 0, p.events);
+    finish (b.ev, p.lengthInBeats, 0, p.events, b.fills);
 
     if (s.intro)
     {
@@ -766,7 +816,7 @@ Pattern generate (const Settings& in)
         Builder ib { introSettings, {} };
         buildIntro (ib, introRng);
         p.introLengthInBeats = 4.0;
-        finish (ib.ev, p.introLengthInBeats, -1, p.intro);
+        finish (ib.ev, p.introLengthInBeats, -1, p.intro, ib.fills);
     }
     return p;
 }

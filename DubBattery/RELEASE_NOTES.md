@@ -1,6 +1,15 @@
-## DUB BATTERY REGGAE 1.0 — Dub Station
+## DUB BATTERY REGGAE 1.1 — Dub Station
 
-Primeira versão para teste.
+- **LAYER**: TIMBRE 2 (um segundo timbre tocando junto no mesmo pad, com volume e afinação próprios) e JUNTAR COM
+  (um pad dispara outro pad junto). Os pads mostram +T2 / +nn
+- **Timbres novos**: DM-HATs 1, 4, 5, 7 a 16 e DM-PRATOS 1 a 5. O pad 14 (PRATO) agora é o DM-PRATOS1;
+  os outros ficam na biblioteca do < SAMPLE > e do TIMBRE 2 (34 timbres)
+- **Groove mais limpo**: mesma peça batendo muito perto dela mesma fica só com a nota principal; a ghost colada sai
+  e a próxima cai para 35% da força (as viradas ficam como estão). Vale também para o MRDM-12 e o MRM-0420
+- Preset de fábrica novo: DUB LAYER
+- CHOKE agora fica dentro da seção PAD
+
+### Da 1.0
 
 - 16 pads estilo MPC / SP-404 nas notas C1 (36) a D#2 (51), o mesmo mapa do MRDM-12
 - Visor do sample com início e fim arrastáveis e envelope AHDSR gráfico (ONE SHOT / GATE)

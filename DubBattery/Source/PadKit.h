@@ -39,11 +39,14 @@ inline juce::String noteName (int n)
 }
 
 // ids dos parâmetros de cada pad: "p01_level" ... "p16_choke"
-enum class P { level, pan, tune, start, end, attack, hold, decay, sustain, release, cutoff, velocity, reverse, mode, choke, count };
+// link = JUNTAR COM outro pad (0 = nenhum, k = pad k); layer = TIMBRE 2 (0 = nenhum, k = timbre k-1 da biblioteca)
+enum class P { level, pan, tune, start, end, attack, hold, decay, sustain, release, cutoff, velocity, reverse, mode, choke,
+               link, layer, layerLevel, layerTune, count };
 inline const char* paramSuffix (P p)
 {
     static const char* s[] = { "level", "pan", "tune", "start", "end", "attack", "hold", "decay", "sustain",
-                               "release", "cutoff", "velocity", "reverse", "mode", "choke" };
+                               "release", "cutoff", "velocity", "reverse", "mode", "choke",
+                               "link", "layer", "layerLevel", "layerTune" };
     return s[(int) p];
 }
 inline juce::String pid (int pad, P p)
@@ -84,6 +87,14 @@ inline const std::vector<FactoryPreset>& factoryPresets()
                 for (int p = 0; p < numPads; ++p) { set (p, P::sustain, 0.0f); set (p, P::decay, 140.0f); set (p, P::cutoff, 7000.0f); }
                 set (9, P::level, 2.0f);   set (4, P::level, 1.0f);
                 set (0, P::decay, 220.0f); set (13, P::decay, 600.0f);
+            } },
+        { "DUB LAYER", [] (auto set)
+            {
+                // caixa 1 com o aro junto (TIMBRE 2), bumbo 1 com o sub do bumbo 2 por baixo,
+                // e o HH aberto puxando o prato junto (mais baixo)
+                set (2, P::layer, 2.0f);  set (2, P::layerLevel, -7.0f); set (2, P::layerTune, 0.5f);
+                set (0, P::layer, 6.0f);  set (0, P::layerLevel, -5.0f); set (0, P::layerTune, -2.0f);
+                set (10, P::link, 14.0f); set (13, P::level, -9.0f);
             } },
         { "DUB PESADO", [] (auto set)
             {

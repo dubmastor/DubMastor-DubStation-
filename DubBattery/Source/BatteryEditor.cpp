@@ -414,6 +414,24 @@ void Pad::paint (juce::Graphics& g)
     g.setColour (juce::Colours::black.withAlpha (0.45f));
     g.drawRoundedRectangle (pad, 5.0f, 1.0f);
 
+    // TIMBRE 2 / JUNTAR COM: etiqueta âmbar no alto do pad
+    {
+        const int layer = juce::roundToInt (proc.padValue (index, P::layer)), link = juce::roundToInt (proc.padValue (index, P::link));
+        juce::String tag;
+        if (layer > 0) tag << "+T2";
+        if (link > 0)  tag << (tag.isEmpty() ? "" : " ") << "+" << juce::String (link).paddedLeft ('0', 2);
+        if (tag.isNotEmpty())
+        {
+            g.setFont (stencil (9.5f, 0.08f));
+            const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), tag) + 10.0f;
+            auto chip = juce::Rectangle<float> (tw, 14.0f).withCentre ({ pad.getCentreX(), pad.getY() + 27.0f });
+            g.setColour (juce::Colour (0xff1a1714).withAlpha (0.85f));
+            g.fillRoundedRectangle (chip, 3.0f);
+            g.setColour (col::amber);
+            g.drawText (tag, chip, juce::Justification::centred);
+        }
+    }
+
     // serigrafia
     auto txt = pad.reduced (8.0f, 5.0f);
     const juce::Colour ink = col::ink.withAlpha (0.82f);
@@ -497,7 +515,12 @@ void SampleVisor::paint (juce::Graphics& g)
                  + noteName (firstNote + pad) + " " + juce::String (firstNote + pad),
           top, juce::Justification::centredLeft, 14.0f);
     if (s != nullptr)
-        glow (g, s->name + "   " + juce::String (juce::roundToInt (s->lengthMs())) + " MS", top, juce::Justification::centredRight, 12.0f, 0.75f);
+    {
+        juce::String t = s->name + "   " + juce::String (juce::roundToInt (s->lengthMs())) + " MS";
+        const int layer = juce::roundToInt (proc.padValue (pad, P::layer));
+        if (layer > 0) t << "   + " << BatteryProcessor::factorySampleName (layer - 1);
+        glow (g, t, top, juce::Justification::centredRight, 12.0f, 0.75f);
+    }
 
     // grade do LCD
     auto wa = waveArea();
@@ -814,6 +837,94 @@ void EnvelopeView::mouseDoubleClick (const juce::MouseEvent&)
 }
 
 //==============================================================================
+void StepSelector::bind (juce::RangedAudioParameter& p)
+{
+    param = &p;
+    att = std::make_unique<juce::ParameterAttachment> (p, [this] (float v) { value = v; repaint(); if (onChange) onChange(); }, nullptr);
+    att->sendInitialUpdate();
+}
+
+void StepSelector::step (int delta)
+{
+    if (param == nullptr) return;
+    const int n = param->getNumSteps();
+    const int next = (juce::roundToInt (value) + delta + n) % n;
+    att->setValueAsCompleteGesture ((float) next);
+}
+
+void StepSelector::mouseDown (const juce::MouseEvent& e)
+{
+    const auto d = getLocalBounds().toFloat().withTrimmedLeft (92.0f);
+    if (e.position.x < d.getX()) return;
+    step (e.position.x < d.getCentreX() ? -1 : 1);   // metade esquerda volta, direita avança
+}
+
+void StepSelector::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
+{
+    step (w.deltaY > 0 ? -1 : 1);
+}
+
+void StepSelector::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat();
+    g.setColour (col::ink);
+    g.setFont (stencil (10.5f, 0.18f));
+    g.drawText (caption, r.removeFromLeft (92.0f), juce::Justification::centredLeft);
+    auto d = r.reduced (0, 2);
+    lcdGlass (g, d);
+    const bool on = juce::roundToInt (value) > 0;
+    for (int side : { -1, 1 })
+    {
+        juce::Path tri;
+        const float cx = side < 0 ? d.getX() + 12.0f : d.getRight() - 12.0f, cy = d.getCentreY(), s = 5.0f;
+        if (side < 0) tri.addTriangle (cx - s, cy, cx + s * 0.8f, cy - s, cx + s * 0.8f, cy + s);
+        else          tri.addTriangle (cx + s, cy, cx - s * 0.8f, cy - s, cx - s * 0.8f, cy + s);
+        g.setColour (col::amber.withAlpha (isMouseOver() ? 0.95f : 0.6f));
+        g.fillPath (tri);
+    }
+    glow (g, text ? text (juce::roundToInt (value)) : juce::String (juce::roundToInt (value)), d.reduced (24.0f, 0.0f),
+          juce::Justification::centred, 11.5f, on ? 1.0f : 0.45f, 0.08f);
+    lcdShine (g, d);
+}
+
+void DragValue::bind (juce::RangedAudioParameter& p)
+{
+    param = &p;
+    att = std::make_unique<juce::ParameterAttachment> (p, [this] (float v) { value = v; repaint(); }, nullptr);
+    att->sendInitialUpdate();
+}
+
+void DragValue::mouseDown (const juce::MouseEvent&)  { if (param != nullptr) { dragStart = param->convertTo0to1 (value); att->beginGesture(); } }
+void DragValue::mouseUp (const juce::MouseEvent&)    { if (param != nullptr) att->endGesture(); }
+void DragValue::mouseDrag (const juce::MouseEvent& e)
+{
+    if (param == nullptr) return;
+    const float n = juce::jlimit (0.0f, 1.0f, dragStart - (float) e.getDistanceFromDragStartY() / 220.0f);
+    att->setValueAsPartOfGesture (param->convertFrom0to1 (n));
+}
+void DragValue::mouseDoubleClick (const juce::MouseEvent&)
+{
+    if (param != nullptr) att->setValueAsCompleteGesture (param->convertFrom0to1 (param->getDefaultValue()));
+}
+void DragValue::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
+{
+    if (param == nullptr) return;
+    const float n = juce::jlimit (0.0f, 1.0f, param->convertTo0to1 (value) + (w.deltaY > 0 ? 0.02f : -0.02f));
+    att->setValueAsCompleteGesture (param->convertFrom0to1 (n));
+}
+void DragValue::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat();
+    g.setColour (col::ink);
+    g.setFont (stencil (10.0f, 0.18f));
+    g.drawText (caption, r.removeFromTop (14.0f), juce::Justification::centred);
+    auto d = r.reduced (4.0f, 3.0f);
+    lcdGlass (g, d);
+    glow (g, format ? format (value) : juce::String (value, 1), d, juce::Justification::centred, 11.5f);
+    lcdShine (g, d);
+}
+
+//==============================================================================
 void LedMeter::paint (juce::Graphics& g)
 {
     auto r = getLocalBounds().toFloat();
@@ -1015,7 +1126,11 @@ static juce::String fmtPct (float v)  { return juce::String (juce::roundToInt (v
 BatteryPanel::BatteryPanel (BatteryProcessor& p)
     : proc (p), visor (p), envelope (p),
       level ("VOLUME", fmtDb), pan ("PAN", fmtPan), tune ("AFINACAO", fmtTune), cutoff ("FILTRO", fmtHz),
-      velocity ("VELOCITY", fmtPct), masterLevel ("VOLUME", fmtDb), tape ("FITA", fmtPct)
+      velocity ("VELOCITY", fmtPct), masterLevel ("VOLUME", fmtDb), tape ("FITA", fmtPct),
+      layerSel ("TIMBRE 2", [] (int v) { return v <= 0 ? juce::String ("NENHUM") : BatteryProcessor::factorySampleName (v - 1); }),
+      linkSel ("JUNTAR COM", [] (int v) { return v <= 0 ? juce::String ("NENHUM")
+                                                         : "PAD " + juce::String (v).paddedLeft ('0', 2) + "  " + dbr::pads[v - 1].name; }),
+      layerLevel ("VOLUME 2", fmtDb), layerTune ("AFINACAO 2", fmtTune)
 {
     for (int i = 0; i < numPads; ++i)
     {
@@ -1029,8 +1144,12 @@ BatteryPanel::BatteryPanel (BatteryProcessor& p)
     addAndMakeVisible (envelope);
     visor.onLoaded = [this] { refreshAll(); };
     for (auto* c : std::initializer_list<juce::Component*> { &prevSample, &nextSample, &load, &listen, &reverse, &mode, &choke,
-                                                            &level, &pan, &tune, &cutoff, &velocity, &masterLevel, &tape, &meter })
+                                                            &level, &pan, &tune, &cutoff, &velocity, &masterLevel, &tape, &meter,
+                                                            &layerSel, &linkSel, &layerLevel, &layerTune })
         addAndMakeVisible (c);
+    auto padsChanged = [this] { for (auto& p : pads) p->repaint(); visor.repaint(); };
+    layerSel.onChange = padsChanged;
+    linkSel.onChange = padsChanged;
     reverse.toggle = true;
     for (auto* k : { &prevSample, &nextSample, &load, &listen }) k->showLamp = false;
     prevSample.onClick = [this] { stepSample (-1); };
@@ -1070,12 +1189,17 @@ void BatteryPanel::selectPad (int pad)
     reverse.bind (proc.padParam (pad, P::reverse));
     mode.bind    (proc.padParam (pad, P::mode));
     choke.bind   (proc.padParam (pad, P::choke));
+    layerSel.bind   (proc.padParam (pad, P::layer));
+    linkSel.bind    (proc.padParam (pad, P::link));
+    layerLevel.bind (proc.padParam (pad, P::layerLevel));
+    layerTune.bind  (proc.padParam (pad, P::layerTune));
     repaint (padDisplay.expanded (6));
 }
 
 void BatteryPanel::refreshAll()
 {
     selectPad (proc.selectedPad);
+    for (auto& p : pads) p->repaint();
     repaint();
 }
 
@@ -1132,8 +1256,8 @@ void BatteryPanel::resized()
     envSec    = { 848, 26, 380, 250 };
     padSec    = { 52, 302, 560, 400 };
     padCtlSec = { 632, 302, 596, 230 };
-    chokeSec  = { 632, 554, 280, 148 };
-    masterSec = { 932, 554, 296, 148 };
+    layerSec  = { 632, 554, 350, 148 };
+    masterSec = { 1002, 554, 226, 148 };
 
     visor.setBounds (sampleSec.getX() + 14, sampleSec.getY() + 18, sampleSec.getWidth() - 28, 176);
     {
@@ -1162,15 +1286,25 @@ void BatteryPanel::resized()
 
     padDisplay = { padCtlSec.getX() + 16, padCtlSec.getY() + 20, padCtlSec.getWidth() - 32, 32 };
     {
-        auto row = juce::Rectangle<int> (padCtlSec.getX() + 8, padCtlSec.getY() + 62, padCtlSec.getWidth() - 16, 160);
+        auto row = juce::Rectangle<int> (padCtlSec.getX() + 8, padCtlSec.getY() + 58, padCtlSec.getWidth() - 16, 124);
         const int w = row.getWidth() / 5;
         for (auto* k : { &level, &pan, &tune, &cutoff, &velocity })
             k->setBounds (row.removeFromLeft (w).reduced (2, 0));
     }
-    choke.setBounds (chokeSec.reduced (12, 0).withTrimmedTop (22).withHeight (88));
-    masterLevel.setBounds (masterSec.getX() + 10, masterSec.getY() + 12, 104, 130);
-    tape.setBounds (masterSec.getX() + 116, masterSec.getY() + 12, 104, 130);
-    meter.setBounds (masterSec.getRight() - 58, masterSec.getY() + 18, 40, 118);
+    choke.setBounds (padCtlSec.getX() + 86, padCtlSec.getY() + 188, padCtlSec.getWidth() - 98, 36);
+    {
+        auto r = layerSec.reduced (12, 0).withTrimmedTop (16);
+        layerSel.setBounds (r.removeFromTop (32));
+        r.removeFromTop (6);
+        linkSel.setBounds (r.removeFromTop (32));
+        r.removeFromTop (6);
+        auto vals = r.removeFromTop (48);
+        layerLevel.setBounds (vals.removeFromLeft (vals.getWidth() / 2));
+        layerTune.setBounds (vals);
+    }
+    masterLevel.setBounds (masterSec.getX() + 6, masterSec.getY() + 12, 84, 130);
+    tape.setBounds (masterSec.getX() + 90, masterSec.getY() + 12, 84, 130);
+    meter.setBounds (masterSec.getRight() - 46, masterSec.getY() + 18, 34, 118);
     background = {};
 }
 
@@ -1194,7 +1328,7 @@ void BatteryPanel::renderBackground()
     section (g, envSec, "ENVELOPE");
     section (g, padSec, "PADS");
     section (g, padCtlSec, "PAD");
-    section (g, chokeSec, "CHOKE");
+    section (g, layerSec, "LAYER");
     section (g, masterSec, "MASTER");
 
     g.setColour (col::inkSoft);
@@ -1202,9 +1336,10 @@ void BatteryPanel::renderBackground()
     g.drawText ("CLIQUE TOCA E ESCOLHE  -  EM CIMA = MAIS FORTE  -  SOLTE UM WAV NO PAD",
                 padSec.getX(), padSec.getBottom() + 8, padSec.getWidth(), 12, juce::Justification::centred);
     g.drawText ("MIDI: NOTAS C1 (36) A D#2 (51)  -  MESMO MAPA DO MRDM-12",
-                padCtlSec.getX(), chokeSec.getBottom() + 8, masterSec.getRight() - padCtlSec.getX(), 12, juce::Justification::centred);
-    g.drawText ("O PAD CORTA OS OUTROS DO MESMO GRUPO", chokeSec.getX(), chokeSec.getBottom() - 26, chokeSec.getWidth(), 12,
-                juce::Justification::centred);
+                padCtlSec.getX(), layerSec.getBottom() + 8, masterSec.getRight() - padCtlSec.getX(), 12, juce::Justification::centred);
+    g.setColour (col::ink);
+    g.setFont (stencil (11.0f, 0.2f));
+    g.drawText ("CHOKE", padCtlSec.getX() + 16, padCtlSec.getY() + 188, 70, 36, juce::Justification::centredLeft);
     g.drawText ("SAIDA", meter.getX() - 6, meter.getBottom() + 2, meter.getWidth() + 12, 10, juce::Justification::centred);
 }
 
