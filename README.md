@@ -12,20 +12,20 @@ Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e t
 **BATERIA**, aperte **PLAY RIDDIM** para ouvir tudo junto e **arraste o riddim inteiro** (bateria, skank e
 bubble, já alinhados, de 4 a 64 compassos) para a timeline. Um projeto começa em segundos.
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.1/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.1/MRM-0420-macOS.zip)** · [Detalhes](RiddimMachine/)
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS.zip)** · [Detalhes](RiddimMachine/)
 
 | Plugin | O que é | Mac | Windows | Detalhes |
 |---|---|---|---|---|
-| **Mastor Riddim Machine MRM-0420 1.1** | Instrumento / gerador MIDI: Dub Chords + MDDM-12 num só, em abas (HARMONIA e BATERIA), com PLAY RIDDIM, BPM ligado e ARRASTE O RIDDIM com bateria, skank e bubble alinhados (os acordes entram depois da intro) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.1/MRM-0420-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.1/MRM-0420-Windows.zip) | [RiddimMachine/](RiddimMachine/) |
-| **DubMastor Big Knob 3.2** | Estação de dub: filtro big knob estilo King Tubby (com bypass), eco de fita com cabeçotes, presets de EQ e liga/desliga, sirene de dub, VUs e maximizer | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-Windows.zip) | [BigKnob/](BigKnob/) |
-| **DubMastor Roots Keys 2.3** | Instrumento: piano estilo Korg M1 e órgão estilo Hammond com Leslie, eco de fita FitaEco, flanger dub, maximizer, VUs e teclado que acende com o MIDI; aba **Dub Chords** com acordes de duas mãos (6 notas) para montar o riddim e arrastar o MIDI para a DAW; visual de teclado anos 80 no piano e de madeira e marfim no órgão | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.3/DubMastorRootsKeys-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.3/DubMastorRootsKeys-Windows.zip) | [RootsKeys/](RootsKeys/) |
-| **Mastor Reggae Chord Machine MRCM-1240 1.5** | Instrumento / gerador MIDI: escolha até 4 acordes (teclado mecânico, maior/menor, inversões com sugestão automática, contador de compassos) e ele toca o skank de piano M1 com as duas mãos e o bubble de Hammond no andamento da DAW; arraste o MIDI colorido por acorde para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-Windows.zip) | [DubChords/](DubChords/) |
-| **Mastor Reggae Dub Bass Instrument MRDBI-07 1.5** | Instrumento (antigo Dub Bass): baixo de reggae Bass (senoide), Super Tone (digital King Jammy) ou 808, envelope gráfico, saturação com válvula animada ou fita de rolo, EQ editável na tela, reverb, bass boost em 60 Hz, teclado C1–C4 e maximizer com VU digital estilo Ozone | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubBass-1.4/DubBass-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubBass-1.4/DubBass-Windows.zip) | [DubBass/](DubBass/) |
-| **Mastor Dub Drums Machine MDDM-12 1.3** | Instrumento / gerador MIDI: esqueleto da bateria de reggae (Rockers, One Drop) e Boom Bap, com caixa no 2 e no 4 e bumbo/caixa editáveis por colcheia, com chave de baterista (Style Scott, Santa Davis, Carlton Barrett) com a assinatura de hi-hat e as viradas de cada um, caixa/aro, virada de intro, kit anos 70 ou digital (King Jammy / Sleng Teng), MIDI colorido por compasso e mapa de notas | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MastorDubDrumsMachine-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MastorDubDrumsMachine-Windows.zip) | [DubDrums/](DubDrums/) |
+| **Mastor Riddim Machine MRM-0420 1.2** | Instrumento / gerador MIDI: Dub Chords + MDDM-12 num só, em abas (HARMONIA e BATERIA), com PLAY RIDDIM, BPM ligado e ARRASTE O RIDDIM com bateria, skank e bubble alinhados (os acordes entram depois da intro) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows.zip) | [RiddimMachine/](RiddimMachine/) |
+| **Mastor Big Knob MBK-76 3.2** | Estação de dub: filtro big knob estilo King Tubby (com bypass), eco de fita com cabeçotes, presets de EQ e liga/desliga, sirene de dub, VUs e maximizer | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows.zip) | [BigKnob/](BigKnob/) |
+| **Mastor Roots Keys MRK-80 2.3** | Instrumento: piano estilo Korg M1 e órgão estilo Hammond com Leslie, eco de fita Mastor Tape Echo, flanger dub, maximizer, VUs e teclado que acende com o MIDI; aba **Dub Chords** com acordes de duas mãos (6 notas) para montar o riddim e arrastar o MIDI para a DAW; visual de teclado anos 80 no piano e de madeira e marfim no órgão | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-2.3/MRK-80-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-2.3/MRK-80-Windows.zip) | [RootsKeys/](RootsKeys/) |
+| **Mastor Reggae Chord Machine MRCM-1240 1.5** | Instrumento / gerador MIDI: escolha até 4 acordes (teclado mecânico, maior/menor, inversões com sugestão automática, contador de compassos) e ele toca o skank de piano M1 com as duas mãos e o bubble de Hammond no andamento da DAW; arraste o MIDI colorido por acorde para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-Windows.zip) | [DubChords/](DubChords/) |
+| **Mastor Reggae Dub Bass Instrument MRDBI-07 1.5** | Instrumento (antigo Dub Bass): baixo de reggae Bass (senoide), Super Tone (digital King Jammy) ou 808, envelope gráfico, saturação com válvula animada ou fita de rolo, EQ editável na tela, reverb, bass boost em 60 Hz, teclado C1–C4 e maximizer com VU digital estilo Ozone | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDBI-07-1.5/MRDBI-07-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDBI-07-1.5/MRDBI-07-Windows.zip) | [DubBass/](DubBass/) |
+| **Mastor Dub Drums Machine MDDM-12 1.3** | Instrumento / gerador MIDI: esqueleto da bateria de reggae (Rockers, One Drop) e Boom Bap, com caixa no 2 e no 4 e bumbo/caixa editáveis por colcheia, com chave de baterista (Style Scott, Santa Davis, Carlton Barrett) com a assinatura de hi-hat e as viradas de cada um, caixa/aro, virada de intro, kit anos 70 ou digital (King Jammy / Sleng Teng), MIDI colorido por compasso e mapa de notas | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MDDM-12-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDDM-12-1.3/MDDM-12-Windows.zip) | [DubDrums/](DubDrums/) |
 | **Mastor Reggae Bass Machine MRBM-69 2.4** | Instrumento / gerador de reggae bass lines em MIDI: botoeira com 7 baixistas (Family Man, Flabba, Derrick Barnett, Robbie, Leroy Sibbles, Fully Fullwood, Jammys/Sleng Teng) sobre até 4 acordes; preview com os timbres do Dub Bass (Roots Sine e Super Tone), bateria de acompanhamento (Roots, One Drop, Digital, Dancehall) e teclado do Roots Keys; arraste o MIDI para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.4/MRBM-69-Windows.zip) | [BassMachine/](BassMachine/) |
-| **Mastor Dub Horns 1.1** | Instrumento: naipe de metais anos 70 (trompete, flugel, saxes e trombone) com harmonia no tom, timbres de estúdio jamaicano, Mastor Tape Echo, EQ gráfico de 10 bandas com Filtro Tubby e frases MIDI (ataques estilo Dean Fraser e introduções) com notas escolhidas por você | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MastorDubHorns-1.1/MastorDubHorns-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MastorDubHorns-1.1/MastorDubHorns-Windows.zip) | [MastorDubHorns/](MastorDubHorns/) |
-| **Mastor Phone Vox MPV-01 1.6** | Efeito de voz (antigo Mastor Fone): rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-Windows.zip) | [MastorFone/](MastorFone/) |
-| **Dub Station 2.6 (FitaEco TE-12)** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-Windows.zip) | [DubStation21/](DubStation21/) |
+| **Mastor Dub Horns MDH-70 1.1** | Instrumento: naipe de metais anos 70 (trompete, flugel, saxes e trombone) com harmonia no tom, timbres de estúdio jamaicano, Mastor Tape Echo, EQ gráfico de 10 bandas com Filtro Tubby e frases MIDI (ataques estilo Dean Fraser e introduções) com notas escolhidas por você | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-Windows.zip) | [MastorDubHorns/](MastorDubHorns/) |
+| **Mastor Phone Vox MPV-01 1.6** | Efeito de voz (antigo Mastor Fone): rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows.zip) | [MastorFone/](MastorFone/) |
+| **Mastor Tape Echo MTE-12 2.6** | Antigo Dub Station 2.6 (FitaEco TE-12): eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS.zip) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows.zip) | [DubStation21/](DubStation21/) |
 
 Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor/DubMastor-DubStation-/releases/latest)**. Não precisa de conta no GitHub para baixar.
 
@@ -37,15 +37,15 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
 3. No Finder, aperte **Cmd+Shift+G**, cole `~/Library/Audio/Plug-Ins/VST3/` e copie para lá o arquivo **`.vst3`** do plugin.
 4. No **Terminal**, libere o plugin (troque pelo nome do arquivo que você copiou):
    ```
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Big Knob.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"FitaEco TE-12.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Roots Keys.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Big Knob MBK-76.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Tape Echo MTE-12.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Roots Keys MRK-80.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Phone Vox MPV-01.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Dub Bass Instrument MRDBI-07.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Drums Machine MDDM-12.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Bass Machine MRBM-69.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Horns.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Horns MDH-70.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"
    ```
 5. Abra o Cubase.
@@ -61,28 +61,21 @@ O formato é **VST3** (`.vst3`). O formato antigo `.vst` (VST2) não é suportad
 
 ## Estrutura do repositório
 
-```
-BigKnob/                         DubMastor Big Knob (C++ / JUCE 8)
-DubStation21/                    Dub Station 2.6 — FitaEco TE-12 (C++ / JUCE 8)
-RootsKeys/                       DubMastor Roots Keys — piano M1 + órgão Hammond + Dub Chords (C++ / JUCE 8)
-MastorFone/                      Mastor Phone Vox MPV-01 — rádio AM, telefone e megafone para voz (C++ / JUCE 8)
-DubChords/                       Mastor Reggae Chord Machine MRCM-1240 — gerador de skank/harmonia para riddim (C++ / JUCE 8)
-DubBass/                         Mastor Reggae Dub Bass Instrument MRDBI-07 — baixo de reggae Bass / Super Tone / 808 (C++ / JUCE 8)
-DubDrums/                        Mastor Dub Drums Machine MDDM-12 — gerador de bateria de reggae com bateria interna (C++ / JUCE 8)
-BassMachine/                     Mastor Reggae Bass Machine MRBM-69 — gerador de reggae bass lines (preview com Dub Bass, Mastor Dub Drums Machine e Roots Keys) (C++ / JUCE 8)
-MastorDubHorns/                  Mastor Dub Horns — naipe de metais anos 70 + Mastor Tape Echo (C++ / JUCE 8)
-RiddimMachine/                   Mastor Riddim Machine MRM-0420 — Dub Chords + MDDM-12 em abas (C++ / JUCE 8)
-.github/workflows/
-  build-bigknob.yml              compila, valida e publica o Big Knob
-  build-dubstation21.yml         compila, valida e publica o Dub Station 2.6
-  build-rootskeys.yml            compila, valida e publica o DubMastor Roots Keys
-  build-mastorfone.yml           compila, valida e publica o Mastor Phone Vox MPV-01
-  build-dubchords.yml            compila, valida e publica o MRCM-1240
-  build-dubbass.yml              testa, compila, valida e publica o MRDBI-07 (release MRDBI-07-x.y a cada versão)
-  build-dubdrums.yml             testa, compila, valida e publica o MDDM-12 (release MDDM-12-x.y a cada versão)
-  build-bassmachine.yml          testa, compila, valida e publica o Reggae Bass Machine (release MRBM-69-x.y a cada versão)
-  build-mastordubhorns.yml       testa, compila, valida e publica o Mastor Dub Horns (release MastorDubHorns-x.y a cada versão)
-  build-mrm0420.yml              testa, compila, valida e publica o MRM-0420 (release MRM-0420-x.y a cada versão)
-```
+Padrão de nomes: **`Mastor <Nome> <SIGLA>`** no Cubase (fabricante **DubMastor**), release **`SIGLA-versão`** e zips **`SIGLA-Windows.zip`** / **`SIGLA-macOS.zip`**. "Dub Station" é o nome da coleção.
 
-Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. Quando uma release é publicada, os builds anexam seus instaladores a ela.
+| Pasta | Plugin (nome no Cubase) | Sigla | Workflow |
+|---|---|---|---|
+| `BigKnob/` | Mastor Big Knob MBK-76 (antigo DubMastor Big Knob) | MBK-76 | `build-bigknob.yml` |
+| `DubStation21/` | Mastor Tape Echo MTE-12 (antigo Dub Station 2.6 / FitaEco TE-12) | MTE-12 | `build-dubstation21.yml` |
+| `RootsKeys/` | Mastor Roots Keys MRK-80 (antigo DubMastor Roots Keys) | MRK-80 | `build-rootskeys.yml` |
+| `MastorDubHorns/` | Mastor Dub Horns MDH-70 | MDH-70 | `build-mastordubhorns.yml` |
+| `MastorFone/` | Mastor Phone Vox MPV-01 (antigo Mastor Fone) | MPV-01 | `build-mastorfone.yml` |
+| `DubChords/` | Mastor Reggae Chord Machine MRCM-1240 | MRCM-1240 | `build-dubchords.yml` |
+| `DubBass/` | Mastor Reggae Dub Bass Instrument MRDBI-07 (antigo Dub Bass) | MRDBI-07 | `build-dubbass.yml` |
+| `DubDrums/` | Mastor Dub Drums Machine MDDM-12 | MDDM-12 | `build-dubdrums.yml` |
+| `BassMachine/` | Mastor Reggae Bass Machine MRBM-69 | MRBM-69 | `build-bassmachine.yml` |
+| `RiddimMachine/` | Mastor Riddim Machine MRM-0420 | MRM-0420 | `build-mrm0420.yml` |
+
+Todos em C++ / JUCE 8. Os códigos internos (`PLUGIN_CODE`, fabricante `Dblb` e `BUNDLE_ID`) não mudaram com os nomes novos, então projetos antigos do Cubase continuam abrindo os plugins.
+
+Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. A cada push na `main` que mexa num plugin, o build dele publica (ou atualiza) a release `SIGLA-versão`, sem virar a "latest".

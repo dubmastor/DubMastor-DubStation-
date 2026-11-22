@@ -552,7 +552,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             for (int i = 0; i < 4; ++i)
                 g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 216, 96, 12, juce::Justification::centred);
 
-            sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", plasticText, plasticMuted);
+            sectionTitle (kEcho, "TAPE ECHO", "MTE-12", plasticText, plasticMuted);
             sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
             sectionTitle (kOut, "MAXIMIZER", "", plasticText, plasticMuted);
             g.setColour (juce::Colour (0xff3a3a3e));
@@ -610,7 +610,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.setColour (brownInk);
             g.drawText ("LESLIE", kLeslie.getX(), kLeslie.getY() + 8, kLeslie.getWidth(), 14, juce::Justification::centred);
             g.drawText ("PERCUSSION", kPerc.getX(), kPerc.getY() + 8, kPerc.getWidth(), 14, juce::Justification::centred);
-            sectionTitle (kEcho, "TAPE ECHO", "FITAECO TE-12", brownInk, brownInk.withAlpha (0.6f));
+            sectionTitle (kEcho, "TAPE ECHO", "MTE-12", brownInk, brownInk.withAlpha (0.6f));
             sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", brownInk, brownInk.withAlpha (0.6f));
             sectionTitle (kOut, "MAXIMIZER", "", brownInk, brownInk);
             g.setColour (brownInk.withAlpha (0.3f));

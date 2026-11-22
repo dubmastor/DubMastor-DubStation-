@@ -26,7 +26,7 @@ juce_add_plugin(RootsKeys
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Rtky
     FORMATS VST3 AU Standalone
-    PRODUCT_NAME "DubMastor Roots Keys"
+    PRODUCT_NAME "Mastor Roots Keys MRK-80"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE

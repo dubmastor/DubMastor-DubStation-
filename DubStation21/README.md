@@ -1,4 +1,4 @@
-# Dub Station 2.6 (FitaEco TE-12) — Tape Echo + Spring Reverb (VST3 / AU / Standalone)
+# Mastor Tape Echo MTE-12 2.6 (antigo Dub Station 2.6 / FitaEco TE-12) — Tape Echo + Spring Reverb (VST3 / AU / Standalone)
 
 Por DubMastor.
 
@@ -51,10 +51,10 @@ Tempos: cabeça 1 de 175 ms (lento) a 55 ms (rápido); cabeças 2 e 3 em 2× e 3
 ## Download
 
 O GitHub Actions compila sozinho a cada push nesta pasta (`.github/workflows/build-dubstation21.yml`):
-- **Actions → "Build Dub Station 2.6" → última execução → Artifacts**: `DubStation26-Windows` e `DubStation26-macOS`.
-- Quando uma release é publicada na página de **Releases** do repositório, os zips (`DubStation26-macOS.zip` e `DubStation26-Windows.zip`) são anexados a ela automaticamente.
+- **Actions → "Build Mastor Tape Echo MTE-12" → última execução → Artifacts**: `MTE-12-Windows` e `MTE-12-macOS`.
+- Quando uma release é publicada na página de **Releases** do repositório, os zips (`MTE-12-macOS.zip` e `MTE-12-Windows.zip`) são anexados a ela automaticamente.
 
-Instalação: copie `FitaEco TE-12.vst3` para `C:\Program Files\Common Files\VST3` (Windows) ou
+Instalação: copie `Mastor Tape Echo MTE-12.vst3` para `C:\Program Files\Common Files\VST3` (Windows) ou
 `~/Library/Audio/Plug-Ins/VST3` (Mac; o AU vai em `~/Library/Audio/Plug-Ins/Components`).
 
 ## Como compilar localmente

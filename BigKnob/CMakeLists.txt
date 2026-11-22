@@ -26,7 +26,7 @@ juce_add_plugin(DubKnob
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Dbkn
     FORMATS VST3 AU Standalone
-    PRODUCT_NAME "DubMastor Big Knob"
+    PRODUCT_NAME "Mastor Big Knob MBK-76"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE

@@ -70,7 +70,7 @@ if(DUBCHORDS_SNAPSHOT)
     target_compile_definitions(DubChordsSnapshot PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="DubChords" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
+        JucePlugin_Name="Mastor Reggae Chord Machine MRCM-1240" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
     target_include_directories(DubChordsSnapshot PRIVATE ${DUBSTATION_SHARED})
     target_link_libraries(DubChordsSnapshot PRIVATE juce::juce_audio_utils

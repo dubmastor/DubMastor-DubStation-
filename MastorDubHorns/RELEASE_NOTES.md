@@ -1,4 +1,6 @@
-## Mastor Dub Horns 1.1 🟢🟡⚫
+## Mastor Dub Horns MDH-70 1.1 🟢🟡⚫
+
+**Nome novo:** no Cubase ele agora aparece como **Mastor Dub Horns MDH-70**. Os projetos antigos continuam abrindo o plugin; apague o `Mastor Dub Horns.vst3` antigo da pasta VST3 para não aparecer duplicado.
 
 Naipe de metais anos 70 para sessão de dub. Você escolhe os instrumentos e cada nota vira um acorde de metais, com o som de estúdio jamaicano.
 

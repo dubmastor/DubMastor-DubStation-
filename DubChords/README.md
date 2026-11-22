@@ -2,11 +2,11 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDCM-404-1.4/MastorDubChordsMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-macOS.zip)**
 
 ![Interface do Mastor Reggae Chord Machine MRCM-1240](docs/interface.png)
 
-(Antes se chamava **DubMastor Dub Chords** e, na 1.4, **Mastor Dub Chords Machine MDCM-404**; a partir da 1.5 é o **Mastor Reggae Chord Machine MRCM-1240**.)
+(Antes se chamava **DubMastor Dub Chords** e, na 1.4, **Mastor Dub Chords Machine MRCM-1240**; a partir da 1.5 é o **Mastor Reggae Chord Machine MRCM-1240**.)
 
 Gerador de harmonia para começar a programar um riddim de reggae. Você escolhe até 4 acordes e quanto
 tempo cada um dura, e o plugin toca o skank de piano **com as duas mãos** (o acorde em duas oitavas) e o

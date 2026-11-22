@@ -33,7 +33,7 @@ if(NOT HORNS_SNAPSHOT_ONLY)
 juce_add_plugin(MastorDubHorns
     COMPANY_NAME               "DubMastor"
     BUNDLE_ID                  com.dubmastor.mastordubhorns
-    PRODUCT_NAME               "Mastor Dub Horns"
+    PRODUCT_NAME               "Mastor Dub Horns MDH-70"
     PLUGIN_MANUFACTURER_CODE   Dblb
     PLUGIN_CODE                Dbhn
     FORMATS                    ${HORNS_FORMATS}
@@ -74,7 +74,7 @@ if(HORNS_SNAPSHOT)
     target_compile_definitions(HornsSnapshot PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="Mastor Dub Horns" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
+        JucePlugin_Name="Mastor Dub Horns MDH-70" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0)
     target_link_libraries(HornsSnapshot PRIVATE juce::juce_audio_utils
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)

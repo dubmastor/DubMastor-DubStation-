@@ -1343,7 +1343,7 @@ void HornsPanel::paint (Graphics& g)
     g.setFont (uiFont (32.0f, true, 0.06f));
     g.drawText ("MASTOR DUB HORNS", header.getX() + 22, 14, 420, 38, Justification::left);
     g.setColour (hc::muted); g.setFont (uiFont (11.0f, true, 0.3f));
-    g.drawText (HU ("DUB STATION · HORN SECTION"), header.getX() + 24, 52, 400, 14, Justification::left);
+    g.drawText (HU ("DUB STATION · HORN SECTION · MDH-70"), header.getX() + 24, 52, 400, 14, Justification::left);
     const Colour stripes[3] = { hc::red, hc::gold, hc::green };
     for (int i = 0; i < 3; ++i) { g.setColour (stripes[i]); g.fillRect (header.getX() + 24 + i * 42, 70, 42, 6); }
     // caixa do tom

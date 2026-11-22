@@ -51,4 +51,4 @@ cmake -B build-test -DDUBBASS_TESTS=ON && cmake --build build-test --target DubB
 
 ## Publicar
 
-O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, a cada push na `main` que mexa no Dub Bass, cria (ou atualiza) a release `MRDBI-07-x.y` da versão do `CMakeLists.txt` com `MastorReggaeDubBassInstrument-Windows.zip` e `MastorReggaeDubBassInstrument-macOS.zip`. A release não vira a "latest", para não mexer nos links dos outros plugins.
+O workflow `.github/workflows/build-dubbass.yml` roda o teste, compila Windows e Mac (universal), valida com pluginval e auval e, a cada push na `main` que mexa no Dub Bass, cria (ou atualiza) a release `MRDBI-07-x.y` da versão do `CMakeLists.txt` com `MRDBI-07-Windows.zip` e `MRDBI-07-macOS.zip`. A release não vira a "latest", para não mexer nos links dos outros plugins.

@@ -16,7 +16,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "FitaEco TE-12"; }
+    const juce::String getName() const override { return "Mastor Tape Echo MTE-12"; }
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
     bool isMidiEffect() const override { return false; }
