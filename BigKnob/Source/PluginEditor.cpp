@@ -807,9 +807,9 @@ void DubPanel::renderBackground()
     // --- cabeçalho
     g.setColour (colours::ink);
     g.setFont (stencil (30.0f, 0.22f));
-    g.drawText ("DUBMASTOR BIG KNOB", plate.getX() + 32, 20, 720, 34, juce::Justification::left);
+    g.drawText ("MASTOR BIG KNOB", plate.getX() + 32, 20, 720, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f
-                           + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), "DUBMASTOR BIG KNOB");
+                           + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), "MASTOR BIG KNOB");
 
     // --- placa metálica antiga "DUB STATION" (latão escovado, rebites, letras gravadas)
     {

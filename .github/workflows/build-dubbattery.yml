@@ -7,7 +7,7 @@ on:
     branches: [main]
     paths:
       - 'DubBattery/**'
-      - 'DubDrums/Source/**'
+      - 'DubDrumsMachine/Source/**'
       - '.github/workflows/build-dubbattery.yml'
     tags:
       - 'DBR-*'

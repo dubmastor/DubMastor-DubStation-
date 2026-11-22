@@ -1,6 +1,6 @@
 #include "MrmMain.h"
 #include "MrmStyle.h"
-#include "../../DubChords/Source/HarmonyPresets.h"
+#include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 
 #ifndef MRM_DRUMS_VER
  #define MRM_DRUMS_VER ""

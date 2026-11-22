@@ -9,6 +9,11 @@ Piano estilo Korg M1 e órgão estilo Hammond para reggae e dub — VST3 (Window
 **Na 2.3:** aba Dub Chords com acordes de duas mãos (6 notas), tamanho da nota a partir de 1/32, sem baixo guia.
 
 **Instalação (Mac):** copie o `.vst3` para `~/Library/Audio/Plug-Ins/VST3/` e rode no Terminal:
-`xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Roots Keys.vst3"`
+`xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Roots Keys MRK-80.vst3"`
 
 No Cubase, carregue numa *Instrument Track*.
+
+## Como instalar
+- **Windows:** baixe o `…-Windows-Instalador.exe` e siga o instalador (se o Windows avisar, clique em *Mais informações → Executar assim mesmo*).
+- **Mac:** baixe o `…-macOS-Instalador.pkg` (VST3 + AU, Intel e Apple Silicon). Se o Mac bloquear, vá em *Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim*.
+- Os zips são para instalação manual. Passo a passo para cada DAW: https://dubmastor.github.io/DubMastor-DubStation-/#instalacao

@@ -5,14 +5,14 @@
 #pragma once
 #include <juce_audio_utils/juce_audio_utils.h>
 
-#include "../../DubChords/Source/PluginEditor.h"
+#include "../../ReggaeChordMachine/Source/PluginEditor.h"
 
 #include "DrumsNames.h"
-#include "../../DubDrums/Source/PluginEditor.h"
+#include "../../DubDrumsMachine/Source/PluginEditor.h"
 #include "DrumsNamesEnd.h"
 
 #include "BassNames.h"
-#include "../../BassMachine/Source/PluginEditor.h"
+#include "../../ReggaeBassMachine/Source/PluginEditor.h"
 #include "BassNamesEnd.h"
 
 #include "KnobNames.h"

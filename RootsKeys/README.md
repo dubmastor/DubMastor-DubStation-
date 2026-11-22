@@ -14,7 +14,7 @@ Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cad
 - **Piano estilo Korg M1** — o piano brilhante do M1 recriado por síntese aditiva (sem samples da Korg): ataque brilhante, presença em 2–4 kHz, decaimento em dois estágios, ruído de martelo e chorus estéreo.
 - **Órgão tonewheel estilo Hammond B3** — 9 drawbars, percussão single-trigger (2º/3º harmônico, rápida/lenta), key click, overdrive valvulado e caixa Leslie com aceleração realista.
 
-Cadeia de saída: **Tape Echo FitaEco TE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
+Cadeia de saída: **Tape Echo Mastor Tape Echo MTE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
 
 ## Timbres de piano
 
@@ -63,7 +63,7 @@ As texturas são geradas por código (sem imagens). O emblema dourado **Dub Stat
 |---|---|
 | Piano | Brilho, Decay, Chorus, Volume · pedal de sustain (CC64) |
 | Órgão | 9 drawbars (16' 5⅓' 8' 4' 2⅔' 2' 1⅗' 1⅓' 1'), tabs de percussão ON / 3RD / SLOW, chave Leslie SLOW/FAST, Leslie Mix, Drive, Click, Organ Vol · mod wheel (CC1) = Leslie rápido |
-| Tape Echo (FitaEco TE-12) | Echo on/off, Mode 1–12 (1–4 só eco, 5–11 eco + mola, 12 só mola), Rate, Intensity (acima de ~0.85 auto-oscila), Echo Vol, Spring, Wow, Tape Age. Ao desligar, a cauda continua tocando. |
+| Tape Echo (Mastor Tape Echo MTE-12) | Echo on/off, Mode 1–12 (1–4 só eco, 5–11 eco + mola, 12 só mola), Rate, Intensity (acima de ~0.85 auto-oscila), Echo Vol, Spring, Wow, Tape Age. Ao desligar, a cauda continua tocando. |
 | Flanger | Flanger on/off, Rate (0,02–4 Hz), Depth, Manual (posição do "pente"), Feedback (−0,95 a +0,95; negativo dá o timbre oco), Mix. Fica depois do eco e do reverb, então os ecos também "voam". |
 | Maximizer / VU | Max on/off, Gain (0 a +18 dB), Ceiling, Reverb, Master, leitura de GR e VUs L/R (0 VU = −18 dBFS RMS) |
 
@@ -80,7 +80,7 @@ Um preset de piano nunca altera o órgão, e vice-versa.
 
 ## Compilar
 
-O GitHub Actions (`.github/workflows/build-rootskeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `DubMastorRootsKeys-Windows.zip` / `DubMastorRootsKeys-macOS.zip` à release `RootsKeys-x.y` (uma por versão; ela não vira a "latest" do repositório).
+O GitHub Actions (`.github/workflows/build-rootskeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `MRK-80-Windows.zip` / `MRK-80-macOS.zip` à release `RootsKeys-x.y` (uma por versão; ela não vira a "latest" do repositório).
 
 Localmente:
 ```bash
@@ -92,11 +92,11 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 
 ## Arquivos
 - `Source/RootsKeysEngine.h` — piano, órgão, Leslie, reverb e maximizer (sem dependências)
-- `Source/TapeEchoDSP.h` — FitaEco TE-12 (cópia do Dub Station 2.1)
+- `Source/TapeEchoDSP.h` — Mastor Tape Echo MTE-12 (cópia do Dub Station 2.1)
 - `Source/PluginProcessor.*` — parâmetros, presets, MIDI, medidores
 - `Source/PluginEditor.*` — interface com os dois visuais, abas e a placa Dub Station
 - `Source/DubChordsPage.*` — aba DUB CHORDS (cartões, ritmo, grade e arrastar MIDI)
-- `Source/DubChordsEngine.h` — motor de harmonia (cópia do `DubChords/Source/DubEngine.h`) + riddims prontos
+- `Source/DubChordsEngine.h` — motor de harmonia (cópia do `ReggaeChordMachine/Source/DubEngine.h`) + riddims prontos
 - `Source/VintageLookAndFeel.h` — knobs, faders, chaves e visor de cada visual
 - `Source/SkinTextures.h` — texturas procedurais (plástico preto e madeira)
 - `Source/VUMeter.h` — VU analógico
@@ -114,7 +114,7 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 - Removido o **baixo guia** (da grade, da tela e do MIDI exportado).
 
 ## Novidades da 2.2
-- Novo nome: **DubMastor Roots Keys**. O número da versão aparece no cabeçalho do plugin.
+- Novo nome: **Mastor Roots Keys MRK-80**. O número da versão aparece no cabeçalho do plugin.
 - Aba **DUB CHORDS**: progressão de até 4 acordes, riddims prontos, grade piano roll e arrastar MIDI (tudo, skank, baixo ou um acorde) para a DAW, tocando no próprio piano/órgão.
 
 ## Novidades da 2.1

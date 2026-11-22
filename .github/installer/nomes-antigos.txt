@@ -1,0 +1,12 @@
+# SIGLA|nome antigo|outro nome antigo ...
+# Os instaladores apagam os plugins com estes nomes, para não aparecerem duplicados na DAW.
+MBK-76|DubMastor Big Knob
+MTE-12|FitaEco TE-12
+MRK-80|DubMastor Roots Keys|Mastor Roots Keys|Dub Station Roots Keys
+MDH-70|Mastor Dub Horns
+MPV-01|Mastor Fone
+MRCM-1240|Mastor Dub Chords Machine MDCM-404|DubMastor Dub Chords
+MRDBI-07|Dub Bass - Dub Station
+MDDM-12|DubMastor Dub Drums
+MRBM-69|Mastor Bass Machine MBM-710
+MRM-0420|

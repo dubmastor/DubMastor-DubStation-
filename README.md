@@ -40,15 +40,15 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
 3. No Finder, aperte **Cmd+Shift+G**, cole `~/Library/Audio/Plug-Ins/VST3/` e copie para lá o arquivo **`.vst3`** do plugin.
 4. No **Terminal**, libere o plugin (troque pelo nome do arquivo que você copiou):
    ```
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Big Knob.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"FitaEco TE-12.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Roots Keys.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Big Knob MBK-76.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Tape Echo MTE-12.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Roots Keys MRK-80.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Phone Vox MPV-01.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Chord Machine MRCM-1240.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Dub Bass Instrument MRDBI-07.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Drum Machine MRDM-12.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Reggae Bass Machine MRBM-69.vst3"
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Horns.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Dub Horns MDH-70.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Riddim Machine MRM-0420.vst3"
    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Dub Battery Reggae.vst3"
    ```
@@ -91,4 +91,19 @@ DubBattery/                      Dub Battery Reggae — sampler de bateria com 1
   build-mrm0420.yml              testa, compila, valida e publica o MRM-0420 (release MRM-0420-x.y a cada versão)
 ```
 
-Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. Quando uma release é publicada, os builds anexam seus instaladores a ela.
+| Pasta | Plugin (nome no Cubase) | Sigla | Workflow |
+|---|---|---|---|
+| `BigKnob/` | Mastor Big Knob MBK-76 (antigo DubMastor Big Knob) | MBK-76 | `build-bigknob.yml` |
+| `TapeEcho/` | Mastor Tape Echo MTE-12 (antigo Dub Station 2.6 / FitaEco TE-12) | MTE-12 | `build-tapeecho.yml` |
+| `RootsKeys/` | Mastor Roots Keys MRK-80 (antigo DubMastor Roots Keys) | MRK-80 | `build-rootskeys.yml` |
+| `DubHorns/` | Mastor Dub Horns MDH-70 | MDH-70 | `build-dubhorns.yml` |
+| `PhoneVox/` | Mastor Phone Vox MPV-01 (antigo Mastor Fone) | MPV-01 | `build-phonevox.yml` |
+| `ReggaeChordMachine/` | Mastor Reggae Chord Machine MRCM-1240 | MRCM-1240 | `build-reggaechordmachine.yml` |
+| `ReggaeDubBassInstrument/` | Mastor Reggae Dub Bass Instrument MRDBI-07 (antigo Dub Bass) | MRDBI-07 | `build-reggaedubbassinstrument.yml` |
+| `DubDrumsMachine/` | Mastor Dub Drums Machine MDDM-12 | MDDM-12 | `build-dubdrumsmachine.yml` |
+| `ReggaeBassMachine/` | Mastor Reggae Bass Machine MRBM-69 | MRBM-69 | `build-reggaebassmachine.yml` |
+| `RiddimMachine/` | Mastor Riddim Machine MRM-0420 | MRM-0420 | `build-riddimmachine.yml` |
+
+Todos em C++ / JUCE 8. Os códigos internos (`PLUGIN_CODE`, fabricante `Dblb` e `BUNDLE_ID`) não mudaram com os nomes novos, então projetos antigos do Cubase continuam abrindo os plugins.
+
+Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. A cada push na `main` que mexa num plugin, o build dele publica (ou atualiza) a release `SIGLA-versão`, sem virar a "latest".

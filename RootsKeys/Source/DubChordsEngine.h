@@ -1,5 +1,5 @@
 // Dub Chords — motor de harmonia (C++ puro, sem JUCE, testável isoladamente)
-// Cópia do motor do plugin Dub Chords (DubChords/Source/DubEngine.h), usada na aba DUB CHORDS do Roots Keys.
+// Cópia do motor do plugin Dub Chords (ReggaeChordMachine/Source/DubEngine.h), usada na aba DUB CHORDS do Roots Keys.
 // Ao mudar a lógica de harmonia, atualize os dois arquivos.
 #pragma once
 #include <algorithm>

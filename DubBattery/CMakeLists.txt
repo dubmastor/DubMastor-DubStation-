@@ -46,7 +46,7 @@ set(DBR_SOURCES
     Source/BatteryEditor.cpp
     Source/DrumsProcessorUnit.cpp
     Source/DrumsEditorUnit.cpp
-    ../DubDrums/Source/PatternGenerator.cpp)
+    ../DubDrumsMachine/Source/PatternGenerator.cpp)
 set(DBR_DEFINES
     DBR_VERSION_SHORT="1.1"
     DD_VERSION_SHORT="2.1"

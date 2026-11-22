@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""Checagem de coordenação dos plugins DubMastor (roda em todo push e pull request).
+
+Confere, para cada plugin do plugins.json:
+  - nome no Cubase (PRODUCT_NAME) igual ao registro
+  - versão do CMakeLists (ou Source/Version.h) igual à do site, do README, das notas de release
+    e da versão para celular
+  - links de download do site no padrão SIGLA-versão (instaladores e zips)
+  - workflow build-<pasta>.yml existe
+  - versão para celular/navegador existe em site/<web>/index.html e o site tem o botão para ela
+E falha se aparecer uma pasta de plugin que não está no plugins.json.
+
+Uso: python3 .github/checagem/checar.py   (sai com erro se algo estiver fora do padrão)
+"""
+import json, pathlib, re, sys
+
+RAIZ = pathlib.Path(__file__).resolve().parents[2]
+REL = "https://github.com/dubmastor/DubMastor-DubStation-/releases/download"
+erros, avisos = [], []
+
+def err(sig, msg): erros.append(f"{sig}: {msg}")
+def warn(sig, msg): avisos.append(f"{sig}: {msg}")
+
+def versao(pasta):
+    cm = (RAIZ / pasta / "CMakeLists.txt").read_text()
+    m = re.search(r"^project\(\w+ VERSION (\d+)\.(\d+)", cm, re.M)
+    if m:
+        return f"{m.group(1)}.{m.group(2)}"
+    vh = RAIZ / pasta / "Source/Version.h"
+    if vh.exists():
+        m = re.search(r'"(\d+)\.(\d+)', vh.read_text())
+        if m:
+            return f"{m.group(1)}.{m.group(2)}"
+    return None
+
+reg = json.loads((RAIZ / "plugins.json").read_text())["plugins"]
+site = (RAIZ / "site/index.html").read_text()
+readme = (RAIZ / "README.md").read_text()
+
+for p in reg:
+    sig, pasta, nome = p["sigla"], p["pasta"], p["nome"]
+    cm_path = RAIZ / pasta / "CMakeLists.txt"
+    if not cm_path.exists():
+        err(sig, f"pasta {pasta}/ sem CMakeLists.txt"); continue
+    cm = cm_path.read_text()
+
+    m = re.search(r'PRODUCT_NAME\s+"([^"]+)"', cm)
+    if not m or m.group(1) != nome:
+        err(sig, f"PRODUCT_NAME no CMakeLists é {m.group(1) if m else '(nenhum)'!r}, o registro diz {nome!r}")
+    if not nome.startswith("Mastor ") or not nome.endswith(" " + sig):
+        err(sig, f"nome fora do padrão 'Mastor <Nome> <SIGLA>': {nome!r}")
+
+    v = versao(pasta)
+    if not v:
+        err(sig, "versão não encontrada no CMakeLists nem em Source/Version.h"); continue
+
+    if not (RAIZ / f".github/workflows/build-{pasta.lower()}.yml").exists():
+        err(sig, f"falta o workflow .github/workflows/build-{pasta.lower()}.yml")
+
+    # site: card com nome + versão e links da versão atual
+    card = re.search(r'(?s)<article class="card">(?:(?!</article>).)*?<h3>' + re.escape(nome) + r' <small>([^<]+)</small></h3>.*?</article>', site)
+    if not card:
+        err(sig, "o site não tem o card deste plugin (título '<h3>nome <small>versão</small></h3>')")
+    else:
+        c = card.group(0)
+        if card.group(1) != v:
+            err(sig, f"site mostra a versão {card.group(1)}, o código está na {v}")
+        for f in (f"{sig}-Windows-Instalador.exe", f"{sig}-macOS-Instalador.pkg", f"{sig}-Windows.zip", f"{sig}-macOS.zip"):
+            if f"{REL}/{sig}-{v}/{f}" not in c:
+                err(sig, f"site sem o link {sig}-{v}/{f}")
+        web = p.get("web")
+        if web and web != "pendente":
+            if f'href="{web}/"' not in c:
+                err(sig, f"site sem o botão da versão para celular ({web}/)")
+    # README
+    if f"{nome} {v}" not in readme:
+        err(sig, f"README.md não cita '{nome} {v}'")
+    # notas de release
+    rn = RAIZ / pasta / "RELEASE_NOTES.md"
+    if not rn.exists():
+        err(sig, "falta RELEASE_NOTES.md")
+    elif v not in "\n".join(rn.read_text().splitlines()[:3]):
+        err(sig, f"RELEASE_NOTES.md não começa com a versão {v}")
+    # versão para celular / navegador
+    web = p.get("web")
+    if not web:
+        err(sig, "sem versão para celular: todo plugin novo precisa de site/web/<nome>/index.html (campo 'web' no plugins.json)")
+    elif web == "pendente":
+        warn(sig, "versão para celular/navegador ainda pendente")
+    else:
+        idx = RAIZ / "site" / web / "index.html"
+        if not idx.exists():
+            err(sig, f"versão para celular não encontrada em site/{web}/index.html")
+        else:
+            h = idx.read_text()
+            mv = re.search(r"VERSION\s*=\s*['\"](\d+\.\d+)", h)
+            if not mv:
+                err(sig, f"site/{web}/index.html sem 'const VERSION = \"x.y\"'")
+            elif mv.group(1) != v:
+                err(sig, f"versão para celular está na {mv.group(1)}, o plugin está na {v}")
+            if sig not in h:
+                err(sig, f"site/{web}/index.html não mostra a sigla {sig}")
+
+# pasta de plugin nova sem registro
+registradas = {p["pasta"] for p in reg}
+for cm in RAIZ.glob("*/CMakeLists.txt"):
+    if "juce_add_plugin" in cm.read_text() and cm.parent.name not in registradas:
+        err(cm.parent.name, "plugin novo fora do plugins.json: registre sigla, nome, pasta e versão para celular")
+
+for a in avisos:
+    print(f"::warning::{a}")
+for e in erros:
+    print(f"::error::{e}")
+print(f"\n{len(reg)} plugins conferidos · {len(erros)} erro(s) · {len(avisos)} aviso(s)")
+sys.exit(1 if erros else 0)

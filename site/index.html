@@ -155,6 +155,20 @@
   .btn.alt { background: linear-gradient(#f2f2ef, #b9b9b4); box-shadow: 0 3px 0 #5f5f5b, inset 0 1px 0 #fff; }
   .btn.alt:active { box-shadow: 0 1px 0 #5f5f5b, inset 0 1px 0 #fff; }
   .btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .btn.web { grid-column: 1 / -1; background: linear-gradient(#5fae68, var(--green) 60%, #24683a); color: #fff; box-shadow: 0 3px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
+  .btn.web:active { box-shadow: 0 1px 0 #164a26, inset 0 1px 0 rgba(255,255,255,.35); }
+  .zips { font-size: 13px; color: #a59f8d; text-align: center; }
+  .zips a { color: #cfc8b4; }
+  table.daws { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+  table.daws th, table.daws td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid #2c2722; }
+  table.daws th { color: var(--amber); font-size: 13px; letter-spacing: .06em; }
+  table.daws td:first-child { color: var(--cream); font-weight: 700; white-space: nowrap; }
+  table.daws td { color: #cfc8b4; }
+  .dawwrap { overflow-x: auto; background: #0f0e0c; border-radius: var(--radius); padding: 6px 12px 10px; box-shadow: inset 0 0 0 1px #000; }
+  .box ul { margin: 0; padding-left: 20px; }
+  .box li { margin: 6px 0; }
+  details.manual { margin-top: 22px; }
+  details.manual summary { cursor: pointer; color: var(--amber); font-weight: 700; }
 
   /* --- install */
   .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 8px; }
@@ -244,9 +258,9 @@
         </article>
 
         <article class="card">
-          <img class="shot" src="img/bigknob.jpg" alt="Interface do DubMastor Big Knob: painel creme com o grande botão do filtro, eco de fita, VUs de ponteiro, maximizer e sirene de dub" width="1400" height="786" loading="lazy">
+          <img class="shot" src="img/bigknob.jpg" alt="Interface do Mastor Big Knob MBK-76: painel creme com o grande botão do filtro, eco de fita, VUs de ponteiro, maximizer e sirene de dub" width="1400" height="786" loading="lazy">
           <div class="body">
-            <h3>Big Knob <small>3.2</small></h3>
+            <h3>Mastor Big Knob MBK-76 <small>3.2</small></h3>
             <p>Estação de dub num plugin só, com o filtro high-pass por degraus inspirado no King Tubby.</p>
             <ul>
               <li>Filtro big knob (passos de mesa ou contínuo), ressonância e drive</li>
@@ -255,17 +269,18 @@
             </ul>
             <div class="formats">Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
             <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-Windows.zip">⬇ Windows<span>VST3 · zip, ~5 MB</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-macOS.zip">⬇ Mac<span>VST3 + AU · zip, ~9 MB</span></a>
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
             </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS.zip">zip Mac</a></div>
           </div>
         </article>
 
         <article class="card">
-          <img class="shot" src="img/dubstation21.jpg" alt="Interface do Dub Station 2.6: painel creme com placa metálica, janela da fita e botões de alumínio" width="1400" height="786" loading="lazy">
+          <img class="shot" src="img/tapeecho.jpg" alt="Interface do Mastor Tape Echo MTE-12: painel creme com placa metálica, janela da fita e botões de alumínio" width="1400" height="786" loading="lazy">
           <div class="body">
-            <h3>Dub Station <small>2.6</small></h3>
-            <p>Eco de fita de três cabeças com reverb de mola, no visual de equipamento de estúdio dos anos 70.</p>
+            <h3>Mastor Tape Echo MTE-12 <small>2.6</small></h3>
+            <p>O antigo Dub Station 2.6 (FitaEco TE-12). Eco de fita de três cabeças com reverb de mola, no visual de equipamento de estúdio dos anos 70.</p>
             <ul>
               <li>Seletor de 12 modos e Repeat Rate com o pitch da fita</li>
               <li>VU analógico do nível de gravação, saturação, wow &amp; flutter e desgaste de fita</li>
@@ -274,14 +289,15 @@
             </ul>
             <div class="formats">Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
             <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-Windows.zip">⬇ Windows<span>VST3 · zip, ~5 MB</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubStation26-macOS.zip">⬇ Mac<span>VST3 + AU · zip, ~9 MB</span></a>
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
             </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS.zip">zip Mac</a></div>
           </div>
         </article>
 
         <article class="card">
-            <img class="shot" src="img/rootskeys.jpg" alt="Interface do DubMastor Roots Keys: à esquerda o modo piano, teclado preto anos 80 com caixas de som e visor LCD verde; à direita a aba Dub Chords no visual de madeira, com os cartões de acorde e a grade de notas para arrastar para a DAW" width="1400" height="786" loading="lazy">
+            <img class="shot" src="img/rootskeys.jpg" alt="Interface do Mastor Roots Keys MRK-80: à esquerda o modo piano, teclado preto anos 80 com caixas de som e visor LCD verde; à direita a aba Dub Chords no visual de madeira, com os cartões de acorde e a grade de notas para arrastar para a DAW" width="1400" height="786" loading="lazy">
           <div class="body">
             <h3>DubMastor Roots Keys <small>2.4</small></h3>
             <p>Instrumento com o piano brilhante estilo Korg M1 e o órgão tonewheel estilo Hammond. O visual muda com o instrumento: teclado preto anos 80 com visor LCD verde no piano, gabinete de madeira e marfim no órgão. Nova aba Dub Chords para montar o riddim e arrastar o MIDI para a DAW.</p>
@@ -291,13 +307,14 @@
               <li>Piano com 4 timbres: M1, Grand Piano, MT-40 (estilo Casio) e FM EP (estilo Yamaha DX); rodas de pitch e mod que funcionam com o mouse</li>
               <li>Aba Dub Chords: até 4 acordes ou riddims prontos, com 6 notas em duas oitavas (duas mãos) e tamanho da nota a partir de 1/32; arraste a grade ou um acorde para a timeline</li>
               <li>Flanger dub estilo Mad Professor: o "avião a jato" passando pela mistura e pelos ecos</li>
-              <li>Eco de fita FitaEco TE-12, maximizer, VUs analógicos e teclado que acende com o MIDI</li>
+              <li>Eco de fita Mastor Tape Echo, maximizer, VUs analógicos e teclado que acende com o MIDI</li>
             </ul>
             <div class="formats">Instrumento · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
             <div class="dl">
               <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-Windows.zip">⬇ Windows<span>VST3 · zip</span></a>
               <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
             </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-2.3/MRK-80-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-2.3/MRK-80-macOS.zip">zip Mac</a></div>
           </div>
         </article>
 
@@ -321,11 +338,12 @@
               <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.7/MastorReggaeChordMachine-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
               <a class="btn alt" href="chords/">📱 Celular<span>abre no navegador</span></a>
             </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.5/MRCM-1240-macOS.zip">zip Mac</a></div>
           </div>
         </article>
 
         <article class="card">
-          <img class="shot" src="img/dubbass.jpg" alt="Interface do Mastor Reggae Dub Bass Instrument MRDBI-07: painel creme com laterais de madeira e plaqueta de latão; seções de oscilador, envelope e filtro, osciloscópio verde, válvula 12AX7 acesa ao lado dos knobs de saturação, EQ gráfico com faders, reverb, botão verde de bass boost, teclado de marfim de C1 a C4 e, na lateral direita, o maximizer com VU digital" width="1400" height="786" loading="lazy">
+          <img class="shot" src="img/reggaedubbassinstrument.jpg" alt="Interface do Mastor Reggae Dub Bass Instrument MRDBI-07: painel creme com laterais de madeira e plaqueta de latão; seções de oscilador, envelope e filtro, osciloscópio verde, válvula 12AX7 acesa ao lado dos knobs de saturação, EQ gráfico com faders, reverb, botão verde de bass boost, teclado de marfim de C1 a C4 e, na lateral direita, o maximizer com VU digital" width="1400" height="786" loading="lazy">
           <div class="body">
             <h3>Mastor Reggae Dub Bass Instrument MRDBI-07 <small>1.6</small></h3>
             <p>O antigo Dub Bass. Sintetizador de baixo de reggae: a senoide redonda do roots clássico, o Super Tone digital da era King Jammy ou o 808 com o pitch caindo. Mono, com glide entre as notas.</p>
@@ -417,7 +435,47 @@
         </article>
 
         <article class="card">
-          <img class="shot" src="img/mastorfone.jpg" alt="Interface do Mastor Phone Vox MPV-01: painel creme com plaqueta de alumínio, VU, janela da fita, teclas de rádio, telefone e megafone, dial de ondas médias e botões de alumínio" width="1400" height="786" loading="lazy">
+          <img class="shot" src="img/riddimmachine.jpg" alt="Interface do Mastor Riddim Machine MRM-0420 na aba HARMONIA: painel creme com os módulos de acorde, o botão PLAY RIDDIM e a área de arrastar o riddim para a DAW" width="1400" height="786" loading="lazy">
+          <div class="body">
+            <h3>Mastor Riddim Machine MRM-0420 <small>1.2</small></h3>
+            <p>O Chord Machine e o Dub Drums Machine num instrumento só: monte os acordes e a bateria, ouça tudo junto e arraste o riddim inteiro para a timeline.</p>
+            <ul>
+              <li>Abas HARMONIA e BATERIA, com o BPM ligado ao da DAW</li>
+              <li>PLAY RIDDIM para ouvir bateria, skank e bubble juntos</li>
+              <li>Arraste o riddim inteiro (de 4 a 64 compassos), já alinhado, com os acordes entrando depois da intro</li>
+            </ul>
+            <div class="formats">Instrumento / gerador MIDI · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
+            <div class="dl">
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
+            </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-1.2/MRM-0420-macOS.zip">zip Mac</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="shot" src="img/dubhorns.jpg" alt="Interface do Mastor Dub Horns MDH-70 na aba NAIPE: seis instrumentos de sopro com volume, pan, harmonia e oitava, VU analógico e teclado de C2 a C7" width="1400" height="786" loading="lazy">
+          <div class="body">
+            <h3>Mastor Dub Horns MDH-70 <small>1.1</small></h3>
+            <p>Naipe de metais anos 70 para sessão de dub: cada nota vira um acorde de metais no tom, com som de estúdio jamaicano.</p>
+            <ul>
+              <li>Trompete, flugelhorn, saxes alto, tenor e barítono e trombone, com harmonia no tom e na escala</li>
+              <li>Timbres '70s de estúdio e Mastor Tape Echo com Dub Throw</li>
+              <li>EQ gráfico de 10 bandas com Filtro Tubby</li>
+              <li>Frases MIDI (ataques estilo Dean Fraser e introduções) com as notas que você escolher</li>
+            </ul>
+            <div class="formats">Instrumento · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
+            <div class="dl">
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
+              <a class="btn web" href="web/dubhorns/">▶ Tocar no celular / navegador<span>sem instalar nada · versão 1.1</span></a>
+            </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.1/MDH-70-macOS.zip">zip Mac</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="shot" src="img/phonevox.jpg" alt="Interface do Mastor Phone Vox MPV-01: painel creme com plaqueta de alumínio, VU, janela da fita, teclas de rádio, telefone e megafone, dial de ondas médias e botões de alumínio" width="1400" height="786" loading="lazy">
           <div class="body">
             <h3>Mastor Phone Vox MPV-01 <small>1.6</small></h3>
             <p>Efeito para voz (antigo Mastor Fone) que imita rádio AM, telefone antigo e megafone, com o mesmo eco de fita do Big Knob.</p>
@@ -430,9 +488,10 @@
             </ul>
             <div class="formats">Efeito · Windows: VST3 + standalone · Mac: VST3, AU + standalone (Intel e Apple Silicon)</div>
             <div class="dl">
-              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-Windows.zip">⬇ Windows<span>VST3 · zip</span></a>
-              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/MastorPhoneVox-macOS.zip">⬇ Mac<span>VST3 + AU · zip</span></a>
+              <a class="btn" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows-Instalador.exe">⬇ Windows<span>instalador .exe · VST3</span></a>
+              <a class="btn alt" href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS-Instalador.pkg">⬇ Mac<span>instalador .pkg · VST3 + AU</span></a>
             </div>
+            <div class="zips">Instalação manual: <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows.zip">zip Windows</a> · <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS.zip">zip Mac</a></div>
           </div>
         </article>
 
@@ -443,15 +502,16 @@
       <h2>INSTALAÇÃO</h2>
       <div class="install">
         <div class="box">
-          <h3>WINDOWS</h3>
+          <h3>WINDOWS · INSTALADOR .EXE</h3>
           <ol>
-            <li>Descompacte o zip (botão direito → <em>Extrair tudo</em>).</li>
-            <li>Copie a pasta <code>.vst3</code> do plugin para <code>C:\Program Files\Common Files\VST3\</code></li>
-            <li>Abra o Cubase (ou sua DAW).</li>
+            <li>Feche a sua DAW.</li>
+            <li>Abra o instalador baixado. Se aparecer <em>"O Windows protegeu o computador"</em>, clique em <strong>Mais informações → Executar assim mesmo</strong> (o plugin é gratuito e não tem certificado pago).</li>
+            <li>Clique em <em>Avançar</em> até o fim. O plugin vai para <code>C:\Program Files\Common Files\VST3</code>, a pasta que todas as DAWs procuram, e o programa standalone fica no menu Iniciar.</li>
+            <li>Abra a DAW e, se ela pedir, faça um novo scan (veja a tabela abaixo).</li>
           </ol>
         </div>
         <div class="box">
-          <h3>MAC</h3>
+          <h3>MAC · INSTALADOR .PKG</h3>
           <ol>
             <li>Baixe o zip. O Mac descompacta sozinho.</li>
             <li>Feche o Cubase.</li>

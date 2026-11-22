@@ -9,11 +9,11 @@
 //   mrm_render maquinas                -> ARRASTE de cada máquina e máquina desligada fora do riddim
 //   mrm_render samples                 -> o kit da bateria é o dos samples DM (os WAVs de DubDrums/Samples)
 //   mrm_render estado                  -> salva e recarrega o estado (aba, BPM, harmonia, edições, Big Knob)
-#include "../../DubChords/Source/HarmonyPresets.h"
+#include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/MrmProcessor.h"
 #include "../Source/MrmEditor.h"
-#include "../../DubDrums/Source/DMSamples.h"
+#include "../../DubDrumsMachine/Source/DMSamples.h"
 
 namespace
 {

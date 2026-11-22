@@ -1,4 +1,4 @@
-# DubMastor Big Knob 3.2 — King Tubby tribute 🟢🟡⚫
+# Mastor Big Knob MBK-76 3.2 — King Tubby tribute 🟢🟡⚫
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
@@ -87,38 +87,38 @@ A janela é **redimensionável**: arraste o canto inferior direito (50% a 150%).
 https://github.com/dubmastor/DubMastor-DubStation-/releases/latest
 
 Links diretos:
-- Windows: https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-Windows.zip
-- Mac: https://github.com/dubmastor/DubMastor-DubStation-/releases/latest/download/DubMastorBigKnob-macOS.zip
+- Windows: https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows.zip
+- Mac: https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS.zip
 
 Não precisa de conta no GitHub para baixar.
 
 ### Windows
-1. Baixe o **DubMastorBigKnob-Windows.zip** e descompacte (botão direito → *Extrair tudo*).
-2. Copie a pasta **`DubMastor Big Knob.vst3`** para:
+1. Baixe o **MBK-76-Windows.zip** e descompacte (botão direito → *Extrair tudo*).
+2. Copie a pasta **`Mastor Big Knob MBK-76.vst3`** para:
    `C:\Program Files\Common Files\VST3\`
    (o Windows pede permissão de administrador: clique em *Continuar*).
 3. Abra o Cubase.
 
 ### Mac
-1. Baixe o **DubMastorBigKnob-macOS.zip** (o Mac descompacta sozinho).
-2. No Finder, aperte **Cmd+Shift+G**, cole `~/Library/Audio/Plug-Ins/VST3/` e copie para lá o **`DubMastor Big Knob.vst3`**.
+1. Baixe o **MBK-76-macOS.zip** (o Mac descompacta sozinho).
+2. No Finder, aperte **Cmd+Shift+G**, cole `~/Library/Audio/Plug-Ins/VST3/` e copie para lá o **`Mastor Big Knob MBK-76.vst3`**.
 3. Abra o **Terminal** e rode este comando para o macOS liberar o plugin:
    ```
-   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"DubMastor Big Knob.vst3"
+   xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Mastor Big Knob MBK-76.vst3"
    ```
 4. Abra o Cubase.
-   (Para Logic: copie o `DubMastor Big Knob.component` para `~/Library/Audio/Plug-Ins/Components/` e rode o mesmo comando trocando o caminho.)
+   (Para Logic: copie o `Mastor Big Knob MBK-76.component` para `~/Library/Audio/Plug-Ins/Components/` e rode o mesmo comando trocando o caminho.)
 
 ### No Cubase
-- O plugin aparece como **DubMastor Big Knob** (fabricante **DubMastor**), na categoria de efeitos.
+- O plugin aparece como **Mastor Big Knob MBK-76** (fabricante **DubMastor**), na categoria de efeitos.
 - Se não aparecer: **Studio → VST Plug-in Manager** → refaça o scan. Se estiver na lista de bloqueados, clique em **Reactivate**.
 - **Atualizando de uma versão anterior:** feche o Cubase, substitua o `.vst3` antigo pelo novo e abra de novo.
 
 ### Uso recomendado
-Crie um **FX Channel** com o DubMastor Big Knob, **DRY em 0** e **SEND em 100%**, e mande bateria, skank e voz pelos sends. Ligue o **W** (Write) da pista para gravar os movimentos do big knob, THROW e FIRE.
+Crie um **FX Channel** com o Mastor Big Knob MBK-76, **DRY em 0** e **SEND em 100%**, e mande bateria, skank e voz pelos sends. Ligue o **W** (Write) da pista para gravar os movimentos do big knob, THROW e FIRE.
 
 ## Como novas versões são geradas
-Cada envio que muda a pasta `BigKnob/` compila e valida o plugin (aba **Actions**, workflow *Build DubMastor Big Knob*). Quando uma release é publicada na página de **Releases**, os instaladores são anexados a ela automaticamente.
+Cada envio que muda a pasta `BigKnob/` compila e valida o plugin (aba **Actions**, workflow *Build Mastor Big Knob MBK-76*). Quando uma release é publicada na página de **Releases**, os instaladores são anexados a ela automaticamente.
 
 ## Compilar no próprio computador (opcional)
 

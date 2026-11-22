@@ -2,4 +2,4 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "BassNames.h"
 #define createPluginFilter mrmUnused_createBassMachine
-#include "../../BassMachine/Source/PluginEditor.cpp"
+#include "../../ReggaeBassMachine/Source/PluginEditor.cpp"

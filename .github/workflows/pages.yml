@@ -31,16 +31,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # Instaladores do Mastor Reggae Drum Machine MRDM-12 servidos pelo próprio site
-      # (downloads/MastorReggaeDrumMachine-*.zip), pegos do último build do MRDM-12 que gerou os zips.
+      # (downloads/MRDM-12-*.zip), pegos do último build do MRDM-12 que gerou os zips.
       # Não derruba o site se não achar nada.
       - name: Instaladores do MRDM-12
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p site/downloads
-          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow build-dubdrums.yml --branch main -L 15 --json databaseId,status --jq '.[] | select(.status=="completed") | .databaseId'); do
+          for id in $(gh run list -R "$GITHUB_REPOSITORY" --workflow build-dubdrumsmachine.yml --branch main -L 15 --json databaseId,status --jq '.[] | select(.status=="completed") | .databaseId'); do
             rm -rf dl
-            if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'MastorReggaeDrumMachine-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
+            if gh run download "$id" -R "$GITHUB_REPOSITORY" -p 'MRDM-12-*' -D dl 2>/dev/null && [ -n "$(find dl -name '*.zip')" ]; then
               echo "Instaladores do build $id"
               find dl \( -name '*.zip' -o -name '*.pkg' -o -name '*.exe' \) -exec cp {} site/downloads/ \;
               break

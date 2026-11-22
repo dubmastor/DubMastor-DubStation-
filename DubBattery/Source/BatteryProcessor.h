@@ -10,7 +10,7 @@
 #include "PadKit.h"
 
 #include "DrumsNames.h"
-#include "../../DubDrums/Source/PluginProcessor.h"
+#include "../../DubDrumsMachine/Source/PluginProcessor.h"
 #include "DrumsNamesEnd.h"
 
 namespace dbr
