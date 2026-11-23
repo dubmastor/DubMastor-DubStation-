@@ -4,7 +4,19 @@
 
 Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e testados para o **Cubase**.
 
-## 🎛️ Novo: Mastor Riddim Machine MRM-0420 2.2 — DubStation
+## 🐢 Novo efeito: Mastor Half Dub MHD-050 1.0 — meia velocidade de fita
+
+[![Mastor Half Dub MHD-050](HalfDub/docs/interface.png)](HalfDub/)
+
+**Evolução do half-time no visual Dub Station.** Coloque no canal e ele já abre com o efeito ligado (preset INIT,
+meia velocidade). Seletor **VELOCIDADE** (1/1, 2/3, 1/2, 1/3, 1/4 e REV) preso ao compasso, motor **FITA** (o tom desce)
+ou **GROOVE** (o tom fica), **três bandas** com velocidade própria, botão **DROP** para tocar ao vivo com POWER DOWN/UP
+de fita, pads de **sound system** (REWIND, TAPE STOP, REVERSE, SPIN-BACK, também por MIDI), eco de fita com **WASHOUT**,
+**EQ gráfico** editável com presets e bypass, e o **Mastor Big Knob**.
+
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MHD-050-1.0/MHD-050-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MHD-050-1.0/MHD-050-macOS-Instalador.pkg)** · **📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/halfdub/)** · [Detalhes](HalfDub/)
+
+## 🎛️ Mastor Riddim Machine MRM-0420 2.2 — DubStation
 
 [![Mastor Riddim Machine MRM-0420](RiddimMachine/docs/interface-riddim.png)](RiddimMachine/)
 
@@ -27,6 +39,7 @@ só para tudo, e a aba **CONTROL ROOM** com o Big Knob no master, o mute de cada
 | **Mastor Reggae Drum Machine MRDM-12 2.7** | Instrumento / gerador MIDI: esqueleto da bateria de reggae (Rockers, One Drop, Boom Bap, Dembow), caixa no 2 e no 4, chave de baterista (Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL: Casio MT-40 do Sleng Teng / Oberheim DMX), GROOVES de 118 músicas no visor azul de MPC, kit anos 70 com samples DM ou digital, grade editável e arraste de um compasso só no canal dele. [📱 Versão celular](https://dubmastor.github.io/DubMastor-DubStation-/drums/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDM-12-2.7/MRDM-12-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRDM-12-2.7/MRDM-12-Windows-Instalador.exe) | [ReggaeDrumMachine/](ReggaeDrumMachine/) |
 | **Mastor Reggae Bass Machine MRBM-69 3.0** | Instrumento / gerador de reggae bass lines em MIDI: 160 riddims clássicos (20 por estilo, por baixista e por década, com a era digital do King Jammys); botoeira com 7 baixistas (Family Man, Flabba, Derrick Barnett, Robbie, Leroy Sibbles, Fully Fullwood, Jammys/Sleng Teng) sobre até 4 acordes; preview com os timbres do MRDBI-07 (Roots Sine, Super Tone e 808), MIDI editável no visor (só pentatônica do acorde), caixa no 2 e no 4, letreiro de palhetas, versão para navegador ([▶ tocar](https://dubmastor.github.io/DubMastor-DubStation-/bassmachine/)), bateria de acompanhamento (Roots, One Drop, Digital, Dancehall) e teclado do Roots Keys; arraste o MIDI para a timeline | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-3.0/MRBM-69-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-3.0/MRBM-69-Windows-Instalador.exe) | [ReggaeBassMachine/](ReggaeBassMachine/) |
 | **Mastor Dub Horns MDH-70 1.3** | Instrumento: naipe de metais anos 70 (trompete, flugel, saxes e trombone) com harmonia no tom, timbres de estúdio jamaicano, Mastor Tape Echo, EQ gráfico de 10 bandas com Filtro Tubby e frases MIDI (ataques estilo Dean Fraser e introduções) com notas escolhidas por você; final de nota natural e aba Músicos com 24 presets (Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis…) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.3/MDH-70-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.3/MDH-70-Windows-Instalador.exe) | [DubHorns/](DubHorns/) |
+| **Mastor Half Dub MHD-050 1.0** | Efeito novo: meia velocidade de fita (evolução do half-time). VELOCIDADE 1/1, 2/3, 1/2, 1/3, 1/4 e REV presa ao compasso, motor FITA ou GROOVE, três bandas com velocidade própria, botão DROP com POWER DOWN/UP, pads REWIND / TAPE STOP / REVERSE / SPIN-BACK (também por MIDI), eco de fita com WASHOUT, EQ gráfico editável e Mastor Big Knob. Abre com o efeito ligado. [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/halfdub/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MHD-050-1.0/MHD-050-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MHD-050-1.0/MHD-050-Windows-Instalador.exe) | [HalfDub/](HalfDub/) |
 | **Mastor Phone Vox MPV-01 1.6** | Efeito de voz (antigo Mastor Fone): rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows-Instalador.exe) | [PhoneVox/](PhoneVox/) |
 | **Mastor Tape Echo MTE-12 2.6** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows-Instalador.exe) | [TapeEcho/](TapeEcho/) |
 
@@ -36,8 +49,8 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
 
 Um instalador só com a coleção inteira — na instalação dá para desmarcar os que não quiser:
 
-- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.3/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
-- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.3/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
+- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.4/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
+- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.4/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
 - **Pro Tools (AAX):** em preparação — veja [PROTOOLS.md](PROTOOLS.md).
 
 ## Instalação no Cubase
@@ -82,6 +95,7 @@ Padrão de nomes: **`Mastor <Nome> <SIGLA>`** no Cubase (fabricante **DubMastor*
 | `RootsKeys/` | Mastor Roots Keys MRK-80 (antigo DubMastor Roots Keys) | MRK-80 | `build-rootskeys.yml` |
 | `DubHorns/` | Mastor Dub Horns MDH-70 | MDH-70 | `build-dubhorns.yml` |
 | `PhoneVox/` | Mastor Phone Vox MPV-01 (antigo Mastor Fone) | MPV-01 | `build-phonevox.yml` |
+| `HalfDub/` | Mastor Half Dub MHD-050 | MHD-050 | `build-halfdub.yml` |
 | `ReggaeChordMachine/` | Mastor Reggae Chord Machine MRCM-1240 | MRCM-1240 | `build-reggaechordmachine.yml` |
 | `ReggaeDubBassInstrument/` | Mastor Reggae Dub Bass Instrument MRDBI-07 (antigo Dub Bass) | MRDBI-07 | `build-reggaedubbassinstrument.yml` |
 | `ReggaeDrumMachine/` | Mastor Reggae Drum Machine MRDM-12 (antigo Mastor Dub Drums Machine MDDM-12) | MRDM-12 | `build-reggaedrummachine.yml` |
