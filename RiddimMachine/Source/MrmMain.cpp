@@ -1407,8 +1407,11 @@ MainPage::MainPage (MrmProcessor& p)
     {
         juce::StringArray bassists;
         for (int s = 0; s < mbm::NumStyles; ++s) bassists.add (mbm::styleName (s));
-        rows[MrmProcessor::Bass].musicians = std::make_unique<MusicianKeys> (*b.apvts.getParameter ("style"), bassists, 3);
+        rows[MrmProcessor::Bass].musicians = std::make_unique<MusicianKeys> (*b.apvts.getParameter ("style"), bassists, 4);
     }
+    // baixo: o timbre do MRBM-69 (os do MRDBI-07), com o SUPER TONE do Sleng Teng
+    bassTimbre = std::make_unique<MusicianKeys> (*b.apvts.getParameter ("timbre"), juce::StringArray { "ROOTS", "SUPER TONE", "808" }, 3);
+    addAndMakeVisible (*bassTimbre);
     rows[MrmProcessor::Drums].lane  = &drumLane;
     rows[MrmProcessor::Chords].lane = &chordLane;
     rows[MrmProcessor::Bass].lane   = &bassLane;
@@ -1601,7 +1604,7 @@ void MainPage::resized()
         row.power->setBounds (70, y + 42, 148, 28);
         row.undo.setBounds (70, y + 74, 148, 18);
         if (row.musicians)
-            row.musicians->setBounds (m == MrmProcessor::Drums ? juce::Rectangle<int> (234, y + 46, 290, 48) : juce::Rectangle<int> (234, y + 16, 290, 78));
+            row.musicians->setBounds (m != MrmProcessor::Chords ? juce::Rectangle<int> (234, y + 46, 290, 48) : juce::Rectangle<int> (234, y + 16, 290, 78));
         const bool newKey = m != MrmProcessor::Chords;   // NOVA LINHA na bateria e no baixo
         row.lane->setBounds (534, y, newKey ? 446 : 550, 96);
         if (newKey) (m == MrmProcessor::Drums ? newDrums : newBass)->setBounds (986, y + 4, 100, 88);
@@ -1609,6 +1612,7 @@ void MainPage::resized()
     }
 
     drumStyle->setBounds (234, 330 + 14, 290, 26);
+    bassTimbre->setBounds (234, 330 + 2 * 104 + 14, 290, 26);
 
     // big knob · control room
     bigKnob->setBounds (70, 684, 112, 108);
@@ -1722,7 +1726,7 @@ void MainPage::renderBackground()
     const char* names[]  = { "BATERIA", "HARMONIA", "BAIXO" };
     const juce::String models[] = { juce::String ("MRDM-12 ") + MRM_DRUMS_VER, juce::String ("MRCM-1240 ") + MRM_CHORDS_VER,
                                     juce::String ("MRBM-69 ") + MRM_BASS_VER };
-    const char* players[] = { "ESTILO DE REGGAE  \xc2\xb7  BATERISTA", "PADR\xc3\x83O DO SKANK", "BAIXISTA" };
+    const char* players[] = { "ESTILO DE REGGAE  \xc2\xb7  BATERISTA", "PADR\xc3\x83O DO SKANK", "TIMBRE  \xc2\xb7  BAIXISTA" };
     for (int m = 0; m < MrmProcessor::NumMachines; ++m)
     {
         const auto& row = rows[(size_t) m];
