@@ -7,7 +7,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
 # Mastor Dub Battery Reggae DBR: sampler de bateria com 16 pads + aba Dub Drums (MRDM-12)
-project(DubBatteryReggae VERSION 1.5.0)
+project(DubBatteryReggae VERSION 2.0.0)   # alvo interno com o nome antigo: o ID de estado e o BUNDLE_ID não mudam
 
 # versão curta para a plaqueta (ex.: "1.2") e a do MRDM-12 embutido (lida da pasta dele)
 set(DBR_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
@@ -40,7 +40,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
 juce_add_plugin(DubBatteryReggae
     COMPANY_NAME                "DubMastor"
     BUNDLE_ID                   com.dubmastor.dubbatteryreggae
-    PRODUCT_NAME                "Mastor Dub Battery Reggae DBR"
+    PRODUCT_NAME                "Mastor Reggae Drums MRD-12"
     PLUGIN_MANUFACTURER_CODE    Dblb
     PLUGIN_CODE                 Dbr1
     FORMATS                     ${DBR_FORMATS} ${DM_AAX}

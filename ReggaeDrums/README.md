@@ -1,4 +1,6 @@
-# Mastor Dub Battery Reggae DBR 1.5 — Dub Station
+# Mastor Reggae Drums MRD-12 2.0 — Dub Station
+
+*(antigo Mastor Dub Battery Reggae DBR: agora com o Mastor Reggae Drum Machine MRDM-12 inteiro na aba DUB DRUMS)*
 
 Sampler de bateria com **16 pads**, no espírito do Native Instruments Battery, com os pads de borracha de uma
 **MPC** que acendem por dentro como na **Roland SP-404** e o visor âmbar de uma **Oberheim DMX**, no visual
@@ -6,11 +8,11 @@ Dub Station (painel creme, laterais de madeira, plaquetas pretas). Já vem com o
 
 ![Aba BATTERY](docs/interface.png)
 
-**[⬇️ Windows (instalador .exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.5/DBR-Windows-Instalador.exe)** ·
-**[⬇️ macOS (instalador .pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.5/DBR-macOS-Instalador.pkg)** ·
+**[⬇️ Windows (instalador .exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRD-12-2.0/MRD-12-Windows-Instalador.exe)** ·
+**[⬇️ macOS (instalador .pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRD-12-2.0/MRD-12-macOS-Instalador.pkg)** ·
 **[▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/battery/)**
 
-Sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.5/DBR-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.5/DBR-macOS.zip)
+Sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRD-12-2.0/MRD-12-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRD-12-2.0/MRD-12-macOS.zip)
 
 ## Instalação
 - **Mac:** abra o `.pkg` (se o macOS avisar que é de desenvolvedor não identificado, clique com o botão direito → **Abrir**).

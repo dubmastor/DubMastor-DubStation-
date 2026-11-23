@@ -187,7 +187,7 @@ Header::Header (MrmProcessor& p, std::function<void (int)> onTab)
 {
     setOpaque (true);
     const char* titles[MrmProcessor::numTabs] = { "RIDDIM", "HARMONIA", "BATERIA", "BAIXO", "CONTROL ROOM" };
-    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRCM-1240", "MRDM-12", "MRBM-69", u8 ("BIG KNOB  \xc2\xb7  MUTE") };
+    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRCM-1240", "MRD-12", "MRBM-69", u8 ("BIG KNOB  \xc2\xb7  MUTE") };
     for (int i = 0; i < MrmProcessor::numTabs; ++i)
     {
         tabs[(size_t) i] = std::make_unique<TabKey> (titles[i], subs[i]);
@@ -446,7 +446,7 @@ void MuteKey::paint (juce::Graphics& g)
 //==============================================================================
 ControlRoomPage::ControlRoomPage (MrmProcessor& p, juce::Component& knobPanel, int cropTop)
     : holder (knobPanel, cropTop),
-      drums  (*p.apvts.getParameter ("muteDrums"),  "DRUMS",  u8 ("MRDM-12  \xc2\xb7  BATERIA"), juce::Colour (0xff2fbf55)),
+      drums  (*p.apvts.getParameter ("muteDrums"),  "DRUMS",  u8 ("MRD-12  \xc2\xb7  BATERIA"), juce::Colour (0xff2fbf55)),
       bass   (*p.apvts.getParameter ("muteBass"),   "BASS",   u8 ("MRBM-69  \xc2\xb7  BAIXO"),   col::jamGold),
       riddim (*p.apvts.getParameter ("muteChords"), "RIDDIM", u8 ("MRCM-1240  \xc2\xb7  SKANK E BUBBLE"), juce::Colour (0xffe8432c)),
       fx   (*p.apvts.getParameter ("fxOn"), "CONTROL ROOM", "CONTROL ROOM"),

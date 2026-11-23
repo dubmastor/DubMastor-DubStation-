@@ -1011,7 +1011,7 @@ void Header::askSave()
         if (result == 1 && safe != nullptr)
         {
             if (! safe->proc.savePreset (w->getTextEditorContents ("name")))
-                juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon, "DUB BATTERY REGGAE",
+                juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon, "MASTOR REGGAE DRUMS",
                                                         u8"N\xc3\xa3o foi poss\xc3\xadvel gravar o preset.");
             safe->refresh();
         }
@@ -1047,9 +1047,10 @@ void Header::renderBackground()
 
     // título (padrão da casa: versão logo depois do nome)
     g.setColour (col::ink);
-    const juce::String title ("DUB BATTERY REGGAE DBR " DBR_VERSION_SHORT);
-    g.setFont (stencil (30.0f, 0.22f));
+    const juce::String title ("MASTOR REGGAE DRUMS MRD-12 " DBR_VERSION_SHORT);
+    g.setFont (stencil (26.0f, 0.22f));   // nome mais longo (MRD-12): a placa de latão e as faixas cabem ao lado
     g.drawText (title, plate.getX() + 32, 20, 700, 34, juce::Justification::left);
+    float plaqueRight = 0.0f;
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
     {   // placa de latão "DUB STATION"
@@ -1057,6 +1058,7 @@ void Header::renderBackground()
         const juce::String t ("DUB STATION");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
+        plaqueRight = pl.getRight();
         g.setColour (juce::Colours::black.withAlpha (0.28f));
         g.fillRoundedRectangle (pl.translated (1.5f, 3.0f), 3.0f);
         juce::ColourGradient brass (juce::Colour (0xffe3cd85), pl.getX(), pl.getY(), juce::Colour (0xff8a6d2c), pl.getX(), pl.getBottom(), false);
@@ -1093,7 +1095,8 @@ void Header::renderBackground()
     g.drawText ("16 PAD REGGAE DRUM SAMPLER", plate.getX() + 34, 52, 500, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
-        const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
+        const float sx = juce::jmax ((float) plate.getRight() - 330.0f, plaqueRight + 16.0f);
+        const float sw = (float) plate.getRight() - 40.0f - sx, sh = 7.0f;
         const juce::Colour faded[] = {
             col::jamGreen.interpolatedWith (juce::Colour (0xff6f7a4a), 0.35f),
             col::jamGold.interpolatedWith (juce::Colour (0xffb08a3a), 0.40f),

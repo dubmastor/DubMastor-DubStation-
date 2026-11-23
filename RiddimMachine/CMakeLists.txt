@@ -55,11 +55,11 @@ function(mrm_version dir out)
     string(REGEX MATCH "VERSION ([0-9]+)\\.([0-9]+)" _ "${line}")
     set(${out} "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}" PARENT_SCOPE)
 endfunction()
-mrm_version(ReggaeDrumMachine MRM_DRUMS_VER)
+mrm_version(ReggaeDrums MRM_DRUMS_VER)        # a bateria é a do Mastor Reggae Drums MRD-12 (aba DUB DRUMS)
 mrm_version(ReggaeChordMachine MRM_CHORDS_VER)
 mrm_version(ReggaeBassMachine MRM_BASS_VER)
 mrm_version(BigKnob     MRM_KNOB_VER)
-message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRDM-12 ${MRM_DRUMS_VER}, MRCM-1240 ${MRM_CHORDS_VER}, MRBM-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
+message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRCM-1240 ${MRM_CHORDS_VER}, MRBM-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
 
 set(MRM_SOURCES
     Source/MrmProcessor.cpp

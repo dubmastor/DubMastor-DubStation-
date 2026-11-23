@@ -1,6 +1,6 @@
 {
   "_leia": "Registro dos plugins. Todo plugin novo entra aqui. A checagem automática (.github/checagem/checar.py) compara este arquivo com o CMakeLists, o site, o README e as notas de release em todo push e pull request. 'web' é a pasta da versão para celular/navegador dentro de site/ ('pendente' só para os plugins antigos que ainda não têm). 'categoria' é a página do site (efeitos, instrumentos ou machines). 'padrao': false marca o plugin que ainda não segue o padrão de nomes e de releases (a checagem só confere a versão dele).",
-  "pacote": {"_leia": "Instalador completo (todos os plugins). Quando a versão de qualquer plugin subir, atualize a versão dele aqui e suba 'versao'. A checagem confere.", "versao": "2.6", "plugins": {"MBK-76": "3.2", "MTE-12": "2.6", "MPV-01": "1.6", "MRK-80": "2.4", "MRDBI-07": "1.6", "MDH-70": "1.3", "DBR": "1.5", "MRCM-1240": "2.5", "MRDM-12": "2.8", "MRBM-69": "3.1", "MRM-0420": "2.4", "MHD-050": "1.0", "MT-0420": "1.0"}},
+  "pacote": {"_leia": "Instalador completo (todos os plugins). Quando a versão de qualquer plugin subir, atualize a versão dele aqui e suba 'versao'. A checagem confere.", "versao": "2.6", "plugins": {"MBK-76": "3.2", "MTE-12": "2.6", "MPV-01": "1.6", "MRK-80": "2.4", "MRDBI-07": "1.6", "MDH-70": "1.3", "MRD-12": "2.0", "MRCM-1240": "2.5", "MRBM-69": "3.1", "MRM-0420": "2.4", "MHD-050": "1.0", "MT-0420": "1.0"}},
   "plugins": [
     {"sigla": "MBK-76", "pasta": "BigKnob", "nome": "Mastor Big Knob MBK-76", "tipo": "efeito", "web": "pendente", "categoria": "efeitos"},
     {"sigla": "MTE-12", "pasta": "TapeEcho", "nome": "Mastor Tape Echo MTE-12", "tipo": "efeito", "web": "pendente", "categoria": "efeitos"},
@@ -9,9 +9,9 @@
     {"sigla": "MRK-80", "pasta": "RootsKeys", "nome": "Mastor Roots Keys MRK-80", "tipo": "instrumento", "web": "pendente", "categoria": "instrumentos"},
     {"sigla": "MRDBI-07", "pasta": "ReggaeDubBassInstrument", "nome": "Mastor Reggae Dub Bass Instrument MRDBI-07", "tipo": "instrumento", "web": "bass", "categoria": "instrumentos"},
     {"sigla": "MDH-70", "pasta": "DubHorns", "nome": "Mastor Dub Horns MDH-70", "tipo": "instrumento", "web": "web/dubhorns", "categoria": "instrumentos"},
-    {"sigla": "DBR", "pasta": "DubBatteryReggae", "nome": "Mastor Dub Battery Reggae DBR", "tipo": "instrumento", "web": "battery", "categoria": "instrumentos"},
+    {"sigla": "MRD-12", "pasta": "ReggaeDrums", "nome": "Mastor Reggae Drums MRD-12", "tipo": "instrumento", "web": "battery", "categoria": "instrumentos"},
     {"sigla": "MRCM-1240", "pasta": "ReggaeChordMachine", "nome": "Mastor Reggae Chord Machine MRCM-1240", "tipo": "instrumento", "web": "chords", "categoria": "machines"},
-    {"sigla": "MRDM-12", "pasta": "ReggaeDrumMachine", "nome": "Mastor Reggae Drum Machine MRDM-12", "tipo": "instrumento", "web": "drums", "categoria": "machines"},
+    {"sigla": "MRDM-12", "pasta": "ReggaeDrumMachine", "nome": "Mastor Reggae Drum Machine MRDM-12", "tipo": "instrumento", "web": "drums", "categoria": "machines", "legado": "Mastor Reggae Drums MRD-12"},
     {"sigla": "MRBM-69", "pasta": "ReggaeBassMachine", "nome": "Mastor Reggae Bass Machine MRBM-69", "tipo": "instrumento", "web": "bassmachine", "categoria": "machines"},
     {"sigla": "MRM-0420", "pasta": "RiddimMachine", "nome": "Mastor Riddim Machine MRM-0420", "tipo": "instrumento", "web": "riddim", "categoria": "machines"},
     {"sigla": "MT-0420", "pasta": "Tune", "nome": "Mastor Tune MT-0420", "tipo": "efeito", "web": "web/tune", "categoria": "efeitos"}

@@ -1,7 +1,14 @@
-## Mastor Dub Battery Reggae DBR 1.5 — Dub Station
+## Mastor Reggae Drums MRD-12 2.0 — Dub Station
 
-- **BANCO ÚNICO DE RIDDIMS na aba DUB DRUMS** (vem do MRDM-12 2.8): 356 músicas por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**, com as luzes **H B D**; a bateria vem com o groove da música (o original ou o do baterista mais próximo) no BPM dela
-- Versão para celular 1.5 com o mesmo menu
+- **Nome novo:** o Mastor Dub Battery Reggae DBR passa a se chamar **Mastor Reggae Drums MRD-12** e absorve o Mastor Reggae Drum Machine MRDM-12, que deixa de ser um plugin separado (o MRDM-12 2.7 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo
+- **Kit SLENG TENG (CASIO MT-40):** preset novo com os sons do KIT DIGITAL do MRDM-12 nos pads (bumbo, aro, caixa, hi-hats, tons e prato), também na biblioteca do < SAMPLE > e do TIMBRE 2
+- **Mapa de NOTAS:** o groove da aba DUB DRUMS toca o pad certo mesmo com o mapa de notas mudado
+- **Balanço calibrado:** o microtempo humano da bateria segue a medição de bateria de reggae de Wright & Berdahl (Stanford, 2005)
+- **Créditos no visor:** com uma música do banco único, o visor azul alterna os créditos da gravação (produção, estúdio, baixo e bateria)
+
+- **BANCO ÚNICO DE RIDDIMS na aba DUB DRUMS**: 356 músicas por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**, com as luzes **H B D**; a bateria vem com o groove da música (o original ou o do baterista mais próximo) no BPM dela
+- Versão para celular 2.0 com o mesmo menu e o kit Sleng Teng
+
 
 ## Mastor Dub Battery Reggae DBR 1.4 — Dub Station
 

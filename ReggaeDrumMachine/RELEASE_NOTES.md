@@ -1,11 +1,8 @@
-## Mastor Reggae Drum Machine MRDM-12 2.8 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.7 — legado
 
-- **BANCO ÚNICO DE RIDDIMS no visor azul dos GROOVES:** 356 músicas e 155 riddims, o mesmo banco do MRCM-1240, do MRBM-69 e do MRM-0420 (`RiddimBank/`). Escolha por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**: a bateria vem com o groove original da música ou, quando o banco não tem, com o groove do baterista mais próximo de quem gravou, no BPM da música
-- **Luzes H B D** em cada música (harmonia, baixo e bateria da gravação original) e a opção **Só completos**
-- Os 118 grooves continuam no mesmo lugar e na mesma ordem (os projetos antigos abrem igual)
-- Versão para celular 2.8 com o mesmo menu
+- O MRDM-12 virou a aba DUB DRUMS do Mastor Reggae Drums MRD-12; as novidades da bateria (banco único de riddims, créditos, balanço calibrado) saem lá e no MRM-0420
 
-## Mastor Reggae Drum Machine MRDM-12 2.7 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.7 🟢🟡⚫ (última versão separada)
 
 - **118 GROOVES** no visor azul (antes 21), separados por baterista, tirados de uma pesquisa de créditos e transcrições:
   - **Style Scott (22):** Night Nurse, Bounty Hunter, Minibus, Wa Do Dem, Police In Helicopter, Firehouse Rock, Cool Runnings, Zungguzung…
