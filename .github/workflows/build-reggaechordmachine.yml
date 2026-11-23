@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'ReggaeChordMachine/**'
+      - 'RiddimBank/Source/**'
       - 'RootsKeys/Source/RootsKeysEngine.h'
       - 'RootsKeys/Source/TapeEchoDSP.h'
       - 'RootsKeys/Source/PluginProcessor.cpp'
@@ -17,6 +18,7 @@ on:
   pull_request:
     paths:
       - 'ReggaeChordMachine/**'
+      - 'RiddimBank/Source/**'
       - 'RootsKeys/Source/RootsKeysEngine.h'
       - 'RootsKeys/Source/TapeEchoDSP.h'
       - '.github/workflows/build-reggaechordmachine.yml'

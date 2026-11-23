@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - 'RiddimMachine/**'
+      - 'RiddimBank/Source/**'
       - 'ReggaeChordMachine/Source/**'
       - 'ReggaeChordMachine/CMakeLists.txt'
       - 'ReggaeDrumMachine/Source/**'
@@ -30,6 +31,7 @@ on:
   pull_request:
     paths:
       - 'RiddimMachine/**'
+      - 'RiddimBank/Source/**'
       - 'ReggaeChordMachine/Source/**'
       - 'ReggaeDrumMachine/Source/**'
       - 'RootsKeys/Source/RootsKeysEngine.h'
@@ -95,6 +97,7 @@ jobs:
           $R play-riddim.wav intro
           $R daw-intro.wav intro
           $R estado
+          $R banco
           $R inicial
           $R presets
           $R aleatorio

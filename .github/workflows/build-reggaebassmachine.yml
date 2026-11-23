@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'ReggaeBassMachine/**'
+      - 'RiddimBank/Source/**'
       - 'ReggaeDubBassInstrument/Source/BassVoice.h'
       - 'ReggaeDubBassInstrument/Source/Maximizer.h'
       - 'ReggaeDrumMachine/Source/DrumSynth.h'
@@ -20,6 +21,7 @@ on:
   pull_request:
     paths:
       - 'ReggaeBassMachine/**'
+      - 'RiddimBank/Source/**'
       - 'ReggaeDubBassInstrument/Source/BassVoice.h'
       - 'ReggaeDubBassInstrument/Source/Maximizer.h'
       - 'ReggaeDrumMachine/Source/DrumSynth.h'

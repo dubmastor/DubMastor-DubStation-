@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'ReggaeDrumMachine/**'
+      - 'RiddimBank/Source/**'
       - 'site/drums/generator.js'
       - '.github/workflows/build-reggaedrummachine.yml'
       - '.github/scripts/**'
@@ -14,6 +15,7 @@ on:
   pull_request:
     paths:
       - 'ReggaeDrumMachine/**'
+      - 'RiddimBank/Source/**'
       - '.github/workflows/build-reggaedrummachine.yml'
       - '.github/scripts/**'
       - '.github/installer/**'
