@@ -1,3 +1,12 @@
+## Mastor Riddim Machine MRM-0420 2.3 — DubStation
+
+- **Link de harmonia com o novo Mastor Tune MT-0420**: com os dois abertos na mesma DAW, o MRM publica os 4 acordes, o acorde que está tocando e o BPM, e o Mastor Tune afina a voz pela harmonia do riddim, sem roteamento
+- O resto continua igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Riddim Machine MRM-0420 2.2 — DubStation
 
 - **118 GROOVES do MRDM-12 2.7 na aba BATERIA** (antes 21): músicas de Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL

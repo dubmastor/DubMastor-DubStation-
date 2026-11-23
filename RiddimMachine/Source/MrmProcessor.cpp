@@ -361,6 +361,7 @@ void MrmProcessor::syncLinks()
 void MrmProcessor::timerCallback()
 {
     syncLinks();
+    publishLink();
 
     // semente do JACKPOT: vale para a bateria e para o baixo
     const int seed = juce::roundToInt (raw ("seed"));
@@ -387,6 +388,40 @@ void MrmProcessor::timerCallback()
             if (getParam (*s, "preview") > 0.5f) setParam (*s, "preview", 0.0f);
     for (int m = 0; m < NumMachines; ++m)
         lastPreview[m] = getParam (*subs[m], "preview") > 0.5f;
+}
+
+// harmonia e acorde do momento para o Mastor Tune MT-0420 (ver MrmLink.h)
+void MrmProcessor::publishLink()
+{
+    mrmlink::Data d {};
+    const auto slots = chords.getSlots();
+    d.numSlots = (juce::int32) juce::jmin (4, (int) slots.size());
+    double total = 0.0;
+    for (int i = 0; i < d.numSlots; ++i)
+    {
+        const auto& s = slots[(size_t) i];
+        d.root[i]  = ((s.root % 12) + 12) % 12;
+        d.minor[i] = s.quality == dub::Min ? 1 : 0;
+        d.on[i]    = s.beats > 0.0 ? 1 : 0;
+        d.beats[i] = (float) s.beats;
+        total += s.beats;
+    }
+    const double pos = chords.getPlayPositionInLoop();
+    d.posBeats = (float) pos;
+    d.playing  = pos >= 0.0 ? 1 : 0;
+    d.curSlot  = -1;
+    if (pos >= 0.0 && total > 0.0)
+    {
+        double acc = 0.0;
+        for (int i = 0; i < d.numSlots; ++i)
+        {
+            if (! d.on[i]) continue;
+            acc += d.beats[i];
+            if (pos < acc) { d.curSlot = i; break; }
+        }
+    }
+    d.bpm = getParam (apvts, "bpm");
+    linkWriter.write (d);
 }
 
 void MrmProcessor::newRiddim()
