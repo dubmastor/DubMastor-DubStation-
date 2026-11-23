@@ -1,9 +1,15 @@
-## Mastor Riddim Machine MRM-0420 1.9 — DubStation
+## Mastor Riddim Machine MRM-0420 2.0 — DubStation
 
-- **GROOVES do MRDM-12 2.4 na aba BATERIA**: visor azul de MPC no módulo BATERISTA com 21 presets de músicas de cada baterista
+- **GROOVES do MRDM-12 2.5 na aba BATERIA**: visor azul de MPC no módulo BATERISTA com 21 presets de músicas de cada baterista
   (Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL). ◀ ▶ passa pelas músicas do baterista; clique no visor para a lista.
   O groove ajusta a bateria e o BPM; a harmonia e o baixo continuam como estão
 - **Sem flam** na bateria: duas notas coladas da mesma peça viram uma só, no tempo certo
+
+### Da 1.9
+
+- **Visual de console anos 70**: faixa verde-petróleo atrás do nome; dentro das abas, cada máquina mostra a sua cor e a placa de latão com a própria sigla (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota)
+- Aba BAIXO com o visor de riddims em LCD azul estilo MPC do MRBM-69 2.9
+- Mesma faixa na versão para navegador
 
 ### Da 1.8
 

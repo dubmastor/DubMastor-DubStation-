@@ -1,3 +1,10 @@
+# Mastor Reggae Bass Machine MRBM-69 — 2.9 · Gerador de Reggae Bass Lines
+
+- **Visor de riddims em LCD azul estilo MPC**: moldura cinza, tela azul com letras claras de matriz (=RIDDIM= 081/160, nome, BASS e TEMPO); setas < > dentro da tela
+- **Visual de console anos 70**: faixa terracota no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)
+- **Placa de latão com a sigla MRBM-69** no lugar de "DUB STATION"
+- Mesmo visual na versão para navegador
+
 # Mastor Reggae Bass Machine MRBM-69 — 2.8 · Gerador de Reggae Bass Lines
 
 - **RIDDIM CLÁSSICO: 160 presets, 20 por estilo de reggae** — Rocksteady (Studio One e Treasure Isle, 1966-69), Early Reggae e Roots (1969-75), Roots e Rockers (Channel One, Joe Gibbs, Black Ark, 1975-79), Rub a Dub (Roots Radics e Taxi, 1979-84), **Digital King Jammys (1985-89)**, Ragga (Steely & Clevie, Bobby Digital, Sly & Robbie, 1990-95), Dancehall 1995-2001 e Dancehall 2002-07

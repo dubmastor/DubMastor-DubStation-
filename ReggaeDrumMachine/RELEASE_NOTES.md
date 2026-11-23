@@ -1,4 +1,4 @@
-## Mastor Reggae Drum Machine MRDM-12 2.4 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.5 🟢🟡⚫
 
 - **GROOVES no visor azul de MPC** (no módulo BATERISTA, igual ao do Mastor Riddim Machine): 21 presets tirados de músicas de cada baterista. **◀ ▶** passa pelas músicas do baterista escolhido; clique no visor para a lista completa, separada por baterista
   - **Style Scott:** Night Nurse, Rock 'n' Groove, Looking My Love, Big Ship, Man of Mystery
@@ -9,6 +9,12 @@
 - Cada groove ajusta estilo, bumbo, caixa/aro, hi-hat, swing, dinâmica, aleatoriedade, viradas, kit e BPM da gravação ("~" quando o BPM é aproximado). O visor mostra a música, o artista, o ano e o BPM; um "*" aparece quando você mexe em algo depois de carregar
 - **Sem flam:** quando duas notas da mesma peça caem coladas, fica só a nota no tempo certo (o flam parecia defeito)
 - Versão para celular igual, com o mesmo visor de grooves
+
+### Da 2.4
+
+- **Visual de console anos 70**: faixa verde-oliva no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)
+- **Placa de latão com a sigla MRDM-12** no lugar de "DUB STATION"
+- Mesmo visual na versão para navegador
 
 ### Da 2.3
 

@@ -252,6 +252,22 @@ void Header::renderBackground()
     paintWood (g, woodL, rng);
     paintWood (g, woodR, rng);
     paintPlate (g, plate, rng, true, false);
+    {   // faixa de console anos 70 (verde-petróleo do MRM-0420) atrás do nome; cada máquina tem a sua cor
+        const auto band = plate.withHeight (74).toFloat();
+        const juce::Colour bc (0xff3d5a55);
+        g.setColour (bc);
+        g.fillRect (band);
+        for (int i = 0; i < 900; ++i)
+        {
+            const float x = band.getX() + rng.nextFloat() * band.getWidth(), y = band.getY() + rng.nextFloat() * band.getHeight();
+            g.setColour ((rng.nextBool() ? juce::Colours::white : juce::Colours::black).withAlpha (0.03f + rng.nextFloat() * 0.05f));
+            g.fillRect (x, y, 1.0f + rng.nextFloat() * 2.0f, 1.0f);
+        }
+        g.setColour (bc.darker (0.6f));
+        g.fillRect (band.getX(), band.getBottom() - 3.0f, band.getWidth(), 3.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.18f));
+        g.fillRect (band.getX(), band.getBottom(), band.getWidth(), 1.0f);
+    }
     screw (g, (float) plate.getX() + 12.0f, 12.0f, rng);
     screw (g, (float) plate.getRight() - 12.0f, 12.0f, rng);
 
@@ -262,12 +278,12 @@ void Header::renderBackground()
     const juce::String title ("MASTOR RIDDIM MACHINE " + ver);
     g.setFont (stencil (30.0f, 0.2f));
     const float titleW = textWidth (g.getCurrentFont(), title);
-    g.setColour (juce::Colours::white.withAlpha (0.35f));
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
     g.drawText (title, juce::Rectangle<float> (60.0f, 14.0f, titleW + 10.0f, 38.0f).translated (0.8f, 1.0f), juce::Justification::left);
-    g.setColour (col::ink);
+    g.setColour (juce::Colour (0xfff3e6c8));
     g.drawText (title, juce::Rectangle<float> (60.0f, 14.0f, titleW + 10.0f, 38.0f), juce::Justification::left);
     engraved (g, u8 ("BATERIA + HARMONIA + BAIXO + CONTROL ROOM  \xc2\xb7  RIDDIM STARTER"),
-              juce::Rectangle<float> (62.0f, 51.0f, 700.0f, 13.0f), juce::Justification::left, 10.0f, 0.25f);
+              juce::Rectangle<float> (62.0f, 51.0f, 700.0f, 13.0f), juce::Justification::left, 10.0f, 0.25f, juce::Colour (0xfff3e6c8).withAlpha (0.75f));
 
     {   // placa de latão grande com o modelo
         g.setFont (stencil (25.0f, 0.3f));
@@ -293,7 +309,7 @@ void Header::renderBackground()
             g.setGradientFill (fade);
             g.fillPath (band);
         }
-        engraved (g, "DUBSTATION", juce::Rectangle<float> (sx, 42.0f, sw, 22.0f), juce::Justification::centredRight, 19.0f, 0.42f, col::ink);
+        engraved (g, "DUBSTATION", juce::Rectangle<float> (sx, 42.0f, sw, 22.0f), juce::Justification::centredRight, 19.0f, 0.42f, juce::Colour (0xfff3e6c8));
     }
 
     section (g, tabSection, "ABAS");

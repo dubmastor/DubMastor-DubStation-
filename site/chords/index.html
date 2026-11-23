@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Chord Machine MRCM-1240 2.2 — Dub Station</title>
+<title>Mastor Reggae Chord Machine MRCM-1240 2.3 — Dub Station</title>
 <meta name="description" content="Mastor Reggae Chord Machine MRCM-1240 no celular: escolha os acordes, ouça o skank de piano M1 e o bubble de Hammond e baixe o MIDI para a sua DAW.">
 <style>
 :root{
@@ -87,13 +87,17 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 @media (min-width:900px){.dock{display:none}body{padding-bottom:20px}}
 .foot{text-align:center;font-size:11px;color:var(--ink2);margin-top:16px;line-height:1.6}
 .foot a{color:var(--ink)}
+
+/* faixa de console anos 70 (mostarda do MRCM-1240) */
+header{margin:-12px -12px 18px;padding:16px 16px 18px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px),#b08a3a;border-bottom:3px solid #5e4a1f;box-shadow:0 1px 0 rgba(255,255,255,.25),0 4px 6px -2px rgba(0,0,0,.25)}
+header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{display:none}
 </style>
 </head>
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE CHORD MACHINE MRCM-1240 <span id="ver">2.2</span></h1><div class="sub">RIDDIM CHORD GENERATOR · NO NAVEGADOR</div></div>
-  <div class="plaque">DUB STATION</div><div class="flag"></div>
+  <div><h1>MASTOR REGGAE CHORD MACHINE MRCM-1240 <span id="ver">2.3</span></h1><div class="sub">RIDDIM CHORD GENERATOR · NO NAVEGADOR</div></div>
+  <div class="plaque">MRCM-1240</div><div class="flag"></div>
 </header>
 
 <div class="grid-mods" id="chords"></div>
@@ -150,7 +154,7 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '2.2';
+const VERSION = '2.3';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)

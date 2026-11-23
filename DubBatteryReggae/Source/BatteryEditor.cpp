@@ -1383,7 +1383,7 @@ void BatteryPanel::paint (juce::Graphics& g)
 //==============================================================================
 namespace
 {
-    constexpr int kCropDrums = 74;   // o MRDM-12 aparece a partir da altura das plaquetas dos módulos
+    constexpr int kCropDrums = 78;   // o MRDM-12 aparece a partir das plaquetas dos módulos (abaixo da faixa oliva do título)
 }
 
 BatteryRoot::BatteryRoot (BatteryProcessor& p)

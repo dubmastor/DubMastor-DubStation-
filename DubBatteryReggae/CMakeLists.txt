@@ -12,6 +12,7 @@ project(DubBatteryReggae VERSION 1.2.0)
 # versão curta para a plaqueta (ex.: "1.2") e a do MRDM-12 embutido (lida da pasta dele)
 set(DBR_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeDrumMachine/CMakeLists.txt" _dd_line REGEX "^project\\(")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeDrumMachine/CMakeLists.txt")
 string(REGEX MATCH "VERSION ([0-9]+)\\.([0-9]+)" _ "${_dd_line}")
 set(DBR_DRUMS_VER "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}")
 

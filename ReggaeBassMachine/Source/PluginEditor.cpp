@@ -1356,16 +1356,36 @@ void BassMachinePanel::renderBackground()
     screw ((float) plate.getX() + m, (float) plate.getBottom() - m);
     screw ((float) plate.getRight() - m, (float) plate.getBottom() - m);
 
-    // --- cabeçalho
-    g.setColour (colours::ink);
+    // --- faixa de console anos 70 (terracota do MRBM-69) no alto da placa creme
+    {
+        const auto band = plate.withHeight (80).toFloat();
+        const juce::Colour bc (0xff9a5a32);
+        g.setColour (bc);
+        g.fillRect (band);
+        for (int i = 0; i < 900; ++i)   // tinta velha: pontinhos e riscos
+        {
+            const float x = band.getX() + rng.nextFloat() * band.getWidth(), y = band.getY() + rng.nextFloat() * band.getHeight();
+            g.setColour ((rng.nextBool() ? juce::Colours::white : juce::Colours::black).withAlpha (0.03f + rng.nextFloat() * 0.05f));
+            g.fillRect (x, y, 1.0f + rng.nextFloat() * 2.0f, 1.0f);
+        }
+        g.setColour (bc.darker (0.6f));
+        g.fillRect (band.getX(), band.getBottom() - 3.0f, band.getWidth(), 3.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.18f));
+        g.fillRect (band.getX(), band.getBottom(), band.getWidth(), 1.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.10f));
+        g.fillRect (band.getX(), band.getBottom() + 1.0f, band.getWidth(), 3.0f);
+    }
+
+    // --- cabeçalho (letras creme sobre a faixa)
+    g.setColour (juce::Colour (0xfff3e6c8));
     g.setFont (stencil (22.0f, 0.12f));
     const juce::String title ("MASTOR REGGAE BASS MACHINE MRBM-69 " + versionShort());
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
-    {   // placa de latão "DUB STATION" (a versão fica no título)
+    {   // placa de latão com a sigla da máquina (a versão fica no título)
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION");
+        const juce::String t ("MRBM-69");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -1398,30 +1418,9 @@ void BassMachinePanel::renderBackground()
         g.setColour (juce::Colour (0xff2e2108));
         g.drawText (t, pl, juce::Justification::centred);
     }
-    g.setColour (colours::inkSoft);
+    g.setColour (juce::Colour (0xfff3e6c8).withAlpha (0.75f));
     g.setFont (stencil (10.5f, 0.25f));
     g.drawText (juce::String::fromUTF8 ("GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
-
-    {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
-        const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 3.0f;   // fininhas, acima do visor de riddims
-        const juce::Colour faded[] = {
-            colours::jamGreen.interpolatedWith (juce::Colour (0xff6f7a4a), 0.35f),
-            colours::jamGold.interpolatedWith (juce::Colour (0xffb08a3a), 0.40f),
-            juce::Colour (0xff2b2621) };
-        for (int k = 0; k < 3; ++k)
-        {
-            const float y = 9.0f + 4.5f * (float) k;
-            juce::Path bandP;
-            bandP.startNewSubPath (sx, y + rng.nextFloat() * 0.8f);
-            for (float x = sx; x <= sx + sw; x += 6.0f) bandP.lineTo (x, y + (rng.nextFloat() - 0.3f) * 0.9f);
-            for (float x = sx + sw; x >= sx; x -= 6.0f) bandP.lineTo (x, y + sh + (rng.nextFloat() - 0.7f) * 0.9f);
-            bandP.closeSubPath();
-            juce::ColourGradient fade (faded[k].withAlpha (0.92f), sx, y, faded[k].withAlpha (0.70f), sx + sw, y, false);
-            fade.addColour (0.3, faded[k].brighter (0.12f).withAlpha (0.85f));
-            g.setGradientFill (fade);
-            g.fillPath (bandP);
-        }
-    }
 
     // --- seções: moldura gravada + plaqueta preta com o nome
     auto section = [&] (juce::Rectangle<int> r, const juce::String& t)
@@ -1553,7 +1552,7 @@ void BassMachinePanel::resized()
     woodR = { W - 28, 0, 28, H };
     plate = { 28, 0, W - 56, H };
 
-    riddimBox.setBounds (plate.getRight() - 330, 26, 290, 52);
+    riddimBox.setBounds (plate.getRight() - 344, 9, 304, 64);
 
     // --- linha 1: ESTILO (botoeira) | HARMONIA
     stylePanel   = { 52, 92, 300, 362 };
@@ -1684,55 +1683,63 @@ void BassMachinePanel::resized()
 //==============================================================================
 void RiddimBox::paint (juce::Graphics& g)
 {
+    // visor de LCD azul estilo MPC: moldura cinza, tela azul com letras claras de matriz
     auto r = getLocalBounds().toFloat().reduced (1.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.3f));
-    g.fillRoundedRectangle (r.translated (0, 2.0f), 5.0f);
-    g.setColour (juce::Colour (0xff1a1714));
-    g.fillRoundedRectangle (r, 5.0f);
-    auto glass = r.reduced (4.0f);
-    g.setColour (colours::glass);
-    g.fillRoundedRectangle (glass, 3.0f);
-    g.setColour (colours::amber.withAlpha (isMouseOver() ? 0.45f : 0.22f));
-    g.drawRoundedRectangle (glass, 3.0f, 1.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.fillRoundedRectangle (r.translated (0, 2.0f), 4.0f);
+    juce::ColourGradient bez (juce::Colour (0xff6a6d71), r.getX(), r.getY(), juce::Colour (0xff3e4044), r.getX(), r.getBottom(), false);
+    g.setGradientFill (bez);
+    g.fillRoundedRectangle (r, 4.0f);
+    auto lcd = r.reduced (5.0f, 5.0f);
+    g.setColour (juce::Colour (0xff15204a));
+    g.fillRect (lcd.expanded (1.5f));
+    juce::ColourGradient blue (juce::Colour (0xff3d64b8), lcd.getX(), lcd.getY(), juce::Colour (0xff2c4f9e), lcd.getX(), lcd.getBottom(), false);
+    g.setGradientFill (blue);
+    g.fillRect (lcd);
+    g.setColour (juce::Colours::black.withAlpha (0.07f));   // linhas da matriz
+    for (float y = lcd.getY() + 1.0f; y < lcd.getBottom(); y += 2.0f) g.drawHorizontalLine ((int) y, lcd.getX(), lcd.getRight());
+    g.setColour (juce::Colours::white.withAlpha (0.08f));
+    g.fillRect (lcd.withHeight (lcd.getHeight() * 0.35f));
 
+    const juce::Colour ink (0xffe6efff);
+    const auto mono = [] (float h, bool bold) { return juce::Font (juce::FontOptions (juce::Font::getDefaultMonospacedFontName(), h, bold ? juce::Font::bold : juce::Font::plain)); };
     const auto mp = getMouseXYRelative().toFloat();
     const bool over = isMouseOver();
-    auto arrowArea = [&] (bool right) { return right ? glass.withLeft (glass.getRight() - 20.0f) : glass.withWidth (20.0f); };
     for (bool right : { false, true })
     {
-        const auto a = arrowArea (right);
-        juce::Path tri;
-        const float cx = a.getCentreX(), cy = a.getCentreY();
-        if (right) tri.addTriangle (cx - 3.5f, cy - 5, cx - 3.5f, cy + 5, cx + 4.0f, cy);
-        else       tri.addTriangle (cx + 3.5f, cy - 5, cx + 3.5f, cy + 5, cx - 4.0f, cy);
-        g.setColour (colours::amber.withAlpha (over && a.contains (mp) ? 0.95f : 0.5f));
-        g.fillPath (tri);
+        const auto a = right ? lcd.withLeft (lcd.getRight() - 16.0f) : lcd.withWidth (16.0f);
+        g.setColour (ink.withAlpha (over && a.contains (mp) ? 1.0f : 0.55f));
+        g.setFont (mono (14.0f, true));
+        g.drawText (right ? ">" : "<", a, juce::Justification::centred);
     }
 
-    auto t = glass.reduced (22.0f, 3.0f);
+    auto t = lcd.reduced (17.0f, 2.0f);
     const int idx = proc.currentRiddim();
-    g.setFont (stencil (8.5f, 0.2f));
-    g.setColour (colours::amber.withAlpha (0.6f));
-    g.drawText (juce::String::fromUTF8 ("RIDDIM CLÁSSICO  \xe2\x96\xbe"), t.removeFromTop (11.0f), juce::Justification::centredLeft);
+    auto top = t.removeFromTop (11.0f);
+    g.setFont (mono (10.0f, false));
+    g.setColour (ink.withAlpha (0.85f));
     if (idx < 0)
     {
-        g.setColour (colours::amber);
-        g.setFont (stencil (13.0f, 0.06f));
-        g.drawText (juce::String::fromUTF8 ("ESCOLHA UM DOS 160"), t.removeFromTop (17.0f), juce::Justification::centredLeft);
-        g.setFont (stencil (8.5f, 0.06f));
-        g.setColour (colours::amber.withAlpha (0.6f));
-        g.drawText (juce::String::fromUTF8 ("POR ESTILO · BAIXISTA · DÉCADA"), t, juce::Justification::centredLeft);
+        g.drawText ("=RIDDIM= ---/160", top, juce::Justification::centredLeft);
+        g.setFont (mono (15.0f, true));
+        g.setColour (ink);
+        g.drawText ("SELECT RIDDIM", t.removeFromTop (19.0f), juce::Justification::centredLeft);
+        g.setFont (mono (10.0f, false));
+        g.setColour (ink.withAlpha (0.85f));
+        g.drawText (juce::String::fromUTF8 ("ESTILO·BAIXISTA·DÉCADA"), t, juce::Justification::centredLeft);
         return;
     }
     const auto& rd = mbmriddims::riddims[idx];
-    g.setColour (colours::amber);
-    g.setFont (stencil (13.0f, 0.06f));
-    g.drawFittedText (juce::String::fromUTF8 (rd.name).toUpperCase() + "  " + juce::String (rd.year), t.removeFromTop (17.0f).toNearestInt(),
-                      juce::Justification::centredLeft, 1, 0.8f);
-    g.setFont (stencil (8.5f, 0.04f));
-    g.setColour (colours::amber.withAlpha (0.7f));
-    g.drawFittedText (juce::String::fromUTF8 ("BAIXO: ") + juce::String::fromUTF8 (rd.bass)
-                      + (rd.approx ? juce::String::fromUTF8 ("  ·  TOM APROX.") : juce::String()),
+    g.drawText ("=RIDDIM= " + juce::String (idx + 1).paddedLeft ('0', 3) + "/160", top, juce::Justification::centredLeft);
+    g.drawText (juce::String ("[") + mbmriddims::folderShort[rd.folder] + "]", top, juce::Justification::centredRight);
+    g.setFont (mono (15.0f, true));
+    g.setColour (ink);
+    g.drawFittedText (juce::String::fromUTF8 (rd.name).toUpperCase() + " " + juce::String (rd.year), t.removeFromTop (19.0f).toNearestInt(),
+                      juce::Justification::centredLeft, 1, 0.75f);
+    g.setFont (mono (10.0f, false));
+    g.setColour (ink.withAlpha (0.85f));
+    g.drawFittedText (juce::String::fromUTF8 ("BASS:") + juce::String::fromUTF8 (rd.bass).toUpperCase()
+                      + "  TEMPO:" + juce::String (rd.bpm).paddedLeft ('0', 3) + (rd.approx ? "~" : ""),
                       t.toNearestInt(), juce::Justification::centredLeft, 1, 0.7f);
 }
 

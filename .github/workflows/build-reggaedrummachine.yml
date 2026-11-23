@@ -207,7 +207,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           sudo installer -pkg ../MRDM-12-macOS-Instalador.pkg -target /
-          ls -la "/Library/Audio/Plug-Ins/VST3/" "/Library/Audio/Plug-Ins/Components/" | grep MDDM
+          ls -la "/Library/Audio/Plug-Ins/VST3/" "/Library/Audio/Plug-Ins/Components/" | grep -E "MRDM|MDDM"
           killall -9 AudioComponentRegistrar 2>/dev/null || true
           sleep 3
           auval -v aumu Dbd1 Dblb | tail -3
