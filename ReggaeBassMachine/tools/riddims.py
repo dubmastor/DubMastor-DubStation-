@@ -42,6 +42,9 @@ FOLDERS = [
     ("DANCEHALL - 2002 A 2007",                           dict(style=JAMMYS,  drum=DANCEHALL, timbre=E808, bpm=100, dens=.50, var=.45, swing=0.0)),
 ]
 
+SHORT = ["ROCKSTEADY 66-69", "EARLY ROOTS 69-75", "ROOTS ROCKERS 75-79", "RUB A DUB 79-84", "DIGITAL 85-89",
+         "RAGGA 90-95", "DANCEHALL 95-01", "DANCEHALL 02-07"]   # nome curto para o visor
+
 # (riddim, gravação de origem, ano, produtor/estúdio, baixo, harmonia, bpm ou None, extras)
 # harmonia: "Am:1 G:1" (tônica + m / 7 / m7, ":" duração h=1/2, 1, 2, 3, 4, 8 compassos); "~" no início = aproximada
 R = [
@@ -287,6 +290,7 @@ def write_header(rows):
     L.append("")
     L.append("inline constexpr int numFolders = %d;" % len(FOLDERS))
     L.append("inline const char* const folders[numFolders] = { %s };" % ", ".join(cstr(f[0]) for f in FOLDERS))
+    L.append("inline const char* const folderShort[numFolders] = { %s };" % ", ".join(cstr(f) for f in SHORT))
     L.append("")
     L.append("inline constexpr int numRiddims = %d;" % len(rows))
     L.append("inline const Riddim riddims[numRiddims] = {")
@@ -300,7 +304,7 @@ def write_header(rows):
     open(os.path.join(ROOT, "ReggaeBassMachine/Source/RiddimPresets.h"), "w").write("\n".join(L) + "\n")
 
 def write_js(rows):
-    data = dict(folders=[f[0] for f in FOLDERS], riddims=[dict(f=r["folder"], n=r["name"], o=r["origin"], y=r["year"], d=r["decade"],
+    data = dict(folders=[f[0] for f in FOLDERS], short=SHORT, riddims=[dict(f=r["folder"], n=r["name"], o=r["origin"], y=r["year"], d=r["decade"],
                 p=r["producer"], b=r["bass"], c=[list(c) for c in r["chords"]], a=1 if r["approx"] else 0, bpm=r["bpm"], s=r["style"],
                 dr=r["drum"], t=r["timbre"], den=r["dens"], v=r["var"], sw=r["swing"]) for r in rows])
     js = ("// Gerado por ReggaeBassMachine/tools/riddims.py — não editar à mão. Mesmo banco do plugin MRBM-69.\n"

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Bass Machine MRBM-69 2.8 — Dub Station</title>
+<title>Mastor Reggae Bass Machine MRBM-69 2.9 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -22,7 +22,11 @@ h1{margin:0;font-size:clamp(14px,3.2vw,24px);letter-spacing:.16em;font-weight:80
 .sub{font-size:10px;letter-spacing:.3em;color:var(--ink2);margin-top:4px}
 .plaque{padding:6px 16px;border-radius:5px;font-weight:800;letter-spacing:.35em;font-size:13px;color:#3a2a10;
   background:linear-gradient(180deg,#f3d27a,#c99a33 55%,#a87c22);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 4px rgba(0,0,0,.35)}
-.flag{flex:1;min-width:80px;height:14px;border-radius:3px;background:linear-gradient(180deg,var(--green) 0 33%,var(--gold) 33% 66%,#222 66%);opacity:.85}
+.flag{display:none}
+/* faixa de console anos 70 (terracota do MRBM-69) */
+header{margin:-12px -12px 18px;padding:16px 16px 18px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px),#9a5a32;
+  border-bottom:3px solid #4f2c18;box-shadow:0 1px 0 rgba(255,255,255,.25),0 4px 6px -2px rgba(0,0,0,.25)}
+header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}
 .grid-mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
 .mod{position:relative;border:1.2px solid rgba(43,36,29,.55);border-radius:6px;padding:20px 12px 12px;box-shadow:1px 1px 0 rgba(255,255,255,.45)}
 .mod.wide{grid-column:1/-1}
@@ -43,9 +47,11 @@ h1{margin:0;font-size:clamp(14px,3.2vw,24px);letter-spacing:.16em;font-weight:80
 .keys12 .b.sharp{background:linear-gradient(180deg,#151210,#050403);color:#a89c84}
 /* riddims clássicos */
 .riddim{margin-bottom:14px}
-.rdisp{background:#17110a;border-radius:5px;padding:8px 12px;color:var(--amber,#ffa928);border:1px solid rgba(255,169,40,.25);min-height:52px}
-.rdisp b{display:block;font-size:16px;letter-spacing:.04em}
-.rdisp small{display:block;font-size:11px;opacity:.75;margin-top:2px}
+.rdisp{font-family:"Courier New",Courier,monospace;color:#e6efff;border-radius:2px;padding:8px 12px;min-height:60px;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.07) 0 1px,transparent 1px 2px),linear-gradient(180deg,#4a70c2,#2c4f9e);
+  border:2px solid #15204a;box-shadow:0 0 0 6px #55585c,0 0 0 7px #2e3033,0 3px 0 7px rgba(0,0,0,.25);margin:7px 7px 14px}
+.rdisp .l{display:flex;justify-content:space-between;gap:8px;font-size:11px;opacity:.88}
+.rdisp b{display:block;font-size:19px;letter-spacing:.06em;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rrow{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
 .rrow select{flex:1;min-width:140px;padding:9px 8px;border-radius:5px;background:#1a1714;color:#f3e6c0;border:1px solid #3a332b;font-weight:700;font-size:13px}
 .rrow .b{flex:0 0 auto;padding:9px 12px}
@@ -110,12 +116,12 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.8</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
-  <div class="plaque">DUB STATION</div><div class="flag"></div>
+  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.9</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
+  <div class="plaque">MRBM-69</div><div class="flag"></div>
 </header>
 
 <section class="mod riddim"><div class="tag">RIDDIM CLÁSSICO · 160 PRESETS</div>
-  <div class="rdisp" id="rdisp"><b>ESCOLHA UM DOS 160 RIDDIMS</b><small>por estilo de reggae, baixista ou década</small></div>
+  <div class="rdisp" id="rdisp"></div>
   <div class="rrow"><div class="btns c3" id="rmode" style="flex:1;min-width:240px"></div></div>
   <div class="rrow"><select id="rgroup" aria-label="grupo"></select><select id="rpick" aria-label="riddim"></select>
     <button class="b nolamp" id="rprev">◀</button><button class="b nolamp" id="rnext">▶</button></div>
@@ -340,8 +346,11 @@ function fillRiddimSelects(keepGroup) {
 }
 function showRiddim() {
   const r = RD.riddims[st.riddim];
-  $('rdisp').innerHTML = r ? `<b>${r.n.toUpperCase()} · ${r.y}</b><small>${r.o} · ${r.p}</small><small>BAIXO: ${r.b}${r.a ? ' · tom aproximado' : ' · harmonia conferida'}</small>`
-    : '<b>ESCOLHA UM DOS 160 RIDDIMS</b><small>por estilo de reggae, baixista ou década</small>';
+  const pad = n => String(n).padStart(3, '0');
+  $('rdisp').innerHTML = r
+    ? `<div class="l"><span>=RIDDIM= ${pad(st.riddim + 1)}/160</span><span>[${RD.short[r.f]}]</span></div><b>${r.n.toUpperCase()} ${r.y}</b>`
+      + `<div class="l"><span>BASS:${r.b.toUpperCase()}</span><span>TEMPO:${pad(r.bpm)}${r.a ? '~' : ''}</span></div><div class="l"><span>${r.o} · ${r.p}</span></div>`
+    : '<div class="l"><span>=RIDDIM= ---/160</span><span>[ESTILO·BAIXISTA·DÉCADA]</span></div><b>SELECT RIDDIM</b><div class="l"><span>escolha embaixo</span></div>';
 }
 function loadRiddim(i) {
   const r = RD.riddims[i]; if (!r) return;

@@ -1,3 +1,9 @@
+## Mastor Reggae Drum Machine MRDM-12 2.4 🟢🟡⚫
+
+- **Visual de console anos 70**: faixa verde-oliva no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)
+- **Placa de latão com a sigla MRDM-12** no lugar de "DUB STATION"
+- Mesmo visual na versão para navegador
+
 ## Mastor Reggae Drum Machine MRDM-12 2.3 🟢🟡⚫
 
 - **Instaladores**: `.pkg` para Mac (VST3 + AU em /Library/Audio/Plug-Ins, app em /Applications) e `.exe` para Windows (VST3 na pasta comum de todas as DAWs)

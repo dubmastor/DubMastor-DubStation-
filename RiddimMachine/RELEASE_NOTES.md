@@ -1,3 +1,9 @@
+## Mastor Riddim Machine MRM-0420 1.9 — DubStation
+
+- **Visual de console anos 70**: faixa verde-petróleo atrás do nome; dentro das abas, cada máquina mostra a sua cor e a placa de latão com a própria sigla (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota)
+- Aba BAIXO com o visor de riddims em LCD azul estilo MPC do MRBM-69 2.9
+- Mesma faixa na versão para navegador
+
 ## Mastor Riddim Machine MRM-0420 1.8 — DubStation
 
 - **PRESETS no visor azul de MPC** (aba RIDDIM): **ESTILO ◀ ▶** e **MÚSICA ◀ ▶** carregam o riddim na hora, como os presets do Dub Battery Reggae; o visor mostra o estilo, a posição (ex.: 05/21), a música, os acordes, o BPM, o kit e os músicos; clique no visor ou em **LISTA** para escolher por estilo

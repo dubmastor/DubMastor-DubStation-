@@ -1,3 +1,9 @@
+## Mastor Reggae Chord Machine MRCM-1240 2.3 🟢🟡⚫
+
+- **Visual de console anos 70**: faixa mostarda no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)
+- **Placa de latão com a sigla MRCM-1240** no lugar de "DUB STATION"
+- Mesmo visual na versão para navegador
+
 ## Mastor Reggae Chord Machine MRCM-1240 2.2 🟢🟡⚫
 
 - **PRESETS separados só por estilo de reggae:** EARLY REGGAE, ROOTS, ROCKERS, LOVERS ROCK, RUB A DUB, DIGITAL, DANCEHALL e NEW ROOTS (sem a década no nome; o Gregory Isaacs entra no estilo de cada fase), músicas em ordem alfabética

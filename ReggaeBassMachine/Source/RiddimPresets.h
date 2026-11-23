@@ -16,6 +16,7 @@ struct Riddim
 
 inline constexpr int numFolders = 8;
 inline const char* const folders[numFolders] = { "ROCKSTEADY - STUDIO ONE E TREASURE ISLE 1966 A 69", "EARLY REGGAE E ROOTS - 1969 A 75", "ROOTS E ROCKERS - CHANNEL ONE, JOE GIBBS E BLACK ARK 1975 A 79", "RUB A DUB - ROOTS RADICS E TAXI 1979 A 84", "DIGITAL - KING JAMMYS 1985 A 89", "RAGGA - STEELY & CLEVIE, BOBBY DIGITAL E SLY & ROBBIE 1990 A 95", "DANCEHALL - 1995 A 2001", "DANCEHALL - 2002 A 2007" };
+inline const char* const folderShort[numFolders] = { "ROCKSTEADY 66-69", "EARLY ROOTS 69-75", "ROOTS ROCKERS 75-79", "RUB A DUB 79-84", "DIGITAL 85-89", "RAGGA 90-95", "DANCEHALL 95-01", "DANCEHALL 02-07" };
 
 inline constexpr int numRiddims = 160;
 inline const Riddim riddims[numRiddims] = {

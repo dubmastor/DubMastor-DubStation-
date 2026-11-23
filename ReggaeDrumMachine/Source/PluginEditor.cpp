@@ -394,8 +394,28 @@ void DubDrumsPanel::renderBackground()
     screw ((float) plate.getX() + m, (float) plate.getBottom() - m);
     screw ((float) plate.getRight() - m, (float) plate.getBottom() - m);
 
+    // --- faixa de console anos 70 (oliva do MRDM-12) no alto da placa creme; letras do cabeçalho em creme
+    {
+        const auto band = plate.withHeight (80).toFloat();
+        const juce::Colour bc (0xff6f7a4a);
+        g.setColour (bc);
+        g.fillRect (band);
+        for (int i = 0; i < 900; ++i)   // tinta velha: pontinhos e riscos
+        {
+            const float x = band.getX() + rng.nextFloat() * band.getWidth(), y = band.getY() + rng.nextFloat() * band.getHeight();
+            g.setColour ((rng.nextBool() ? juce::Colours::white : juce::Colours::black).withAlpha (0.03f + rng.nextFloat() * 0.05f));
+            g.fillRect (x, y, 1.0f + rng.nextFloat() * 2.0f, 1.0f);
+        }
+        g.setColour (bc.darker (0.6f));
+        g.fillRect (band.getX(), band.getBottom() - 3.0f, band.getWidth(), 3.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.18f));
+        g.fillRect (band.getX(), band.getBottom(), band.getWidth(), 1.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.10f));
+        g.fillRect (band.getX(), band.getBottom() + 1.0f, band.getWidth(), 3.0f);
+    }
+
     // --- cabeçalho
-    g.setColour (colours::ink);
+    g.setColour (juce::Colour (0xfff3e6c8));
     const juce::String title ("MASTOR REGGAE DRUM MACHINE MRDM-12 " DD_VERSION_SHORT);   // padrão: versão logo depois do nome
     {   // nome comprido: diminui a fonte até o título + a placa DUB STATION caberem antes das faixas da bandeira
         float fs = 30.0f;
@@ -407,9 +427,9 @@ void DubDrumsPanel::renderBackground()
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 
-    {   // placa de latão "DUB STATION"
+    {   // placa de latão com a sigla da máquina
         g.setFont (stencil (15.0f, 0.34f));
-        const juce::String t ("DUB STATION");
+        const juce::String t ("MRDM-12");
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -447,53 +467,10 @@ void DubDrumsPanel::renderBackground()
         g.setColour (juce::Colour (0xff2e2108));
         g.drawText (t, pl, juce::Justification::centred);
     }
-    g.setColour (colours::inkSoft);
+    g.setColour (juce::Colour (0xfff3e6c8).withAlpha (0.75f));
     g.setFont (stencil (10.5f, 0.25f));
     g.drawText ("RIDDIM DRUM GENERATOR", plate.getX() + 34, 52, 500, 14, juce::Justification::left);
 
-    {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
-        const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
-        const juce::Colour faded[] = {
-            colours::jamGreen.interpolatedWith (juce::Colour (0xff6f7a4a), 0.35f),
-            colours::jamGold.interpolatedWith (juce::Colour (0xffb08a3a), 0.40f),
-            juce::Colour (0xff2b2621) };
-        juce::Path all;
-        for (int k = 0; k < 3; ++k)
-        {
-            const float y = 30.0f + 9.0f * (float) k;
-            juce::Path band;
-            band.startNewSubPath (sx, y + rng.nextFloat() * 0.8f);
-            for (float x = sx; x <= sx + sw; x += 6.0f) band.lineTo (x, y + (rng.nextFloat() - 0.3f) * 0.9f);
-            for (float x = sx + sw; x >= sx; x -= 6.0f) band.lineTo (x, y + sh + (rng.nextFloat() - 0.7f) * 0.9f);
-            band.closeSubPath();
-            all.addPath (band);
-            juce::ColourGradient fade (faded[k].withAlpha (0.92f), sx, y, faded[k].withAlpha (0.70f), sx + sw, y, false);
-            fade.addColour (0.3, faded[k].brighter (0.12f).withAlpha (0.85f));
-            g.setGradientFill (fade);
-            g.fillPath (band);
-        }
-        g.saveState();
-        g.reduceClipRegion (all);
-        const auto area = all.getBounds();
-        for (int i = 0; i < 12; ++i)
-        {
-            const float rr = 6.0f + rng.nextFloat() * 26.0f;
-            const juce::Point<float> pc (area.getX() + rng.nextFloat() * area.getWidth(), area.getY() + rng.nextFloat() * area.getHeight());
-            const bool light = rng.nextBool();
-            juce::ColourGradient st ((light ? colours::plate : juce::Colour (0xff4a3518)).withAlpha (light ? 0.30f : 0.25f), pc.x, pc.y,
-                                     juce::Colours::transparentBlack, pc.x + rr, pc.y, true);
-            g.setGradientFill (st);
-            g.fillEllipse (juce::Rectangle<float> (rr * 2, rr).withCentre (pc));
-        }
-        g.setColour (colours::plate.withAlpha (0.14f));
-        g.fillRect (area);
-        for (int i = 0; i < 900; ++i)
-        {
-            g.setColour ((rng.nextBool() ? juce::Colours::white : juce::Colour (0xff3d2b14)).withAlpha (0.08f + rng.nextFloat() * 0.10f));
-            g.fillRect (area.getX() + rng.nextFloat() * area.getWidth(), area.getY() + rng.nextFloat() * area.getHeight(), 1.0f, 1.0f);
-        }
-        g.restoreState();
-    }
 
     // --- seções: moldura gravada + plaqueta preta com o nome
     auto section = [&] (juce::Rectangle<int> r, const juce::String& t)
