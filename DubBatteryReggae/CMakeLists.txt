@@ -3,8 +3,18 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-# DUB BATTERY REGGAE: sampler de bateria com 16 pads + aba Dub Drums (MRDM-12)
-project(DubBatteryReggae VERSION 1.1.0)
+# Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
+
+# Mastor Dub Battery Reggae DBR: sampler de bateria com 16 pads + aba Dub Drums (MRDM-12)
+project(DubBatteryReggae VERSION 1.2.0)
+
+# versão curta para a plaqueta (ex.: "1.2") e a do MRDM-12 embutido (lida da pasta dele)
+set(DBR_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeDrumMachine/CMakeLists.txt" _dd_line REGEX "^project\\(")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeDrumMachine/CMakeLists.txt")
+string(REGEX MATCH "VERSION ([0-9]+)\\.([0-9]+)" _ "${_dd_line}")
+set(DBR_DRUMS_VER "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,13 +34,16 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX) no Windows e no Mac (veja .github/cmake/aax.cmake)
+include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
+
 juce_add_plugin(DubBatteryReggae
     COMPANY_NAME                "DubMastor"
     BUNDLE_ID                   com.dubmastor.dubbatteryreggae
-    PRODUCT_NAME                "Dub Battery Reggae"
+    PRODUCT_NAME                "Mastor Dub Battery Reggae DBR"
     PLUGIN_MANUFACTURER_CODE    Dblb
     PLUGIN_CODE                 Dbr1
-    FORMATS                     ${DBR_FORMATS}
+    FORMATS                     ${DBR_FORMATS} ${DM_AAX}
     IS_SYNTH                    TRUE
     NEEDS_MIDI_INPUT            TRUE
     NEEDS_MIDI_OUTPUT           TRUE
@@ -38,7 +51,9 @@ juce_add_plugin(DubBatteryReggae
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD     FALSE
     VST3_CATEGORIES             Instrument Drum Sampler
-    AU_MAIN_TYPE                kAudioUnitType_MusicDevice)
+    AU_MAIN_TYPE                kAudioUnitType_MusicDevice
+    AAX_CATEGORY                AAX_ePlugInCategory_SWGenerators
+    PLUGIN_AAX_IDENTIFIER       com.dubmastor.dbr.aax)
 
 # O código do Dub Drums (MRDM-12) é usado direto da pasta dele (nada copiado)
 set(DBR_SOURCES
@@ -48,8 +63,8 @@ set(DBR_SOURCES
     Source/DrumsEditorUnit.cpp
     ../ReggaeDrumMachine/Source/PatternGenerator.cpp)
 set(DBR_DEFINES
-    DBR_VERSION_SHORT="1.1"
-    DD_VERSION_SHORT="2.1"
+    DBR_VERSION_SHORT="${DBR_VERSION_SHORT}"
+    DD_VERSION_SHORT="${DBR_DRUMS_VER}"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -82,7 +97,7 @@ if(DBR_RENDER_TEST)
     target_compile_definitions(dbr_render PRIVATE ${DBR_DEFINES}
         JUCE_MODAL_LOOPS_PERMITTED=1 JUCE_ALSA=0 JUCE_JACK=0
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="Dub Battery Reggae" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1
+        JucePlugin_Name="Mastor Dub Battery Reggae DBR" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1
         JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
     target_link_libraries(dbr_render PRIVATE juce::juce_audio_utils juce::juce_recommended_config_flags)
 endif()

@@ -1,3 +1,14 @@
+## Mastor Riddim Machine MRM-0420 2.1 — DubStation
+
+- **GROOVES do MRDM-12 2.6 na aba BATERIA**: visor azul de MPC no módulo BATERISTA com 21 presets de músicas de cada baterista
+  (Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL). ◀ ▶ passa pelas músicas do baterista; clique no visor para a lista.
+  O groove ajusta a bateria e o BPM do riddim todo; a harmonia e o baixo continuam como estão
+- **Sem flam** na bateria: duas notas coladas da mesma peça viram uma só, no tempo certo
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Riddim Machine MRM-0420 2.0 — DubStation
 
 - **BPM corrigido em todos os presets:** nada passa de 100 BPM. Os riddims que estavam acima estavam dobrados e agora ficam na metade (ex.: Could You Be Loved 52, Temperature 63); os presets de BPM DANCEHALL 2000 (52) e STEPPERS UK (65 e 70) também

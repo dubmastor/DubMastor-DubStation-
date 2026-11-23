@@ -1,6 +1,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "DMSamples.h"
+#include "GroovePresets.h"
 
 namespace
 {
@@ -314,6 +315,53 @@ void DubDrumsProcessor::clearEdits()
     if (! old.isValid()) return;
     apvts.state.removeChild (old, nullptr);
     publish (generated);
+}
+
+//==============================================================================
+// GROOVES: presets de músicas de cada baterista
+namespace
+{
+    // valores "de verdade" de cada controle no groove (escolhas pelo índice; bars é o número de compassos)
+    std::vector<std::pair<const char*, float>> grooveValues (const dubdrums::GroovePreset& g)
+    {
+        return { { "drummer", (float) g.drummer }, { "style", (float) g.style }, { "kickBeats", (float) g.kick },
+                 { "snareBeats", (float) g.snare }, { "backbeat", (float) g.backbeat }, { "hatPattern", (float) g.hat },
+                 { "swing", (float) g.swing }, { "swingAll", g.swingAll ? 1.0f : 0.0f }, { "dynamics", (float) g.dyn },
+                 { "rndKick", (float) g.rndKick }, { "rndSnare", (float) g.rndSnare }, { "rndHat", (float) g.rndHat },
+                 { "rndPerc", (float) g.rndPerc }, { "fill", g.fill ? 1.0f : 0.0f }, { "intro", g.intro ? 1.0f : 0.0f },
+                 { "kit", (float) g.kit }, { "bars", (float) (g.bars - 1) }, { "seed", (float) g.seed }, { "bpm", (float) g.bpm } };
+    }
+}
+
+void DubDrumsProcessor::loadGroove (int index)
+{
+    if (! juce::isPositiveAndBelow (index, dubdrums::numGroovePresets)) return;
+    for (auto [id, value] : grooveValues (dubdrums::groovePresets[index]))
+        if (auto* p = apvts.getParameter (id))
+        {
+            p->beginChangeGesture();
+            p->setValueNotifyingHost (p->convertTo0to1 (value));
+            p->endChangeGesture();
+        }
+    apvts.state.setProperty ("groove", index, nullptr);
+    clearEdits();
+    dirty = true;
+}
+
+int DubDrumsProcessor::getGroove() const
+{
+    const int g = apvts.state.getProperty ("groove", -1);
+    return juce::isPositiveAndBelow (g, dubdrums::numGroovePresets) ? g : -1;
+}
+
+bool DubDrumsProcessor::grooveIntact() const
+{
+    const int g = getGroove();
+    if (g < 0) return false;
+    for (auto [id, value] : grooveValues (dubdrums::groovePresets[g]))
+        if (auto* p = apvts.getRawParameterValue (id))
+            if (std::abs (p->load() - value) > 0.5f) return false;
+    return true;
 }
 
 namespace

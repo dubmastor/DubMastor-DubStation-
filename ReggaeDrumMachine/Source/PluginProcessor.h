@@ -59,6 +59,12 @@ public:
     bool hasEdits() const;
     void clearEdits();
 
+    // GROOVES (visor azul do módulo BATERISTA): músicas de cada baterista em GroovePresets.h.
+    // loadGroove põe todos os controles do groove de uma vez (e desfaz as edições da grade).
+    void loadGroove (int index);
+    int  getGroove() const;              // último groove carregado; -1 = nenhum
+    bool grooveIntact() const;           // os controles ainda estão como o groove deixou
+
     // posição tocando agora, na linha do tempo "intro + loop" (em semínimas); -1 = parado
     double getPlayheadBeat() const noexcept       { return playheadBeat.load(); }
     bool isHostPlaying() const noexcept           { return hostPlaying.load(); }

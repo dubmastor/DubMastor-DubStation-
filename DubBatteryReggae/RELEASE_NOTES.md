@@ -1,4 +1,17 @@
-## DUB BATTERY REGGAE 1.1 — Dub Station
+## Mastor Dub Battery Reggae DBR 1.2 — Dub Station
+
+O **Dub Battery Reggae** agora se chama **Mastor Dub Battery Reggae DBR**, no padrão dos outros plugins da Dub Station.
+
+- **GROOVES no visor azul de MPC** na aba DUB DRUMS (os do MRDM-12 2.6): 21 presets de músicas de Style Scott, Santa Davis,
+  Carlton Barrett, Sly Dunbar e DIGIKAL (Night Nurse, Exodus, Stalag 17, Shine Eye Gal, Under Mi Sleng Teng…), com o BPM da gravação.
+  ◀ ▶ passa pelas músicas do baterista; clique no visor para a lista completa
+- **Sem flam**: duas notas coladas da mesma peça viram uma só, no tempo certo
+- **Pro Tools (AAX)** compilado junto (entra no instalador depois da assinatura PACE) e runtime do C++ embutido no Windows
+- Instaladores novos `DBR-Windows-Instalador.exe` e `DBR-macOS-Instalador.pkg`; eles apagam o antigo `Dub Battery Reggae`
+  para não aparecer duplicado na DAW. Os projetos antigos abrem normalmente (mesmo código de plugin), e os presets gravados
+  continuam em Documentos / Dub Battery Reggae / Presets
+
+### Da 1.1
 
 - **LAYER**: TIMBRE 2 (um segundo timbre tocando junto no mesmo pad, com volume e afinação próprios) e JUNTAR COM
   (um pad dispara outro pad junto). Os pads mostram +T2 / +nn

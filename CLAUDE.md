@@ -32,8 +32,6 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
 
 ## Padrão de nomes
 
-- O Dub Battery Reggae (`DubBattery/`) ainda está fora do padrão (`"padrao": false` no `plugins.json`); quando for atualizado, ganha nome `Mastor <Nome> <SIGLA>`, pasta e workflow no padrão.
-
 - Nome no Cubase (`PRODUCT_NAME`): `Mastor <Nome> <SIGLA>`. Pasta: o nome em CamelCase, sem "Mastor" e sem sigla.
 - Release `SIGLA-x.y`; arquivos `SIGLA-Windows-Instalador.exe`, `SIGLA-macOS-Instalador.pkg`, `SIGLA-Windows.zip`, `SIGLA-macOS.zip`.
 - Imagem do card: `site/img/<pasta em minúsculas>.jpg`.

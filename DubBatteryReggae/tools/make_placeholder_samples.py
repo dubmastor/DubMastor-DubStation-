@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gera os timbres provisórios (SYN-*.wav) dos pads que ainda não têm sample DM.
 Quando os samples de verdade chegarem, troque os WAVs em Samples/ e rode tools/make_samples_header.py.
-Uso: python3 tools/make_placeholder_samples.py  (rodar na pasta DubBattery)"""
+Uso: python3 tools/make_placeholder_samples.py  (rodar na pasta DubBatteryReggae)"""
 import os
 import numpy as np
 from scipy.io import wavfile

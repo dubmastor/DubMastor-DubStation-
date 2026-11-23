@@ -6,5 +6,5 @@ JUCE/
 # samples do kit ANOS 70 do MRDM-12 (plugin e versão do navegador)
 !ReggaeDrumMachine/Samples/*.wav
 !site/drums/samples/*.wav
-!DubBattery/Samples/*.wav
+!DubBatteryReggae/Samples/*.wav
 !site/battery/samples/*.wav

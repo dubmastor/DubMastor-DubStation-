@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gera Source/BatterySamples.h com os WAVs de Samples/ embutidos (um por pad, na ordem das notas 36..51).
 Para trocar um timbre: substitua o WAV em Samples/ (ou mude o nome aqui) e rode de novo.
-Uso: python3 tools/make_samples_header.py  (rodar na pasta DubBattery)"""
+Uso: python3 tools/make_samples_header.py  (rodar na pasta DubBatteryReggae)"""
 import os
 
 # (arquivo, nome curto no visor) — os 16 primeiros são os timbres de fábrica dos pads, na ordem das notas

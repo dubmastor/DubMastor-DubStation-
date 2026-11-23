@@ -70,6 +70,8 @@ jobs:
           R=./build-test/render_preview_artefacts/Release/render_preview
           $R test-out/interface.png 0 4 42 intro 2
           $R test-out/notas.png 0 4 42 notas 0
+          # os 21 grooves (músicas de cada baterista): carregam, geram o padrão, salvam/voltam no estado e marcam edição
+          $R test-out/grooves.png 0 4 42 groove 0
           $R test-out/preview-carlton.wav 0 2 42 intro 2
           $R test-out/preview-scott.wav 2 2 42 intro 0
           $R test-out/preview-santa.wav 0 2 42 intro 1
