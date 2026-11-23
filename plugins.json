@@ -8,7 +8,7 @@
     {"sigla": "MHD-050", "pasta": "HalfDub", "nome": "Mastor Half Dub MHD-050", "tipo": "efeito", "web": "web/halfdub", "categoria": "efeitos"},
     {"sigla": "MRK-80", "pasta": "ReggaeKeys", "nome": "Mastor Reggae Keys MRK-80", "tipo": "instrumento", "web": "keys", "categoria": "instrumentos"},
     {"sigla": "MRB-69", "pasta": "ReggaeBass", "nome": "Mastor Reggae Bass MRB-69", "tipo": "instrumento", "web": "bass", "categoria": "instrumentos"},
-    {"sigla": "MDH-70", "pasta": "DubHorns", "nome": "Mastor Dub Horns MDH-70", "tipo": "instrumento", "web": "web/dubhorns", "categoria": "instrumentos"},
+    {"sigla": "MDH-70", "pasta": "DubHorns", "nome": "Mastor Dub Horns MDH-70", "tipo": "instrumento", "web": "web/dubhorns", "categoria": "instrumentos", "oculto": true},
     {"sigla": "MRD-12", "pasta": "ReggaeDrums", "nome": "Mastor Reggae Drums MRD-12", "tipo": "instrumento", "web": "battery", "categoria": "instrumentos"},
     {"sigla": "MRCM-1240", "pasta": "ReggaeChordMachine", "nome": "Mastor Reggae Chord Machine MRCM-1240", "tipo": "instrumento", "web": "chords", "categoria": "machines", "legado": "Mastor Reggae Keys MRK-80"},
     {"sigla": "MRDM-12", "pasta": "ReggaeDrumMachine", "nome": "Mastor Reggae Drum Machine MRDM-12", "tipo": "instrumento", "web": "drums", "categoria": "machines", "legado": "Mastor Reggae Drums MRD-12"},
