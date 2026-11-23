@@ -1,4 +1,16 @@
-## Mastor Reggae Drum Machine MRDM-12 2.3 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.4 🟢🟡⚫
+
+- **GROOVES no visor azul de MPC** (no módulo BATERISTA, igual ao do Mastor Riddim Machine): 21 presets tirados de músicas de cada baterista. **◀ ▶** passa pelas músicas do baterista escolhido; clique no visor para a lista completa, separada por baterista
+  - **Style Scott:** Night Nurse, Rock 'n' Groove, Looking My Love, Big Ship, Man of Mystery
+  - **Santa Davis:** None Shall Escape the Judgement, Every Knee Shall Bow, Stalag 17, Money in My Pocket
+  - **Carlton Barrett:** One Drop, Exodus, Stir It Up, Three Little Birds, Is This Love
+  - **Sly Dunbar:** Right Time, I Need a Roof, Shine Eye Gal, Sinsemilla, Sponji Reggae
+  - **DIGIKAL:** Under Mi Sleng Teng (Casio MT-40) e Tempo (DX/DMX)
+- Cada groove ajusta estilo, bumbo, caixa/aro, hi-hat, swing, dinâmica, aleatoriedade, viradas, kit e BPM da gravação ("~" quando o BPM é aproximado). O visor mostra a música, o artista, o ano e o BPM; um "*" aparece quando você mexe em algo depois de carregar
+- **Sem flam:** quando duas notas da mesma peça caem coladas, fica só a nota no tempo certo (o flam parecia defeito)
+- Versão para celular igual, com o mesmo visor de grooves
+
+### Da 2.3
 
 - **Instaladores**: `.pkg` para Mac (VST3 + AU em /Library/Audio/Plug-Ins, app em /Applications) e `.exe` para Windows (VST3 na pasta comum de todas as DAWs)
 - O instalador do Mac **tira a quarentena** (o aviso de "danificado") e relê os Audio Units para o Logic/GarageBand

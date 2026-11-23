@@ -1,5 +1,6 @@
 // Interface do Mastor Reggae Drum Machine MRDM-12 (antigo Dub Drums) — visual copiado do DubMastor Dub Chords
 #include "PluginEditor.h"
+#include "GroovePresets.h"
 
 #ifndef DD_VERSION_SHORT
  #define DD_VERSION_SHORT "1.0"
@@ -924,6 +925,7 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
       backbeatButtons (*p.apvts.getParameter ("backbeat"), { "CAIXA", "ARO", "AMBOS" }, 3, true),
       kitButtons (*p.apvts.getParameter ("kit"), { "ANOS 70", "DIGITAL" }, 2, true),
       drummerSwitch (*p.apvts.getParameter ("drummer")),
+      grooveSelector (p),
       bars (*p.apvts.getParameter ("bars")),
       seed (*p.apvts.getParameter ("seed")),
       beatGrid (*p.apvts.getParameter ("kickBeats"), *p.apvts.getParameter ("snareBeats")),
@@ -933,7 +935,7 @@ DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     setLookAndFeel (&lnf);
 
     for (juce::Component* c : { (juce::Component*) &styleButtons, (juce::Component*) &hatButtons,
-                                (juce::Component*) &backbeatButtons, (juce::Component*) &drummerSwitch,
+                                (juce::Component*) &backbeatButtons, (juce::Component*) &drummerSwitch, (juce::Component*) &grooveSelector,
                                 (juce::Component*) &kitButtons, (juce::Component*) &beatGrid,
                                 (juce::Component*) &bars, (juce::Component*) &seed, (juce::Component*) &variation })
         addAndMakeVisible (c);
@@ -1159,14 +1161,15 @@ void DubDrumsPanel::paint (juce::Graphics& g)
         sigs[4]  = mt40 ? "PRESET ROCK DO SLENG TENG 1985" : "DANCEHALL DIGITAL ANOS 80";
         const int d = juce::jlimit (0, dubdrums::numDrummers - 1, choice ("drummer"));
         glowText (g, drummerDisplay.toFloat(), kDrummerNames[d], 17.0f);
-        auto info = drumMod.reduced (16, 0).withTop (drummerSwitch.getBottom() + 2).withBottom (drumMod.getBottom() - 6).toFloat();
-        g.setColour (colours::ink);
-        g.setFont (stencil (9.5f, 0.16f));
-        g.drawText (bands[d], info.removeFromTop (16.0f), juce::Justification::centred);
-        g.setColour (colours::inkSoft);
-        g.setFont (stencil (9.0f, 0.12f));
-        g.drawText (choice ("kit") == 1 && d != 4 ? "KIT DIGITAL: TEMPO DE MAQUINA" : sigs[d],
-                    info.removeFromTop (16.0f), juce::Justification::centred);
+        // embaixo do visor GROOVES: como é o groove carregado, ou a banda / assinatura do baterista
+        auto info = drumMod.reduced (12, 0).withTop (grooveSelector.getBottom() + 1).withBottom (drumMod.getBottom() - 4).toFloat();
+        const int gr = proc.getGroove();
+        const bool showGroove = gr >= 0 && dubdrums::groovePresets[gr].drummer == d && proc.grooveIntact();
+        g.setColour (showGroove ? colours::ink : colours::inkSoft);
+        g.setFont (stencil (9.0f, 0.1f));
+        g.drawFittedText (showGroove ? juce::String (dubdrums::groovePresets[gr].note)
+                                     : juce::String (bands[d]) + "  -  " + (choice ("kit") == 1 && d != 4 ? "KIT DIGITAL" : sigs[d]),
+                          info.toNearestInt(), juce::Justification::centred, 1, 0.8f);
     }
     glowText (g, dynDisplay.toFloat(), kDynNames[juce::jlimit (0, 5, choice ("dynamics"))], 17.0f);
 
@@ -1455,7 +1458,9 @@ void DubDrumsPanel::resized()
         a.removeFromTop (22);
         drummerDisplay = a.removeFromTop (34).reduced (2, 0);
         a.removeFromTop (4);
-        drummerSwitch.setBounds (a.removeFromTop (220));
+        drummerSwitch.setBounds (a.removeFromTop (184));
+        a.removeFromTop (2);
+        grooveSelector.setBounds (a.removeFromTop (44));   // GROOVES: visor azul com as músicas do baterista
     }
     {   // HI-HAT: figura e swing
         auto a = hatMod.reduced (14, 0);
@@ -1963,4 +1968,185 @@ void VintageSpeaker::paint (juce::Graphics& g)
             screw (g, p, 2.2f, p.x * 0.1f);
         scratches (g, b, 63);
     }
+}
+
+//==============================================================================
+// GROOVES: visor azul de MPC (o mesmo visual dos presets do Riddim Machine)
+namespace
+{
+    void blueLcd (juce::Graphics& g, juce::Rectangle<float> r)
+    {
+        g.setColour (juce::Colour (0xff0a0c10));
+        g.fillRoundedRectangle (r.expanded (3.0f), 5.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.25f));
+        g.drawRoundedRectangle (r.expanded (3.0f).translated (0, 1.0f), 5.0f, 1.0f);
+        juce::ColourGradient gl (juce::Colour (0xff4a8cf0), r.getX(), r.getY(), juce::Colour (0xff1d4aa8), r.getX(), r.getBottom(), false);
+        gl.addColour (0.55, juce::Colour (0xff2e66cc));
+        g.setGradientFill (gl);
+        g.fillRoundedRectangle (r, 3.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.07f));               // grade de pixels do LCD
+        for (float y = r.getY() + 2.0f; y < r.getBottom() - 1.0f; y += 3.0f)
+            g.drawHorizontalLine ((int) y, r.getX() + 2.0f, r.getRight() - 2.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.35f));
+        g.drawRoundedRectangle (r.reduced (0.5f), 3.0f, 1.0f);
+    }
+
+    void blueText (juce::Graphics& g, const juce::String& t, juce::Rectangle<float> r, juce::Justification j, float size, float alpha = 1.0f)
+    {
+        g.setFont (stencil (size, 0.06f));
+        g.setColour (juce::Colours::white.withAlpha (0.22f * alpha));
+        for (auto o : { juce::Point<float> (-0.8f, 0), { 0.8f, 0 }, { 0, -0.8f }, { 0, 0.8f } })
+            g.drawFittedText (t, r.translated (o.x, o.y).toNearestInt(), j, 1, 0.75f);
+        g.setColour (juce::Colour (0xffe8f3ff).withAlpha (alpha));
+        g.drawFittedText (t, r.toNearestInt(), j, 1, 0.75f);
+    }
+
+    juce::Array<int> groovesOf (int drummer)
+    {
+        juce::Array<int> list;
+        for (int i = 0; i < dubdrums::numGroovePresets; ++i)
+            if (dubdrums::groovePresets[i].drummer == drummer) list.add (i);
+        return list;
+    }
+
+    juce::String grooveLine2 (const dubdrums::GroovePreset& gp)
+    {
+        return juce::String (gp.artist).toUpperCase() + "  " + juce::String (gp.year) + "  -  "
+             + (gp.approx ? "~" : "") + juce::String (gp.bpm) + " BPM";
+    }
+}
+
+GrooveSelector::GrooveSelector (DubDrumsProcessor& p) : proc (p)
+{
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
+    setRepaintsOnMouseActivity (true);
+    startTimerHz (8);
+}
+
+GrooveSelector::~GrooveSelector() { stopTimer(); }
+
+int GrooveSelector::drummer() const
+{
+    return juce::jlimit (0, dubdrums::numDrummers - 1, (int) proc.apvts.getRawParameterValue ("drummer")->load());
+}
+
+juce::Rectangle<float> GrooveSelector::keyRect (int side) const
+{
+    auto r = getLocalBounds().toFloat().reduced (1.0f, 4.0f);
+    return side < 0 ? r.removeFromLeft (26.0f) : r.removeFromRight (26.0f);
+}
+
+juce::Rectangle<float> GrooveSelector::lcdRect() const
+{
+    return getLocalBounds().toFloat().reduced (31.0f, 4.0f);
+}
+
+void GrooveSelector::timerCallback()
+{
+    const juce::String key = juce::String (drummer()) + ":" + juce::String (proc.getGroove()) + ":" + (proc.grooveIntact() ? "1" : "0");
+    if (key != shownKey) { shownKey = key; repaint(); if (auto* parent = getParentComponent()) parent->repaint (getBounds().withHeight (getHeight() + 22)); }
+}
+
+void GrooveSelector::paint (juce::Graphics& g)
+{
+    // teclas pretas ◀ ▶ com a luz azul embaixo
+    for (int side : { -1, 1 })
+    {
+        const auto k = keyRect (side);
+        const bool down = pressed == side;
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.fillRoundedRectangle (k.translated (0, 2.0f), 3.0f);
+        auto cap = k.translated (0, down ? 1.5f : 0.0f);
+        juce::ColourGradient cg (juce::Colour (0xff2c2925), cap.getX(), cap.getY(), juce::Colour (0xff141210), cap.getX(), cap.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRoundedRectangle (cap, 3.0f);
+        g.setColour (juce::Colour (0xff4a8cf0).withAlpha (down ? 0.9f : 0.35f));
+        g.fillRoundedRectangle (cap.withTop (cap.getBottom() - 3.0f).reduced (4.0f, 0.0f).translated (0, -1.5f), 1.0f);
+        juce::Path tri;
+        const auto c = cap.withTrimmedBottom (3.0f).getCentre();
+        if (side < 0) tri.addTriangle (c.x - 5.0f, c.y, c.x + 4.0f, c.y - 5.5f, c.x + 4.0f, c.y + 5.5f);
+        else          tri.addTriangle (c.x + 5.0f, c.y, c.x - 4.0f, c.y - 5.5f, c.x - 4.0f, c.y + 5.5f);
+        g.setColour (colours::cream.withAlpha (isMouseOver() ? 0.95f : 0.75f));
+        g.fillPath (tri);
+    }
+
+    const auto r = lcdRect();
+    blueLcd (g, r);
+    auto t = r.reduced (7.0f, 2.0f);
+    const int d = drummer(), gr = proc.getGroove();
+    const auto list = groovesOf (d);
+    if (gr >= 0 && dubdrums::groovePresets[gr].drummer == d)
+    {
+        const auto& gp = dubdrums::groovePresets[gr];
+        const bool intact = proc.grooveIntact();
+        // título não invade o contador n/N do canto
+        blueText (g, juce::String (gp.song).toUpperCase() + (intact ? "" : " *"),
+                  t.removeFromTop (t.getHeight() * 0.55f).withTrimmedRight (30.0f),
+                  juce::Justification::centredLeft, 13.0f);
+        blueText (g, grooveLine2 (gp), t, juce::Justification::centredLeft, 9.0f, 0.8f);
+        blueText (g, juce::String (list.indexOf (gr) + 1) + "/" + juce::String (list.size()), r.reduced (7.0f, 3.0f).removeFromTop (14.0f),
+                  juce::Justification::topRight, 8.5f, 0.6f);
+    }
+    else
+    {
+        blueText (g, "GROOVES  -  " + juce::String (list.size()) + " MUSICAS", t.removeFromTop (t.getHeight() * 0.55f),
+                  juce::Justification::centredLeft, 12.0f);
+        blueText (g, "ESCOLHA COM  < >  OU CLIQUE AQUI", t, juce::Justification::centredLeft, 9.0f, 0.75f);
+    }
+    // brilho do vidro
+    juce::ColourGradient sh (juce::Colours::white.withAlpha (0.16f), r.getX(), r.getY(),
+                             juce::Colours::transparentWhite, r.getX(), r.getY() + r.getHeight() * 0.45f, false);
+    g.setGradientFill (sh);
+    g.fillRoundedRectangle (r, 3.0f);
+}
+
+void GrooveSelector::step (int delta)
+{
+    const auto list = groovesOf (drummer());
+    if (list.isEmpty()) return;
+    const int at = list.indexOf (proc.getGroove());
+    const int next = at < 0 ? (delta > 0 ? 0 : list.size() - 1) : (at + delta + list.size()) % list.size();
+    proc.loadGroove (list[next]);
+    repaint();
+}
+
+void GrooveSelector::showList()
+{
+    juce::PopupMenu menu;
+    static const char* names[] = { "STYLE SCOTT", "SANTA DAVIS", "CARLTON BARRETT", "SLY DUNBAR", "DIGIKAL (MAQUINAS)" };
+    const int current = proc.getGroove();
+    for (int d = 0; d < dubdrums::numDrummers; ++d)
+    {
+        juce::PopupMenu sub;
+        for (int i : groovesOf (d))
+        {
+            const auto& gp = dubdrums::groovePresets[i];
+            sub.addItem (i + 1, juce::String (gp.song) + "  -  " + gp.artist + " " + juce::String (gp.year)
+                                    + "  (" + (gp.approx ? "~" : "") + juce::String (gp.bpm) + " BPM)", true, i == current);
+        }
+        menu.addSubMenu (names[d], sub, true, nullptr, current >= 0 && dubdrums::groovePresets[current].drummer == d);
+    }
+    juce::Component::SafePointer<GrooveSelector> safe (this);
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int result)
+    {
+        if (safe != nullptr && result > 0)
+        {
+            safe->proc.loadGroove (result - 1);
+            safe->repaint();
+        }
+    });
+}
+
+void GrooveSelector::mouseDown (const juce::MouseEvent& e)
+{
+    if (keyRect (-1).contains (e.position))     { pressed = -1; step (-1); }
+    else if (keyRect (1).contains (e.position)) { pressed = 1;  step (1); }
+    else if (lcdRect().contains (e.position))   showList();
+    repaint();
+}
+
+void GrooveSelector::mouseUp (const juce::MouseEvent&)
+{
+    pressed = 0;
+    repaint();
 }

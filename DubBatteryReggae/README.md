@@ -1,4 +1,4 @@
-# DUB BATTERY REGGAE 1.1 — Dub Station
+# Mastor Dub Battery Reggae DBR 1.2 — Dub Station
 
 Sampler de bateria com **16 pads**, no espírito do Native Instruments Battery, com os pads de borracha de uma
 **MPC** que acendem por dentro como na **Roland SP-404** e o visor âmbar de uma **Oberheim DMX**, no visual
@@ -6,11 +6,11 @@ Dub Station (painel creme, laterais de madeira, plaquetas pretas). Já vem com o
 
 ![Aba BATTERY](docs/interface.png)
 
-**[⬇️ Windows (instalador .exe)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-Windows-Instalador.exe)** ·
-**[⬇️ macOS (instalador .pkg)](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-macOS-Instalador.pkg)** ·
+**[⬇️ Windows (instalador .exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.2/DBR-Windows-Instalador.exe)** ·
+**[⬇️ macOS (instalador .pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.2/DBR-macOS-Instalador.pkg)** ·
 **[▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/battery/)**
 
-Sem instalador: [zip Windows](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-Windows.zip) · [zip Mac](https://dubmastor.github.io/DubMastor-DubStation-/downloads/DubBatteryReggae-macOS.zip)
+Sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.2/DBR-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DBR-1.2/DBR-macOS.zip)
 
 ## Instalação
 - **Mac:** abra o `.pkg` (se o macOS avisar que é de desenvolvedor não identificado, clique com o botão direito → **Abrir**).
@@ -86,7 +86,7 @@ cmake -B build-test -DDBR_FORMATS=VST3 -DDBR_RENDER_TEST=ON && cmake --build bui
 
 ## Trocar os timbres
 Coloque os WAVs em `Samples/`, ajuste a lista em `tools/make_samples_header.py` e rode
-`python3 tools/make_samples_header.py` (na pasta DubBattery). Os timbres SINT são gerados por
+`python3 tools/make_samples_header.py` (na pasta DubBatteryReggae). Os timbres SINT são gerados por
 `tools/make_placeholder_samples.py`.
 
 ## Arquivos

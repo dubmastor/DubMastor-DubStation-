@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%274%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23ffa928%27/%3E%3Crect x=%2717%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%274%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%2717%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3C/svg%3E">
-<title>Dub Battery Reggae 1.1 — Dub Station (navegador)</title>
+<title>Mastor Dub Battery Reggae DBR 1.2 — Dub Station (navegador)</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -138,13 +138,28 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
   .b{font-size:10.5px;letter-spacing:.05em}
 }
 #midiState{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--ink2);text-align:center;margin-top:8px}
+/* GROOVES: visor azul de MPC com as músicas do baterista (igual aos presets do Riddim Machine) */
+.grooves{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:6px;align-items:stretch;margin-top:12px}
+.gkey{border:0;border-radius:4px;background:linear-gradient(180deg,#2c2925,#141210);color:var(--cream);font-size:15px;cursor:pointer;
+  box-shadow:0 2px 0 #000,inset 0 -3px 0 rgba(74,140,240,.35);min-height:46px}
+.gkey:active{transform:translateY(1px);box-shadow:0 1px 0 #000,inset 0 -3px 0 rgba(74,140,240,.9)}
+.blue{position:relative;border-radius:4px;padding:6px 10px;min-width:0;overflow:hidden;color:#e8f3ff;cursor:pointer;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.07) 0 1px,transparent 1px 3px),linear-gradient(180deg,#4a8cf0,#2e66cc 55%,#1d4aa8);
+  box-shadow:0 0 0 3px #0a0c10,inset 0 0 0 1px rgba(0,0,0,.35);text-shadow:0 0 4px rgba(255,255,255,.35)}
+.blue::after{content:"";position:absolute;inset:0 0 55% 0;background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);pointer-events:none}
+.blue b{display:block;font-size:14px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px}
+.blue span{display:block;font-size:9.5px;letter-spacing:.08em;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px;font-weight:700}
+.blue i{position:absolute;right:8px;top:6px;font-style:normal;font-size:9px;opacity:.65;font-weight:700}
+.blue select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.gnote{text-align:center;font-size:9.5px;letter-spacing:.12em;font-weight:800;margin-top:8px;color:var(--ink2);min-height:12px}
+.gnote.on{color:var(--ink)}
 </style>
 </head>
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <i class="screw tl"></i><i class="screw tr"></i><i class="screw bl"></i><i class="screw br"></i>
 <header>
-  <div><h1>DUB BATTERY REGGAE&nbsp;1.1</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
+  <div><h1>DUB BATTERY REGGAE DBR&nbsp;1.2</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -223,7 +238,13 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
   <section class="mod"><div class="tag">BATERISTA</div>
     <div class="display" style="justify-content:center" id="drumDisp">STYLE SCOTT</div>
     <div class="btns c3" id="drummer" style="margin-top:12px"></div>
-    <div class="info" id="drumInfo"></div>
+    <div class="grooves">
+      <button class="gkey" id="gPrev" aria-label="groove anterior">◀</button>
+      <div class="blue"><b id="gSong">GROOVES</b><span id="gSub"></span><i id="gNum"></i><select id="gList" aria-label="escolher groove"></select></div>
+      <button class="gkey" id="gNext" aria-label="próximo groove">▶</button>
+    </div>
+    <div class="gnote" id="gNote"></div>
+    <div class="info" id="drumInfo" hidden></div>
   </section>
   <section class="mod"><div class="tag">LOOP</div>
     <div class="stepper"><button id="barsDn">◀</button><div class="val" id="barsVal">4 COMPASSOS</div><button id="barsUp">▶</button></div>
@@ -266,6 +287,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 </div><div class="wood"></div></div>
 
 <script src="../drums/generator.js"></script>
+<script src="../drums/grooves.js"></script>
 <script>
 'use strict';
 const G = window.MDDM;
@@ -809,6 +831,68 @@ $('barsDn').onclick = () => { D.bars = Math.max(1, D.bars - 1); drumChanged(); }
 $('barsUp').onclick = () => { D.bars = Math.min(4, D.bars + 1); drumChanged(); };
 $('variation').onclick = () => { D.seed = 1 + Math.floor(Math.random() * 9999); try { localStorage.removeItem('dbr1-edits'); } catch (e) {} drumChanged(); groove.restart(); };
 $('export').onclick = () => download();
+// ---------------------------------------------------------------- GROOVES: músicas de cada baterista (os mesmos do plugin)
+const GROOVES = window.MDDM_GROOVES || [];
+const GROOVE_DRUMMERS = ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL (MÁQUINAS)'];
+const grooveValues = (g) => ({ drummer: g.drummer, style: g.style, kickMask: g.kick, snareMask: g.snare, backbeat: g.backbeat,
+  hatPattern: g.hat, swing: g.swing, swingAll: g.swingAll, dynamics: g.dyn, rndKick: g.rnd[0], rndSnare: g.rnd[1], rndHat: g.rnd[2],
+  rndPerc: g.rnd[3], fill: g.fill, intro: g.intro, kit: g.kit, bars: g.bars, seed: g.seed, bpm: g.bpm });
+function grooveIntact(S) {
+  const g = GROOVES[S.groove]; if (!g) return false;
+  const v = grooveValues(g);
+  return Object.keys(v).every((k) => {
+    if (k === 'kit' && S.kit === undefined) return !!S.machine === (g.kit === 1);
+    return S[k] === v[k] || (typeof v[k] === 'boolean' && !!S[k] === v[k]);
+  });
+}
+function applyGroove(S, i) {
+  const g = GROOVES[i]; if (!g) return;
+  const v = grooveValues(g);
+  for (const k of Object.keys(v)) {
+    if (k === 'kit' && S.kit === undefined) { S.machine = g.kit === 1; continue; }
+    S[k] = v[k];
+  }
+  S.groove = i;
+}
+function groovesOf(d) { return GROOVES.map((g, i) => (g.drummer === d ? i : -1)).filter((i) => i >= 0); }
+function stepGroove(S, delta) {
+  const list = groovesOf(S.drummer); if (!list.length) return -1;
+  const at = list.indexOf(S.groove);
+  return list[at < 0 ? (delta > 0 ? 0 : list.length - 1) : (at + delta + list.length) % list.length];
+}
+function fillGrooveList() {
+  const sel = document.getElementById('gList'); if (!sel) return;
+  sel.innerHTML = '<option value="-1">— escolha uma música —</option>';
+  GROOVE_DRUMMERS.forEach((name, d) => {
+    const og = document.createElement('optgroup'); og.label = name;
+    groovesOf(d).forEach((i) => { const g = GROOVES[i], o = document.createElement('option');
+      o.value = i; o.textContent = g.song + ' — ' + g.artist + ' ' + g.year + ' (' + (g.approx ? '~' : '') + g.bpm + ' BPM)'; og.appendChild(o); });
+    sel.appendChild(og);
+  });
+}
+function showGroove(S, fallbackHtml) {
+  const g = GROOVES[S.groove], same = g && g.drummer === S.drummer, intact = same && grooveIntact(S), list = groovesOf(S.drummer);
+  document.getElementById('gSong').textContent = same ? g.song.toUpperCase() + (intact ? '' : ' *') : 'GROOVES · ' + list.length + ' MÚSICAS';
+  document.getElementById('gSub').textContent = same ? g.artist.toUpperCase() + '  ' + g.year + ' · ' + (g.approx ? '~' : '') + g.bpm + ' BPM'
+                                                     : 'ESCOLHA COM ◀ ▶ OU TOQUE AQUI';
+  document.getElementById('gNum').textContent = same ? (list.indexOf(S.groove) + 1) + '/' + list.length : '';
+  const note = document.getElementById('gNote');
+  note.classList.toggle('on', intact);
+  note.innerHTML = intact ? g.note : fallbackHtml;
+  const sel = document.getElementById('gList'); if (sel) sel.value = same ? String(S.groove) : '-1';
+}
+
+fillGrooveList();
+function loadGroove(i) {
+  if (i < 0) return;
+  applyGroove(D, i);
+  try { localStorage.removeItem('dbr1-edits'); } catch (e) {}
+  for (const id of ['rndKick', 'rndSnare', 'rndHat', 'rndPerc', 'bpm']) $(id).value = D[id];
+  drumChanged(); groove.restart();
+}
+$('gPrev').onclick = () => loadGroove(stepGroove(D, -1));
+$('gNext').onclick = () => loadGroove(stepGroove(D, 1));
+$('gList').onchange = (e) => loadGroove(+e.target.value);
 
 const ROWS = [[49, 'PRATO'], [46, 'HH ABERTO'], [42, 'HH FECHADO'], [50, 'TOM 1'], [47, 'TOM 2'], [43, 'SURDO'], [38, 'CAIXA'], [37, 'ARO'], [36, 'BUMBO']];
 const pat = $('pat');
@@ -877,8 +961,8 @@ function refresh() {
   $('barsVal').textContent = D.bars + (D.bars === 1 ? ' COMPASSO' : ' COMPASSOS');
   $('seed').textContent = String(D.seed).padStart(4, '0');
   $('drumDisp').textContent = DRUMMERS[D.drummer];
-  $('drumInfo').innerHTML = D.drummer === 4 ? (D.seed % 2 ? 'MÁQUINA: CASIO MT-40 (SEMENTE ÍMPAR)<small>PRESET ROCK DO SLENG TENG 1985</small>'
-    : 'MÁQUINA: OBERHEIM DMX (SEMENTE PAR)<small>DANCEHALL DIGITAL ANOS 80</small>') : BANDS[D.drummer] + '<small>' + SIGS[D.drummer] + '</small>';
+  showGroove(D, D.drummer === 4 ? (D.seed % 2 ? 'MÁQUINA: CASIO MT-40 (SEMENTE ÍMPAR)' : 'MÁQUINA: OBERHEIM DMX (SEMENTE PAR)')
+                                : BANDS[D.drummer] + ' · ' + SIGS[D.drummer]);
   const bd = $('barDownloads'); bd.innerHTML = '';
   const bars = (pattern.introLengthInBeats > 0 ? [-1] : []).concat([...Array(Math.round(pattern.lengthInBeats / 4)).keys()]);
   for (const bar of bars) { const b = document.createElement('button'); b.style.background = barColor(bar); b.textContent = bar < 0 ? '⬇ INTRO' : '⬇ COMPASSO ' + (bar + 1); b.onclick = () => download(bar); bd.appendChild(b); }

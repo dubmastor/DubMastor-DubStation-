@@ -123,6 +123,29 @@ private:
     int dragStartIndex = 0;
 };
 
+// GROOVES: visor azul de MPC (igual ao dos presets do Riddim Machine) com as músicas do baterista escolhido.
+// ◀ ▶ passam pelas músicas daquele baterista e carregam na hora; clique no visor abre a lista de todas.
+class GrooveSelector : public juce::Component, private juce::Timer
+{
+public:
+    explicit GrooveSelector (DubDrumsProcessor&);
+    ~GrooveSelector() override;
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void step (int delta);
+    void showList();
+
+private:
+    void timerCallback() override;
+    juce::Rectangle<float> keyRect (int side) const;   // -1 = ◀, 1 = ▶
+    juce::Rectangle<float> lcdRect() const;
+    int drummer() const;
+    DubDrumsProcessor& proc;
+    int pressed = 0;
+    juce::String shownKey;
+};
+
 // Compassos: janela de contador mecânico; clique à direita avança, à esquerda volta
 class BarsWindow : public ParamControl
 {
@@ -297,6 +320,7 @@ private:
 
     ChoiceButtons styleButtons, hatButtons, backbeatButtons, kitButtons;
     DrummerSwitch drummerSwitch;
+    GrooveSelector grooveSelector;
     BarsWindow bars;
     SeedWindow seed;
     PushButton variation { "NOVA VARIACAO", true };

@@ -1,6 +1,9 @@
 // Salva uma imagem da interface sem abrir a DAW:
 // ./render_preview interface.png [estilo] [compassos] [semente] [intro|notas|editado] [baterista 0-3] [kit 0-2]
 // ./render_preview troca.txt   -> toca 60 s trocando variação e baterista no meio do tempo e procura notas dobradas
+// ./render_preview grooves.png 0 4 42 groove N  -> confere os presets GROOVES (todos carregam, ficam intactos,
+//                                                  geram notas e voltam do projeto salvo) e salva a tela com o groove N
+#include "GroovePresets.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <cstdlib>
@@ -127,6 +130,43 @@ int main (int argc, char** argv)
         w->writeFromAudioSampleBuffer (all, 0, total);
         std::printf ("audio: %s pico %.3f  rms %.4f\n", out.getFullPathName().toRawUTF8(), peak, std::sqrt (sum / total));
         return 0;
+    }
+
+    // "groove N": carrega todos os presets GROOVES e confere; a tela fica com o groove N
+    if (argc > 5 && juce::String (argv[5]).contains ("groove"))
+    {
+        int falhas = 0;
+        for (int i = 0; i < dubdrums::numGroovePresets; ++i)
+        {
+            const auto& gp = dubdrums::groovePresets[i];
+            proc.loadGroove (i);
+            dubdrums::Settings st;
+            st.style = (dubdrums::Style) gp.style; st.kickMask = (uint8_t) gp.kick; st.snareMask = (uint8_t) gp.snare;
+            st.bars = gp.bars; st.hatPattern = (dubdrums::HatPattern) gp.hat; st.swing = (dubdrums::Swing) gp.swing;
+            st.swingAll = gp.swingAll; st.dynamics = (dubdrums::Dynamics) gp.dyn;
+            st.randKick = gp.rndKick / 100.0f; st.randSnare = gp.rndSnare / 100.0f; st.randHat = gp.rndHat / 100.0f;
+            st.randPerc = gp.rndPerc / 100.0f; st.drummer = (dubdrums::Drummer) gp.drummer;
+            st.backbeat = (dubdrums::Backbeat) gp.backbeat; st.machine = gp.kit == 1; st.fill = gp.fill; st.intro = gp.intro;
+            st.seed = (uint32_t) gp.seed;
+            const auto pat = dubdrums::generate (st);
+            int kicks = 0, snares = 0;
+            for (auto& e : pat.events) { kicks += e.note == dubdrums::gm::Kick; snares += e.note == dubdrums::gm::Snare || e.note == dubdrums::gm::SideStick; }
+            juce::MemoryBlock mb;
+            proc.getStateInformation (mb);
+            DubDrumsProcessor other;
+            other.setStateInformation (mb.getData(), (int) mb.getSize());
+            const bool ok = proc.getGroove() == i && proc.grooveIntact() && kicks > 0 && snares > 0
+                         && other.getGroove() == i && other.grooveIntact()
+                         && (int) proc.apvts.getRawParameterValue ("bpm")->load() == gp.bpm;
+            std::printf ("%-2d %-16s %-34s %3d BPM  bumbo %2d  caixa/aro %2d  %s\n", i + 1, dubdrums::drummerName ((dubdrums::Drummer) gp.drummer),
+                         gp.song, gp.bpm, kicks, snares, ok ? "ok" : "FALHOU");
+            if (! ok) ++falhas;
+        }
+        set ("swing", 2.0f);   // mexer num controle: o groove fica marcado como editado (*)
+        const bool marca = ! proc.grooveIntact();
+        std::printf ("mexer num controle marca o groove como editado: %s\n", marca ? "ok" : "FALHOU");
+        if (falhas > 0 || ! marca) return 1;
+        proc.loadGroove (argc > 6 ? juce::jlimit (0, dubdrums::numGroovePresets - 1, juce::String (argv[6]).getIntValue()) : 0);
     }
 
     std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditor());

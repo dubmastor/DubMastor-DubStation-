@@ -45,7 +45,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "Dub Battery Reggae"; }
+    const juce::String getName() const override { return "Mastor Dub Battery Reggae DBR"; }
     bool acceptsMidi() const override  { return true; }
     bool producesMidi() const override { return true; }
     bool isMidiEffect() const override { return false; }

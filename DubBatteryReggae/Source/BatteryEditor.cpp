@@ -1047,7 +1047,7 @@ void Header::renderBackground()
 
     // título (padrão da casa: versão logo depois do nome)
     g.setColour (col::ink);
-    const juce::String title ("DUB BATTERY REGGAE " DBR_VERSION_SHORT);
+    const juce::String title ("DUB BATTERY REGGAE DBR " DBR_VERSION_SHORT);
     g.setFont (stencil (30.0f, 0.22f));
     g.drawText (title, plate.getX() + 32, 20, 700, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
