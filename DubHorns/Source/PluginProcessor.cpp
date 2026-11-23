@@ -74,6 +74,9 @@ AudioProcessorValueTreeState::ParameterLayout HornsProcessor::createLayout()
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "hiss", 1 },    "Chiado de fita", NormalisableRange<float> (0, 1), def.hiss, fmt (pct)));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "human", 1 },   "Humanizar",   NormalisableRange<float> (0, 1), def.human, fmt (pct)));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "width", 1 },   HU ("Abertura estéreo"), NormalisableRange<float> (0, 1), def.width, fmt (pct)));
+    // v1.2
+    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "growl", 1 },   "Rouco (growl)", NormalisableRange<float> (0, 1), def.growl, fmt (pct)));
+    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "room", 1 },    HU ("Sala do estúdio"), NormalisableRange<float> (0, 1), def.room, fmt (pct)));
 
     // Mastor Tape Echo
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "echoOn", 1 },  "Echo ligado", def.echoOn));
@@ -167,6 +170,7 @@ void HornsProcessor::fillParams (horns::Params& P, double bpm) const
     P.bright = param ("bright"); P.breath = param ("breath"); P.vib = param ("vib"); P.scoop = param ("scoop");
     P.attack = param ("attack"); P.release = param ("release"); P.drive = param ("drive"); P.band = param ("band");
     P.lowcut = param ("lowcut"); P.hiss = param ("hiss"); P.human = param ("human"); P.width = param ("width");
+    P.growl = param ("growl"); P.room = param ("room");
     P.echoOn = param ("echoOn") > 0.5f; P.sync = (int) param ("sync"); P.echoMs = param ("echoTime");
     P.fb = param ("fb"); P.send = param ("send"); P.ret = param ("ret"); P.tone = param ("tone"); P.bass = param ("bass");
     P.wow = param ("wow"); P.sat = param ("sat");

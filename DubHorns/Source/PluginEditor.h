@@ -79,6 +79,7 @@ class TimbrePage;
 class EchoPage;
 class EqPage;
 class PhrasePage;
+class MusicosPage;
 
 //==============================================================================
 class VuMeter : public juce::Component
@@ -120,7 +121,7 @@ private:
     std::unique_ptr<KnobCtl> master;
     VuMeter vu;
     juce::TextButton versionBtn;
-    std::array<juce::TextButton, 5> tabs;
+    std::array<juce::TextButton, 6> tabs;
     std::vector<std::unique_ptr<HornsPage>> pages;
     juce::MidiKeyboardComponent keyboard;
     ChangelogView changelog;

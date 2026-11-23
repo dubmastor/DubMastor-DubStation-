@@ -163,6 +163,7 @@ struct Params
     // timbre
     float bright = 0.55f, breath = 0.40f, vib = 0.30f, scoop = 0.40f, attack = 1.0f, release = 0.30f;
     float drive = 0.35f, band = 9000.0f, lowcut = 80.0f, hiss = 0.15f, human = 0.50f, width = 0.70f;
+    float growl = 0.30f, room = 0.25f;     // v1.2: rouco do sax e sala do estúdio
     // Mastor Tape Echo
     bool echoOn = true; int sync = 5; float echoMs = 375.0f;
     float fb = 0.45f, send = 0.30f, ret = 0.75f, tone = 3200.0f, bass = 220.0f, wow = 0.30f, sat = 0.50f;
@@ -200,6 +201,16 @@ inline double echoMs (const Params& p)
 inline float softSat (float x, float g) { return std::tanh (x * g) / g; }
 
 // ------------------------------------------------------------------ voz
+//  v1.2: o fim da nota é o que entrega se é gente ou máquina. Aqui:
+//   • fall / doit: a nota segura um instante, depois cai (ou sobe) acelerando, com o volume
+//     sumindo JUNTO — a parte de baixo do fall quase não se ouve, como num músico de verdade.
+//     Profundidade, duração e curva variam a cada nota; o sax cai "pelas chaves" (meio cromático),
+//     o trombone desliza liso pela vara. O filtro fecha e aparece o ar do sopro.
+//   • fim normal: o lábio relaxa e a afinação cede uns poucos cents enquanto o som some.
+//   • vibrato: começa depois do ataque, varia de velocidade e de fundura, mexe também no volume e
+//     no brilho, e PARA quando o músico solta a nota (nada de vibrato "de máquina" na cauda).
+//   • afinação viva: cada músico oscila uns cents devagar; o ataque assenta na nota.
+//   • golpe de língua no ataque e "rouco" (growl) para os saxes estilo Dean Fraser.
 struct Voice
 {
     bool active = false, releasing = false;
@@ -210,14 +221,24 @@ struct Voice
 
     int numOsc = 1; Wave wave[3] { Saw, Saw, Saw }; float oscGain[3] {}, detRatio[3] { 1, 1, 1 }, ph[3] {};
     float baseFreq = 440.0f, dt = 0.01f;
-    float pOff = 0, pTarget = 0, pCoef = 0;
-    float vibPh = 0, vibRate = 5, vibDepth = 0, vibRamp = 0, vibInc = 0;
+    float pOff = 0, pCoef = 0;                                   // scoop (semitons)
+    float settle = 0, settleCoef = 0;                            // ataque assentando na nota
+    float drift = 0, driftTarget = 0, driftAmt = 0; int driftCount = 0;
+    float vibPh = 0, vibRate = 5, vibRateCur = 5, vibDepth = 0, vibDepthCur = 0, vibRamp = 0, vibInc = 0, vibVal = 0;
+    int vibWait = 0;
 
     Svf lp; Biquad f1, f2; float q = 1;
     float cut = 500, cutBase = 500, cutPeak = 1000, cutTarget = 500, cutCoef16 = 0, cutInc16 = 0; int cutStage = 0;
 
-    float amp = 0, ampPeak = 1, ampSus = 0.7f, ampInc = 0, ampCoef = 0, relCoef = 0; int ampStage = 0, relDelay = 0;
-    Svf bf; float bAmp = 0, bPeak = 0, bSus = 0, bInc = 0, bCoef = 0, bRel = 0; bool bUp = true;
+    float amp = 0, ampPeak = 1, ampSus = 0.7f, ampInc = 0, ampCoef = 0, relCoef = 0; int ampStage = 0;
+    // final da nota
+    int endMode = 0;                     // 0 normal, 1 fall, 2 doit
+    float relT = 0, relHold = 0, relLen = 1, endDepth = 0, endExpo = 2, endU = 0, ampRel0 = 1, sagSemis = 0;
+    float endGain = 1, endGainStep = 0, stairMix = 0, stairSm = 0, wobble = 0;
+    float trem = 1, tremStep = 0;
+    Svf bf; float bAmp = 0, bPeak = 0, bSus = 0, bInc = 0, bCoef = 0, bRel = 0, bEnd = 0; bool bUp = true;
+    Svf tf; float tAmp = 0, tCoef = 0;                           // golpe de língua
+    float growlAmt = 0, gz1 = 0, gz2 = 0, gK = 0, gNorm = 1;
     float gL = 0.7f, gR = 0.7f;
     int ctr = 0;
     Rng rng;
@@ -234,7 +255,7 @@ struct Voice
 
         const float hum = P.human;
         delay = (int) (r.uniform() * 0.02f * hum * sr);
-        const float det = r.next() * 7.0f * hum;
+        const float det = r.next() * 5.0f * hum;
         numOsc = D.numOsc;
         for (int i = 0; i < 3; ++i)
         {
@@ -246,12 +267,18 @@ struct Voice
         vel = std::clamp (vel, 0.05f, 1.0f);
 
         const float atk = D.atk * (0.4f + P.attack * 0.9f);
-        const float scoopC = P.scoop * D.scoop + (artic == Scoop ? 260.0f : 0.0f);
-        const float scoopT = 0.04f + P.scoop * 0.05f + (artic == Scoop ? 0.09f : 0.0f);
-        pOff = -scoopC / 100.0f; pTarget = 0.0f; pCoef = coefFor (scoopT / 3.0f, sr);
+        // scoop: cada nota entra um pouco diferente (e quase nada nas pontadas secas)
+        const float scoopVar = 0.65f + 0.7f * rng.uniform();
+        const float scoopC = (P.scoop * D.scoop * scoopVar * (artic == Stac ? 0.45f : 1.0f)) + (artic == Scoop ? 200.0f + 120.0f * rng.uniform() : 0.0f);
+        const float scoopT = 0.035f + P.scoop * 0.045f + (artic == Scoop ? 0.08f + 0.04f * rng.uniform() : 0.0f);
+        pOff = -scoopC / 100.0f; pCoef = coefFor (scoopT / 3.0f, sr);
+        settle = (rng.next() * 9.0f * (0.3f + hum)) / 100.0f; settleCoef = coefFor (0.05f, sr) * 16.0f;
+        driftAmt = D.drift * (0.25f + hum) / 100.0f; drift = rng.next() * driftAmt * 0.5f; driftTarget = drift; driftCount = 0;
 
-        vibRate = 4.6f + r.uniform() * 0.9f; vibPh = r.uniform();
-        vibDepth = 0.19f * P.vib * D.vib; vibRamp = 0.0f; vibInc = 1.0f / (0.55f * sr);
+        // vibrato atrasado, com a velocidade do músico
+        vibRate = D.vibRate * (0.92f + 0.16f * rng.uniform()); vibRateCur = vibRate; vibPh = rng.uniform();
+        vibDepth = 0.20f * P.vib * D.vib; vibDepthCur = vibDepth * 0.8f; vibRamp = 0.0f; vibVal = 0.0f;
+        vibWait = (int) ((0.16f + 0.14f * rng.uniform()) * sr / 16.0f); vibInc = 1.0f / (0.45f * sr / 16.0f);
 
         const float kt = std::pow (baseFreq / 440.0f, 0.45f);
         cutBase = D.cut * kt * (0.55f + P.bright * 0.9f);
@@ -264,11 +291,21 @@ struct Voice
         f1.peaking (D.f1, 1.4f, D.g1, sr); f1.reset();
         f2.peaking (D.f2, 2.0f, D.g2, sr); f2.reset();
 
-        amp = 0.0f; ampPeak = vel * 0.95f; ampSus = vel * 0.72f; ampStage = 0;
+        amp = 0.0f; ampPeak = vel * 0.95f; ampSus = vel * (0.68f + 0.08f * rng.uniform()); ampStage = 0;
         ampInc = ampPeak / std::max (1.0f, atk * sr); ampCoef = coefFor (0.12f, sr);
         bPeak = P.breath * D.breath * 0.22f * (0.5f + vel); bAmp = 0.0f; bUp = true;
-        bInc = bPeak / std::max (1.0f, 0.7f * atk * sr); bSus = bPeak * 0.3f; bCoef = coefFor (0.08f, sr);
+        bInc = bPeak / std::max (1.0f, 0.7f * atk * sr); bSus = bPeak * 0.3f; bCoef = coefFor (0.08f, sr); bEnd = 0.0f;
         bf.reset(); bf.set (D.breathF, 1.2f, sr);
+        // golpe de língua: um "t" curtinho de ar no começo da nota
+        tAmp = (0.05f + 0.11f * vel) * (0.4f + P.breath) * (artic == Stac ? 1.3f : 1.0f) * (D.breath + 0.4f);
+        tCoef = coefFor (0.007f, sr); tf.reset(); tf.set (std::min (D.breathF * 1.6f, 7000.0f), 0.9f, sr);
+        // rouco (growl): modulação áspera vinda de um ruído grave, como a garganta do saxofonista
+        growlAmt = P.growl * D.growl;
+        gK = coefFor (1.0f / (2.0f * kPi * (55.0f + 25.0f * rng.uniform())), sr); gz1 = gz2 = 0.0f;
+        gNorm = 1.0f / std::sqrt (std::max (1.0e-6f, gK * 0.5f)) * 0.55f;
+
+        endMode = 0; relT = 0; endGain = 1; endGainStep = 0; stairSm = 0; wobble = 0; endU = 0; trem = 1; tremStep = 0;
+        stairMix = D.stair;
 
         const float p = std::clamp (S.pan * (0.3f + P.width), -1.0f, 1.0f);
         const float lvl = S.level * D.gain;
@@ -281,22 +318,38 @@ struct Voice
     {
         if (releasing || ! active) return;
         releasing = true;
+        const auto& D = instruments()[(size_t) inst];
         const float rel = 0.05f + relParam * 0.45f;
         bRel = coefFor (rel / 4.0f, sr);
-        if (artic == Fall)
+        ampRel0 = std::max (1.0e-4f, amp);
+        relT = 0;
+        if (artic == Fall || artic == Doit)
         {
-            pTarget = -8.0f; pCoef = coefFor (0.13f, sr);
-            relCoef = coefFor (0.12f, sr); relDelay = (int) (0.06f * sr);
-            cutTarget = cutBase * 0.4f; cutCoef16 = 1.0f - std::pow (1.0f - coefFor (0.12f, sr), 16.0f);
-        }
-        else if (artic == Doit)
-        {
-            pTarget = 5.0f; pCoef = coefFor (0.09f, sr);
-            relCoef = coefFor (0.09f, sr); relDelay = (int) (0.08f * sr);
+            endMode = artic == Fall ? 1 : 2;
+            const float var = 0.8f + 0.4f * rng.uniform();
+            // segura um pouco a nota e então cai / sobe acelerando; o volume vai junto
+            relHold = (0.035f + 0.05f * rng.uniform()) * sr;
+            if (endMode == 1)
+            {
+                endDepth = -D.fallDepth * var;
+                relLen = (0.24f + 0.14f * rng.uniform() + relParam * 0.18f) * sr;
+                endExpo = 1.9f + 0.6f * rng.uniform();
+            }
+            else
+            {
+                endDepth = (D.fallDepth * 0.45f + 0.8f) * var;
+                relLen = (0.16f + 0.10f * rng.uniform() + relParam * 0.12f) * sr;
+                endExpo = 1.6f + 0.5f * rng.uniform();
+            }
+            relCoef = 0.0f;
+            bEnd = bPeak * (endMode == 1 ? 0.55f : 0.4f);   // o ar aparece quando o lábio solta
+            if (ampStage < 2) amp = std::max (amp, ampSus * 0.8f);
         }
         else
         {
-            relCoef = coefFor (rel / 3.5f, sr); relDelay = 0;
+            endMode = 0;
+            relCoef = coefFor (rel / 3.5f, sr);
+            sagSemis = -(0.06f + 0.10f * rng.uniform()) * (0.4f + 0.8f * D.drift / 6.0f);   // lábio relaxando: poucos cents
             cutTarget = cutBase * 0.45f; cutCoef16 = 1.0f - std::pow (1.0f - coefFor (rel / 3.0f, sr), 16.0f);
         }
         if (cutStage == 1) cutStage = 2;
@@ -306,7 +359,47 @@ struct Voice
 
     void updateCoefs()
     {
-        const float semis = pOff + std::sin (2.0f * kPi * vibPh) * vibDepth * vibRamp;
+        // afinação viva (passeio lento)
+        if (--driftCount <= 0) { driftTarget = rng.next() * driftAmt; driftCount = (int) ((0.25f + 0.4f * rng.uniform()) * sr / 16.0f); }
+        drift += (driftTarget - drift) * (16.0f / (0.35f * sr));
+        settle -= settle * settleCoef;
+
+        // vibrato humano
+        if (! releasing)
+        {
+            if (vibWait > 0) --vibWait; else vibRamp = std::min (1.0f, vibRamp + vibInc);
+            vibRateCur += (vibRate * (1.0f + 0.07f * rng.next()) - vibRateCur) * 0.004f;
+            vibDepthCur += (vibDepth * (1.0f + 0.25f * rng.next()) - vibDepthCur) * 0.003f;
+        }
+        else vibRamp *= 0.985f;                                 // o músico para o vibrato ao soltar
+        vibPh += vibRateCur * 16.0f / sr; if (vibPh >= 1.0f) vibPh -= 1.0f;
+        vibVal = std::sin (2.0f * kPi * vibPh) * vibDepthCur * vibRamp;
+
+        // final da nota
+        float endSemis = 0.0f, gTarget = 1.0f;
+        if (releasing)
+        {
+            relT += 16.0f;
+            if (endMode != 0)
+            {
+                endU = std::clamp ((relT - relHold) / relLen, 0.0f, 1.0f);
+                float semis = endDepth * std::pow (endU, endExpo);
+                // chaves do sax: meio cromático; trombone: liso
+                stairSm += (std::round (semis) - stairSm) * 0.35f;
+                semis = semis * (1.0f - stairMix * 0.6f) + stairSm * stairMix * 0.6f;
+                wobble += (rng.next() * 0.35f - wobble) * 0.08f;
+                endSemis = semis + wobble * endU;
+                gTarget = std::pow (1.0f - endU, 1.7f);
+                if (endU >= 1.0f) { active = false; return; }
+            }
+            else
+                endSemis = sagSemis * (1.0f - std::min (1.0f, amp / ampRel0));
+        }
+        endGainStep = (gTarget - endGain) / 16.0f;
+        const float tTarget = 1.0f + vibVal * 0.45f;            // vibrato também mexe no volume
+        tremStep = (tTarget - trem) / 16.0f;
+
+        const float semis = pOff + settle + drift + vibVal + endSemis;
         const float f = baseFreq * std::exp2 (semis / 12.0f);
         dt = std::min (0.45f, f / sr);
         if (cutStage == 0)
@@ -315,7 +408,9 @@ struct Voice
             if (cut >= cutPeak) { cut = cutPeak; cutStage = releasing ? 2 : 1; }
         }
         else cut += (cutTarget - cut) * cutCoef16;
-        lp.set (cut, q, sr);
+        // metal de verdade: o brilho acompanha o volume (fica escuro quando some)
+        const float lvl = std::clamp ((amp / std::max (1.0e-4f, ampPeak)) * endGain, 0.0f, 1.0f);
+        lp.set (std::max (120.0f, cut * (0.45f + 0.55f * lvl) * (1.0f + vibVal * 0.6f)), q, sr);
     }
 
     // soma a voz em L/R por n amostras
@@ -324,11 +419,10 @@ struct Voice
         for (int s = 0; s < n; ++s)
         {
             if (delay > 0) { --delay; continue; }
-            if ((ctr++ & 15) == 0) updateCoefs();
+            if ((ctr++ & 15) == 0) { updateCoefs(); if (! active) return; }
 
-            pOff += (pTarget - pOff) * pCoef;
-            vibRamp = std::min (1.0f, vibRamp + vibInc);
-            vibPh += vibRate / sr; if (vibPh >= 1.0f) vibPh -= 1.0f;
+            pOff -= pOff * pCoef;
+            endGain += endGainStep; trem += tremStep;
 
             float x = 0.0f;
             for (int i = 0; i < numOsc; ++i)
@@ -347,6 +441,14 @@ struct Voice
                 }
                 x += v * oscGain[i];
             }
+            // rouco: aspereza na palheta antes do filtro (fica dentro do timbre do instrumento)
+            if (growlAmt > 0.001f)
+            {
+                gz1 += (rng.next() - gz1) * gK; gz2 += (gz1 - gz2) * gK;
+                const float gm = std::clamp (gz2 * gNorm, -1.0f, 1.0f);
+                x *= 1.0f + growlAmt * 0.7f * gm;
+                x += growlAmt * 0.22f * (x * std::fabs (x) - 0.3f * x);
+            }
             lp.process (x);
             float y = f2.process (f1.process (lp.lpOut));
 
@@ -356,20 +458,23 @@ struct Voice
                 if (bUp) { bAmp += bInc; if (bAmp >= bPeak) { bAmp = bPeak; bUp = false; } }
                 else bAmp += (bSus - bAmp) * bCoef;
             }
+            else if (endMode != 0) bAmp += (bEnd * (1.0f - endU) - bAmp) * bCoef;
             else bAmp -= bAmp * bRel;
             y += bf.bpOut * bAmp;
+
+            if (tAmp > 1.0e-4f) { tf.process (rng.next()); y += tf.bpOut * tAmp; tAmp -= tAmp * tCoef; }
 
             switch (ampStage)
             {
                 case 0: amp += ampInc; if (amp >= ampPeak) { amp = ampPeak; ampStage = releasing ? 2 : 1; } break;
                 case 1: amp += (ampSus - amp) * ampCoef; if (releasing) ampStage = 2; break;
                 default:
-                    if (relDelay > 0) { --relDelay; amp += (ampSus - amp) * ampCoef; }
+                    if (endMode != 0) amp += (ampSus - amp) * ampCoef;     // o fall/doit cuida do volume
                     else amp -= amp * relCoef;
                     if (amp < 1.0e-4f) { active = false; return; }
                     break;
             }
-            const float out = y * amp;
+            const float out = y * amp * std::max (0.0f, endGain) * trem;
             L[s] += out * gL;
             R[s] += out * gR;
         }
@@ -394,6 +499,11 @@ public:
         smoothK = coefFor (0.03f, sr);
         glideK = coefFor (0.12f, sr);
         compAtk = coefFor (0.01f, sr); compRel = coefFor (0.2f, sr);
+        // sala do estúdio (4 linhas com matriz de Hadamard): a sala de gravação de Kingston
+        static const float roomMs[4] = { 23.9f, 31.3f, 37.7f, 43.1f };
+        for (int i = 0; i < 4; ++i) { roomLen[i] = std::max (8, (int) (roomMs[i] * 0.001f * sr)); roomBuf[i].assign ((size_t) roomLen[i], 0.0f); roomPos[i] = 0; }
+        roomDamp = coefFor (1.0f / (2.0f * kPi * 4200.0f), sr);
+        roomHpK = coefFor (1.0f / (2.0f * kPi * 180.0f), sr);
         dirtyCoefs = true;
         updateCoefs();
         reset();
@@ -406,6 +516,8 @@ public:
         for (auto& b : eqL) b.reset();
         for (auto& b : eqR) b.reset();
         compEnv = 0.0f;
+        for (int i = 0; i < 4; ++i) { std::fill (roomBuf[i].begin(), roomBuf[i].end(), 0.0f); roomLp[i] = 0.0f; }
+        roomHpL = roomHpR = 0.0f;
     }
 
     void setParams (const Params& p)
@@ -501,6 +613,7 @@ private:
         const float wowInc = 0.55f / sr, flutInc = 6.3f / sr;
         const float masterG = P.master * 1.2f;
         const float thr = 0.2f; // ~ -14 dB
+        const float roomG = 0.60f + P.room * 0.22f, roomWet = P.room * 0.42f;
         float peak = 0.0f, sumSq = 0.0f;
 
         for (int s = 0; s < n; ++s)
@@ -539,7 +652,33 @@ private:
             // chiado de fita
             const float hl = hissL.process (rngHiss.next()) * hissG, hr = hissR.process (rngHiss.next()) * hissG;
 
-            float ol = (l + wl + hl) * masterG, or_ = (r + wr + hr) * masterG;
+            // sala: as paredes da sala de gravação, bem curtinho, só para o naipe respirar
+            float rl = 0.0f, rr = 0.0f;
+            if (roomWet > 0.0005f)
+            {
+                roomHpL += (l - roomHpL) * roomHpK; roomHpR += (r - roomHpR) * roomHpK;
+                const float il = (l - roomHpL) * 0.5f, ir = (r - roomHpR) * 0.5f;
+                float o[4];
+                for (int i = 0; i < 4; ++i)
+                {
+                    o[i] = roomBuf[i][(size_t) roomPos[i]];
+                    roomLp[i] += (o[i] - roomLp[i]) * roomDamp;
+                    o[i] = roomLp[i];
+                }
+                const float q0 = 0.5f * (o[0] + o[1] + o[2] + o[3]), q1 = 0.5f * (o[0] - o[1] + o[2] - o[3]);
+                const float q2 = 0.5f * (o[0] + o[1] - o[2] - o[3]), q3 = 0.5f * (o[0] - o[1] - o[2] + o[3]);
+                const float in4[4] = { il, ir, il, ir }, hv[4] = { q0, q1, q2, q3 };
+                for (int i = 0; i < 4; ++i)
+                {
+                    roomBuf[i][(size_t) roomPos[i]] = in4[i] + roomG * hv[i];
+                    if (++roomPos[i] >= roomLen[i]) roomPos[i] = 0;
+                }
+                rl = (o[0] + 0.6f * o[2] - 0.3f * o[3]) * roomWet;
+                rr = (o[1] + 0.6f * o[3] - 0.3f * o[2]) * roomWet;
+            }
+            else { roomHpL = roomHpR = 0.0f; }
+
+            float ol = (l + wl + hl + rl) * masterG, or_ = (r + wr + hr + rr) * masterG;
 
             // compressor de barramento + limitador suave
             const float lv = std::max (std::fabs (ol), std::fabs (or_));
@@ -583,5 +722,7 @@ private:
     float wowPh = 0, flutPh = 0.37f, smoothK = 0.001f, glideK = 0.001f;
     Biquad hissL, hissR;
     float compEnv = 0, compAtk = 0.01f, compRel = 0.001f;
+    std::vector<float> roomBuf[4]; int roomLen[4] { 8, 8, 8, 8 }, roomPos[4] {}; float roomLp[4] {};
+    float roomDamp = 0.5f, roomHpK = 0.02f, roomHpL = 0, roomHpR = 0;
 };
 } // namespace horns

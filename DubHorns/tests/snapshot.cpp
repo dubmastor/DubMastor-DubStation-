@@ -52,11 +52,12 @@ int main (int argc, char** argv)
 
     std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditor());
     auto* he = dynamic_cast<HornsEditor*> (ed.get());
-    const char* names[5] = { "naipe", "timbre", "echo", "eq", "frases" };
+    const char* names[6] = { "naipe", "timbre", "echo", "eq", "frases", "musicos" };
     juce::File dir = juce::File::getCurrentWorkingDirectory().getChildFile (out);
     dir.createDirectory();
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 6; ++i)
     {
+        if (i == 5) proc.apvts.state.setProperty ("musico", 17, nullptr);   // Dean Fraser · Black Horn Man
         he->panel.showPage (i);
         auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
         auto f = dir.getChildFile (juce::String ("interface-") + names[i] + ".png");

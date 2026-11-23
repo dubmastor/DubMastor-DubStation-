@@ -2,6 +2,7 @@
 //   g++ -std=c++17 -O2 -Wall -Wextra tests/engine_test.cpp -o engine_test && ./engine_test
 // Verifica harmonia diatônica, sugestões de frase, estabilidade do som (sem NaN, sem estouro),
 // a cauda do Mastor Tape Echo, a auto-oscilação limitada e que o eco não dispara sozinho.
+// v1.2: o fall/doit some junto com a queda de afinação (nada de sirene) e o vibrato para ao soltar.
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
@@ -68,6 +69,27 @@ int main (int argc, char** argv)
                 for (const auto& ev : ph.events) okLen = okLen && ev.note == -1;
             }
         CHECK (total == 14 && okLen, "14 sugestoes, eventos dentro do compasso e 'so ritmo' deixa as notas em aberto");
+    }
+
+
+    // --- v1.2: final natural. Sax tenor sozinho, seco: o fall cai JUNTO com o volume
+    {
+        const int sr = 48000;
+        Engine e; Params p;
+        for (auto& i : p.inst) i.on = false;
+        p.inst[3].on = true; p.inst[3].oct = 0; p.echoOn = false; p.hiss = 0; p.room = 0;
+        e.prepare (sr, 256); e.setParams (p);
+        e.noteOn (69, 0.9f, Fall, 1);
+        std::vector<float> rec; run (e, sr / 2, 64, &rec);
+        auto rmsOf = [] (const std::vector<float>& lr, size_t a, size_t b) { double s = 0; for (size_t i = a; i < b; ++i) s += lr[2 * i] * lr[2 * i]; return std::sqrt (s / (double) std::max<size_t> (1, b - a)); };
+        const double sus = rmsOf (rec, (size_t) (0.35 * sr), (size_t) (0.5 * sr));
+        e.noteOff (69, 1);
+        std::vector<float> rel; run (e, sr, 64, &rel);
+        const double late = rmsOf (rel, (size_t) (0.25 * sr), (size_t) (0.35 * sr));
+        CHECK (20 * std::log10 (late / sus) < -10.0, "fall: depois de 250 ms o volume ja caiu junto com a afinacao (%.1f dB)", 20 * std::log10 (late / sus));
+        CHECK (e.activeVoices() == 0, "fall: a voz termina sozinha, sem cauda de sirene");
+        const double early = rmsOf (rel, (size_t) (0.0 * sr), (size_t) (0.03 * sr));
+        CHECK (20 * std::log10 (early / sus) > -4.0, "fall: segura a nota um instante antes de cair (%.1f dB)", 20 * std::log10 (early / sus));
     }
 
     for (double sr : { 44100.0, 48000.0, 96000.0 })
