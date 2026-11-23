@@ -134,7 +134,12 @@ else:
         if pac["plugins"].get(p["sigla"]) != v:
             err("DubStation", f"{p['sigla']} está na {v}, o instalador completo registra {pac['plugins'].get(p['sigla'])}: "
                 "atualize 'pacote' → 'plugins' e suba 'pacote' → 'versao' no plugins.json")
-    for f in ("DubStation-Windows-Instalador.exe", "DubStation-macOS-Instalador.pkg"):
+    if pac.get("pausado"):
+        # instalador completo pausado: fica fora do site até ser liberado (tirar "pausado" e pôr os links de volta)
+        warn("DubStation", f"instalador completo {pv} pausado (sem link no site)")
+        if f"{REL}/DubStation-" in site:
+            err("DubStation", "pacote pausado, mas o site ainda tem link para o instalador completo")
+    for f in (() if pac.get("pausado") else ("DubStation-Windows-Instalador.exe", "DubStation-macOS-Instalador.pkg")):
         if f"{REL}/DubStation-{pv}/{f}" not in site:
             err("DubStation", f"site sem o link do instalador completo DubStation-{pv}/{f}")
     if not (RAIZ / ".github/workflows/build-pacote.yml").exists():

@@ -69,10 +69,10 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
 
 ## Instalador completo (todos os plugins)
 
-Um instalador só com a coleção inteira — na instalação dá para desmarcar os que não quiser:
+Um instalador só com a coleção inteira — na instalação dá para desmarcar os que não quiser.
 
-- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.7/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
-- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.7/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
+- **Em pausa:** a nova versão sai depois dos testes dos instrumentos novos (Reggae Keys MRK-80, Reggae Bass MRB-69 e Reggae Drums MRD-12). Até lá, baixe cada plugin na tabela abaixo.
+
 - **Pro Tools (AAX):** em preparação — veja [PROTOOLS.md](PROTOOLS.md).
 
 ## Instalação no Cubase

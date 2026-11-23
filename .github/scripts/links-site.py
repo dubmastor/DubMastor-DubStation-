@@ -76,7 +76,7 @@ for sigla, pasta, padrao in itens:
 pv = reg["pacote"]["versao"]
 tag = f"DubStation-{pv}"
 tem = assets(tag)
-faltam = [f for f in ("DubStation-Windows-Instalador.exe", "DubStation-macOS-Instalador.pkg") if f not in tem]
+faltam = [] if reg["pacote"].get("pausado") else [f for f in ("DubStation-Windows-Instalador.exe", "DubStation-macOS-Instalador.pkg") if f not in tem]
 if faltam:
     for f in do_build("build-pacote.yml", "DubStation-*"):
         if f.name in faltam:
