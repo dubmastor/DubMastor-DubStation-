@@ -21,6 +21,9 @@ on:
       - 'Build Mastor Riddim Machine MRM-0420'
       - 'Build Mastor Roots Keys MRK-80'
       - 'Build Mastor Tape Echo MTE-12'
+      - 'Build Mastor Half Dub MHD-050'
+      - 'Build Mastor Tune MT-0420'
+      - 'Build Mastor Key Scout MKS-0420'
     types: [completed]
   workflow_dispatch:
 
