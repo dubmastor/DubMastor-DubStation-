@@ -1,3 +1,10 @@
+## Mastor Reggae Drum Machine MRDM-12 2.8 🟢🟡⚫
+
+- **BANCO ÚNICO DE RIDDIMS no visor azul dos GROOVES:** 356 músicas e 155 riddims, o mesmo banco do MRCM-1240, do MRBM-69 e do MRM-0420 (`RiddimBank/`). Escolha por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**: a bateria vem com o groove original da música ou, quando o banco não tem, com o groove do baterista mais próximo de quem gravou, no BPM da música
+- **Luzes H B D** em cada música (harmonia, baixo e bateria da gravação original) e a opção **Só completos**
+- Os 118 grooves continuam no mesmo lugar e na mesma ordem (os projetos antigos abrem igual)
+- Versão para celular 2.8 com o mesmo menu
+
 ## Mastor Reggae Drum Machine MRDM-12 2.7 🟢🟡⚫
 
 - **118 GROOVES** no visor azul (antes 21), separados por baterista, tirados de uma pesquisa de créditos e transcrições:

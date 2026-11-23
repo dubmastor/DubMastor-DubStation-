@@ -1,3 +1,8 @@
+## Mastor Dub Battery Reggae DBR 1.5 — Dub Station
+
+- **BANCO ÚNICO DE RIDDIMS na aba DUB DRUMS** (vem do MRDM-12 2.8): 356 músicas por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**, com as luzes **H B D**; a bateria vem com o groove da música (o original ou o do baterista mais próximo) no BPM dela
+- Versão para celular 1.5 com o mesmo menu
+
 ## Mastor Dub Battery Reggae DBR 1.4 — Dub Station
 
 - **Menu de GROOVES em dois caminhos** (aba DUB DRUMS): clique no visor azul e escolha **ORGANIZAR POR**

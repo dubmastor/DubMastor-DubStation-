@@ -1,3 +1,10 @@
+# Mastor Reggae Bass Machine MRBM-69 — 3.1 · Gerador de Reggae Bass Lines
+
+- **BANCO ÚNICO DE RIDDIMS no visor dos riddims:** 356 músicas e 155 riddims, o mesmo banco do MRCM-1240, do MRDM-12 e do MRM-0420 (`RiddimBank/`), por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**, com as luzes **H B D** e a opção **Só completos**
+- A música carrega a harmonia conferida e o BPM dela; o baixo é o do riddim do MRBM-69 quando ele existe (baixista, densidade, timbre, bateria), senão o baixista mais próximo de quem gravou. O visor mostra `=BANCO= n/356` e as setas passam de música em música
+- Os 160 riddims continuam no mesmo menu e na mesma ordem (os projetos antigos abrem igual)
+- Versão para celular 3.1 com o mesmo menu
+
 # Mastor Reggae Bass Machine MRBM-69 — 3.0 · Gerador de Reggae Bass Lines
 
 - **BPM dos riddims corrigido:** os 10 riddims de dancehall que estavam acima de 100 BPM (Speed, Hard Drive, Coolie Dance, Bad Company, Applause, Stepz, Red Bull & Guinness, Power Cut, Wipe Out, Tremor) estavam dobrados e agora ficam na metade (51 e 52)

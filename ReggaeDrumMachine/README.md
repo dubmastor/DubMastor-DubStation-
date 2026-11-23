@@ -1,4 +1,4 @@
-# Mastor Reggae Drum Machine MRDM-12 2.7
+# Mastor Reggae Drum Machine MRDM-12 2.8
 
 *(antigo Mastor Dub Drums Machine MDDM-12 e DubMastor Dub Drums)*
 

@@ -1,3 +1,11 @@
+## Mastor Reggae Chord Machine MRCM-1240 2.5 🟢🟡⚫
+
+- **BANCO ÚNICO DE RIDDIMS no PRESETS:** 356 músicas e 155 riddims, o mesmo banco do MRBM-69, do MRDM-12 e do MRM-0420 (`RiddimBank/`). Três caminhos no menu: **ESTILOS** (10 estilos, do rocksteady ao new roots), **RIDDIMS A–Z** (cada riddim com a música de origem e as versões gravadas nele) e **MÚSICAS A–Z**
+- **Luzes H B D** em cada música: acesa = a harmonia, o baixo ou a bateria vieram da gravação original; apagada = escolhida pelo músico mais próximo de quem gravou. Opção **Só completos** para ver só as músicas com as três partes originais
+- Harmonias conferidas com as gravações (Night Nurse, Big Ship, No Woman No Cry, Positive Vibration, Africa Unite e outras corrigidas); a música carrega a harmonia e o BPM dela. As que ainda não têm harmonia conferida aparecem apagadas
+- O banco antigo de 180 harmonias continua no menu (HARMONIAS CLÁSSICAS) e os projetos antigos abrem igual: o preset antigo aparece marcado na música certa do banco novo
+- Versão para celular 2.5 com o mesmo menu
+
 ## Mastor Reggae Chord Machine MRCM-1240 2.4 🟢🟡⚫
 
 - **BPM dos presets corrigido:** nenhum riddim passa de 100 BPM; os que estavam acima (Rivers of Babylon, The Harder They Come, Now That We Found Love, Could You Be Loved, Kingston Town, Here Comes the Hotstepper, Temperature) estavam dobrados e agora ficam na metade, contados com a caixa no 2 e no 4
