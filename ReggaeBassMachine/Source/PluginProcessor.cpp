@@ -1,6 +1,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "RiddimPresets.h"
+#include "../../RiddimBank/Source/RiddimBank.h"
 
 namespace
 {
@@ -637,5 +638,49 @@ void BassMachineProcessor::loadRiddim (int index)
     set ("timbre", (float) r.timbre);
     clearEdits();
     apvts.state.setProperty ("riddim", index, nullptr);
+    apvts.state.setProperty ("bank", -1, nullptr);
+    dirty.store (true);
+}
+
+void BassMachineProcessor::applyBankEntry (int index)
+{
+    if (index < 0 || index >= riddimbank::numEntries) return;
+    const auto& e = riddimbank::entries[index];
+    if (e.numChords <= 0) return;   // harmonia ainda pendente
+
+    auto set = [this] (const juce::String& id, float plainValue)
+    {
+        if (auto* p = apvts.getParameter (id))
+            p->setValueNotifyingHost (p->convertTo0to1 (plainValue));
+    };
+
+    if (e.mrbm >= 0 && e.mrbm < mbmriddims::numRiddims)
+        loadRiddim (e.mrbm);       // o baixo do riddim (baixista, densidade, timbre, bateria)
+    else
+    {
+        set ("style", (float) e.bassStyle);
+        set ("density", e.density);
+        set ("variation", e.variation);
+        set ("swing", e.swing);
+        set ("seed", 1.0f);
+        set ("drumStyle", (float) e.bassDrum);
+        set ("drumsOn", 1.0f);
+        set ("timbre", (float) e.timbre);
+        clearEdits();
+        apvts.state.setProperty ("riddim", -1, nullptr);
+    }
+    // a harmonia e o BPM do banco valem sobre os do riddim (conferidos com as gravações)
+    for (int i = 0; i < numSlots; ++i)
+    {
+        if (i < e.numChords)
+        {
+            set (rootId (i), (float) e.chords[i].root);
+            set (qualId (i), (float) (e.chords[i].minor ? mbm::Min : mbm::Maj));
+            set (durId (i),  (float) e.chords[i].dur);
+        }
+        if (i > 0) set (onId (i), i < e.numChords ? 1.0f : 0.0f);
+    }
+    set ("bpm", (float) e.bpm);
+    apvts.state.setProperty ("bank", index, nullptr);
     dirty.store (true);
 }

@@ -2,6 +2,7 @@
 #include "MrmStyle.h"
 #include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 #include "BpmPresets.h"
+#include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 #ifndef MRM_DRUMS_VER
  #define MRM_DRUMS_VER ""
@@ -481,8 +482,8 @@ void BpmPanel::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheel
 }
 
 //==============================================================================
-// RiddimPresetPanel: PRESETS no visor azul de MPC (estilo > música), carrega na hora
-static const char* const kKits[] = { "ROCKERS", "ONE DROP" };
+// RiddimPresetPanel: BANCO ÚNICO DE RIDDIMS no visor azul de MPC (estilo > música), carrega na hora
+static const char* const kKits[] = { "ROCKERS", "ONE DROP", "BOOM BAP", "DEMBOW" };
 
 RiddimPresetPanel::RiddimPresetPanel (MrmProcessor& p) : proc (p)
 {
@@ -490,30 +491,33 @@ RiddimPresetPanel::RiddimPresetPanel (MrmProcessor& p) : proc (p)
     startTimerHz (8);
 }
 
-int RiddimPresetPanel::current() const { return proc.getChords().getLastPreset(); }
+int RiddimPresetPanel::current() const { return proc.currentBankRiddim(); }   // projeto antigo: o preset do MRCM vira a música do banco
 
-int RiddimPresetPanel::styleOf (int preset) const
+int RiddimPresetPanel::styleOf (int entry) const
 {
-    if (preset < 0) return -1;
-    for (int f = 0; f < dubpresets::numFolders; ++f)
-        if (juce::String (dubpresets::presets[preset].folder) == dubpresets::folders[f]) return f;
-    return -1;
+    return entry >= 0 && entry < riddimbank::numEntries ? riddimbank::entries[entry].style : -1;
 }
 
 juce::Array<int> RiddimPresetPanel::songsOf (int style) const
 {
-    juce::Array<int> out;   // ordem do menu: nome em ordem alfabética
-    for (int i : dubpresets::menuOrder)
-        if (juce::String (dubpresets::presets[i].folder) == dubpresets::folders[style]) out.add (i);
+    juce::Array<int> out;   // ordem do menu MÚSICAS A–Z, só as que já têm harmonia
+    for (int k = 0; k < riddimbank::numEntries; ++k)
+    {
+        const int i = riddimbank::songOrder[k];
+        if (riddimbank::entries[i].style == style && riddimbank::usable (i)) out.add (i);
+    }
     return out;
 }
 
 void RiddimPresetPanel::stepStyle (int delta)
 {
     const int cur = styleOf (current());
-    styleSel = ((cur >= 0 ? cur : styleSel) + delta + dubpresets::numFolders) % dubpresets::numFolders;
-    const auto songs = songsOf (styleSel);
-    if (! songs.isEmpty()) proc.applyRiddimPreset (songs[0]);
+    for (int tries = 0; tries < riddimbank::numStyles; ++tries)
+    {
+        styleSel = ((cur >= 0 && tries == 0 ? cur : styleSel) + delta + riddimbank::numStyles) % riddimbank::numStyles;
+        const auto songs = songsOf (styleSel);
+        if (! songs.isEmpty()) { proc.applyBankRiddim (songs[0]); break; }
+    }
     repaint();
 }
 
@@ -526,30 +530,20 @@ void RiddimPresetPanel::stepSong (int delta)
     const int pos = songs.indexOf (cur);
     const int n = songs.size();
     const int next = pos < 0 ? (delta > 0 ? 0 : n - 1) : (pos + delta + n) % n;
-    proc.applyRiddimPreset (songs[next]);
+    proc.applyBankRiddim (songs[next]);
     repaint();
 }
 
 void RiddimPresetPanel::showList()
 {
     juce::PopupMenu menu;
-    menu.addSectionHeader (u8 ("RIDDIMS CL\xc3\x81SSICOS POR ESTILO DE REGGAE"));
-    const int cur = current();
-    for (int f = 0; f < dubpresets::numFolders; ++f)
-    {
-        juce::PopupMenu sub;
-        const auto songs = songsOf (f);
-        for (int i : songs)
-        {
-            const auto& pr = dubpresets::presets[i];
-            sub.addItem (i + 1, u8 (pr.name) + u8 ("   \xc2\xb7  ") + (pr.bpmReal ? "" : "~") + juce::String (pr.bpm) + " BPM", true, cur == i);
-        }
-        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (songs.size()) + ")", sub, true, nullptr, styleOf (cur) == f);
-    }
+    riddimbank::addMenus (menu, current());   // ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z (o mesmo menu de todas as machines)
     juce::Component::SafePointer<RiddimPresetPanel> safe (this);
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int r)
     {
-        if (safe != nullptr && r > 0) { safe->proc.applyRiddimPreset (r - 1); safe->repaint(); }
+        if (safe == nullptr || r == 0) return;
+        if (r == riddimbank::toggleCompleteId) { riddimbank::onlyComplete() = ! riddimbank::onlyComplete(); safe->showList(); return; }
+        if (const int e = riddimbank::entryFromMenuResult (r); e >= 0) { safe->proc.applyBankRiddim (e); safe->repaint(); }
     });
 }
 
@@ -582,25 +576,40 @@ void RiddimPresetPanel::paint (juce::Graphics& g)
     const int cur = current();
     const int st = cur >= 0 ? styleOf (cur) : styleSel;
     const auto songs = songsOf (st);
-    mpc::text (g, juce::String (dubpresets::folders[st]), t.withHeight (16.0f), juce::Justification::centredLeft, 13.0f, 0.85f, 0.25f);
+    mpc::text (g, juce::String (riddimbank::styles[st]) + "  " + riddimbank::styleYears[st], t.withHeight (16.0f), juce::Justification::centredLeft, 13.0f, 0.85f, 0.25f);
     if (cur >= 0)
     {
-        const auto& pr = dubpresets::presets[cur];
-        mpc::text (g, juce::String (songs.indexOf (cur) + 1).paddedLeft ('0', 2) + "/" + juce::String (songs.size()).paddedLeft ('0', 2),
-                   t.withHeight (16.0f), juce::Justification::centredRight, 12.0f, 0.8f);
-        mpc::text (g, u8 (pr.name).toUpperCase(), t.withTrimmedTop (17.0f).withHeight (22.0f), juce::Justification::centredLeft, 17.0f, 1.0f, 0.04f);
-        juce::StringArray ch;
-        for (int k = 0; k < pr.numChords; ++k)
-            ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
-        mpc::text (g, ch.joinIntoString (" - ") + u8 ("  \xc2\xb7  ") + (pr.bpmReal ? juce::String (pr.bpm) + " BPM ORIGINAL" : "~" + juce::String (pr.bpm) + " BPM")
-                      + u8 ("  \xc2\xb7  ") + kKits[pr.kit] + u8 ("  \xc2\xb7  ")
-                      + juce::String (dubdrums::drummerName ((dubdrums::Drummer) pr.drummer)).toUpperCase() + " + " + juce::String (mbm::styleName (pr.bassist)).toUpperCase(),
+        const auto& e = riddimbank::entries[cur];
+        const auto count = juce::String (songs.indexOf (cur) + 1).paddedLeft ('0', 2) + "/" + juce::String (songs.size()).paddedLeft ('0', 2);
+        mpc::text (g, count, t.withHeight (16.0f), juce::Justification::centredRight, 12.0f, 0.8f);
+        {   // luzes H B D: acesa = a parte veio da gravação original
+            static const juce::uint32 ledCol[3] = { 0xffe5484d, 0xfff5c542, 0xff3fb950 };
+            static const char* const ledTxt[3] = { "H", "B", "D" };
+            auto row = t.withHeight (16.0f).withTrimmedRight (70.0f).removeFromRight (78.0f);
+            for (int k = 0; k < 3; ++k)
+            {
+                auto cell = row.removeFromLeft (26.0f);
+                const bool on = (e.orig >> k) & 1;
+                const auto dot = cell.removeFromLeft (10.0f).withSizeKeepingCentre (8.0f, 8.0f);
+                g.setColour (juce::Colour (ledCol[k]).withAlpha (on ? 1.0f : 0.18f));
+                g.fillEllipse (dot);
+                if (on) { g.setColour (juce::Colour (ledCol[k]).withAlpha (0.35f)); g.drawEllipse (dot.expanded (1.5f), 1.0f); }
+                mpc::text (g, ledTxt[k], cell.withTrimmedLeft (2.0f), juce::Justification::centredLeft, 11.0f, on ? 0.95f : 0.4f);
+            }
+        }
+        mpc::text (g, (u8 (e.name) + (e.year > 0 ? " " + juce::String (e.year) : juce::String())).toUpperCase(),
+                   t.withTrimmedTop (17.0f).withHeight (22.0f), juce::Justification::centredLeft, 17.0f, 1.0f, 0.04f);
+        mpc::text (g, riddimbank::chordsText (e) + (e.harmony == 1 ? "~" : "") + u8 ("  \xc2\xb7  ")
+                      + (e.bpmMeasured ? juce::String (e.bpm) + " BPM ORIGINAL" : "~" + juce::String (e.bpm) + " BPM")
+                      + u8 ("  \xc2\xb7  ") + kKits[juce::jlimit (0, 3, e.kit)] + u8 ("  \xc2\xb7  ")
+                      + juce::String (dubdrums::drummerName ((dubdrums::Drummer) e.drummer)).toUpperCase() + " + " + juce::String (mbm::styleName (e.bassStyle)).toUpperCase(),
                    t.withTrimmedTop (41.0f), juce::Justification::centredLeft, 10.5f, 0.85f, 0.06f);
     }
     else
     {
         mpc::text (g, u8 ("ESCOLHA UM RIDDIM  \xc2\xb7  \xe2\x97\x80 \xe2\x96\xb6"), t.withTrimmedTop (17.0f).withHeight (22.0f), juce::Justification::centredLeft, 16.0f, 0.8f);
-        mpc::text (g, u8 ("HARMONIA, BPM ORIGINAL, BATERIA E OS M\xc3\x9aSICOS DE CADA M\xc3\x9aSICA"), t.withTrimmedTop (41.0f), juce::Justification::centredLeft, 10.5f, 0.7f);
+        mpc::text (g, u8 ("BANCO \xc3\x9aNICO: ") + juce::String (riddimbank::numEntries) + u8 (" M\xc3\x9aSICAS \xc2\xb7 ") + juce::String (riddimbank::numFamilies)
+                      + u8 (" RIDDIMS \xc2\xb7 HARMONIA, BPM E OS M\xc3\x9aSICOS CERTOS"), t.withTrimmedTop (41.0f), juce::Justification::centredLeft, 10.5f, 0.7f);
     }
     mpc::shine (g, l);
 
@@ -611,7 +620,7 @@ void RiddimPresetPanel::paint (juce::Graphics& g)
     g.drawText ("LISTA", lk.withTrimmedBottom (34.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), juce::Justification::centredBottom);
     g.setFont (stencil (7.5f, 0.12f));
     g.setColour (col::cream.withAlpha (0.6f));
-    g.drawText (u8 ("POR ESTILO \xe2\x96\xbe"), lk.withTrimmedTop (44.0f).withHeight (14.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), juce::Justification::centred);
+    g.drawText (u8 ("BANCO \xc3\x9aNICO \xe2\x96\xbe"), lk.withTrimmedTop (44.0f).withHeight (14.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), juce::Justification::centred);
 }
 
 void RiddimPresetPanel::mouseDown (const juce::MouseEvent& e)
@@ -1507,32 +1516,16 @@ void MainPage::exportRiddim()
 
 void MainPage::showPresets()
 {
-    auto& c = proc.getChords();
     juce::PopupMenu menu;
-    menu.addSectionHeader (u8 ("RIDDIMS CL\xc3\x81SSICOS  \xc2\xb7  HARMONIA, BPM E OS M\xc3\x9aSICOS CERTOS"));
-    // estilo de reggae > música (abre passando o mouse ou clicando)
-    for (int f = 0; f < dubpresets::numFolders; ++f)
-    {
-        juce::PopupMenu sub;
-        int count = 0;
-        bool ticked = false;
-        for (int i : dubpresets::menuOrder)
-        {
-            const auto& pr = dubpresets::presets[i];
-            if (juce::String (pr.folder) != dubpresets::folders[f]) continue;
-            juce::StringArray ch;
-            for (int k = 0; k < pr.numChords; ++k)
-                ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
-            const bool tick = c.getLastPreset() == i;
-            ticked = ticked || tick; ++count;
-            sub.addItem (i + 1, u8 (pr.name) + "   " + ch.joinIntoString (" - ") + u8 ("   \xc2\xb7  ") + (pr.bpmReal ? "" : "~") + juce::String (pr.bpm) + " BPM "
-                                    + kKits[pr.kit] + u8 ("  \xc2\xb7  ") + juce::String (dubdrums::drummerName ((dubdrums::Drummer) pr.drummer)).toUpperCase()
-                                    + " + " + mbm::styleName (pr.bassist), true, tick);
-        }
-        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (count) + ")", sub, true, nullptr, ticked);
-    }
+    riddimbank::addMenus (menu, proc.currentBankRiddim());   // BANCO ÚNICO: o mesmo menu de todas as machines
+    juce::Component::SafePointer<MainPage> safe (this);
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presets),
-                        [this] (int r) { if (r > 0) proc.applyRiddimPreset (r - 1); });
+                        [safe] (int r)
+                        {
+                            if (safe == nullptr || r == 0) return;
+                            if (r == riddimbank::toggleCompleteId) { riddimbank::onlyComplete() = ! riddimbank::onlyComplete(); safe->showPresets(); return; }
+                            if (const int e = riddimbank::entryFromMenuResult (r); e >= 0) safe->proc.applyBankRiddim (e);
+                        });
 }
 
 void MainPage::timerCallback()
@@ -1716,7 +1709,7 @@ void MainPage::renderBackground()
     engraved (g, u8 ("BYPASS: DESLIGA O BIG KNOB INTEIRO"), juce::Rectangle<float> (196.0f, 727.0f, 220.0f, 11.0f), juce::Justification::centred, 6.5f, 0.15f);
     engraved (g, u8 ("TUDO NA ABA CONTROL ROOM"), juce::Rectangle<float> (196.0f, 784.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
 
-    section (g, presetBox, u8 ("PRESETS  \xc2\xb7  RIDDIMS CL\xc3\x81SSICOS POR ESTILO DE REGGAE  \xc2\xb7  BPM DA GRAVA\xc3\x87\xc3\x83O ORIGINAL"));
+    section (g, presetBox, u8 ("PRESETS  \xc2\xb7  BANCO \xc3\x9aNICO DE RIDDIMS  \xc2\xb7  ESTILO, RIDDIM E M\xc3\x9aSICA A-Z  \xc2\xb7  H B D = PARTES DA GRAVA\xc3\x87\xc3\x83O"));
     section (g, bpmBox, u8 ("BPM  \xc2\xb7  DIGITE, BATA NO TEMPO OU ESCOLHA O PRESET DE BPM"));
     section (g, sirenSection, u8 ("DUB SIREN  \xc2\xb7  A SIRENE DO MASTOR BIG KNOB"));
     engraved (g, u8 ("SEGURE O FIRE  \xc2\xb7  O DELAY CONTINUA DEPOIS"), juce::Rectangle<float> (196.0f, 882.0f, 380.0f, 9.0f), juce::Justification::centredLeft, 7.0f, 0.2f);

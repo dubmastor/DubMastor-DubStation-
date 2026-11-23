@@ -59,6 +59,10 @@ public:
     void applyPreset (int index);                 // thread da interface: acordes, tipos, durações e ON
     int  getLastPreset() const noexcept { return lastPreset.load(); }   // -1 = nenhum
 
+    // BANCO ÚNICO DE RIDDIMS (RiddimBank/Source/RiddimBank.h, o mesmo das outras machines)
+    void applyBankEntry (int index);              // thread da interface: harmonia e BPM da música
+    int  getBankEntry() const;                    // entrada atual do banco (-1 = nenhuma)
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:

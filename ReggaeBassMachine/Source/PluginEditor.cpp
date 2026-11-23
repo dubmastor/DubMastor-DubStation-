@@ -1,5 +1,6 @@
 #include "PluginEditor.h"
 #include "RiddimPresets.h"
+#include "../../RiddimBank/Source/RiddimBankMenu.h"
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
@@ -1718,6 +1719,21 @@ void RiddimBox::paint (juce::Graphics& g)
     auto top = t.removeFromTop (11.0f);
     g.setFont (mono (10.0f, false));
     g.setColour (ink.withAlpha (0.85f));
+    if (const int b = proc.currentBank(); b >= 0 && b < riddimbank::numEntries)
+    {   // música do BANCO ÚNICO: número no banco, estilo, nome, baixista e luzes H B D
+        const auto& e = riddimbank::entries[b];
+        g.drawText ("=BANCO= " + juce::String (b + 1).paddedLeft ('0', 3) + "/" + juce::String (riddimbank::numEntries), top, juce::Justification::centredLeft);
+        g.drawText (juce::String ("[") + riddimbank::styles[e.style] + "]", top, juce::Justification::centredRight);
+        g.setFont (mono (15.0f, true));
+        g.setColour (ink);
+        g.drawFittedText (juce::String::fromUTF8 (e.name).toUpperCase() + (e.year > 0 ? " " + juce::String (e.year) : juce::String()),
+                          t.removeFromTop (19.0f).toNearestInt(), juce::Justification::centredLeft, 1, 0.75f);
+        g.setFont (mono (10.0f, false));
+        g.setColour (ink.withAlpha (0.85f));
+        g.drawFittedText ("BASS:" + juce::String (mbm::styleName (e.bassStyle)).toUpperCase() + "  TEMPO:" + juce::String (e.bpm).paddedLeft ('0', 3)
+                          + "  " + riddimbank::lights (e), t.toNearestInt(), juce::Justification::centredLeft, 1, 0.7f);
+        return;
+    }
     if (idx < 0)
     {
         g.drawText ("=RIDDIM= ---/160", top, juce::Justification::centredLeft);
@@ -1745,6 +1761,14 @@ void RiddimBox::paint (juce::Graphics& g)
 
 void RiddimBox::mouseDown (const juce::MouseEvent& e)
 {
+    if (const int b = proc.currentBank(); b >= 0 && (e.x < 26 || e.x > getWidth() - 26))
+    {   // setas no BANCO: próxima / anterior música com harmonia
+        const int dir = e.x < 26 ? -1 : 1;
+        int n = b;
+        do n = (n + dir + riddimbank::numEntries) % riddimbank::numEntries; while (! riddimbank::usable (n) && n != b);
+        loadBank (n);
+        return;
+    }
     const int idx = proc.currentRiddim();
     if (e.x < 26) { load (idx <= 0 ? mbmriddims::numRiddims - 1 : idx - 1); return; }
     if (e.x > getWidth() - 26) { load (idx < 0 || idx >= mbmriddims::numRiddims - 1 ? 0 : idx + 1); return; }
@@ -1797,13 +1821,21 @@ void RiddimBox::showMenu()
         }
     }
     juce::PopupMenu m;
-    m.addSectionHeader (juce::String::fromUTF8 ("160 RIDDIMS CLÁSSICOS  ·  ✓ = harmonia conferida"));
+    riddimbank::addMenus (m, proc.currentBank());   // BANCO ÚNICO (o mesmo do MRCM-1240, MRDM-12 e MRM-0420)
+    m.addSeparator();
+    m.addSectionHeader (juce::String::fromUTF8 ("160 RIDDIMS DO MRBM-69  ·  ✓ = harmonia conferida"));
     m.addSubMenu ("POR ESTILO DE REGGAE", byStyle);
     m.addSubMenu ("POR BAIXISTA", byBass);
     m.addSubMenu (juce::String::fromUTF8 ("POR DÉCADA"), byDecade);
     m.addSeparator();
-    m.addItem (-1, juce::String::fromUTF8 ("O baixo é gerado no estilo do baixista (não é transcrição)"), false);
+    m.addItem (-3, juce::String::fromUTF8 ("O baixo é gerado no estilo do baixista (não é transcrição)"), false);
     juce::Component::SafePointer<RiddimBox> safe (this);
     m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withMinimumWidth (getWidth()),
-                     [safe] (int res) { if (safe != nullptr && res > 0) safe->load (res - 1); });
+                     [safe] (int res)
+                     {
+                         if (safe == nullptr || res == 0) return;
+                         if (res == riddimbank::toggleCompleteId) { riddimbank::onlyComplete() = ! riddimbank::onlyComplete(); safe->showMenu(); return; }
+                         if (const int e = riddimbank::entryFromMenuResult (res); e >= 0) safe->loadBank (e);
+                         else if (res > 0 && res <= mbmriddims::numRiddims) safe->load (res - 1);
+                     });
 }

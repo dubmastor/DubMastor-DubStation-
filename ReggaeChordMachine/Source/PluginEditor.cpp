@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 // Visual da família DubMastor (mesmo do Big Knob): painel de metal creme envelhecido,
 // laterais de madeira, knobs de baquelite com saia de alumínio, lâmpadas piloto e displays âmbar.
@@ -1200,8 +1201,11 @@ void DubChordsPanel::resized()
 void DubChordsPanel::showPresets()
 {
     juce::PopupMenu menu;
-    menu.addSectionHeader (juce::String::fromUTF8 ("HARMONIAS CLÁSSICAS DO REGGAE"));
-    // estilo de reggae > música (abre passando o mouse ou clicando)
+    // BANCO ÚNICO DE RIDDIMS (o mesmo do MRBM-69, MRDM-12 e MRM-0420)
+    riddimbank::addMenus (menu, proc.getBankEntry());
+    menu.addSeparator();
+    // banco antigo do MRCM-1240: estilo de reggae > música (a ordem não muda: os projetos guardam o número)
+    juce::PopupMenu classic;
     for (int f = 0; f < dubpresets::numFolders; ++f)
     {
         juce::PopupMenu sub;
@@ -1218,8 +1222,17 @@ void DubChordsPanel::showPresets()
             ticked = ticked || tick; ++count;
             sub.addItem (i + 1, juce::String::fromUTF8 (pr.name) + "   (" + pr.era + ")   " + ch.joinIntoString (" - "), true, tick);
         }
-        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (count) + ")", sub, true, nullptr, ticked);
+        classic.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (count) + ")", sub, true, nullptr, ticked);
     }
+    menu.addSubMenu (juce::String::fromUTF8 ("HARMONIAS CLÁSSICAS (banco antigo do MRCM)"), classic);
+    juce::Component::SafePointer<DubChordsPanel> safe (this);
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presetBtn),
-                        [this] (int r) { if (r > 0) { proc.applyPreset (r - 1); repaint(); } });
+                        [safe] (int r)
+                        {
+                            if (safe == nullptr || r == 0) return;
+                            if (r == riddimbank::toggleCompleteId) { riddimbank::onlyComplete() = ! riddimbank::onlyComplete(); safe->showPresets(); return; }
+                            if (const int e = riddimbank::entryFromMenuResult (r); e >= 0) safe->proc.applyBankEntry (e);
+                            else if (r > 0 && r <= dubpresets::numPresets) safe->proc.applyPreset (r - 1);
+                            safe->repaint();
+                        });
 }

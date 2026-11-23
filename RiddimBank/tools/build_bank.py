@@ -296,11 +296,11 @@ def build():
         # baixo
         era = BASS_ERA[estilo]
         if b0:
-            baixo = dict(estilo=BASSISTS[b0["style"]], riddimMRBM=b0["idx"], original=True, quemGravou=b0["bassman"],
+            baixo = dict(estilo=BASSISTS[b0["style"]], riddimMRBM=b0["idx"], original=True, quemGravou=b0["bassman"], bateriaInterna=b0["drum"],
                          timbre=b0["timbre"], densidade=b0["dens"], variacao=b0["var"], swing=b0["swing"])
         else:
             bx = c0["bx"] if c0 else bassist_for(prod, artista, ano)
-            baixo = dict(estilo=BASSISTS[bx], riddimMRBM=None, original=False, quemGravou="",
+            baixo = dict(estilo=BASSISTS[bx], riddimMRBM=None, original=False, quemGravou="", bateriaInterna=era["drum"],
                          timbre=era["timbre"], densidade=era["dens"], variacao=era["var"], swing=era["swing"])
         e = OrderedDict(
             id="", nome=nome, artista=artista, ano=ano, estilo=estilo, riddim=riddim, produtor=prod,
@@ -323,7 +323,7 @@ def build():
             id="", nome=n["nome"], artista=n["artista"], ano=n["ano"], estilo=est, riddim=n["riddim"], produtor=n["produtor"],
             harmonia=[], harmoniaTexto="", harmoniaStatus="pendente", harmoniaFonte="pendente (" + n["fonte"] + ")", bpm=bpm, bpmFonte="típico da época",
             bateria=OrderedDict(baterista=DRUMMERS[dr], kit="ROCKERS", groove=dict(indice=gp["idx"], musica=f'{gp["song"]} ({gp["artist"]})', original=False)),
-            baixo=dict(estilo=BASSISTS[bx], riddimMRBM=None, original=False, quemGravou="", timbre=era["timbre"],
+            baixo=dict(estilo=BASSISTS[bx], riddimMRBM=None, original=False, quemGravou="", bateriaInterna=era["drum"], timbre=era["timbre"],
                        densidade=era["dens"], variacao=era["var"], swing=era["swing"]),
             completo=False, original=OrderedDict(harmonia=False, baixo=False, bateria=False),
             indices=OrderedDict(MRCM=None, MRBM=None, MRDM=None), conferir=[]))
@@ -359,7 +359,7 @@ def write(entries, cm, bm, dm):
     cols = ["Estilo", "Música", "Artista", "Ano", "Riddim", "Harmonia", "BPM", "Baterista", "Kit", "Groove (MRDM-12)",
             "Bateria", "Baixista", "Baixo", "Quem gravou o baixo", "Harmonia: status", "Harmonia: fonte", "BPM: fonte", "Conferir", "ID"]
     with open(os.path.join(OUT, "riddims.csv"), "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f); w.writerow(cols)
+        w = csv.writer(f, lineterminator="\n"); w.writerow(cols)
         for e in entries:
             w.writerow([e["estilo"], e["nome"], e["artista"], e["ano"] or "", e["riddim"], e["harmoniaTexto"] or "pendente", e["bpm"],
                         e["bateria"]["baterista"], e["bateria"]["kit"], e["bateria"]["groove"]["musica"],
@@ -425,7 +425,7 @@ def write_families(fams):
                           total=len(fams), comVersoes=sum(len(f["versoes"]) > 1 for f in fams), riddims=fams),
               open(os.path.join(OUT, "riddims_por_nome.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     with open(os.path.join(OUT, "riddims_por_nome.csv"), "w", newline="", encoding="utf-8") as fh:
-        w = csv.writer(fh)
+        w = csv.writer(fh, lineterminator="\n")
         w.writerow(["Letra", "Riddim", "Ano", "Estilo", "Produtor", "Gravação de origem", "Harmonia", "BPM", "Versões no banco", "Músicas", "Também chamado", "Nota"])
         for f in fams:
             w.writerow([f["letra"], f["nome"], f["ano"] or "", f["estilo"], f["produtor"], f["origem"], f["harmonia"] or "pendente", f["bpm"],
@@ -445,6 +445,80 @@ def write_families(fams):
     open(os.path.join(OUT, "RIDDIMS_POR_NOME.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
 
 
+def cstr(x):
+    return json.dumps(x or "", ensure_ascii=False)
+
+
+def write_code(entries, fams):
+    """riddimbank.h (plugins) e site/riddimbank.js (versões do navegador): o mesmo banco, para todas as machines."""
+    idx = {e["id"]: i for i, e in enumerate(entries)}
+    HS = {"conferida": 0, "aproximada": 1, "pendente": 2}
+    rows = []
+    for e in entries:
+        ch = [(NOTE.index(c["tonica"]), int(c["menor"]), DURTXT.index(c["compassos"])) for c in e["harmonia"]]
+        orig = (1 if e["original"]["harmonia"] else 0) | (2 if e["original"]["baixo"] else 0) | (4 if e["original"]["bateria"] else 0)
+        b = e["baixo"]; d = e["bateria"]; ix = e["indices"]
+        rows.append(dict(id=e["id"], name=e["nome"], artist=e["artista"] or "", year=e["ano"] or 0, style=STYLES.index(e["estilo"]),
+                         riddim=e["riddim"] or "", chords=ch, bpm=e["bpm"], bpmMeasured=int(e["bpmFonte"].startswith("medido")),
+                         drummer=DRUMMERS.index(d["baterista"]), kit=KITS.index(d["kit"]), groove=d["groove"]["indice"],
+                         grooveOriginal=int(d["groove"]["original"]), bassStyle=BASSISTS.index(b["estilo"]),
+                         mrbm=-1 if b["riddimMRBM"] is None else b["riddimMRBM"], bassDrum=b["bateriaInterna"], timbre=b["timbre"],
+                         density=b["densidade"], variation=b["variacao"], swing=b["swing"],
+                         mrcm=-1 if ix["MRCM"] is None else ix["MRCM"], mrdm=-1 if ix["MRDM"] is None else ix["MRDM"],
+                         orig=orig, harmony=HS[e["harmoniaStatus"]]))
+    songOrder = sorted(range(len(rows)), key=lambda i: (re.sub(r"^(the |a )", "", rows[i]["name"].lower()), rows[i]["artist"].lower()))
+    famRows, members = [], []
+    for f in fams:
+        mem = [idx[v["id"]] for v in f["versoes"]]
+        famRows.append(dict(name=f["nome"], letter=f["letra"], year=f["ano"] or 0, style=STYLES.index(f["estilo"]),
+                            first=len(members), count=len(mem)))
+        members += mem
+    mrcmTo = [-1] * 180
+    for i, r in enumerate(rows):
+        if r["mrcm"] >= 0: mrcmTo[r["mrcm"]] = i
+    assert all(v >= 0 for v in mrcmTo)
+
+    H = ["// Gerado por RiddimBank/tools/build_bank.py a partir do riddims.json: não editar à mão.",
+         "// BANCO ÚNICO DE RIDDIMS da Dub Station: o mesmo banco no MRCM-1240, no MRBM-69, no MRDM-12 e no MRM-0420.",
+         "#pragma once", "", "namespace riddimbank", "{",
+         "struct Chord { int root, minor, dur; };   // tônica 0..11 (C = 0), 1 = menor, duração 0..5 (1/2, 1, 2, 3, 4, 8 compassos)",
+         "// drummer: 0 STYLE SCOTT, 1 SANTA DAVIS, 2 CARLTON BARRETT, 3 SLY DUNBAR, 4 DIGIKAL · kit: 0 ROCKERS, 1 ONE DROP, 2 BOOM BAP, 3 DEMBOW",
+         "// groove: índice no GroovePresets.h (MRDM-12) · bassStyle: estilo do MRBM-69 · mrbm/mrcm/mrdm: índice no banco de cada máquina (-1 = não tem)",
+         "// orig: 1 = harmonia, 2 = baixo, 4 = bateria vindos da gravação · harmony: 0 conferida, 1 aproximada, 2 pendente (sem acordes)",
+         "struct Entry { const char* id; const char* name; const char* artist; int year; int style; const char* riddim;",
+         "               int numChords; Chord chords[4]; int bpm, bpmMeasured, drummer, kit, groove, grooveOriginal;",
+         "               int bassStyle, mrbm, bassDrum, timbre; float density, variation, swing; int mrcm, mrdm, orig, harmony; };",
+         "struct Family { const char* name; char letter; int year; int style; int first, count; };   // members[first .. first+count-1], o primeiro é a origem", "",
+         f"inline constexpr int numStyles = {len(STYLES)};",
+         "inline const char* const styles[numStyles] = { " + ", ".join(cstr(x) for x in STYLES) + " };",
+         "inline const char* const styleYears[numStyles] = { " + ", ".join(cstr(STYLE_YEARS[x]) for x in STYLES) + " };", "",
+         f"inline constexpr int numEntries = {len(rows)};", "inline const Entry entries[numEntries] = {"]
+    for r in rows:
+        ch = ", ".join(f"{{ {a}, {m}, {d} }}" for a, m, d in r["chords"]) or "{ 0, 0, 1 }"
+        H.append(f'    {{ {cstr(r["id"])}, {cstr(r["name"])}, {cstr(r["artist"])}, {r["year"]}, {r["style"]}, {cstr(r["riddim"])}, '
+                 f'{len(r["chords"])}, {{ {ch} }}, {r["bpm"]}, {r["bpmMeasured"]}, {r["drummer"]}, {r["kit"]}, {r["groove"]}, {r["grooveOriginal"]}, '
+                 f'{r["bassStyle"]}, {r["mrbm"]}, {r["bassDrum"]}, {r["timbre"]}, {r["density"]:.2f}f, {r["variation"]:.2f}f, {r["swing"]:.2f}f, '
+                 f'{r["mrcm"]}, {r["mrdm"]}, {r["orig"]}, {r["harmony"]} }},')
+    H += ["};", "", "// MÚSICAS de A a Z", "inline const int songOrder[numEntries] = { " + ", ".join(map(str, songOrder)) + " };", "",
+          f"inline constexpr int numFamilies = {len(famRows)};", "inline const Family families[numFamilies] = {"]
+    for f in famRows:
+        H.append(f'    {{ {cstr(f["name"])}, \'{f["letter"]}\', {f["year"]}, {f["style"]}, {f["first"]}, {f["count"]} }},')
+    H += ["};", f"inline const int members[{len(members)}] = {{ " + ", ".join(map(str, members)) + " };", "",
+          "// preset antigo do MRCM-1240 (HarmonyPresets.h) -> entrada do banco",
+          "inline const int fromMrcm[180] = { " + ", ".join(map(str, mrcmTo)) + " };",
+          "inline int indexOf (const char* id) { for (int i = 0; i < numEntries; ++i) { const char* a = entries[i].id; const char* b = id; while (*a && *a == *b) { ++a; ++b; } if (*a == *b) return i; } return -1; }",
+          "}", ""]
+    os.makedirs(os.path.join(OUT, "Source"), exist_ok=True)
+    open(os.path.join(OUT, "Source", "RiddimBank.h"), "w", encoding="utf-8").write("\n".join(H))
+    js = ("// Gerado por RiddimBank/tools/build_bank.py: não editar à mão.\n"
+          "// BANCO ÚNICO DE RIDDIMS da Dub Station (mesmo banco dos plugins).\n"
+          "(function (root) {\n  root.RIDDIM_BANK = " +
+          json.dumps(dict(styles=STYLES, styleYears=[STYLE_YEARS[x] for x in STYLES], entries=rows, songOrder=songOrder,
+                          families=famRows, members=members, fromMrcm=mrcmTo), ensure_ascii=False, separators=(",", ":")) +
+          ";\n})(typeof window !== \"undefined\" ? window : globalThis);\n")
+    open(os.path.join(ROOT, "site", "riddimbank.js"), "w", encoding="utf-8").write(js)
+
+
 if __name__ == "__main__":
     entries, cm, bm, dm = build()
     # checagens
@@ -458,4 +532,5 @@ if __name__ == "__main__":
     fams = families(entries)
     write_families(fams)
     stats["riddimsPorNome"] = len(fams)
+    write_code(entries, fams)
     print(json.dumps(stats, ensure_ascii=False, indent=1))

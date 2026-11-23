@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "../../RiddimBank/Source/RiddimBank.h"
 
 namespace
 {
@@ -398,6 +399,47 @@ void DubChordsProcessor::applyPreset (int index)
         if (i > 0) set (onId (i), used ? 1.0f : 0.0f);
     }
     lastPreset.store (index);
+    apvts.state.setProperty ("bank", riddimbank::fromMrcm[index], nullptr);
+}
+
+// BANCO ÚNICO: a harmonia da música (só os acordes que ela tem ficam ligados) e o BPM dela
+void DubChordsProcessor::applyBankEntry (int index)
+{
+    if (index < 0 || index >= riddimbank::numEntries) return;
+    const auto& e = riddimbank::entries[index];
+    if (e.numChords <= 0) return;   // harmonia ainda pendente
+    auto set = [this] (const juce::String& id, float v)
+    {
+        if (auto* p = apvts.getParameter (id))
+        {
+            p->beginChangeGesture();
+            p->setValueNotifyingHost (p->convertTo0to1 (v));
+            p->endChangeGesture();
+        }
+    };
+    for (int i = 0; i < numSlots; ++i)
+    {
+        const bool used = i < e.numChords;
+        if (used)
+        {
+            set (rootId (i), (float) e.chords[i].root);
+            set (qualId (i), (float) (e.chords[i].minor ? dub::Min : dub::Maj));
+            set (durId (i),  (float) e.chords[i].dur);
+            set (invId (i),  0.0f);   // AUTO
+        }
+        if (i > 0) set (onId (i), used ? 1.0f : 0.0f);
+    }
+    set ("bpm", (float) e.bpm);
+    lastPreset.store (e.mrcm);
+    apvts.state.setProperty ("bank", index, nullptr);
+}
+
+int DubChordsProcessor::getBankEntry() const
+{
+    const int b = apvts.state.getProperty ("bank", -1);
+    if (b >= 0 && b < riddimbank::numEntries) return b;
+    const int p = lastPreset.load();
+    return p >= 0 && p < dubpresets::numPresets ? riddimbank::fromMrcm[p] : -1;
 }
 
 //==============================================================================

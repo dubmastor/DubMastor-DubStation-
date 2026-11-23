@@ -2,6 +2,7 @@
 #include "PluginEditor.h"
 #include "DMSamples.h"
 #include "GroovePresets.h"
+#include "../../RiddimBank/Source/RiddimBank.h"
 
 namespace
 {
@@ -344,8 +345,29 @@ void DubDrumsProcessor::loadGroove (int index)
             p->endChangeGesture();
         }
     apvts.state.setProperty ("groove", index, nullptr);
+    apvts.state.setProperty ("bank", -1, nullptr);
     clearEdits();
     dirty = true;
+}
+
+void DubDrumsProcessor::applyBankEntry (int index)
+{
+    if (! juce::isPositiveAndBelow (index, riddimbank::numEntries)) return;
+    const auto& e = riddimbank::entries[index];
+    loadGroove (e.groove);
+    if (auto* p = apvts.getParameter ("bpm"))
+    {
+        p->beginChangeGesture();
+        p->setValueNotifyingHost (p->convertTo0to1 ((float) e.bpm));
+        p->endChangeGesture();
+    }
+    apvts.state.setProperty ("bank", index, nullptr);
+}
+
+int DubDrumsProcessor::getBankEntry() const
+{
+    const int b = apvts.state.getProperty ("bank", -1);
+    return juce::isPositiveAndBelow (b, riddimbank::numEntries) ? b : -1;
 }
 
 int DubDrumsProcessor::getGroove() const

@@ -65,6 +65,8 @@ public:
     void newRiddim();
     void newLine (int machine);                    // NOVA LINHA: semente nova só para a bateria (Drums) ou só para o baixo (Bass)                              // JACKPOT: sorteia outra semente para a bateria e o baixo
     void applyRiddimPreset (int index);           // PRESET de riddim: harmonia + BPM + estilo + baterista + baixista
+    void applyBankRiddim (int index);             // BANCO ÚNICO (RiddimBank.h): a música inteira nas três máquinas
+    int  currentBankRiddim() const;               // -1 = nenhuma
     void randomRiddim();                           // ALAVANCA: aleatoriedade total (harmonia, durações, estilo e
                                                    // baterista, padrão do skank, baixista e semente)
 
