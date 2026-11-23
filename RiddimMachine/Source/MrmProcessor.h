@@ -10,6 +10,7 @@
 #pragma once
 
 #include "SubPlugins.h"
+#include "MrmLink.h"
 
 class MrmProcessor : public juce::AudioProcessor,
                      private juce::Timer
@@ -137,6 +138,8 @@ private:
 
     std::vector<Link> links;
     int lastSeed = -1;
+    mrmlink::Writer linkWriter;   // harmonia para o Mastor Tune MT-0420
+    void publishLink();
     bool lastPreview[NumMachines] {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmProcessor)
