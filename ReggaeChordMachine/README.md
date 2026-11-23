@@ -57,7 +57,8 @@ Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é m
 
 ## PRESETS (banco de riddims clássicos)
 O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de **riddims clássicos do reggae**: 180 músicas, 20 em cada pasta,
-separadas por estilo e época, do early reggae ao new roots. No MRCM-1240 o preset ajusta os acordes, a duração de cada um e
+separadas por estilo e época, do early reggae ao new roots. Cada pasta se divide por **letras** (A - G, H - L...,
+5 músicas por grupo): passe o mouse ou clique na pasta, depois no grupo e na música. No MRCM-1240 o preset ajusta os acordes, a duração de cada um e
 quais ficam ligados (inversão em AUTO). No **MRM-0420** ele monta o riddim inteiro: harmonia, **BPM sugerido**, estilo da
 bateria e os **músicos das máquinas mais próximos de quem gravou** (baterista do MRDM-12 e baixista do MRBM-69).
 Cada preset está no tom da gravação original; sétimas viram tríades e, quando a música tem várias partes, fica o groove

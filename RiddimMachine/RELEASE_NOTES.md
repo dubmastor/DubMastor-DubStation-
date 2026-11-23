@@ -1,3 +1,15 @@
+## Mastor Riddim Machine MRM-0420 1.6 — DubStation
+
+- **Seção BPM na aba RIDDIM:** BPM grande que você **clica e digita** (60 a 180), também arrasta ou gira a roda do mouse; teclas **−1, +1, −5 e +5**; **TAP** (bata no tempo e ele acha o BPM)
+- **24 teclas de BPM por época e estilo de reggae**, todas à vista: ROCKSTEADY, EARLY REGGAE, ROOTS, ROCKERS, RUB A DUB, DIGITAL, DANCEHALL 90s e 2000s, LOVERS ROCK, NEW ROOTS, DUB e STEPPERS UK; a tecla escolhida acende
+- **PRESETS com subdivisões:** os 180 riddims agora abrem em pasta (estilo e época) > **letras** (A - G...) > música; abre passando o mouse ou clicando, e a pasta e o grupo da música atual ficam marcados
+- Banco do MRCM-1240 2.1 (180 riddims, 20 por estilo e época)
+- Versão para celular igual: seção BPM com campo para digitar, TAP e as teclas de estilo, e o menu de presets em cascata
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Riddim Machine MRM-0420 1.0 — DubStation
 
 Nova geração do MRM-0420: as máquinas da DubStation num instrumento só.

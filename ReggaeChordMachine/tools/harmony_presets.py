@@ -256,6 +256,23 @@ for f in FOLDERS:
 assert len({b[2] for b in BANK}) == len(BANK), 'nome repetido'
 
 presets = [dict(folder=f, era=e, name=n, chords=parse(s), **riddim(f, o)) for f, e, n, s, o in BANK]
+
+# subdivisões de cada pasta: o menu fica pasta > letras > música (ordem alfabética, 4 grupos de 5, ex.: "A - F").
+# A ordem do banco não muda (o índice do preset fica salvo nos projetos); cada preset só ganha o grupo.
+def initial(p):
+    c = p['name'].upper().lstrip("'")[0]
+    return c if c.isalpha() else '#'
+menu_order = []   # índices na ordem do menu (pasta, letras, nome)
+for f in FOLDERS:
+    items = sorted([p for p in presets if p['folder'] == f], key=lambda p: (initial(p) != '#', p['name'].upper()))
+    for g in range(0, len(items), 5):
+        chunk = items[g:g + 5]
+        a, z = initial(chunk[0]), initial(chunk[-1])
+        label = a if a == z else f'{a} - {z}'
+        for p in chunk: p['group'] = label
+    menu_order += [presets.index(p) for p in items]
+    labels = [p['group'] for p in items]
+    assert len(set(labels)) == len(labels) // 5, (f, labels)
 folders = FOLDERS
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -265,23 +282,25 @@ h = ['// Gerado por tools/harmony_presets.py — não editar à mão.',
      'struct Chord { int root; int minor; int dur; };   // tônica 0..11 (C = 0), 1 = menor, duração 0..5 (1/2, 1, 2, 3, 4, 8 comp.)',
      '// bpm sugerido, kit (0 ROCKERS, 1 ONE DROP), baterista do MRDM-12 (0 STYLE SCOTT, 1 SANTA DAVIS, 2 CARLTON BARRETT, 3 SLY DUNBAR, 4 DIGIKAL),',
      '// baixista do MRBM-69 (0 FAMILY MAN, 1 FLABBA, 2 DERRICK BARNETT, 3 ROBBIE, 4 LEROY SIBBLES, 5 FULLY FULLWOOD, 6 JAMMYS)',
-     'struct Preset { const char* folder; const char* era; const char* name; int numChords; Chord chords[4]; int bpm, kit, drummer, bassist; };', '',
+     '// group: subdivisão da pasta no menu (período), na ordem do ano da gravação',
+     'struct Preset { const char* folder; const char* era; const char* name; int numChords; Chord chords[4]; int bpm, kit, drummer, bassist; const char* group; };', '',
      f'inline constexpr int numFolders = {len(folders)};',
      'inline const char* const folders[numFolders] = { ' + ', '.join(json.dumps(f) for f in folders) + ' };', '',
      f'inline constexpr int numPresets = {len(presets)};',
      'inline const Preset presets[numPresets] = {']
 for p in presets:
     ch = ', '.join(f'{{ {r}, {m}, {d} }}' for r, m, d in p['chords'])
-    h.append(f'    {{ {json.dumps(p["folder"])}, {json.dumps(p["era"])}, {json.dumps(p["name"], ensure_ascii=False)}, {len(p["chords"])}, {{ {ch} }}, {p["bpm"]}, {p["kit"]}, {p["drummer"]}, {p["bassist"]} }},')
-h += ['};', '}', '']
+    h.append(f'    {{ {json.dumps(p["folder"])}, {json.dumps(p["era"])}, {json.dumps(p["name"], ensure_ascii=False)}, {len(p["chords"])}, {{ {ch} }}, {p["bpm"]}, {p["kit"]}, {p["drummer"]}, {p["bassist"]}, {json.dumps(p["group"])} }},')
+h += ['};', '', '// ordem do menu: pasta > letras > música (nome em ordem alfabética)',
+      'inline const int menuOrder[numPresets] = { ' + ', '.join(str(i) for i in menu_order) + ' };', '}', '']
 open(os.path.join(here, '..', 'Source', 'HarmonyPresets.h'), 'w', encoding='utf-8').write('\n'.join(h))
 
 js = ('// Gerado por ReggaeChordMachine/tools/harmony_presets.py — não editar à mão.\n'
       '// Banco de RIDDIMS da DubStation (MRCM-1240 e MRM-0420): harmonia, BPM e músicos, por estilo e época.\n'
       '(function (root) {\n  root.DUB_PRESETS = ' +
-      json.dumps({'folders': folders, 'presets': [{'folder': p['folder'], 'era': p['era'], 'name': p['name'],
+      json.dumps({'folders': folders, 'menuOrder': menu_order, 'presets': [{'folder': p['folder'], 'era': p['era'], 'name': p['name'],
                   'chords': [{'root': r, 'quality': m, 'dur': d} for r, m, d in p['chords']],
-                  'bpm': p['bpm'], 'kit': p['kit'], 'drummer': p['drummer'], 'bassist': p['bassist']} for p in presets]},
+                  'bpm': p['bpm'], 'kit': p['kit'], 'drummer': p['drummer'], 'bassist': p['bassist'], 'group': p['group']} for p in presets]},
                  ensure_ascii=False, indent=1) + ';\n})(typeof window !== "undefined" ? window : globalThis);\n')
 open(os.path.join(here, '..', '..', 'site', 'chords', 'presets.js'), 'w', encoding='utf-8').write(js)
 print('ok', len(presets), 'presets em', len(folders), 'pastas')

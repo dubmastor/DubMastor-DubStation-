@@ -91,6 +91,38 @@ private:
     bool down = false;
 };
 
+// Seção BPM da aba RIDDIM: o BPM grande (clique e digite, arraste ou roda do mouse), -5 -1 +1 +5, TAP e os
+// presets de BPM por época e estilo de reggae (BpmPresets.h), cada um numa tecla
+class BpmPanel : public juce::Component, private juce::Timer
+{
+public:
+    explicit BpmPanel (MrmProcessor&);
+    void paint (juce::Graphics&) override;
+    void resized() override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+    void setBpm (float v);                 // 60..180, arredondado
+    void tap (double ms);                  // TAP: média dos últimos toques
+    int getChosen() const { return chosen; }
+    void choosePreset (int i);
+private:
+    void timerCallback() override;
+    void openEntry();
+    void commitEntry();
+    juce::Rectangle<int> display, steps[4], tapKey, keyArea (int i) const;
+    MrmProcessor& proc;
+    juce::ParameterAttachment att;
+    juce::TextEditor entry;
+    float value = 75.0f, dragStart = 75.0f;
+    int chosen = -1, pressed = -1;          // preset escolhido (some quando o BPM muda); tecla apertada
+    bool dragging = false, dawShown = false;
+    double dawBpm = 0.0;
+    std::vector<double> taps;
+    double tapFlash = 0.0;
+};
+
 // Arraste para a timeline: uma máquina só (machine >= 0) ou o riddim inteiro (machine = -1)
 class DragZone : public juce::Component
 {
@@ -236,7 +268,7 @@ private:
 class MainPage : public juce::Component, private juce::Timer
 {
 public:
-    static constexpr int kW = 1280, kH = 1142;
+    static constexpr int kW = 1280, kH = 1298;
     explicit MainPage (MrmProcessor&);
     ~MainPage() override;
     void paint (juce::Graphics&) override;
@@ -301,11 +333,12 @@ private:
     std::unique_ptr<MusicianKeys> sirenWave;
     std::array<std::unique_ptr<BigDial>, 6> sirenDials;                 // PITCH, RATE, DEPTH, DELAY, REPEATS, LEVEL
     std::unique_ptr<MuteKey> muteDrums, muteBass, muteRiddim;
+    BpmPanel bpmPanel;
     GrilleSpeaker speaker;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
-    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection, sirenSection;
+    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection, sirenSection, bpmBox;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPage)
 };

@@ -92,7 +92,7 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE CHORD MACHINE MRCM-1240 <span id="ver">2.0</span></h1><div class="sub">RIDDIM CHORD GENERATOR · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE CHORD MACHINE MRCM-1240 <span id="ver">2.1</span></h1><div class="sub">RIDDIM CHORD GENERATOR · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -131,7 +131,7 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 </div>
 
 <section class="mod" style="margin-top:16px"><div class="tag">LOOP</div>
-  <select class="presets" id="presets" aria-label="Presets de harmonia"></select>
+  <div id="presets"></div>
   <div class="loop" id="loop"><div class="head" id="head"></div></div>
   <div class="hint" id="loopInfo"></div>
 </section>
@@ -145,11 +145,12 @@ input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 
 <script src="engine.js"></script>
 <script src="presets.js"></script>
+<script src="presetmenu.js"></script>
 <script>
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '2.0';
+const VERSION = '2.1';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)
@@ -466,28 +467,22 @@ slider('organLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
 for (const id of ['preview', 'preview2']) $(id).onclick = () => setPreview(!audio.isPlaying());
 for (const id of ['export', 'export2']) $(id).onclick = download;
 // PRESETS: harmonias clássicas do reggae por estilo (o mesmo banco do plugin)
-(function presets() {
-  const P = window.DUB_PRESETS, sel = $('presets');
-  sel.innerHTML = '<option value="">PRESETS ▾  harmonias clássicas</option>';
-  P.folders.forEach((f) => {
-    const g = document.createElement('optgroup'); g.label = f;
-    P.presets.forEach((p, i) => {
-      if (p.folder !== f) return;
-      const o = document.createElement('option'); o.value = i;
-      o.textContent = `${p.name} (${p.era})  ${p.chords.map((c) => M.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')}`;
-      g.appendChild(o);
-    });
-    sel.appendChild(g);
+(function presets() {   // pasta > letras > música (passe o mouse ou toque)
+  let last = -1;
+  presetMenu($('presets'), {
+    label: 'PRESETS ▾  180 harmonias clássicas',
+    itemText: (p) => `${p.era} · ${p.chords.map((c) => M.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')}`,
+    current: () => last,
+    onPick: (p, i) => {
+      last = i;
+      st.slots.forEach((s, k) => {
+        const c = p.chords[k];
+        if (c) Object.assign(s, { root: c.root, quality: c.quality, dur: c.dur, inv: -1, on: true });
+        else s.on = false;
+      });
+      changed();
+    },
   });
-  sel.onchange = () => {
-    const p = P.presets[+sel.value]; if (!p) return;
-    st.slots.forEach((s, k) => {
-      const c = p.chords[k];
-      if (c) Object.assign(s, { root: c.root, quality: c.quality, dur: c.dur, inv: -1, on: true });
-      else s.on = false;
-    });
-    sel.value = ''; changed();
-  };
 })();
 render();
 

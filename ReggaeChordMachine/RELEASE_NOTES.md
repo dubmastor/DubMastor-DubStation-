@@ -1,3 +1,12 @@
+## Mastor Reggae Chord Machine MRCM-1240 2.1 🟢🟡⚫
+
+- **PRESETS com subdivisões:** cada pasta de estilo e época agora se divide por **letras** (A - G, H - L...), 5 músicas em cada grupo, em ordem alfabética; abre passando o mouse ou clicando e marca a pasta e o grupo do preset atual
+- Versão para celular igual: menu de presets em cascata (pasta > letras > música), que abre no toque
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Chord Machine MRCM-1240 2.0 🟢🟡⚫
 
 - **180 riddims clássicos: 20 em cada uma das 9 pastas de estilo e época** (eram 10), cada um no tom da gravação, com BPM e músicos

@@ -13,6 +13,188 @@
   "DANCEHALL - ANOS 90",
   "NEW ROOTS - ANOS 2000"
  ],
+ "menuOrder": [
+  10,
+  1,
+  6,
+  19,
+  0,
+  12,
+  13,
+  17,
+  18,
+  4,
+  2,
+  5,
+  16,
+  7,
+  9,
+  11,
+  15,
+  3,
+  8,
+  14,
+  38,
+  33,
+  26,
+  32,
+  31,
+  27,
+  35,
+  34,
+  22,
+  25,
+  28,
+  39,
+  24,
+  21,
+  29,
+  20,
+  23,
+  30,
+  36,
+  37,
+  58,
+  49,
+  41,
+  48,
+  53,
+  55,
+  51,
+  56,
+  54,
+  44,
+  40,
+  46,
+  43,
+  47,
+  59,
+  57,
+  45,
+  52,
+  50,
+  42,
+  67,
+  72,
+  79,
+  64,
+  68,
+  65,
+  78,
+  73,
+  66,
+  69,
+  77,
+  62,
+  60,
+  63,
+  74,
+  61,
+  70,
+  71,
+  76,
+  75,
+  99,
+  92,
+  85,
+  93,
+  83,
+  89,
+  88,
+  87,
+  96,
+  80,
+  90,
+  84,
+  82,
+  86,
+  91,
+  97,
+  81,
+  98,
+  95,
+  94,
+  113,
+  105,
+  115,
+  106,
+  117,
+  114,
+  112,
+  102,
+  116,
+  118,
+  111,
+  101,
+  103,
+  104,
+  109,
+  108,
+  119,
+  100,
+  110,
+  107,
+  137,
+  139,
+  128,
+  131,
+  133,
+  121,
+  138,
+  134,
+  136,
+  130,
+  123,
+  126,
+  135,
+  120,
+  124,
+  129,
+  132,
+  127,
+  122,
+  125,
+  158,
+  154,
+  152,
+  145,
+  148,
+  150,
+  143,
+  141,
+  147,
+  156,
+  155,
+  140,
+  151,
+  159,
+  142,
+  153,
+  149,
+  146,
+  157,
+  144,
+  167,
+  166,
+  172,
+  169,
+  170,
+  171,
+  161,
+  174,
+  177,
+  163,
+  164,
+  175,
+  176,
+  165,
+  162,
+  179,
+  168,
+  160,
+  178,
+  173
+ ],
  "presets": [
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -43,7 +225,8 @@
    "bpm": 86,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "# - I"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -64,7 +247,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "# - I"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -95,7 +279,8 @@
    "bpm": 88,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "M - T"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -116,7 +301,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "T - Y"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -137,7 +323,8 @@
    "bpm": 86,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - L"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -163,7 +350,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "M - T"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -194,7 +382,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "# - I"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -220,7 +409,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "M - T"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -241,7 +431,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "T - Y"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -272,7 +463,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "M - T"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -298,7 +490,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "# - I"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -324,7 +517,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "T - Y"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -345,7 +539,8 @@
    "bpm": 86,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - L"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -376,7 +571,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - L"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -407,7 +603,8 @@
    "bpm": 86,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "T - Y"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -428,7 +625,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "T - Y"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -459,7 +657,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "M - T"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -490,7 +689,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - L"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -521,7 +721,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - L"
   },
   {
    "folder": "EARLY REGGAE - 1967 A 72",
@@ -552,7 +753,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "# - I"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -583,7 +785,8 @@
    "bpm": 70,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "S - W"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -614,7 +817,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 2,
-   "bassist": 4
+   "bassist": 4,
+   "group": "O - R"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -635,7 +839,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 3
+   "bassist": 3,
+   "group": "J - N"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -661,7 +866,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - W"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -692,7 +898,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "O - R"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -718,7 +925,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "J - N"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -749,7 +957,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "C - I"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -780,7 +989,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "J - N"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -811,7 +1021,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "O - R"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -842,7 +1053,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "O - R"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -868,7 +1080,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - W"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -894,7 +1107,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "C - I"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -910,7 +1124,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "C - I"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -936,7 +1151,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "C - I"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -957,7 +1173,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "J - N"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -978,7 +1195,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "J - N"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -1004,7 +1222,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - W"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -1025,7 +1244,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - W"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -1056,7 +1276,8 @@
    "bpm": 70,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "C - I"
   },
   {
    "folder": "ROOTS - ANOS 70",
@@ -1077,7 +1298,8 @@
    "bpm": 70,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "O - R"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1098,7 +1320,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "L - P"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1129,7 +1352,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "B - D"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1150,7 +1374,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "P - U"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1176,7 +1401,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "L - P"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1197,7 +1423,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "E - K"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1228,7 +1455,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "P - U"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1259,7 +1487,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "L - P"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1290,7 +1519,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "L - P"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1321,7 +1551,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "B - D"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1352,7 +1583,8 @@
    "bpm": 82,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "B - D"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1383,7 +1615,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "P - U"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1414,7 +1647,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "E - K"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1435,7 +1669,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "P - U"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1456,7 +1691,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "B - D"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1482,7 +1718,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "E - K"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1513,7 +1750,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "E - K"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1534,7 +1772,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "E - K"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1555,7 +1794,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "P - U"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1581,7 +1821,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "B - D"
   },
   {
    "folder": "ROCKERS - FIM DOS 70",
@@ -1602,7 +1843,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "L - P"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1623,7 +1865,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "R - T"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1649,7 +1892,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "T - Z"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1670,7 +1914,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "R - T"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1701,7 +1946,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "R - T"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1722,7 +1968,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "B - H"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1743,7 +1990,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "I - P"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1764,7 +2012,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "I - P"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1785,7 +2034,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "B - H"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1806,7 +2056,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "B - H"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1837,7 +2088,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "I - P"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1858,7 +2110,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "T - Z"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1879,7 +2132,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "T - Z"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1900,7 +2154,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "B - H"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1921,7 +2176,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "I - P"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1952,7 +2208,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "R - T"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -1983,7 +2240,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "T - Z"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -2004,7 +2262,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "T - Z"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -2025,7 +2284,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "R - T"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -2046,7 +2306,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "I - P"
   },
   {
    "folder": "RUB A DUB - VOLCANO E ANOS 80",
@@ -2067,7 +2328,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "B - H"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2093,7 +2355,8 @@
    "bpm": 74,
    "kit": 0,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "G - M"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2114,7 +2377,8 @@
    "bpm": 74,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "S - T"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2145,7 +2409,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "M - S"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2166,7 +2431,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "# - F"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2192,7 +2458,8 @@
    "bpm": 72,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "M - S"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2213,7 +2480,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "# - F"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2234,7 +2502,8 @@
    "bpm": 74,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "M - S"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2265,7 +2534,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "G - M"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2296,7 +2566,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "G - M"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2317,7 +2588,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "G - M"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2348,7 +2620,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "M - S"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2369,7 +2642,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "M - S"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2400,7 +2674,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "# - F"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2421,7 +2696,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 5
+   "bassist": 5,
+   "group": "# - F"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2442,7 +2718,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "S - T"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2468,7 +2745,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "S - T"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2494,7 +2772,8 @@
    "bpm": 74,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "G - M"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2525,7 +2804,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "S - T"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2546,7 +2826,8 @@
    "bpm": 74,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "S - T"
   },
   {
    "folder": "GREGORY ISAACS - COOL RULER",
@@ -2572,7 +2853,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "# - F"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2588,7 +2870,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "S - W"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2609,7 +2892,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "P - S"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2640,7 +2924,8 @@
    "bpm": 88,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "I - O"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2661,7 +2946,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "P - S"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2682,7 +2968,8 @@
    "bpm": 88,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "P - S"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2703,7 +2990,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "B - H"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2734,7 +3022,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "B - H"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2760,7 +3049,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "S - W"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2781,7 +3071,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "S - W"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2802,7 +3093,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "P - S"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2823,7 +3115,8 @@
    "bpm": 88,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "S - W"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2849,7 +3142,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "P - S"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2875,7 +3169,8 @@
    "bpm": 88,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "I - O"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2896,7 +3191,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "B - H"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2917,7 +3213,8 @@
    "bpm": 86,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "I - O"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2938,7 +3235,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "B - H"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2959,7 +3257,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "I - O"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -2985,7 +3284,8 @@
    "bpm": 84,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "B - H"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -3006,7 +3306,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "I - O"
   },
   {
    "folder": "DIGITAL - KING JAMMY E 85-89",
@@ -3027,7 +3328,8 @@
    "bpm": 92,
    "kit": 0,
    "drummer": 4,
-   "bassist": 6
+   "bassist": 6,
+   "group": "S - W"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3058,7 +3360,8 @@
    "bpm": 70,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - R"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3089,7 +3392,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "H - I"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3110,7 +3414,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "R - W"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3136,7 +3441,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 2,
-   "bassist": 0
+   "bassist": 0,
+   "group": "I - R"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3167,7 +3473,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - R"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3198,7 +3505,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "R - W"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3229,7 +3537,8 @@
    "bpm": 70,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - R"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3260,7 +3569,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "R - W"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3286,7 +3596,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "B - G"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3317,7 +3628,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "R - W"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3338,7 +3650,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "H - I"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3369,7 +3682,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "B - G"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3400,7 +3714,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "R - W"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3426,7 +3741,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "B - G"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3457,7 +3773,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "H - I"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3488,7 +3805,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "I - R"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3519,7 +3837,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "H - I"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3540,7 +3859,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "B - G"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3561,7 +3881,8 @@
    "bpm": 80,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "H - I"
   },
   {
    "folder": "LOVERS ROCK - 69 A 94",
@@ -3592,7 +3913,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 1,
-   "bassist": 4
+   "bassist": 4,
+   "group": "B - G"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3623,7 +3945,8 @@
    "bpm": 96,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "L - S"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3644,7 +3967,8 @@
    "bpm": 98,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "H - I"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3675,7 +3999,8 @@
    "bpm": 96,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "L - S"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3696,7 +4021,8 @@
    "bpm": 100,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "H - I"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3717,7 +4043,8 @@
    "bpm": 92,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "T - Y"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3743,7 +4070,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "A - G"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3769,7 +4097,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "T - Y"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3795,7 +4124,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "H - I"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3816,7 +4146,8 @@
    "bpm": 100,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "A - G"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3847,7 +4178,8 @@
    "bpm": 104,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "T - Y"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3878,7 +4210,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "H - I"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3909,7 +4242,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "L - S"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3935,7 +4269,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "A - G"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3956,7 +4291,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 3,
-   "bassist": 3
+   "bassist": 3,
+   "group": "T - Y"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -3982,7 +4318,8 @@
    "bpm": 90,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "A - G"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -4003,7 +4340,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "L - S"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -4024,7 +4362,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "H - I"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -4045,7 +4384,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "T - Y"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -4076,7 +4416,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "A - G"
   },
   {
    "folder": "DANCEHALL - ANOS 90",
@@ -4097,7 +4438,8 @@
    "bpm": 94,
    "kit": 0,
    "drummer": 4,
-   "bassist": 2
+   "bassist": 2,
+   "group": "L - S"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4118,7 +4460,8 @@
    "bpm": 82,
    "kit": 0,
    "drummer": 4,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - Y"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4149,7 +4492,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "D - H"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4180,7 +4524,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "K - S"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4201,7 +4546,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "D - H"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4222,7 +4568,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "K - S"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4248,7 +4595,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "K - S"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4269,7 +4617,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "A - D"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4300,7 +4649,8 @@
    "bpm": 72,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "A - D"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4331,7 +4681,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - Y"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4357,7 +4708,8 @@
    "bpm": 78,
    "kit": 0,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "A - D"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4383,7 +4735,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "A - D"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4414,7 +4767,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "D - H"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4440,7 +4794,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "A - D"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4466,7 +4821,8 @@
    "bpm": 80,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - Y"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4487,7 +4843,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "D - H"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4518,7 +4875,8 @@
    "bpm": 84,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "K - S"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4544,7 +4902,8 @@
    "bpm": 74,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "K - S"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4565,7 +4924,8 @@
    "bpm": 76,
    "kit": 0,
    "drummer": 0,
-   "bassist": 1
+   "bassist": 1,
+   "group": "D - H"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4586,7 +4946,8 @@
    "bpm": 76,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - Y"
   },
   {
    "folder": "NEW ROOTS - ANOS 2000",
@@ -4617,7 +4978,8 @@
    "bpm": 78,
    "kit": 1,
    "drummer": 1,
-   "bassist": 0
+   "bassist": 0,
+   "group": "S - Y"
   }
  ]
 };
