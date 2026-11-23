@@ -2,11 +2,11 @@
 
 Gerado por `RiddimBank/tools/build_bank.py` a partir dos bancos do MRCM-1240, do MRBM-69 e do MRDM-12, com as correções de `RiddimBank/correcoes.json`.
 
-**355 músicas e riddims** em 10 estilos. 310 com harmonia, 45 com harmonia pendente. Bateria original em 117, baixo original em 159, as três partes originais em 53. Harmonia conferida em 136, aproximada em 174. 13 entradas têm divergência entre os bancos (⚠).
+**356 músicas e riddims** em 10 estilos. 311 com harmonia, 45 com harmonia pendente. Bateria original em 117, baixo original em 160, as três partes originais em 53. Harmonia conferida em 137, aproximada em 174. 13 entradas têm divergência entre os bancos (⚠).
 
 Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo músico mais próximo de quem gravou.
 
-## ROCKSTEADY (1966-68) — 17
+## ROCKSTEADY (1966-68) — 18
 
 | Música | Ano | Riddim | Harmonia | BPM | Bateria | Baixo |
 |---|---|---|---|---|---|---|
@@ -20,6 +20,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | One Step Beyond — Jackie Mittoo & The Soul Vendors | 1967 | Bobby Babylon | Cm:1 Fm:1 ~ | 76 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Real Rock — Sound Dimension | 1967 | Real Rock | Bb:1 Fm:1 ~ | 76 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Rockfort Rock — Sound Dimension | 1967 | Rockfort Rock | Dm:1 C:1 ~ | 80 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
+| Train To Skaville — The Ethiopians | 1967 | Boops (Train To Skaville) | G:1 C:1 | 88 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Full Up — Sound Dimension | 1968 | Full Up | C:1 G:1 | 80 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Heavenless — Don Drummond Jr & Sound Dimension | 1968 | Heavenless | Gm:1 F:1 ~ | 78 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Hot Milk — Jackie Mittoo & The Soul Vendors | 1968 | Hot Milk | Dm:2 ~ | 82 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
@@ -279,7 +280,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Under Mi Sensi — Barrington Levy | 1985 |  | C:1 F:1 G:1 | 76 | DIGIKAL · ROCKERS (esc.) | DERRICK BARNETT (esc.) |
 | Under Mi Sleng Teng — Wayne Smith ⚠ | 1985 | Sleng Teng | D:1 G:1 ~ | 82 | DIGIKAL · ROCKERS (orig.) | JAMMYS (orig.) |
 | Bad Girls — King Everald | 1986 | Swing Easy (digital) | Bb:1 Eb:1 ~ | 90 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
-| Boops — Super Cat | 1986 | Boops (Train To Skaville) | G:1 C:1 | 80 | DIGIKAL · ROCKERS (orig.) | LEROY SIBBLES (orig.) |
+| Boops — Super Cat | 1986 | Boops | G:1 C:1 | 80 | DIGIKAL · ROCKERS (orig.) | JAMMYS (orig.) |
 | Chase Vampire — Wayne Smith | 1986 | Chase Vampire | Fm:1 Eb:1 ~ | 92 | DIGIKAL · ROCKERS (orig.) | JAMMYS (orig.) |
 | Greetings — Half Pint | 1986 |  | F:1 C:1 Dm:1 C:1 ~ | 86 | DIGIKAL · ROCKERS (esc.) | JAMMYS (esc.) |
 | I'm Not a Substitute Lover — Half Pint | 1986 |  | E:1 A:1 ~ | 86 | DIGIKAL · ROCKERS (esc.) | JAMMYS (esc.) |
@@ -298,7 +299,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Gun In A Baggy — Little Lenny | 1989 | Gun In A Baggy | Em:2 ~ | 96 | DIGIKAL · ROCKERS (orig.) | JAMMYS (orig.) |
 | Poco Man Jam — Gregory Peck | 1989 | Poco Man Jam | Gm:1 Cm:1 ~ | 96 | DIGIKAL · DEMBOW (orig.) | JAMMYS (orig.) |
 | Tata Fool — Dennis Star / Beenie Man | 1989 | Soap | Dm:1 Bb:1 ~ | 92 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
-| Ting-A-Ling — Shabba Ranks | 1990 |  | Bb:1 Gm:1 ~ | 63 | DIGIKAL · ROCKERS (esc.) | JAMMYS (esc.) |
+| Ting-A-Ling — Shabba Ranks | 1992 | Giggy | Bb:1 Gm:1 ~ | 63 | DIGIKAL · ROCKERS (esc.) | JAMMYS (esc.) |
 
 ## RAGGA (1990-95) — 30
 

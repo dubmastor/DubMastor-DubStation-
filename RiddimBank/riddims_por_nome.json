@@ -1,0 +1,3892 @@
+{
+ "_leia": [
+  "RIDDIMS CLÁSSICOS POR NOME. Gerado por build_bank.py a partir do riddims.json. Não editar à mão.",
+  "Cada família: o riddim original (o mais antigo do banco), os relicks e as músicas gravadas nele. 'id' aponta para riddims.json.",
+  "partesOriginais: H = harmonia, B = baixo, D = bateria vindos da gravação."
+ ],
+ "total": 155,
+ "comVersoes": 12,
+ "riddims": [
+  {
+   "nome": "Action",
+   "letra": "A",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Dave Kelly (Penthouse)",
+   "origem": "Action — Terror Fabulous & Nadine Sutherland",
+   "harmonia": "Am:1 Em:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "action-terror-fabulous-nadine-sutherland",
+     "nome": "Action",
+     "artista": "Terror Fabulous & Nadine Sutherland",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "African Rock",
+   "letra": "A",
+   "aliases": [],
+   "ano": 1997,
+   "estilo": "DANCEHALL",
+   "produtor": "Bobby Konders (Massive B)",
+   "origem": "One Man — Shabba Ranks",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "one-man-shabba-ranks",
+     "nome": "One Man",
+     "artista": "Shabba Ranks",
+     "ano": 1997,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "After Dark",
+   "letra": "A",
+   "aliases": [],
+   "ano": 2007,
+   "estilo": "DANCEHALL",
+   "produtor": "Di Genius / DJ Sunshine",
+   "origem": "All Alone — Sean Paul",
+   "harmonia": "Fm:1 C#:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "all-alone-sean-paul",
+     "nome": "All Alone",
+     "artista": "Sean Paul",
+     "ano": 2007,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Agony",
+   "letra": "A",
+   "aliases": [],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Agony — Pinchers",
+   "harmonia": "Em:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 90,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "agony-pinchers",
+     "nome": "Agony",
+     "artista": "Pinchers",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Answer",
+   "letra": "A",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Studio One",
+   "origem": "I'll Never Let You Go — Slim Smith & The Uniques",
+   "harmonia": "C:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "i-ll-never-let-you-go-slim-smith-the-uniques",
+     "nome": "I'll Never Let You Go",
+     "artista": "Slim Smith & The Uniques",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Applause",
+   "letra": "A",
+   "aliases": [],
+   "ano": 2005,
+   "estilo": "DANCEHALL",
+   "produtor": "Rohan \"Snow Cone\" Fuller",
+   "origem": "Temperature — Sean Paul",
+   "harmonia": "Bbm:1 Ab:1 Bbm:1 C:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 63,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "temperature-sean-paul",
+     "nome": "Temperature",
+     "artista": "Sean Paul",
+     "ano": 2005,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Arab Attack",
+   "letra": "A",
+   "aliases": [],
+   "ano": 1995,
+   "estilo": "DANCEHALL",
+   "produtor": "Dave Kelly (Madhouse)",
+   "origem": "Arab Attack riddim — Bounty Killer & outros",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "arab-attack-riddim-bounty-killer-outros",
+     "nome": "Arab Attack riddim",
+     "artista": "Bounty Killer & outros",
+     "ano": 1995,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Ba Ba Boom",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Duke Reid (Treasure Isle)",
+   "origem": "Ba Ba Boom — The Jamaicans",
+   "harmonia": "C:1 F:1 G:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "ba-ba-boom-the-jamaicans",
+     "nome": "Ba Ba Boom",
+     "artista": "The Jamaicans",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Bad Company",
+   "letra": "B",
+   "aliases": [],
+   "ano": 2003,
+   "estilo": "DANCEHALL",
+   "produtor": "Cordel \"Scatta\" Burrell",
+   "origem": "More Than One Time — Ce'Cile",
+   "harmonia": "F#m:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 51,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "more-than-one-time-ce-cile",
+     "nome": "More Than One Time",
+     "artista": "Ce'Cile",
+     "ano": 2003,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Bada Bada",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1998,
+   "estilo": "DANCEHALL",
+   "produtor": "Ward 21",
+   "origem": "Haters — Ward 21",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "haters-ward-21",
+     "nome": "Haters",
+     "artista": "Ward 21",
+     "ano": 1998,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Baddis",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1998,
+   "estilo": "DANCEHALL",
+   "produtor": "Richard Browne",
+   "origem": "Hardcore Lover — Lady Saw & T.O.K.",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "hardcore-lover-lady-saw-t-o-k",
+     "nome": "Hardcore Lover",
+     "artista": "Lady Saw & T.O.K.",
+     "ano": 1998,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Ballistic Affair",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROCKERS",
+   "produtor": "Jo Jo Hookim (Channel One)",
+   "origem": "Ballistic Affair — Leroy Smart",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "ballistic-affair-leroy-smart",
+     "nome": "Ballistic Affair",
+     "artista": "Leroy Smart",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Baltimore",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1980,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "Baltimore — The Tamlins",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "baltimore-the-tamlins",
+     "nome": "Baltimore",
+     "artista": "The Tamlins",
+     "ano": 1980,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Bam Bam",
+   "letra": "B",
+   "aliases": [
+    "Murder She Wrote"
+   ],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "Murder She Wrote — Chaka Demus & Pliers",
+   "harmonia": "D:1 C:1 D:1 Am:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 95,
+   "nota": "derivado do Stalag com outra linha de baixo",
+   "fonte": "Wikipedia (Stalag riddim): o Bam Bam riddim é o Stalag com outro baixo; o maior sucesso nele é Murder She Wrote",
+   "versoes": [
+    {
+     "id": "murder-she-wrote-chaka-demus-pliers",
+     "nome": "Murder She Wrote",
+     "artista": "Chaka Demus & Pliers",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Bellevue",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1993,
+   "estilo": "RAGGA",
+   "produtor": "Mafia & Fluxy",
+   "origem": "Sample — Red Dragon",
+   "harmonia": "Gm:1 Eb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "sample-red-dragon",
+     "nome": "Sample",
+     "artista": "Red Dragon",
+     "ano": 1993,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Bellyas",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1999,
+   "estilo": "DANCEHALL",
+   "produtor": "Ward 21 / King Jammy",
+   "origem": "Who Dem — Capleton",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "who-dem-capleton",
+     "nome": "Who Dem",
+     "artista": "Capleton",
+     "ano": 1999,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Big Ship",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1982,
+   "estilo": "RUB A DUB",
+   "produtor": "Linval Thompson",
+   "origem": "Big Ship — Freddie McGregor",
+   "harmonia": "F:1 Gm:1 C:1 Gm:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "big-ship-freddie-mcgregor",
+     "nome": "Big Ship",
+     "artista": "Freddie McGregor",
+     "ano": 1982,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Black Cinderella",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1972,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Jimmy Radway",
+   "origem": "Black Cinderella — Errol Dunkley",
+   "harmonia": "Bb:1 Eb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "black-cinderella-errol-dunkley",
+     "nome": "Black Cinderella",
+     "artista": "Errol Dunkley",
+     "ano": 1972,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Blackout",
+   "letra": "B",
+   "aliases": [],
+   "ano": 2004,
+   "estilo": "DANCEHALL",
+   "produtor": "—",
+   "origem": "Picture This — Vybz Kartel",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "picture-this-vybz-kartel",
+     "nome": "Picture This",
+     "artista": "Vybz Kartel",
+     "ano": 2004,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Bobby Babylon",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Studio One",
+   "origem": "One Step Beyond — Jackie Mittoo & The Soul Vendors",
+   "harmonia": "Cm:1 Fm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "one-step-beyond-jackie-mittoo-the-soul-vendors",
+     "nome": "One Step Beyond",
+     "artista": "Jackie Mittoo & The Soul Vendors",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Bogle",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Dave Kelly (Madhouse)",
+   "origem": "Bogle — Buju Banton",
+   "harmonia": "",
+   "harmoniaStatus": "pendente",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "bogle-buju-banton",
+     "nome": "Bogle",
+     "artista": "Buju Banton",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": ""
+    }
+   ]
+  },
+  {
+   "nome": "Bookshelf",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1998,
+   "estilo": "DANCEHALL",
+   "produtor": "Tony Kelly (K-Licious)",
+   "origem": "Bookshelf — Beenie Man",
+   "harmonia": "Dm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "bookshelf-beenie-man",
+     "nome": "Bookshelf",
+     "artista": "Beenie Man",
+     "ano": 1998,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Boops / Train To Skaville",
+   "letra": "B",
+   "aliases": [
+    "Boops",
+    "Boops (Train To Skaville)"
+   ],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "The Ethiopians",
+   "origem": "Train To Skaville — The Ethiopians",
+   "harmonia": "G:1 C:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 88,
+   "nota": "",
+   "fonte": "MRBM-69: o Boops de Super Cat usa o riddim de Train To Skaville (Ethiopians, 1967)",
+   "versoes": [
+    {
+     "id": "train-to-skaville-the-ethiopians",
+     "nome": "Train To Skaville",
+     "artista": "The Ethiopians",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    },
+    {
+     "id": "boops-super-cat",
+     "nome": "Boops",
+     "artista": "Super Cat",
+     "ano": 1986,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Bounty Hunter",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1979,
+   "estilo": "RUB A DUB",
+   "produtor": "Henry \"Junjo\" Lawes",
+   "origem": "Bounty Hunter — Barrington Levy",
+   "harmonia": "Am:1 Dm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "bounty-hunter-barrington-levy",
+     "nome": "Bounty Hunter",
+     "artista": "Barrington Levy",
+     "ano": 1979,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Boxing",
+   "letra": "B",
+   "aliases": [],
+   "ano": 1981,
+   "estilo": "RUB A DUB",
+   "produtor": "Joe Gibbs",
+   "origem": "Boxing Around — Cornell Campbell",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "boxing-around-cornell-campbell",
+     "nome": "Boxing Around",
+     "artista": "Cornell Campbell",
+     "ano": 1981,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Chase The Devil",
+   "letra": "C",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROOTS",
+   "produtor": "Lee Perry (Black Ark)",
+   "origem": "Chase the Devil — Max Romeo",
+   "harmonia": "Am:1 Em:1 Dm:1 Am:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 75,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "chase-the-devil-max-romeo",
+     "nome": "Chase the Devil",
+     "artista": "Max Romeo",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Chase Vampire",
+   "letra": "C",
+   "aliases": [],
+   "ano": 1986,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Chase Vampire — Wayne Smith",
+   "harmonia": "Fm:1 Eb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "chase-vampire-wayne-smith",
+     "nome": "Chase Vampire",
+     "artista": "Wayne Smith",
+     "ano": 1986,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Cherry Oh Baby",
+   "letra": "C",
+   "aliases": [],
+   "ano": 1971,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Dynamic Sounds",
+   "origem": "Cherry Oh Baby — Eric Donaldson",
+   "harmonia": "G:1 C:1 D:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "cherry-oh-baby-eric-donaldson",
+     "nome": "Cherry Oh Baby",
+     "artista": "Eric Donaldson",
+     "ano": 1971,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Chrome",
+   "letra": "C",
+   "aliases": [],
+   "ano": 2003,
+   "estilo": "DANCEHALL",
+   "produtor": "Michael Sterling / Craig Marsh / Daniel Lewis",
+   "origem": "In Her Heart — Capleton",
+   "harmonia": "Gm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "in-her-heart-capleton",
+     "nome": "In Her Heart",
+     "artista": "Capleton",
+     "ano": 2003,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "College Rock",
+   "letra": "C",
+   "aliases": [],
+   "ano": 1972,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "College Rock — Big Willie",
+   "harmonia": "Cm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "college-rock-big-willie",
+     "nome": "College Rock",
+     "artista": "Big Willie",
+     "ano": 1972,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Concrete Jungle",
+   "letra": "C",
+   "aliases": [],
+   "ano": 1973,
+   "estilo": "ROOTS",
+   "produtor": "Chris Blackwell / Wailers (Island)",
+   "origem": "Concrete Jungle — Bob Marley",
+   "harmonia": "Em:1 Am:1 Em:2",
+   "harmoniaStatus": "conferida",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "concrete-jungle-bob-marley",
+     "nome": "Concrete Jungle",
+     "artista": "Bob Marley",
+     "ano": 1973,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Coolie Dance",
+   "letra": "C",
+   "aliases": [],
+   "ano": 2003,
+   "estilo": "DANCEHALL",
+   "produtor": "Scatta & Eva Burrell",
+   "origem": "Give It To Me — Ce'Cile",
+   "harmonia": "Dm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 52,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "give-it-to-me-ce-cile",
+     "nome": "Give It To Me",
+     "artista": "Ce'Cile",
+     "ano": 2003,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Corduroy",
+   "letra": "C",
+   "aliases": [],
+   "ano": 1994,
+   "estilo": "RAGGA",
+   "produtor": "Patrick Roberts (Shocking Vibes)",
+   "origem": "World Dance — Beenie Man",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "world-dance-beenie-man",
+     "nome": "World Dance",
+     "artista": "Beenie Man",
+     "ano": 1994,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Da Joint",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1999,
+   "estilo": "DANCEHALL",
+   "produtor": "Ward 21 / King Jammy",
+   "origem": "It Ago Red — Black Uhuru",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "it-ago-red-black-uhuru",
+     "nome": "It Ago Red",
+     "artista": "Black Uhuru",
+     "ano": 1999,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Darker Shade Of Black",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Studio One",
+   "origem": "Darker Shade Of Black — Jackie Mittoo & The Soul Vendors",
+   "harmonia": "Am:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "darker-shade-of-black-jackie-mittoo-the-soul-vendors",
+     "nome": "Darker Shade Of Black",
+     "artista": "Jackie Mittoo & The Soul Vendors",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Declaration Of Rights",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROOTS",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Declaration Of Rights — The Abyssinians",
+   "harmonia": "Em:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "declaration-of-rights-the-abyssinians",
+     "nome": "Declaration Of Rights",
+     "artista": "The Abyssinians",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Dickie",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Dave Kelly (Penthouse)",
+   "origem": "Wicked Dickie — Nadine Sutherland & Buju Banton",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "wicked-dickie-nadine-sutherland-buju-banton",
+     "nome": "Wicked Dickie",
+     "artista": "Nadine Sutherland & Buju Banton",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Diwali",
+   "letra": "D",
+   "aliases": [],
+   "ano": 2002,
+   "estilo": "DANCEHALL",
+   "produtor": "",
+   "origem": "No Letting Go — Wayne Wonder",
+   "harmonia": "Am:1 Em:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "no-letting-go-wayne-wonder",
+     "nome": "No Letting Go",
+     "artista": "Wayne Wonder",
+     "ano": 2002,
+     "papel": "original",
+     "partesOriginais": "H"
+    },
+    {
+     "id": "get-busy-sean-paul",
+     "nome": "Get Busy",
+     "artista": "Sean Paul",
+     "ano": 2003,
+     "papel": "versão",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Doorslam",
+   "letra": "D",
+   "aliases": [],
+   "ano": 2000,
+   "estilo": "DANCEHALL",
+   "produtor": "Harvel \"Gadaffi\" Hart (Annex)",
+   "origem": "Bust It — Capleton",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "bust-it-capleton",
+     "nome": "Bust It",
+     "artista": "Capleton",
+     "ano": 2000,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Drum Song",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Drum Song — Jackie Mittoo & Sound Dimension",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "drum-song-jackie-mittoo-sound-dimension",
+     "nome": "Drum Song",
+     "artista": "Jackie Mittoo & Sound Dimension",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Duck",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1985,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Duck — Little John",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "duck-little-john",
+     "nome": "Duck",
+     "artista": "Little John",
+     "ano": 1985,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Duppy Conqueror",
+   "letra": "D",
+   "aliases": [],
+   "ano": 1970,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Lee Perry (Upsetters)",
+   "origem": "Duppy Conqueror — Wailers",
+   "harmonia": "C:1/2 F:1/2 G:1/2 F:1/2",
+   "harmoniaStatus": "conferida",
+   "bpm": 89,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "duppy-conqueror-wailers",
+     "nome": "Duppy Conqueror",
+     "artista": "Wailers",
+     "ano": 1970,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Exodus",
+   "letra": "E",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROOTS",
+   "produtor": "Wailers (Tuff Gong)",
+   "origem": "Exodus — Bob Marley",
+   "harmonia": "Am:4 C:1/2 Dm:1/2 Am:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 67,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "exodus-bob-marley",
+     "nome": "Exodus",
+     "artista": "Bob Marley",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Famine",
+   "letra": "F",
+   "aliases": [],
+   "ano": 2002,
+   "estilo": "DANCEHALL",
+   "produtor": "Leftside / Dia / Scatta",
+   "origem": "Pick A Number — Merciless",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "pick-a-number-merciless",
+     "nome": "Pick A Number",
+     "artista": "Merciless",
+     "ano": 2002,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Far East",
+   "letra": "F",
+   "aliases": [],
+   "ano": 1973,
+   "estilo": "ROOTS",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Jah Shakey — Rolando Alphonso",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 72,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "jah-shakey-rolando-alphonso",
+     "nome": "Jah Shakey",
+     "artista": "Rolando Alphonso",
+     "ano": 1973,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Fed Up",
+   "letra": "F",
+   "aliases": [],
+   "ano": 1995,
+   "estilo": "RAGGA",
+   "produtor": "Gitsy / Sly & Robbie",
+   "origem": "Fed Up — Bounty Killer",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "fed-up-bounty-killer",
+     "nome": "Fed Up",
+     "artista": "Bounty Killer",
+     "ano": 1995,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Fever",
+   "letra": "F",
+   "aliases": [],
+   "ano": 1972,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Studio One",
+   "origem": "Fever — Horace Andy",
+   "harmonia": "Dm:1 Am:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "fever-horace-andy",
+     "nome": "Fever",
+     "artista": "Horace Andy",
+     "ano": 1972,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Fiesta",
+   "letra": "F",
+   "aliases": [],
+   "ano": 2003,
+   "estilo": "DANCEHALL",
+   "produtor": "Dave Kelly",
+   "origem": "Fiesta — Beenie Man",
+   "harmonia": "",
+   "harmoniaStatus": "pendente",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "fiesta-beenie-man",
+     "nome": "Fiesta",
+     "artista": "Beenie Man",
+     "ano": 2003,
+     "papel": "original",
+     "partesOriginais": ""
+    }
+   ]
+  },
+  {
+   "nome": "Fish Market / Dem Bow",
+   "letra": "F",
+   "aliases": [
+    "Dem Bow",
+    "Fish Market",
+    "Poco Man Jam"
+   ],
+   "ano": 1989,
+   "estilo": "RAGGA",
+   "produtor": "Steely & Clevie",
+   "origem": "Fish Market — Steely & Clevie",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "Wikipedia (Steely & Clevie): o Fish Market virou a base do Dem Bow",
+   "versoes": [
+    {
+     "id": "fish-market-steely-clevie",
+     "nome": "Fish Market",
+     "artista": "Steely & Clevie",
+     "ano": 1989,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "poco-man-jam-gregory-peck",
+     "nome": "Poco Man Jam",
+     "artista": "Gregory Peck",
+     "ano": 1989,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "dem-bow-shabba-ranks",
+     "nome": "Dem Bow",
+     "artista": "Shabba Ranks",
+     "ano": 1990,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Forty Sup'emmh",
+   "letra": "F",
+   "aliases": [],
+   "ano": 2006,
+   "estilo": "DANCEHALL",
+   "produtor": "Steely & Clevie",
+   "origem": "Mama Mama — Pinchers",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "mama-mama-pinchers",
+     "nome": "Mama Mama",
+     "artista": "Pinchers",
+     "ano": 2006,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Freedom Blues",
+   "letra": "F",
+   "aliases": [],
+   "ano": 1970,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Freedom Blues — Roy Richards",
+   "harmonia": "Em:1 A:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "freedom-blues-roy-richards",
+     "nome": "Freedom Blues",
+     "artista": "Roy Richards",
+     "ano": 1970,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Frog",
+   "letra": "F",
+   "aliases": [],
+   "ano": 1994,
+   "estilo": "RAGGA",
+   "produtor": "Computer Paul / Steely",
+   "origem": "Matey Renk — Merciless",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "matey-renk-merciless",
+     "nome": "Matey Renk",
+     "artista": "Merciless",
+     "ano": 1994,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Full Up",
+   "letra": "F",
+   "aliases": [
+    "Pass The Kouchie (Full Up)"
+   ],
+   "ano": 1968,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Full Up — Sound Dimension",
+   "harmonia": "C:1 G:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "Deezer (Mighty Diamonds): Pass the Kouchie no riddim Full Up",
+   "versoes": [
+    {
+     "id": "full-up-sound-dimension",
+     "nome": "Full Up",
+     "artista": "Sound Dimension",
+     "ano": 1968,
+     "papel": "original",
+     "partesOriginais": "HB"
+    },
+    {
+     "id": "pass-the-kouchie-mighty-diamonds",
+     "nome": "Pass the Kouchie",
+     "artista": "Mighty Diamonds",
+     "ano": 1981,
+     "papel": "versão",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Gangster",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Sly Dunbar / Gitsy Willis",
+   "origem": "The Gangster — Anthony Red Rose",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "the-gangster-anthony-red-rose",
+     "nome": "The Gangster",
+     "artista": "Anthony Red Rose",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "General",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Studio One",
+   "origem": "Love Me Girl — Leroy Sibbles & Anthony Ellis",
+   "harmonia": "G:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "love-me-girl-leroy-sibbles-anthony-ellis",
+     "nome": "Love Me Girl",
+     "artista": "Leroy Sibbles & Anthony Ellis",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Get Up Stand Up",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1973,
+   "estilo": "ROOTS",
+   "produtor": "Wailers (Island)",
+   "origem": "Get Up Stand Up — Bob Marley",
+   "harmonia": "Cm:4",
+   "harmoniaStatus": "conferida",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "get-up-stand-up-bob-marley",
+     "nome": "Get Up Stand Up",
+     "artista": "Bob Marley",
+     "ano": 1973,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Ghetto Whiskey",
+   "letra": "G",
+   "aliases": [],
+   "ano": 2006,
+   "estilo": "DANCEHALL",
+   "produtor": "Stephen \"Di Genius\" McGregor",
+   "origem": "Sunrise — Mavado & Vybz Kartel",
+   "harmonia": "Cm:1 Ab:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "sunrise-mavado-vybz-kartel",
+     "nome": "Sunrise",
+     "artista": "Mavado & Vybz Kartel",
+     "ano": 2006,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Giggy",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1991,
+   "estilo": "RAGGA",
+   "produtor": "Bulby York / Steely & Clevie",
+   "origem": "Mama — Baby Wayne",
+   "harmonia": "Em:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "Jamaica Observer: Giggy (Steely & Clevie, 1991) com Mama, Ting-A-Ling e Shot a Talk",
+   "versoes": [
+    {
+     "id": "mama-baby-wayne",
+     "nome": "Mama",
+     "artista": "Baby Wayne",
+     "ano": 1991,
+     "papel": "original",
+     "partesOriginais": "HB"
+    },
+    {
+     "id": "ting-a-ling-shabba-ranks",
+     "nome": "Ting-A-Ling",
+     "artista": "Shabba Ranks",
+     "ano": 1992,
+     "papel": "versão",
+     "partesOriginais": "H"
+    }
+   ]
+  },
+  {
+   "nome": "Golden Hen",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1985,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy",
+   "origem": "Golden Hen — Tenor Saw",
+   "harmonia": "",
+   "harmoniaStatus": "pendente",
+   "bpm": 90,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "golden-hen-tenor-saw",
+     "nome": "Golden Hen",
+     "artista": "Tenor Saw",
+     "ano": 1985,
+     "papel": "original",
+     "partesOriginais": ""
+    }
+   ]
+  },
+  {
+   "nome": "Gun In A Baggy",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1989,
+   "estilo": "DIGITAL",
+   "produtor": "Tony Kelly",
+   "origem": "Gun In A Baggy — Little Lenny",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "gun-in-a-baggy-little-lenny",
+     "nome": "Gun In A Baggy",
+     "artista": "Little Lenny",
+     "ano": 1989,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Gunman",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1980,
+   "estilo": "RUB A DUB",
+   "produtor": "Henry \"Junjo\" Lawes (Volcano)",
+   "origem": "Gunman — Michael Prophet",
+   "harmonia": "Cm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "gunman-michael-prophet",
+     "nome": "Gunman",
+     "artista": "Michael Prophet",
+     "ano": 1980,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "The Gum",
+   "letra": "G",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Danny Browne",
+   "origem": "You Have The Gum — Captain Willy",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "you-have-the-gum-captain-willy",
+     "nome": "You Have The Gum",
+     "artista": "Captain Willy",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Hard Drive",
+   "letra": "H",
+   "aliases": [],
+   "ano": 2002,
+   "estilo": "DANCEHALL",
+   "produtor": "Christopher Clarke / Gregory Harriot",
+   "origem": "Buss Back Sketell — Ce'Cile & Tanya Stephens",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 51,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "buss-back-sketell-ce-cile-tanya-stephens",
+     "nome": "Buss Back Sketell",
+     "artista": "Ce'Cile & Tanya Stephens",
+     "ano": 2002,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Hard Drugs",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1988,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie / Tappa Zukie",
+   "origem": "Hard Drugs — Gregory Isaacs",
+   "harmonia": "C:1 G:1 C:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "hard-drugs-gregory-isaacs",
+     "nome": "Hard Drugs",
+     "artista": "Gregory Isaacs",
+     "ano": 1988,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "He Prayed",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1972,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Joe Frazier — Burning Spear & Morris Toughest",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 72,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "joe-frazier-burning-spear-morris-toughest",
+     "nome": "Joe Frazier",
+     "artista": "Burning Spear & Morris Toughest",
+     "ano": 1972,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Head To Toe",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Head To Toe — Frankie Paul",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "head-to-toe-frankie-paul",
+     "nome": "Head To Toe",
+     "artista": "Frankie Paul",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Headache",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1999,
+   "estilo": "DANCEHALL",
+   "produtor": "Ricky Myrie",
+   "origem": "Headache — Elephant Man & Delly Ranks",
+   "harmonia": "F#m:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "headache-elephant-man-delly-ranks",
+     "nome": "Headache",
+     "artista": "Elephant Man & Delly Ranks",
+     "ano": 1999,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Heathen",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROOTS",
+   "produtor": "Wailers (Tuff Gong)",
+   "origem": "The Heathen — Bob Marley & The Wailers",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 72,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "the-heathen-bob-marley-the-wailers",
+     "nome": "The Heathen",
+     "artista": "Bob Marley & The Wailers",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Heavenless",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1968,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Heavenless — Don Drummond Jr & Sound Dimension",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "heavenless-don-drummond-jr-sound-dimension",
+     "nome": "Heavenless",
+     "artista": "Don Drummond Jr & Sound Dimension",
+     "ano": 1968,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Hot Milk",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1968,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Hot Milk — Jackie Mittoo & The Soul Vendors",
+   "harmonia": "Dm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 82,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "hot-milk-jackie-mittoo-the-soul-vendors",
+     "nome": "Hot Milk",
+     "artista": "Jackie Mittoo & The Soul Vendors",
+     "ano": 1968,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Hot Wax",
+   "letra": "H",
+   "aliases": [],
+   "ano": 1995,
+   "estilo": "RAGGA",
+   "produtor": "Sly & Robbie / Bulby (Fat Eyes)",
+   "origem": "Gun From Paris — Merciless",
+   "harmonia": "Cm:1 Ab:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "gun-from-paris-merciless",
+     "nome": "Gun From Paris",
+     "artista": "Merciless",
+     "ano": 1995,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "I'm Still In Love",
+   "letra": "I",
+   "aliases": [
+    "Uptown Top Ranking"
+   ],
+   "ano": 1967,
+   "estilo": "LOVERS ROCK",
+   "produtor": "Studio One",
+   "origem": "I'm Still in Love — Alton Ellis",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "Uptown Top Ranking foi gravada sobre o riddim de I'm Still In Love (Alton Ellis)",
+   "versoes": [
+    {
+     "id": "i-m-still-in-love-alton-ellis",
+     "nome": "I'm Still in Love",
+     "artista": "Alton Ellis",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    },
+    {
+     "id": "uptown-top-ranking-althea-donna",
+     "nome": "Uptown Top Ranking",
+     "artista": "Althea & Donna",
+     "ano": 1977,
+     "papel": "versão",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Ice Cream Love",
+   "letra": "I",
+   "aliases": [],
+   "ano": 1981,
+   "estilo": "RUB A DUB",
+   "produtor": "Henry \"Junjo\" Lawes",
+   "origem": "Ice Cream Love — Johnny Osbourne",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "ice-cream-love-johnny-osbourne",
+     "nome": "Ice Cream Love",
+     "artista": "Johnny Osbourne",
+     "ano": 1981,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Java",
+   "letra": "J",
+   "aliases": [],
+   "ano": 1971,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Clive Chin (Randy's)",
+   "origem": "Java — Augustus Pablo",
+   "harmonia": "Gm:1 Cm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "java-augustus-pablo",
+     "nome": "Java",
+     "artista": "Augustus Pablo",
+     "ano": 1971,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Joker",
+   "letra": "J",
+   "aliases": [],
+   "ano": 2000,
+   "estilo": "DANCEHALL",
+   "produtor": "Shocking Vibes Crew",
+   "origem": "Chunny Mouth — Red Rat",
+   "harmonia": "Em:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "chunny-mouth-red-rat",
+     "nome": "Chunny Mouth",
+     "artista": "Red Rat",
+     "ano": 2000,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Joy Ride",
+   "letra": "J",
+   "aliases": [],
+   "ano": 1996,
+   "estilo": "DANCEHALL",
+   "produtor": "Dave Kelly (Madhouse)",
+   "origem": "Joy Ride — Wayne Wonder & Baby Cham",
+   "harmonia": "Am:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "joy-ride-wayne-wonder-baby-cham",
+     "nome": "Joy Ride",
+     "artista": "Wayne Wonder & Baby Cham",
+     "ano": 1996,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Kasablanca",
+   "letra": "K",
+   "aliases": [],
+   "ano": 2004,
+   "estilo": "DANCEHALL",
+   "produtor": "Sly Dunbar / Computer Paul / Alberto Blackwood",
+   "origem": "Mi Mean That — Jagwa",
+   "harmonia": "Dm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "mi-mean-that-jagwa",
+     "nome": "Mi Mean That",
+     "artista": "Jagwa",
+     "ano": 2004,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Kiki",
+   "letra": "K",
+   "aliases": [],
+   "ano": 1999,
+   "estilo": "DANCEHALL",
+   "produtor": "Tony Kelly",
+   "origem": "Disrespect — Sean Paul",
+   "harmonia": "Bbm:1 F#:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "disrespect-sean-paul",
+     "nome": "Disrespect",
+     "artista": "Sean Paul",
+     "ano": 1999,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Ku Klux Klan",
+   "letra": "K",
+   "aliases": [],
+   "ano": 1978,
+   "estilo": "ROCKERS",
+   "produtor": "Karl Pitterson (Island)",
+   "origem": "Ku Klux Klan — Steel Pulse",
+   "harmonia": "Am:1 Em:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "ku-klux-klan-steel-pulse",
+     "nome": "Ku Klux Klan",
+     "artista": "Steel Pulse",
+     "ano": 1978,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Kuff",
+   "letra": "K",
+   "aliases": [],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Kuff — Frankie Paul",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "kuff-frankie-paul",
+     "nome": "Kuff",
+     "artista": "Frankie Paul",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "original-kuff-chaka-demus",
+     "nome": "Original Kuff",
+     "artista": "Chaka Demus",
+     "ano": 1988,
+     "papel": "versão",
+     "partesOriginais": "H"
+    }
+   ]
+  },
+  {
+   "nome": "A Love I Can Feel",
+   "letra": "L",
+   "aliases": [],
+   "ano": 1970,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Studio One",
+   "origem": "A Love I Can Feel — John Holt",
+   "harmonia": "D:1 G:1 A:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "a-love-i-can-feel-john-holt",
+     "nome": "A Love I Can Feel",
+     "artista": "John Holt",
+     "ano": 1970,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Legalize It",
+   "letra": "L",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROCKERS",
+   "produtor": "Peter Tosh",
+   "origem": "Legalize It — Peter Tosh",
+   "harmonia": "G:1 F:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 73,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "legalize-it-peter-tosh",
+     "nome": "Legalize It",
+     "artista": "Peter Tosh",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Lively Up Yourself",
+   "letra": "L",
+   "aliases": [],
+   "ano": 1973,
+   "estilo": "ROOTS",
+   "produtor": "Wailers (Island)",
+   "origem": "Lively Up Yourself — Bob Marley",
+   "harmonia": "D:1 G:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 65,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "lively-up-yourself-bob-marley",
+     "nome": "Lively Up Yourself",
+     "artista": "Bob Marley",
+     "ano": 1973,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Love Is Not A Gamble",
+   "letra": "L",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Duke Reid (Treasure Isle)",
+   "origem": "Love Is Not A Gamble — The Techniques",
+   "harmonia": "D:1 G:1 A:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 82,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "love-is-not-a-gamble-the-techniques",
+     "nome": "Love Is Not A Gamble",
+     "artista": "The Techniques",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Love Is The Answer",
+   "letra": "L",
+   "aliases": [],
+   "ano": 1993,
+   "estilo": "RAGGA",
+   "produtor": "Bobby Digital",
+   "origem": "Love Is the Answer — Garnett Silk",
+   "harmonia": "Cm:1 Gm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "love-is-the-answer-garnett-silk",
+     "nome": "Love Is the Answer",
+     "artista": "Garnett Silk",
+     "ano": 1993,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Love Me Forever",
+   "letra": "L",
+   "aliases": [],
+   "ano": 1968,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Love Me Forever — Carlton & The Shoes",
+   "harmonia": "F:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 72,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "love-me-forever-carlton-the-shoes",
+     "nome": "Love Me Forever",
+     "artista": "Carlton & The Shoes",
+     "ano": 1968,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Mad Mad / Diseases",
+   "letra": "M",
+   "aliases": [
+    "Diseases (Mad Mad)",
+    "Mad Mad",
+    "Zungguzung"
+   ],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Mad Mad — Alton Ellis",
+   "harmonia": "Cm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "MRBM-69 (Diseases = Mad Mad)",
+   "versoes": [
+    {
+     "id": "mad-mad-alton-ellis",
+     "nome": "Mad Mad",
+     "artista": "Alton Ellis",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    },
+    {
+     "id": "diseases-michigan-smiley",
+     "nome": "Diseases",
+     "artista": "Michigan & Smiley",
+     "ano": 1981,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "zungguzungguguzungguzeng-yellowman",
+     "nome": "Zungguzungguguzungguzeng",
+     "artista": "Yellowman",
+     "ano": 1983,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Marcus Garvey",
+   "letra": "M",
+   "aliases": [],
+   "ano": 1975,
+   "estilo": "ROOTS",
+   "produtor": "Jack Ruby",
+   "origem": "Marcus Garvey — Burning Spear",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "marcus-garvey-burning-spear",
+     "nome": "Marcus Garvey",
+     "artista": "Burning Spear",
+     "ano": 1975,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Martial Arts",
+   "letra": "M",
+   "aliases": [],
+   "ano": 2002,
+   "estilo": "DANCEHALL",
+   "produtor": "Craig \"Leftside\" Parks / Scatta",
+   "origem": "Karate — Sizzla",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "karate-sizzla",
+     "nome": "Karate",
+     "artista": "Sizzla",
+     "ano": 2002,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Mean Girl",
+   "letra": "M",
+   "aliases": [],
+   "ano": 1968,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Studio One",
+   "origem": "Mean Girl — Larry Marshall",
+   "harmonia": "F:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "mean-girl-larry-marshall",
+     "nome": "Mean Girl",
+     "artista": "Larry Marshall",
+     "ano": 1968,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Military",
+   "letra": "M",
+   "aliases": [],
+   "ano": 2004,
+   "estilo": "DANCEHALL",
+   "produtor": "Christopher Birch",
+   "origem": "Step Pon Dem — Assassin",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "step-pon-dem-assassin",
+     "nome": "Step Pon Dem",
+     "artista": "Assassin",
+     "ano": 2004,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "MPLA",
+   "letra": "M",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROCKERS",
+   "produtor": "Jo Jo Hookim (Channel One)",
+   "origem": "MPLA — The Revolutionaries",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "mpla-the-revolutionaries",
+     "nome": "MPLA",
+     "artista": "The Revolutionaries",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Mr. Bassie",
+   "letra": "M",
+   "aliases": [],
+   "ano": 1971,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Studio One",
+   "origem": "Mr. Bassie — Horace Andy",
+   "harmonia": "Am:1 Em:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "mr-bassie-horace-andy",
+     "nome": "Mr. Bassie",
+     "artista": "Horace Andy",
+     "ano": 1971,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Mud Up",
+   "letra": "M",
+   "aliases": [],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "Kenneth Black",
+   "origem": "Mud Up — Super Cat",
+   "harmonia": "Cm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "mud-up-super-cat",
+     "nome": "Mud Up",
+     "artista": "Super Cat",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Muslim",
+   "letra": "M",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Sly & Robbie / Firehouse Crew",
+   "origem": "Price Increase — Papa San",
+   "harmonia": "Am:1 Dm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "price-increase-papa-san",
+     "nome": "Price Increase",
+     "artista": "Papa San",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Nanny Goat",
+   "letra": "N",
+   "aliases": [],
+   "ano": 1968,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Nanny Goat — Larry Marshall",
+   "harmonia": "G:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "nanny-goat-larry-marshall",
+     "nome": "Nanny Goat",
+     "artista": "Larry Marshall",
+     "ano": 1968,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Natural Mystic",
+   "letra": "N",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROOTS",
+   "produtor": "Wailers (Tuff Gong)",
+   "origem": "Natural Mystic — Bob Marley",
+   "harmonia": "Dm:1 Em:1 Am:2",
+   "harmoniaStatus": "conferida",
+   "bpm": 66,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "natural-mystic-bob-marley",
+     "nome": "Natural Mystic",
+     "artista": "Bob Marley",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Night Nurse",
+   "letra": "N",
+   "aliases": [],
+   "ano": 1982,
+   "estilo": "RUB A DUB",
+   "produtor": "Gregory Isaacs (African Museum)",
+   "origem": "Night Nurse — Gregory Isaacs",
+   "harmonia": "Am:1 G:1 Dm:1 Am:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "night-nurse-gregory-isaacs",
+     "nome": "Night Nurse",
+     "artista": "Gregory Isaacs",
+     "ano": 1982,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "No Warrior",
+   "letra": "N",
+   "aliases": [],
+   "ano": 1979,
+   "estilo": "ROOTS",
+   "produtor": "Junior Delgado",
+   "origem": "The Raiders — Junior Delgado",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "the-raiders-junior-delgado",
+     "nome": "The Raiders",
+     "artista": "Junior Delgado",
+     "ano": 1979,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Old Broom",
+   "letra": "O",
+   "aliases": [],
+   "ano": 1980,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "Old Broom — The Wailing Souls",
+   "harmonia": "Am:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 82,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "old-broom-the-wailing-souls",
+     "nome": "Old Broom",
+     "artista": "The Wailing Souls",
+     "ano": 1980,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Operation Radication",
+   "letra": "O",
+   "aliases": [],
+   "ano": 1975,
+   "estilo": "ROOTS",
+   "produtor": "Lloyd Campbell",
+   "origem": "Won't You Come Home — Ronnie Davis & The Tennors",
+   "harmonia": "F:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "won-t-you-come-home-ronnie-davis-the-tennors",
+     "nome": "Won't You Come Home",
+     "artista": "Ronnie Davis & The Tennors",
+     "ano": 1975,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Peanie Peanie",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "Bobby Digital",
+   "origem": "Peanie Peanie — Shabba Ranks",
+   "harmonia": "Em:1 Am:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "peanie-peanie-shabba-ranks",
+     "nome": "Peanie Peanie",
+     "artista": "Shabba Ranks",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Pepper Seed",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1993,
+   "estilo": "RAGGA",
+   "produtor": "Dave Kelly (Penthouse)",
+   "origem": "Miss Angella — Beenie Man",
+   "harmonia": "Dm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "miss-angella-beenie-man",
+     "nome": "Miss Angella",
+     "artista": "Beenie Man",
+     "ano": 1993,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Pitch",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Gitsy Willis & Sly Dunbar",
+   "origem": "The Key — Dollar Fifty",
+   "harmonia": "Fm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "the-key-dollar-fifty",
+     "nome": "The Key",
+     "artista": "Dollar Fifty",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Playground",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1997,
+   "estilo": "DANCEHALL",
+   "produtor": "Jeremy Harding (2 Hard)",
+   "origem": "Who Am I — Beenie Man",
+   "harmonia": "Fm:1 C#:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 88,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "who-am-i-beenie-man",
+     "nome": "Who Am I",
+     "artista": "Beenie Man",
+     "ano": 1997,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Police And Thieves",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROOTS",
+   "produtor": "Lee Perry (Black Ark)",
+   "origem": "Police and Thieves — Junior Murvin",
+   "harmonia": "G:1 Am:1 D:1 Am:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 64,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "police-and-thieves-junior-murvin",
+     "nome": "Police and Thieves",
+     "artista": "Junior Murvin",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Power Cut",
+   "letra": "P",
+   "aliases": [],
+   "ano": 2006,
+   "estilo": "DANCEHALL",
+   "produtor": "Stephen \"Di Genius\" McGregor",
+   "origem": "Caliber — Einstein",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 51,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "caliber-einstein",
+     "nome": "Caliber",
+     "artista": "Einstein",
+     "ano": 2006,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Pretty Looks",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1969,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Pretty Looks — Sound Dimension",
+   "harmonia": "Gm:1 Cm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "pretty-looks-sound-dimension",
+     "nome": "Pretty Looks",
+     "artista": "Sound Dimension",
+     "ano": 1969,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Promised Land",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1981,
+   "estilo": "RUB A DUB",
+   "produtor": "Aswad",
+   "origem": "Love Fire — Aswad",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "love-fire-aswad",
+     "nome": "Love Fire",
+     "artista": "Aswad",
+     "ano": 1981,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Punaany",
+   "letra": "P",
+   "aliases": [],
+   "ano": 1986,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Punaany — Admiral Bailey",
+   "harmonia": "G:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 94,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "punaany-admiral-bailey",
+     "nome": "Punaany",
+     "artista": "Admiral Bailey",
+     "ano": 1986,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "sonia-come-back-cocoa-tea",
+     "nome": "Sonia Come Back",
+     "artista": "Cocoa Tea",
+     "ano": null,
+     "papel": "versão",
+     "partesOriginais": "H"
+    }
+   ]
+  },
+  {
+   "nome": "Real Rock",
+   "letra": "R",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Real Rock — Sound Dimension",
+   "harmonia": "Bb:1 Fm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "real-rock-sound-dimension",
+     "nome": "Real Rock",
+     "artista": "Sound Dimension",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    },
+    {
+     "id": "good-thing-going-sugar-minott",
+     "nome": "Good Thing Going",
+     "artista": "Sugar Minott",
+     "ano": 1981,
+     "papel": "versão",
+     "partesOriginais": "H"
+    },
+    {
+     "id": "she-loves-me-now-cocoa-tea",
+     "nome": "She Loves Me Now",
+     "artista": "Cocoa Tea",
+     "ano": null,
+     "papel": "versão",
+     "partesOriginais": "H"
+    }
+   ]
+  },
+  {
+   "nome": "Red Bull & Guinness",
+   "letra": "R",
+   "aliases": [],
+   "ano": 2006,
+   "estilo": "DANCEHALL",
+   "produtor": "Delly Ranks / Stephen \"Di Genius\" McGregor",
+   "origem": "Red Bull & Guinness — Delly Ranks & Chino",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 52,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "red-bull-guinness-delly-ranks-chino",
+     "nome": "Red Bull & Guinness",
+     "artista": "Delly Ranks & Chino",
+     "ano": 2006,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Revolution",
+   "letra": "R",
+   "aliases": [],
+   "ano": 1983,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "Revolution — Dennis Brown",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 82,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "revolution-dennis-brown",
+     "nome": "Revolution",
+     "artista": "Dennis Brown",
+     "ano": 1983,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Rice And Peas",
+   "letra": "R",
+   "aliases": [],
+   "ano": 2001,
+   "estilo": "DANCEHALL",
+   "produtor": "Rohan \"Snow Cone\" Fuller",
+   "origem": "Warrior Cause — Spragga Benz & Elephant Man",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "warrior-cause-spragga-benz-elephant-man",
+     "nome": "Warrior Cause",
+     "artista": "Spragga Benz & Elephant Man",
+     "ano": 2001,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Rockfort Rock",
+   "letra": "R",
+   "aliases": [],
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Rockfort Rock — Sound Dimension",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "rockfort-rock-sound-dimension",
+     "nome": "Rockfort Rock",
+     "artista": "Sound Dimension",
+     "ano": 1967,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Rope In",
+   "letra": "R",
+   "aliases": [],
+   "ano": 1980,
+   "estilo": "RUB A DUB",
+   "produtor": "Joe Gibbs",
+   "origem": "Rope In — Cornell Campbell",
+   "harmonia": "Dm:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "rope-in-cornell-campbell",
+     "nome": "Rope In",
+     "artista": "Cornell Campbell",
+     "ano": 1980,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Rumours",
+   "letra": "R",
+   "aliases": [],
+   "ano": 1988,
+   "estilo": "DIGITAL",
+   "produtor": "Gussie Clarke (Music Works)",
+   "origem": "Rumours — Gregory Isaacs",
+   "harmonia": "Ab:1 Bbm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "rumours-gregory-isaacs",
+     "nome": "Rumours",
+     "artista": "Gregory Isaacs",
+     "ano": 1988,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Sara",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Sara — Frankie Paul",
+   "harmonia": "C:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 88,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "sara-frankie-paul",
+     "nome": "Sara",
+     "artista": "Frankie Paul",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Satta Massagana",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1969,
+   "estilo": "ROOTS",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Satta Massagana — Abyssinians",
+   "harmonia": "Am:1 Dm:1 Am:1 Em:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 77,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "satta-massagana-abyssinians",
+     "nome": "Satta Massagana",
+     "artista": "Abyssinians",
+     "ano": 1969,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Scarface",
+   "letra": "S",
+   "aliases": [],
+   "ano": 2000,
+   "estilo": "DANCEHALL",
+   "produtor": "Patrick Roberts (Shocking Vibes)",
+   "origem": "Original Trend — Mr. Vegas",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "original-trend-mr-vegas",
+     "nome": "Original Trend",
+     "artista": "Mr. Vegas",
+     "ano": 2000,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Sensimilla",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1980,
+   "estilo": "RUB A DUB",
+   "produtor": "Henry \"Junjo\" Lawes",
+   "origem": "Sensimilla — Barrington Levy",
+   "harmonia": "Fm:1 Cm:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "sensimilla-barrington-levy",
+     "nome": "Sensimilla",
+     "artista": "Barrington Levy",
+     "ano": 1980,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Shine Eye Gal",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1979,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "Shine Eye Gal — Black Uhuru",
+   "harmonia": "Cm:2 Gm:2",
+   "harmoniaStatus": "conferida",
+   "bpm": 69,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "shine-eye-gal-black-uhuru",
+     "nome": "Shine Eye Gal",
+     "artista": "Black Uhuru",
+     "ano": 1979,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Showtime",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1997,
+   "estilo": "DANCEHALL",
+   "produtor": "Dave Kelly (Madhouse)",
+   "origem": "Slurp — Alias",
+   "harmonia": "Gm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "slurp-alias",
+     "nome": "Slurp",
+     "artista": "Alias",
+     "ano": 1997,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Sitting And Watching",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1978,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie",
+   "origem": "Sitting And Watching — Dennis Brown",
+   "harmonia": "Em:1 Am:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "sitting-and-watching-dennis-brown",
+     "nome": "Sitting And Watching",
+     "artista": "Dennis Brown",
+     "ano": 1978,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Skylarking",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1972,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Studio One",
+   "origem": "Skylarking — Horace Andy",
+   "harmonia": "Em:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 72,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "skylarking-horace-andy",
+     "nome": "Skylarking",
+     "artista": "Horace Andy",
+     "ano": 1972,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Sleng Teng",
+   "letra": "S",
+   "aliases": [
+    "Sleng Teng Resurrection"
+   ],
+   "ano": 1985,
+   "estilo": "DIGITAL",
+   "produtor": "",
+   "origem": "Budy Bye — Johnny Osbourne",
+   "harmonia": "D:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 90,
+   "nota": "",
+   "fonte": "Wikipedia (Sleng Teng): Sleng Teng Resurrection é o relick de Jammy de 2005",
+   "versoes": [
+    {
+     "id": "budy-bye-johnny-osbourne",
+     "nome": "Budy Bye",
+     "artista": "Johnny Osbourne",
+     "ano": 1985,
+     "papel": "original",
+     "partesOriginais": "H"
+    },
+    {
+     "id": "under-mi-sleng-teng-wayne-smith",
+     "nome": "Under Mi Sleng Teng",
+     "artista": "Wayne Smith",
+     "ano": 1985,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "sleng-teng-resurrection-luciano",
+     "nome": "Sleng Teng Resurrection",
+     "artista": "Luciano",
+     "ano": 2005,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Small Axe",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1970,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Lee Perry (Upsetters)",
+   "origem": "Small Axe — Wailers",
+   "harmonia": "Eb:1/2 Bb:1/2 F:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "small-axe-wailers",
+     "nome": "Small Axe",
+     "artista": "Wailers",
+     "ano": 1970,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Soap",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1989,
+   "estilo": "DIGITAL",
+   "produtor": "Mafia & Fluxy",
+   "origem": "Tata Fool — Dennis Star / Beenie Man",
+   "harmonia": "Dm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "tata-fool-dennis-star-beenie-man",
+     "nome": "Tata Fool",
+     "artista": "Dennis Star / Beenie Man",
+     "ano": 1989,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Speed",
+   "letra": "S",
+   "aliases": [],
+   "ano": 2000,
+   "estilo": "DANCEHALL",
+   "produtor": "Desmond & Rupert Blake",
+   "origem": "Look Like — Madd Anju",
+   "harmonia": "Gm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 51,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "look-like-madd-anju",
+     "nome": "Look Like",
+     "artista": "Madd Anju",
+     "ano": 2000,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Stalag",
+   "letra": "S",
+   "aliases": [
+    "Ring The Alarm (Stalag)"
+   ],
+   "ano": 1973,
+   "estilo": "ROOTS",
+   "produtor": "Winston Riley (Techniques)",
+   "origem": "Stalag 17 — Ansell Collins",
+   "harmonia": "C:1 Bb:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "Wikipedia (Stalag riddim): Bam Bam e Ring the Alarm sobre o Stalag 17 de Ansel Collins, 1973",
+   "versoes": [
+    {
+     "id": "stalag-17-ansell-collins",
+     "nome": "Stalag 17",
+     "artista": "Ansell Collins",
+     "ano": 1973,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    },
+    {
+     "id": "bam-bam-sister-nancy",
+     "nome": "Bam Bam",
+     "artista": "Sister Nancy",
+     "ano": 1982,
+     "papel": "versão",
+     "partesOriginais": "H"
+    },
+    {
+     "id": "ring-the-alarm-tenor-saw",
+     "nome": "Ring the Alarm",
+     "artista": "Tenor Saw",
+     "ano": 1985,
+     "papel": "versão",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Stepz",
+   "letra": "S",
+   "aliases": [],
+   "ano": 2004,
+   "estilo": "DANCEHALL",
+   "produtor": "Michael Jarrett / Craig \"Serani\" Marsh",
+   "origem": "Hyperventilating — Tami Chynn",
+   "harmonia": "Am:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 52,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "hyperventilating-tami-chynn",
+     "nome": "Hyperventilating",
+     "artista": "Tami Chynn",
+     "ano": 2004,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Stink",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1996,
+   "estilo": "DANCEHALL",
+   "produtor": "Dave Kelly (Madhouse)",
+   "origem": "Girls Anthem — Rude Boy Kelly",
+   "harmonia": "Cm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "girls-anthem-rude-boy-kelly",
+     "nome": "Girls Anthem",
+     "artista": "Rude Boy Kelly",
+     "ano": 1996,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Storm",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROOTS",
+   "produtor": "Gregory Isaacs (African Museum)",
+   "origem": "Storm — Gregory Isaacs",
+   "harmonia": "Am:1 G:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "storm-gregory-isaacs",
+     "nome": "Storm",
+     "artista": "Gregory Isaacs",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Street Sweeper",
+   "letra": "S",
+   "aliases": [],
+   "ano": 1999,
+   "estilo": "DANCEHALL",
+   "produtor": "Steely & Clevie",
+   "origem": "Street Sweeper — Steely & Clevie",
+   "harmonia": "Dm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 98,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "street-sweeper-steely-clevie",
+     "nome": "Street Sweeper",
+     "artista": "Steely & Clevie",
+     "ano": 1999,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Swing Easy",
+   "letra": "S",
+   "aliases": [
+    "Swing Easy (digital)"
+   ],
+   "ano": 1986,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Bad Girls — King Everald",
+   "harmonia": "Bb:1 Eb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 90,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "bad-girls-king-everald",
+     "nome": "Bad Girls",
+     "artista": "King Everald",
+     "ano": 1986,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Talk About Love",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1971,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Studio One",
+   "origem": "They Talk About Love — Pat Kelly",
+   "harmonia": "F:1 Dm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "they-talk-about-love-pat-kelly",
+     "nome": "They Talk About Love",
+     "artista": "Pat Kelly",
+     "ano": 1971,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Taxi",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1975,
+   "estilo": "ROOTS",
+   "produtor": "Maurice & Melvin Jackson",
+   "origem": "Prophecy — Little Roy",
+   "harmonia": "Am:1 Em:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "prophecy-little-roy",
+     "nome": "Prophecy",
+     "artista": "Little Roy",
+     "ano": 1975,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Tease Me",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1993,
+   "estilo": "RAGGA",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "Tease Me — Chaka Demus & Pliers",
+   "harmonia": "C:2 Ab:2",
+   "harmoniaStatus": "conferida",
+   "bpm": 68,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "tease-me-chaka-demus-pliers",
+     "nome": "Tease Me",
+     "artista": "Chaka Demus & Pliers",
+     "ano": 1993,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Tempo",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1985,
+   "estilo": "DIGITAL",
+   "produtor": "King Tubby (Firehouse)",
+   "origem": "Tempo — Anthony Red Rose",
+   "harmonia": "Am:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 88,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "tempo-anthony-red-rose",
+     "nome": "Tempo",
+     "artista": "Anthony Red Rose",
+     "ano": 1985,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Things And Time",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1970,
+   "estilo": "EARLY REGGAE",
+   "produtor": "Studio One",
+   "origem": "Back Out With It — The Wailing Souls",
+   "harmonia": "Gm:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 74,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "back-out-with-it-the-wailing-souls",
+     "nome": "Back Out With It",
+     "artista": "The Wailing Souls",
+     "ano": 1970,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Tonight",
+   "letra": "T",
+   "aliases": [
+    "Tonight (digital)"
+   ],
+   "ano": 1987,
+   "estilo": "DIGITAL",
+   "produtor": "King Jammy (Jammys)",
+   "origem": "Tonight — King Jammy",
+   "harmonia": "F:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 88,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "tonight-king-jammy",
+     "nome": "Tonight",
+     "artista": "King Jammy",
+     "ano": 1987,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Top Ten",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1992,
+   "estilo": "RAGGA",
+   "produtor": "Bobby Digital",
+   "origem": "Top Ten — Terror Fabulous",
+   "harmonia": "Cm:1 Bb:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 92,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "top-ten-terror-fabulous",
+     "nome": "Top Ten",
+     "artista": "Terror Fabulous",
+     "ano": 1992,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Tremor",
+   "letra": "T",
+   "aliases": [],
+   "ano": 2007,
+   "estilo": "DANCEHALL",
+   "produtor": "Stephen \"Di Genius\" McGregor",
+   "origem": "Actor — Craig Dennis",
+   "harmonia": "Bm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 52,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "actor-craig-dennis",
+     "nome": "Actor",
+     "artista": "Craig Dennis",
+     "ano": 2007,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Trilogy",
+   "letra": "T",
+   "aliases": [],
+   "ano": 2001,
+   "estilo": "DANCEHALL",
+   "produtor": "King Jammy / Ward 21",
+   "origem": "Gi Wi Dem — Spragga Benz & Red Square",
+   "harmonia": "Em:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 100,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "gi-wi-dem-spragga-benz-red-square",
+     "nome": "Gi Wi Dem",
+     "artista": "Spragga Benz & Red Square",
+     "ano": 2001,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Truths And Rights",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1980,
+   "estilo": "RUB A DUB",
+   "produtor": "Coxsone Dodd (Studio One)",
+   "origem": "Truths and Rights — Johnny Osbourne",
+   "harmonia": "C#m:1 E:1 Ab:1",
+   "harmoniaStatus": "conferida",
+   "bpm": 78,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "truths-and-rights-johnny-osbourne",
+     "nome": "Truths and Rights",
+     "artista": "Johnny Osbourne",
+     "ano": 1980,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Two Sevens Clash",
+   "letra": "T",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROCKERS",
+   "produtor": "Joe Gibbs",
+   "origem": "Two Sevens Clash — Culture",
+   "harmonia": "Ab:1 C#:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 82,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "two-sevens-clash-culture",
+     "nome": "Two Sevens Clash",
+     "artista": "Culture",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Up Close and Personal",
+   "letra": "U",
+   "aliases": [],
+   "ano": 1998,
+   "estilo": "DANCEHALL",
+   "produtor": "Donovan Germain (Penthouse)",
+   "origem": "Up Close and Personal — Tanto Metro & Devonte",
+   "harmonia": "",
+   "harmoniaStatus": "pendente",
+   "bpm": 96,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "up-close-and-personal-tanto-metro-devonte",
+     "nome": "Up Close and Personal",
+     "artista": "Tanto Metro & Devonte",
+     "ano": 1998,
+     "papel": "original",
+     "partesOriginais": ""
+    }
+   ]
+  },
+  {
+   "nome": "Wa Do Dem",
+   "letra": "W",
+   "aliases": [],
+   "ano": 1981,
+   "estilo": "RUB A DUB",
+   "produtor": "Henry \"Junjo\" Lawes (Volcano)",
+   "origem": "Wa-Do-Dem — Eek-A-Mouse",
+   "harmonia": "G:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 77,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "wa-do-dem-eek-a-mouse",
+     "nome": "Wa-Do-Dem",
+     "artista": "Eek-A-Mouse",
+     "ano": 1981,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Wanna Be Loved",
+   "letra": "W",
+   "aliases": [],
+   "ano": 1995,
+   "estilo": "RAGGA",
+   "produtor": "Donovan Germain (Penthouse)",
+   "origem": "Wanna Be Loved — Buju Banton",
+   "harmonia": "Bb:1 Gm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 73,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "wanna-be-loved-buju-banton",
+     "nome": "Wanna Be Loved",
+     "artista": "Buju Banton",
+     "ano": 1995,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "War Ina Babylon",
+   "letra": "W",
+   "aliases": [],
+   "ano": 1976,
+   "estilo": "ROOTS",
+   "produtor": "Lee Perry (Black Ark)",
+   "origem": "War Ina Babylon — Max Romeo",
+   "harmonia": "Am:1 Em:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 70,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "war-ina-babylon-max-romeo",
+     "nome": "War Ina Babylon",
+     "artista": "Max Romeo",
+     "ano": 1976,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Weather Balloon",
+   "letra": "W",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROOTS",
+   "produtor": "U Brown",
+   "origem": "Weather Balloon — U Brown",
+   "harmonia": "Cm:1 Fm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "weather-balloon-u-brown",
+     "nome": "Weather Balloon",
+     "artista": "U Brown",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "Westbound Train",
+   "letra": "W",
+   "aliases": [],
+   "ano": 1973,
+   "estilo": "ROOTS",
+   "produtor": "Niney The Observer",
+   "origem": "Westbound Train — Dennis Brown",
+   "harmonia": "Em:1 A:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 80,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "westbound-train-dennis-brown",
+     "nome": "Westbound Train",
+     "artista": "Dennis Brown",
+     "ano": 1973,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Wipe Out",
+   "letra": "W",
+   "aliases": [],
+   "ano": 2006,
+   "estilo": "DANCEHALL",
+   "produtor": "—",
+   "origem": "Look Alike — Flippa Mafia",
+   "harmonia": "Gm:2",
+   "harmoniaStatus": "aproximada",
+   "bpm": 51,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "look-alike-flippa-mafia",
+     "nome": "Look Alike",
+     "artista": "Flippa Mafia",
+     "ano": 2006,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  },
+  {
+   "nome": "World A Music",
+   "letra": "W",
+   "aliases": [],
+   "ano": 1983,
+   "estilo": "RUB A DUB",
+   "produtor": "Sly & Robbie (Taxi)",
+   "origem": "World A Music — Ini Kamoze",
+   "harmonia": "Em:1 D:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 84,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "world-a-music-ini-kamoze",
+     "nome": "World A Music",
+     "artista": "Ini Kamoze",
+     "ano": 1983,
+     "papel": "original",
+     "partesOriginais": "HBB"
+    }
+   ]
+  },
+  {
+   "nome": "Youthman",
+   "letra": "Y",
+   "aliases": [],
+   "ano": 1977,
+   "estilo": "ROOTS",
+   "produtor": "Glen Brown",
+   "origem": "Wicked Can't Run Away — Glenroy Richards",
+   "harmonia": "Dm:1 Gm:1",
+   "harmoniaStatus": "aproximada",
+   "bpm": 76,
+   "nota": "",
+   "fonte": "",
+   "versoes": [
+    {
+     "id": "wicked-can-t-run-away-glenroy-richards",
+     "nome": "Wicked Can't Run Away",
+     "artista": "Glenroy Richards",
+     "ano": 1977,
+     "papel": "original",
+     "partesOriginais": "HB"
+    }
+   ]
+  }
+ ]
+}

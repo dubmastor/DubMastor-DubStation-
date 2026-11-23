@@ -218,9 +218,10 @@ def build():
 
     items = []
     for p in cm: items.append(("CM", p, [kk(key(p["title"], p["artist"]))]))
+    rk = Counter(norm(b["riddim"]) for b in bm)      # dois riddims de baixo com o mesmo nome não viram uma entrada só
     for b in bm:
-        ks = [kk(key(b["riddim"], b["artist"]))]
-        if norm(b["song"]) and norm(b["song"]) != norm(b["riddim"]):
+        ks = [kk(key(b["riddim"], b["artist"]))] if rk[norm(b["riddim"])] == 1 else []
+        if norm(b["song"]) and (not ks or norm(b["song"]) != norm(b["riddim"])):
             ks.append(kk(key(b["song"], b["artist"])))
         items.append(("BM", b, ks))
     for g in dm: items.append(("DM", g, [kk(key(g["song"], g["artist"]))]))
@@ -241,6 +242,8 @@ def build():
         elif " - " in b0["rec"]: nome, artista, ano = b0["song"], b0["artist"], b0["year"]
         else: nome, artista, ano = b0["riddim"] + " riddim", re.sub(r" \d{4}$", "", b0["rec"]), b0["year"]
         if not ano: ano = (d0 or b0 or {}).get("year")
+        fix = next((v for k, v in cor.get("anos", {}).items() if not k.startswith("_") and k in {BASE_KEY(x) for x in keys}), None)
+        if fix: ano = fix["ano"]
         prod = (b0 or {}).get("prod") or (d0 or {}).get("producer") or ""
         riddim = b0["riddim"] if b0 else next((v for k, v in riddim_de.items() if k in keys), "")
         # estilo
@@ -385,6 +388,62 @@ def write(entries, cm, bm, dm):
     return stats
 
 
+def families(entries):
+    """RIDDIMS CLÁSSICOS POR NOME: cada família junta o riddim original, os relicks e as músicas gravadas nele."""
+    cor = json.load(open(os.path.join(OUT, "correcoes.json"), encoding="utf-8"))
+    fams = {k: v for k, v in cor["familias"].items() if not k.startswith("_")}
+    alias = {a.lower(): f for f, v in fams.items() for a in v["aliases"]}
+    groups = OrderedDict()
+    for e in entries:
+        if not e["riddim"]: continue
+        r = e["riddim"]
+        f = alias.get(r.lower()) or re.sub(r"\s*\((digital|[^)]*)\)$", "", r).strip()
+        groups.setdefault(f, []).append(e)
+    out = []
+    for f, es in groups.items():
+        es = sorted(es, key=lambda e: (e["ano"] or 9999, e["nome"]))
+        orig = es[0]
+        info = fams.get(f, {})
+        out.append(OrderedDict(
+            nome=f, letra=(re.sub(r"^(the|a) ", "", f.lower())[:1].upper()), aliases=sorted({e["riddim"] for e in es} - {f}),
+            ano=orig["ano"], estilo=orig["estilo"], produtor=orig["produtor"],
+            origem=f'{orig["nome"]} — {orig["artista"]}', harmonia=orig["harmoniaTexto"], harmoniaStatus=orig["harmoniaStatus"],
+            bpm=orig["bpm"], nota=info.get("nota", ""), fonte=info.get("fonte", ""),
+            versoes=[OrderedDict(id=e["id"], nome=e["nome"], artista=e["artista"], ano=e["ano"],
+                                 papel="original" if e is orig else "versão",
+                                 partesOriginais="".join(k[0].upper() for k, v in e["original"].items() if v))
+                     for e in es]))
+    out.sort(key=lambda r: (r["letra"], r["nome"].lower()))
+    return out
+
+
+def write_families(fams):
+    json.dump(OrderedDict(_leia=["RIDDIMS CLÁSSICOS POR NOME. Gerado por build_bank.py a partir do riddims.json. Não editar à mão.",
+                                 "Cada família: o riddim original (o mais antigo do banco), os relicks e as músicas gravadas nele. 'id' aponta para riddims.json.",
+                                 "partesOriginais: H = harmonia, B = baixo, D = bateria vindos da gravação."],
+                          total=len(fams), comVersoes=sum(len(f["versoes"]) > 1 for f in fams), riddims=fams),
+              open(os.path.join(OUT, "riddims_por_nome.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    with open(os.path.join(OUT, "riddims_por_nome.csv"), "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["Letra", "Riddim", "Ano", "Estilo", "Produtor", "Gravação de origem", "Harmonia", "BPM", "Versões no banco", "Músicas", "Também chamado", "Nota"])
+        for f in fams:
+            w.writerow([f["letra"], f["nome"], f["ano"] or "", f["estilo"], f["produtor"], f["origem"], f["harmonia"] or "pendente", f["bpm"],
+                        len(f["versoes"]), " · ".join(f'{v["nome"]} ({v["artista"]}{", " + str(v["ano"]) if v["ano"] else ""})' for v in f["versoes"]),
+                        ", ".join(f["aliases"]), f["nota"]])
+    L = ["# Riddims clássicos por nome — Dub Station", "",
+         f"{len(fams)} riddims, de A a Z. {sum(len(f['versoes']) > 1 for f in fams)} deles com mais de uma música no banco. "
+         "Cada riddim mostra a gravação de origem, a harmonia, o BPM e as músicas do banco gravadas nele.", ""]
+    letra = None
+    for f in fams:
+        if f["letra"] != letra:
+            letra = f["letra"]; L += ["", f"## {letra}", ""]
+        vs = "; ".join(f'{v["nome"]} ({v["artista"]}{", " + str(v["ano"]) if v["ano"] else ""})' + (" · original" if v["papel"] == "original" else "") for v in f["versoes"])
+        extra = f' Também chamado {", ".join(f["aliases"])}.' if f["aliases"] else ""
+        L.append(f'- **{f["nome"]}** ({f["ano"] or "?"}, {f["produtor"] or "produtor não informado"}) · {f["estilo"]} · '
+                 f'{f["harmonia"] or "harmonia pendente"} · {f["bpm"]} BPM — {vs}.{extra}' + (f' *{f["nota"]}.*' if f["nota"] else ""))
+    open(os.path.join(OUT, "RIDDIMS_POR_NOME.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
+
+
 if __name__ == "__main__":
     entries, cm, bm, dm = build()
     # checagens
@@ -395,4 +454,7 @@ if __name__ == "__main__":
     used = Counter(e["indices"]["MRCM"] for e in entries if e["indices"]["MRCM"] is not None)
     assert len(used) == len(cm), "algum preset do MRCM ficou de fora"
     stats = write(entries, cm, bm, dm)
+    fams = families(entries)
+    write_families(fams)
+    stats["riddimsPorNome"] = len(fams)
     print(json.dumps(stats, ensure_ascii=False, indent=1))

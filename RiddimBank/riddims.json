@@ -49,17 +49,17 @@
   }
  ],
  "estatisticas": {
-  "total": 355,
-  "comHarmonia": 310,
+  "total": 356,
+  "comHarmonia": 311,
   "harmoniaPendente": 45,
   "bateriaOriginal": 117,
-  "baixoOriginal": 159,
+  "baixoOriginal": 160,
   "tresOriginais": 53,
-  "harmoniaConferida": 136,
+  "harmoniaConferida": 137,
   "harmoniaAproximada": 174,
   "divergencias": 13,
   "porEstilo": {
-   "ROCKSTEADY": 17,
+   "ROCKSTEADY": 18,
    "EARLY REGGAE": 35,
    "ROOTS": 53,
    "ROCKERS": 27,
@@ -653,6 +653,63 @@
    "indices": {
     "MRCM": null,
     "MRBM": 11,
+    "MRDM": null
+   },
+   "conferir": []
+  },
+  {
+   "id": "train-to-skaville-the-ethiopians",
+   "nome": "Train To Skaville",
+   "artista": "The Ethiopians",
+   "ano": 1967,
+   "estilo": "ROCKSTEADY",
+   "riddim": "Boops (Train To Skaville)",
+   "produtor": "The Ethiopians",
+   "harmonia": [
+    {
+     "tonica": "G",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "C",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "G:1 C:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "MRBM-69",
+   "bpm": 88,
+   "bpmFonte": "típico da época (MRBM-69)",
+   "bateria": {
+    "baterista": "CARLTON BARRETT",
+    "kit": "ONE DROP",
+    "groove": {
+     "indice": 50,
+     "musica": "I Shot The Sheriff (Bob Marley & The Wailers)",
+     "original": false
+    }
+   },
+   "baixo": {
+    "estilo": "LEROY SIBBLES",
+    "riddimMRBM": 19,
+    "original": true,
+    "quemGravou": "Supersonics",
+    "timbre": 0,
+    "densidade": 0.55,
+    "variacao": 0.45,
+    "swing": 0.2
+   },
+   "completo": true,
+   "original": {
+    "harmonia": true,
+    "baixo": true,
+    "bateria": false
+   },
+   "indices": {
+    "MRCM": null,
+    "MRBM": 19,
     "MRDM": null
    },
    "conferir": []
@@ -13967,8 +14024,8 @@
    "artista": "Super Cat",
    "ano": 1986,
    "estilo": "DIGITAL",
-   "riddim": "Boops (Train To Skaville)",
-   "produtor": "The Ethiopians",
+   "riddim": "Boops",
+   "produtor": "Winston Riley (Techniques)",
    "harmonia": [
     {
      "tonica": "G",
@@ -13996,14 +14053,14 @@
     }
    },
    "baixo": {
-    "estilo": "LEROY SIBBLES",
-    "riddimMRBM": 19,
+    "estilo": "JAMMYS",
+    "riddimMRBM": 92,
     "original": true,
-    "quemGravou": "Supersonics",
-    "timbre": 0,
+    "quemGravou": "Techniques All Stars",
+    "timbre": 1,
     "densidade": 0.55,
-    "variacao": 0.45,
-    "swing": 0.2
+    "variacao": 0.4,
+    "swing": 0.05
    },
    "completo": true,
    "original": {
@@ -14013,7 +14070,7 @@
    },
    "indices": {
     "MRCM": 113,
-    "MRBM": 19,
+    "MRBM": 92,
     "MRDM": 107
    },
    "conferir": []
@@ -15042,9 +15099,9 @@
    "id": "ting-a-ling-shabba-ranks",
    "nome": "Ting-A-Ling",
    "artista": "Shabba Ranks",
-   "ano": 1990,
+   "ano": 1992,
    "estilo": "DIGITAL",
-   "riddim": "",
+   "riddim": "Giggy",
    "produtor": "",
    "harmonia": [
     {

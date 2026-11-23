@@ -55,7 +55,8 @@
   "_leia": "Mesma gravação com nomes diferentes nos bancos: vira uma entrada só.",
   "onelovepeoplegetready": "onelove",
   "gimmepunanny": "punaany",
-  "getbusy": "diwali"
+  "getbusy": "diwali",
+  "getbusywaynewondernolettinggo": "diwali"
  },
  "novos": [
   {
@@ -93,7 +94,6 @@
  ],
  "riddimDe": {
   "_leia": "Música -> riddim em que foi gravada (para ligar músicas do mesmo riddim).",
-  "tingaling": "Giggy",
   "originalkuff": "Kuff",
   "soniacomeback": "Punaany",
   "shelovesmenow": "Real Rock",
@@ -107,6 +107,89 @@
   "passkouchie": "Full Up",
   "zungguzung": "Diseases (Mad Mad)",
   "temperature": "Applause",
-  "uptowntopranking": "I'm Still In Love"
+  "uptowntopranking": "I'm Still In Love",
+  "tingling": "Giggy"
+ },
+ "familias": {
+  "_leia": "Famílias de riddim: nome canônico -> nomes usados nos bancos (aliases). Uma família junta o riddim original, os relicks e as músicas gravadas nele.",
+  "Stalag": {
+   "aliases": [
+    "Stalag",
+    "Stalag 17",
+    "Ring The Alarm (Stalag)"
+   ],
+   "fonte": "Wikipedia (Stalag riddim): Bam Bam e Ring the Alarm sobre o Stalag 17 de Ansel Collins, 1973"
+  },
+  "Bam Bam": {
+   "aliases": [
+    "Bam Bam",
+    "Murder She Wrote"
+   ],
+   "nota": "derivado do Stalag com outra linha de baixo",
+   "fonte": "Wikipedia (Stalag riddim): o Bam Bam riddim é o Stalag com outro baixo; o maior sucesso nele é Murder She Wrote"
+  },
+  "Full Up": {
+   "aliases": [
+    "Full Up",
+    "Pass The Kouchie (Full Up)"
+   ],
+   "fonte": "Deezer (Mighty Diamonds): Pass the Kouchie no riddim Full Up"
+  },
+  "Mad Mad / Diseases": {
+   "aliases": [
+    "Mad Mad",
+    "Diseases (Mad Mad)",
+    "Zungguzung",
+    "Diseases"
+   ],
+   "fonte": "MRBM-69 (Diseases = Mad Mad)"
+  },
+  "Sleng Teng": {
+   "aliases": [
+    "Sleng Teng",
+    "Sleng Teng Resurrection"
+   ],
+   "fonte": "Wikipedia (Sleng Teng): Sleng Teng Resurrection é o relick de Jammy de 2005"
+  },
+  "I'm Still In Love": {
+   "aliases": [
+    "I'm Still In Love",
+    "Uptown Top Ranking"
+   ],
+   "fonte": "Uptown Top Ranking foi gravada sobre o riddim de I'm Still In Love (Alton Ellis)"
+  },
+  "Fish Market / Dem Bow": {
+   "aliases": [
+    "Fish Market",
+    "Dem Bow",
+    "Poco Man Jam"
+   ],
+   "fonte": "Wikipedia (Steely & Clevie): o Fish Market virou a base do Dem Bow"
+  },
+  "Applause": {
+   "aliases": [
+    "Applause"
+   ]
+  },
+  "Giggy": {
+   "aliases": [
+    "Giggy"
+   ],
+   "fonte": "Jamaica Observer: Giggy (Steely & Clevie, 1991) com Mama, Ting-A-Ling e Shot a Talk"
+  },
+  "Boops / Train To Skaville": {
+   "aliases": [
+    "Boops (Train To Skaville)",
+    "Boops"
+   ],
+   "fonte": "MRBM-69: o Boops de Super Cat usa o riddim de Train To Skaville (Ethiopians, 1967)"
+  }
+ },
+ "anos": {
+  "_leia": "Anos corrigidos (chave = nome normalizado).",
+  "tingling": {
+   "ano": 1992,
+   "fonte": "Jamaica Observer: Giggy saiu no fim de 1991; Ting-A-Ling está no X-tra Naked (1992)"
+  }
  }
 }
