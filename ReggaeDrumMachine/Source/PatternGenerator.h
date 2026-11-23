@@ -27,12 +27,12 @@ namespace gm
 //  - Rockers : bumbo no 1 e no 3, caixa no 2 e no 4 (o rockers dos Roots Radics / Style Scott)
 //  - One Drop: bumbo e caixa juntos no 2 e no 4 (o 1 e o 3 ficam vazios)
 //  - Boom Bap: hip-hop dos anos 90, bumbo no 1, no "e" do 2 e no "e" do 3, caixa no 2 e no 4
-enum class Style      { Rockers = 0, OneDrop, BoomBap };
+enum class Style      { Rockers = 0, OneDrop, BoomBap, Dembow };
 
 // Bumbo e caixa principais editáveis: 8 posições de colcheia por compasso (bit 0 = "1", bit 1 = "1 e", ...)
 uint8_t defaultKickMask  (Style);
 uint8_t defaultSnareMask (Style);
-enum class HatPattern { Eighths = 0, Sixteenths, Offbeat, Triplets };
+enum class HatPattern { Eighths = 0, Sixteenths, Offbeat, Triplets, FlyingCymbal, OpenOnOne };
 enum class Swing      { Straight = 0, Light, Medium, Heavy, Shuffle };
 enum class Dynamics   { Soft = 0, Medium, Loud, Accented, Crescendo, Breathing };
 

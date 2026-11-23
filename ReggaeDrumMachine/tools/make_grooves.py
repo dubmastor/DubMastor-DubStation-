@@ -11,8 +11,9 @@ keys = ["drummer", "song", "artist", "year", "bpm", "approx", "style", "kick", "
 for i, g in enumerate(data):
     missing = [k for k in keys if k not in g]
     assert not missing, (i, missing)
-    assert 0 <= g["drummer"] <= 4 and 60 <= g["bpm"] <= 180 and 1 <= g["seed"] <= 9999 and 1 <= g["bars"] <= 4, g["song"]
+    assert 0 <= g["drummer"] <= 4 and 50 <= g["bpm"] <= 100 and 1 <= g["seed"] <= 9999 and 1 <= g["bars"] <= 4, g["song"]
     assert len(g["note"]) <= 34, ("nota longa demais para o visor", g["song"])
+    assert 0 <= g["style"] <= 3 and 0 <= g["hat"] <= 5 and 0 <= g["kick"] <= 255 and 0 <= g["snare"] <= 255, g["song"]
     if g["drummer"] == 4:
         assert g["kit"] == 1, g["song"]
 # ordem: por baterista, mantendo a ordem do arquivo dentro de cada um
@@ -46,4 +47,18 @@ js = ["// Gerado por ReggaeDrumMachine/tools/make_grooves.py a partir de tools/g
       "// Presets de groove do MRDM-12 (os mesmos do plugin): músicas de cada baterista.",
       "window.MDDM_GROOVES = " + json.dumps([{k: g[k] for k in keys} for g in data], ensure_ascii=False, indent=0) + ";", ""]
 open(os.path.join("..", "site", "drums", "grooves.js"), "w", encoding="utf-8").write("\n".join(js))
+# lista para ler: docs/GROOVES.md
+names = ["Style Scott", "Santa Davis", "Carlton Barrett", "Sly Dunbar", "DIGIKAL"]
+styles = ["Rockers", "One Drop", "Boom Bap", "Dembow"]
+hats = ["colcheias", "semicolcheias", "contratempo", "tercinas", "flying cymbal", "abre no 1"]
+md = ["# Grooves do MRDM-12", "", f"{len(data)} presets de músicas de cada baterista (visor azul do módulo BATERISTA).",
+      "Gerado por `tools/make_grooves.py` a partir de `tools/grooves.json`. BPM com \"~\" é estimado.", ""]
+for d, n in enumerate(names):
+    rows = [g for g in data if g["drummer"] == d]
+    md += [f"## {n} ({len(rows)})", "", "| Música | Artista | Ano | BPM | Groove | Crédito | Fonte |", "| --- | --- | --- | --- | --- | --- | --- |"]
+    for g in rows:
+        md.append(f"| {g['song']} | {g['artist']} | {g['year']} | {'~' if g['approx'] else ''}{g['bpm']} | "
+                  f"{styles[g['style']]}, hi-hat {hats[g['hat']]}: {g['note'].lower()} | {g.get('credito', '')} | {g.get('fonte', '')} |")
+    md.append("")
+open(os.path.join("docs", "GROOVES.md"), "w", encoding="utf-8").write("\n".join(md))
 print(len(data), "grooves")

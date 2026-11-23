@@ -120,6 +120,39 @@ int main()
         for (auto& e : p.events) check (e.beat >= 0 && e.beat < p.lengthInBeats && e.velocity >= 1 && e.velocity <= 127, "limites");
     }
 
+    // 2.7: estilo DEMBOW (Steely & Clevie) e hi-hats FLYING CYMBAL e ABRE NO 1
+    {
+        auto has = [] (const Pattern& p, int note, double beat)
+        {
+            for (auto& e : p.events) if (e.note == note && std::abs (e.beat - beat) < 0.02) return true;
+            return false;
+        };
+        Settings d; d.style = Style::Dembow; d.kickMask = defaultKickMask (d.style); d.snareMask = defaultSnareMask (d.style);
+        d.bars = 2; d.fill = false; d.swing = Swing::Straight; d.drummer = Drummer::Digikal; d.seed = 6;
+        d.randKick = d.randSnare = d.randHat = d.randPerc = 0;
+        auto p = generate (d);
+        for (int bar = 0; bar < 2; ++bar)
+        {
+            const double o = bar * 4.0;
+            check (has (p, gm::Kick, o) && has (p, gm::Kick, o + 1) && has (p, gm::Kick, o + 2) && has (p, gm::Kick, o + 3), "dembow: bumbo nos 4 tempos");
+            check (has (p, gm::Snare, o + 0.75) && has (p, gm::Snare, o + 1.5) && has (p, gm::Snare, o + 2.75) && has (p, gm::Snare, o + 3.5), "dembow: boom-ch-boom-chick");
+            check (! has (p, gm::Snare, o + 1.0), "dembow: sem caixa no 2");
+            if (bar == 0) check (! has (p, gm::Snare, o + 3.0), "dembow: sem caixa no 4 (fora do rufo do ultimo compasso)");
+        }
+        Settings f; f.bars = 2; f.fill = false; f.swing = Swing::Straight; f.drummer = Drummer::SlyDunbar; f.seed = 4;
+        f.hatPattern = HatPattern::FlyingCymbal; f.randKick = f.randSnare = f.randHat = f.randPerc = 0;
+        auto q = generate (f);
+        for (int beat = 0; beat < 8; ++beat)
+            check (has (q, gm::OpenHat, beat + 0.5) && ! has (q, gm::OpenHat, (double) beat), "flying cymbal: abre no contratempo, fecha no tempo");
+        Settings c; c.bars = 2; c.fill = false; c.swing = Swing::Straight; c.drummer = Drummer::CarltonBarrett; c.seed = 4;
+        c.style = Style::OneDrop; c.kickMask = defaultKickMask (c.style);
+        c.hatPattern = HatPattern::OpenOnOne; c.randKick = c.randSnare = c.randHat = c.randPerc = 0;
+        auto r = generate (c);
+        for (int bar = 0; bar < 2; ++bar)
+            check (has (r, gm::OpenHat, bar * 4.0) && has (r, gm::OpenHat, bar * 4.0 + 2.0) && ! has (r, gm::OpenHat, bar * 4.0 + 1.0),
+                   "abre no 1: hi-hat aberto no 1 e no 3");
+    }
+
     // 1 a 4 compassos
     for (int bars = 1; bars <= 4; ++bars)
     {

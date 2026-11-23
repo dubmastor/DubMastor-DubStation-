@@ -164,10 +164,12 @@ namespace
                     // bumbos "sujos" de MPC: semicolcheia antes da caixa e no fim do compasso
                     for (int st : { 7, 10, 15 }) pickup (st, r * 0.30, 88);
                     break;
+                case Style::Dembow:
+                    break;   // dembow: o bumbo é só o quatro no chão
             }
 
-            // assinatura de bumbo do baterista (fora do Boom Bap, que é de máquina)
-            if (s.style == Style::BoomBap) continue;
+            // assinatura de bumbo do baterista (fora do Boom Bap e do Dembow, que são de máquina)
+            if (s.style == Style::BoomBap || s.style == Style::Dembow) continue;
             auto extra = [&] (int st, double p, int vel)
             {
                 if (st % 2 == 0 && maskHas (s.kickMask, st / 2)) return;
@@ -235,6 +237,19 @@ namespace
                 {
                     addBackbeat (b, stepPos (bar, st), s.backbeat, 110);
                 }
+            }
+
+            // DEMBOW (Steely & Clevie, Poco Man Jam / Fish Market): caixa no "a" do 1 e no "e" do 2,
+            // repetida no 3 e no 4 (boom-ch-boom-chick), com rufos de caixa em semicolcheia
+            if (s.style == Style::Dembow)
+            {
+                for (int st : { 3, 6, 11, 14 })
+                    addBackbeat (b, stepPos (bar, st), s.backbeat, (st == 3 || st == 11) ? 104 : 96);
+                if (s.strict) continue;
+                if ((lastBar && s.bars > 1) || rng.chance (0.20 + r * 0.40))
+                    for (int st : { 12, 13, 15 })
+                        if (! b.has (stepPos (bar, st), gm::Snare)) b.add (stepPos (bar, st), gm::Snare, (int) rng.range (64, 84));
+                continue;
             }
 
             if (s.strict) continue;   // reggae de livro: só a batida principal
@@ -308,6 +323,10 @@ namespace
             for (auto& e : b.ev) if (isHat (e.note) && nearly (e.beat, t0 + beat)) return true;
             return false;
         };
+
+        // figuras de hi-hat que já são a assinatura de quem as criou: nada por cima
+        if (s.hatPattern == HatPattern::FlyingCymbal || s.hatPattern == HatPattern::OpenOnOne)
+            return;
 
         if (s.hatPattern == HatPattern::Triplets)
         {
@@ -464,6 +483,38 @@ namespace
                 continue;
             }
 
+            if (s.hatPattern == HatPattern::FlyingCymbal)
+            {
+                // FLYING CYMBAL (Santa Davis / Bunny Lee, 1974): o hi-hat abre no contratempo de cada
+                // tempo ("tsss"), junto com a guitarra, e o pé fecha no tempo; semicolcheias leves no meio
+                const double t0 = barStart (bar);
+                for (int beat = 0; beat < 4; ++beat)
+                {
+                    b.add (t0 + beat, gm::ClosedHat, beat % 2 == 0 ? 62 : 56);
+                    for (double q : { 0.25, 0.75 })
+                        if (rng.chance (0.30 + r * 0.30)) b.add (t0 + beat + q, gm::ClosedHat, (int) rng.range (30, 42));
+                    b.add (t0 + beat + 0.5, gm::OpenHat, 100, 0.22);
+                }
+                continue;
+            }
+
+            if (s.hatPattern == HatPattern::OpenOnOne)
+            {
+                // Carlton Barrett em Get Up Stand Up: hi-hat de ride de jazz, abre no 1 (e no 3)
+                // e fecha na colcheia seguinte; as outras colcheias fechadas, com tercina de enfeite
+                const double t0 = barStart (bar);
+                for (int e8 = 0; e8 < 8; ++e8)
+                {
+                    const double at = t0 + e8 * 0.5;
+                    if (e8 == 0 || e8 == 4) { b.add (at, gm::OpenHat, 96, 0.45); continue; }
+                    b.add (at, gm::ClosedHat, (e8 == 1 || e8 == 5) ? 64 : (e8 % 2 == 0 ? 80 : 70));
+                }
+                for (int beat : { 1, 3 })
+                    if (rng.chance (orn * 0.30))
+                        b.add (t0 + beat + 2.0 / 3.0, gm::ClosedHat, (int) rng.range (44, 58));
+                continue;
+            }
+
             bool skipNext = false;
             for (int st = 0; st < kStepsPerBar; ++st)
             {
@@ -496,6 +547,8 @@ namespace
                         break;
 
                     case HatPattern::Triplets:
+                    case HatPattern::FlyingCymbal:
+                    case HatPattern::OpenOnOne:
                         break;
                 }
 
@@ -824,6 +877,7 @@ const char* styleName (Style s)
         case Style::Rockers: return "Rockers";
         case Style::OneDrop: return "One Drop";
         case Style::BoomBap: return "Boom Bap";
+        case Style::Dembow:  return "Dembow";
     }
     return "";
 }
@@ -835,11 +889,12 @@ uint8_t defaultKickMask (Style s)
         case Style::Rockers: return 0x11;   // 1 e 3 (Style Scott / Roots Radics)
         case Style::OneDrop: return 0x44;   // 2 e 4 (junto com a caixa)
         case Style::BoomBap: return 0x29;   // 1, "e" do 2, "e" do 3
+        case Style::Dembow:  return 0x55;   // 1, 2, 3 e 4 (quatro no chão)
     }
     return 0x11;
 }
 
-uint8_t defaultSnareMask (Style) { return 0x44; }   // 2 e 4
+uint8_t defaultSnareMask (Style s) { return s == Style::Dembow ? 0 : 0x44; }   // 2 e 4 (o dembow tem a figura própria)
 
 const char* drummerName (Drummer d)
 {

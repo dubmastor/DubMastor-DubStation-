@@ -44,14 +44,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
                                                            AudioParameterFloatAttributes().withLabel ("%")));
     };
 
-    choice ("style", "Estilo", { "Rockers", "One Drop", "Boom Bap" }, 0);
+    choice ("style", "Estilo", { "Rockers", "One Drop", "Boom Bap", "Dembow" }, 0);
     // bumbo e caixa principais por colcheia (8 posições, bit 0 = "1"); o estilo carrega o padrão dele
     layout.add (std::make_unique<AudioParameterInt> (ParameterID { "kickBeats", 1 },  "Bumbo (colcheias)", 0, 255,
                                                      dubdrums::defaultKickMask (dubdrums::Style::Rockers)));
     layout.add (std::make_unique<AudioParameterInt> (ParameterID { "snareBeats", 1 }, "Caixa (colcheias)", 0, 255,
                                                      dubdrums::defaultSnareMask (dubdrums::Style::Rockers)));
     choice ("bars", "Compassos", { "1", "2", "3", "4" }, 3);
-    choice ("hatPattern", "Hi-hat", { "Colcheias", "Semicolcheias", "Contratempo", "Tercinas" }, 1);   // preset inicial: 1/16
+    choice ("hatPattern", "Hi-hat", { "Colcheias", "Semicolcheias", "Contratempo", "Tercinas", "Flying cymbal", "Abre no 1" }, 1);   // preset inicial: 1/16
     choice ("swing", "Swing do hi-hat",
             { "Reto", "Leve (54%)", "Médio (58%)", "Pesado (62%)", "Shuffle (tercina)" }, 0);
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "swingAll", 1 }, "Swing em tudo", true));
@@ -458,7 +458,7 @@ void DubDrumsProcessor::changeVelocity (int gmNote, double beat, int delta)
 
 void DubDrumsProcessor::applyStyleDefaults (int styleIndex)
 {
-    const auto st = (dubdrums::Style) juce::jlimit (0, 2, styleIndex);
+    const auto st = (dubdrums::Style) juce::jlimit (0, 3, styleIndex);
     auto set = [this] (const char* id, int v)
     {
         if (auto* p = apvts.getParameter (id))

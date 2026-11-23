@@ -523,14 +523,15 @@ void DubDrumsPanel::renderBackground()
 }
 
 //==============================================================================
-[[maybe_unused]] static const char* kStyleNames[] = { "ROCKERS", "ONE DROP", "BOOM BAP" };
-static const char* kHatNames[]   = { "COLCHEIAS", "SEMICOLCHEIAS", "CONTRATEMPO", "TERCINAS" };
+[[maybe_unused]] static const char* kStyleNames[] = { "ROCKERS", "ONE DROP", "BOOM BAP", "DEMBOW" };
+static const char* kHatNames[]   = { "COLCHEIAS", "SEMICOLCHEIAS", "CONTRATEMPO", "TERCINAS", "FLYING CYMBAL", "ABRE NO 1" };
 static const char* kDynNames[]   = { "SUAVE", "MEDIA", "FORTE", "ACENTUADA", "CRESCENDO", "RESPIRANDO" };
 static const char* kDrummerNames[] = { "STYLE SCOTT", "SANTA DAVIS", "CARLTON BARRETT", "SLY DUNBAR", "DIGIKAL" };
 // letreiro do ESTILO: o texto passa como num painel de letras de bar
 static const char* kStyleMarquee[] = { "ROCKERS   *   BUMBO NO 1 E NO 3   *   CAIXA NO 2 E NO 4   *   CHANNEL ONE 1976   *   ",
                                        "ONE DROP   *   BUMBO E CAIXA JUNTOS NO 2 E NO 4   *   O 1 FICA VAZIO   *   ",
-                                       "BOOM BAP   *   HIP-HOP ANOS 90   *   BUMBO NO 1, E DO 2, E DO 3   *   CAIXA NO 2 E NO 4   *   " };
+                                       "BOOM BAP   *   HIP-HOP ANOS 90   *   BUMBO NO 1, E DO 2, E DO 3   *   CAIXA NO 2 E NO 4   *   ",
+                                       "DEMBOW   *   STEELY & CLEVIE 1989   *   BUMBO NOS 4 TEMPOS   *   CAIXA BOOM-CH-BOOM-CHICK   *   " };
 
 // cor de cada compasso na grade (intro + 4 compassos), nas cores do reggae
 static juce::Colour barColour (int bar)
@@ -897,8 +898,8 @@ void MidiDragZone::mouseDrag (const juce::MouseEvent&)
 //==============================================================================
 DubDrumsPanel::DubDrumsPanel (DubDrumsProcessor& p)
     : proc (p),
-      styleButtons (*p.apvts.getParameter ("style"), { "ROCKERS", "ONE DROP", "BOOM BAP" }, 1),
-      hatButtons (*p.apvts.getParameter ("hatPattern"), { "1/8", "1/16", "CONTRA", "TERCINA" }, 2),
+      styleButtons (*p.apvts.getParameter ("style"), { "ROCKERS", "ONE DROP", "BOOM BAP", "DEMBOW" }, 1),
+      hatButtons (*p.apvts.getParameter ("hatPattern"), { "1/8", "1/16", "CONTRA", "TERCINA", "FLYING", "ABRE 1" }, 2),
       backbeatButtons (*p.apvts.getParameter ("backbeat"), { "CAIXA", "ARO", "AMBOS" }, 3, true),
       kitButtons (*p.apvts.getParameter ("kit"), { "ANOS 70", "DIGITAL" }, 2, true),
       drummerSwitch (*p.apvts.getParameter ("drummer")),
@@ -1095,7 +1096,7 @@ void DubDrumsPanel::paint (juce::Graphics& g)
         g.drawImage (background, getLocalBounds().toFloat());
 
     {   // ESTILO: letreiro analógico passando
-        const int st = juce::jlimit (0, 2, choice ("style"));
+        const int st = juce::jlimit (0, 3, choice ("style"));
         const auto r = styleDisplay.toFloat();
         glowText (g, r, {}, 19.0f);
         juce::Graphics::ScopedSaveState ss (g);
@@ -1122,7 +1123,7 @@ void DubDrumsPanel::paint (juce::Graphics& g)
         g.setColour (juce::Colours::white.withAlpha (0.06f));
         g.fillRoundedRectangle (r.withHeight (r.getHeight() * 0.45f), 3.0f);
     }
-    glowText (g, hatDisplay.toFloat(), kHatNames[juce::jlimit (0, 3, choice ("hatPattern"))], 15.0f);
+    glowText (g, hatDisplay.toFloat(), kHatNames[juce::jlimit (0, 5, choice ("hatPattern"))], 15.0f);
 
     // ficha do baterista: nome no display e, gravado embaixo, a banda e a assinatura
     {
@@ -1144,7 +1145,7 @@ void DubDrumsPanel::paint (juce::Graphics& g)
         const bool showGroove = gr >= 0 && dubdrums::groovePresets[gr].drummer == d && proc.grooveIntact();
         g.setColour (showGroove ? colours::ink : colours::inkSoft);
         g.setFont (stencil (9.0f, 0.1f));
-        g.drawFittedText (showGroove ? juce::String (dubdrums::groovePresets[gr].note)
+        g.drawFittedText (showGroove ? juce::String::fromUTF8 (dubdrums::groovePresets[gr].note)
                                      : juce::String (bands[d]) + "  -  " + (choice ("kit") == 1 && d != 4 ? "KIT DIGITAL" : sigs[d]),
                           info.toNearestInt(), juce::Justification::centred, 1, 0.8f);
     }
@@ -1988,7 +1989,7 @@ namespace
 
     juce::String grooveLine2 (const dubdrums::GroovePreset& gp)
     {
-        return juce::String (gp.artist).toUpperCase() + "  " + juce::String (gp.year) + "  -  "
+        return juce::String::fromUTF8 (gp.artist).toUpperCase() + "  " + juce::String (gp.year) + "  -  "
              + (gp.approx ? "~" : "") + juce::String (gp.bpm) + " BPM";
     }
 }
@@ -2057,7 +2058,7 @@ void GrooveSelector::paint (juce::Graphics& g)
         const auto& gp = dubdrums::groovePresets[gr];
         const bool intact = proc.grooveIntact();
         // título não invade o contador n/N do canto
-        blueText (g, juce::String (gp.song).toUpperCase() + (intact ? "" : " *"),
+        blueText (g, juce::String::fromUTF8 (gp.song).toUpperCase() + (intact ? "" : " *"),
                   t.removeFromTop (t.getHeight() * 0.55f).withTrimmedRight (30.0f),
                   juce::Justification::centredLeft, 13.0f);
         blueText (g, grooveLine2 (gp), t, juce::Justification::centredLeft, 9.0f, 0.8f);
@@ -2098,7 +2099,7 @@ void GrooveSelector::showList()
         for (int i : groovesOf (d))
         {
             const auto& gp = dubdrums::groovePresets[i];
-            sub.addItem (i + 1, juce::String (gp.song) + "  -  " + gp.artist + " " + juce::String (gp.year)
+            sub.addItem (i + 1, juce::String::fromUTF8 (gp.song) + "  -  " + juce::String::fromUTF8 (gp.artist) + " " + juce::String (gp.year)
                                     + "  (" + (gp.approx ? "~" : "") + juce::String (gp.bpm) + " BPM)", true, i == current);
         }
         menu.addSubMenu (names[d], sub, true, nullptr, current >= 0 && dubdrums::groovePresets[current].drummer == d);
