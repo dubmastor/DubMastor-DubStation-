@@ -1,6 +1,6 @@
 # Mastor Dub Horns 🎺 — Dub Station
 
-**Mastor Dub Horns MDH-70 1.3.** Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU** (Mac) e app standalone. Também toca no navegador: <https://dubmastor.github.io/DubMastor-DubStation-/web/dubhorns/>
+**Mastor Dub Horns MDH-70 1.4.** Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU** (Mac) e app standalone. Também toca no navegador: <https://dubmastor.github.io/DubMastor-DubStation-/web/dubhorns/>
 
 ![Naipe](docs/interface-naipe.png)
 
@@ -12,7 +12,7 @@
 | **Timbre '70s** | Presets de estúdio (Randy's, Channel One, Tubby's, Black Ark, Treasure Isle, rádio AM) e knobs de brilho, sopro, vibrato, **rouco**, scoop, ataque, release, saturação de fita, banda, **sala**, corte grave, chiado, humanizar e abertura estéreo. Fall e doit seguram a nota e caem junto com o volume, como um músico. |
 | **Mastor Tape Echo** | Eco de fita com 3 cabeças (1×, 2×, 3×), sync com a DAW ou tempo livre, intensidade, envio, volume, agudos, graves, wow & flutter, saturação, **Dub Throw** (segure o botão ou o pedal de sustain) e auto-oscilação. |
 | **Equalizador** | EQ gráfico de 10 bandas (±12 dB) com curva e **Filtro Tubby** (passa-altas ressonante). |
-| **Frases MIDI** | 8 ataques curtos estilo Dean Fraser e 6 frases de introdução. A sugestão traz o ritmo e a articulação (staccato, fall, scoop, doit); **as notas são escolhidas por você**, na lista ou tocando no teclado com *Escolher pelo teclado*. A frase toca junto com a DAW (ou no clock interno) e dá para arrastar/exportar o `.mid`, com uma trilha por instrumento já harmonizada. |
+| **Frases MIDI** | 41 frases **originais** em 8 estilos por década (Ska 60-66, Rocksteady, Early Reggae, Roots One Drop, Rockers, Dub, Dancehall, Digital & Ragga), no padrão da Riddim Machine (visor azul, ESTILO ◀ ▶, LISTA). **Transcrição:** arraste um MP3/WAV (ou toque em *Transcrever áudio*) e os metais viram a frase, com staccato, scoop, fall e doit reconhecidos; modo *metal sozinho* ou *música inteira*. A sugestão traz o ritmo e a articulação (staccato, fall, scoop, doit); **as notas são escolhidas por você**, na lista ou tocando no teclado com *Escolher pelo teclado*. A frase toca junto com a DAW (ou no clock interno) e dá para arrastar/exportar o `.mid`, com uma trilha por instrumento já harmonizada. |
 | **Músicos** | Presets no padrão da Riddim Machine (visor azul **sempre à vista** acima das abas, ESTILO ◀ ▶, MÚSICO ◀ ▶, LISTA; abre no "Tubby · naipe no eco", com o Tape Echo na frente): 24 estilos de músicos e naipes jamaicanos (Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis, Roland Alphonso, Rico Rodriguez…). Carrega naipe, timbre, eco e EQ; o tom e a escala continuam os seus. |
 
 | Timbre | Tape Echo |
@@ -53,6 +53,8 @@ cmake -B build-snap -DHORNS_SNAPSHOT=ON -DHORNS_SNAPSHOT_ONLY=ON && cmake --buil
 ```
 Source/Music.h           escalas, harmonia diatônica, instrumentos do naipe, divisões do sync
 Source/Phrases.h         sugestões de ataques e introduções
+Source/PhraseStyles.h    frases por década e estilo (gerado por tools/frases.py, mesma tabela da versão web)
+Source/Transcriber.h     transcrição de áudio para frase MIDI (YIN + ataques + articulação; também na versão web)
 Source/Musicians.h       presets da aba Músicos (gerado por tools/musicos.py, mesma tabela da versão web)
 Source/HornEngine.h      motor de som (vozes de metal, barramento anos 70, EQ, Filtro Tubby, Mastor Tape Echo) — C++ puro
 Source/PluginProcessor.* parâmetros, MIDI, frase sincronizada com a DAW, exportação .mid, estado

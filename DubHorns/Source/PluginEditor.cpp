@@ -1,5 +1,7 @@
 #include "PluginEditor.h"
 #include "Musicians.h"
+#include "PhraseStyles.h"
+#include "Transcriber.h"
 
 using namespace juce;
 
@@ -1106,7 +1108,7 @@ private:
     bool dragging = false;
 };
 
-class PhrasePage : public HornsPage, private MidiKeyboardState::Listener
+class PhrasePage : public HornsPage, private MidiKeyboardState::Listener, public FileDragAndDropTarget
 {
 public:
     explicit PhrasePage (HornsProcessor& p) : HornsPage (p),
@@ -1115,16 +1117,26 @@ public:
         ph = proc.getPhrase();
         lastKey = key(); lastScale = scale();
 
-        for (auto* b : { &libStab, &libIntro }) { b->setRadioGroupId (77); b->setClickingTogglesState (true); addAndMakeVisible (*b); }
-        libStab.setToggleState (true, dontSendNotification);
-        libStab.onClick = [this] { if (libStab.getToggleState()) { lib = 0; refreshLib(); } };
-        libIntro.onClick = [this] { if (libIntro.getToggleState()) { lib = 1; refreshLib(); } };
+        // biblioteca por década e estilo (padrão Riddim Machine: visor azul, ESTILO ◀ ▶, LISTA)
+        lib = jlimit (0, (int) horns::phraseStyles().size() - 1, (int) proc.apvts.state.getProperty ("phraseStyle", 3));
+        stylePrev.onClick = [this] { stepStyle (-1); };
+        styleNext.onClick = [this] { stepStyle (1); };
+        styleList.onClick = [this] { showStyleList(); };
+        for (auto* b : { &stylePrev, &styleNext, &styleList }) addAndMakeVisible (*b);
+        // transcrição de áudio
+        trMode.addItem ("metal sozinho", 1);
+        trMode.addItem (HU ("música inteira"), 2);
+        trMode.setSelectedId ((int) proc.apvts.state.getProperty ("trMode", 1), dontSendNotification);
+        trMode.onChange = [this] { proc.apvts.state.setProperty ("trMode", trMode.getSelectedId(), nullptr); };
+        trBtn.getProperties().set ("tint", "green");
+        trBtn.onClick = [this] { chooseAudio(); };
+        addAndMakeVisible (trMode); addAndMakeVisible (trBtn);
         fillMode.addItem ("sugerir notas no tom", 1);
         fillMode.addItem (HU ("só ritmo (eu escolho as notas)"), 2);
         fillMode.setSelectedId ((int) proc.apvts.state.getProperty ("fillMode", 1), dontSendNotification);
         fillMode.onChange = [this] { proc.apvts.state.setProperty ("fillMode", fillMode.getSelectedId(), nullptr); };
         addAndMakeVisible (fillMode);
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < 6; ++i)
         {
             auto& c = *cards.emplace_back (std::make_unique<PatternCard>());
             c.onClick = [this, i] { loadPattern (i); };
@@ -1169,7 +1181,7 @@ public:
         rebuildRows();
         proc.keyboardState.addListener (this);
     }
-    ~PhrasePage() override { proc.keyboardState.removeListener (this); }
+    ~PhrasePage() override { pool.removeAllJobs (true, 8000); proc.keyboardState.removeListener (this); }
 
     int key() const   { return (int) proc.apvts.getRawParameterValue ("key")->load(); }
     int scale() const { return (int) proc.apvts.getRawParameterValue ("scale")->load(); }
@@ -1188,6 +1200,7 @@ public:
             roll.repaint();
         }
         const bool host = proc.isHostPlaying();
+        if (Time::getMillisecondCounter() < flashUntil) { if (status.getText() != flash) status.setText (flash, dontSendNotification); return; }
         const auto txt = picking ? (selected >= 0 ? HU ("teclado: escolhendo a nota da linha ") + String (selected + 1) : HU ("teclado: escolhendo notas"))
                                  : host ? HU ("seguindo o transporte da DAW") : HU ("teclado: tocar · DAW parada = clock interno");
         if (status.getText() != txt) status.setText (txt, dontSendNotification);
@@ -1196,12 +1209,34 @@ public:
     void paint (Graphics& g) override
     {
         g.setColour (hc::cream); g.setFont (uiFont (19.0f, true, 0.05f));
-        g.drawText (HU ("SUGESTÕES MIDI · ATAQUES & INTRODUÇÕES"), 20, 6, 700, 24, Justification::left);
+        g.drawText (HU ("FRASES MIDI · POR DÉCADA E ESTILO"), 20, 6, 700, 24, Justification::left);
         g.setColour (hc::muted); g.setFont (uiFont (12.5f));
-        g.drawText (HU ("As sugestões trazem ritmo e articulação. As notas são suas: escolha em cada linha ou ligue ESCOLHER PELO TECLADO e toque em sequência."),
+        g.drawText (HU ("Frases originais com ritmo e articulação de cada época; as notas são suas. Arraste um MP3/WAV nesta aba para transcrever os metais em MIDI."),
                     20, 30, getWidth() - 40, 18, Justification::left);
         g.setFont (uiFont (11.0f, true));
         g.drawText ("AO CARREGAR:", 20, fillMode.getY(), 90, fillMode.getHeight(), Justification::left);
+        {   // visor azul do estilo
+            const auto& st = horns::phraseStyles()[(size_t) lib];
+            auto l = lcdBox.toFloat();
+            mpc::lcd (g, l);
+            auto t = l.reduced (10.0f, 4.0f);
+            mpc::text (g, HU ("ESTILO  ·  ") + HU (st.era), t.withHeight (14.0f), Justification::centredLeft, 10.5f, 0.85f, 0.18f);
+            mpc::text (g, String (lib + 1).paddedLeft ('0', 2) + "/" + String ((int) horns::phraseStyles().size()).paddedLeft ('0', 2),
+                       t.withHeight (14.0f), Justification::centredRight, 10.5f, 0.8f);
+            mpc::text (g, upper (HU (st.name)), t.withTrimmedTop (15.0f).withHeight (20.0f), Justification::centredLeft, 16.0f, 1.0f, 0.04f);
+            mpc::shine (g, l);
+            g.setColour (hc::muted); g.setFont (uiFont (11.0f));
+            g.drawFittedText (HU (st.desc), descBox, Justification::topLeft, 2);
+            g.setColour (hc::cream); g.setFont (uiFont (10.0f, true, 0.25f));
+            g.drawText ("ESTILO", styleNext.getRight() + 8, stylePrev.getY(), 60, stylePrev.getHeight(), Justification::centredLeft);
+        }
+        if (dragOver)
+        {
+            g.setColour (hc::amber.withAlpha (0.18f)); g.fillRoundedRectangle (getLocalBounds().toFloat().reduced (6), 10);
+            g.setColour (hc::amber); g.drawRoundedRectangle (getLocalBounds().toFloat().reduced (6), 10, 2.5f);
+            g.setFont (uiFont (22.0f, true)); g.setColour (hc::cream);
+            g.drawText (HU ("Solte o áudio aqui: os metais viram uma frase MIDI"), getLocalBounds(), Justification::centred);
+        }
         g.setColour (hc::muted); g.setFont (uiFont (10.0f, true, 0.12f));
         auto hdr = view.getBounds().translated (0, -16).withHeight (14).withTrimmedLeft (32);
         g.drawText (HU ("POSIÇÃO"), hdr.removeFromLeft (92), Justification::left);
@@ -1215,9 +1250,13 @@ public:
     void resized() override
     {
         const int L = 20, LW = 300, R = L + LW + 18, RW = getWidth() - R - 20;
-        libStab.setBounds (L, 56, 146, 28); libIntro.setBounds (L + 154, 56, 146, 28);
-        fillMode.setBounds (L + 94, 92, LW - 94, 24);
-        for (int i = 0; i < 8; ++i) cards[(size_t) i]->setBounds (L, 124 + i * 41, LW, 37);
+        lcdBox = { L + 4, 56, LW - 8, 42 };
+        stylePrev.setBounds (L, 106, 40, 26); styleNext.setBounds (L + 44, 106, 40, 26);
+        styleList.setBounds (L + LW - 96, 106, 96, 26);
+        descBox = { L, 136, LW, 28 };
+        fillMode.setBounds (L + 94, 166, LW - 94, 22);
+        for (int i = 0; i < 6; ++i) cards[(size_t) i]->setBounds (L, 194 + i * 39, LW, 35);
+        trBtn.setBounds (L, 430, 182, 30); trMode.setBounds (L + 188, 430, LW - 188, 30);
 
         play.setBounds (R, 60, 170, 34);
         guide.setBounds (R + 178, 60, 130, 34);
@@ -1267,8 +1306,8 @@ private:
 
     void refreshLib()
     {
-        const auto& defs = lib == 0 ? horns::stabPatterns() : horns::introPatterns();
-        for (int i = 0; i < 8; ++i)
+        const auto& defs = horns::phraseStyles()[(size_t) lib].pats;
+        for (int i = 0; i < 6; ++i)
         {
             auto& c = *cards[(size_t) i];
             c.setVisible (i < (int) defs.size());
@@ -1283,7 +1322,7 @@ private:
 
     void loadPattern (int i)
     {
-        const auto& defs = lib == 0 ? horns::stabPatterns() : horns::introPatterns();
+        const auto& defs = horns::phraseStyles()[(size_t) lib].pats;
         if (i >= (int) defs.size()) return;
         const bool suggest = fillMode.getSelectedId() != 2;
         ph = horns::makePhrase (defs[(size_t) i], suggest, key(), scale());
@@ -1291,6 +1330,106 @@ private:
         push (true);
         refreshLib();
         setPicking (! suggest);
+    }
+
+    void stepStyle (int d)
+    {
+        const int n = (int) horns::phraseStyles().size();
+        lib = (lib + d + n) % n;
+        proc.apvts.state.setProperty ("phraseStyle", lib, nullptr);
+        refreshLib(); repaint();
+    }
+    void showStyleList()
+    {
+        PopupMenu m;
+        m.addSectionHeader (HU ("FRASES POR DÉCADA E ESTILO"));
+        const auto& st = horns::phraseStyles();
+        for (int i = 0; i < (int) st.size(); ++i)
+        {
+            PopupMenu sub;
+            for (int k = 0; k < (int) st[(size_t) i].pats.size(); ++k)
+                sub.addItem (1000 + i * 50 + k, HU (st[(size_t) i].pats[(size_t) k].name) + "   (" + st[(size_t) i].pats[(size_t) k].tag + ")");
+            m.addSubMenu (HU (st[(size_t) i].name) + HU ("  ·  ") + st[(size_t) i].era, sub, true, nullptr, i == lib);
+        }
+        Component::SafePointer<PhrasePage> safe (this);
+        m.showMenuAsync (PopupMenu::Options().withTargetComponent (&styleList), [safe] (int r)
+        {
+            if (safe == nullptr || r < 1000) return;
+            safe->lib = (r - 1000) / 50; safe->proc.apvts.state.setProperty ("phraseStyle", safe->lib, nullptr);
+            safe->refreshLib(); safe->loadPattern ((r - 1000) % 50); safe->repaint();
+        });
+    }
+
+    // ---- transcrição de áudio (MP3, WAV, AIFF, FLAC, OGG)
+    static bool isAudio (const String& f)
+    {
+        return f.endsWithIgnoreCase (".mp3") || f.endsWithIgnoreCase (".wav") || f.endsWithIgnoreCase (".aif") || f.endsWithIgnoreCase (".aiff")
+            || f.endsWithIgnoreCase (".flac") || f.endsWithIgnoreCase (".ogg") || f.endsWithIgnoreCase (".m4a");
+    }
+public:
+    bool isInterestedInFileDrag (const StringArray& files) override { for (auto& f : files) if (isAudio (f)) return true; return false; }
+    void fileDragEnter (const StringArray&, int, int) override { dragOver = true; repaint(); }
+    void fileDragExit (const StringArray&) override { dragOver = false; repaint(); }
+    void filesDropped (const StringArray& files, int, int) override
+    {
+        dragOver = false; repaint();
+        for (auto& f : files) if (isAudio (f)) { transcribeFile (File (f)); break; }
+    }
+private:
+    void say (const String& t, int ms = 6000) { flash = t; flashUntil = Time::getMillisecondCounter() + (uint32) ms; status.setText (t, dontSendNotification); }
+    void chooseAudio()
+    {
+        chooser = std::make_unique<FileChooser> (HU ("Escolha o áudio com os metais (MP3, WAV, AIFF, FLAC)"),
+            File::getSpecialLocation (File::userMusicDirectory), "*.mp3;*.wav;*.aif;*.aiff;*.flac;*.ogg;*.m4a");
+        chooser->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+            [this] (const FileChooser& fc) { const auto f = fc.getResult(); if (f.existsAsFile()) transcribeFile (f); });
+    }
+    void transcribeFile (const File& file)
+    {
+        if (busy) return;
+        busy = true; trBtn.setEnabled (false);
+        say (HU ("Transcrevendo ") + file.getFileName() + "...", 60000);
+        const double tempo = proc.getBpmForDisplay();
+        const bool full = trMode.getSelectedId() == 2;
+        Component::SafePointer<PhrasePage> safe (this);
+        pool.addJob ([safe, file, tempo, full]
+        {
+            AudioFormatManager fm; fm.registerBasicFormats();
+            std::unique_ptr<AudioFormatReader> rd (fm.createReaderFor (file));
+            std::vector<float> mono; double sr = 44100;
+            if (rd != nullptr)
+            {
+                sr = rd->sampleRate;
+                const auto n = (int) jmin<int64> (rd->lengthInSamples, (int64) (sr * 90.0));   // até 90 s
+                AudioBuffer<float> buf ((int) jmax (1u, rd->numChannels), jmax (1, n));
+                rd->read (&buf, 0, n, 0, true, true);
+                mono.resize ((size_t) n);
+                for (int i = 0; i < n; ++i)
+                {
+                    float v = 0; for (int c = 0; c < buf.getNumChannels(); ++c) v += buf.getSample (c, i);
+                    mono[(size_t) i] = v / (float) buf.getNumChannels();
+                }
+            }
+            auto res = std::make_shared<horns::TranscribeResult> (horns::transcribe (mono, sr, tempo, full));
+            const bool ok = rd != nullptr;
+            MessageManager::callAsync ([safe, res, ok, name = file.getFileNameWithoutExtension()]
+            {
+                if (safe != nullptr) safe->transcribed (*res, ok, name);
+            });
+        });
+    }
+    void transcribed (const horns::TranscribeResult& r, bool ok, const String& name)
+    {
+        busy = false; trBtn.setEnabled (true);
+        if (! ok) { say (HU ("Não consegui abrir esse arquivo de áudio.")); return; }
+        if (r.phrase.events.empty()) { say (HU ("Não encontrei notas de metal nesse áudio. Tente um trecho com o metal na frente.")); return; }
+        ph = r.phrase;
+        ph.name = (String ("Transcrição: ") + name).toStdString();
+        selected = -1;
+        push (true); refreshLib(); setPicking (false);
+        say (String (ph.events.size()) + HU (" notas transcritas")
+             + (r.dropped > 0 ? HU (" · ") + String (r.dropped) + HU (" ficaram de fora (máx. 4 compassos / 32 notas)") : String())
+             + HU (" · confira e corrija nas linhas abaixo"), 10000);
     }
 
     void addEvent()
@@ -1376,7 +1515,13 @@ private:
     horns::Phrase ph;
     int selected = -1, lib = 0, lastKey = -1, lastScale = -1;
     bool picking = false;
-    TextButton libStab { "ATAQUES CURTOS" }, libIntro { HU ("INTRODUÇÕES") };
+    TextButton stylePrev { String::fromUTF8 ("\xe2\x97\x80") }, styleNext { String::fromUTF8 ("\xe2\x96\xb6") }, styleList { "LISTA" };
+    TextButton trBtn { HU ("TRANSCREVER ÁUDIO") };
+    ComboBox trMode;
+    Rectangle<int> lcdBox, descBox;
+    ThreadPool pool { 1 };
+    bool busy = false, dragOver = false;
+    String flash; uint32 flashUntil = 0;
     ComboBox fillMode;
     std::vector<std::unique_ptr<PatternCard>> cards;
     ParamToggle play, guide;
@@ -1466,6 +1611,9 @@ void VuMeter::paint (Graphics& g)
 }
 
 static const char* kChangelog =
+    "v1.4 · 23/11/2026\n"
+    "• Frases MIDI por década e estilo (visor azul): 41 frases originais em 8 estilos, do ska ao digital.\n"
+    "• Transcrição: arraste um MP3/WAV na aba Frases e os metais viram uma frase MIDI.\n\n"
     "v1.3 · 23/11/2026\n"
     "• Timbre de sessão: pp escuro e ff brilhante como metal real, saxes com todos os harmônicos, zumbido do lábio/palheta, formantes e campana.\n"
     "• Naipe com líder e afinação de cada músico; fita com head bump e sala tipo plate.\n"

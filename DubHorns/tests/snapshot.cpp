@@ -2,15 +2,33 @@
 //   cmake -B build-snap -DHORNS_SNAPSHOT=ON && cmake --build build-snap --target HornsSnapshot
 //   ./build-snap/HornsSnapshot_artefacts/Release/HornsSnapshot docs/          (PNGs)
 //   ./build-snap/HornsSnapshot_artefacts/Release/HornsSnapshot teste.wav      (4 compassos da frase no clock interno + .mid)
+//   ./build-snap/HornsSnapshot_artefacts/Release/HornsSnapshot transcrever audio.mp3 [bpm] [mix]   (transcrição, como na aba Frases)
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/PluginProcessor.h"
 #include "../Source/PluginEditor.h"
+#include "../Source/Transcriber.h"
 
 int main (int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI gui;
     const juce::String out = argc > 1 ? juce::String (argv[1]) : juce::String ("docs/");
     const float scale = argc > 2 ? (float) juce::String (argv[2]).getDoubleValue() : 1.0f;
+
+    if (out == "transcrever" && argc > 2)
+    {
+        juce::AudioFormatManager fm; fm.registerBasicFormats();
+        std::unique_ptr<juce::AudioFormatReader> rd (fm.createReaderFor (juce::File (juce::File::getCurrentWorkingDirectory().getChildFile (argv[2]))));
+        if (rd == nullptr) { std::printf ("nao abriu %s\n", argv[2]); return 1; }
+        const int n = (int) rd->lengthInSamples;
+        juce::AudioBuffer<float> buf ((int) rd->numChannels, n);
+        rd->read (&buf, 0, n, 0, true, true);
+        std::vector<float> mono ((size_t) n);
+        for (int i = 0; i < n; ++i) { float v = 0; for (int c = 0; c < buf.getNumChannels(); ++c) v += buf.getSample (c, i); mono[(size_t) i] = v / (float) buf.getNumChannels(); }
+        const auto r = horns::transcribe (mono, rd->sampleRate, argc > 3 ? std::atof (argv[3]) : 74.0, argc > 4);
+        std::printf ("formato=%s sr=%.0f notas=%zu sobras=%d\n", rd->getFormatName().toRawUTF8(), rd->sampleRate, r.phrase.events.size(), r.dropped);
+        for (const auto& e : r.phrase.events) std::printf ("  %2d dur %2d midi %d %s\n", e.start, e.dur, e.note, horns::articName (e.artic));
+        return 0;
+    }
 
     HornsProcessor proc;
     proc.prepareToPlay (48000.0, 512);
