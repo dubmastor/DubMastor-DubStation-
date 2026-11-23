@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%274%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23ffa928%27/%3E%3Crect x=%2717%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%274%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%2717%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3C/svg%3E">
-<title>Mastor Dub Battery Reggae DBR 1.3 — Dub Station (navegador)</title>
+<title>Mastor Dub Battery Reggae DBR 1.4 — Dub Station (navegador)</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -139,6 +139,11 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 }
 #midiState{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--ink2);text-align:center;margin-top:8px}
 /* GROOVES: visor azul de MPC com as músicas do baterista (igual aos presets do Riddim Machine) */
+.gview{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+.gview button{border:0;border-radius:4px;padding:8px 4px;font-family:inherit;font-weight:800;font-size:10px;line-height:1;letter-spacing:.1em;cursor:pointer;color:var(--cream);
+  background:linear-gradient(180deg,#2c2925,#141210);box-shadow:0 2px 0 #000,inset 0 -3px 0 rgba(74,140,240,.25)}
+.gview button.on{box-shadow:0 1px 0 #000,inset 0 -3px 0 rgba(74,140,240,.95);color:#e8f3ff;text-shadow:0 0 6px rgba(74,140,240,.9)}
+.gpath{display:block;font-weight:800;letter-spacing:.08em}
 .grooves{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:6px;align-items:stretch;margin-top:12px}
 .gkey{border:0;border-radius:4px;background:linear-gradient(180deg,#2c2925,#141210);color:var(--cream);font-size:15px;cursor:pointer;
   box-shadow:0 2px 0 #000,inset 0 -3px 0 rgba(74,140,240,.35);min-height:46px}
@@ -159,7 +164,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 <div class="rack"><div class="wood"></div><div class="unit">
 <i class="screw tl"></i><i class="screw tr"></i><i class="screw bl"></i><i class="screw br"></i>
 <header>
-  <div><h1>DUB BATTERY REGGAE DBR&nbsp;1.3</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
+  <div><h1>DUB BATTERY REGGAE DBR&nbsp;1.4</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -238,7 +243,10 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
   <section class="mod"><div class="tag">BATERISTA</div>
     <div class="display" style="justify-content:center" id="drumDisp">STYLE SCOTT</div>
     <div class="btns c3" id="drummer" style="margin-top:12px"></div>
-    <div class="grooves">
+    <div class="gview" role="group" aria-label="organizar os grooves por">
+      <button id="gvD" class="on">POR BATERISTA</button><button id="gvS">POR ESTILO</button>
+    </div>
+    <div class="grooves" style="margin-top:8px">
       <button class="gkey" id="gPrev" aria-label="groove anterior">◀</button>
       <div class="blue"><b id="gSong">GROOVES</b><span id="gSub"></span><i id="gNum"></i><select id="gList" aria-label="escolher groove"></select></div>
       <button class="gkey" id="gNext" aria-label="próximo groove">▶</button>
@@ -335,6 +343,8 @@ st.pads = PADS.map((_, i) => Object.assign(defaults(i), (st.pads || [])[i] || {}
 let userPresets = loadJSON('dbr1-presets', []);
 let saveTimer = 0;
 function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => saveJSON('dbr1', st), 200); }
+// ao fechar ou recarregar a página, grava na hora (o atraso acima perderia a última mudança)
+addEventListener('pagehide', () => { clearTimeout(saveTimer); saveJSON('dbr1', st); });
 const P = () => st.pads[st.sel];
 
 // ---------------------------------------------------------------- áudio (Web Audio)
@@ -855,30 +865,49 @@ function applyGroove(S, i) {
   S.groove = i;
 }
 function groovesOf(d) { return GROOVES.map((g, i) => (g.drummer === d ? i : -1)).filter((i) => i >= 0); }
+// MENU EM DOIS CAMINHOS: POR BATERISTA (fase da carreira) ou POR ESTILO (a família do groove, de todos os bateristas)
+const FAMILIES = window.MDDM_GROOVE_FAMILIES || [];
+const byPhase = (a, b) => GROOVES[a].phaseOrder - GROOVES[b].phaseOrder || GROOVES[a].year - GROOVES[b].year || a - b;
+const byDrummer = (a, b) => GROOVES[a].drummer - GROOVES[b].drummer || GROOVES[a].year - GROOVES[b].year || a - b;
+function groovesOfFamily(f) { return GROOVES.map((g, i) => (g.family === f ? i : -1)).filter((i) => i >= 0).sort(byDrummer); }
+function currentFamily(S) { const g = GROOVES[S.groove]; return g ? g.family : (S.gfamily || 0); }
+function activeList(S) { return S.gview === 1 ? groovesOfFamily(currentFamily(S)) : groovesOf(S.drummer).sort(byPhase); }
+function groovePath(S) {
+  const g = GROOVES[S.groove]; if (!g) return '';
+  return S.gview === 1 ? 'POR ESTILO · ' + FAMILIES[g.family] : 'POR BATERISTA · ' + g.phase;
+}
 function stepGroove(S, delta) {
-  const list = groovesOf(S.drummer); if (!list.length) return -1;
+  const list = activeList(S); if (!list.length) return -1;
   const at = list.indexOf(S.groove);
   return list[at < 0 ? (delta > 0 ? 0 : list.length - 1) : (at + delta + list.length) % list.length];
 }
 function fillGrooveList() {
   const sel = document.getElementById('gList'); if (!sel) return;
   sel.innerHTML = '<option value="-1">— escolha uma música —</option>';
-  GROOVE_DRUMMERS.forEach((name, d) => {
-    const og = document.createElement('optgroup'); og.label = name;
-    groovesOf(d).forEach((i) => { const g = GROOVES[i], o = document.createElement('option');
-      o.value = i; o.textContent = g.song + ' — ' + g.artist + ' ' + g.year + ' (' + (g.approx ? '~' : '') + g.bpm + ' BPM)'; og.appendChild(o); });
-    sel.appendChild(og);
-  });
+  const item = (i) => { const g = GROOVES[i], o = document.createElement('option');
+    o.value = i; o.textContent = g.year + '  ' + g.song + ' — ' + g.artist + ' · ' + (g.approx ? '~' : '') + g.bpm + ' BPM'; return o; };
+  const group = (label, list) => { if (!list.length) return; const og = document.createElement('optgroup'); og.label = label;
+    list.forEach((i) => og.appendChild(item(i))); sel.appendChild(og); };
+  if (D.gview === 1) {
+    // estilo → baterista → músicas
+    FAMILIES.forEach((name, f) => { const list = groovesOfFamily(f);
+      GROOVE_DRUMMERS.forEach((who, d) => group(name + ' (' + list.length + ') › ' + who, list.filter((i) => GROOVES[i].drummer === d))); });
+  } else {
+    // baterista → fase → músicas
+    GROOVE_DRUMMERS.forEach((who, d) => { const list = groovesOf(d).sort(byPhase); const phases = [...new Set(list.map((i) => GROOVES[i].phase))];
+      phases.forEach((ph) => group(who + ' › ' + ph, list.filter((i) => GROOVES[i].phase === ph))); });
+  }
+  $('gvD').classList.toggle('on', D.gview !== 1); $('gvS').classList.toggle('on', D.gview === 1);
 }
 function showGroove(S, fallbackHtml) {
-  const g = GROOVES[S.groove], same = g && g.drummer === S.drummer, intact = same && grooveIntact(S), list = groovesOf(S.drummer);
+  const g = GROOVES[S.groove], same = g && g.drummer === S.drummer, intact = same && grooveIntact(S), list = activeList(S);
   document.getElementById('gSong').textContent = same ? g.song.toUpperCase() + (intact ? '' : ' *') : 'GROOVES · ' + list.length + ' MÚSICAS';
   document.getElementById('gSub').textContent = same ? g.artist.toUpperCase() + '  ' + g.year + ' · ' + (g.approx ? '~' : '') + g.bpm + ' BPM'
                                                      : 'ESCOLHA COM ◀ ▶ OU TOQUE AQUI';
   document.getElementById('gNum').textContent = same ? (list.indexOf(S.groove) + 1) + '/' + list.length : '';
   const note = document.getElementById('gNote');
-  note.classList.toggle('on', intact);
-  note.innerHTML = intact ? g.note : fallbackHtml;
+  note.classList.toggle('on', same);
+  note.innerHTML = same ? '<span class="gpath">' + groovePath(S) + '</span>' + (intact ? g.note : '') : fallbackHtml;
   const sel = document.getElementById('gList'); if (sel) sel.value = same ? String(S.groove) : '-1';
 }
 
@@ -892,7 +921,9 @@ function loadGroove(i) {
 }
 $('gPrev').onclick = () => loadGroove(stepGroove(D, -1));
 $('gNext').onclick = () => loadGroove(stepGroove(D, 1));
-$('gList').onchange = (e) => loadGroove(+e.target.value);
+$('gList').onchange = (e) => { const i = +e.target.value; if (GROOVES[i]) D.gfamily = GROOVES[i].family; loadGroove(i); };
+for (const [id, v] of [['gvD', 0], ['gvS', 1]])
+  $(id).onclick = () => { D.gview = v; fillGrooveList(); drumChanged(); };
 
 const ROWS = [[49, 'PRATO'], [46, 'HH ABERTO'], [42, 'HH FECHADO'], [50, 'TOM 1'], [47, 'TOM 2'], [43, 'SURDO'], [38, 'CAIXA'], [37, 'ARO'], [36, 'BUMBO']];
 const pat = $('pat');
