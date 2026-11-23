@@ -231,6 +231,7 @@ def build():
     for i, it in enumerate(items): groups.setdefault(find(("i", i)), []).append(it)
 
     hcor = {k: v for k, v in cor["harmonia"].items()}
+    bcor = {k: v for k, v in cor.get("bpm", {}).items() if not k.startswith("_")}
     entries = []
     for g in groups.values():
         c = [x[1] for x in g if x[0] == "CM"]; b = [x[1] for x in g if x[0] == "BM"]; d = [x[1] for x in g if x[0] == "DM"]
@@ -253,7 +254,8 @@ def build():
         else: estilo = style_for(ano, prod, artista)
         # harmonia
         conferir = []; hstatus = "conferida"
-        hk = next((BASE_KEY(k) for k in keys if BASE_KEY(k) in hcor and not (BASE_KEY(k) == "sunisshining" and "blackuhuru" in k)), None)
+        hk = next((k for k in keys if k in hcor), None) or \
+             next((BASE_KEY(k) for k in keys if BASE_KEY(k) in hcor and not (BASE_KEY(k) == "sunisshining" and "blackuhuru" in k)), None)
         if hk:
             hh, _ = parse_h(hcor[hk]["h"]); hfonte = "pesquisa: " + hcor[hk]["fonte"]
             if hcor[hk].get("conferir"): conferir.append("harmonia: confirmar de ouvido"); hstatus = "aproximada"
@@ -281,7 +283,9 @@ def build():
         elif c0: bpm, bfonte = c0["bpm"], "típico da época (MRCM-1240)"
         else: bpm, bfonte = {"DIGITAL": 90, "RAGGA": 94, "DANCEHALL": 96}.get(estilo, 76), "típico da época"
         vs = list(cands.values())
-        if len(vs) > 1 and (max(vs) - min(vs)) / min(vs) > 0.15:
+        bk = next((k for k in keys if k in bcor), None) or next((BASE_KEY(k) for k in keys if BASE_KEY(k) in bcor), None)
+        if bk: bpm, bfonte = bcor[bk]["bpm"], "medido: " + bcor[bk]["fonte"]
+        elif len(vs) > 1 and (max(vs) - min(vs)) / min(vs) > 0.15 and not (c0 and c0["real"]):   # medido vale sobre os típicos
             conferir.append("BPM (bancos: %s)" % ", ".join(f"{k} {v}" for k, v in cands.items()))
         # bateria
         if d0:
@@ -317,16 +321,23 @@ def build():
     for n in cor["novos"]:
         est = style_for(n["ano"], n["produtor"], n["artista"])
         dr = drummer_for(n["produtor"], n["artista"], n["ano"]); bx = bassist_for(n["produtor"], n["artista"], n["ano"])
-        bpm = {"DIGITAL": 90, "RAGGA": 94, "DANCEHALL": 96}.get(est, 80)
+        bpm, bfonte = {"DIGITAL": 90, "RAGGA": 94, "DANCEHALL": 96}.get(est, 80), "típico da época"
+        nk = key(n["nome"], n["artista"])
+        if nk in bcor or BASE_KEY(nk) in bcor:
+            b_ = bcor.get(nk) or bcor[BASE_KEY(nk)]; bpm, bfonte = b_["bpm"], "medido: " + b_["fonte"]
+        hc = hcor.get(nk) or hcor.get(BASE_KEY(nk))
+        nh = parse_h(hc["h"])[0] if hc else []
+        nst = ("aproximada" if hc.get("conferir") else "conferida") if hc else "pendente"
         gp = pick_groove(dm, dr, 0, bpm, n["ano"]); era = BASS_ERA[est]
         entries.append(OrderedDict(
             id="", nome=n["nome"], artista=n["artista"], ano=n["ano"], estilo=est, riddim=n["riddim"], produtor=n["produtor"],
-            harmonia=[], harmoniaTexto="", harmoniaStatus="pendente", harmoniaFonte="pendente (" + n["fonte"] + ")", bpm=bpm, bpmFonte="típico da época",
+            harmonia=[dict(tonica=NOTE[r], menor=bool(m), compassos=DURTXT[du]) for r, m, du in nh], harmoniaTexto=htext(nh), harmoniaStatus=nst,
+            harmoniaFonte=("pesquisa: " + hc["fonte"]) if hc else "pendente (" + n["fonte"] + ")", bpm=bpm, bpmFonte=bfonte,
             bateria=OrderedDict(baterista=DRUMMERS[dr], kit="ROCKERS", groove=dict(indice=gp["idx"], musica=f'{gp["song"]} ({gp["artist"]})', original=False)),
             baixo=dict(estilo=BASSISTS[bx], riddimMRBM=None, original=False, quemGravou="", bateriaInterna=era["drum"], timbre=era["timbre"],
                        densidade=era["dens"], variacao=era["var"], swing=era["swing"]),
-            completo=False, original=OrderedDict(harmonia=False, baixo=False, bateria=False),
-            indices=OrderedDict(MRCM=None, MRBM=None, MRDM=None), conferir=[]))
+            completo=bool(nh), original=OrderedDict(harmonia=bool(nh), baixo=False, bateria=False),
+            indices=OrderedDict(MRCM=None, MRBM=None, MRDM=None), conferir=["harmonia: confirmar de ouvido"] if hc and hc.get("conferir") else []))
 
     entries.sort(key=lambda e: (STYLES.index(e["estilo"]), (e["ano"] or 0), e["nome"].lower()))
     seen = Counter()

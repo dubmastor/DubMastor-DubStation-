@@ -2,7 +2,7 @@
 
 - **BANCO ÚNICO DE RIDDIMS no PRESETS:** 356 músicas e 155 riddims, o mesmo banco do MRBM-69, do MRDM-12 e do MRM-0420 (`RiddimBank/`). Três caminhos no menu: **ESTILOS** (10 estilos, do rocksteady ao new roots), **RIDDIMS A–Z** (cada riddim com a música de origem e as versões gravadas nele) e **MÚSICAS A–Z**
 - **Luzes H B D** em cada música: acesa = a harmonia, o baixo ou a bateria vieram da gravação original; apagada = escolhida pelo músico mais próximo de quem gravou. Opção **Só completos** para ver só as músicas com as três partes originais
-- Harmonias conferidas com as gravações (Night Nurse, Big Ship, No Woman No Cry, Positive Vibration, Africa Unite e outras corrigidas); a música carrega a harmonia e o BPM dela. As que ainda não têm harmonia conferida aparecem apagadas
+- Harmonias conferidas com as gravações (Night Nurse, Big Ship, No Woman No Cry, Positive Vibration, Africa Unite e outras corrigidas); 10 harmonias novas pesquisadas (Soul Rebel, Chant Down Babylon, Glass House, Mama Africa, Cool Runnings, Punky Reggae Party e outras), Hard Drugs e Wa-Do-Dem resolvidas e BPM conferido de Concrete Jungle, Marcus Garvey, Steppin' Razor e outras. A música carrega a harmonia e o BPM dela; as 35 que ainda não têm harmonia aparecem apagadas
 - O banco antigo de 180 harmonias continua no menu (HARMONIAS CLÁSSICAS) e os projetos antigos abrem igual: o preset antigo aparece marcado na música certa do banco novo
 - Versão para celular 2.5 com o mesmo menu
 

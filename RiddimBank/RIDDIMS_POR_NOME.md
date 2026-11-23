@@ -89,7 +89,7 @@
 ## H
 
 - **Hard Drive** (2002, Christopher Clarke / Gregory Harriot) · DANCEHALL · Am:2 · 51 BPM — Buss Back Sketell (Ce'Cile & Tanya Stephens, 2002) · original.
-- **Hard Drugs** (1988, Sly & Robbie / Tappa Zukie) · RUB A DUB · C:1 G:1 C:1 D:1 · 84 BPM — Hard Drugs (Gregory Isaacs, 1988) · original.
+- **Hard Drugs** (1988, Sly & Robbie / Tappa Zukie) · RUB A DUB · D:1 A:1 D:1 E:1 · 84 BPM — Hard Drugs (Gregory Isaacs, 1988) · original.
 - **He Prayed** (1972, Coxsone Dodd (Studio One)) · EARLY REGGAE · Dm:1 C:1 · 72 BPM — Joe Frazier (Burning Spear & Morris Toughest, 1972) · original.
 - **Head To Toe** (1987, King Jammy (Jammys)) · DIGITAL · Gm:1 F:1 · 92 BPM — Head To Toe (Frankie Paul, 1987) · original.
 - **Headache** (1999, Ricky Myrie) · DANCEHALL · F#m:2 · 100 BPM — Headache (Elephant Man & Delly Ranks, 1999) · original.

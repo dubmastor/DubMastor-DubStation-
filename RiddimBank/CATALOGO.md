@@ -2,7 +2,7 @@
 
 Gerado por `RiddimBank/tools/build_bank.py` a partir dos bancos do MRCM-1240, do MRBM-69 e do MRDM-12, com as correções de `RiddimBank/correcoes.json`.
 
-**356 músicas e riddims** em 10 estilos. 311 com harmonia, 45 com harmonia pendente. Bateria original em 117, baixo original em 160, as três partes originais em 53. Harmonia conferida em 137, aproximada em 174. 13 entradas têm divergência entre os bancos (⚠).
+**356 músicas e riddims** em 10 estilos. 321 com harmonia, 35 com harmonia pendente. Bateria original em 117, baixo original em 160, as três partes originais em 53. Harmonia conferida em 146, aproximada em 175. 4 entradas têm divergência entre os bancos (⚠).
 
 Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo músico mais próximo de quem gravou.
 
@@ -50,10 +50,10 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Freedom Blues — Roy Richards | 1970 | Freedom Blues | Em:1 A:1 ~ | 78 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Rivers of Babylon — Melodians | 1970 |  | G:2 D:1 G:1 | 54 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
 | Small Axe — Wailers | 1970 | Small Axe | Eb:1/2 Bb:1/2 F:1 | 78 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
-| Soul Rebel — Bob Marley & The Wailers | 1970 |  | *pendente* | 76 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
+| Soul Rebel — Bob Marley & The Wailers | 1970 |  | C#m:1 B:1 | 76 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | You Can Get It — Jimmy Cliff | 1970 |  | C:1 F:1 | 64 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
 | Cherry Oh Baby — Eric Donaldson | 1971 | Cherry Oh Baby | G:1 C:1 D:1 C:1 ~ | 80 | CARLTON BARRETT · ONE DROP (esc.) | FAMILY MAN (orig.) |
-| Double Barrel — Dave & Ansel Collins | 1971 |  | *pendente* | 92 | SLY DUNBAR · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
+| Double Barrel — Dave & Ansel Collins ⚠ | 1971 |  | Bb:1 F:1 ~ | 81 | SLY DUNBAR · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | Java — Augustus Pablo | 1971 | Java | Gm:1 Cm:1 ~ | 74 | CARLTON BARRETT · ONE DROP (esc.) | FAMILY MAN (orig.) |
 | Johnny Too Bad — Slickers | 1971 |  | G:1 D:1 C:1 G:1 | 80 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
 | Let Your Yeah Be Yeah — Pioneers | 1971 |  | Bb:1 C:1 Eb:1 Bb:1 | 65 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
@@ -76,24 +76,24 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Babylon Too Rough — Gregory Isaacs |  |  | C#m:1 Abm:1 Ebm:1 Abm:1 | 72 | SANTA DAVIS · ONE DROP (esc.) | FULLY FULLWOOD (esc.) |
 | Pressure Drop — Toots | 1969 |  | Ab:1 Eb:1 C#:1 Ab:1 | 73 | CARLTON BARRETT · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
 | Satta Massagana — Abyssinians | 1969 | Satta Massagana | Am:1 Dm:1 Am:1 Em:1 | 77 | SANTA DAVIS · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
-| Concrete Jungle — Bob Marley ⚠ | 1973 | Concrete Jungle | Em:1 Am:1 Em:2 | 96 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
+| Concrete Jungle — Bob Marley | 1973 | Concrete Jungle | Em:1 Am:1 Em:2 | 96 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
 | Get Up Stand Up — Bob Marley | 1973 | Get Up Stand Up | Cm:4 | 74 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
-| Here I Am Baby — Al Brown & Skin Flesh & Bones | 1973 |  | *pendente* | 80 | SLY DUNBAR · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
+| Here I Am Baby — Al Brown & Skin Flesh & Bones ⚠ | 1973 |  | Fm:1 Eb:1 ~ | 80 | SLY DUNBAR · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | I Shot the Sheriff — Bob Marley | 1973 |  | Gm:1 Cm:1 Gm:2 | 97 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | Jah Shakey — Rolando Alphonso | 1973 | Far East | Am:2 ~ | 72 | SANTA DAVIS · ONE DROP (esc.) | LEROY SIBBLES (orig.) |
 | Kinky Reggae — Bob Marley | 1973 |  | C:1 Gm:1 | 70 | CARLTON BARRETT · ONE DROP (esc.) | FAMILY MAN (esc.) |
-| Lively Up Yourself — Bob Marley ⚠ | 1973 | Lively Up Yourself | D:1 G:1 | 65 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
+| Lively Up Yourself — Bob Marley | 1973 | Lively Up Yourself | D:1 G:1 | 65 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
 | Stalag 17 — Ansell Collins | 1973 | Stalag | C:1 Bb:1 | 78 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (orig.) |
 | Stir It Up — Bob Marley | 1973 |  | A:1 D:1 E:1 | 74 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | Westbound Train — Dennis Brown | 1973 | Westbound Train | Em:1 A:1 ~ | 80 | SANTA DAVIS · ONE DROP (orig.) | FULLY FULLWOOD (orig.) |
 | No Woman No Cry — Bob Marley & The Wailers | 1974 |  | C#:1 Ab:1 Bbm:1 F#:1 | 77 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
-| None Shall Escape the Judgement — Johnny Clarke | 1974 |  | *pendente* | 100 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
+| None Shall Escape the Judgement — Johnny Clarke | 1974 |  | Em:1 Bm:1 | 100 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | Them Belly Full — Bob Marley | 1974 |  | Am:2 F:1 E:1 | 70 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | A Dance In A Greenwich Farm — Cornell Campbell | 1975 |  | *pendente* | 92 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | Enter Into His Gates With Praise — Johnny Clarke | 1975 |  | *pendente* | 96 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | Every Knee Shall Bow — Johnny Clarke | 1975 |  | *pendente* | 96 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | I Am Ethiopian — Ras Michael & The Sons of Negus | 1975 |  | *pendente* | 72 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
-| Marcus Garvey — Burning Spear ⚠ | 1975 | Marcus Garvey | Am:1 G:1 | 92 | SANTA DAVIS · ONE DROP (orig.) | ROBBIE (orig.) |
+| Marcus Garvey — Burning Spear | 1975 | Marcus Garvey | Am:1 G:1 | 92 | SANTA DAVIS · ONE DROP (orig.) | ROBBIE (orig.) |
 | Move Out Of Babylon (Rastaman) — Johnny Clarke | 1975 |  | *pendente* | 96 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | Prophecy — Little Roy | 1975 | Taxi | Am:1 Em:1 ~ | 76 | SANTA DAVIS · ROCKERS (esc.) | ROBBIE (orig.) |
 | Revelation Time — Max Romeo | 1975 |  | *pendente* | 72 | SANTA DAVIS · ONE DROP (orig.) | FULLY FULLWOOD (esc.) |
@@ -111,11 +111,11 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | War — Bob Marley | 1976 |  | Bm:1 A:1 | 72 | CARLTON BARRETT · ONE DROP (esc.) | FAMILY MAN (esc.) |
 | War Ina Babylon — Max Romeo | 1976 | War Ina Babylon | Am:1 Em:1 ~ | 70 | CARLTON BARRETT · ONE DROP (esc.) | FAMILY MAN (orig.) |
 | Young Generation Dub — King Tubby | 1976 |  | *pendente* | 76 | CARLTON BARRETT · ONE DROP (orig.) | FULLY FULLWOOD (esc.) |
-| Exodus — Bob Marley ⚠ | 1977 | Exodus | Am:4 C:1/2 Dm:1/2 Am:1 | 67 | CARLTON BARRETT · ROCKERS (orig.) | FAMILY MAN (orig.) |
+| Exodus — Bob Marley | 1977 | Exodus | Am:4 C:1/2 Dm:1/2 Am:1 | 67 | CARLTON BARRETT · ROCKERS (orig.) | FAMILY MAN (orig.) |
 | Jamming — Bob Marley | 1977 |  | Bm:1 E:1 G:1 F#m:1 | 62 | CARLTON BARRETT · ROCKERS (orig.) | FAMILY MAN (esc.) |
 | Natural Mystic — Bob Marley | 1977 | Natural Mystic | Dm:1 Em:1 Am:2 | 66 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
 | One Love — Bob Marley | 1977 |  | Bb:1 F:1 Eb:1 Bb:1 | 77 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
-| Punky Reggae Party — Bob Marley & The Wailers | 1977 |  | *pendente* | 78 | SLY DUNBAR · ROCKERS (orig.) | FAMILY MAN (esc.) |
+| Punky Reggae Party — Bob Marley & The Wailers | 1977 |  | Bm:2 Em:1 D:1 | 78 | SLY DUNBAR · ROCKERS (orig.) | FAMILY MAN (esc.) |
 | Roots — Bob Marley | 1977 |  | F#m:1 Bm:1 D:1 C#m:1 | 65 | CARLTON BARRETT · ONE DROP (esc.) | FAMILY MAN (esc.) |
 | Storm — Gregory Isaacs | 1977 | Storm | Am:1 G:1 ~ | 74 | STYLE SCOTT · ROCKERS (esc.) | ROBBIE (orig.) |
 | The Heathen — Bob Marley & The Wailers | 1977 | Heathen | Cm:2 ~ | 72 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (orig.) |
@@ -141,7 +141,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Equal Rights — Peter Tosh | 1977 |  | G:1 Am:1 C:1 D:1 | 76 | SLY DUNBAR · ROCKERS (esc.) | ROBBIE (esc.) |
 | Equal Rights — Heptones | 1977 |  | Bb:1 F:1 Gm:1 F:1 | 78 | SANTA DAVIS · ONE DROP (esc.) | FULLY FULLWOOD (esc.) |
 | Jah Guide — Peter Tosh | 1977 |  | Bm:1 A:1 G:1 | 76 | SLY DUNBAR · ROCKERS (esc.) | ROBBIE (esc.) |
-| Steppin' Razor — Peter Tosh ⚠ | 1977 |  | C:1 G:1 | 64 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
+| Steppin' Razor — Peter Tosh | 1977 |  | C:1 G:1 | 65 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
 | Three Little Birds — Bob Marley | 1977 |  | A:1 D:1 A:1 E:1 | 74 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | Two Sevens Clash — Culture | 1977 | Two Sevens Clash | Ab:1 C#:1 ~ | 82 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
 | Uptown Top Ranking — Althea & Donna | 1977 | Uptown Top Ranking | Am:1 G:1 | 81 | SLY DUNBAR · ROCKERS (esc.) | ROBBIE (orig.) |
@@ -172,7 +172,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | My Only Lover — Gregory Isaacs | 1973 |  | C:1 Am:1 Dm:1 G:1 | 72 | SANTA DAVIS · ONE DROP (esc.) | FULLY FULLWOOD (esc.) |
 | Everything I Own — Ken Boothe | 1974 |  | F:1 C:1 Bb:1 F:1 | 77 | SANTA DAVIS · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
 | Help Me Make It Through the Night — John Holt | 1974 |  | E:1 A:1 F#m:1 B:1 | 79 | SANTA DAVIS · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
-| Waiting in Vain — Bob Marley ⚠ | 1977 |  | Ab:1 C#:1 | 79 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
+| Waiting in Vain — Bob Marley | 1977 |  | Ab:1 C#:1 | 79 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | Is This Love — Bob Marley | 1978 |  | F#m:2 D:1 A:1 | 61 | CARLTON BARRETT · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | Silly Games — Janet Kay | 1979 |  | F:1 Am:1 F:1 Bb:1 | 61 | SANTA DAVIS · ONE DROP (esc.) | LEROY SIBBLES (esc.) |
 | Soon Forward — Gregory Isaacs | 1979 |  | C:1 Dm:1 | 74 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
@@ -206,7 +206,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Top Ten — Gregory Isaacs |  |  | G:1 C:1 Am:1 ~ | 76 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
 | Sitting And Watching — Dennis Brown | 1978 | Sitting And Watching | Em:1 Am:1 ~ | 76 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
 | Bounty Hunter — Barrington Levy | 1979 | Bounty Hunter | Am:1 Dm:1 ~ | 80 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
-| Shine Eye Gal — Black Uhuru ⚠ | 1979 | Shine Eye Gal | Cm:2 Gm:2 | 69 | STYLE SCOTT · ROCKERS (orig.) | ROBBIE (orig.) |
+| Shine Eye Gal — Black Uhuru | 1979 | Shine Eye Gal | Cm:2 Gm:2 | 69 | STYLE SCOTT · ROCKERS (orig.) | ROBBIE (orig.) |
 | Baltimore — The Tamlins | 1980 | Baltimore | Dm:1 C:1 ~ | 80 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
 | Coming In From The Cold — Bob Marley & The Wailers | 1980 |  | C:2 Bb:1/2 F:1/2 F:1 | 69 | SANTA DAVIS · ONE DROP (orig.) | FAMILY MAN (esc.) |
 | Gunman — Michael Prophet | 1980 | Gunman | Cm:1 Bb:1 ~ | 78 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
@@ -216,10 +216,10 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Sinsemilla — Black Uhuru | 1980 |  | Am:1 Em:1 Am:1 G:1 | 80 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
 | Truths and Rights — Johnny Osbourne | 1980 | Truths And Rights | C#m:1 E:1 Ab:1 | 78 | SANTA DAVIS · ROCKERS (esc.) | FLABBA (orig.) |
 | Boxing Around — Cornell Campbell | 1981 | Boxing | Am:1 G:1 ~ | 80 | SLY DUNBAR · ROCKERS (esc.) | FLABBA (orig.) |
-| Cool Runnings — Bunny Wailer | 1981 |  | *pendente* | 74 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
+| Cool Runnings — Bunny Wailer | 1981 |  | F:1 Bb:1 | 74 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Dance of the Vampires — Scientist & Roots Radics | 1981 |  | *pendente* | 78 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Diseases — Michigan & Smiley | 1981 | Diseases (Mad Mad) | Cm:1 Bb:1 ~ | 80 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
-| Fire House Rock — Wailing Souls ⚠ | 1981 |  | A:1 Bm:1 | 65 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
+| Fire House Rock — Wailing Souls | 1981 |  | A:1 Bm:1 | 65 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Front Door — Gregory Isaacs | 1981 |  | D:1 Em:1 ~ | 76 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
 | Ice Cream Love — Johnny Osbourne | 1981 | Ice Cream Love | Gm:1 F:1 ~ | 84 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
 | Love Fire — Aswad | 1981 | Promised Land | Gm:1 F:1 ~ | 78 | STYLE SCOTT · ROCKERS (esc.) | DERRICK BARNETT (orig.) |
@@ -227,21 +227,21 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Rock 'n' Groove — Bunny Wailer | 1981 |  | *pendente* | 72 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Sponji Reggae — Black Uhuru | 1981 |  | *pendente* | 75 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
 | Sun Is Shining (Black Uhuru) — Black Uhuru | 1981 |  | *pendente* | 78 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
-| Wa-Do-Dem — Eek-A-Mouse ⚠ | 1981 | Wa Do Dem | G:1 F:1 ~ | 77 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
+| Wa-Do-Dem — Eek-A-Mouse | 1981 | Wa Do Dem | G:1 F:1 | 77 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
 | War — Wailing Souls | 1981 |  | E:1 F#m:1 | 84 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
 | Youth of Eglington — Black Uhuru | 1981 |  | *pendente* | 80 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (esc.) |
 | Bam Bam — Sister Nancy | 1982 | Stalag | C:1 Bb:1 | 83 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
 | Big Ship — Freddie McGregor | 1982 | Big Ship | F:1 Gm:1 C:1 Gm:1 | 76 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
 | Cool Down the Pace — Gregory Isaacs | 1982 |  | Bb:1 Cm:1 | 76 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
-| Ganja Smuggling — Eek-A-Mouse | 1982 |  | *pendente* | 80 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
+| Ganja Smuggling — Eek-A-Mouse | 1982 |  | *pendente* | 72 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Minibus (On The Telephone) — Barrington Levy | 1982 |  | *pendente* | 80 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Night Nurse — Gregory Isaacs | 1982 | Night Nurse | Am:1 G:1 Dm:1 Am:1 | 74 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (orig.) |
 | Noah's Ark — Eek-A-Mouse | 1982 |  | Em:1 D:1 ~ | 82 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
-| Police In Helicopter — John Holt | 1982 |  | *pendente* | 80 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
-| Chant Down Babylon — Bob Marley & The Wailers | 1983 |  | *pendente* | 76 | SANTA DAVIS · ONE DROP (orig.) | FAMILY MAN (esc.) |
-| Glass House — Peter Tosh | 1983 |  | *pendente* | 74 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
+| Police In Helicopter — John Holt ⚠ | 1982 |  | Am:1 C:1 ~ | 73 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
+| Chant Down Babylon — Bob Marley & The Wailers | 1983 |  | F:2 Bb:1 C:1 | 76 | SANTA DAVIS · ONE DROP (orig.) | FAMILY MAN (esc.) |
+| Glass House — Peter Tosh | 1983 |  | G:1 C:1 | 95 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | Johnny B. Goode — Peter Tosh | 1983 |  | *pendente* | 92 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
-| Mama Africa — Peter Tosh | 1983 |  | *pendente* | 78 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
+| Mama Africa — Peter Tosh | 1983 |  | G:1 C:1 D:2 | 78 | SANTA DAVIS · ROCKERS (orig.) | FULLY FULLWOOD (esc.) |
 | No Vacancy — Sugar Minott | 1983 |  | *pendente* | 78 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Revolution — Dennis Brown | 1983 | Revolution | Am:1 G:1 ~ | 82 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
 | The Mouse and the Man — Eek-A-Mouse | 1983 |  | Dm:1 Em:1 Am:1 Em:1 ~ | 78 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
@@ -254,7 +254,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Man of Mystery — Dub Syndicate | 1984 |  | *pendente* | 70 | STYLE SCOTT · ROCKERS (orig.) | FLABBA (esc.) |
 | Murderer — Barrington Levy | 1984 |  | F:1 G:1 ~ | 86 | STYLE SCOTT · ROCKERS (esc.) | FLABBA (esc.) |
 | Peeni Walli — Eek-A-Mouse | 1984 |  | Ab:1 Ebm:1 C#:1 Eb:1 ~ | 73 | STYLE SCOTT · ONE DROP (esc.) | FLABBA (esc.) |
-| Hard Drugs — Gregory Isaacs ⚠ | 1988 | Hard Drugs | C:1 G:1 C:1 D:1 ~ | 84 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
+| Hard Drugs — Gregory Isaacs | 1988 | Hard Drugs | D:1 A:1 D:1 E:1 | 84 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
 
 ## DIGITAL (1985-89) — 40
 
@@ -326,7 +326,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Love Is the Answer — Garnett Silk | 1993 | Love Is The Answer | Cm:1 Gm:1 ~ | 80 | DIGIKAL · ONE DROP (esc.) | FAMILY MAN (orig.) |
 | Miss Angella — Beenie Man | 1993 | Pepper Seed | Dm:2 ~ | 96 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
 | Sample — Red Dragon | 1993 | Bellevue | Gm:1 Eb:1 ~ | 96 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
-| Tease Me — Chaka Demus & Pliers ⚠ | 1993 | Tease Me | C:2 Ab:2 | 68 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
+| Tease Me — Chaka Demus & Pliers | 1993 | Tease Me | C:2 Ab:2 | 68 | SLY DUNBAR · ROCKERS (orig.) | ROBBIE (orig.) |
 | Here Comes the Hotstepper — Ini Kamoze | 1994 |  | Am:1 G:1 | 63 | SLY DUNBAR · ROCKERS (esc.) | ROBBIE (esc.) |
 | It's Me Again Jah — Luciano | 1994 |  | Abm:1 F#:1 ~ | 77 | DIGIKAL · ONE DROP (esc.) | DERRICK BARNETT (esc.) |
 | Matey Renk — Merciless | 1994 | Frog | Em:2 ~ | 96 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
@@ -378,7 +378,7 @@ Legenda: **orig.** = a máquina tem a gravação; **esc.** = escolhido pelo mús
 | Picture This — Vybz Kartel | 2004 | Blackout | Cm:2 ~ | 100 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
 | Step Pon Dem — Assassin | 2004 | Military | Em:2 ~ | 100 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
 | Sleng Teng Resurrection — Luciano | 2005 | Sleng Teng Resurrection | D:1 G:1 ~ | 96 | DIGIKAL · ROCKERS (orig.) | JAMMYS (orig.) |
-| Temperature — Sean Paul ⚠ | 2005 | Applause | Bbm:1 Ab:1 Bbm:1 C:1 | 63 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
+| Temperature — Sean Paul | 2005 | Applause | Bbm:1 Ab:1 Bbm:1 C:1 | 63 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
 | Caliber — Einstein | 2006 | Power Cut | Am:2 ~ | 51 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
 | Look Alike — Flippa Mafia | 2006 | Wipe Out | Gm:2 ~ | 51 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |
 | Mama Mama — Pinchers | 2006 | Forty Sup'emmh | Gm:1 F:1 ~ | 96 | DIGIKAL · ROCKERS (esc.) | JAMMYS (orig.) |

@@ -49,6 +49,57 @@
   "sunisshining": {
    "h": "Ebm:1 Abm:1",
    "fonte": "Ultimate Guitar / ChordU: D#m-G#m (versão 1973 em Dm-Gm com capo 1)"
+  },
+  "soulrebel": {
+   "h": "C#m:1 B:1",
+   "fonte": "GuitarTabs.cc / Chordband (versão de 1970): vamp C#m–Bmaj7"
+  },
+  "doublebarrel": {
+   "h": "Bb:1 F:1",
+   "fonte": "GuitarTabs.cc (tab de baixo): parte A em Bb, parte C F–Bb; Klangio: tom Bb",
+   "conferir": true
+  },
+  "noneshallescapejudgement": {
+   "h": "Em:1 Bm:1",
+   "fonte": "GuitarTabsExplorer: Joshua's Word (Johnny Clarke, mesmo riddim) Em–Bm"
+  },
+  "hereiambaby": {
+   "h": "Fm:1 Eb:1",
+   "fonte": "ChordU (versões de Pluto Shervington e UB40 do mesmo tema): Fm–Eb na estrofe; tom da versão de Al Brown não confirmado",
+   "conferir": true
+  },
+  "punkyreggaeparty": {
+   "h": "Bm:2 Em:1 D:1",
+   "fonte": "GuitarTabs.cc / Ukulele Tabs: estrofe em Bm, refrão Em–D"
+  },
+  "chantdownbabylon": {
+   "h": "F:2 Bb:1 C:1",
+   "fonte": "Cifra Club / GuitarTabs.cc: F F Bb C"
+  },
+  "glasshouse": {
+   "h": "G:1 C:1",
+   "fonte": "Cifra Club / GuitarTabsExplorer / ChordU: G–C (tom G)"
+  },
+  "mamaafrica": {
+   "h": "G:1 C:1 D:2",
+   "fonte": "Ultimate Guitar: G–C–D–D a música inteira"
+  },
+  "policeinhelicopter": {
+   "h": "Am:1 C:1",
+   "fonte": "Cifra Club / GuitarTabsExplorer: Am–Cmaj7 (outra cifra traz Am–Em)",
+   "conferir": true
+  },
+  "coolrunnings": {
+   "h": "F:1 Bb:1",
+   "fonte": "Ultimate Guitar: F–Bb (tom F)"
+  },
+  "harddrugs": {
+   "h": "D:1 A:1 D:1 E:1",
+   "fonte": "ChordU (tom A: D–A–D–E) e ChordIntel (mesma sequência um tom abaixo, tom indicado A)"
+  },
+  "wadodem": {
+   "h": "G:1 F:1",
+   "fonte": "AcousticBrainz: tom G maior, confirma o G–F do MRCM-1240 (o Dm–Am do MRBM fica de fora)"
   }
  },
  "juntar": {
@@ -190,6 +241,41 @@
   "tingling": {
    "ano": 1992,
    "fonte": "Jamaica Observer: Giggy saiu no fim de 1991; Ting-A-Ling está no X-tra Naked (1992)"
+  }
+ },
+ "bpm": {
+  "_leia": "BPM conferido fora dos bancos (contado com a caixa no 2 e no 4, nunca acima de 100: os sites que dão o dobro foram divididos por 2).",
+  "concretejungle": {
+   "bpm": 96,
+   "fonte": "AcousticBrainz (Catch a Fire) 97 e Karaoke Version ~97"
+  },
+  "marcusgarvey": {
+   "bpm": 92,
+   "fonte": "AcousticBrainz 185 (metade = 92)"
+  },
+  "steppinrazor": {
+   "bpm": 65,
+   "fonte": "Hooktheory 131 (metade = 65)"
+  },
+  "wadodem": {
+   "bpm": 77,
+   "fonte": "AcousticBrainz 154 (metade = 77)"
+  },
+  "ganjasmuggling": {
+   "bpm": 72,
+   "fonte": "AcousticBrainz 143 (metade = 72)"
+  },
+  "policeinhelicopter": {
+   "bpm": 73,
+   "fonte": "Klangio 73"
+  },
+  "doublebarrel": {
+   "bpm": 81,
+   "fonte": "Klangio 162 (metade = 81)"
+  },
+  "glasshouse": {
+   "bpm": 95,
+   "fonte": "ChordU 95"
   }
  }
 }

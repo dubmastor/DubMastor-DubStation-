@@ -4,7 +4,7 @@
 - Visor azul com o estilo e os anos, a música, os acordes, o BPM (ORIGINAL quando medido), o kit, os músicos e as **luzes H B D** (harmonia, baixo e bateria da gravação original). ◀ ▶ passam por estilo e por música; LISTA e PRESETS abrem **ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z** e a opção **Só completos**
 - **ALAVANCA** sorteia uma música do banco (só ROCKERS e ONE DROP: caixa no 2 e no 4)
 - Projetos antigos abrem igual: o preset antigo aparece como a música certa do banco
-- Teste novo `mrm_render banco`: as 311 músicas com harmonia carregam certo nas três máquinas e ficam salvas no projeto
+- Teste novo `mrm_render banco`: as 321 músicas com harmonia carregam certo nas três máquinas e ficam salvas no projeto
 - Versão para celular 2.3 com o mesmo banco
 
 ## Mastor Riddim Machine MRM-0420 2.2 — DubStation

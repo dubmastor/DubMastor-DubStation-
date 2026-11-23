@@ -50,14 +50,14 @@
  ],
  "estatisticas": {
   "total": 356,
-  "comHarmonia": 311,
-  "harmoniaPendente": 45,
+  "comHarmonia": 321,
+  "harmoniaPendente": 35,
   "bateriaOriginal": 117,
   "baixoOriginal": 160,
   "tresOriginais": 53,
-  "harmoniaConferida": 137,
-  "harmoniaAproximada": 174,
-  "divergencias": 13,
+  "harmoniaConferida": 146,
+  "harmoniaAproximada": 175,
+  "divergencias": 4,
   "porEstilo": {
    "ROCKSTEADY": 18,
    "EARLY REGGAE": 35,
@@ -2200,10 +2200,21 @@
    "estilo": "EARLY REGGAE",
    "riddim": "",
    "produtor": "Lee Perry (Upsetters)",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "C#",
+     "menor": true,
+     "compassos": "1"
+    },
+    {
+     "tonica": "B",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "C#m:1 B:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: GuitarTabs.cc / Chordband (versão de 1970): vamp C#m–Bmaj7",
    "bpm": 76,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -2226,9 +2237,9 @@
     "variacao": 0.5,
     "swing": 0.15
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -2373,12 +2384,23 @@
    "estilo": "EARLY REGGAE",
    "riddim": "",
    "produtor": "Winston Riley",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
-   "bpm": 92,
-   "bpmFonte": "groove do MRDM-12 (estimado)",
+   "harmonia": [
+    {
+     "tonica": "Bb",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "F",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "Bb:1 F:1",
+   "harmoniaStatus": "aproximada",
+   "harmoniaFonte": "pesquisa: GuitarTabs.cc (tab de baixo): parte A em Bb, parte C F–Bb; Klangio: tom Bb",
+   "bpm": 81,
+   "bpmFonte": "medido: Klangio 162 (metade = 81)",
    "bateria": {
     "baterista": "SLY DUNBAR",
     "kit": "ROCKERS",
@@ -2399,9 +2421,9 @@
     "variacao": 0.5,
     "swing": 0.15
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -2410,7 +2432,9 @@
     "MRBM": null,
     "MRDM": 94
    },
-   "conferir": []
+   "conferir": [
+    "harmonia: confirmar de ouvido"
+   ]
   },
   {
    "id": "java-augustus-pablo",
@@ -3507,7 +3531,7 @@
    "harmoniaStatus": "conferida",
    "harmoniaFonte": "MRCM-1240 (cifras feitas por pessoas)",
    "bpm": 96,
-   "bpmFonte": "medido na gravação (MRCM-1240)",
+   "bpmFonte": "medido: AcousticBrainz (Catch a Fire) 97 e Karaoke Version ~97",
    "bateria": {
     "baterista": "CARLTON BARRETT",
     "kit": "ONE DROP",
@@ -3539,9 +3563,7 @@
     "MRBM": 23,
     "MRDM": 57
    },
-   "conferir": [
-    "BPM (bancos: MRCM 96, MRBM 72, MRDM 72)"
-   ]
+   "conferir": []
   },
   {
    "id": "get-up-stand-up-bob-marley",
@@ -3604,10 +3626,21 @@
    "estilo": "ROOTS",
    "riddim": "",
    "produtor": "Lloyd Campbell",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "F",
+     "menor": true,
+     "compassos": "1"
+    },
+    {
+     "tonica": "Eb",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "Fm:1 Eb:1",
+   "harmoniaStatus": "aproximada",
+   "harmoniaFonte": "pesquisa: ChordU (versões de Pluto Shervington e UB40 do mesmo tema): Fm–Eb na estrofe; tom da versão de Al Brown não confirmado",
    "bpm": 80,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -3630,9 +3663,9 @@
     "variacao": 0.5,
     "swing": 0.15
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -3641,7 +3674,9 @@
     "MRBM": null,
     "MRDM": 93
    },
-   "conferir": []
+   "conferir": [
+    "harmonia: confirmar de ouvido"
+   ]
   },
   {
    "id": "i-shot-the-sheriff-bob-marley",
@@ -3873,9 +3908,7 @@
     "MRBM": 25,
     "MRDM": 54
    },
-   "conferir": [
-    "BPM (bancos: MRCM 65, MRBM 78, MRDM 78)"
-   ]
+   "conferir": []
   },
   {
    "id": "stalag-17-ansell-collins",
@@ -4132,10 +4165,21 @@
    "estilo": "ROOTS",
    "riddim": "",
    "produtor": "Bunny Lee",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "E",
+     "menor": true,
+     "compassos": "1"
+    },
+    {
+     "tonica": "B",
+     "menor": true,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "Em:1 Bm:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: GuitarTabsExplorer: Joshua's Word (Johnny Clarke, mesmo riddim) Em–Bm",
    "bpm": 100,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -4158,9 +4202,9 @@
     "variacao": 0.5,
     "swing": 0.15
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -4446,7 +4490,7 @@
    "harmoniaStatus": "conferida",
    "harmoniaFonte": "MRCM-1240 (cifras feitas por pessoas)",
    "bpm": 92,
-   "bpmFonte": "medido na gravação (MRCM-1240)",
+   "bpmFonte": "medido: AcousticBrainz 185 (metade = 92)",
    "bateria": {
     "baterista": "SANTA DAVIS",
     "kit": "ONE DROP",
@@ -4478,9 +4522,7 @@
     "MRBM": 52,
     "MRDM": 42
    },
-   "conferir": [
-    "BPM (bancos: MRCM 92, MRBM 72, MRDM 72)"
-   ]
+   "conferir": []
   },
   {
    "id": "move-out-of-babylon-rastaman-johnny-clarke",
@@ -5487,9 +5529,7 @@
     "MRBM": 49,
     "MRDM": 44
    },
-   "conferir": [
-    "BPM (bancos: MRCM 67, MRBM 78, MRDM 67)"
-   ]
+   "conferir": []
   },
   {
    "id": "jamming-bob-marley",
@@ -5698,10 +5738,26 @@
    "estilo": "ROOTS",
    "riddim": "",
    "produtor": "Lee Perry",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "B",
+     "menor": true,
+     "compassos": "2"
+    },
+    {
+     "tonica": "E",
+     "menor": true,
+     "compassos": "1"
+    },
+    {
+     "tonica": "D",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "Bm:2 Em:1 D:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: GuitarTabs.cc / Ukulele Tabs: estrofe em Bm, refrão Em–D",
    "bpm": 78,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -5724,9 +5780,9 @@
     "variacao": 0.5,
     "swing": 0.15
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -6905,8 +6961,8 @@
    "harmoniaTexto": "C:1 G:1",
    "harmoniaStatus": "conferida",
    "harmoniaFonte": "MRCM-1240 (cifras feitas por pessoas)",
-   "bpm": 64,
-   "bpmFonte": "medido na gravação (MRCM-1240)",
+   "bpm": 65,
+   "bpmFonte": "medido: Hooktheory 131 (metade = 65)",
    "bateria": {
     "baterista": "SLY DUNBAR",
     "kit": "ROCKERS",
@@ -6938,9 +6994,7 @@
     "MRBM": null,
     "MRDM": 78
    },
-   "conferir": [
-    "BPM (bancos: MRCM 64, MRDM 76)"
-   ]
+   "conferir": []
   },
   {
    "id": "three-little-birds-bob-marley",
@@ -8551,9 +8605,7 @@
     "MRBM": null,
     "MRDM": 62
    },
-   "conferir": [
-    "BPM (bancos: MRCM 79, MRDM 64)"
-   ]
+   "conferir": []
   },
   {
    "id": "is-this-love-bob-marley",
@@ -10385,9 +10437,7 @@
     "MRBM": 72,
     "MRDM": 6
    },
-   "conferir": [
-    "BPM (bancos: MRCM 69, MRBM 80, MRDM 80)"
-   ]
+   "conferir": []
   },
   {
    "id": "baltimore-the-tamlins",
@@ -10944,10 +10994,21 @@
    "estilo": "RUB A DUB",
    "riddim": "",
    "produtor": "Solomonic",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "F",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "Bb",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "F:1 Bb:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: Ultimate Guitar: F–Bb (tom F)",
    "bpm": 74,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -10970,9 +11031,9 @@
     "variacao": 0.45,
     "swing": 0.1
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -11144,9 +11205,7 @@
     "MRBM": null,
     "MRDM": 16
    },
-   "conferir": [
-    "BPM (bancos: MRCM 65, MRDM 78)"
-   ]
+   "conferir": []
   },
   {
    "id": "front-door-gregory-isaacs",
@@ -11542,10 +11601,10 @@
     }
    ],
    "harmoniaTexto": "G:1 F:1",
-   "harmoniaStatus": "aproximada",
-   "harmoniaFonte": "MRCM-1240 (detecção automática)",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: AcousticBrainz: tom G maior, confirma o G–F do MRCM-1240 (o Dm–Am do MRBM fica de fora)",
    "bpm": 77,
-   "bpmFonte": "medido na gravação (MRCM-1240)",
+   "bpmFonte": "medido: AcousticBrainz 154 (metade = 77)",
    "bateria": {
     "baterista": "STYLE SCOTT",
     "kit": "ROCKERS",
@@ -11577,9 +11636,7 @@
     "MRBM": 64,
     "MRDM": 9
    },
-   "conferir": [
-    "harmonia (bancos divergem: MRCM G:1 F:1 / MRBM Dm:1 Am:1)"
-   ]
+   "conferir": []
   },
   {
    "id": "war-wailing-souls",
@@ -11882,8 +11939,8 @@
    "harmoniaTexto": "",
    "harmoniaStatus": "pendente",
    "harmoniaFonte": "pendente",
-   "bpm": 80,
-   "bpmFonte": "groove do MRDM-12 (estimado)",
+   "bpm": 72,
+   "bpmFonte": "medido: AcousticBrainz 143 (metade = 72)",
    "bateria": {
     "baterista": "STYLE SCOTT",
     "kit": "ROCKERS",
@@ -12098,12 +12155,23 @@
    "estilo": "RUB A DUB",
    "riddim": "",
    "produtor": "Henry 'Junjo' Lawes",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
-   "bpm": 80,
-   "bpmFonte": "groove do MRDM-12 (estimado)",
+   "harmonia": [
+    {
+     "tonica": "A",
+     "menor": true,
+     "compassos": "1"
+    },
+    {
+     "tonica": "C",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "Am:1 C:1",
+   "harmoniaStatus": "aproximada",
+   "harmoniaFonte": "pesquisa: Cifra Club / GuitarTabsExplorer: Am–Cmaj7 (outra cifra traz Am–Em)",
+   "bpm": 73,
+   "bpmFonte": "medido: Klangio 73",
    "bateria": {
     "baterista": "STYLE SCOTT",
     "kit": "ROCKERS",
@@ -12124,9 +12192,9 @@
     "variacao": 0.45,
     "swing": 0.1
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -12135,7 +12203,9 @@
     "MRBM": null,
     "MRDM": 15
    },
-   "conferir": []
+   "conferir": [
+    "harmonia: confirmar de ouvido"
+   ]
   },
   {
    "id": "chant-down-babylon-bob-marley-the-wailers",
@@ -12145,10 +12215,26 @@
    "estilo": "RUB A DUB",
    "riddim": "",
    "produtor": "Tuff Gong",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "F",
+     "menor": false,
+     "compassos": "2"
+    },
+    {
+     "tonica": "Bb",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "C",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "F:2 Bb:1 C:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: Cifra Club / GuitarTabs.cc: F F Bb C",
    "bpm": 76,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -12171,9 +12257,9 @@
     "variacao": 0.45,
     "swing": 0.1
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -12192,12 +12278,23 @@
    "estilo": "RUB A DUB",
    "riddim": "",
    "produtor": "Peter Tosh (Mama Africa)",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
-   "bpm": 74,
-   "bpmFonte": "groove do MRDM-12 (estimado)",
+   "harmonia": [
+    {
+     "tonica": "G",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "C",
+     "menor": false,
+     "compassos": "1"
+    }
+   ],
+   "harmoniaTexto": "G:1 C:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: Cifra Club / GuitarTabsExplorer / ChordU: G–C (tom G)",
+   "bpm": 95,
+   "bpmFonte": "medido: ChordU 95",
    "bateria": {
     "baterista": "SANTA DAVIS",
     "kit": "ROCKERS",
@@ -12218,9 +12315,9 @@
     "variacao": 0.45,
     "swing": 0.1
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -12286,10 +12383,26 @@
    "estilo": "RUB A DUB",
    "riddim": "",
    "produtor": "Peter Tosh",
-   "harmonia": [],
-   "harmoniaTexto": "",
-   "harmoniaStatus": "pendente",
-   "harmoniaFonte": "pendente",
+   "harmonia": [
+    {
+     "tonica": "G",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "C",
+     "menor": false,
+     "compassos": "1"
+    },
+    {
+     "tonica": "D",
+     "menor": false,
+     "compassos": "2"
+    }
+   ],
+   "harmoniaTexto": "G:1 C:1 D:2",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: Ultimate Guitar: G–C–D–D a música inteira",
    "bpm": 78,
    "bpmFonte": "groove do MRDM-12 (estimado)",
    "bateria": {
@@ -12312,9 +12425,9 @@
     "variacao": 0.45,
     "swing": 0.1
    },
-   "completo": false,
+   "completo": true,
    "original": {
-    "harmonia": false,
+    "harmonia": true,
     "baixo": false,
     "bateria": true
    },
@@ -13028,17 +13141,12 @@
    "produtor": "Sly & Robbie / Tappa Zukie",
    "harmonia": [
     {
-     "tonica": "C",
+     "tonica": "D",
      "menor": false,
      "compassos": "1"
     },
     {
-     "tonica": "G",
-     "menor": false,
-     "compassos": "1"
-    },
-    {
-     "tonica": "C",
+     "tonica": "A",
      "menor": false,
      "compassos": "1"
     },
@@ -13046,11 +13154,16 @@
      "tonica": "D",
      "menor": false,
      "compassos": "1"
+    },
+    {
+     "tonica": "E",
+     "menor": false,
+     "compassos": "1"
     }
    ],
-   "harmoniaTexto": "C:1 G:1 C:1 D:1",
-   "harmoniaStatus": "aproximada",
-   "harmoniaFonte": "MRCM-1240 (detecção automática)",
+   "harmoniaTexto": "D:1 A:1 D:1 E:1",
+   "harmoniaStatus": "conferida",
+   "harmoniaFonte": "pesquisa: ChordU (tom A: D–A–D–E) e ChordIntel (mesma sequência um tom abaixo, tom indicado A)",
    "bpm": 84,
    "bpmFonte": "groove do MRDM-12",
    "bateria": {
@@ -13084,9 +13197,7 @@
     "MRBM": 96,
     "MRDM": 95
    },
-   "conferir": [
-    "harmonia (bancos divergem: MRCM C:1 G:1 C:1 D:1 / MRBM Am:1 Dm:1)"
-   ]
+   "conferir": []
   },
   {
    "id": "herb-tree-cocoa-tea",
@@ -16705,9 +16816,7 @@
     "MRBM": 108,
     "MRDM": 92
    },
-   "conferir": [
-    "BPM (bancos: MRCM 68, MRBM 94, MRDM 94)"
-   ]
+   "conferir": []
   },
   {
    "id": "here-comes-the-hotstepper-ini-kamoze",
@@ -19326,9 +19435,7 @@
     "MRBM": 147,
     "MRDM": null
    },
-   "conferir": [
-    "BPM (bancos: MRCM 63, MRBM 52)"
-   ]
+   "conferir": []
   },
   {
    "id": "caliber-einstein",
