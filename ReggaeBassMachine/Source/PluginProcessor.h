@@ -58,6 +58,11 @@ public:
     void clearEdits();
     void dropStaleEdits();                                               // chamada pelo timer da interface
 
+    // RIDDIMS CLÁSSICOS (RiddimPresets.h): carrega harmonia, estilo, BPM, bateria e timbre de um riddim.
+    // O número fica salvo no projeto (propriedade "riddim" do estado; -1 = nenhum).
+    void loadRiddim (int index);
+    int currentRiddim() const { return (int) apvts.state.getProperty ("riddim", -1); }
+
     // osciloscópio: últimas amostras da saída (mono)
     static constexpr int kScopeSize = 8192;
     void copyScope (float* dest, int n) const

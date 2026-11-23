@@ -3,6 +3,7 @@
 // g++ -std=c++17 -O2 -Wall tests/engine_test.cpp -o engine_test && ./engine_test
 #include "../Source/BassEngine.h"
 #include "../Source/AccompEngine.h"
+#include "../Source/RiddimPresets.h"
 #include <cstdio>
 #include <cstdlib>
 #include <set>
@@ -191,6 +192,37 @@ int main()
             piano |= e.target == AccPiano; organ |= e.target == AccOrgan;
         }
         CHECK (piano == (km != KeysOrgan) && organ == (km != KeysPiano), "modo do teclado errado (%s)", keysModeName (km));
+    }
+
+    // RIDDIMS CLÁSSICOS: 20 por estilo, valores dentro dos parâmetros, linha gerada em cima da harmonia
+    {
+        using namespace mbmriddims;
+        CHECK (numRiddims == numFolders * 20, "deveriam ser 20 riddims por estilo (%d)", numRiddims);
+        int perFolder[numFolders] = {};
+        for (int i = 0; i < numRiddims; ++i)
+        {
+            const auto& r = riddims[i];
+            CHECK (r.folder >= 0 && r.folder < numFolders, "%s: pasta", r.name);
+            if (r.folder >= 0 && r.folder < numFolders) ++perFolder[r.folder];
+            CHECK (r.numChords >= 1 && r.numChords <= 4, "%s: acordes", r.name);
+            CHECK (r.bpm >= 55 && r.bpm <= 180 && r.style >= 0 && r.style < NumStyles && r.drum >= 0 && r.drum < NumDrumStyles && r.timbre >= 0 && r.timbre < 3,
+                   "%s: valores fora dos parametros", r.name);
+            CHECK (r.year >= 1964 && r.year <= 2010, "%s: ano", r.name);
+            std::vector<ChordSlot> sl;
+            for (int c = 0; c < r.numChords; ++c)
+            {
+                CHECK (r.chords[c].root >= 0 && r.chords[c].root < 12 && r.chords[c].quality >= 0 && r.chords[c].quality < NumQualities
+                       && r.chords[c].dur >= 0 && r.chords[c].dur < numDurations, "%s: acorde %d", r.name, c);
+                sl.push_back ({ r.chords[c].root, r.chords[c].quality, durationBeats (r.chords[c].dur) });
+            }
+            Settings s; s.style = r.style; s.seed = 1; s.density = r.density; s.variation = r.variation; s.swing = r.swing;
+            double L = 0;
+            const auto ev = buildLoop (sl, s, L);
+            CHECK (! ev.empty() && L >= 2.0, "%s: linha vazia", r.name);
+            for (int j = 0; j < i; ++j) CHECK (std::string (riddims[j].name) != r.name, "%s repetido", r.name);
+        }
+        for (int f = 0; f < numFolders; ++f) CHECK (perFolder[f] == 20, "%s: %d riddims", folders[f], perFolder[f]);
+        std::printf ("riddims classicos: %d em %d estilos OK\n", numRiddims, numFolders);
     }
 
     // edição: escala pentatônica maior/menor por acorde e encaixe na nota permitida mais próxima

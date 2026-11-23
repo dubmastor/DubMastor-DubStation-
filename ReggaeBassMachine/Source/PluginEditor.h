@@ -172,6 +172,24 @@ private:
     std::vector<float> buf = std::vector<float> (4096), trace, prev1, prev2;
 };
 
+// RIDDIM CLÁSSICO: visor âmbar com o riddim carregado; clique abre o menu (por estilo, baixista, década),
+// as setas passam para o anterior / próximo
+class RiddimBox : public juce::Component
+{
+public:
+    explicit RiddimBox (BassMachineProcessor& p) : proc (p) { setMouseCursor (juce::MouseCursor::PointingHandCursor); }
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseMove (const juce::MouseEvent&) override { repaint(); }
+    void mouseExit (const juce::MouseEvent&) override { repaint(); }
+    void refresh() { if (shown != proc.currentRiddim()) { shown = proc.currentRiddim(); repaint(); } }
+private:
+    void showMenu();
+    void load (int index) { proc.loadRiddim (index); shown = -2; refresh(); }
+    BassMachineProcessor& proc;
+    int shown = -2;
+};
+
 //==============================================================================
 // Painel com todo o layout no tamanho base; o editor o escala para a janela redimensionável
 class BassMachinePanel : public juce::Component, private juce::Timer
@@ -243,6 +261,7 @@ private:
     MidiDragZone dragZone;
     BassRoll roll;
     CrtScope scope;
+    RiddimBox riddimBox;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;

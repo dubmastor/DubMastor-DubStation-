@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include "RiddimPresets.h"
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
@@ -972,9 +973,10 @@ void CrtScope::paint (juce::Graphics& g)
 }
 
 //==============================================================================
-BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZone (p), roll (p), scope (p)
+BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZone (p), roll (p), scope (p), riddimBox (p)
 {
     setLookAndFeel (&lnf);
+    addAndMakeVisible (riddimBox);
 
     for (int i = 0; i < BassMachineProcessor::numSlots; ++i)
     {
@@ -1139,6 +1141,7 @@ void BassMachinePanel::timerCallback()
                 c->setAlpha (on ? 1.0f : 0.38f);
         }
     }
+    riddimBox.refresh();
     proc.dropStaleEdits();
     const bool edited = proc.hasEdits();
     clearEditsBtn.setEnabled (edited);
@@ -1400,14 +1403,14 @@ void BassMachinePanel::renderBackground()
     g.drawText (juce::String::fromUTF8 ("GERADOR DE REGGAE BASS LINES  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 700, 14, juce::Justification::left);
 
     {   // faixas da bandeira da Jamaica, pintadas à mão e envelhecidas
-        const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 7.0f;
+        const float sx = (float) plate.getRight() - 330.0f, sw = 290.0f, sh = 3.0f;   // fininhas, acima do visor de riddims
         const juce::Colour faded[] = {
             colours::jamGreen.interpolatedWith (juce::Colour (0xff6f7a4a), 0.35f),
             colours::jamGold.interpolatedWith (juce::Colour (0xffb08a3a), 0.40f),
             juce::Colour (0xff2b2621) };
         for (int k = 0; k < 3; ++k)
         {
-            const float y = 30.0f + 9.0f * (float) k;
+            const float y = 9.0f + 4.5f * (float) k;
             juce::Path bandP;
             bandP.startNewSubPath (sx, y + rng.nextFloat() * 0.8f);
             for (float x = sx; x <= sx + sw; x += 6.0f) bandP.lineTo (x, y + (rng.nextFloat() - 0.3f) * 0.9f);
@@ -1550,6 +1553,8 @@ void BassMachinePanel::resized()
     woodR = { W - 28, 0, 28, H };
     plate = { 28, 0, W - 56, H };
 
+    riddimBox.setBounds (plate.getRight() - 330, 26, 290, 52);
+
     // --- linha 1: ESTILO (botoeira) | HARMONIA
     stylePanel   = { 52, 92, 300, 362 };
     harmonyPanel = { 366, 92, W - 52 - 366, 362 };
@@ -1674,4 +1679,124 @@ void BassMachinePanel::resized()
     }
 
     renderBackground();
+}
+
+//==============================================================================
+void RiddimBox::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat().reduced (1.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.3f));
+    g.fillRoundedRectangle (r.translated (0, 2.0f), 5.0f);
+    g.setColour (juce::Colour (0xff1a1714));
+    g.fillRoundedRectangle (r, 5.0f);
+    auto glass = r.reduced (4.0f);
+    g.setColour (colours::glass);
+    g.fillRoundedRectangle (glass, 3.0f);
+    g.setColour (colours::amber.withAlpha (isMouseOver() ? 0.45f : 0.22f));
+    g.drawRoundedRectangle (glass, 3.0f, 1.0f);
+
+    const auto mp = getMouseXYRelative().toFloat();
+    const bool over = isMouseOver();
+    auto arrowArea = [&] (bool right) { return right ? glass.withLeft (glass.getRight() - 20.0f) : glass.withWidth (20.0f); };
+    for (bool right : { false, true })
+    {
+        const auto a = arrowArea (right);
+        juce::Path tri;
+        const float cx = a.getCentreX(), cy = a.getCentreY();
+        if (right) tri.addTriangle (cx - 3.5f, cy - 5, cx - 3.5f, cy + 5, cx + 4.0f, cy);
+        else       tri.addTriangle (cx + 3.5f, cy - 5, cx + 3.5f, cy + 5, cx - 4.0f, cy);
+        g.setColour (colours::amber.withAlpha (over && a.contains (mp) ? 0.95f : 0.5f));
+        g.fillPath (tri);
+    }
+
+    auto t = glass.reduced (22.0f, 3.0f);
+    const int idx = proc.currentRiddim();
+    g.setFont (stencil (8.5f, 0.2f));
+    g.setColour (colours::amber.withAlpha (0.6f));
+    g.drawText (juce::String::fromUTF8 ("RIDDIM CLÁSSICO  \xe2\x96\xbe"), t.removeFromTop (11.0f), juce::Justification::centredLeft);
+    if (idx < 0)
+    {
+        g.setColour (colours::amber);
+        g.setFont (stencil (13.0f, 0.06f));
+        g.drawText (juce::String::fromUTF8 ("ESCOLHA UM DOS 160"), t.removeFromTop (17.0f), juce::Justification::centredLeft);
+        g.setFont (stencil (8.5f, 0.06f));
+        g.setColour (colours::amber.withAlpha (0.6f));
+        g.drawText (juce::String::fromUTF8 ("POR ESTILO · BAIXISTA · DÉCADA"), t, juce::Justification::centredLeft);
+        return;
+    }
+    const auto& rd = mbmriddims::riddims[idx];
+    g.setColour (colours::amber);
+    g.setFont (stencil (13.0f, 0.06f));
+    g.drawFittedText (juce::String::fromUTF8 (rd.name).toUpperCase() + "  " + juce::String (rd.year), t.removeFromTop (17.0f).toNearestInt(),
+                      juce::Justification::centredLeft, 1, 0.8f);
+    g.setFont (stencil (8.5f, 0.04f));
+    g.setColour (colours::amber.withAlpha (0.7f));
+    g.drawFittedText (juce::String::fromUTF8 ("BAIXO: ") + juce::String::fromUTF8 (rd.bass)
+                      + (rd.approx ? juce::String::fromUTF8 ("  ·  TOM APROX.") : juce::String()),
+                      t.toNearestInt(), juce::Justification::centredLeft, 1, 0.7f);
+}
+
+void RiddimBox::mouseDown (const juce::MouseEvent& e)
+{
+    const int idx = proc.currentRiddim();
+    if (e.x < 26) { load (idx <= 0 ? mbmriddims::numRiddims - 1 : idx - 1); return; }
+    if (e.x > getWidth() - 26) { load (idx < 0 || idx >= mbmriddims::numRiddims - 1 ? 0 : idx + 1); return; }
+    showMenu();
+}
+
+void RiddimBox::showMenu()
+{
+    using namespace mbmriddims;
+    const int cur = proc.currentRiddim();
+    auto item = [&] (juce::PopupMenu& m, int i)
+    {
+        const auto& r = riddims[i];
+        m.addItem (i + 1, juce::String::fromUTF8 (r.name) + "  (" + juce::String (r.year) + ")  -  " + juce::String::fromUTF8 (r.origin)
+                              + (r.approx ? juce::String() : juce::String::fromUTF8 ("  ✓")), true, i == cur);
+    };
+
+    juce::PopupMenu byStyle, byBass, byDecade;
+    for (int f = 0; f < numFolders; ++f)
+    {
+        juce::PopupMenu sub;
+        for (int i = 0; i < numRiddims; ++i) if (riddims[i].folder == f) item (sub, i);
+        byStyle.addSubMenu (juce::String::fromUTF8 (folders[f]), sub, true, nullptr, cur >= 0 && riddims[cur].folder == f);
+    }
+    {   // baixista: na ordem do mais gravado para o menos
+        std::vector<std::pair<juce::String, std::vector<int>>> groups;
+        for (int i = 0; i < numRiddims; ++i)
+        {
+            const auto b = juce::String::fromUTF8 (riddims[i].bass);
+            auto it = std::find_if (groups.begin(), groups.end(), [&] (const auto& gr) { return gr.first == b; });
+            if (it == groups.end()) groups.push_back ({ b, { i } }); else it->second.push_back (i);
+        }
+        std::stable_sort (groups.begin(), groups.end(), [] (const auto& a, const auto& b) { return a.second.size() > b.second.size(); });
+        for (auto& gr : groups)
+        {
+            juce::PopupMenu sub;
+            for (int i : gr.second) item (sub, i);
+            byBass.addSubMenu (gr.first + "  (" + juce::String ((int) gr.second.size()) + ")", sub, true, nullptr,
+                               std::find (gr.second.begin(), gr.second.end(), cur) != gr.second.end());
+        }
+    }
+    {
+        juce::StringArray decs;
+        for (int i = 0; i < numRiddims; ++i) decs.addIfNotAlreadyThere (riddims[i].decade);
+        for (auto& d : decs)
+        {
+            juce::PopupMenu sub;
+            for (int i = 0; i < numRiddims; ++i) if (d == riddims[i].decade) item (sub, i);
+            byDecade.addSubMenu (d, sub, true, nullptr, cur >= 0 && d == riddims[cur].decade);
+        }
+    }
+    juce::PopupMenu m;
+    m.addSectionHeader (juce::String::fromUTF8 ("160 RIDDIMS CLÁSSICOS  ·  ✓ = harmonia conferida"));
+    m.addSubMenu ("POR ESTILO DE REGGAE", byStyle);
+    m.addSubMenu ("POR BAIXISTA", byBass);
+    m.addSubMenu (juce::String::fromUTF8 ("POR DÉCADA"), byDecade);
+    m.addSeparator();
+    m.addItem (-1, juce::String::fromUTF8 ("O baixo é gerado no estilo do baixista (não é transcrição)"), false);
+    juce::Component::SafePointer<RiddimBox> safe (this);
+    m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withMinimumWidth (getWidth()),
+                     [safe] (int res) { if (safe != nullptr && res > 0) safe->load (res - 1); });
 }

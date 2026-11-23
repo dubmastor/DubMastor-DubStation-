@@ -1,3 +1,7 @@
+## Mastor Riddim Machine MRM-0420 1.7 — DubStation
+
+- **Aba BAIXO com os 160 riddims clássicos do MRBM-69 2.8** (20 por estilo de reggae, por baixista e por década, com a era digital do King Jammys): o visor âmbar no alto da aba carrega harmonia, BPM e estilo do baixista, e a harmonia vale para o MRM-0420 inteiro
+
 ## Mastor Riddim Machine MRM-0420 1.6 — DubStation
 
 - **Seção BPM na aba RIDDIM:** BPM grande que você **clica e digita** (60 a 180), também arrasta ou gira a roda do mouse; teclas **−1, +1, −5 e +5**; **TAP** (bata no tempo e ele acha o BPM)

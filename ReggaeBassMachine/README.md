@@ -1,8 +1,8 @@
-# Mastor Reggae Bass Machine MRBM-69 2.7 — Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 2.8 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.7/MRBM-69-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.8/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.8/MRBM-69-macOS.zip)**
 
 ![Interface do Reggae Bass Machine](docs/interface.png)
 
@@ -11,6 +11,15 @@ Você escolhe a harmonia e o baixista, ouve com o som do **Dub Bass**, liga a **
 Roots Keys** para ouvir no contexto, e arrasta o MIDI do baixo para a timeline para editar à vontade.
 Formatos: **VST3** (Windows/macOS), **AU** (macOS) e **Standalone**. É um **instrumento**: no Cubase,
 carregue numa *Instrument Track*.
+
+
+## Riddims clássicos (2.8)
+
+O visor âmbar no alto do painel carrega **160 riddims clássicos, 20 por estilo de reggae** (Rocksteady, Early Reggae e Roots,
+Roots e Rockers, Rub a Dub, Digital King Jammys, Ragga, Dancehall 1995-2001 e 2002-07). Clique para escolher por estilo, por
+baixista ou por década; as setas passam para o anterior / próximo. Cada preset traz a gravação de origem, o ano, o produtor e
+quem tocou o baixo, e ajusta harmonia, BPM, bateria, timbre e o estilo do gerador. O baixo é gerado no estilo do baixista,
+não é transcrição. Lista completa: [docs/RIDDIMS.md](docs/RIDDIMS.md) (gerada por `tools/riddims.py`).
 
 ## ESTILO (botoeira de 7 teclas)
 Teclas intertravadas como as de um rádio valvulado: apertar uma solta a outra. O nome do baixista aparece num **letreiro de palhetas** (split-flap, como os painéis de estação): ao trocar, as palhetas giram passando pelo alfabeto até parar no nome novo.

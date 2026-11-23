@@ -59,6 +59,8 @@ int main (int argc, char** argv)
     // 6º e 7º argumentos: estilo da bateria (0-3) e instrumento do teclado (0-2); -1 = desligado
     if (argc > 6 && juce::String (argv[6]).getIntValue() >= 0) { set ("drumsOn", 1.0f); set ("drumStyle", (float) juce::String (argv[6]).getIntValue()); }
     if (argc > 7 && juce::String (argv[7]).getIntValue() >= 0) { set ("keysOn", 1.0f);  set ("keysMode",  (float) juce::String (argv[7]).getIntValue()); }
+    // 8º argumento: riddim clássico (0..159) carregado antes de tocar
+    if (argc > 8 && juce::String (argv[8]).getIntValue() >= 0) proc.loadRiddim (juce::String (argv[8]).getIntValue());
     set ("preview", 1.0f);   // PLAY ligado: cursor e osciloscópio com sinal
 
     // toca ~3,4 tempos para ter nota soando e onda no osciloscópio

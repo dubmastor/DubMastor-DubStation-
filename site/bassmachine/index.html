@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Bass Machine MRBM-69 2.7 — Dub Station</title>
+<title>Mastor Reggae Bass Machine MRBM-69 2.8 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -41,6 +41,15 @@ h1{margin:0;font-size:clamp(14px,3.2vw,24px);letter-spacing:.16em;font-weight:80
 .keys12 .b{font-size:11px;letter-spacing:0;padding:8px 2px;min-height:34px}
 .btns.c3 .b,.btns.c4 .b{font-size:10.5px;letter-spacing:.03em;gap:5px;padding:8px 3px;white-space:normal;line-height:1.15;text-align:center}
 .keys12 .b.sharp{background:linear-gradient(180deg,#151210,#050403);color:#a89c84}
+/* riddims clássicos */
+.riddim{margin-bottom:14px}
+.rdisp{background:#17110a;border-radius:5px;padding:8px 12px;color:var(--amber,#ffa928);border:1px solid rgba(255,169,40,.25);min-height:52px}
+.rdisp b{display:block;font-size:16px;letter-spacing:.04em}
+.rdisp small{display:block;font-size:11px;opacity:.75;margin-top:2px}
+.rrow{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.rrow select{flex:1;min-width:140px;padding:9px 8px;border-radius:5px;background:#1a1714;color:#f3e6c0;border:1px solid #3a332b;font-weight:700;font-size:13px}
+.rrow .b{flex:0 0 auto;padding:9px 12px}
+.rnote{font-size:10.5px;color:var(--ink2);margin-top:6px}
 /* letreiro de palhetas (split-flap) */
 .flapboard{display:grid;grid-template-columns:repeat(15,1fr);gap:2px;background:#0c0907;padding:4px;border-radius:5px}
 .flap{position:relative;height:34px;border-radius:2px;background:linear-gradient(180deg,#2b2723 50%,#12100e 50%);color:#f3e6c0;font-weight:800;
@@ -101,9 +110,17 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.7</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE BASS MACHINE MRBM-69 <span id="ver">2.8</span></h1><div class="sub">GERADOR DE REGGAE BASS LINES · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
+
+<section class="mod riddim"><div class="tag">RIDDIM CLÁSSICO · 160 PRESETS</div>
+  <div class="rdisp" id="rdisp"><b>ESCOLHA UM DOS 160 RIDDIMS</b><small>por estilo de reggae, baixista ou década</small></div>
+  <div class="rrow"><div class="btns c3" id="rmode" style="flex:1;min-width:240px"></div></div>
+  <div class="rrow"><select id="rgroup" aria-label="grupo"></select><select id="rpick" aria-label="riddim"></select>
+    <button class="b nolamp" id="rprev">◀</button><button class="b nolamp" id="rnext">▶</button></div>
+  <div class="rnote">Carrega harmonia, BPM, bateria, timbre e o estilo do baixista. O baixo é gerado no estilo de quem tocou (não é transcrição); ✓ = harmonia conferida, as outras são aproximadas: use a TÔNICA para acertar o tom.</div>
+</section>
 
 <div class="grid-mods">
   <section class="mod"><div class="tag">ESTILO</div>
@@ -169,6 +186,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <div class="dock"><button class="preview" id="play2"><span class="ic"></span><span id="playTxt2">PLAY</span></button><button class="redbtn" id="newIdea2">NOVA IDEIA</button></div>
 
 <script src="engine.js"></script>
+<script src="riddims.js"></script>
 <script>
 'use strict';
 const M = window.MRBM;
@@ -297,6 +315,51 @@ $('ideaUp').onclick = () => { st.seed = Math.min(999, st.seed + 1); changedGen()
 function newIdea() { let n = st.seed; while (n === st.seed) n = 1 + Math.floor(Math.random() * 999); st.seed = n; changedGen(); }
 $('newIdea').onclick = newIdea; $('newIdea2').onclick = newIdea;
 $('clearEdits').onclick = () => { try { localStorage.removeItem('mrbm69-edits'); } catch (e) {} regenerate(); };
+
+// ---------------------------------------------------------------- RIDDIMS CLÁSSICOS (mesmo banco do plugin)
+const RD = window.MRBM_RIDDIMS;
+const RMODES = ['ESTILO', 'BAIXISTA', 'DÉCADA'];
+if (st.rmode === undefined) st.rmode = 0;
+if (st.riddim === undefined) st.riddim = -1;
+function rgroups() {
+  const key = r => st.rmode === 0 ? RD.folders[r.f] : st.rmode === 1 ? r.b : r.d;
+  const map = new Map();
+  RD.riddims.forEach((r, i) => { const k = key(r); if (!map.has(k)) map.set(k, []); map.get(k).push(i); });
+  let arr = [...map.entries()];
+  if (st.rmode === 1) arr.sort((a, b) => b[1].length - a[1].length);
+  return arr;
+}
+function fillRiddimSelects(keepGroup) {
+  const gs = rgroups(), gsel = $('rgroup'), psel = $('rpick');
+  let gi = keepGroup !== undefined ? keepGroup : Math.max(0, gs.findIndex(g => g[1].includes(st.riddim)));
+  gsel.innerHTML = gs.map((g, i) => `<option value="${i}">${g[0]}${st.rmode === 1 ? ' (' + g[1].length + ')' : ''}</option>`).join('');
+  gsel.value = gi;
+  psel.innerHTML = '<option value="-1">— escolha o riddim —</option>' + gs[gi][1].map(i => { const r = RD.riddims[i];
+    return `<option value="${i}">${r.n} (${r.y})${r.a ? '' : ' ✓'}</option>`; }).join('');
+  psel.value = gs[gi][1].includes(st.riddim) ? st.riddim : -1;
+}
+function showRiddim() {
+  const r = RD.riddims[st.riddim];
+  $('rdisp').innerHTML = r ? `<b>${r.n.toUpperCase()} · ${r.y}</b><small>${r.o} · ${r.p}</small><small>BAIXO: ${r.b}${r.a ? ' · tom aproximado' : ' · harmonia conferida'}</small>`
+    : '<b>ESCOLHA UM DOS 160 RIDDIMS</b><small>por estilo de reggae, baixista ou década</small>';
+}
+function loadRiddim(i) {
+  const r = RD.riddims[i]; if (!r) return;
+  st.riddim = i;
+  st.chords.forEach((c, k) => { if (k < r.c.length) { c.root = r.c[k][0]; c.quality = r.c[k][1]; c.dur = r.c[k][2]; } if (k > 0) c.on = k < r.c.length; });
+  Object.assign(st, { style: r.s, density: r.den, variation: r.v, swing: r.sw, seed: 1, bpm: r.bpm, drumStyle: r.dr, drumsOn: true, timbre: r.t });
+  for (const id of ['density', 'variation', 'swing', 'bpm']) { $(id).value = st[id]; $('o-' + id).textContent = SLIDERS[id][0](st[id]); }
+  try { localStorage.removeItem('mrbm69-edits'); } catch (e) {}
+  setFlap(M.styleNames[st.style], true);
+  engine.tempoChanged(); changedGen(); publish(); showRiddim(); fillRiddimSelects();
+}
+const rmodeRefresh = buttons($('rmode'), RMODES, () => st.rmode, i => { st.rmode = i; save(); fillRiddimSelects(); });
+refreshers.push(rmodeRefresh);
+$('rgroup').onchange = () => fillRiddimSelects(+$('rgroup').value);
+$('rpick').onchange = () => { const v = +$('rpick').value; if (v >= 0) loadRiddim(v); };
+$('rprev').onclick = () => loadRiddim(st.riddim <= 0 ? RD.riddims.length - 1 : st.riddim - 1);
+$('rnext').onclick = () => loadRiddim(st.riddim < 0 || st.riddim >= RD.riddims.length - 1 ? 0 : st.riddim + 1);
+fillRiddimSelects(); showRiddim();
 
 // ---------------------------------------------------------------- som (timbres do MRDBI-07, bateria sintetizada)
 const engine = (() => {

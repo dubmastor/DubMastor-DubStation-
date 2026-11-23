@@ -1,4 +1,12 @@
-# Mastor Reggae Bass Machine MRBM-69 — 2.7 · Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 — 2.8 · Gerador de Reggae Bass Lines
+
+- **RIDDIM CLÁSSICO: 160 presets, 20 por estilo de reggae** — Rocksteady (Studio One e Treasure Isle, 1966-69), Early Reggae e Roots (1969-75), Roots e Rockers (Channel One, Joe Gibbs, Black Ark, 1975-79), Rub a Dub (Roots Radics e Taxi, 1979-84), **Digital King Jammys (1985-89)**, Ragga (Steely & Clevie, Bobby Digital, Sly & Robbie, 1990-95), Dancehall 1995-2001 e Dancehall 2002-07
+- Visor âmbar no alto do painel: clique para escolher **por estilo, por baixista ou por década**; as setas passam para o anterior / próximo
+- Cada preset traz o riddim, a gravação de origem e o ano, o produtor e quem tocou (ou programou) o baixo — Boris Gardiner, Leroy Sibbles, Family Man, Robbie Shakespeare, Flabba Holt, Noel Davey, Steely & Clevie, Dave Kelly e outros — e carrega a harmonia, o BPM, a bateria, o timbre e o estilo do gerador mais próximo do baixista
+- O baixo é gerado pelo MRBM-69 no estilo de quem tocou; não é transcrição das linhas originais. Harmonias marcadas como aproximadas foram tiradas de ouvido: confira o tom no disco e acerte com a TÔNICA
+- Lista completa em `docs/RIDDIMS.md`; mesmo banco na versão para navegador
+
+## 2.7
 
 - **Edição só na pentatônica do acorde**: no visor, as linhas fora da pentatônica do acorde de cada trecho ficam escurecidas e desabilitadas; nota nova ou arrastada encaixa na nota permitida mais próxima (pentatônica menor em acordes menor e m7, maior em maior e 7). O nome da escala aparece ao lado do acorde (PENTA / PENTA m)
 - Mesma regra na versão para navegador

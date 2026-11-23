@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "RiddimPresets.h"
 
 namespace
 {
@@ -602,3 +603,39 @@ void BassMachineProcessor::setStateInformation (const void* data, int sizeInByte
 juce::AudioProcessorEditor* BassMachineProcessor::createEditor() { return new BassMachineEditor (*this); }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new BassMachineProcessor(); }
+
+//==============================================================================
+void BassMachineProcessor::loadRiddim (int index)
+{
+    if (index < 0 || index >= mbmriddims::numRiddims) return;
+    const auto& r = mbmriddims::riddims[index];
+
+    auto set = [this] (const juce::String& id, float plainValue)
+    {
+        if (auto* p = apvts.getParameter (id))
+            p->setValueNotifyingHost (p->convertTo0to1 (plainValue));
+    };
+
+    for (int i = 0; i < numSlots; ++i)
+    {
+        if (i < r.numChords)
+        {
+            set (rootId (i), (float) r.chords[i].root);
+            set (qualId (i), (float) r.chords[i].quality);
+            set (durId (i),  (float) r.chords[i].dur);
+        }
+        if (i > 0) set (onId (i), i < r.numChords ? 1.0f : 0.0f);
+    }
+    set ("style", (float) r.style);
+    set ("density", r.density);
+    set ("variation", r.variation);
+    set ("swing", r.swing);
+    set ("seed", 1.0f);
+    set ("bpm", (float) r.bpm);
+    set ("drumStyle", (float) r.drum);
+    set ("drumsOn", 1.0f);
+    set ("timbre", (float) r.timbre);
+    clearEdits();
+    apvts.state.setProperty ("riddim", index, nullptr);
+    dirty.store (true);
+}
