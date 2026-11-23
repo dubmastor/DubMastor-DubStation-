@@ -1,8 +1,8 @@
-# Mastor Reggae Chord Machine MRCM-1240 1.9
+# Mastor Reggae Chord Machine MRCM-1240 2.0
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.9/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.9/MastorReggaeChordMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.0/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.0/MastorReggaeChordMachine-macOS.zip)**
 
 **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/chords/)**: monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
 
@@ -56,7 +56,7 @@ Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é m
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
 
 ## PRESETS (banco de riddims clássicos)
-O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de **riddims clássicos do reggae**: 90 músicas, 10 em cada pasta,
+O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de **riddims clássicos do reggae**: 180 músicas, 20 em cada pasta,
 separadas por estilo e época, do early reggae ao new roots. No MRCM-1240 o preset ajusta os acordes, a duração de cada um e
 quais ficam ligados (inversão em AUTO). No **MRM-0420** ele monta o riddim inteiro: harmonia, **BPM sugerido**, estilo da
 bateria e os **músicos das máquinas mais próximos de quem gravou** (baterista do MRDM-12 e baixista do MRBM-69).
@@ -67,15 +67,15 @@ GuitarTabs.cc, GuitarTabsExplorer, Ukulele-Tabs, Recifra); as marcadas **[auto]*
 
 | Pasta | Músicas | BPM e músicos sugeridos (MRM-0420) |
 |---|---|---|
-| **EARLY REGGAE - 1968 A 72** | Israelites, 54-46 That's My Number, Monkey Man, Wonderful World, Long Shot Kick de Bucket, Rivers of Babylon, Duppy Conqueror, Small Axe, You Can Get It, The Harder They Come | 78-88 · one drop · Carlton Barrett + Leroy Sibbles (Wailers/Upsetters: Family Man) |
-| **ROOTS - ANOS 70** | Satta Massagana, Pressure Drop, Marcus Garvey, Smile Jamaica, Police and Thieves, Natural Mystic, Exodus, Jamming, One Love, Roots | 70-80 · one drop · Carlton Barrett + Family Man (Burning Spear: Robbie) |
-| **ROCKERS - FIM DOS 70** | Legalize It, Burial, Uptown Top Ranking, Now That We Found Love, Ku Klux Klan, Soldiers, Money in My Pocket, One Drop, Could You Be Loved, Buffalo Soldier | 76-84 · rockers · Sly Dunbar + Robbie (Marley: Carlton + Family Man) |
-| **RUB A DUB - VOLCANO E ANOS 80** | Shine Eye Gal, Truths and Rights, Sensimilla, Sinsemilla, Fire House Rock, Ice Cream Love, Pass the Kouchie, Bam Bam, Here I Come, Peeni Walli (Eek-A-Mouse) | 74-86 · rockers · Style Scott + Flabba (Roots Radics); Black Uhuru: Sly + Robbie |
-| **GREGORY ISAACS - COOL RULER** | My Number One, Soon Forward, Not the Way, Front Door, Night Nurse, Cool Down the Pace, Private Secretary, If I Don't Have You, Hard Drugs, Good Morning | 72-82 · Style Scott + Flabba (Soon Forward: Sly + Robbie) |
-| **DIGITAL - KING JAMMY E 85-89** | Under Mi Sleng Teng, Ring the Alarm, Lots of Sign, Rub a Dub Market, Run Come Call Me, Budy Bye, Greetings, Winsome, Sonia Come Back (Punaany), She Loves Me Now (Real Rock) | 80-94 · rockers · Digikal + Jammys |
-| **LOVERS ROCK - 69 A 94** | Many Rivers to Cross, Help Me Make It Through the Night, Waiting in Vain, Is This Love, Red Red Wine, Wild World, Kingston Town (UB40), Tempted to Touch, Close to You, Rockaway | 70-82 · one drop · Santa Davis + Leroy Sibbles |
-| **DANCEHALL - ANOS 90** | Mr. Loverman, Informer, Sweat, Here Comes the Hotstepper, You Don't Love Me, Boombastic, Under Mi Sensi, It Wasn't Me, Get Busy, Temperature | 82-104 · rockers · Digikal + Derrick Barnett (Sly + Robbie nos de Taxi) |
-| **NEW ROOTS - ANOS 2000** | Welcome to Jamrock, Ganja Farmer, She's Royal, Herbalist, Kingston Town (Alborosie), Mystical Reggae, Callin, Access Granted, Smile Jamaica (Chronixx), Dem Gone | 72-82 · one drop · Santa Davis + Family Man |
+| **EARLY REGGAE - 1967 A 72** | Israelites, 54-46 That's My Number, Monkey Man, Wonderful World, Long Shot Kick de Bucket, Rivers of Babylon, Duppy Conqueror, Small Axe, You Can Get It, The Harder They Come, 007 Shanty Town, The Tide Is High, It Mek, It Pays, Young Gifted and Black, Vietnam, Sitting in Limbo, Johnny Too Bad, Let Your Yeah Be Yeah, I Can See Clearly Now | 78-88 · one drop · Carlton Barrett + Leroy Sibbles (Wailers/Upsetters: Family Man) |
+| **ROOTS - ANOS 70** | Satta Massagana, Pressure Drop, Marcus Garvey, Smile Jamaica, Police and Thieves, Natural Mystic, Exodus, Jamming, One Love, Roots, Stir It Up, I Shot the Sheriff, Get Up Stand Up, Concrete Jungle, Lively Up Yourself, Kinky Reggae, Them Belly Full, War (Bob Marley), Chase the Devil, One Step Forward | 70-80 · one drop · Carlton Barrett + Family Man (Burning Spear: Robbie) |
+| **ROCKERS - FIM DOS 70** | Legalize It, Burial, Uptown Top Ranking, Now That We Found Love, Ku Klux Klan, Soldiers, Money in My Pocket, One Drop, Could You Be Loved, Buffalo Soldier, Three Little Birds, Equal Rights (Peter Tosh), Steppin' Razor, Downpressor Man, Jah Guide, Equal Rights (Heptones), Handsworth Revolution, Prodigal Son, Bad Man, Prediction | 76-84 · rockers · Sly Dunbar + Robbie (Marley: Carlton + Family Man) |
+| **RUB A DUB - VOLCANO E ANOS 80** | Shine Eye Gal, Truths and Rights, Sensimilla, Sinsemilla, Fire House Rock, Ice Cream Love, Pass the Kouchie, Bam Bam, Here I Come, Peeni Walli (Eek-A-Mouse), Wa-Do-Dem, War (Wailing Souls), Big Ship, Noah's Ark, The Mouse and the Man, Zungguzungguguzungguzeng, Water Pumping, Rude Boy Jamaican, Murderer, Collie Weed | 74-86 · rockers · Style Scott + Flabba (Roots Radics); Black Uhuru: Sly + Robbie |
+| **GREGORY ISAACS - COOL RULER** | My Number One, Soon Forward, Not the Way, Front Door, Night Nurse, Cool Down the Pace, Private Secretary, If I Don't Have You, Hard Drugs, Good Morning, My Only Lover, Sad to Know You're Leaving, Babylon Too Rough, Freedom, Tune In, Top Ten, Let's Talk About Love, Set Back, Tears Come Rolling Down, 9 to 5 | 72-82 · Style Scott + Flabba (Soon Forward: Sly + Robbie) |
+| **DIGITAL - KING JAMMY E 85-89** | Under Mi Sleng Teng, Ring the Alarm, Lots of Sign, Rub a Dub Market, Run Come Call Me, Budy Bye, Greetings, Winsome, Sonia Come Back (Punaany), She Loves Me Now (Real Rock), Victory Train, Pull Up Selector, Lone Ranger and Tonto, Boops, I'm Not a Substitute Lover, Gimme Punanny, Old Time Something, Herb Tree, Original Kuff, Ting-A-Ling | 80-94 · rockers · Digikal + Jammys |
+| **LOVERS ROCK - 69 A 94** | Many Rivers to Cross, Help Me Make It Through the Night, Waiting in Vain, Is This Love, Red Red Wine, Wild World, Kingston Town (UB40), Tempted to Touch, Close to You, Rockaway, I'm Still in Love, Everything I Own, Silly Games, Good Thing Going, Hopelessly in Love, Love Has Found Its Way, I Wanna Wake Up With You, Breakfast in Bed, Here I Am, Can't Help Falling in Love | 70-82 · one drop · Santa Davis + Leroy Sibbles |
+| **DANCEHALL - ANOS 90** | Mr. Loverman, Informer, Sweat, Here Comes the Hotstepper, You Don't Love Me, Boombastic, Under Mi Sensi, It Wasn't Me, Get Busy, Temperature, Hello Mama Africa, Murder She Wrote, Bam Bam (Chaka Demus & Pliers), Tease Me, Bad Boys, Love Is the Answer, It's Me Again Jah, Wanna Be Loved, Angel, No Letting Go | 82-104 · rockers · Digikal + Derrick Barnett (Sly + Robbie nos de Taxi) |
+| **NEW ROOTS - ANOS 2000** | Welcome to Jamrock, Ganja Farmer, She's Royal, Herbalist, Kingston Town (Alborosie), Mystical Reggae, Callin, Access Granted, Smile Jamaica (Chronixx), Dem Gone, Don't Haffi Dread, Down by the River, Can't Satisfy Her, Youths Dem Cold, Ghetto Girl, Longing For, My Day, Guess Who's Coming to Dinner, Who Knows, Skankin' Sweet | 72-82 · one drop · Santa Davis + Family Man |
 
 O mesmo banco está no **MRM-0420** e nas versões para celular. Fonte única: `tools/harmony_presets.py`
 (gera `Source/HarmonyPresets.h` e `site/chords/presets.js`).

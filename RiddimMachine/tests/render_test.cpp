@@ -121,12 +121,12 @@ int main (int argc, char** argv)
     {
         // banco de presets: cada um aplica raiz/qualidade/duração e liga só os acordes do preset; o baixo segue
         auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
-        bool ok = dubpresets::numPresets == 90 && dubpresets::numFolders == 9;
+        bool ok = dubpresets::numPresets == 180 && dubpresets::numFolders == 9;
         for (int f = 0; f < dubpresets::numFolders; ++f)
         {
             int n = 0;
             for (int i = 0; i < dubpresets::numPresets; ++i) n += juce::String (dubpresets::presets[i].folder) == dubpresets::folders[f];
-            if (n != 10) { ok = false; std::printf ("pasta %s tem %d presets\n", dubpresets::folders[f], n); }
+            if (n != 20) { ok = false; std::printf ("pasta %s tem %d presets\n", dubpresets::folders[f], n); }
         }
         for (int i = 0; i < dubpresets::numPresets && ok; ++i)
         {

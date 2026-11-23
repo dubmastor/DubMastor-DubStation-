@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Banco de RIDDIMS (PRESETS) da DubStation (MRCM-1240 e MRM-0420): 9 pastas por estilo e época, 10 músicas cada.
+"""Banco de RIDDIMS (PRESETS) da DubStation (MRCM-1240 e MRM-0420): 9 pastas por estilo e época, 20 músicas cada.
 
 Fonte única: gera Source/HarmonyPresets.h (plugins) e ../site/chords/presets.js (versões do navegador).
 Uso: python3 tools/harmony_presets.py   (rodar na pasta ReggaeChordMachine)
@@ -23,7 +23,7 @@ DRUM = {'STYLE': 0, 'SANTA': 1, 'CARLTON': 2, 'SLY': 3, 'DIGI': 4}            # 
 BASS = {'FAMILY': 0, 'FLABBA': 1, 'BARNETT': 2, 'ROBBIE': 3, 'SIBBLES': 4, 'FULLWOOD': 5, 'JAMMYS': 6}  # MRBM-69
 
 EAR, R70, RK, RD, GI, DG, LR, DH, NR = (
-    'EARLY REGGAE - 1968 A 72', 'ROOTS - ANOS 70', 'ROCKERS - FIM DOS 70', 'RUB A DUB - VOLCANO E ANOS 80',
+    'EARLY REGGAE - 1967 A 72', 'ROOTS - ANOS 70', 'ROCKERS - FIM DOS 70', 'RUB A DUB - VOLCANO E ANOS 80',
     'GREGORY ISAACS - COOL RULER', 'DIGITAL - KING JAMMY E 85-89', 'LOVERS ROCK - 69 A 94',
     'DANCEHALL - ANOS 90', 'NEW ROOTS - ANOS 2000')
 
@@ -46,6 +46,16 @@ BANK = [
     (EAR, '70s', 'Small Axe (Wailers 1970)',              'Eb:1/2 Bb:1/2 F:1', 'bpm=78 bx=FAMILY'),
     (EAR, '70s', 'You Can Get It (Jimmy Cliff 1970)',     'C:1 F:1', 'bpm=84'),
     (EAR, '70s', 'The Harder They Come (Jimmy Cliff 1972)', 'Db:1 Ab:1 Gb:1 Ab:1', 'bpm=80'),
+    (EAR, '60s', '007 Shanty Town (Desmond Dekker 1967)', 'Ab:1 Db:1 Eb:1', 'bpm=78'),
+    (EAR, '60s', 'The Tide Is High (Paragons 1967)', 'G:1 C:1 D:1', 'bpm=76 dr=SANTA'),
+    (EAR, '60s', 'It Mek (Desmond Dekker 1969)', 'Ab:1 Eb:1', 'bpm=86'),
+    (EAR, '60s', 'It Pays (Desmond Dekker 1969)', 'Ab:1 Db:1 Eb:1 Db:1', 'bpm=84'),
+    (EAR, '60s', 'Young Gifted and Black (Bob & Marcia 1969)', 'C:1 F:1 C:1 G:1', 'bpm=86'),
+    (EAR, '60s', 'Vietnam (Jimmy Cliff 1969)', 'Db:1 Gb:1', 'bpm=84'),
+    (EAR, '70s', 'Sitting in Limbo (Jimmy Cliff 1971)', 'E:1 A:1 E:1 B:1', 'bpm=76'),
+    (EAR, '70s', 'Johnny Too Bad (Slickers 1971)', 'G:1 D:1 C:1 G:1', 'bpm=80'),
+    (EAR, '70s', 'Let Your Yeah Be Yeah (Pioneers 1971)', 'Bb:1 C:1 Eb:1 Bb:1', 'bpm=84'),
+    (EAR, '70s', 'I Can See Clearly Now (Johnny Nash 1972)', 'D:1 G:1 D:1 A:1', 'bpm=80 kit=RK'),
 
     (R70, '70s', 'Satta Massagana (Abyssinians 1969)',    'Am:1 Dm:1 Am:1 Em:1', 'bpm=70 dr=SANTA bx=SIBBLES'),
     (R70, '70s', 'Pressure Drop (Toots 1969)',            'Ab:1 Eb:1 Db:1 Ab:1', 'bpm=80 bx=SIBBLES'),
@@ -57,6 +67,16 @@ BANK = [
     (R70, '70s', 'Jamming (Bob Marley 1977)',             'Bm:1 E:1 G:1 F#m:1', 'bpm=74'),
     (R70, '70s', 'One Love (Bob Marley 1977)',            'Bb:1 F:1 Eb:1 Bb:1', 'bpm=76'),
     (R70, '70s', 'Roots (Bob Marley 1977)',               'F#m:1 Bm:1 D:1 C#m:1', 'bpm=72'),
+    (R70, '70s', 'Stir It Up (Bob Marley 1973)', 'A:1 D:1 E:1', 'bpm=76'),
+    (R70, '70s', 'I Shot the Sheriff (Bob Marley 1973)', 'Gm:1 Cm:1 Gm:2', 'bpm=74'),
+    (R70, '70s', 'Get Up Stand Up (Bob Marley 1973)', 'Bm:4', 'bpm=76'),
+    (R70, '70s', 'Concrete Jungle (Bob Marley 1973)', 'Em:1 Am:1 Em:2', 'bpm=72'),
+    (R70, '70s', 'Lively Up Yourself (Bob Marley 1973)', 'D:1 G:1', 'bpm=78'),
+    (R70, '70s', 'Kinky Reggae (Bob Marley 1973)', 'C:1 Gm:1', 'bpm=78'),
+    (R70, '70s', 'Them Belly Full (Bob Marley 1974)', 'Am:2 F:1 E:1', 'bpm=72'),
+    (R70, '70s', 'War (Bob Marley 1976)', 'Bm:1 A:1', 'bpm=72'),
+    (R70, '70s', 'Chase the Devil (Max Romeo 1976)', 'Am:1 Em:1 Dm:1 Am:1', 'bpm=70 dr=SANTA bx=FULLWOOD'),
+    (R70, '70s', 'One Step Forward (Max Romeo 1976)', 'Bbm:1 Fm:1', 'bpm=70 dr=SANTA bx=FULLWOOD'),
 
     (RK, '70s', 'Legalize It (Peter Tosh 1976)',          'G:1 F:1', 'bpm=76'),
     (RK, '70s', 'Burial (Peter Tosh 1976)',               'Bb:1 Gm:1 Eb:1 F:1', 'bpm=78'),
@@ -68,6 +88,16 @@ BANK = [
     (RK, '70s', 'One Drop (Bob Marley 1979)',             'C:1 Am:1 Dm:1 G:1', 'bpm=76 kit=OD dr=CARLTON bx=FAMILY'),
     (RK, '80s', 'Could You Be Loved (Bob Marley 1980)',   'Bm:1 Em:1 D:1 Bm:1', 'bpm=84 dr=CARLTON bx=FAMILY'),
     (RK, '80s', 'Buffalo Soldier (Bob Marley 1983)',      'A:1 F#m:1 D:1 A:1', 'bpm=82 kit=OD dr=CARLTON bx=FAMILY'),
+    (RK, '70s', 'Three Little Birds (Bob Marley 1977)', 'A:1 D:1 A:1 E:1', 'bpm=74 kit=OD dr=CARLTON bx=FAMILY'),
+    (RK, '70s', 'Equal Rights (Peter Tosh 1977)', 'G:1 Am:1 C:1 D:1', 'bpm=78'),
+    (RK, '70s', "Steppin' Razor (Peter Tosh 1977)", 'C:1 G:1', 'bpm=80'),
+    (RK, '70s', 'Downpressor Man (Peter Tosh 1977)', 'Gm:1 F:1', 'bpm=80'),
+    (RK, '70s', 'Jah Guide (Peter Tosh 1977)', 'Bm:1 A:1 G:1', 'bpm=76'),
+    (RK, '70s', 'Equal Rights (Heptones 1977)', 'Bb:1 F:1 Gm:1 F:1', 'bpm=78 kit=OD dr=SANTA bx=FULLWOOD'),
+    (RK, '70s', 'Handsworth Revolution (Steel Pulse 1978)', 'Cm:1 Gm:1', 'bpm=78'),
+    (RK, '70s', 'Prodigal Son (Steel Pulse 1978)', 'Am:1 Em:1', 'bpm=80'),
+    (RK, '70s', 'Bad Man (Steel Pulse 1978)', 'Bm:1 D:1 Em:1', 'bpm=80'),
+    (RK, '70s', 'Prediction (Steel Pulse 1978)', 'B:1 Am:1', 'bpm=78'),
 
     (RD, '70s', 'Shine Eye Gal (Black Uhuru 1979)',       'Cm:2 Gm:2', 'bpm=80 dr=SLY bx=ROBBIE'),
     (RD, '80s', 'Truths and Rights (Johnny Osbourne 1980)', 'C#m:1 E:1 Ab:1', 'bpm=78 dr=SANTA bx=SIBBLES'),
@@ -79,6 +109,16 @@ BANK = [
     (RD, '80s', 'Bam Bam (Sister Nancy 1982)',            'C:1 Bb:1', 'bpm=86'),
     (RD, '80s', 'Here I Come (Barrington Levy 1984)',     'Em:1 Am:1', 'bpm=86'),
     (RD, '80s', 'Peeni Walli (Eek-A-Mouse 1984) [auto]',  'Ab:1 Ebm:1 Db:1 Eb:1', 'bpm=74 kit=OD'),
+    (RD, '80s', 'Wa-Do-Dem (Eek-A-Mouse 1981) [auto]', 'G:1 F:1', 'bpm=78 kit=OD'),
+    (RD, '80s', 'War (Wailing Souls 1981)', 'E:1 F#m:1', 'bpm=84'),
+    (RD, '80s', 'Big Ship (Freddie McGregor 1982)', 'F:1 Gm:1', 'bpm=82'),
+    (RD, '80s', "Noah's Ark (Eek-A-Mouse 1982) [auto]", 'Em:1 D:1', 'bpm=82'),
+    (RD, '80s', 'The Mouse and the Man (Eek-A-Mouse 1983) [auto]', 'Dm:1 Em:1 Am:1 Em:1', 'bpm=78'),
+    (RD, '80s', 'Zungguzungguguzungguzeng (Yellowman 1983) [auto]', 'Abm:1 Ab:1 B:1 Ab:1', 'bpm=82'),
+    (RD, '80s', 'Water Pumping (Johnny Osbourne 1983) [auto]', 'A:1 Bm:1', 'bpm=86'),
+    (RD, '80s', 'Rude Boy Jamaican (Eek-A-Mouse) [auto]', 'Am:1 D:1', 'bpm=84'),
+    (RD, '80s', 'Murderer (Barrington Levy 1984) [auto]', 'F:1 G:1', 'bpm=86'),
+    (RD, '80s', 'Collie Weed (Barrington Levy) [auto]', 'Ab:1 Eb:1', 'bpm=84'),
 
     (GI, '70s', 'My Number One (Gregory Isaacs)',    'G:1 Am:1 D:1', 'bpm=74 dr=SANTA bx=FULLWOOD'),
     (GI, '70s', 'Soon Forward (Gregory Isaacs 1979)',     'C:1 Dm:1', 'bpm=74 dr=SLY bx=ROBBIE'),
@@ -90,6 +130,16 @@ BANK = [
     (GI, '80s', 'If I Don\'t Have You (Gregory Isaacs) [auto]', 'Am:1 G:1 Am:1 Dm:1', 'bpm=76'),
     (GI, '80s', 'Hard Drugs (Gregory Isaacs) [auto]',     'C:1 G:1 C:1 D:1', 'bpm=82'),
     (GI, '80s', 'Good Morning (Gregory Isaacs) [auto]',   'A:1 D:1', 'bpm=82'),
+    (GI, '70s', 'My Only Lover (Gregory Isaacs 1973)', 'C:1 Am:1 Dm:1 G:1', 'bpm=72 kit=OD dr=SANTA bx=FULLWOOD'),
+    (GI, '70s', "Sad to Know You're Leaving (Gregory Isaacs)", 'D:1 G:1', 'bpm=74 kit=OD dr=SANTA bx=FULLWOOD'),
+    (GI, '70s', 'Babylon Too Rough (Gregory Isaacs)', 'Dbm:1 Abm:1 Ebm:1 Abm:1', 'bpm=72 kit=OD dr=SANTA bx=FULLWOOD'),
+    (GI, '70s', 'Freedom (Gregory Isaacs) [auto]', 'G:1 C:1', 'bpm=74 kit=OD dr=SANTA bx=FULLWOOD'),
+    (GI, '80s', 'Tune In (Gregory Isaacs 1983)', 'C:1 Dm:1', 'bpm=76'),
+    (GI, '80s', 'Top Ten (Gregory Isaacs) [auto]', 'G:1 C:1 Am:1', 'bpm=76'),
+    (GI, '80s', "Let's Talk About Love (Gregory Isaacs) [auto]", 'D:1 A:1 Bm:1', 'bpm=74'),
+    (GI, '80s', 'Set Back (Gregory Isaacs) [auto]', 'D:1 G:1 Bm:1 C:1', 'bpm=76'),
+    (GI, '80s', 'Tears Come Rolling Down (Gregory Isaacs) [auto]', 'D:1 C:1', 'bpm=74'),
+    (GI, '80s', '9 to 5 (Gregory Isaacs) [auto]', 'Em:1 C:1 Am:1', 'bpm=76'),
 
     (DG, '80s', 'Under Mi Sleng Teng (Wayne Smith 1985) [auto]', 'D:2', 'bpm=82'),
     (DG, '80s', 'Ring the Alarm (Tenor Saw 1985)',        'C:1 Bb:1', 'bpm=90'),
@@ -101,6 +151,16 @@ BANK = [
     (DG, '80s', 'Winsome (Half Pint) [auto]',             'C:1 D:1 G:2', 'bpm=84'),
     (DG, '80s', 'Sonia Come Back (Cocoa Tea, Punaany) [auto]', 'Ab:1 Db:1', 'bpm=94'),
     (DG, '80s', 'She Loves Me Now (Cocoa Tea, Real Rock) [auto]', 'Bb:1 Fm:1', 'bpm=80'),
+    (DG, '80s', 'Victory Train (Tenor Saw) [auto]', 'Ebm:1 Db:1', 'bpm=88'),
+    (DG, '80s', 'Pull Up Selector (Tenor Saw) [auto]', 'A:1 Am:1 D:2', 'bpm=90'),
+    (DG, '80s', 'Lone Ranger and Tonto (Tenor Saw) [auto]', 'C:1 Gm:1 G:1', 'bpm=88'),
+    (DG, '80s', 'Boops (Super Cat 1986) [auto]', 'G:1 C:1', 'bpm=90'),
+    (DG, '80s', "I'm Not a Substitute Lover (Half Pint 1986) [auto]", 'E:1 A:1', 'bpm=86'),
+    (DG, '80s', 'Gimme Punanny (Admiral Bailey 1987) [auto]', 'G:1 D:1', 'bpm=94'),
+    (DG, '80s', 'Old Time Something (Admiral Bailey) [auto]', 'Dm:1 Bb:1', 'bpm=90'),
+    (DG, '80s', 'Herb Tree (Cocoa Tea) [auto]', 'D:1 A:1 G:1', 'bpm=84'),
+    (DG, '80s', 'Original Kuff (Chaka Demus 1988) [auto]', 'Em:1 B:1', 'bpm=90'),
+    (DG, '90s', 'Ting-A-Ling (Shabba Ranks 1990) [auto]', 'Bb:1 Gm:1', 'bpm=92'),
 
     (LR, '60s', 'Many Rivers to Cross (Jimmy Cliff 1969)', 'G:1 Bm:1/2 C:1/2 D:1', 'bpm=70'),
     (LR, '70s', 'Help Me Make It Through the Night (John Holt 1974)', 'E:1 A:1 F#m:1 B:1', 'bpm=72'),
@@ -112,6 +172,16 @@ BANK = [
     (LR, '90s', 'Tempted to Touch (Beres Hammond 1990)',  'C:1 Am:1 Dm:1 G:1', 'bpm=74'),
     (LR, '90s', 'Close to You (Maxi Priest 1990)',        'Ebm:2 Abm:1 Bbm:1', 'bpm=78 kit=RK'),
     (LR, '90s', 'Rockaway (Beres Hammond 1994)',          'Ab:1 Eb:1 Fm:1 Db:1', 'bpm=72'),
+    (LR, '60s', "I'm Still in Love (Alton Ellis 1967)", 'Am:1 G:1', 'bpm=72'),
+    (LR, '70s', 'Everything I Own (Ken Boothe 1974)', 'F:1 C:1 Bb:1 F:1', 'bpm=72'),
+    (LR, '70s', 'Silly Games (Janet Kay 1979)', 'F:1 Am:1 F:1 Bb:1', 'bpm=76'),
+    (LR, '80s', 'Good Thing Going (Sugar Minott 1981)', 'D:1 Em:1 A:1', 'bpm=76'),
+    (LR, '80s', 'Hopelessly in Love (Carroll Thompson 1981) [auto]', 'Gb:1 Bbm:1 Db:1 B:1', 'bpm=72'),
+    (LR, '80s', 'Love Has Found Its Way (Dennis Brown 1982)', 'Ab:1 Eb:1 Fm:1 Bb:1', 'bpm=78 kit=RK'),
+    (LR, '80s', 'I Wanna Wake Up With You (Boris Gardiner 1986)', 'Eb:1 Bb:1 Cm:1 Ab:1', 'bpm=72'),
+    (LR, '80s', 'Breakfast in Bed (UB40 1988)', 'Bb:1 F:1', 'bpm=76'),
+    (LR, '90s', 'Here I Am (UB40 1990)', 'Fm:1 Eb:1', 'bpm=80 kit=RK'),
+    (LR, '90s', "Can't Help Falling in Love (UB40 1993)", 'G:1 D:1 Em:1 Am:1', 'bpm=82 kit=RK'),
 
     (DH, '90s', 'Mr. Loverman (Shabba Ranks 1992)',       'Am:1 Dm:1 G:1 Am:1', 'bpm=96'),
     (DH, '90s', 'Informer (Snow 1992)',                   'F#:1 E:1', 'bpm=98'),
@@ -123,6 +193,16 @@ BANK = [
     (DH, '00s', "It Wasn't Me (Shaggy 2000)",             'C:1 G:1 F:1', 'bpm=94'),
     (DH, '00s', 'Get Busy (Sean Paul 2003)',              'Fm:1 Gb:1', 'bpm=100'),
     (DH, '00s', 'Temperature (Sean Paul 2005)',           'Bbm:1 Ab:1 Bbm:1 C:1', 'bpm=104'),
+    (DH, '90s', 'Hello Mama Africa (Garnett Silk 1992)', 'Eb:1 Fm:1 Gm:1 Fm:1', 'bpm=80 kit=OD'),
+    (DH, '90s', 'Murder She Wrote (Chaka Demus & Pliers 1992) [auto]', 'D:1 C:1 D:1 Am:1', 'bpm=94 dr=SLY bx=ROBBIE'),
+    (DH, '90s', 'Bam Bam (Chaka Demus & Pliers 1992) [auto]', 'D:1 Am:1 C:1', 'bpm=94 dr=SLY bx=ROBBIE'),
+    (DH, '90s', 'Tease Me (Chaka Demus & Pliers 1993) [auto]', 'C:2 Ab:2', 'bpm=94 dr=SLY bx=ROBBIE'),
+    (DH, '90s', 'Bad Boys (Inner Circle 1993)', 'Am:1 C:1/2 Am:1/2', 'bpm=90'),
+    (DH, '90s', 'Love Is the Answer (Garnett Silk) [auto]', 'Cm:1 Gm:1', 'bpm=80 kit=OD'),
+    (DH, '90s', "It's Me Again Jah (Luciano 1994) [auto]", 'Abm:1 Gb:1', 'bpm=78 kit=OD'),
+    (DH, '90s', 'Wanna Be Loved (Buju Banton 1995) [auto]', 'Bb:1 Gm:1', 'bpm=74 kit=OD'),
+    (DH, '00s', 'Angel (Shaggy 2000)', 'G:1 C:1 D:1 C:1', 'bpm=82'),
+    (DH, '00s', 'No Letting Go (Wayne Wonder 2002)', 'Am:1 Em:1', 'bpm=94'),
 
     (NR, '00s', 'Welcome to Jamrock (Damian Marley 2005)', 'Gm:1 Dm:1', 'bpm=82 kit=RK dr=DIGI'),
     (NR, '00s', 'Ganja Farmer (Marlon Asher 2005)',       'C:1 Em:1 Am:1 F:1', 'bpm=76'),
@@ -134,6 +214,16 @@ BANK = [
     (NR, '10s', 'Access Granted (Protoje 2013)',          'Gm:1 Cm:1 Gm:1 F:1', 'bpm=72'),
     (NR, '10s', 'Smile Jamaica (Chronixx 2014)',          'G:1 C:1 Em:1 D:1', 'bpm=76'),
     (NR, '10s', 'Dem Gone (Kabaka Pyramid 2018)',         'Am:1 G:1 F:1', 'bpm=78 kit=RK'),
+    (NR, '90s', "Don't Haffi Dread (Morgan Heritage 1999)", 'Bb:1 Eb:1 Gm:2', 'bpm=76'),
+    (NR, '00s', 'Down by the River (Morgan Heritage) [auto]', 'Gb:1 Ab:1 Db:1 Ebm:1', 'bpm=76'),
+    (NR, '00s', "Can't Satisfy Her (I Wayne 2004) [auto]", 'A:1 D:1 Bm:1', 'bpm=76'),
+    (NR, '00s', 'Youths Dem Cold (Richie Spice 2006) [auto]', 'E:1 Ab:1 C#m:2', 'bpm=80'),
+    (NR, '00s', 'Ghetto Girl (Richie Spice) [auto]', 'Cm:1 Gm:1', 'bpm=76'),
+    (NR, '00s', 'Longing For (Jah Cure 2006) [auto]', 'C:1 D:1 Bm:1 Em:1', 'bpm=84'),
+    (NR, '00s', 'My Day (Tarrus Riley)', 'G:1 F:1 C:2', 'bpm=74'),
+    (NR, '10s', "Guess Who's Coming to Dinner (Alborosie)", 'Gm:1 F:1', 'bpm=76 kit=RK dr=STYLE bx=FLABBA'),
+    (NR, '10s', 'Who Knows (Protoje 2014)', 'Em:1 D:1', 'bpm=76'),
+    (NR, '10s', "Skankin' Sweet (Chronixx 2017) [auto]", 'Dm:1 C:1 Gm:1 Dm:1', 'bpm=78'),
 ]
 
 FOLDERS = [EAR, R70, RK, RD, GI, DG, LR, DH, NR]
@@ -162,7 +252,7 @@ def parse(spec):
     return out
 
 for f in FOLDERS:
-    assert sum(1 for b in BANK if b[0] == f) == 10, f
+    assert sum(1 for b in BANK if b[0] == f) == 20, f
 assert len({b[2] for b in BANK}) == len(BANK), 'nome repetido'
 
 presets = [dict(folder=f, era=e, name=n, chords=parse(s), **riddim(f, o)) for f, e, n, s, o in BANK]
