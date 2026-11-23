@@ -1,0 +1,112 @@
+{
+ "_leia": "Correções e acréscimos do banco único (pesquisa de nov/2026). 'harmonia' usa o formato do harmony_presets.py (acorde:duração; durações 1/2, 1, 2, 3, 4, 8). Cada item diz a fonte. Chave = nome normalizado (ver build_bank.py).",
+ "harmonia": {
+  "nightnurse": {
+   "h": "Am:1 G:1 Dm:1 Am:1",
+   "fonte": "Ukulele Tabs / ChordU: Am-G com Dm no refrão (o MRBM tinha ~Gm-Cm)"
+  },
+  "bigship": {
+   "h": "F:1 Gm:1 C:1 Gm:1",
+   "fonte": "ChordU: F-Gm-C (o MRBM tinha ~G-C)"
+  },
+  "passkouchie": {
+   "h": "C:1 G:1",
+   "fonte": "Cifra Club / Ultimate Guitar: C-G, tom de C"
+  },
+  "fullup": {
+   "h": "C:1 G:1",
+   "fonte": "Pass the Kouchie é o riddim Full Up (Deezer): C-G"
+  },
+  "getupstandup": {
+   "h": "Cm:4",
+   "fonte": "Hooktheory / Musicnotes: Cm (a gravação fica entre Bm e Cm)"
+  },
+  "diwali": {
+   "h": "Fm:1 F#:1",
+   "fonte": "Riddim World: Fm, 100 BPM; igual ao Get Busy do MRCM"
+  },
+  "slengteng": {
+   "h": "D:1 G:1",
+   "fonte": "2 de 3 bancos (MRBM e Budy Bye no MRCM); conferir de ouvido",
+   "conferir": true
+  },
+  "nowomannocry": {
+   "h": "Db:1 Ab:1 Bbm:1 Gb:1",
+   "fonte": "Hooktheory: Db, I-V-vi-IV, 78 BPM"
+  },
+  "positivevibration": {
+   "h": "A:1 F#m:1 D:2",
+   "fonte": "GuitarTabs.cc: A-F#m-D"
+  },
+  "africaunite": {
+   "h": "G:1 D:1 Em:1 C:1",
+   "fonte": "Cifra Club / GuitarTabs.cc: G-D-Em, C-D-Em"
+  },
+  "cominginfromcold": {
+   "h": "C:2 Bb:1/2 F:1/2 F:1",
+   "fonte": "Cifra Club: | C | C | Bb F | F |"
+  },
+  "sunisshining": {
+   "h": "Ebm:1 Abm:1",
+   "fonte": "Ultimate Guitar / ChordU: D#m-G#m (versão 1973 em Dm-Gm com capo 1)"
+  }
+ },
+ "juntar": {
+  "_leia": "Mesma gravação com nomes diferentes nos bancos: vira uma entrada só.",
+  "onelovepeoplegetready": "onelove",
+  "gimmepunanny": "punaany",
+  "getbusy": "diwali"
+ },
+ "novos": [
+  {
+   "nome": "Bogle",
+   "riddim": "Bogle",
+   "artista": "Buju Banton",
+   "ano": 1992,
+   "produtor": "Dave Kelly (Madhouse)",
+   "fonte": "Riddim World / DancehallMag"
+  },
+  {
+   "nome": "Golden Hen",
+   "riddim": "Golden Hen",
+   "artista": "Tenor Saw",
+   "ano": 1985,
+   "produtor": "King Jammy",
+   "fonte": "DancehallMag"
+  },
+  {
+   "nome": "Up Close and Personal",
+   "riddim": "Up Close and Personal",
+   "artista": "Tanto Metro & Devonte",
+   "ano": 1998,
+   "produtor": "Donovan Germain (Penthouse)",
+   "fonte": "DancehallMag"
+  },
+  {
+   "nome": "Fiesta",
+   "riddim": "Fiesta",
+   "artista": "Beenie Man",
+   "ano": 2003,
+   "produtor": "Dave Kelly",
+   "fonte": "DancehallMag"
+  }
+ ],
+ "riddimDe": {
+  "_leia": "Música -> riddim em que foi gravada (para ligar músicas do mesmo riddim).",
+  "tingaling": "Giggy",
+  "originalkuff": "Kuff",
+  "soniacomeback": "Punaany",
+  "shelovesmenow": "Real Rock",
+  "goodthinggoing": "Real Rock",
+  "budybye": "Sleng Teng",
+  "pumpkinbelly": "Sleng Teng",
+  "nolettinggo": "Diwali",
+  "ringalarm": "Stalag",
+  "bambam|sisternancy": "Stalag",
+  "murdershewrote": "Bam Bam",
+  "passkouchie": "Full Up",
+  "zungguzung": "Diseases (Mad Mad)",
+  "temperature": "Applause",
+  "uptowntopranking": "I'm Still In Love"
+ }
+}
