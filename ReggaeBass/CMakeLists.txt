@@ -7,7 +7,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 # versão: aparece no título da interface ("... MRDBI-07 1.5") e no plugin
 # Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-project(DubBass VERSION 1.6.0)
+project(DubBass VERSION 2.0.0)   # alvo interno com o nome antigo: o ID de estado e o BUNDLE_ID não mudam
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,7 +32,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../.github/cmake/aax.cmake")
 juce_add_plugin(DubBass
     COMPANY_NAME               "DubMastor"
     BUNDLE_ID                  com.dubmastor.dubbass
-    PRODUCT_NAME               "Mastor Reggae Dub Bass Instrument MRDBI-07"
+    PRODUCT_NAME               "Mastor Reggae Bass MRB-69"
     PLUGIN_MANUFACTURER_CODE   Dblb
     PLUGIN_CODE                Dbbs
     FORMATS                    VST3 AU Standalone ${DM_AAX}
@@ -45,9 +45,17 @@ juce_add_plugin(DubBass
     VST3_CATEGORIES            Instrument Synth
     AU_MAIN_TYPE               kAudioUnitType_MusicDevice)
 
+# aba BASS MACHINE: o MRBM-69 inteiro, compilado direto da pasta dele
+set(MRB_MACHINE_SOURCES Source/MachineProcessorUnit.cpp Source/MachineEditorUnit.cpp)
 target_sources(DubBass PRIVATE
     Source/PluginProcessor.cpp
-    Source/PluginEditor.cpp)
+    Source/PluginEditor.cpp
+    ${MRB_MACHINE_SOURCES})
+target_include_directories(DubBass PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)   # teclado de acompanhamento
+if(UNIX AND NOT APPLE)
+    # teste de compilação no Linux sem ALSA/JACK/Xrandr/Xcursor (como no Mastor Reggae Drums)
+    target_compile_definitions(DubBass PUBLIC JUCE_ALSA=0 JUCE_JACK=0 JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0)
+endif()
 
 target_compile_definitions(DubBass PUBLIC
     JUCE_WEB_BROWSER=0
@@ -69,7 +77,9 @@ if(DUBBASS_TESTS)
     target_sources(DubBassTest PRIVATE
         tests/render_test.cpp
         Source/PluginProcessor.cpp
-        Source/PluginEditor.cpp)
+        Source/PluginEditor.cpp
+        ${MRB_MACHINE_SOURCES})
+    target_include_directories(DubBassTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)
     target_compile_definitions(DubBassTest PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0

@@ -10,6 +10,8 @@
 #include "Maximizer.h"
 #include "ScopeFifo.h"
 
+class BassMachineProcessor;   // MRBM-69 inteiro na aba BASS MACHINE (Source/MachineProcessorUnit.cpp)
+
 namespace ParamID
 {
     // Oscilador
@@ -48,10 +50,12 @@ namespace ParamID
     inline constexpr const char* maxCeiling = "maxCeiling";
     inline constexpr const char* maxRelease = "maxRelease";
     inline constexpr const char* output     = "output";
+    // BASS MACHINE (MRBM-69): a linha gerada toca com a DAW
+    inline constexpr const char* machineOn  = "machineOn";
 }
 
 //==============================================================================
-class DubBassAudioProcessor : public juce::AudioProcessor
+class DubBassAudioProcessor : public juce::AudioProcessor, private juce::AsyncUpdater
 {
 public:
     static constexpr int   numEqBands = 10;
@@ -65,7 +69,11 @@ public:
     static juce::String eqParamID (int band) { return "eq" + juce::String (band); }
 
     DubBassAudioProcessor();
-    ~DubBassAudioProcessor() override = default;
+    ~DubBassAudioProcessor() override;
+
+    // BASS MACHINE: o gerador do MRBM-69 toca a linha pela voz e pela cadeia de som deste baixo;
+    // a bateria e o teclado de acompanhamento dele somam por cima
+    BassMachineProcessor& getMachine() noexcept { return *machine; }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -107,6 +115,13 @@ public:
     std::atomic<float> currentNote { -1.0f };  // nota MIDI soando (-1 = silêncio)
 
 private:
+    void handleAsyncUpdate() override;    // timbre escolhido na BASS MACHINE -> ajustes de fábrica do oscilador
+    std::unique_ptr<BassMachineProcessor> machine;
+    juce::AudioBuffer<float> machineBuf;
+    juce::MidiBuffer machineMidi;
+    std::atomic<int> machineTimbre { -1 };
+    int lastMachineTimbre = -1;
+
     void updateVoiceParams();
     void renderVoice (float* out, int start, int end);
     void handleMidi (const juce::MidiMessage& msg);

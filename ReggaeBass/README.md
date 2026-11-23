@@ -1,10 +1,12 @@
-# Mastor Reggae Dub Bass Instrument MRDBI-07 1.6
+# Mastor Reggae Bass MRB-69 2.0
 
-O antigo **Dub Bass**.
+O antigo **Dub Bass** (Mastor Reggae Dub Bass Instrument MRDBI-07), agora com o **Mastor Reggae Bass Machine MRBM-69** inteiro na aba **BASS MACHINE**: a linha gerada toca por este som (válvula, EQ, reverb e maximizer), com bateria e teclado de acompanhamento. Ligue **BASS MACHINE LIGADA** para a linha tocar com a DAW.
 
-Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, nome e versão no título (MASTOR REGGAE DUB BASS INSTRUMENT MRDBI-07 x.y), plaqueta de latão DUB STATION, knobs de baquelite e lâmpadas âmbar.
+Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, nome e versão no título (MASTOR REGGAE BASS MRB-69 x.y), plaqueta de latão DUB STATION, knobs de baquelite e lâmpadas âmbar.
 
 ![Interface](docs/interface.png)
+
+![Aba BASS MACHINE](docs/interface-bass-machine.png)
 
 ## Cadeia de sinal
 
@@ -33,7 +35,7 @@ Mono/legato: no Classic Sine as notas ligadas deslizam com o glide; no 808 cada 
 
 ## Versão
 
-A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha no título da interface. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site. O push na `main` publica a release `MRDBI-07-x.y` sozinho.
+A versão fica em `CMakeLists.txt` (`project(DubBass VERSION x.y.z)`) e aparece sozinha no título da interface. A cada atualização: suba a versão, atualize `RELEASE_NOTES.md`, o README da raiz e o card do site. O push na `main` publica a release `MRB-69-x.y` sozinho.
 
 ## Instalar
 

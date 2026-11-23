@@ -1,13 +1,13 @@
 // Mastor Reggae Bass Machine MRBM-69 — som do preview com o sistema de timbres do MRDBI-07 (Dub Bass)
 //
-// Usa as mesmas peças do Dub Bass (pasta ../../ReggaeDubBassInstrument/Source): a voz BassVoice (Classic Sine com
+// Usa as mesmas peças do Dub Bass (pasta ../../ReggaeBass/Source): a voz BassVoice (Classic Sine com
 // harmônicos ou 808), o filtro passa-baixa, as saturações TUBE / TAPE / FUZZ e o Maximizer.
 // Cada TIMBRE é um conjunto de ajustes do Dub Bass; TONE e DRIVE mexem por cima do timbre.
 // Se o Dub Bass mudar o som, o preview do Reggae Bass Machine acompanha.
 #pragma once
 #include <juce_dsp/juce_dsp.h>
-#include "../../ReggaeDubBassInstrument/Source/BassVoice.h"
-#include "../../ReggaeDubBassInstrument/Source/Maximizer.h"
+#include "../../ReggaeBass/Source/BassVoice.h"
+#include "../../ReggaeBass/Source/Maximizer.h"
 
 namespace mbm
 {

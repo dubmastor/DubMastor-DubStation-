@@ -7,6 +7,8 @@
 #include <juce_audio_formats/juce_audio_formats.h>
 #include "../Source/PluginProcessor.h"
 #include "../Source/PluginEditor.h"
+#include "../../ReggaeBassMachine/Source/PluginProcessor.h"   // aba BASS MACHINE (MRBM-69)
+#include "../../ReggaeBassMachine/Source/RiddimPresets.h"
 
 static int failures = 0;
 static void check (bool ok, const juce::String& what)
@@ -19,6 +21,10 @@ static void setP (DubBassAudioProcessor& p, const juce::String& id, float v)
 {
     auto* par = p.apvts.getParameter (id);
     par->setValueNotifyingHost (par->convertTo0to1 (v));
+}
+static void setP (BassMachineProcessor& m, const juce::String& id, float v)
+{
+    if (auto* prm = m.apvts.getParameter (id)) prm->setValueNotifyingHost (prm->convertTo0to1 (v));
 }
 
 // toca a linha e devolve o pico em dBFS; grava WAV se pedido
@@ -110,6 +116,50 @@ int main (int argc, char** argv)
     check (std::abs (q.apvts.getRawParameterValue ("eq6")->load() + 8.0f) < 0.01f && q.apvts.getRawParameterValue (ParamID::mode)->load() > 0.5f,
            "estado salva e carrega");
 
+    {   // BASS MACHINE (MRBM-69 dentro do Mastor Reggae Bass MRB-69)
+        DubBassAudioProcessor b;
+        b.prepareToPlay (48000.0, 512);
+        auto& mach = b.getMachine();
+        auto runBlocks = [&] (int n) {
+            float peak = 0.0f; bool noteSeen = false;
+            for (int i = 0; i < n; ++i)
+            {
+                juce::AudioBuffer<float> buf (2, 512); juce::MidiBuffer mm;
+                b.processBlock (buf, mm);
+                peak = juce::jmax (peak, buf.getMagnitude (0, 0, 512));
+                noteSeen |= b.currentNote.load() >= 0.0f;
+            }
+            return std::make_pair (peak, noteSeen);
+        };
+        // um riddim digital do MRBM-69 com SUPER TONE: o timbre vai para o oscilador do Dub Bass
+        int digital = -1;
+        for (int i = 0; i < mbmriddims::numRiddims && digital < 0; ++i) if (mbmriddims::riddims[i].timbre == mbm::SuperTone) digital = i;
+        mach.loadRiddim (digital);
+        setP (mach, "drumsOn", 0.0f); setP (mach, "keysOn", 0.0f);
+        auto off = runBlocks (60);
+        check (off.first < 1.0e-4f, "BASS MACHINE desligada e sem PLAY: silencio");
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (50);
+        check (juce::roundToInt (b.apvts.getRawParameterValue (ParamID::mode)->load()) == (int) BassVoice::Mode::SuperTone,
+               "riddim com SUPER TONE leva o oscilador do Dub Bass para Super Tone");
+        setP (mach, "preview", 1.0f);
+        auto on = runBlocks (200);
+        check (on.first > 0.01f && on.second, "PLAY da BASS MACHINE toca a linha pela voz do Dub Bass (pico "
+               + juce::String (juce::Decibels::gainToDecibels (on.first), 1) + " dB)");
+        setP (mach, "preview", 0.0f);
+        juce::MemoryBlock st;
+        b.getStateInformation (st);
+        DubBassAudioProcessor c;
+        c.setStateInformation (st.getData(), (int) st.getSize());
+        check (c.getMachine().currentRiddim() == digital && juce::roundToInt (c.apvts.getRawParameterValue (ParamID::mode)->load()) == 2,
+               "estado guarda o riddim da BASS MACHINE e o som do baixo");
+        DubBassAudioProcessor old;   // projeto antigo (sem BASS MACHINE no estado) continua abrindo
+        juce::MemoryBlock legacy;
+        if (auto xml = old.apvts.copyState().createXml()) juce::AudioProcessor::copyXmlToBinary (*xml, legacy);
+        DubBassAudioProcessor d;
+        d.setStateInformation (legacy.getData(), (int) legacy.getSize());
+        check (d.getMachine().currentRiddim() < 0, "projeto antigo do Dub Bass abre sem BASS MACHINE");
+    }
+
     // interface: válvula quente, nota tocando e medidores cheios
     setP (p, ParamID::mode, 0); setP (p, ParamID::drvType, 3); setP (p, ParamID::drive, 18);
     setP (p, ParamID::drvOn, 1);
@@ -147,6 +197,18 @@ int main (int argc, char** argv)
     juce::FileOutputStream os808 (png808);
     check (os808.openedOk() && fmt.writeImageToStream (img808, os808), "interface 808 salva em " + png808.getFullPathName());
     ed.reset();
+    {   // terceira foto: aba BASS MACHINE (o MRBM-69 inteiro dentro do Mastor Reggae Bass MRB-69)
+        p.apvts.state.setProperty ("tab", 1, nullptr);
+        p.getMachine().loadRiddim (0);
+        std::unique_ptr<juce::AudioProcessorEditor> edm (p.createEditor());
+        for (int f = 0; f < 10; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+        auto imgM = edm->createComponentSnapshot (edm->getLocalBounds(), true, scale * 1300.0f / (float) edm->getWidth());
+        auto pngM = dir.getChildFile ("interface_machine.png");
+        pngM.deleteFile();
+        juce::FileOutputStream osM (pngM);
+        check (osM.openedOk() && fmt.writeImageToStream (imgM, osM), "interface BASS MACHINE salva em " + pngM.getFullPathName());
+        p.apvts.state.setProperty ("tab", 0, nullptr);
+    }
 
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");
     return failures == 0 ? 0 : 1;

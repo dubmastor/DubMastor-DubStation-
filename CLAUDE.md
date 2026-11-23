@@ -52,7 +52,7 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
 O MRM-0420 compila o código destas pastas direto, sem cópia:
 - `ReggaeDrumMachine/` — Mastor Reggae Drum Machine MRDM-12 (samples DM em `ReggaeDrumMachine/Samples`)
 - `ReggaeChordMachine/` — Mastor Reggae Chord Machine MRCM-1240
-- `ReggaeBassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `ReggaeDubBassInstrument/Source`)
+- `ReggaeBassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `ReggaeBass/Source`)
 - `BigKnob/` — Mastor Big Knob (aba CONTROL ROOM)
 - `RootsKeys/Source/` — timbres do piano M1 / Hammond
 
@@ -70,3 +70,15 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 - **Sempre que a versão de um plugin subir**, atualize `plugins.json` → `pacote` → `plugins` com a nova versão, suba `pacote` → `versao` e troque `DubStation-x.y` nos links do site e do README. A checagem falha se esquecer.
 - Pro Tools (AAX): todo CMakeLists inclui `.github/cmake/aax.cmake` e põe `${DM_AAX}` no fim de `FORMATS`. Plugin novo também. O AAX é compilado sempre (SDK do JUCE 8) e só entra no instalador público quando assinado pela PACE (passo a passo em `PROTOOLS.md`).
 
+
+## Instrumentos com machine embutida (unificação de nov/2026)
+- **Mastor Reggae Drums MRD-12** (`ReggaeDrums/`, antigo Dub Battery Reggae DBR) tem o MRDM-12 inteiro na aba DUB DRUMS.
+- **Mastor Reggae Bass MRB-69** (`ReggaeBass/`, antigo Dub Bass MRDBI-07) tem o MRBM-69 inteiro na aba BASS MACHINE
+  (`Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`; nomes repetidos trocados em `MachineNames.h`).
+- **Mastor Reggae Keys MRK-80** (`RootsKeys/`) vai ganhar o MRCM-1240 na aba CHORD MACHINE (só maior e menor).
+- As machines separadas (MRDM-12, MRBM-69, MRCM-1240) ficam como **legado** no `plugins.json` (`"legado": "<instrumento>"`):
+  saem do site e do pacote, a última release fica congelada (o workflow só publica por tag manual), mas a pasta continua
+  porque o instrumento e o MRM-0420 compilam o código dela. Mudou uma machine? Teste o instrumento dela e o MRM-0420.
+- Ao renomear, o alvo do CMake e os IDs internos (`DubBatteryReggae`, `DubBatteryReggaeState`, `DubBassState`) ficam:
+  são eles que mantêm os projetos antigos abrindo.
+- Toda alteração de bateria vale para o MRD-12, o MRM-0420 e o código do MRDM-12.

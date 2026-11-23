@@ -1649,7 +1649,7 @@ void DubBassPanel::renderBackground()
     g.setFont (stencil (15.0f, 0.34f));
     const juce::String plateText ("DUB STATION");
     const float plateW = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), plateText) + 64.0f;
-    const juce::String title ("MASTOR REGGAE DUB BASS INSTRUMENT MRDBI-07 " + versionShort());
+    const juce::String title ("MASTOR REGGAE BASS MRB-69 " + versionShort());
     const float maxW = stripesX - 24.0f - plateW - 26.0f - ((float) plate.getX() + 32.0f);
     float fs = 30.0f;
     while (fs > 16.0f && juce::GlyphArrangement::getStringWidth (stencil (fs, 0.14f), title) > maxW)

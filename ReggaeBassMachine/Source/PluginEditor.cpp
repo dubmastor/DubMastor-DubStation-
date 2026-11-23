@@ -1380,7 +1380,11 @@ void BassMachinePanel::renderBackground()
     // --- cabeçalho (letras creme sobre a faixa)
     g.setColour (juce::Colour (0xfff3e6c8));
     g.setFont (stencil (22.0f, 0.12f));
+   #ifdef MBM_PANEL_TITLE   // dentro do Mastor Reggae Bass MRB-69 (aba BASS MACHINE)
+    const juce::String title (MBM_PANEL_TITLE + versionShort());
+   #else
     const juce::String title ("MASTOR REGGAE BASS MACHINE MRBM-69 " + versionShort());
+   #endif
     g.drawText (title, plate.getX() + 32, 20, 760, 34, juce::Justification::left);
     const float titleRight = (float) plate.getX() + 32.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), title);
 

@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "../../ReggaeBassMachine/Source/PluginProcessor.h"   // BASS MACHINE (MRBM-69)
 
 namespace
 {
@@ -55,8 +56,14 @@ namespace
 //==============================================================================
 DubBassAudioProcessor::DubBassAudioProcessor()
     : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-      apvts (*this, nullptr, "DubBassState", createLayout())
+      apvts (*this, nullptr, "DubBassState", createLayout()),
+      machine (std::make_unique<BassMachineProcessor>())
 {
+    // BASS MACHINE: o som do baixo sai daqui (voz + válvula + EQ + reverb + maximizer); o MRBM-69 só manda o MIDI
+    // e a bateria/teclado de acompanhamento
+    if (auto* p = machine->apvts.getParameter ("sound")) p->setValueNotifyingHost (0.0f);
+    lastMachineTimbre = juce::roundToInt (machine->apvts.getRawParameterValue ("timbre")->load());
+
     auto get = [this] (const juce::String& id) { return apvts.getRawParameterValue (id); };
 
     prm.mode = get (ParamID::mode);           prm.harm2 = get (ParamID::harm2);
@@ -152,6 +159,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubBassAudioProcessor::creat
     // OUTPUT
     addFloat (ParamID::output, "Output", { -30.0f, 0.0f, 0.1f }, 0.0f, fmtDb);
 
+    // BASS MACHINE (no fim da lista: os parâmetros antigos não mudam de lugar)
+    addBool  (ParamID::machineOn,  "Bass Machine On", false);   // a linha do MRBM-69 toca com a DAW (o PLAY da aba toca sempre)
+
     return layout;
 }
 
@@ -162,9 +172,14 @@ bool DubBassAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 }
 
 //==============================================================================
+DubBassAudioProcessor::~DubBassAudioProcessor() { cancelPendingUpdate(); }
+
 void DubBassAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     currentSampleRate = sampleRate;
+    machine->setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
+    machine->prepareToPlay (sampleRate, samplesPerBlock);
+    machineBuf.setSize (2, juce::jmax (1, samplesPerBlock));
     keyboardState.reset();
     const int  nCh   = juce::jlimit (1, 2, getTotalNumOutputChannels());
     const auto block = (juce::uint32) juce::jmax (1, samplesPerBlock);
@@ -409,6 +424,21 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     if (numSamples == 0 || numChannels == 0)
         return;
 
+    // BASS MACHINE: gera a linha no andamento da DAW (ou no PLAY dela) e a toca por esta voz
+    machine->setPlayHead (getPlayHead());
+    machineBuf.setSize (2, numSamples, false, false, true);
+    machineBuf.clear();
+    machineMidi.clear();
+    machine->processBlock (machineBuf, machineMidi);
+    const bool machineHeard = apvts.getRawParameterValue (ParamID::machineOn)->load() > 0.5f
+                           || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
+    if (machineHeard) midi.addEvents (machineMidi, 0, numSamples, 0);
+    else              machineBuf.clear();
+    {   // timbre escolhido na BASS MACHINE (ou por um riddim): leva os ajustes de fábrica do oscilador
+        const int t = juce::roundToInt (machine->apvts.getRawParameterValue ("timbre")->load());
+        if (t != machineTimbre.load()) { machineTimbre.store (t); triggerAsyncUpdate(); }
+    }
+
     // teclas clicadas na interface entram no MIDI; o MIDI da DAW acende as teclas
     keyboardState.processNextMidiBuffer (midi, 0, numSamples, true);
 
@@ -484,6 +514,10 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     outGainSm.setTargetValue (juce::Decibels::decibelsToGain (prm.output->load()));
     outGainSm.applyGain (buffer, numSamples);
 
+    // bateria e teclado de acompanhamento da BASS MACHINE por cima (já com o VOLUME dela)
+    for (int ch = 0; ch < numChannels; ++ch)
+        buffer.addFrom (ch, 0, machineBuf, juce::jmin (ch, 1), 0, numSamples);
+
     storePeaks (outPeakDb);
     currentNote.store (voice.isActive() ? voice.getCurrentNote() : -1.0f);
 
@@ -500,14 +534,51 @@ juce::AudioProcessorEditor* DubBassAudioProcessor::createEditor()
 void DubBassAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     if (auto xml = apvts.copyState().createXml())
+    {
+        juce::MemoryBlock m;   // a BASS MACHINE vai junto, num filho que o Dub Bass antigo ignora
+        machine->getStateInformation (m);
+        xml->createNewChildElement ("BassMachine")->setAttribute ("data", m.toBase64Encoding());
         copyXmlToBinary (*xml, destData);
+    }
 }
 
 void DubBassAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         if (xml->hasTagName (apvts.state.getType()))
+        {
+            if (auto* bm = xml->getChildByName ("BassMachine"))
+            {
+                juce::MemoryBlock m;
+                if (m.fromBase64Encoding (bm->getStringAttribute ("data")) && m.getSize() > 0)
+                    machine->setStateInformation (m.getData(), (int) m.getSize());
+                xml->removeChildElement (bm, true);
+            }
             apvts.replaceState (juce::ValueTree::fromXml (*xml));
+            if (auto* p = machine->apvts.getParameter ("sound")) p->setValueNotifyingHost (0.0f);
+            lastMachineTimbre = juce::roundToInt (machine->apvts.getRawParameterValue ("timbre")->load());
+            machineTimbre.store (lastMachineTimbre);   // abrir um projeto não troca o som do baixo
+        }
+}
+
+// TIMBRE da BASS MACHINE (ROOTS, SUPER TONE ou 808, à mão ou por um riddim do banco): o oscilador, os harmônicos,
+// o envelope e o filtro do Dub Bass vão para os valores de fábrica daquele timbre. Válvula, EQ, reverb e maximizer ficam.
+void DubBassAudioProcessor::handleAsyncUpdate()
+{
+    const int t = machineTimbre.load();
+    if (t < 0 || t == lastMachineTimbre) return;
+    lastMachineTimbre = t;
+    const auto& pr = mbm::timbre (t);
+    auto set = [this] (const char* id, float v)
+    {
+        if (auto* p = apvts.getParameter (id)) p->setValueNotifyingHost (p->convertTo0to1 (v));
+    };
+    set (ParamID::mode, (float) (int) pr.mode);
+    set (ParamID::harm2, pr.harm2);       set (ParamID::harm3, pr.harm3);
+    set (ParamID::pitchAmt, pr.pitchAmt); set (ParamID::pitchTime, pr.pitchTimeMs);
+    set (ParamID::attack, pr.attackMs);   set (ParamID::decay, pr.decayMs);
+    set (ParamID::sustain, pr.sustain);   set (ParamID::release, pr.releaseMs);
+    set (ParamID::cutoff, pr.cutoff);     set (ParamID::reso, pr.reso);
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

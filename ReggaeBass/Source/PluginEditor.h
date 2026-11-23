@@ -256,23 +256,83 @@ private:
 };
 
 //==============================================================================
+std::unique_ptr<juce::Component> makeBassMachinePanel (BassMachineProcessor&);   // Source/MachineEditorUnit.cpp
+
+// Mastor Reggae Bass MRB-69: aba BAIXO (o instrumento) e aba BASS MACHINE (o MRBM-69 inteiro, tocando por este som)
 class DubBassAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    explicit DubBassAudioProcessorEditor (DubBassAudioProcessor& p) : juce::AudioProcessorEditor (p), panel (p)
+    static constexpr int kW = 1300, kTabH = 46, kPanelH = 980;   // tamanho base; a janela escala tudo junto
+
+    explicit DubBassAudioProcessorEditor (DubBassAudioProcessor& p)
+        : juce::AudioProcessorEditor (p), proc (p), panel (p), machinePanel (makeBassMachinePanel (p.getMachine())),
+          machineOnAtt (p.apvts, ParamID::machineOn, machineOn)
     {
         addAndMakeVisible (panel);
-        const int w = panel.getWidth(), h = panel.getHeight();
+        addChildComponent (*machinePanel);
+        for (auto* b : { &tabBass, &tabMachine })
+        {
+            b->setClickingTogglesState (false);
+            b->setColour (juce::TextButton::buttonColourId, juce::Colour (0xff1c1a17));
+            b->setColour (juce::TextButton::buttonOnColourId, juce::Colour (0xff3a2f1c));
+            b->setColour (juce::TextButton::textColourOffId, juce::Colour (0xffcfc3a6));
+            b->setColour (juce::TextButton::textColourOnId, juce::Colour (0xffffc061));
+            addAndMakeVisible (*b);
+        }
+        tabBass.onClick    = [this] { showTab (0); };
+        tabMachine.onClick = [this] { showTab (1); };
+        machineOn.setColour (juce::ToggleButton::textColourId, juce::Colour (0xffcfc3a6));
+        machineOn.setColour (juce::ToggleButton::tickColourId, juce::Colour (0xff3fb950));
+        addAndMakeVisible (machineOn);
+        showTab ((int) proc.apvts.state.getProperty ("tab", 0));
+
+        const int w = kW, h = kTabH + kPanelH;
         setResizable (true, true);
         setResizeLimits (w / 2, h / 2, w * 3 / 2, h * 3 / 2);
         if (auto* c = getConstrainer()) c->setFixedAspectRatio ((double) w / (double) h);
         setSize (w * 4 / 5, h * 4 / 5);
     }
+
+    void paint (juce::Graphics& g) override
+    {
+        g.fillAll (juce::Colour (0xff141210));
+        const float s = (float) getWidth() / (float) kW;
+        g.setColour (juce::Colour (0xffc9a45c));
+        g.setFont (juce::FontOptions (13.0f * s, juce::Font::bold));
+        g.drawText ("MASTOR REGGAE BASS MRB-69", juce::Rectangle<float> (16.0f * s, 0.0f, 300.0f * s, (float) kTabH * s),
+                    juce::Justification::centredLeft);
+    }
+
     void resized() override
     {
-        panel.setTransform (juce::AffineTransform::scale ((float) getWidth() / (float) panel.getWidth()));
+        const float s = (float) getWidth() / (float) kW;
+        auto px = [s] (int v) { return juce::roundToInt ((float) v * s); };
+        tabBass.setBounds (px (330), px (6), px (200), px (kTabH - 12));
+        tabMachine.setBounds (px (540), px (6), px (220), px (kTabH - 12));
+        machineOn.setBounds (px (790), px (6), px (480), px (kTabH - 12));
+        panel.setTransform (juce::AffineTransform::scale (s).translated (0.0f, (float) kTabH * s));
+        // o painel do MRBM-69 (1240 x 1064) cabe na área do Dub Bass (1300 x 980), centralizado
+        const float mw = (float) machinePanel->getWidth(), mh = (float) machinePanel->getHeight();
+        const float m = juce::jmin ((float) kW / mw, (float) kPanelH / mh);
+        machinePanel->setTransform (juce::AffineTransform::scale (m * s)
+                                        .translated (((float) kW - mw * m) * 0.5f * s, (float) kTabH * s));
     }
+
 private:
+    void showTab (int t)
+    {
+        panel.setVisible (t == 0);
+        machinePanel->setVisible (t == 1);
+        tabBass.setToggleState (t == 0, juce::dontSendNotification);
+        tabMachine.setToggleState (t == 1, juce::dontSendNotification);
+        proc.apvts.state.setProperty ("tab", t, nullptr);
+    }
+
+    DubBassAudioProcessor& proc;
     DubBassPanel panel;
+    std::unique_ptr<juce::Component> machinePanel;
+    juce::TextButton tabBass { "BAIXO" }, tabMachine { "BASS MACHINE" };
+    juce::ToggleButton machineOn { "BASS MACHINE LIGADA: a linha gerada toca com a DAW" };
+    juce::AudioProcessorValueTreeState::ButtonAttachment machineOnAtt;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubBassAudioProcessorEditor)
 };

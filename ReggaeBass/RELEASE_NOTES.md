@@ -1,3 +1,15 @@
+## Mastor Reggae Bass MRB-69 2.0 🟢🟡⚫
+
+- **Nome novo:** o Mastor Reggae Dub Bass Instrument MRDBI-07 passa a se chamar **Mastor Reggae Bass MRB-69** e absorve o Mastor Reggae Bass Machine MRBM-69, que deixa de ser um plugin separado (o MRBM-69 3.0 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo
+- **Aba BASS MACHINE:** o MRBM-69 inteiro (riddims, banco único, baixistas, linha editável e arrastável, bateria e teclado de acompanhamento). A linha gerada toca por este baixo, com válvula, EQ, reverb, bass boost e maximizer. O PLAY da aba toca sempre; com **BASS MACHINE LIGADA** a linha também toca com a DAW (começa desligada, para quem usa só o teclado)
+- **Timbre pela machine:** escolher ROOTS, SUPER TONE ou 808 na BASS MACHINE (ou um riddim do banco) leva o oscilador, os harmônicos, o envelope e o filtro para os valores de fábrica daquele timbre; válvula, EQ, reverb e maximizer ficam como você deixou
+- **BANCO ÚNICO DE RIDDIMS na BASS MACHINE:** 356 músicas e 155 riddims, o mesmo banco do MRCM-1240, do MRDM-12 e do MRM-0420 (`RiddimBank/`), por **ESTILOS**, **RIDDIMS A–Z** ou **MÚSICAS A–Z**, com as luzes **H B D** e a opção **Só completos**
+- A música carrega a harmonia conferida e o BPM dela; o baixo é o do riddim do MRBM-69 quando ele existe (baixista, densidade, timbre, bateria), senão o baixista mais próximo de quem gravou. O visor mostra `=BANCO= n/356` e as setas passam de música em música
+- Os 160 riddims continuam no mesmo menu e na mesma ordem (os projetos antigos abrem igual)
+- Versão para celular da BASS MACHINE com o mesmo menu
+- O projeto guarda o riddim e a linha da BASS MACHINE junto com o som do baixo
+- Versão para celular 2.0
+
 ## Mastor Reggae Dub Bass Instrument MRDBI-07 1.6 🟢🟡⚫
 
 Baixo de reggae para a linha Dub Station: a senoide redonda do roots clássico com harmônicos, o 808 com o pitch caindo, ou o Super Tone digital da era King Jammy.

@@ -57,9 +57,9 @@ function(mrm_version dir out)
 endfunction()
 mrm_version(ReggaeDrums MRM_DRUMS_VER)        # a bateria é a do Mastor Reggae Drums MRD-12 (aba DUB DRUMS)
 mrm_version(ReggaeChordMachine MRM_CHORDS_VER)
-mrm_version(ReggaeBassMachine MRM_BASS_VER)
+mrm_version(ReggaeBass MRM_BASS_VER)            # o baixo é o do Mastor Reggae Bass MRB-69 (aba BASS MACHINE)
 mrm_version(BigKnob     MRM_KNOB_VER)
-message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRCM-1240 ${MRM_CHORDS_VER}, MRBM-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
+message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRCM-1240 ${MRM_CHORDS_VER}, MRB-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
 
 set(MRM_SOURCES
     Source/MrmProcessor.cpp
