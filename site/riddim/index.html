@@ -99,6 +99,15 @@ canvas.lane{width:100%;height:118px;border-radius:5px;background:#120d08;box-sha
 .presetsel{width:100%;margin:2px 0 10px;padding:12px;border:0;border-radius:6px;font:900 13px/1 inherit;font-family:inherit;letter-spacing:.14em;color:var(--gold);cursor:pointer;
   background:linear-gradient(180deg,#1e9c4c,#0b5a26);box-shadow:0 0 0 3px #1a1714}
 .presetsel option,.presetsel optgroup{color:#1b140c;background:#efe5cc;letter-spacing:0}
+.siren{display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px;align-items:start}
+.fire{width:110px;height:110px;border-radius:50%;border:0;margin:0 auto 6px;display:block;cursor:pointer;color:#fff;font:900 20px/1 inherit;letter-spacing:.12em;
+  background:radial-gradient(circle at 40% 35%,#ff7a5c,#e8432c 45%,#6d140a);box-shadow:0 0 0 8px #b9b5ac,0 0 0 10px #4a463f,0 6px 14px rgba(0,0,0,.5);touch-action:none}
+.fire.on{filter:brightness(1.35);box-shadow:0 0 0 8px #b9b5ac,0 0 0 10px #4a463f,0 0 30px #e8432c}
+.btns.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.sirknobs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 12px;margin-top:8px}
+.sirknobs label{font-size:9px;font-weight:800;letter-spacing:.2em;color:var(--ink,#2b2620);display:flex;flex-direction:column;gap:2px}
+.sirknobs input{width:100%;accent-color:var(--amber)}
+@media (max-width:640px){.siren{grid-template-columns:1fr}.sirknobs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .luck{margin-top:24px;padding:8px 10px;border-radius:5px;background:linear-gradient(180deg,#2a2219,#120d08);box-shadow:0 0 0 3px #0c0907;color:var(--amber);font-size:10px;font-weight:800;letter-spacing:.1em;line-height:1.6}
 .luck b{color:#ffe3a0}
 .luck.flash{animation:flash .9s ease-out}
@@ -158,6 +167,7 @@ footer a{color:var(--ink)}
       <div class="btns c2" id="fmode"><button class="b" data-m="1">HIGH PASS</button><button class="b" data-m="0">LOW PASS</button></div>
       <div class="row" style="margin-top:10px"><button class="power" id="fxOn" style="flex:1"><i></i><span>CONTROL ROOM</span><em></em></button>
         <button class="power" id="echoOn" style="flex:1"><i></i><span>TAPE ECHO</span><em></em></button></div>
+      <button class="power" id="bypass"><i></i><span>BYPASS · DESLIGA O BIG KNOB INTEIRO</span><em></em></button>
     </div>
   </div>
   <div class="lbl">MUTE DAS MÁQUINAS</div>
@@ -165,6 +175,18 @@ footer a{color:var(--ink)}
     <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRDM-12</small></button>
     <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRBM-69</small></button>
     <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRCM-1240</small></button>
+  </div>
+</section>
+
+<section class="mod"><div class="tag">DUB SIREN · A SIRENE DO MASTOR BIG KNOB</div>
+  <div class="siren">
+    <div><button class="fire" id="fire" aria-label="Disparar a sirene">FIRE</button>
+      <button class="power" id="sirHold"><i></i><span>HOLD</span><em></em></button></div>
+    <div>
+      <div class="lbl" style="margin-top:0">FORMA DA ONDA · SEGURE O FIRE, O DELAY CONTINUA DEPOIS</div>
+      <div class="btns c5" id="sirWave"><button class="b" data-v="0">SENO</button><button class="b" data-v="1">TRIÂNG.</button><button class="b" data-v="2">QUADRADA</button><button class="b" data-v="3">SOBE</button><button class="b" data-v="4">DESCE</button></div>
+      <div class="sirknobs" id="sirKnobs"></div>
+    </div>
   </div>
 </section>
 
@@ -207,7 +229,8 @@ const DEFAULTS = {
   slots: [{ root: 9, quality: 1, dur: 0, inv: -1, on: true }, { root: 2, quality: 1, dur: 0, inv: -1, on: true },
           { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false }],
   bpm: 75, seed: 420, bars: 2, drummer: 0, pattern: 0, bassist: 0, style: 0, hat: 1,
-  on: [true, true, true], mute: [false, false, false], fxOn: true, echoOn: false, knob: 0, hp: true,
+  on: [true, true, true], mute: [false, false, false], fxOn: true, echoOn: false, knob: 0, hp: true, bypass: false, riddim: -1,
+  sir: { pitch: 520, rate: 2, depth: 50, wave: 4, dly: 350, fb: 50, level: 50, hold: false },
 };
 function load() { try { const s = JSON.parse(localStorage.getItem('mrm0420') || 'null'); if (s && s.slots) return Object.assign(structuredClone(DEFAULTS), s); } catch (e) {} return structuredClone(DEFAULTS); }
 const st = load(); st.slots[0].on = true; st.pattern = 0;   // skank sempre no contratempo
@@ -234,8 +257,73 @@ function rebuild(which = [0, 1, 2]) {
 }
 
 // ---------------------------------------------------------------- som: samples DM na bateria, piano M1 + órgão, baixo do MRDBI-07, CONTROL ROOM
+// BIG KNOB: o DSP do plugin Mastor Big Knob (BigKnob/Source/TubbyFilter.h e DubFX.h) num AudioWorklet:
+// filtro SVF de 2 polos com saturação nos integradores, degraus do console do King Tubby (20 Hz = aberto),
+// suavização de 30 ms, e a DUB SIREN com LFO de 5 formas, envelope e delay próprio com realimentação.
+const BIGKNOB_WORKLET = `
+const STEPS = [20, 70, 100, 150, 250, 500, 1000, 2000, 3000, 5000, 7500, 10000];
+const TWO_PI = 6.28318530718;
+class BigKnob extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.s = { knob: 0, hp: true, res: 0.25, bypass: false, sir: { pitch: 520, rate: 2, depth: 0.5, wave: 4, dly: 0.35, fb: 0.5, level: 0.5, gate: false } };
+    const fs = sampleRate;
+    this.smooth = Math.exp(-1 / (0.03 * fs)); this.logF = Math.log(20); this.st = [[0, 0], [0, 0]];
+    this.line = new Float32Array(Math.floor(2.1 * fs) + 4); this.w = 0; this.env = 0; this.osc = 0; this.lfo = 0;
+    this.atk = 1 - Math.exp(-1 / (0.004 * fs)); this.rel = 1 - Math.exp(-1 / (0.09 * fs));
+    this.dSmooth = Math.exp(-1 / (0.15 * fs)); this.curD = 0.35 * fs; this.toneA = 1 - Math.exp(-TWO_PI * 3200 / fs); this.toneZ = 0;
+    this.byp = 0; this.bypA = 1 - Math.exp(-1 / (0.03 * fs));
+    this.port.onmessage = (e) => { const n = e.data; if (n.sir && n.sir.gate && !this.s.sir.gate) this.lfo = 0; this.s = n; };
+  }
+  freq() { const p = Math.min(1, Math.max(0, this.s.knob)); return STEPS[Math.round(p * (STEPS.length - 1))]; }
+  process(inputs, outputs) {
+    const inp = inputs[0], out = outputs[0], sirOut = outputs[1][0], fs = sampleRate, n = out[0].length;
+    const target = Math.log(this.freq()), k = 2 - 1.9 * this.s.res, hp = this.s.hp, S = this.s.sir;
+    const byT = this.s.bypass ? 1 : 0;
+    for (let i = 0; i < n; i++) {
+      this.logF = target + this.smooth * (this.logF - target);
+      const g = Math.tan(Math.PI * Math.min(Math.exp(this.logF), 0.45 * fs) / fs);
+      const a1 = 1 / (1 + g * (g + k)), a2 = g * a1, a3 = g * a2;
+      this.byp += this.bypA * (byT - this.byp);
+      for (let c = 0; c < out.length; c++) {
+        const x = inp.length ? (inp[Math.min(c, inp.length - 1)][i] || 0) : 0, z = this.st[c];
+        const v3 = x - z[1], v1 = a1 * z[0] + a2 * v3, v2 = z[1] + a2 * z[0] + a3 * v3;
+        z[0] = 3 * Math.tanh((2 * v1 - z[0]) / 3); z[1] = 2 * v2 - z[1];
+        const y = hp ? x - k * v1 - v2 : v2;
+        out[c][i] = y * (1 - this.byp) + x * this.byp;
+      }
+      // sirene
+      const gate = S.gate && !this.s.bypass;
+      this.env += (gate ? this.atk : this.rel) * ((gate ? 1 : 0) - this.env);
+      let dry = 0;
+      if (this.env > 1e-5) {
+        this.lfo += S.rate / fs; if (this.lfo >= 1) this.lfo -= 1;
+        const ph = this.lfo;
+        const l = S.wave === 0 ? Math.sin(TWO_PI * ph) : S.wave === 1 ? 1 - 4 * Math.abs(ph - 0.5) : S.wave === 2 ? (ph < 0.5 ? 1 : -1) : S.wave === 3 ? 2 * ph - 1 : 1 - 2 * ph;
+        const f = Math.min(S.pitch * Math.pow(2, 2 * S.depth * l), 0.45 * fs);
+        this.osc += f / fs; if (this.osc >= 1) this.osc -= 1;
+        dry = Math.tanh(3 * Math.sin(TWO_PI * this.osc)) * 0.6 * this.env;
+      }
+      const L = this.line.length, tgt = Math.min(Math.max(S.dly * fs, 8), L - 4);
+      this.curD = tgt + this.dSmooth * (this.curD - tgt);
+      let pos = this.w - this.curD; if (pos < 0) pos += L;
+      const i0 = Math.floor(pos), t = pos - i0, i1 = (i0 + 1) % L;
+      const wet = this.line[i0] + t * (this.line[i1] - this.line[i0]);
+      this.toneZ += this.toneA * (wet - this.toneZ);
+      this.line[this.w] = dry + Math.tanh(this.toneZ * Math.min(S.fb, 0.95));
+      if (++this.w >= L) this.w = 0;
+      sirOut[i] = (dry + wet) * S.level * (1 - this.byp);
+    }
+    return true;
+  }
+}
+registerProcessor('bigknob', BigKnob);
+`;
+const KNOB_STEPS = [20, 70, 100, 150, 250, 500, 1000, 2000, 3000, 5000, 7500, 10000];
+const knobHz = (k) => KNOB_STEPS[Math.round(Math.min(1, Math.max(0, k)) * (KNOB_STEPS.length - 1))];
+
 const audio = (() => {
-  let filt = null;
+  let knobIn = null, knobOut = null, knobNode = null;
   let ctx = null, buses = [], master, dry, echoSend, fxIn, analyser, buffers = {}, wave = {};
   let playing = false, anchorTime = 0, anchorBeat = 0, scheduled = 0, timer = 0, lastBass = null;
   const hz = (n) => 440 * Math.pow(2, (n - 69) / 12);
@@ -249,14 +337,23 @@ const audio = (() => {
     const safety = ctx.createDynamicsCompressor(); safety.threshold.value = -2; safety.ratio.value = 12;
     analyser = ctx.createAnalyser(); analyser.fftSize = 512;
     fxIn = g(1); dry = g(1);
-    filt = ctx.createBiquadFilter(); filt.Q.value = 1.2;   // BIG KNOB: filtro HP/LP no master
-    master.connect(filt).connect(fxIn);
+    // BIG KNOB: enquanto o worklet carrega o som passa direto; depois entra o filtro e a sirene do plugin
+    knobIn = g(1); knobOut = g(1);
+    master.connect(knobIn).connect(knobOut).connect(fxIn);
+    if (ctx.audioWorklet) {
+      const url = URL.createObjectURL(new Blob([BIGKNOB_WORKLET], { type: 'application/javascript' }));
+      ctx.audioWorklet.addModule(url).then(() => {
+        knobNode = new AudioWorkletNode(ctx, 'bigknob', { numberOfInputs: 1, numberOfOutputs: 2, outputChannelCount: [2, 1] });
+        knobIn.disconnect(); knobIn.connect(knobNode); knobNode.connect(knobOut, 0); knobNode.connect(fxIn, 1);
+        applyMix();
+      }).catch((e) => console.warn('Big Knob worklet', e));
+    }
     fxIn.connect(maxi).connect(safety);
     safety.connect(ctx.destination); safety.connect(analyser);
     echoSend = g(0.32);
     const delay = ctx.createDelay(2); delay.delayTime.value = 0.75 * 60 / st.bpm;
     const fb = g(0.42), tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 2400;
-    filt.connect(echoSend).connect(delay).connect(tone).connect(fb).connect(delay);
+    knobOut.connect(echoSend).connect(delay).connect(tone).connect(fb).connect(delay);
     tone.connect(fxIn);
     audio.delay = delay;
     for (let m = 0; m < 3; m++) { const b = g(1); b.connect(master); buses.push(b); }
@@ -289,11 +386,16 @@ const audio = (() => {
     if (!ctx) return;
     const t = ctx.currentTime;
     for (let m = 0; m < 3; m++) buses[m].gain.setTargetAtTime(st.on[m] && !st.mute[m] ? 1 : 0, t, 0.01);
-    echoSend.gain.setTargetAtTime(st.fxOn && st.echoOn ? 0.32 : 0, t, 0.02);
+    echoSend.gain.setTargetAtTime(st.fxOn && st.echoOn && !st.bypass ? 0.32 : 0, t, 0.02);
     audio.delay.delayTime.setTargetAtTime(0.75 * 60 / st.bpm, t, 0.05);
-    const k = st.fxOn ? st.knob / 100 : 0;
-    filt.type = st.hp ? 'highpass' : 'lowpass';
-    filt.frequency.setTargetAtTime(st.hp ? 20 * Math.pow(400, k) : 20000 * Math.pow(1 / 130, k), t, 0.03);
+    sendKnob();
+  }
+  function sendKnob() {   // filtro e sirene do Big Knob (worklet); no modo LOW PASS o botão desce a partir de 10 kHz
+    if (!knobNode) return;
+    const on = st.fxOn && !st.bypass, k = on ? st.knob / 100 : 0, S = st.sir;
+    knobNode.port.postMessage({ knob: k === 0 ? 0 : st.hp ? k : 1 - k, hp: st.hp || k === 0, res: 0.25, bypass: !on,
+      sir: { pitch: S.pitch, rate: S.rate, depth: S.depth / 100, wave: S.wave, dly: S.dly / 1000, fb: S.fb / 100, level: S.level / 100,
+             gate: (S.hold || audio.fire) && st.fxOn } });
   }
   function drum(t, note, vel) {
     const sm = buffers[note === gm.PedalHat ? gm.ClosedHat : note], v = Math.pow(vel / 127, 1.6);
@@ -342,7 +444,8 @@ const audio = (() => {
   function beat() { return playing ? anchorBeat + (ctx.currentTime - anchorTime) / spb() : -1; }
   function setBpm() { if (playing) { const b = beat(); anchorTime = ctx.currentTime; anchorBeat = b; } applyMix(); }
   function level() { if (!analyser) return 0; const d = new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(d); let p = 0; for (const x of d) p = Math.max(p, Math.abs(x - 128)); return p / 128; }
-  return { start, stop, beat, setBpm, applyMix, level, get playing() { return playing; }, delay: null };
+  return { start, stop, beat, setBpm, applyMix, level, get playing() { return playing; }, delay: null, fire: false,
+           ensure: () => { ensure(); ctx.resume(); } };
 })();
 
 // ---------------------------------------------------------------- harmonia
@@ -508,9 +611,12 @@ function drawAll() {
     drawLane(m);
   });
   [0, 1, 2].forEach((i) => $('mute' + i).classList.toggle('muted', st.mute[i]));
-  $('fxOn').classList.toggle('on', st.fxOn); $('echoOn').classList.toggle('on', st.echoOn);
+  $('fxOn').classList.toggle('on', st.fxOn); $('echoOn').classList.toggle('on', st.echoOn); $('bypass').classList.toggle('on', st.bypass);
+  $('sirHold').classList.toggle('on', st.sir.hold);
+  $('sirWave').querySelectorAll('[data-v]').forEach((b) => b.classList.toggle('on', +b.dataset.v === st.sir.wave));
   $('knob').value = st.knob; $('dial').style.setProperty('--a', `${45 + st.knob * 2.7}deg`);
-  $('knobVal').textContent = st.knob ? `${st.hp ? 'HIGH' : 'LOW'} PASS ${st.knob}%` : 'FILTRO ABERTO';
+  const kk = st.hp ? st.knob / 100 : 1 - st.knob / 100;
+  $('knobVal').textContent = st.bypass ? 'BYPASS' : st.knob ? `${st.hp ? 'HIGH' : 'LOW'} PASS ${knobHz(kk) >= 1000 ? knobHz(kk) / 1000 + ' kHz' : knobHz(kk) + ' Hz'}` : 'FILTRO ABERTO';
   $('fmode').querySelectorAll('[data-m]').forEach((b) => b.classList.toggle('on', (b.dataset.m === '1') === st.hp));
   $('len').innerHTML = `${LENGTHS[st.bars]}<small>COMPASSOS</small>`;
   $('bpm').textContent = st.bpm;
@@ -569,29 +675,37 @@ function newSeed() {
 $('jackpot').onclick = () => { newSeed(); rebuild([DRUMS, BASS]); };
 
 // PRESETS de harmonia (o mesmo banco do MRCM-1240): pastas por estilo, de 70 a 2000
+// PRESET de riddim: a harmonia da música, o BPM sugerido, o estilo da bateria e os músicos das máquinas
+// mais próximos de quem gravou (mesmo banco do plugin: ReggaeChordMachine/tools/harmony_presets.py)
 function applyPreset(p) {
   st.slots.forEach((s, k) => { const c = p.chords[k]; if (c) Object.assign(s, { root: c.root, quality: c.quality, dur: c.dur, inv: -1, on: true }); else s.on = false; });
+  st.riddim = window.DUB_PRESETS.presets.indexOf(p);
+  if (p.bpm) { st.bpm = p.bpm; st.style = p.kit; st.drummer = p.drummer; st.bassist = p.bassist; audio.setBpm(); }
 }
 (function presets() {
   const P = window.DUB_PRESETS, sel = $('presets');
-  sel.innerHTML = '<option value="">PRESETS ▾  harmonias clássicas do reggae</option>';
+  sel.innerHTML = '<option value="">PRESETS ▾  riddims clássicos: harmonia, BPM e músicos</option>';
   P.folders.forEach((f) => {
     const g = document.createElement('optgroup'); g.label = f;
     P.presets.forEach((p, i) => { if (p.folder !== f) return; const o = document.createElement('option'); o.value = i;
-      o.textContent = `${p.name} (${p.era})  ${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')}`; g.appendChild(o); });
+      o.textContent = `${p.name}  ${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')} · ${p.bpm} BPM`; g.appendChild(o); });
     sel.appendChild(g);
   });
-  sel.onchange = () => { const p = P.presets[+sel.value]; sel.value = ''; if (!p) return; applyPreset(p); save(); rebuild([CHORDS, BASS]); };
+  sel.onchange = () => { const p = P.presets[+sel.value]; sel.value = ''; if (!p) return; applyPreset(p); save(); rebuild(); showLuck(true); };
 })();
 
-// BPM POR ESTILO (mesma tabela do plugin: RiddimMachine/Source/BpmPresets.h)
+// BPM POR ÉPOCA E ESTILO (mesma tabela do plugin: RiddimMachine/Source/BpmPresets.h)
 const BPM_PRESETS = [
-  ['ROOTS', 'Roots lento', 66], ['ROOTS', 'Roots one drop', 72], ['ROOTS', 'Roots clássico', 76], ['ROCKSTEADY', 'Rocksteady', 80],
-  ['ROCKERS', 'Rockers', 78], ['ROCKERS', 'Rockers rápido', 84], ['RUB A DUB', 'Rub a dub', 84], ['RUB A DUB', 'Rub a dub rápido', 90],
-  ['LOVERS ROCK', 'Lovers lento', 70], ['LOVERS ROCK', 'Lovers rock', 76], ['LOVERS ROCK', 'Lovers dançante', 82],
-  ['DANCEHALL', 'Dancehall digital 85', 92], ['DANCEHALL', 'Ragga 90', 98], ['DANCEHALL', 'Dancehall 2000', 104],
-  ['NEW ROOTS', 'New roots', 72], ['NEW ROOTS', 'New roots groove', 78], ['DUB', 'Dub pesado', 64], ['DUB', 'Dub', 70],
-  ['STEPPERS', 'Steppers UK', 130], ['STEPPERS', 'Steppers rápido', 140]];
+  ['ROCKSTEADY 66-68', 'Rocksteady lento', 74], ['ROCKSTEADY 66-68', 'Rocksteady', 80],
+  ['EARLY REGGAE 68-72', 'Early reggae', 84], ['EARLY REGGAE 68-72', 'Skinhead reggae', 90],
+  ['ROOTS 70s', 'Nyabinghi / roots lento', 66], ['ROOTS 70s', 'Roots one drop', 72], ['ROOTS 70s', 'Roots clássico', 76],
+  ['ROCKERS 75-79', 'Rockers', 78], ['ROCKERS 75-79', 'Rockers rápido', 82],
+  ['RUB A DUB 80-84', 'Rub a dub (Volcano)', 84], ['RUB A DUB 80-84', 'Rub a dub rápido', 88],
+  ['DIGITAL 85-89', 'Digital (Sleng Teng)', 82], ['DIGITAL 85-89', 'Digital (King Jammy)', 90],
+  ['DANCEHALL 90s', 'Ragga 90', 96], ['DANCEHALL 90s', 'Dancehall 90s', 100], ['DANCEHALL 2000s', 'Dancehall 2000', 104],
+  ['LOVERS ROCK 75-95', 'Lovers lento', 70], ['LOVERS ROCK 75-95', 'Lovers rock', 76],
+  ['NEW ROOTS 2000s', 'New roots', 72], ['NEW ROOTS 2000s', 'New roots groove', 78],
+  ['DUB', 'Dub pesado', 64], ['DUB', 'Dub', 70], ['STEPPERS UK 80s-90s', 'Steppers UK', 130], ['STEPPERS UK 80s-90s', 'Steppers rápido', 140]];
 (function bpmStyles() {
   const sel = $('bpmStyle'), groups = {};
   BPM_PRESETS.forEach(([style, name, bpm], i) => {
@@ -605,13 +719,14 @@ const BPM_PRESETS = [
 // skank no contratempo, caixa no 2 e no 4 e o baixo de um dos baixistas do MRBM-69 (modo "de livro", sem cromatismo)
 const rnd = (n) => Math.floor(Math.random() * n);
 function randomRiddim() {
-  applyPreset(window.DUB_PRESETS.presets[rnd(window.DUB_PRESETS.presets.length)]);
-  st.style = rnd(2); st.drummer = rnd(5); st.hat = rnd(3); st.bassist = rnd(B.styleNames.length);
+  applyPreset(window.DUB_PRESETS.presets[rnd(window.DUB_PRESETS.presets.length)]);   // harmonia, BPM e os músicos dela
+  st.hat = rnd(3);
   newSeed(); rebuild(); showLuck(true);
 }
 function showLuck(flash) {
   const l = $('luck');
-  l.innerHTML = `HARMONIA <b>${chordSlots().filter((x) => x.beats > 0).map(C.chordLabel).join(' - ')}</b> · BATERIA <b>${STYLE_NAMES[st.style]}</b> · <b>${HAT_NAMES[st.hat]}</b> · BATERISTA <b>${MACHINES[0].names[st.drummer]}</b> · BAIXISTA <b>${String(B.styleNames[st.bassist]).toUpperCase()}</b> · SEMENTE <b>${st.seed}</b>`;
+  const rp = window.DUB_PRESETS.presets[st.riddim];
+  l.innerHTML = (rp ? `RIDDIM <b>${rp.name}</b> · <b>${st.bpm} BPM</b> · ` : '') + `HARMONIA <b>${chordSlots().filter((x) => x.beats > 0).map(C.chordLabel).join(' - ')}</b> · BATERIA <b>${STYLE_NAMES[st.style]}</b> · <b>${HAT_NAMES[st.hat]}</b> · BATERISTA <b>${MACHINES[0].names[st.drummer]}</b> · BAIXISTA <b>${String(B.styleNames[st.bassist]).toUpperCase()}</b> · SEMENTE <b>${st.seed}</b>`;
   if (flash) { l.classList.remove('flash'); void l.offsetWidth; l.classList.add('flash'); }
 }
 (function lever() {
@@ -632,6 +747,29 @@ $('knob').oninput = () => { st.knob = +$('knob').value; save(); audio.applyMix()
 $('fmode').onclick = (ev) => { const b = ev.target.closest('[data-m]'); if (!b) return; st.hp = b.dataset.m === '1'; save(); audio.applyMix(); drawAll(); };
 $('fxOn').onclick = () => { st.fxOn = !st.fxOn; save(); audio.applyMix(); drawAll(); };
 $('echoOn').onclick = () => { st.echoOn = !st.echoOn; save(); audio.applyMix(); drawAll(); };
+$('bypass').onclick = () => { st.bypass = !st.bypass; save(); audio.applyMix(); drawAll(); };
+// DUB SIREN: FIRE enquanto segura (as repetições continuam no delay), HOLD mantém ligada
+const SIREN_KNOBS = [['pitch', 'PITCH', 80, 2500, 'Hz', true], ['rate', 'RATE', 0.1, 25, 'Hz', true], ['depth', 'DEPTH', 0, 100, '%'],
+                     ['dly', 'DELAY', 30, 2000, 'ms', true], ['fb', 'REPEATS', 0, 95, '%'], ['level', 'LEVEL', 0, 100, '%']];
+(function siren() {
+  const box = $('sirKnobs');
+  SIREN_KNOBS.forEach(([key, name, lo, hi, unit, log]) => {
+    const l = document.createElement('label'), inp = document.createElement('input'), t = document.createElement('span');
+    inp.type = 'range'; inp.min = 0; inp.max = 1000; inp.dataset.k = key;
+    const to = (v) => log ? lo * Math.pow(hi / lo, v / 1000) : lo + (hi - lo) * v / 1000;
+    const from = (x) => log ? 1000 * Math.log(x / lo) / Math.log(hi / lo) : 1000 * (x - lo) / (hi - lo);
+    inp.value = from(st.sir[key]);
+    const show = () => { const x = st.sir[key]; t.textContent = `${name} ${x < 10 ? x.toFixed(1) : Math.round(x)} ${unit}`; };
+    inp.oninput = () => { st.sir[key] = to(+inp.value); show(); save(); audio.applyMix(); };
+    inp.ondblclick = () => { st.sir[key] = DEFAULTS.sir[key]; inp.value = from(st.sir[key]); show(); save(); audio.applyMix(); };
+    show(); l.append(t, inp); box.appendChild(l);
+  });
+  const fire = $('fire'), go = (on) => { audio.fire = on; fire.classList.toggle('on', on); audio.applyMix(); };
+  fire.addEventListener('pointerdown', (e) => { e.preventDefault(); audio.ensure && audio.ensure(); fire.setPointerCapture(e.pointerId); go(true); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => fire.addEventListener(ev, () => go(false)));
+  $('sirHold').onclick = () => { st.sir.hold = !st.sir.hold; save(); audio.applyMix(); drawAll(); };
+  $('sirWave').onclick = (ev) => { const b = ev.target.closest('[data-v]'); if (!b) return; st.sir.wave = +b.dataset.v; save(); audio.applyMix(); drawAll(); };
+})();
 
 (function frame() {   // cursor nos visores e o cone do alto-falante mexendo com o som
   if (audio.playing) MACHINES.forEach(drawLane);

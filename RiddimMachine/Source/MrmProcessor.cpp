@@ -404,39 +404,41 @@ void MrmProcessor::newRiddim()
     timerCallback();   // bateria e baixo recebem a semente na hora
 }
 
-// ALAVANCA do JACKPOT: um riddim novo inteiro. Metade das vezes a harmonia vem do banco de PRESETS
-// (progressões clássicas por estilo); na outra metade é sorteada dentro de um tom (menor ou maior),
-// com os graus que o reggae mais usa. Tudo aparece na tela na hora; é só apertar PLAY.
+static void setRiddimParam (juce::AudioProcessorValueTreeState& s, const juce::String& id, float v)
+{
+    if (auto* p = s.getParameter (id))
+    {
+        p->beginChangeGesture();
+        p->setValueNotifyingHost (p->convertTo0to1 (v));
+        p->endChangeGesture();
+    }
+}
+
+// PRESET de riddim: a harmonia da música, o BPM sugerido, o estilo da bateria e os músicos das máquinas
+// mais próximos de quem gravou (baterista do MRDM-12 e baixista do MRBM-69). Skank sempre no contratempo.
+void MrmProcessor::applyRiddimPreset (int index)
+{
+    if (index < 0 || index >= dubpresets::numPresets) return;
+    const auto& pr = dubpresets::presets[index];
+    chords.applyPreset (index);
+    setRiddimParam (apvts, "bpm", (float) pr.bpm);
+    setRiddimParam (drums.apvts, "style", (float) pr.kit);
+    drums.applyStyleDefaults (pr.kit);
+    setRiddimParam (drums.apvts, "drummer", (float) pr.drummer);
+    setRiddimParam (drums.apvts, "backbeat", 0.0f);   // caixa na batida principal
+    setRiddimParam (drums.apvts, "fill", 0.0f);
+    setRiddimParam (bass.apvts, "style", (float) pr.bassist);
+    syncLinks();       // o baixo e a bateria recebem harmonia e BPM novos agora
+}
+
+// ALAVANCA do JACKPOT: um riddim novo inteiro, sempre reggae. Sorteia uma das músicas do banco de RIDDIMS
+// (harmonia, BPM e os músicos certos dela), o hi-hat e a semente. Tudo aparece na tela; é só apertar PLAY.
 void MrmProcessor::randomRiddim()
 {
     juce::Random rng;
-    auto set = [] (juce::AudioProcessorValueTreeState& s, const juce::String& id, float v)
-    {
-        if (auto* p = s.getParameter (id))
-        {
-            p->beginChangeGesture();
-            p->setValueNotifyingHost (p->convertTo0to1 (v));
-            p->endChangeGesture();
-        }
-    };
-
-    // --- harmonia: sempre uma progressão de verdade do banco de PRESETS (músicas e riddims clássicos)
-    chords.applyPreset (rng.nextInt (dubpresets::numPresets));
-
-    // --- bateria: estilo (com o bumbo e a caixa dele), baterista e hi-hat
-    const int style = rng.nextInt (2);   // ROCKERS ou ONE DROP (o BOOM BAP não é reggae)
-    set (drums.apvts, "style", (float) style);
-    drums.applyStyleDefaults (style);
-    set (drums.apvts, "drummer", (float) rng.nextInt (5));
-    set (drums.apvts, "hatPattern", (float) rng.nextInt (3));   // colcheia, semicolcheia ou contratempo
-    set (drums.apvts, "backbeat", 0.0f);                       // caixa na batida principal
-    set (drums.apvts, "fill", 0.0f);
-
-    // --- baixista (o skank é sempre no contratempo)
-    set (bass.apvts, "style", (float) rng.nextInt (mbm::NumStyles));
-
-    syncLinks();       // o baixo recebe a harmonia nova agora
-    newRiddim();       // e a semente nova gira os rolos do JACKPOT
+    applyRiddimPreset (rng.nextInt (dubpresets::numPresets));
+    setRiddimParam (drums.apvts, "hatPattern", (float) rng.nextInt (3));   // colcheia, semicolcheia ou contratempo
+    newRiddim();       // a semente nova gira os rolos do JACKPOT
 }
 
 //==============================================================================

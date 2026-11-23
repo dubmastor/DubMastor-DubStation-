@@ -121,7 +121,7 @@ int main (int argc, char** argv)
     {
         // banco de presets: cada um aplica raiz/qualidade/duração e liga só os acordes do preset; o baixo segue
         auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
-        bool ok = dubpresets::numPresets == 60 && dubpresets::numFolders == 6;
+        bool ok = dubpresets::numPresets == 90 && dubpresets::numFolders == 9;
         for (int f = 0; f < dubpresets::numFolders; ++f)
         {
             int n = 0;
@@ -131,8 +131,11 @@ int main (int argc, char** argv)
         for (int i = 0; i < dubpresets::numPresets && ok; ++i)
         {
             const auto& pr = dubpresets::presets[i];
-            proc.getChords().applyPreset (i);
+            proc.applyRiddimPreset (i);
             pump();
+            // o riddim inteiro: BPM, estilo, baterista e baixista do preset
+            if ((int) std::lround (get (proc.apvts, "bpm")) != pr.bpm || (int) get (proc.getDrums().apvts, "style") != pr.kit
+                || (int) get (proc.getDrums().apvts, "drummer") != pr.drummer || (int) get (b, "style") != pr.bassist) ok = false;
             for (int k = 0; k < 4; ++k)
             {
                 const juce::String n (k);

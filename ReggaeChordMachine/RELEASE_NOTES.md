@@ -1,3 +1,13 @@
+## Mastor Reggae Chord Machine MRCM-1240 1.9 🟢🟡⚫
+
+- **90 riddims clássicos em 9 pastas por estilo e época (10 em cada):** EARLY REGGAE - 1968 A 72 (nova: Israelites, Monkey Man, 54-46, Rivers of Babylon, Duppy Conqueror, Small Axe, The Harder They Come...), ROOTS - ANOS 70, ROCKERS - FIM DOS 70, **RUB A DUB - VOLCANO E ANOS 80** (Fire House Rock, Ice Cream Love, Peeni Walli do Eek-A-Mouse...), **GREGORY ISAACS - COOL RULER** (nova: Night Nurse, Soon Forward, Front Door, Cool Down the Pace...), **DIGITAL - KING JAMMY E 85-89** (nova: Sleng Teng, Ring the Alarm, Budy Bye, Greetings, Punaany...), LOVERS ROCK, DANCEHALL - ANOS 90 e NEW ROOTS - ANOS 2000
+- Cada preset agora também guarda o BPM sugerido e os músicos (usados pelo **MRM-0420**); no MRCM-1240 continua mudando só os acordes
+- Os presets que vêm de detecção automática de acordes estão marcados **[auto]** no nome
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Chord Machine MRCM-1240 1.8 🟢🟡⚫
 
 - **PRESETS conferidos, só músicas de verdade:** o banco agora tem **60 harmonias de músicas clássicas**, no tom da gravação, conferidas em cifras públicas (as progressões genéricas saíram). São **6 pastas por estilo e década, 10 músicas em cada**:

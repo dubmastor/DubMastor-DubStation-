@@ -78,6 +78,19 @@ private:
     float value = 0.0f, dragStart = 0.0f;
 };
 
+// FIRE da sirene: segura = toca (parâmetro sirFire do Big Knob), solta = as repetições continuam no delay
+class SirenFire : public juce::Component
+{
+public:
+    explicit SirenFire (juce::RangedAudioParameter&);
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+private:
+    juce::ParameterAttachment att;
+    bool down = false;
+};
+
 // Arraste para a timeline: uma máquina só (machine >= 0) ou o riddim inteiro (machine = -1)
 class DragZone : public juce::Component
 {
@@ -223,7 +236,7 @@ private:
 class MainPage : public juce::Component, private juce::Timer
 {
 public:
-    static constexpr int kW = 1280, kH = 1002;
+    static constexpr int kW = 1280, kH = 1142;
     explicit MainPage (MrmProcessor&);
     ~MainPage() override;
     void paint (juce::Graphics&) override;
@@ -283,12 +296,16 @@ private:
     std::unique_ptr<PowerSwitch> fxPower, echoPower;
     std::unique_ptr<MusicianKeys> drumStyle, filterMode;   // estilo de reggae da bateria; HIGH/LOW PASS do Big Knob
     std::unique_ptr<BigDial> bigKnob;
+    std::unique_ptr<PowerSwitch> knobBypass, sirenHold;                 // BYPASS do Big Knob; HOLD da sirene
+    std::unique_ptr<SirenFire> sirenFire;
+    std::unique_ptr<MusicianKeys> sirenWave;
+    std::array<std::unique_ptr<BigDial>, 6> sirenDials;                 // PITCH, RATE, DEPTH, DELAY, REPEATS, LEVEL
     std::unique_ptr<MuteKey> muteDrums, muteBass, muteRiddim;
     GrilleSpeaker speaker;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
-    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection;
+    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection, sirenSection;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPage)
 };

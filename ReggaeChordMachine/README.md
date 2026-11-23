@@ -1,8 +1,8 @@
-# Mastor Reggae Chord Machine MRCM-1240 1.8
+# Mastor Reggae Chord Machine MRCM-1240 1.9
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.8/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.8/MastorReggaeChordMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.9/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-1.9/MastorReggaeChordMachine-macOS.zip)**
 
 **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/chords/)**: monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
 
@@ -55,21 +55,27 @@ Mexer em qualquer controle com o **PREVIEW** tocando é seguro: o loop novo é m
 - **EXPORTAR:** salva o `.mid` (padrão: Documentos/Mastor Reggae Chord Machine). **REPETIR** exporta o loop 1, 2, 4 ou 8 vezes.
 - **MIDI ao vivo:** o plugin também manda as notas como MIDI para outros instrumentos: canal 1 = skank, canal 3 = bubble.
 
-## PRESETS (banco de harmonias clássicas)
-O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de harmonias de **músicas clássicas do reggae**: 60 músicas,
-10 em cada pasta, separadas por estilo e década. Escolher uma ajusta os acordes, a duração de cada um e quais ficam ligados
-(inversão em AUTO); depois é só mexer à vontade. Cada preset está no tom da gravação original; sétimas viram tríades e, quando
-a música tem várias partes, fica o groove principal. As cifras foram conferidas em sites públicos (Ultimate Guitar, E-Chords,
-GuitarTabs.cc, GuitarTabsExplorer, Ukulele-Tabs) em nov/2026; o que não tinha cifra confiável ficou de fora.
+## PRESETS (banco de riddims clássicos)
+O botão verde **PRESETS ▾** (na faixa do LOOP) abre o banco de **riddims clássicos do reggae**: 90 músicas, 10 em cada pasta,
+separadas por estilo e época, do early reggae ao new roots. No MRCM-1240 o preset ajusta os acordes, a duração de cada um e
+quais ficam ligados (inversão em AUTO). No **MRM-0420** ele monta o riddim inteiro: harmonia, **BPM sugerido**, estilo da
+bateria e os **músicos das máquinas mais próximos de quem gravou** (baterista do MRDM-12 e baixista do MRBM-69).
+Cada preset está no tom da gravação original; sétimas viram tríades e, quando a música tem várias partes, fica o groove
+principal. As cifras foram conferidas em nov/2026 em sites de cifra feitos por pessoas (Ultimate Guitar, E-Chords,
+GuitarTabs.cc, GuitarTabsExplorer, Ukulele-Tabs, Recifra); as marcadas **[auto]** no nome vêm de detecção automática
+(ChordU/ChordIntel) e vale conferir de ouvido. O BPM é o andamento típico da época e do estilo, não uma medição da gravação.
 
-| Pasta | Músicas |
-|---|---|
-| **ROOTS - ANOS 70** | Satta Massagana, Pressure Drop, Marcus Garvey, Natural Mystic, Exodus, Jamming, One Love, Smile Jamaica (Marley), Police and Thieves, Roots |
-| **ROCKERS - FIM DOS 70** | Legalize It, Burial, Uptown Top Ranking, Money in My Pocket, Now That We Found Love, Ku Klux Klan, Soldiers, One Drop, Could You Be Loved, Buffalo Soldier |
-| **RUB A DUB - ANOS 80** | Night Nurse, Here I Come, Under Mi Sensi, Sensimilla, Pass the Kouchie, Bam Bam, Cool Down the Pace, Truths and Rights, Sinsemilla (Black Uhuru), Shine Eye Gal |
-| **LOVERS ROCK - 70 A 90** | Help Me Make It Through the Night, Is This Love, Waiting in Vain, Red Red Wine, Kingston Town (UB40), Close to You, Rockaway, Tempted to Touch, My Number One, Wild World |
-| **DANCEHALL - 80 E 90** | Ring the Alarm, Mr. Loverman, Informer, Sweat, Here Comes the Hotstepper, You Don't Love Me, Boombastic, It Wasn't Me, Get Busy, Temperature |
-| **NEW ROOTS - ANOS 2000** | She's Royal, Welcome to Jamrock, Herbalist, Kingston Town (Alborosie), Mystical Reggae, Callin, Ganja Farmer, Dem Gone, Access Granted, Smile Jamaica (Chronixx) |
+| Pasta | Músicas | BPM e músicos sugeridos (MRM-0420) |
+|---|---|---|
+| **EARLY REGGAE - 1968 A 72** | Israelites, 54-46 That's My Number, Monkey Man, Wonderful World, Long Shot Kick de Bucket, Rivers of Babylon, Duppy Conqueror, Small Axe, You Can Get It, The Harder They Come | 78-88 · one drop · Carlton Barrett + Leroy Sibbles (Wailers/Upsetters: Family Man) |
+| **ROOTS - ANOS 70** | Satta Massagana, Pressure Drop, Marcus Garvey, Smile Jamaica, Police and Thieves, Natural Mystic, Exodus, Jamming, One Love, Roots | 70-80 · one drop · Carlton Barrett + Family Man (Burning Spear: Robbie) |
+| **ROCKERS - FIM DOS 70** | Legalize It, Burial, Uptown Top Ranking, Now That We Found Love, Ku Klux Klan, Soldiers, Money in My Pocket, One Drop, Could You Be Loved, Buffalo Soldier | 76-84 · rockers · Sly Dunbar + Robbie (Marley: Carlton + Family Man) |
+| **RUB A DUB - VOLCANO E ANOS 80** | Shine Eye Gal, Truths and Rights, Sensimilla, Sinsemilla, Fire House Rock, Ice Cream Love, Pass the Kouchie, Bam Bam, Here I Come, Peeni Walli (Eek-A-Mouse) | 74-86 · rockers · Style Scott + Flabba (Roots Radics); Black Uhuru: Sly + Robbie |
+| **GREGORY ISAACS - COOL RULER** | My Number One, Soon Forward, Not the Way, Front Door, Night Nurse, Cool Down the Pace, Private Secretary, If I Don't Have You, Hard Drugs, Good Morning | 72-82 · Style Scott + Flabba (Soon Forward: Sly + Robbie) |
+| **DIGITAL - KING JAMMY E 85-89** | Under Mi Sleng Teng, Ring the Alarm, Lots of Sign, Rub a Dub Market, Run Come Call Me, Budy Bye, Greetings, Winsome, Sonia Come Back (Punaany), She Loves Me Now (Real Rock) | 80-94 · rockers · Digikal + Jammys |
+| **LOVERS ROCK - 69 A 94** | Many Rivers to Cross, Help Me Make It Through the Night, Waiting in Vain, Is This Love, Red Red Wine, Wild World, Kingston Town (UB40), Tempted to Touch, Close to You, Rockaway | 70-82 · one drop · Santa Davis + Leroy Sibbles |
+| **DANCEHALL - ANOS 90** | Mr. Loverman, Informer, Sweat, Here Comes the Hotstepper, You Don't Love Me, Boombastic, Under Mi Sensi, It Wasn't Me, Get Busy, Temperature | 82-104 · rockers · Digikal + Derrick Barnett (Sly + Robbie nos de Taxi) |
+| **NEW ROOTS - ANOS 2000** | Welcome to Jamrock, Ganja Farmer, She's Royal, Herbalist, Kingston Town (Alborosie), Mystical Reggae, Callin, Access Granted, Smile Jamaica (Chronixx), Dem Gone | 72-82 · one drop · Santa Davis + Family Man |
 
 O mesmo banco está no **MRM-0420** e nas versões para celular. Fonte única: `tools/harmony_presets.py`
 (gera `Source/HarmonyPresets.h` e `site/chords/presets.js`).

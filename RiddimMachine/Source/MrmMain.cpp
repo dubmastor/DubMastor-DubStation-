@@ -140,7 +140,7 @@ void BigDial::mouseDrag (const juce::MouseEvent& e)
     const float v = juce::jlimit (0.0f, 1.0f, dragStart - (float) e.getDistanceFromDragStartY() / 220.0f);
     att.setValueAsPartOfGesture (param.convertFrom0to1 (v));
 }
-void BigDial::mouseDoubleClick (const juce::MouseEvent&) { att.setValueAsCompleteGesture (param.convertFrom0to1 (0.0f)); }
+void BigDial::mouseDoubleClick (const juce::MouseEvent&) { att.setValueAsCompleteGesture (param.convertFrom0to1 (param.getDefaultValue())); }
 void BigDial::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
 {
     att.setValueAsCompleteGesture (param.convertFrom0to1 (juce::jlimit (0.0f, 1.0f, value + w.deltaY * 0.15f)));
@@ -191,6 +191,41 @@ void BigDial::paint (juce::Graphics& g)
     const float p1 = kr * 0.25f, p2 = kr * 0.92f;
     g.setColour (col::jamRed);
     g.drawLine (ctr.x + std::sin (ang) * p1, ctr.y - std::cos (ang) * p1, ctr.x + std::sin (ang) * p2, ctr.y - std::cos (ang) * p2, 4.0f);
+}
+
+//==============================================================================
+// SirenFire
+SirenFire::SirenFire (juce::RangedAudioParameter& p)
+    : att (p, [this] (float v) { down = v > 0.5f; repaint(); }, nullptr)
+{
+    att.sendInitialUpdate();
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
+}
+void SirenFire::mouseDown (const juce::MouseEvent&) { att.setValueAsCompleteGesture (1.0f); }
+void SirenFire::mouseUp (const juce::MouseEvent&)   { att.setValueAsCompleteGesture (0.0f); }
+void SirenFire::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat();
+    const float size = juce::jmin (r.getWidth(), r.getHeight()) - 6.0f;
+    auto c = r.withSizeKeepingCentre (size, size);
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.fillEllipse (c.translated (2.0f, 4.0f));
+    juce::ColourGradient bezel (juce::Colour (0xffd9d4c8), c.getX(), c.getY(), juce::Colour (0xff4a463f), c.getRight(), c.getBottom(), false);
+    g.setGradientFill (bezel);
+    g.fillEllipse (c);
+    auto cap = c.reduced (size * 0.1f).translated (0, down ? 2.0f : 0.0f);
+    const auto red = juce::Colour (0xffe8432c);
+    juce::ColourGradient cg (down ? red.brighter (0.5f) : red, cap.getX(), cap.getY(), red.darker (0.8f), cap.getX(), cap.getBottom(), false);
+    g.setGradientFill (cg);
+    g.fillEllipse (cap);
+    if (down)
+    {
+        g.setColour (red.withAlpha (0.35f));
+        g.fillEllipse (c.expanded (3.0f));
+    }
+    g.setColour (juce::Colours::white.withAlpha (down ? 0.95f : 0.8f));
+    g.setFont (stencil (size * 0.2f, 0.12f));
+    g.drawText ("FIRE", cap, juce::Justification::centred);
 }
 
 //==============================================================================
@@ -976,6 +1011,21 @@ MainPage::MainPage (MrmProcessor& p)
     addAndMakeVisible (*bigKnob);
     filterMode = std::make_unique<MusicianKeys> (*k.getParameter ("mode"), juce::StringArray { "HIGH PASS", "LOW PASS" }, 2);
     addAndMakeVisible (*filterMode);
+    knobBypass = std::make_unique<PowerSwitch> (*k.getParameter ("bypass"), "BYPASS", "BYPASS");
+    addAndMakeVisible (*knobBypass);
+    // --- DUB SIREN (a sirene do Mastor Big Knob)
+    sirenFire = std::make_unique<SirenFire> (*k.getParameter ("sirFire"));
+    sirenHold = std::make_unique<PowerSwitch> (*k.getParameter ("sirHold"), "HOLD", "HOLD");
+    sirenWave = std::make_unique<MusicianKeys> (*k.getParameter ("sirWave"),
+                    juce::StringArray { "SENO", juce::String::fromUTF8 ("TRI\xc3\x82NG."), "QUADRADA", "SOBE", "DESCE" }, 5);
+    const char* sirenIds[] = { "sirPitch", "sirRate", "sirDepth", "sirDly", "sirFb", "sirLevel" };
+    for (size_t i = 0; i < sirenDials.size(); ++i)
+    {
+        sirenDials[i] = std::make_unique<BigDial> (*k.getParameter (sirenIds[i]));
+        addAndMakeVisible (*sirenDials[i]);
+    }
+    for (juce::Component* c : { (juce::Component*) sirenFire.get(), (juce::Component*) sirenHold.get(), (juce::Component*) sirenWave.get() })
+        addAndMakeVisible (*c);
     muteDrums  = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Drums)),  "DRUMS",  "MRDM-12",   juce::Colour (0xff2fbf55));
     muteBass   = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Bass)),   "BASS",   "MRBM-69",   col::jamGold);
     muteRiddim = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Chords)), "RIDDIM", "MRCM-1240", juce::Colour (0xffe8432c));
@@ -1018,7 +1068,7 @@ void MainPage::showPresets()
 {
     auto& c = proc.getChords();
     juce::PopupMenu menu;
-    menu.addSectionHeader (u8 ("HARMONIAS CL\xc3\x81SSICAS DO REGGAE  \xc2\xb7  VALEM PARA O SKANK E O BAIXO"));
+    menu.addSectionHeader (u8 ("RIDDIMS CL\xc3\x81SSICOS  \xc2\xb7  HARMONIA, BPM E OS M\xc3\x9aSICOS CERTOS"));
     for (int f = 0; f < dubpresets::numFolders; ++f)
     {
         juce::PopupMenu sub;
@@ -1029,12 +1079,15 @@ void MainPage::showPresets()
             juce::StringArray ch;
             for (int k = 0; k < pr.numChords; ++k)
                 ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
-            sub.addItem (i + 1, u8 (pr.name) + "   (" + pr.era + ")   " + ch.joinIntoString (" - "), true, c.getLastPreset() == i);
+            static const char* kits[] = { "ROCKERS", "ONE DROP" };
+            sub.addItem (i + 1, u8 (pr.name) + "   " + ch.joinIntoString (" - ") + u8 ("   \xc2\xb7  ") + juce::String (pr.bpm) + " BPM "
+                                    + kits[pr.kit] + u8 ("  \xc2\xb7  ") + juce::String (dubdrums::drummerName ((dubdrums::Drummer) pr.drummer)).toUpperCase()
+                                    + " + " + mbm::styleName (pr.bassist), true, c.getLastPreset() == i);
         }
         menu.addSubMenu (dubpresets::folders[f], sub);
     }
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presets),
-                        [this] (int r) { if (r > 0) proc.getChords().applyPreset (r - 1); });
+                        [this] (int r) { if (r > 0) proc.applyRiddimPreset (r - 1); });
 }
 
 void MainPage::timerCallback()
@@ -1075,9 +1128,11 @@ void MainPage::resized()
     harmonySection = { 52, 22, 1176, 272 };
     machineSection = { 52, 316, 1176, 330 };
     knobSection    = { 52, 668, 1176, 130 };
-    jackpotSection = { 52, 820, 520, 162 };
-    riddimSection  = { 592, 820, 386, 162 };
-    speakerArea    = { 992, 808, 236, 186 };
+    sirenSection   = { 52, 820, 1176, 122 };
+    constexpr int D = 140;   // o que vem depois da sirene desce
+    jackpotSection = { 52, 820 + D, 520, 162 };
+    riddimSection  = { 592, 820 + D, 386, 162 };
+    speakerArea    = { 992, 808 + D, 236, 186 };
 
     // harmonia: 4 acordes
     const int sw = (1176 - 24 - 36) / 4;
@@ -1113,7 +1168,8 @@ void MainPage::resized()
 
     // big knob · control room
     bigKnob->setBounds (70, 684, 112, 108);
-    filterMode->setBounds (196, 706, 220, 34);
+    filterMode->setBounds (196, 690, 220, 34);
+    knobBypass->setBounds (196, 742, 220, 40);
     fxPower->setBounds (436, 692, 186, 40);
     echoPower->setBounds (436, 742, 186, 40);
     muteDrums->setBounds (644, 688, 184, 98);
@@ -1121,15 +1177,22 @@ void MainPage::resized()
     muteRiddim->setBounds (1032, 688, 184, 98);
 
     // jackpot
-    reels.setBounds (64, 688 + 152, 156, 126);
-    jackpot.setBounds (226, 682 + 152, 196, 138);
-    lever.setBounds (432, 664 + 152, 96, 158);
+    // dub siren
+    sirenFire->setBounds (70, 836, 112, 100);
+    sirenHold->setBounds (196, 842, 150, 36);
+    sirenWave->setBounds (196, 892, 380, 40);
+    for (size_t i = 0; i < sirenDials.size(); ++i)
+        sirenDials[i]->setBounds (600 + (int) i * 103, 840, 84, 76);
+
+    reels.setBounds (64, 688 + 152 + D, 156, 126);
+    jackpot.setBounds (226, 682 + 152 + D, 196, 138);
+    lever.setBounds (432, 664 + 152 + D, 96, 158);
     presets.setBounds (1074, 8, 154, 28);
 
     // riddim
-    length->setBounds (606, 838, 170, 40);
-    exportBtn.setBounds (786, 838, 178, 40);
-    riddimDrag.setBounds (606, 886, 358, 84);
+    length->setBounds (606, 838 + D, 170, 40);
+    exportBtn.setBounds (786, 838 + D, 178, 40);
+    riddimDrag.setBounds (606, 886 + D, 358, 84);
 
     speaker.setBounds (speakerArea);
     renderBackground();
@@ -1181,7 +1244,7 @@ void MainPage::renderBackground()
     section (g, jackpotSection, u8 ("JACKPOT  \xc2\xb7  SEMENTE  \xc2\xb7  ALAVANCA"));
     {
         // placa da alavanca: o que ela sorteia
-        auto plate = juce::Rectangle<float> (526.0f, 840.0f, 40.0f, 126.0f);
+        auto plate = juce::Rectangle<float> (526.0f, 980.0f, 40.0f, 126.0f);   // 840 + 140 (abaixo da sirene)
         g.setColour (juce::Colour (0xff1c1915));
         g.fillRoundedRectangle (plate, 5.0f);
         g.setColour (col::jamGold.withAlpha (0.8f));
@@ -1196,9 +1259,16 @@ void MainPage::renderBackground()
     }
     section (g, riddimSection, "RIDDIM");
     section (g, knobSection, u8 ("BIG KNOB  \xc2\xb7  CONTROL ROOM  \xc2\xb7  MASTER"));
-    engraved (g, "FILTRO", juce::Rectangle<float> (196.0f, 688.0f, 220.0f, 13.0f), juce::Justification::centred, 9.0f, 0.3f);
-    engraved (g, u8 ("ARRASTE O BOT\xc3\x83O  \xc2\xb7  DUPLO CLIQUE ABRE"), juce::Rectangle<float> (196.0f, 748.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
-    engraved (g, u8 ("TUDO NA ABA CONTROL ROOM"), juce::Rectangle<float> (196.0f, 764.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
+    engraved (g, u8 ("FILTRO  \xc2\xb7  DUPLO CLIQUE NO BOT\xc3\x83O ABRE"), juce::Rectangle<float> (196.0f, 677.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
+    engraved (g, u8 ("BYPASS: DESLIGA O BIG KNOB INTEIRO"), juce::Rectangle<float> (196.0f, 727.0f, 220.0f, 11.0f), juce::Justification::centred, 6.5f, 0.15f);
+    engraved (g, u8 ("TUDO NA ABA CONTROL ROOM"), juce::Rectangle<float> (196.0f, 784.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
+
+    section (g, sirenSection, u8 ("DUB SIREN  \xc2\xb7  A SIRENE DO MASTOR BIG KNOB"));
+    engraved (g, u8 ("SEGURE O FIRE  \xc2\xb7  O DELAY CONTINUA DEPOIS"), juce::Rectangle<float> (196.0f, 882.0f, 380.0f, 9.0f), juce::Justification::centredLeft, 7.0f, 0.2f);
+    engraved (g, "FORMA DA ONDA", juce::Rectangle<float> (360.0f, 848.0f, 216.0f, 12.0f), juce::Justification::centredRight, 8.5f, 0.3f);
+    const char* sirenNames[] = { "PITCH", "RATE", "DEPTH", "DELAY", "REPEATS", "LEVEL" };
+    for (int i = 0; i < 6; ++i)
+        engraved (g, sirenNames[i], juce::Rectangle<float> (600.0f + i * 103.0f - 10.0f, 918.0f, 104.0f, 13.0f), juce::Justification::centred, 9.0f, 0.3f);
 
     // plaquetas de cada máquina
     const char* names[]  = { "BATERIA", "HARMONIA", "BAIXO" };
@@ -1242,6 +1312,6 @@ void MainPage::renderBackground()
     }
 
     // gravações da seção RIDDIM
-    engraved (g, "ARRASTE PARA A TIMELINE DA DAW", juce::Rectangle<float> (606.0f, 972.0f, 358.0f, 10.0f), juce::Justification::centred, 7.0f, 0.2f);
+    engraved (g, "ARRASTE PARA A TIMELINE DA DAW", juce::Rectangle<float> (606.0f, 1112.0f, 358.0f, 10.0f), juce::Justification::centred, 7.0f, 0.2f);
 }
 } // namespace mrmui
