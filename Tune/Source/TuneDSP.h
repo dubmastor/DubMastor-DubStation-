@@ -520,7 +520,7 @@ public:
     {
         std::fill (buf.begin(), buf.end(), 0.0f);
         w = 0; phase = 0; fill = 0;
-        shortC.fill (0.0f); longC.fill (0.0f);
+        shortC.fill (0.0f); longC.fill (0.0f); chordHist.fill (0.0f);
         keyRoot = -1; keyMinor = false; chordRoot = -1; chordMinor = false; activeFrames = 0; silentFrames = 0;
     }
 
@@ -539,6 +539,11 @@ public:
     }
 
     bool hasSignal() const { return activeFrames > 6 && silentFrames < 20; }
+    bool hasKey() const { return activeFrames > 6 && keyRoot >= 0; }
+    // aprende o tom de novo (o cromagrama longo começa do zero)
+    void relearn() { longC.fill (0.0f); chordHist.fill (0.0f); keyRoot = -1; activeFrames = 0; }
+    const std::array<float, 12>& getShortChroma() const { return shortC; }
+    const std::array<float, 12>& getLongChroma() const { return longC; }
 
     // tom a partir de um cromagrama qualquer (ex.: a harmonia do MRM) — devolve a tônica, minor = modo
     static int keyFromChroma (const std::array<float, 12>& c, bool& minor)
@@ -619,8 +624,6 @@ private:
             shortC[(size_t) i] += 0.45f * (c[(size_t) i] - shortC[(size_t) i]);
             longC[(size_t) i]  += 0.012f * (c[(size_t) i] - longC[(size_t) i]);
         }
-        // tom: correlação com os perfis de Krumhansl–Kessler
-        keyRoot = keyFromChroma (longC, keyMinor);
         // acorde do momento: tríade que mais bate com o cromagrama curto
         float bc = -1e9f;
         for (int r = 0; r < 12; ++r)
@@ -631,6 +634,19 @@ private:
                 for (int i = 0; i < 12; ++i) s += (mask & (1u << i)) ? shortC[(size_t) i] : -0.35f * shortC[(size_t) i];
                 if (s > bc) { bc = s; chordRoot = r; chordMinor = m == 1; }
             }
+        // histórico dos acordes (a terça de cada acorde conta inteira, mesmo com o baixo forte)
+        {
+            const uint16_t mask = triadMask (chordRoot, chordMinor);
+            for (int i = 0; i < 12; ++i)
+            {
+                const float v = (mask & (1u << i)) ? (i == chordRoot ? 1.4f : 1.0f) : 0.0f;
+                chordHist[(size_t) i] += 0.012f * (v - chordHist[(size_t) i]);
+            }
+        }
+        // tom: perfis de Krumhansl–Kessler sobre os acordes tocados + o cromagrama longo
+        std::array<float, 12> mix {};
+        for (int i = 0; i < 12; ++i) mix[(size_t) i] = chordHist[(size_t) i] + 0.35f * longC[(size_t) i];
+        keyRoot = keyFromChroma (mix, keyMinor);
     }
 
     static constexpr float kMaj[12] = { 6.35f, 2.23f, 3.48f, 2.33f, 4.38f, 4.09f, 2.52f, 5.19f, 2.39f, 3.66f, 2.29f, 2.88f };
@@ -655,7 +671,7 @@ private:
     std::vector<float> buf, winF, binW;
     std::vector<int> bin2pc;
     std::vector<std::complex<float>> work;
-    std::array<float, 12> shortC {}, longC {};
+    std::array<float, 12> shortC {}, longC {}, chordHist {};
     Biquad aa[2];
     int keyRoot = -1, chordRoot = -1;
     bool keyMinor = false, chordMinor = false;

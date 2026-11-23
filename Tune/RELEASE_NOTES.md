@@ -1,3 +1,13 @@
+## Mastor Tune MT-0420 1.1 — DubStation
+
+- **Link com o novo Mastor Key Scout MKS-0420**: coloque o Key Scout no MASTER e o Mastor Tune recebe o tom e os acordes do riddim sozinho, **sem sidechain** e sem roteamento, em qualquer DAW. Prioridade da harmonia: MRM-0420 → MIDI → Key Scout → sidechain → manual
+- **Teclado na parte de baixo** (C2 a B5), nas duas abas: acende em âmbar a nota para onde a voz está indo, marca com um anel vermelho a nota cantada e **apaga as notas fora do tom e da escala** — também na hora em que o tom é achado no riddim, no Key Scout ou no MRM
+- **BYPASS DO AFINADOR** ao lado do teclado: compara com a voz original sem tirar o processamento nem mudar a latência
+- Tom do riddim mais certeiro: o tom agora leva em conta os acordes tocados (a terça de cada acorde), então menor e maior não se confundem quando o baixo está forte
+- Versão para celular igual (teclado e bypass do afinador)
+
+---
+
 ## Mastor Tune MT-0420 1.0 — DubStation
 
 Primeira versão do **Mastor Tune**, o auto-tune do kit DubStation feito para reggae. Grátis.

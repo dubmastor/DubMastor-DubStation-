@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3d5a55">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Mastor Key Scout MKS-0420: descubra o tom e os acordes de um riddim no celular ou no navegador, sem instalar nada.">
+<title>Mastor Key Scout MKS-0420 1.0 — Dub Station</title>
+<style>
+:root{--plate:#e4d8bc;--ink:#2b241d;--inkSoft:#5c5144;--label:#1a1714;--cream:#efe5cc;--green:#0b8a3c;--gold:#eabd12;--amber:#ffa928;--teal:#3d5a55}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#120b06;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 6px 40px;min-height:100vh}
+.rack{display:flex;max-width:900px;margin:0 auto;border-radius:10px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 0 1px #000}
+.wood{width:16px;flex:none;background:repeating-linear-gradient(92deg,rgba(0,0,0,.18) 0 2px,transparent 2px 9px),linear-gradient(90deg,#6b4423,#3b2210 50%,#2e1a0d)}
+.unit{flex:1;min-width:0;background:radial-gradient(ellipse 300px 200px at 18% 62%,rgba(201,166,78,.16),transparent 70%),radial-gradient(ellipse 380px 240px at 78% 30%,rgba(201,166,78,.12),transparent 70%),linear-gradient(90deg,rgba(61,43,20,.25),transparent 26px,transparent calc(100% - 26px),rgba(61,43,20,.25)),linear-gradient(160deg,#e8ddc2,#e4d8bc 45%,#d9c895 80%,#c9b994)}
+header{background:linear-gradient(180deg,#456660,var(--teal) 60%,#33504b);border-bottom:3px solid #1f302d;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1{margin:0;color:#f3e6c8;font-weight:800;font-size:clamp(18px,4.6vw,26px);letter-spacing:.18em;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.sub{color:rgba(243,230,200,.75);font-size:10px;font-weight:800;letter-spacing:.2em;margin-top:4px}
+.brass{background:linear-gradient(180deg,#f2df9e,#d7b860 45%,#86692a);border-radius:5px;padding:5px 14px;box-shadow:0 3px 5px rgba(0,0,0,.45),inset 0 1px 0 #fff6c9}
+.brass span{display:block;border:1px solid rgba(80,55,10,.6);border-radius:3px;padding:3px 10px;font-weight:800;letter-spacing:.26em;color:#3a2a10;font-size:15px}
+.back{color:#f3e6c8;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(243,230,200,.5);border-radius:4px;padding:5px 9px}
+main{padding:14px 12px 10px;display:flex;flex-direction:column;gap:22px}
+.sec{position:relative;border:1.2px solid rgba(43,36,29,.55);border-radius:4px;box-shadow:1px 1px 0 rgba(255,255,255,.45),inset 1px 1px 0 rgba(255,255,255,.35);padding:22px 12px 12px}
+.tag{position:absolute;left:10px;top:-10px;background:var(--label);color:var(--cream);font-weight:800;font-size:11px;letter-spacing:.2em;padding:4px 10px;border-radius:2px;text-transform:uppercase;white-space:nowrap}
+.glass{background:linear-gradient(180deg,#2a1f14,#17110a);border:2px solid #0c0907;border-radius:4px;box-shadow:inset 0 2px 8px rgba(0,0,0,.8);color:var(--amber);text-shadow:0 0 6px rgba(255,169,40,.55);font-weight:800;letter-spacing:.14em;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 12px;min-height:44px}
+.bk{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#3a332b,#1c1915 55%,#141210);color:#b9ad95;border:1px solid #0b0907;border-radius:4px;box-shadow:0 2px 0 rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);font-weight:800;font-size:12px;letter-spacing:.12em;padding:8px 10px;min-height:44px;cursor:pointer;position:relative;touch-action:manipulation}
+.bk .lamp{width:11px;height:11px;border-radius:50%;background:#4a3a22;border:1px solid #000;flex:none}
+.bk.on{color:var(--amber)}.bk.on .lamp{background:radial-gradient(circle at 40% 40%,#fff3c4,#ffa928 55%,#b86a00);box-shadow:0 0 8px #ffa928}
+.bk.green{background:linear-gradient(180deg,#2fb35c,#0b8a3c 50%,#086a2e);color:var(--gold);border-color:#043a17;font-size:14px;letter-spacing:.16em}
+.bk.green.on .lamp{background:radial-gradient(circle,#d8ffd8,#3be070 60%);box-shadow:0 0 10px #3be070}
+.grid{display:grid;gap:8px}
+.cols{display:grid;gap:22px;grid-template-columns:1fr}
+@media(min-width:760px){.cols{grid-template-columns:1fr 1fr}}
+.kb{position:relative;height:110px;display:flex;touch-action:none;user-select:none}
+.kb .w{flex:1;background:linear-gradient(180deg,#f3ecd8,#dccfae);border:1px solid #6b5e48;border-radius:0 0 3px 3px;position:relative}
+.kb .w.off{background:linear-gradient(180deg,#8f877a,#6f675c)}
+.kb .b{position:absolute;top:0;height:60%;background:linear-gradient(180deg,#2a2520,#0d0b09);border:1px solid #000;border-radius:0 0 3px 3px;z-index:2;transform:translateX(-50%)}
+.kb .b.off{background:linear-gradient(180deg,#8a837a,#6a645c)}
+.kb .c{background:linear-gradient(180deg,#f3d9a0,#e7b860)!important;box-shadow:0 0 12px #ffa928}
+.kb .b.c{background:linear-gradient(180deg,#b06a10,#3a2206)!important}
+.kb .p{filter:brightness(.8)}
+.kb .lbl{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;font-weight:800;color:#5c5144}
+.hint{font-size:12px;color:var(--inkSoft);margin:8px 0 0;line-height:1.4}
+#start{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(10,7,4,.72);backdrop-filter:blur(3px)}
+#start .box{background:linear-gradient(160deg,#e8ddc2,#d9c895);border-radius:10px;padding:22px;max-width:420px;margin:14px;text-align:center;box-shadow:0 20px 50px #000}
+footer{display:flex;justify-content:space-between;align-items:center;padding:4px 14px 12px;gap:10px;flex-wrap:wrap;font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--inkSoft)}
+.sig{font-family:"Brush Script MT","Segoe Script",cursive;font-size:28px;color:var(--ink);border-bottom:3px solid var(--gold);transform:rotate(-3deg);letter-spacing:0}
+input[type=file]{display:none}
+canvas{display:block;width:100%}
+</style>
+</head>
+<body>
+<div id="start"><div class="box">
+  <h2 style="margin:0 0 8px;letter-spacing:.16em">MASTOR KEY SCOUT</h2>
+  <p style="font-size:13px;line-height:1.45">Abra um riddim (ou use o microfone perto da caixa de som) e o Key Scout mostra o tom, a escala e o acorde de cada momento.</p>
+  <button class="bk green on" id="go" style="width:100%"><span class="lamp"></span>LIGAR O ÁUDIO</button>
+</div></div>
+<div class="rack"><div class="wood"></div><div class="unit">
+<header>
+  <div><h1>MASTOR KEY SCOUT <span id="ver"></span></h1><div class="sub">ESCUTA O RIDDIM · MANDA O TOM AO MASTOR TUNE</div></div>
+  <div class="brass"><span>MKS-0420</span></div>
+  <a class="back" href="../../">← Dub Station</a>
+</header>
+<main>
+  <div class="sec"><span class="tag">Riddim</span>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      <button class="bk" id="fileBtn"><span class="lamp"></span>ABRIR RIDDIM</button>
+      <button class="bk" id="mic"><span class="lamp"></span>MICROFONE</button>
+      <button class="bk" id="demo"><span class="lamp"></span>RIDDIM DE TESTE</button>
+      <button class="bk green on" id="listen"><span class="lamp"></span>ESCUTAR RIDDIM</button>
+    </div>
+    <input type="file" id="file" accept="audio/*">
+  </div>
+  <div class="cols">
+    <div class="sec"><span class="tag">Tom do riddim · acorde agora</span>
+      <div class="glass" style="font-size:28px;min-height:70px" id="keyTxt">DÊ PLAY NO RIDDIM</div>
+      <div class="glass" style="margin-top:8px;justify-content:space-between"><span style="opacity:.6">ACORDE</span><span style="font-size:22px" id="chordTxt">--</span></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:8px">
+        <button class="bk" id="hold"><span class="lamp"></span>TRAVAR TOM</button>
+        <button class="bk" id="relearn"><span class="lamp"></span>APRENDER DE NOVO</button>
+      </div>
+    </div>
+    <div class="sec"><span class="tag">Notas que estão soando</span>
+      <canvas id="chroma" width="700" height="300" style="border-radius:4px"></canvas>
+    </div>
+  </div>
+  <div class="sec"><span class="tag">Teclado · toque para ouvir</span>
+    <div class="kb" id="kb"></div>
+    <p class="hint">Âmbar = notas do acorde de agora. Teclas apagadas = fora da escala do riddim. No plugin, o Key Scout vai no MASTER e manda o tom e os acordes para o Mastor Tune sem sidechain.</p>
+  </div>
+</main>
+<footer><span id="foot"></span><span class="sig">DubMastor</span></footer>
+</div><div class="wood"></div></div>
+<script>
+const VERSION = '1.0';   // mesma versão do plugin (KeyScout/CMakeLists.txt)
+document.getElementById('ver').textContent = VERSION;
+document.getElementById('foot').textContent = `MKS-0420 v${VERSION} · GRÁTIS · NO PLUGIN: VST3 · AU · AAX`;
+document.title = `Mastor Key Scout MKS-0420 ${VERSION} — Dub Station`;
+const NOTE=['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'], $=id=>document.getElementById(id);
+const KMAJ=[6.35,2.23,3.48,2.33,4.38,4.09,2.52,5.19,2.39,3.66,2.29,2.88], KMIN=[6.33,2.68,3.52,5.38,2.60,3.53,2.54,4.75,3.98,2.69,3.34,3.17];
+const triad=(r,m)=>(1<<r)|(1<<((r+(m?3:4))%12))|(1<<((r+7)%12));
+const scaleMask=(k,m)=>(m?[0,2,3,5,7,8,10]:[0,2,4,5,7,9,11]).reduce((a,i)=>a|(1<<((k+i)%12)),0);
+let ctx, an, src=null, mic=null, demoT=null, listen=true, hold=false, held=null;
+const S={shortC:new Array(12).fill(0),longC:new Array(12).fill(0),hist:new Array(12).fill(0),frames:0,silent:0,key:-1,minor:false,chord:-1,cm:false,signal:false};
+function corr(c,p,r){const mc=c.reduce((a,b)=>a+b)/12,mp=p.reduce((a,b)=>a+b)/12;let n=0,dc=0,dp=0;for(let i=0;i<12;i++){const x=c[(i+r)%12]-mc,y=p[i]-mp;n+=x*y;dc+=x*x;dp+=y*y}return n/Math.sqrt(dc*dp+1e-12)}
+// o mesmo ouvido do plugin: cromagrama -> acorde (tríades) -> tom (Krumhansl sobre os acordes tocados)
+const fd=new Float32Array(4096);
+function analyse(){ if(!an||!listen){S.signal=false;return} an.getFloatFrequencyData(fd); const hz=ctx.sampleRate/an.fftSize, c=new Array(12).fill(0); let e=0;
+  for(let b=1;b<fd.length;b++){const f=b*hz; if(f<60||f>2000) continue; const m=69+12*Math.log2(f/440), off=Math.abs(m-Math.round(m)); if(off>.35) continue; const a=Math.pow(10,fd[b]/20); e+=a; c[((Math.round(m)%12)+12)%12]+=a*(1-off/.35)/Math.sqrt(f/60)}
+  if(e<1e-3){ if(++S.silent>20) S.signal=false; return } S.silent=0; S.frames++; const mx=Math.max(...c,1e-9);
+  for(let i=0;i<12;i++){S.shortC[i]+=.45*(c[i]/mx-S.shortC[i]); S.longC[i]+=.012*(c[i]/mx-S.longC[i])}
+  let bc=-1e9; for(let r=0;r<12;r++)for(let m=0;m<2;m++){const mask=triad(r,m===1);let s=0;for(let i=0;i<12;i++)s+=(mask&(1<<i))?S.shortC[i]:-.35*S.shortC[i];if(s>bc){bc=s;S.chord=r;S.cm=m===1}}
+  const tm=triad(S.chord,S.cm); for(let i=0;i<12;i++) S.hist[i]+=.012*(((tm>>i)&1?(i===S.chord?1.4:1):0)-S.hist[i]);
+  const mix=S.hist.map((v,i)=>v+.35*S.longC[i]); let best=-2; for(let r=0;r<12;r++)for(let m=0;m<2;m++){const v=corr(mix,m?KMIN:KMAJ,r);if(v>best){best=v;S.key=r;S.minor=m===1}}
+  S.signal=S.frames>6 }
+async function init(){ ctx=new (window.AudioContext||window.webkitAudioContext)(); an=ctx.createAnalyser(); an.fftSize=8192; an.smoothingTimeConstant=.5; }
+function stopSrc(){ if(src){try{src.stop()}catch(e){} try{src.disconnect()}catch(e){} src=null} if(mic){mic.getTracks().forEach(t=>t.stop());mic=null} if(demoT){clearInterval(demoT);demoT=null} ['fileBtn','mic','demo'].forEach(i=>$(i).classList.remove('on')) }
+async function useFile(f){ stopSrc(); const b=await ctx.decodeAudioData(await f.arrayBuffer()); src=ctx.createBufferSource(); src.buffer=b; src.loop=true; src.connect(ctx.destination); src.connect(an); src.start(); $('fileBtn').classList.add('on') }
+async function useMic(){ stopSrc(); try{ mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); const s=ctx.createMediaStreamSource(mic); s.connect(an); src={stop(){},disconnect(){s.disconnect()}}; $('mic').classList.add('on') }catch(e){ alert('Não deu para abrir o microfone: '+e.message) } }
+function useDemo(){ stopSrc(); // riddim de teste em A menor: Am - Dm - Em - Am (baixo + skank)
+  const g=ctx.createGain(); g.gain.value=.5; g.connect(ctx.destination); g.connect(an); const prog=[[9,1],[2,1],[4,1],[9,1]]; let i=0;
+  const bar=()=>{ const [r,m]=prog[i++%4], t0=ctx.currentTime; const bass=ctx.createOscillator(), bg=ctx.createGain(); bass.type='triangle'; bass.frequency.value=440*Math.pow(2,(36+r-69)/12); bg.gain.setValueAtTime(.5,t0); bg.gain.setTargetAtTime(.2,t0+.3,.3); bass.connect(bg); bg.connect(g); bass.start(t0); bass.stop(t0+1.6);
+    for(let k=0;k<4;k++){ const ts=t0+.2+k*.4; [0,m?3:4,7].forEach(iv=>{const o=ctx.createOscillator(),og=ctx.createGain(); o.type='square'; o.frequency.value=440*Math.pow(2,(60+r+iv-69)/12); og.gain.setValueAtTime(0,ts); og.gain.linearRampToValueAtTime(.05,ts+.01); og.gain.setTargetAtTime(0,ts+.05,.04); o.connect(og); og.connect(g); o.start(ts); o.stop(ts+.3)}) } };
+  bar(); demoT=setInterval(bar,1600); src={stop(){},disconnect(){g.disconnect()}}; $('demo').classList.add('on') }
+// teclado C3..B5 (toque toca a nota)
+const KB=[]; (()=>{ const kb=$('kb'); let whites=0; for(let m=48;m<=83;m++) if(![1,3,6,8,10].includes(m%12)) whites++; let wi=0;
+  for(let m=48;m<=83;m++){ const black=[1,3,6,8,10].includes(m%12); const d=document.createElement('div'); d.className=black?'b':'w'; d.dataset.m=m;
+    if(black){d.style.left=(wi/whites*100)+'%'; d.style.width=(62/whites)+'%'} else {wi++; if(m%12===0){const l=document.createElement('span');l.className='lbl';l.textContent='C'+(m/12-1);d.appendChild(l)}}
+    $('kb').appendChild(d); KB[m]=d } })();
+$('kb').addEventListener('pointerdown',e=>{ const m=+e.target.dataset.m; if(!m||!ctx) return; const t=ctx.currentTime, o=ctx.createOscillator(), g=ctx.createGain(); o.type='triangle'; o.frequency.value=440*Math.pow(2,(m-69)/12); g.gain.setValueAtTime(.3,t); g.gain.setTargetAtTime(0,t+.15,.25); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t+1.5); e.target.classList.add('p'); setTimeout(()=>e.target.classList.remove('p'),180) });
+function draw(){ const learned=S.frames>6&&S.key>=0, key=hold&&held?held.key:S.key, minor=hold&&held?held.minor:S.minor;
+  $('keyTxt').textContent = (hold&&held)||learned ? NOTE[key]+(minor?' MENOR':' MAIOR')+(hold?'  · TRAVADO':'') : (S.signal?'APRENDENDO O TOM…':'DÊ PLAY NO RIDDIM');
+  $('chordTxt').textContent = S.signal&&S.chord>=0 ? NOTE[S.chord]+(S.cm?'m':'') : '--';
+  const sm=((hold&&held)||learned)?scaleMask(key,minor):0xfff, cm=S.signal?triad(S.chord,S.cm):0;
+  for(let m=48;m<=83;m++){ KB[m].classList.toggle('off',!(sm&(1<<(m%12)))); KB[m].classList.toggle('c',!!(cm&(1<<(m%12)))) }
+  const cv=$('chroma'), g=cv.getContext('2d'), W=cv.width, H=cv.height; g.fillStyle='#17110a'; g.fillRect(0,0,W,H); const bw=(W-20)/12;
+  for(let i=0;i<12;i++){ const x=10+i*bw, h=(S.signal?S.shortC[i]:0)*(H-46), inC=(cm>>i)&1; g.fillStyle='#1b2418'; g.fillRect(x+4,10,bw-8,H-46);
+    g.fillStyle=inC?'#ffa928':'#3be070'; g.fillRect(x+4,H-36-h,bw-8,h); g.fillStyle='#0e0c0a'; for(let y=10;y<H-36;y+=6) g.fillRect(x+4,y,bw-8,2);
+    g.fillStyle=inC?'#ffa928':'rgba(239,229,204,.6)'; g.font='800 18px system-ui'; g.textAlign='center'; g.fillText(NOTE[i],x+bw/2,H-12) } }
+$('go').onclick=async()=>{ await init(); await ctx.resume(); $('start').remove(); useDemo(); setInterval(()=>{analyse();draw()},100) };
+$('fileBtn').onclick=()=>$('file').click(); $('file').onchange=e=>{ if(e.target.files[0]) useFile(e.target.files[0]) };
+$('mic').onclick=useMic; $('demo').onclick=useDemo;
+$('listen').onclick=()=>{ listen=!listen; $('listen').classList.toggle('on',listen) };
+$('hold').onclick=()=>{ hold=!hold; held=hold&&S.key>=0?{key:S.key,minor:S.minor}:null; $('hold').classList.toggle('on',hold) };
+$('relearn').onclick=()=>{ S.longC.fill(0); S.hist.fill(0); S.frames=0; S.key=-1 };
+draw();
+</script>
+</body>
+</html>

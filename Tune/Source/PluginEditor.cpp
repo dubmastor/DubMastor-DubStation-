@@ -364,6 +364,96 @@ void CentsMeter::paint (juce::Graphics& g)
 }
 
 //==============================================================================
+void ScaleKeyboard::set (uint16_t m, float s, int t, bool b)
+{
+    const bool lit = s > 0.0f && ! b;
+    glow += ((lit ? 1.0f : 0.0f) - glow) * 0.35f;
+    if (m != mask || std::abs (s - sung) > 0.02f || t != target || b != byp || glow > 0.01f)
+    {
+        mask = m; sung = s; target = t; byp = b;
+        repaint();
+    }
+}
+
+void ScaleKeyboard::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat();
+    g.setColour (col::labelBg);
+    g.fillRoundedRectangle (r, 4.0f);
+    r = r.reduced (4.0f);
+    int whites = 0;
+    for (int m = kLow; m <= kHigh; ++m) if (! juce::MidiMessage::isMidiNoteBlack (m)) ++whites;
+    const float ww = r.getWidth() / (float) whites;
+    const int sungNote = sung > 0.0f ? juce::roundToInt (sung) : -1;
+    auto inScale = [this] (int m) { return ((mask >> (m % 12)) & 1) != 0; };
+
+    // teclas brancas
+    int wi = 0;
+    std::vector<std::pair<int, float>> blacks;
+    for (int m = kLow; m <= kHigh; ++m)
+    {
+        if (juce::MidiMessage::isMidiNoteBlack (m)) { blacks.push_back ({ m, r.getX() + ww * (float) wi }); continue; }
+        auto k = juce::Rectangle<float> (r.getX() + ww * (float) wi, r.getY(), ww, r.getHeight()).reduced (0.6f, 0);
+        ++wi;
+        const bool on = inScale (m);
+        const bool isT = ! byp && m == target, isS = m == sungNote;
+        juce::Colour top = on ? juce::Colour (0xfff3ecd8) : juce::Colour (0xff8f877a);
+        juce::Colour bot = on ? juce::Colour (0xffdccfae) : juce::Colour (0xff6f675c);
+        if (isT) { top = juce::Colour (0xfff3d9a0).interpolatedWith (top, 1.0f - glow); bot = juce::Colour (0xffe7b860).interpolatedWith (bot, 1.0f - glow); }
+        juce::ColourGradient kg (top, k.getX(), k.getY(), bot, k.getX(), k.getBottom(), false);
+        g.setGradientFill (kg);
+        g.fillRoundedRectangle (k, 2.0f);
+        g.setColour (col::ink.withAlpha (0.5f));
+        g.drawRoundedRectangle (k, 2.0f, 0.8f);
+        if (! on)
+        {
+            g.setColour (col::ink.withAlpha (0.35f));
+            g.drawLine (k.getX() + 4.0f, k.getBottom() - 24.0f, k.getRight() - 4.0f, k.getBottom() - 12.0f, 1.2f);
+        }
+        if (isT)
+        {
+            g.setColour (col::amber.withAlpha (0.4f * glow));
+            g.fillEllipse (juce::Rectangle<float> (16, 16).withCentre ({ k.getCentreX(), k.getBottom() - 14.0f }));
+            g.setColour (col::amber.withAlpha (glow));
+            g.fillEllipse (juce::Rectangle<float> (9, 9).withCentre ({ k.getCentreX(), k.getBottom() - 14.0f }));
+        }
+        if (isS && ! isT)
+        {
+            g.setColour (juce::Colour (0xffff5a3c));
+            g.drawEllipse (juce::Rectangle<float> (11, 11).withCentre ({ k.getCentreX(), k.getBottom() - 14.0f }), 2.0f);
+        }
+        if (m % 12 == 0)
+        {
+            g.setColour (col::inkSoft);
+            g.setFont (stencil (8.5f, 0.0f));
+            g.drawText ("C" + juce::String (m / 12 - 1), k.withTop (k.getBottom() - 11.0f), juce::Justification::centred);
+        }
+    }
+    // teclas pretas
+    for (auto [m, x] : blacks)
+    {
+        auto k = juce::Rectangle<float> (x - ww * 0.3f, r.getY(), ww * 0.6f, r.getHeight() * 0.6f);
+        const bool on = inScale (m);
+        const bool isT = ! byp && m == target, isS = m == sungNote;
+        juce::Colour top = on ? juce::Colour (0xff2a2520) : juce::Colour (0xff8a837a);
+        if (isT) top = juce::Colour (0xffb06a10).interpolatedWith (top, 1.0f - glow);
+        juce::ColourGradient kg (top, k.getX(), k.getY(), on ? juce::Colour (0xff0d0b09) : juce::Colour (0xff6a645c), k.getX(), k.getBottom(), false);
+        g.setGradientFill (kg);
+        g.fillRoundedRectangle (k, 2.0f);
+        if (isT)
+        {
+            g.setColour (col::amber.withAlpha (glow));
+            g.fillEllipse (juce::Rectangle<float> (7, 7).withCentre ({ k.getCentreX(), k.getBottom() - 9.0f }));
+        }
+        if (isS && ! isT)
+        {
+            g.setColour (juce::Colour (0xffff5a3c));
+            g.drawEllipse (juce::Rectangle<float> (9, 9).withCentre ({ k.getCentreX(), k.getBottom() - 9.0f }), 1.8f);
+        }
+    }
+}
+
+//==============================================================================
 NoteEditor::NoteEditor (MastorTuneProcessor& p) : proc (p) { setMouseCursor (juce::MouseCursor::PointingHandCursor); }
 
 juce::Rectangle<float> NoteEditor::rollArea() const { return getLocalBounds().toFloat().reduced (6.0f).withTrimmedLeft (34.0f); }
@@ -1167,6 +1257,14 @@ Panel::Panel (MastorTuneProcessor& p) : proc (p)
     }
     { auto& k = addToggle ("maxOn", "LIGADO", "DESLIGADO"); k.setBounds (910, 862, 226, 36); procPage.push_back (&k); }
 
+    // --- TECLADO + BYPASS DO AFINADOR (nas duas abas)
+    secKeys = { 50, 930, 1100, 104 };
+    bypassKey = &addKey ("BYPASS DO AFINADOR", [this] { setParam ("tuneBypass", param ("tuneBypass") > 0.5f ? 0.0f : 1.0f); },
+                         [this] { return param ("tuneBypass") > 0.5f; }, u8 ("S\xc3\x93 A VOZ ORIGINAL"));
+    bypassKey->setBounds (64, 948, 170, 74); bypassKey->fontSize = 12.0f;
+    keyboard = new ScaleKeyboard(); owned.emplace_back (keyboard);
+    keyboard->setBounds (246, 946, 890, 78); addAndMakeVisible (keyboard);
+
     showTab (0);
     startTimerHz (30);
 }
@@ -1292,7 +1390,7 @@ void Panel::renderBackground()
     section (g, secTabs, "ABAS");
     if (tab == 0)
     {
-        section (g, secHarm, u8 ("HARMONIA  \xc2\xb7  MRM \xe2\x86\x92 RIDDIM \xe2\x86\x92 MANUAL"));
+        section (g, secHarm, u8 ("HARMONIA  \xc2\xb7  MRM \xe2\x86\x92 MIDI \xe2\x86\x92 KEY SCOUT \xe2\x86\x92 SIDECHAIN \xe2\x86\x92 MANUAL"));
         section (g, secKey, u8 ("TOM  \xc2\xb7  ESCALA"));
         section (g, secKnob, u8 ("AFINA\xc3\x87\xc3\x83O  \xc2\xb7  CLEAN \xe2\x86\x94 ROB\xc3\x94"));
         section (g, secMeter, u8 ("MEDIDOR  \xc2\xb7  VOZ"));
@@ -1317,16 +1415,17 @@ void Panel::renderBackground()
         engraved (g, u8 ("CADEIA:  AFINA\xc3\x87\xc3\x83O \xe2\x86\x92 EQ \xe2\x86\x92 SATURADOR \xe2\x86\x92 BIG KNOB \xe2\x86\x92 TAPE ECHO \xe2\x86\x92 MAXIMIZER"),
                   { 64.0f, 520.0f, 820.0f, 14.0f }, juce::Justification::centredLeft, 9.0f, 0.16f);
     }
+    section (g, secKeys, u8 ("TECLADO  \xc2\xb7  NOTA CANTADA ACESA  \xc2\xb7  NOTAS FORA DA ESCALA APAGADAS"));
     // assinatura
     engraved (g, u8 ("v") + ver + u8 ("  \xc2\xb7  GR\xc3\x81TIS  \xc2\xb7  VST3  \xc2\xb7  AU  \xc2\xb7  AAX  \xc2\xb7  STANDALONE"),
-              { 64.0f, 922.0f, 600.0f, 14.0f }, juce::Justification::centredLeft, 9.0f, 0.2f);
+              { 64.0f, 1046.0f, 600.0f, 14.0f }, juce::Justification::centredLeft, 9.0f, 0.2f);
     g.setFont (script (34.0f));
     g.setColour (juce::Colours::white.withAlpha (0.35f));
-    g.drawText ("DubMastor", juce::Rectangle<float> (900.0f, 910.0f, 236.0f, 44.0f).translated (1.0f, 1.5f), juce::Justification::centredRight);
+    g.drawText ("DubMastor", juce::Rectangle<float> (900.0f, 1034.0f, 236.0f, 44.0f).translated (1.0f, 1.5f), juce::Justification::centredRight);
     g.setColour (col::ink);
-    g.drawText ("DubMastor", juce::Rectangle<float> (900.0f, 910.0f, 236.0f, 44.0f), juce::Justification::centredRight);
+    g.drawText ("DubMastor", juce::Rectangle<float> (900.0f, 1034.0f, 236.0f, 44.0f), juce::Justification::centredRight);
     g.setColour (col::jamGold);
-    g.drawLine (980.0f, 950.0f, 1136.0f, 946.0f, 2.5f);
+    g.drawLine (980.0f, 1074.0f, 1136.0f, 1070.0f, 2.5f);
 }
 
 void Panel::paint (juce::Graphics& g)
@@ -1347,17 +1446,27 @@ void Panel::paint (juce::Graphics& g)
         juce::String chord = "--";
         if (st.chordRoot >= 0) chord = juce::String (kNoteNames[st.chordRoot]) + (st.chordMinor ? "m" : "");
         else if (st.source == MastorTuneProcessor::SrcMidi) chord = "MIDI";
-        const char* srcNames[] = { "MANUAL", "RIDDIM", "MIDI", "MRM" };
-        glowText (g, u8 ("ACORDE ") + chord + u8 ("  \xc2\xb7  ") + srcNames[juce::jlimit (0, 3, st.source)],
+        const char* srcNames[] = { "MANUAL", "RIDDIM", "MIDI", "MRM", "KEY SCOUT" };
+        glowText (g, u8 ("ACORDE ") + chord + u8 ("  \xc2\xb7  ") + srcNames[juce::jlimit (0, 4, st.source)],
                   mrmGlass.withTrimmedRight (12.0f), juce::Justification::centredRight);
-        // --- riddim
+        // --- Key Scout (master) ou riddim pela entrada lateral
         darkGlass (g, riddimGlass);
-        const bool lit = st.riddimSignal;
-        lampDot (g, { riddimGlass.getX() + 16.0f, riddimGlass.getCentreY() }, lit, col::amber);
-        g.setFont (stencil (11.5f, 0.14f));
+        juce::String rtxt; bool lit = false;
+        if (st.scoutOpen)
+        {
+            lit = st.scoutSignal || st.scoutKey >= 0;
+            rtxt = st.scoutKey >= 0 ? "KEY SCOUT: " + juce::String (kNoteNames[st.scoutKey]) + (st.scoutMinor ? " MENOR" : " MAIOR")
+                                    : juce::String ("KEY SCOUT: OUVINDO");
+        }
+        else
+        {
+            lit = st.riddimSignal;
+            rtxt = param ("listen") < 0.5f ? "RIDDIM: PAUSADO" : lit ? "RIDDIM: OUVINDO" : st.riddimConnected ? "RIDDIM: SEM SOM" : "SEM KEY SCOUT / SIDECHAIN";
+        }
+        lampDot (g, { riddimGlass.getX() + 16.0f, riddimGlass.getCentreY() }, lit, st.scoutOpen ? juce::Colour (0xff5cff7a) : col::amber);
+        g.setFont (stencil (11.0f, 0.12f));
         g.setColour (col::amber.withAlpha (lit ? 1.0f : 0.6f));
-        g.drawFittedText (param ("listen") < 0.5f ? "RIDDIM: PAUSADO" : lit ? "RIDDIM: OUVINDO" : st.riddimConnected ? "RIDDIM: SEM SOM" : "RIDDIM: SEM ENTRADA",
-                          riddimGlass.withTrimmedLeft (30.0f).toNearestInt(), juce::Justification::centredLeft, 1);
+        g.drawFittedText (rtxt, riddimGlass.withTrimmedLeft (30.0f).withTrimmedRight (6.0f).toNearestInt(), juce::Justification::centredLeft, 1, 0.8f);
         // --- aviso da harmonia automática
         g.setColour (juce::Colour (0x141a1714));
         g.fillRoundedRectangle (infoBox, 4.0f);
@@ -1374,7 +1483,7 @@ void Panel::paint (juce::Graphics& g)
         g.setColour (col::ink);
         g.setFont (juce::Font (juce::FontOptions (12.0f, juce::Font::bold)));
         g.drawFittedText (u8 ("HARMONIA AUTOM\xc3\x81TICA: o Mastor Tune escuta o riddim e encontra sozinho o tom, a escala e os acordes. "
-                              "N\xc3\xa3o precisa configurar nada. Com o MRM-0420 aberto, ele l\xc3\xaa as harmonias direto; sem os dois, escolha o tom \xc3\xa0 m\xc3\xa3o."),
+                              "Coloque o Mastor Key Scout no MASTER (sem sidechain) ou abra o MRM-0420; sem nenhum dos dois, escolha o tom \xc3\xa0 m\xc3\xa3o."),
                           infoBox.withTrimmedLeft (38.0f).withTrimmedRight (8.0f).toNearestInt(), juce::Justification::centredLeft, 2, 0.9f);
 
         // --- tom
@@ -1472,6 +1581,7 @@ void Panel::timerCallback()
         if (k->isVisible()) k->repaint();
     }
     if (piano != nullptr && piano->shown != st.keyRoot) { piano->shown = st.keyRoot; piano->repaint(); }
+    if (keyboard != nullptr) keyboard->set (mt::scaleMask (st.keyRoot, st.scale), st.sungMidi, st.target, st.tuneBypass);
     if (tab == 0)
     {
         const float cents = st.sungMidi > 0 && st.target >= 0 ? (st.sungMidi - (float) st.target) * 100.0f : 0.0f;
