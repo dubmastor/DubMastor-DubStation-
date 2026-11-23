@@ -1,12 +1,12 @@
-name: Build Mastor Dub Battery Reggae DBR
+name: Build Mastor Reggae Drums MRD-12
 
-# O Mastor Dub Battery Reggae DBR usa o código do MRDM-12 direto da pasta dele:
+# O Mastor Reggae Drums MRD-12 usa o código do MRDM-12 direto da pasta dele:
 # quando o MRDM-12 muda, o Battery é recompilado e testado também.
 on:
   push:
     branches: [main]
     paths:
-      - 'DubBatteryReggae/**'
+      - 'ReggaeDrums/**'
       - 'RiddimBank/Source/**'
       - 'ReggaeDrumMachine/Source/**'
       - 'ReggaeDrumMachine/CMakeLists.txt'
@@ -14,10 +14,10 @@ on:
       - '.github/scripts/**'
       - '.github/installer/**'
     tags:
-      - 'DBR-*'
+      - 'MRD-12-*'
   pull_request:
     paths:
-      - 'DubBatteryReggae/**'
+      - 'ReggaeDrums/**'
       - 'RiddimBank/Source/**'
       - 'ReggaeDrumMachine/Source/**'
       - '.github/workflows/build-dubbatteryreggae.yml'
@@ -35,7 +35,7 @@ permissions:
 
 defaults:
   run:
-    working-directory: DubBatteryReggae
+    working-directory: ReggaeDrums
 
 jobs:
   render-test:
@@ -80,8 +80,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: DubBatteryReggae-teste
-          path: DubBatteryReggae/test-out
+          name: ReggaeDrums-teste
+          path: ReggaeDrums/test-out
 
   build:
     needs: render-test
@@ -118,7 +118,7 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip -OutFile pluginval.zip
           Expand-Archive pluginval.zip -DestinationPath pluginval
           # nível 10 (o mais rigoroso): estado, automação, buses, tempo real, várias taxas e tamanhos de bloco
-          ./pluginval/pluginval.exe --strictness-level 10 --timeout-ms 900000 --validate "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Dub Battery Reggae DBR.vst3" 2>&1 | Tee-Object -Variable pvlog
+          ./pluginval/pluginval.exe --strictness-level 10 --timeout-ms 900000 --validate "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" 2>&1 | Tee-Object -Variable pvlog
           $code = $LASTEXITCODE
           Write-Host "pluginval exit code: $code"
           if ($code -ne 0) { exit 1 }
@@ -136,7 +136,7 @@ jobs:
           cmake -B build -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=ON -DSMTG_RUN_VST_VALIDATOR=OFF
           cmake --build build --config Release --target validator --parallel 4
           $v = Get-ChildItem -Recurse -Filter validator.exe build | Select-Object -First 1
-          & $v.FullName "${{ github.workspace }}/DubBatteryReggae/build/DubBatteryReggae_artefacts/Release/VST3/Mastor Dub Battery Reggae DBR.vst3" 2>&1 | Tee-Object -Variable vlog
+          & $v.FullName "${{ github.workspace }}/ReggaeDrums/build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" 2>&1 | Tee-Object -Variable vlog
           $code = $LASTEXITCODE
           $vlog | Select-String -Pattern "Failed|ERROR" -Context 6,0 | ForEach-Object { Write-Host $_ }
           if ($code -ne 0) { Write-Host "validator falhou: $code"; exit 1 }
@@ -144,8 +144,8 @@ jobs:
       - name: Check universal binary + validate (macOS)
         if: runner.os == 'macOS'
         run: |
-          VST3="build/DubBatteryReggae_artefacts/Release/VST3/Mastor Dub Battery Reggae DBR.vst3"
-          BIN="$VST3/Contents/MacOS/Mastor Dub Battery Reggae DBR"
+          VST3="build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3"
+          BIN="$VST3/Contents/MacOS/Mastor Reggae Drums MRD-12"
           echo "== Arquiteturas do binário"; lipo -info "$BIN"
           lipo -info "$BIN" | grep -q x86_64 && lipo -info "$BIN" | grep -q arm64
           curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
@@ -153,26 +153,26 @@ jobs:
           ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate "$VST3"
           echo "== auval (validador da Apple para AU: Logic, GarageBand, Ableton e outros no Mac)"
           mkdir -p ~/Library/Audio/Plug-Ins/Components
-          cp -R "build/DubBatteryReggae_artefacts/Release/AU/Mastor Dub Battery Reggae DBR.component" ~/Library/Audio/Plug-Ins/Components/
+          cp -R "build/DubBatteryReggae_artefacts/Release/AU/Mastor Reggae Drums MRD-12.component" ~/Library/Audio/Plug-Ins/Components/
           killall -9 AudioComponentRegistrar 2>/dev/null || true
           sleep 2
           auval -v aumu Dbr1 Dblb
           echo "== pluginval no AU (o formato que o Logic usa)"
-          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate ~/Library/Audio/Plug-Ins/Components/"Mastor Dub Battery Reggae DBR.component"
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate ~/Library/Audio/Plug-Ins/Components/"Mastor Reggae Drums MRD-12.component"
 
       - name: Collect + package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force out | Out-Null
-          Copy-Item -Recurse "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Dub Battery Reggae DBR.vst3" out/
-          Copy-Item "build/DubBatteryReggae_artefacts/Release/Standalone/Mastor Dub Battery Reggae DBR.exe" out/ -ErrorAction SilentlyContinue
-          Compress-Archive -Path out/* -DestinationPath ../DBR-Windows.zip
+          Copy-Item -Recurse "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" out/
+          Copy-Item "build/DubBatteryReggae_artefacts/Release/Standalone/Mastor Reggae Drums MRD-12.exe" out/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path out/* -DestinationPath ../MRD-12-Windows.zip
 
       - name: Instalador (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Dub Battery Reggae DBR" -Sigla DBR -Saida ../DBR-Windows-Instalador.exe
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Reggae Drums MRD-12" -Sigla MRD-12 -Saida ../MRD-12-Windows-Instalador.exe
 
       - name: Conferir runtime embutido (Windows)
         if: runner.os == 'Windows'
@@ -185,41 +185,41 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir -p out
-          cp -R "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Dub Battery Reggae DBR.vst3" out/
-          cp -R "build/DubBatteryReggae_artefacts/Release/AU/Mastor Dub Battery Reggae DBR.component" out/
-          cp -R "build/DubBatteryReggae_artefacts/Release/Standalone/Mastor Dub Battery Reggae DBR.app" out/
+          cp -R "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" out/
+          cp -R "build/DubBatteryReggae_artefacts/Release/AU/Mastor Reggae Drums MRD-12.component" out/
+          cp -R "build/DubBatteryReggae_artefacts/Release/Standalone/Mastor Reggae Drums MRD-12.app" out/
           # assinatura ad-hoc para o macOS aceitar o plugin localmente
           codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
-          cd out && ditto -c -k --sequesterRsrc . ../../DBR-macOS.zip
+          cd out && ditto -c -k --sequesterRsrc . ../../MRD-12-macOS.zip
 
       - name: Instalador (macOS)
         if: runner.os == 'macOS'
-        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Dub Battery Reggae DBR" DBR ../DBR-macOS-Instalador.pkg
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Reggae Drums MRD-12" MRD-12 ../MRD-12-macOS-Instalador.pkg
 
       # instala o .pkg de verdade no runner e confere que o AU aparece para o macOS (Logic/GarageBand)
       - name: Testar o instalador (macOS)
         if: runner.os == 'macOS'
         run: |
-          sudo installer -pkg ../DBR-macOS-Instalador.pkg -target /
-          ls -la "/Library/Audio/Plug-Ins/VST3/" "/Library/Audio/Plug-Ins/Components/" | grep "Dub Battery"
+          sudo installer -pkg ../MRD-12-macOS-Instalador.pkg -target /
+          ls -la "/Library/Audio/Plug-Ins/VST3/" "/Library/Audio/Plug-Ins/Components/" | grep "Reggae Drums"
           killall -9 AudioComponentRegistrar 2>/dev/null || true
           sleep 3
           auval -v aumu Dbr1 Dblb | tail -3
 
       - uses: actions/upload-artifact@v4
         with:
-          name: DBR-${{ matrix.name }}
+          name: MRD-12-${{ matrix.name }}
           path: |
-            DBR-${{ matrix.name }}.zip
-            DBR-${{ matrix.name }}-Instalador.*
+            MRD-12-${{ matrix.name }}.zip
+            MRD-12-${{ matrix.name }}-Instalador.*
 
 
-  # Release própria do Mastor Dub Battery Reggae DBR: DBR-<versão do CMakeLists>, criada/atualizada a cada push
-  # na main que mexa no DBR (ou por tag DBR-x.y). Não vira a "latest", para não mexer
+  # Release própria do Mastor Reggae Drums MRD-12: MRD-12-<versão do CMakeLists>, criada/atualizada a cada push
+  # na main que mexa no MRD-12 (ou por tag MRD-12-x.y). Não vira a "latest", para não mexer
   # nos links /releases/latest/download dos outros plugins.
   release:
     needs: build
-    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/DBR-') || inputs.tag != '') }}
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRD-12-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -228,23 +228,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            DubBatteryReggae/RELEASE_NOTES.md
-            DubBatteryReggae/CMakeLists.txt
+            ReggaeDrums/RELEASE_NOTES.md
+            ReggaeDrums/CMakeLists.txt
           sparse-checkout-cone-mode: false
 
       - name: Versão
         id: ver
         run: |
-          V=$(sed -n 's/^project(DubBatteryReggae VERSION \([0-9]*\.[0-9]*\).*/\1/p' DubBatteryReggae/CMakeLists.txt)
-          echo "Versão do DBR: $V"
+          V=$(sed -n 's/^project(DubBatteryReggae VERSION \([0-9]*\.[0-9]*\).*/\1/p' ReggaeDrums/CMakeLists.txt)
+          echo "Versão do MRD-12: $V"
           test -n "$V"
-          echo "tag=DBR-$V" >> "$GITHUB_OUTPUT"
-          echo "name=Mastor Dub Battery Reggae DBR $V" >> "$GITHUB_OUTPUT"
+          echo "tag=MRD-12-$V" >> "$GITHUB_OUTPUT"
+          echo "name=Mastor Reggae Drums MRD-12 $V" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@v4
         with:
           path: dist
-          pattern: DBR-*
+          pattern: MRD-12-*
           merge-multiple: true
 
       - name: Conferir os arquivos
@@ -267,5 +267,5 @@ jobs:
             dist/*.zip
             dist/*-Instalador.exe
             dist/*-Instalador.pkg
-          body_path: DubBatteryReggae/RELEASE_NOTES.md
+          body_path: ReggaeDrums/RELEASE_NOTES.md
           make_latest: 'false'

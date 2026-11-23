@@ -14,6 +14,7 @@ on:
       - 'ReggaeDrumMachine/Source/**'
       - 'ReggaeDrumMachine/Samples/**'
       - 'ReggaeDrumMachine/CMakeLists.txt'
+      - 'ReggaeDrums/CMakeLists.txt'
       - 'ReggaeBassMachine/Source/**'
       - 'ReggaeBassMachine/CMakeLists.txt'
       - 'ReggaeDubBassInstrument/Source/**'

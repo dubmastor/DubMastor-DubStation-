@@ -227,7 +227,9 @@ jobs:
   # nos links /releases/latest/download dos outros plugins.
   release:
     needs: build
-    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRDM-12-') || inputs.tag != '') }}
+    # LEGADO: o MRDM-12 virou a aba DUB DRUMS do Mastor Reggae Drums MRD-12. O código continua compilado e testado
+    # (o MRD-12 e o MRM-0420 usam esta pasta), mas a release MRDM-12-2.7 fica congelada: só sai release por tag manual.
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (startsWith(github.ref, 'refs/tags/MRDM-12-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:

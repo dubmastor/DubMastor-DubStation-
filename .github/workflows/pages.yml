@@ -10,7 +10,7 @@ on:
   workflow_run:
     workflows:
       - 'Build Mastor Big Knob MBK-76'
-      - 'Build Mastor Dub Battery Reggae DBR'
+      - 'Build Mastor Reggae Drums MRD-12'
       - 'Build Mastor Dub Horns MDH-70'
       - 'Build Dub Station — instalador completo'
       - 'Build Mastor Phone Vox MPV-01'
