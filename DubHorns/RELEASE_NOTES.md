@@ -1,4 +1,16 @@
-## Mastor Dub Horns MDH-70 1.2 🟢🟡⚫
+## Mastor Dub Horns MDH-70 1.3 🟢🟡⚫
+
+**Timbre de sessão jamaicana dos anos 70 e 80, visor de presets sempre à vista e o plugin abrindo no dub.**
+
+- **Dinâmica de metal de verdade:** tocando fraco (pp) o som fica escuro; tocando forte (ff) os harmônicos agudos crescem muito, como medido em trompete e trombone acústicos. O teclado passa a mudar o *timbre*, não só o volume.
+- **Saxes com todos os harmônicos:** antes eles usavam onda quadrada (só harmônicos ímpares), o que dava um som oco de clarinete. Agora têm a série completa, como o tubo cônico do saxofone.
+- **Zumbido do lábio e da palheta** no ritmo de cada ciclo da nota, **3º formante** (o corpo do instrumento) e a **campana**, que irradia pouco grave.
+- **Naipe de sessão:** um músico lidera e entra primeiro, os outros chegam alguns milissegundos depois, cada um com a sua afinação e a sua força, como numa gravação ao vivo no estúdio.
+- **Fita e sala:** "head bump" da fita no grave (cresce com a Saturação) e a Sala com cara de plate de estúdio.
+- **Visor azul de presets sempre à vista**, entre o cabeçalho e as abas, como na Riddim Machine. A lista começa pelo **DUB** e o plugin **abre no "Tubby · naipe no eco"**, com o Tape Echo na frente (1/8 pontuada, intensidade 62%).
+- A janela ficou um pouco mais alta (1200 × 880) para caber o visor.
+
+### O que veio na 1.2
 
 **Metais mais naturais e a aba MÚSICOS.**
 

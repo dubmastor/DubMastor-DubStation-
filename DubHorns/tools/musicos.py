@@ -76,6 +76,10 @@ add(6,'Black Ark · fumaça','TEN · TBN · BAR','O naipe enfumaçado da Black A
 add(6,'Rádio AM de Kingston','TPT · TEN','Naipe pelo radinho: só médio, saturado, para quebras e intros de dub.',
     sec(trumpet=(.78,-.2,0,0),tenor=(.8,.2,-1,0)),'Stac',bright=.60,breath=.30,vib=.30,scoop=.30,attack=.9,release=.30,drive=.75,band=4800,lowcut=320,hiss=.35,human=.50,width=.3,growl=.30,room=.15,sync=4,fb=.50,send=.35,tone=2400,eq=EQ_RADIO)
 
+# a lista começa pelo DUB: o preset inicial do plugin é o "Tubby · naipe no eco" (delay na frente)
+ORDER=[6,0,1,2,3,4,5]
+F=[F[i] for i in ORDER]
+P.sort(key=lambda p: F.index(p['folder']))
 ART={'Ten':0,'Stac':1,'Fall':2,'Scoop':3,'Doit':4}
 def cstr(s): return '"'+s.replace('"','\\"')+'"'
 def fmt(v): 
@@ -91,6 +95,7 @@ if sys.argv[1]=='cpp':
        'inline constexpr int numFolders = %d;'%len(F),
        'inline constexpr const char* folders[numFolders] = { '+', '.join(cstr(x) for x in F)+' };',
        'inline constexpr int numPresets = %d;'%len(P),
+       'inline constexpr int defaultPreset = 0;   // Tubby · naipe no eco: o plugin abre com o delay',
        'inline const Preset presets[numPresets] = {']
     for p in P:
         secs=', '.join('{ %d, %d, %d, %s, %s }'%(p['naipe'][i]['on'],p['naipe'][i]['oct'],p['naipe'][i]['harm'],fmt(float(p['naipe'][i]['lvl'])),fmt(float(p['naipe'][i]['pan']))) for i in INST)
@@ -102,4 +107,5 @@ if sys.argv[1]=='cpp':
 else:
     out=[dict(f=p['folder'],n=p['name'],r=p['role'],d=p['desc'],a=ART[p['artic']],sec=[p['naipe'][i] for i in INST],t={k:p[k] for k in TIMBRE},echo=dict(on=p['echoOn'],sync=p['sync'],fb=p['fb'],send=p['send'],tone=p['tone']),eq=p['eq']) for p in P]
     print('const MUSICOS_FOLDERS = '+json.dumps(F,ensure_ascii=False)+';')
+    print('const MUSICO_INICIAL = 0;   // Tubby · naipe no eco')
     print('const MUSICOS = '+json.dumps(out,ensure_ascii=False,separators=(',',':'))+';')

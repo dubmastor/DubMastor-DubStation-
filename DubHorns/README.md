@@ -1,6 +1,6 @@
 # Mastor Dub Horns 🎺 — Dub Station
 
-**Mastor Dub Horns MDH-70 1.2.** Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU** (Mac) e app standalone. Também toca no navegador: <https://dubmastor.github.io/DubMastor-DubStation-/web/dubhorns/>
+**Mastor Dub Horns MDH-70 1.3.** Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU** (Mac) e app standalone. Também toca no navegador: <https://dubmastor.github.io/DubMastor-DubStation-/web/dubhorns/>
 
 ![Naipe](docs/interface-naipe.png)
 
@@ -13,7 +13,7 @@
 | **Mastor Tape Echo** | Eco de fita com 3 cabeças (1×, 2×, 3×), sync com a DAW ou tempo livre, intensidade, envio, volume, agudos, graves, wow & flutter, saturação, **Dub Throw** (segure o botão ou o pedal de sustain) e auto-oscilação. |
 | **Equalizador** | EQ gráfico de 10 bandas (±12 dB) com curva e **Filtro Tubby** (passa-altas ressonante). |
 | **Frases MIDI** | 8 ataques curtos estilo Dean Fraser e 6 frases de introdução. A sugestão traz o ritmo e a articulação (staccato, fall, scoop, doit); **as notas são escolhidas por você**, na lista ou tocando no teclado com *Escolher pelo teclado*. A frase toca junto com a DAW (ou no clock interno) e dá para arrastar/exportar o `.mid`, com uma trilha por instrumento já harmonizada. |
-| **Músicos** | Presets no padrão da Riddim Machine (visor azul, ESTILO ◀ ▶, MÚSICO ◀ ▶, LISTA): 24 estilos de músicos e naipes jamaicanos (Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis, Roland Alphonso, Rico Rodriguez…). Carrega naipe, timbre, eco e EQ; o tom e a escala continuam os seus. |
+| **Músicos** | Presets no padrão da Riddim Machine (visor azul **sempre à vista** acima das abas, ESTILO ◀ ▶, MÚSICO ◀ ▶, LISTA; abre no "Tubby · naipe no eco", com o Tape Echo na frente): 24 estilos de músicos e naipes jamaicanos (Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis, Roland Alphonso, Rico Rodriguez…). Carrega naipe, timbre, eco e EQ; o tom e a escala continuam os seus. |
 
 | Timbre | Tape Echo |
 |---|---|

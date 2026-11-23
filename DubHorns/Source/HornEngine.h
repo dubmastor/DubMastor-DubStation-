@@ -227,7 +227,8 @@ struct Voice
     float vibPh = 0, vibRate = 5, vibRateCur = 5, vibDepth = 0, vibDepthCur = 0, vibRamp = 0, vibInc = 0, vibVal = 0;
     int vibWait = 0;
 
-    Svf lp; Biquad f1, f2; float q = 1;
+    Svf lp; Biquad f1, f2, f3, bell; float q = 1;
+    float nlG = 1, nlK = 0, buzzAmt = 0, brightK = 1;   // v1.3: dinâmica dos harmônicos e zumbido do lábio/palheta
     float cut = 500, cutBase = 500, cutPeak = 1000, cutTarget = 500, cutCoef16 = 0, cutInc16 = 0; int cutStage = 0;
 
     float amp = 0, ampPeak = 1, ampSus = 0.7f, ampInc = 0, ampCoef = 0, relCoef = 0; int ampStage = 0;
@@ -244,7 +245,7 @@ struct Voice
     Rng rng;
 
     void start (int instIdx, int midi, float vel, int articIn, int srcId, int srcNoteIn,
-                const Params& P, float sampleRate, uint32_t ageIn, Rng& r)
+                const Params& P, float sampleRate, uint32_t ageIn, Rng& r, float delaySec = -1.0f, float sessionCents = 0.0f)
     {
         const auto& D = instruments()[(size_t) instIdx];
         const auto& S = P.inst[(size_t) instIdx];
@@ -254,8 +255,8 @@ struct Voice
         if (rng.s == 0) rng.s = 1;
 
         const float hum = P.human;
-        delay = (int) (r.uniform() * 0.02f * hum * sr);
-        const float det = r.next() * 5.0f * hum;
+        delay = (int) ((delaySec >= 0.0f ? delaySec : r.uniform() * 0.02f * hum) * sr);
+        const float det = r.next() * 4.0f * hum + sessionCents;
         numOsc = D.numOsc;
         for (int i = 0; i < 3; ++i)
         {
@@ -281,8 +282,8 @@ struct Voice
         vibWait = (int) ((0.16f + 0.14f * rng.uniform()) * sr / 16.0f); vibInc = 1.0f / (0.45f * sr / 16.0f);
 
         const float kt = std::pow (baseFreq / 440.0f, 0.45f);
-        cutBase = D.cut * kt * (0.55f + P.bright * 0.9f);
-        cutPeak = std::min (16000.0f, cutBase + D.env * kt * P.bright * (0.35f + vel * 1.1f));
+        cutBase = D.cut * kt * (0.55f + P.bright * 0.9f) * (0.45f + 0.75f * vel);   // pp fecha, ff abre (como no metal real)
+        cutPeak = std::min (16000.0f, cutBase + D.env * kt * P.bright * (0.08f + vel * vel * 1.37f));
         cut = cutBase * 0.5f; cutStage = 0;
         cutInc16 = (cutPeak - cut) / std::max (1.0f, atk * 1.3f * sr) * 16.0f;
         cutTarget = cutBase + (cutPeak - cutBase) * 0.5f;
@@ -290,6 +291,11 @@ struct Voice
         q = D.q; lp.reset(); lp.set (cut, q, sr);
         f1.peaking (D.f1, 1.4f, D.g1, sr); f1.reset();
         f2.peaking (D.f2, 2.0f, D.g2, sr); f2.reset();
+        f3.peaking (D.f3, 1.6f, D.g3, sr); f3.reset();
+        bell.highpass (D.bellHp, 0.6f, sr); bell.reset();
+        // metal de verdade: em pp o som é escuro, em ff os harmônicos agudos crescem muito (o "blat")
+        nlK = D.nl; brightK = 0.4f + 0.8f * P.bright; nlG = 1.0f;
+        buzzAmt = D.buzz * (0.35f + 0.65f * P.breath) * 0.32f;
 
         amp = 0.0f; ampPeak = vel * 0.95f; ampSus = vel * (0.68f + 0.08f * rng.uniform()); ampStage = 0;
         ampInc = ampPeak / std::max (1.0f, atk * sr); ampCoef = coefFor (0.12f, sr);
@@ -411,6 +417,7 @@ struct Voice
         // metal de verdade: o brilho acompanha o volume (fica escuro quando some)
         const float lvl = std::clamp ((amp / std::max (1.0e-4f, ampPeak)) * endGain, 0.0f, 1.0f);
         lp.set (std::max (120.0f, cut * (0.45f + 0.55f * lvl) * (1.0f + vibVal * 0.6f)), q, sr);
+        nlG = 1.0f + nlK * 2.6f * lvl * ampPeak * brightK;
     }
 
     // soma a voz em L/R por n amostras
@@ -436,11 +443,15 @@ struct Voice
                     case Saw:    v = 2.0f * p - 1.0f - polyBlep (p, d); break;
                     case Square: { float p2 = p + 0.5f; if (p2 >= 1.0f) p2 -= 1.0f;
                                    v = (p < 0.5f ? 1.0f : -1.0f) + polyBlep (p, d) - polyBlep (p2, d); } break;
+                    case Pulse:  { float p2 = p + 0.65f; if (p2 >= 1.0f) p2 -= 1.0f;
+                                   v = (p < 0.35f ? 1.0f : -1.0f) + polyBlep (p, d) - polyBlep (p2, d) - 0.3f; } break;
                     case Tri:
                     default:     v = 4.0f * std::fabs (p - 0.5f) - 1.0f; break;
                 }
                 x += v * oscGain[i];
             }
+            // zumbido do lábio / da palheta: ruído que abre e fecha no ritmo de cada ciclo da nota
+            if (buzzAmt > 0.0f && ph[0] < 0.2f) x += buzzAmt * rng.next() * (1.0f - ph[0] * 5.0f) * 2.0f;
             // rouco: aspereza na palheta antes do filtro (fica dentro do timbre do instrumento)
             if (growlAmt > 0.001f)
             {
@@ -450,7 +461,9 @@ struct Voice
                 x += growlAmt * 0.22f * (x * std::fabs (x) - 0.3f * x);
             }
             lp.process (x);
-            float y = f2.process (f1.process (lp.lpOut));
+            float y0 = lp.lpOut;
+            if (nlG > 1.001f) y0 = std::tanh (nlG * y0) / nlG * (1.0f + 0.35f * (nlG - 1.0f));
+            float y = bell.process (f3.process (f2.process (f1.process (y0))));
 
             bf.process (rng.next());
             if (! releasing)
@@ -499,8 +512,10 @@ public:
         smoothK = coefFor (0.03f, sr);
         glideK = coefFor (0.12f, sr);
         compAtk = coefFor (0.01f, sr); compRel = coefFor (0.2f, sr);
+        for (auto& t : instTune) t = rng.next() * 7.0f;        // cada músico afina um pouco diferente na sessão
         // sala do estúdio (4 linhas com matriz de Hadamard): a sala de gravação de Kingston
-        static const float roomMs[4] = { 23.9f, 31.3f, 37.7f, 43.1f };
+        static const float roomMs[4] = { 31.7f, 41.3f, 49.9f, 57.1f };   // v1.3: mais perto de uma plate de estúdio
+        for (int i = 0; i < 2; ++i) { apLen[i] = std::max (4, (int) ((i == 0 ? 4.7f : 7.3f) * 0.001f * sr)); apBuf[i].assign ((size_t) apLen[i], 0.0f); apPos[i] = 0; }
         for (int i = 0; i < 4; ++i) { roomLen[i] = std::max (8, (int) (roomMs[i] * 0.001f * sr)); roomBuf[i].assign ((size_t) roomLen[i], 0.0f); roomPos[i] = 0; }
         roomDamp = coefFor (1.0f / (2.0f * kPi * 4200.0f), sr);
         roomHpK = coefFor (1.0f / (2.0f * kPi * 180.0f), sr);
@@ -512,17 +527,18 @@ public:
     void reset()
     {
         line.clear();
-        for (auto* b : { &hpL, &hpR, &lp1L, &lp1R, &lp2L, &lp2R, &tubL, &tubR, &eHpL, &eHpR, &eLpL, &eLpR, &fHp, &fLp, &hissL, &hissR }) b->reset();
+        for (auto* b : { &bumpL, &bumpR, &hpL, &hpR, &lp1L, &lp1R, &lp2L, &lp2R, &tubL, &tubR, &eHpL, &eHpR, &eLpL, &eLpR, &fHp, &fLp, &hissL, &hissR }) b->reset();
         for (auto& b : eqL) b.reset();
         for (auto& b : eqR) b.reset();
         compEnv = 0.0f;
         for (int i = 0; i < 4; ++i) { std::fill (roomBuf[i].begin(), roomBuf[i].end(), 0.0f); roomLp[i] = 0.0f; }
+        for (auto& b : apBuf) std::fill (b.begin(), b.end(), 0.0f);
         roomHpL = roomHpR = 0.0f;
     }
 
     void setParams (const Params& p)
     {
-        const bool changed = p.lowcut != P.lowcut || p.band != P.band || p.eq != P.eq || p.tubby != P.tubby
+        const bool changed = p.drive != P.drive || p.lowcut != P.lowcut || p.band != P.band || p.eq != P.eq || p.tubby != P.tubby
                           || p.tubbyRes != P.tubbyRes || p.tone != P.tone || p.bass != P.bass;
         P = p;
         if (changed) dirtyCoefs = true;
@@ -532,6 +548,9 @@ public:
 
     void noteOn (int midi, float vel, int artic, int src)
     {
+        // o naipe tem um líder (o primeiro a entrar); os outros chegam alguns ms depois, cada um com a sua afinação
+        int lead = -1;
+        for (int i : { 0, 3, 2, 1, 4, 5 }) if (P.inst[(size_t) i].on) { lead = i; break; }
         for (int i = 0; i < kNumInst; ++i)
         {
             const auto& S = P.inst[(size_t) i];
@@ -541,7 +560,10 @@ public:
             for (auto& v : voices)
                 if (v.active && ! v.releasing && v.src == src && v.srcNote == midi && v.inst == i) v.release (P.release);
             Voice& v = allocVoice();
-            v.start (i, m, vel, artic, src, midi, P, sr, ++ageCounter, rng);
+            const float hum = P.human;
+            const float dl = i == lead ? rng.uniform() * 0.006f * hum : (0.004f + rng.uniform() * 0.022f) * hum;
+            v.start (i, m, vel * (i == lead ? 1.0f : 0.92f + 0.08f * rng.uniform()), artic, src, midi, P, sr, ++ageCounter, rng, dl,
+                     instTune[(size_t) i] * (0.3f + hum));
         }
     }
 
@@ -587,6 +609,7 @@ private:
         if (! dirtyCoefs) return;
         dirtyCoefs = false;
         hpL.highpass (P.lowcut, 0.7f, sr);  hpR.highpass (P.lowcut, 0.7f, sr);
+        bumpL.lowShelf (95.0f, 1.0f + 2.5f * P.drive, sr); bumpR.lowShelf (95.0f, 1.0f + 2.5f * P.drive, sr);   // "head bump" da fita
         lp1L.lowpass (P.band, 0.6f, sr);    lp1R.lowpass (P.band, 0.6f, sr);
         lp2L.lowpass (std::min (20000.0f, P.band * 1.4f), 0.5f, sr); lp2R.lowpass (std::min (20000.0f, P.band * 1.4f), 0.5f, sr);
         for (int i = 0; i < 10; ++i) { setEqBand (eqL[(size_t) i], i, P.eq[(size_t) i], sr); setEqBand (eqR[(size_t) i], i, P.eq[(size_t) i], sr); }
@@ -613,7 +636,7 @@ private:
         const float wowInc = 0.55f / sr, flutInc = 6.3f / sr;
         const float masterG = P.master * 1.2f;
         const float thr = 0.2f; // ~ -14 dB
-        const float roomG = 0.60f + P.room * 0.22f, roomWet = P.room * 0.42f;
+        const float roomG = 0.64f + P.room * 0.22f, roomWet = P.room * 0.40f;
         float peak = 0.0f, sumSq = 0.0f;
 
         for (int s = 0; s < n; ++s)
@@ -622,7 +645,7 @@ private:
             float l = busL[(size_t) s] * 0.34f, r = busR[(size_t) s] * 0.34f;
             l = hpL.process (l); r = hpR.process (r);
             l = softSat (l, driveG) * driveMake; r = softSat (r, driveG) * driveMake;
-            l = lp2L.process (lp1L.process (l)); r = lp2R.process (lp1R.process (r));
+            l = lp2L.process (lp1L.process (bumpL.process (l))); r = lp2R.process (lp1R.process (bumpR.process (r)));
             for (int b = 0; b < 10; ++b) { l = eqL[(size_t) b].process (l); r = eqR[(size_t) b].process (r); }
             l = tubL.process (l); r = tubR.process (r);
 
@@ -657,7 +680,15 @@ private:
             if (roomWet > 0.0005f)
             {
                 roomHpL += (l - roomHpL) * roomHpK; roomHpR += (r - roomHpR) * roomHpK;
-                const float il = (l - roomHpL) * 0.5f, ir = (r - roomHpR) * 0.5f;
+                float il = (l - roomHpL) * 0.5f, ir = (r - roomHpR) * 0.5f;
+                for (int k = 0; k < 2; ++k)       // difusão (allpass) antes da plate
+                {
+                    const float d = apBuf[k][(size_t) apPos[k]];
+                    const float ain = 0.5f * (il + ir), w = ain + 0.6f * d;
+                    apBuf[k][(size_t) apPos[k]] = w; if (++apPos[k] >= apLen[k]) apPos[k] = 0;
+                    const float o = d - 0.6f * w;
+                    il = 0.6f * o + 0.4f * il; ir = 0.6f * o + 0.4f * ir;
+                }
                 float o[4];
                 for (int i = 0; i < 4; ++i)
                 {
@@ -713,7 +744,8 @@ private:
     std::vector<float> busL, busR;
     bool dirtyCoefs = true;
 
-    Biquad hpL, hpR, lp1L, lp1R, lp2L, lp2R, tubL, tubR;
+    Biquad hpL, hpR, lp1L, lp1R, lp2L, lp2R, tubL, tubR, bumpL, bumpR;
+    std::array<float, kNumInst> instTune {};
     std::array<Biquad, 10> eqL, eqR;
 
     DelayLine line;
@@ -724,5 +756,6 @@ private:
     float compEnv = 0, compAtk = 0.01f, compRel = 0.001f;
     std::vector<float> roomBuf[4]; int roomLen[4] { 8, 8, 8, 8 }, roomPos[4] {}; float roomLp[4] {};
     float roomDamp = 0.5f, roomHpK = 0.02f, roomHpL = 0, roomHpR = 0;
+    std::vector<float> apBuf[2]; int apLen[2] { 4, 4 }, apPos[2] {};
 };
 } // namespace horns

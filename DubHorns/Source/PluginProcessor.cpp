@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Musicians.h"
 
 using namespace juce;
 
@@ -123,6 +124,37 @@ HornsProcessor::HornsProcessor()
     phraseAudio.events.reserve (horns::kMaxEvents);
     phraseAudio.name.reserve (128);
     sched.reserve (1024);
+    applyMusico (musicos::defaultPreset, false);   // abre no "Tubby · naipe no eco": o delay já na frente
+}
+
+void HornsProcessor::applyMusico (int index, bool preview)
+{
+    if (index < 0 || index >= musicos::numPresets) return;
+    const auto& pr = musicos::presets[index];
+    auto set = [this] (const String& id, float plain)
+    {
+        if (auto* p = apvts.getParameter (id))
+        {
+            p->beginChangeGesture(); p->setValueNotifyingHost (p->convertTo0to1 (plain)); p->endChangeGesture();
+        }
+    };
+    const auto ids = instIds();
+    for (int k = 0; k < horns::kNumInst; ++k)
+    {
+        const auto& sc = pr.sec[k];
+        set (ids[k] + "_on", (float) sc.on); set (ids[k] + "_lvl", sc.lvl); set (ids[k] + "_pan", sc.pan);
+        set (ids[k] + "_oct", (float) (sc.oct + 2)); set (ids[k] + "_harm", (float) sc.harm);
+    }
+    for (int k = 0; k < 14; ++k) set (musicos::timbreIds[k], pr.t[k]);
+    set ("echoOn", (float) pr.echoOn); set ("sync", (float) pr.sync); set ("fb", pr.fb); set ("send", pr.send); set ("tone", pr.tone);
+    for (int b = 0; b < 10; ++b) set ("eq" + String (b), pr.eq[b]);
+    apvts.state.setProperty ("musico", index, nullptr);
+    if (preview) previewNote (60 + (int) param ("key"), pr.artic);
+}
+
+int HornsProcessor::currentMusico() const
+{
+    return jlimit (-1, musicos::numPresets - 1, (int) apvts.state.getProperty ("musico", -1));
 }
 
 bool HornsProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const

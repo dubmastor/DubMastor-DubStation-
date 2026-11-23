@@ -9,9 +9,22 @@ struct Preset { const char* folder; const char* name; const char* role; const ch
                 Sec sec[6]; float t[14]; int echoOn, sync; float fb, send, tone; float eq[10]; };
 inline constexpr const char* timbreIds[14] = { "bright", "breath", "vib", "scoop", "attack", "release", "drive", "band", "lowcut", "hiss", "human", "width", "growl", "room" };
 inline constexpr int numFolders = 7;
-inline constexpr const char* folders[numFolders] = { "SKA 63-66 · SKATALITES", "ROCKSTEADY 66-68", "STUDIO ONE 68-79", "ROOTS · CHANNEL ONE 75-79", "WAILERS · ISLAND 73-80", "80s · DEAN FRASER", "DUB · KING TUBBY / BLACK ARK" };
+inline constexpr const char* folders[numFolders] = { "DUB · KING TUBBY / BLACK ARK", "SKA 63-66 · SKATALITES", "ROCKSTEADY 66-68", "STUDIO ONE 68-79", "ROOTS · CHANNEL ONE 75-79", "WAILERS · ISLAND 73-80", "80s · DEAN FRASER" };
 inline constexpr int numPresets = 24;
+inline constexpr int defaultPreset = 0;   // Tubby · naipe no eco: o plugin abre com o delay
 inline const Preset presets[numPresets] = {
+    { "DUB · KING TUBBY / BLACK ARK", "Tubby · naipe no eco", "TPT · TEN · TBN · DUB",
+      "Naipe estreito de console, chiado e fita: notas soltas jogadas no Tape Echo.", 1,
+      { { 1, 0, 0, 0.750f, -0.350f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, -1, 0, 0.800f, 0.150f }, { 1, 0, 2, 0.700f, 0.350f }, { 0, 0, 0, 0.700f, 0.000f } },
+      { 0.520f, 0.420f, 0.300f, 0.450f, 1.000f, 0.350f, 0.550f, 7600.000f, 130.000f, 0.300f, 0.550f, 0.800f, 0.350f, 0.200f }, 1, 5, 0.620f, 0.450f, 2600.000f, { 0.000f, 0.000f, -1.000f, 0.000f, 1.500f, 2.500f, 1.500f, 0.000f, -2.000f, -4.000f } },
+    { "DUB · KING TUBBY / BLACK ARK", "Black Ark · fumaça", "TEN · TBN · BAR",
+      "O naipe enfumaçado da Black Ark: abafado, com muito ar, sala grande e eco escuro.", 3,
+      { { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, -1, 0, 0.800f, -0.200f }, { 1, 0, 2, 0.720f, 0.250f }, { 1, -1, 3, 0.600f, 0.000f } },
+      { 0.400f, 0.580f, 0.360f, 0.500f, 1.200f, 0.450f, 0.650f, 6200.000f, 100.000f, 0.420f, 0.650f, 0.900f, 0.450f, 0.600f }, 1, 2, 0.550f, 0.400f, 2200.000f, { 2.000f, 2.000f, 1.000f, 1.000f, 0.000f, -1.000f, -1.000f, -2.000f, -4.000f, -6.000f } },
+    { "DUB · KING TUBBY / BLACK ARK", "Rádio AM de Kingston", "TPT · TEN",
+      "Naipe pelo radinho: só médio, saturado, para quebras e intros de dub.", 1,
+      { { 1, 0, 0, 0.780f, -0.200f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, -1, 0, 0.800f, 0.200f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f } },
+      { 0.600f, 0.300f, 0.300f, 0.300f, 0.900f, 0.300f, 0.750f, 4800.000f, 320.000f, 0.350f, 0.500f, 0.300f, 0.300f, 0.150f }, 1, 4, 0.500f, 0.350f, 2400.000f, { -6.000f, -4.000f, -2.000f, 0.000f, 2.000f, 4.000f, 3.000f, 0.000f, -4.000f, -8.000f } },
     { "SKA 63-66 · SKATALITES", "Roland Alphonso", "SAX TENOR · STUDIO ONE",
       "Tenor de jazz no ska: solto, vibrato largo e bastante sopro. O \"Chief Musician\".", 0,
       { { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, 0, 0, 0.850f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f } },
@@ -96,18 +109,6 @@ inline const Preset presets[numPresets] = {
       "Trombone gordo e cantado dos anos 80, firme no grave e com fall largo.", 2,
       { { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, 0, 0, 0.900f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f } },
       { 0.580f, 0.380f, 0.320f, 0.450f, 1.100f, 0.400f, 0.350f, 11000.000f, 70.000f, 0.060f, 0.450f, 0.400f, 0.400f, 0.300f }, 1, 5, 0.350f, 0.200f, 3200.000f, { 0.000f, 0.000f, -1.000f, 0.000f, 1.500f, 2.500f, 1.500f, 0.000f, -2.000f, -4.000f } },
-    { "DUB · KING TUBBY / BLACK ARK", "Tubby · naipe no eco", "TPT · TEN · TBN · DUB",
-      "Naipe estreito de console, chiado e fita: notas soltas jogadas no Tape Echo.", 1,
-      { { 1, 0, 0, 0.750f, -0.350f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, -1, 0, 0.800f, 0.150f }, { 1, 0, 2, 0.700f, 0.350f }, { 0, 0, 0, 0.700f, 0.000f } },
-      { 0.520f, 0.420f, 0.300f, 0.450f, 1.000f, 0.350f, 0.550f, 7600.000f, 130.000f, 0.300f, 0.550f, 0.800f, 0.350f, 0.200f }, 1, 5, 0.620f, 0.450f, 2600.000f, { 0.000f, 0.000f, -1.000f, 0.000f, 1.500f, 2.500f, 1.500f, 0.000f, -2.000f, -4.000f } },
-    { "DUB · KING TUBBY / BLACK ARK", "Black Ark · fumaça", "TEN · TBN · BAR",
-      "O naipe enfumaçado da Black Ark: abafado, com muito ar, sala grande e eco escuro.", 3,
-      { { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, -1, 0, 0.800f, -0.200f }, { 1, 0, 2, 0.720f, 0.250f }, { 1, -1, 3, 0.600f, 0.000f } },
-      { 0.400f, 0.580f, 0.360f, 0.500f, 1.200f, 0.450f, 0.650f, 6200.000f, 100.000f, 0.420f, 0.650f, 0.900f, 0.450f, 0.600f }, 1, 2, 0.550f, 0.400f, 2200.000f, { 2.000f, 2.000f, 1.000f, 1.000f, 0.000f, -1.000f, -1.000f, -2.000f, -4.000f, -6.000f } },
-    { "DUB · KING TUBBY / BLACK ARK", "Rádio AM de Kingston", "TPT · TEN",
-      "Naipe pelo radinho: só médio, saturado, para quebras e intros de dub.", 1,
-      { { 1, 0, 0, 0.780f, -0.200f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f }, { 1, -1, 0, 0.800f, 0.200f }, { 0, 0, 0, 0.700f, 0.000f }, { 0, 0, 0, 0.700f, 0.000f } },
-      { 0.600f, 0.300f, 0.300f, 0.300f, 0.900f, 0.300f, 0.750f, 4800.000f, 320.000f, 0.350f, 0.500f, 0.300f, 0.300f, 0.150f }, 1, 4, 0.500f, 0.350f, 2400.000f, { -6.000f, -4.000f, -2.000f, 0.000f, 2.000f, 4.000f, 3.000f, 0.000f, -4.000f, -8.000f } },
 };
 } // namespace musicos
 

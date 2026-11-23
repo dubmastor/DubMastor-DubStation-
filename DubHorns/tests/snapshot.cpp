@@ -57,7 +57,6 @@ int main (int argc, char** argv)
     dir.createDirectory();
     for (int i = 0; i < 6; ++i)
     {
-        if (i == 5) proc.apvts.state.setProperty ("musico", 17, nullptr);   // Dean Fraser · Black Horn Man
         he->panel.showPage (i);
         auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
         auto f = dir.getChildFile (juce::String ("interface-") + names[i] + ".png");

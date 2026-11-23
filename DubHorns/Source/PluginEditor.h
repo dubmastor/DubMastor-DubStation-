@@ -80,6 +80,7 @@ class EchoPage;
 class EqPage;
 class PhrasePage;
 class MusicosPage;
+class PresetBar;
 
 //==============================================================================
 class VuMeter : public juce::Component
@@ -105,7 +106,7 @@ public:
 class HornsPanel : public juce::Component, private juce::Timer
 {
 public:
-    static constexpr int W = 1200, H = 800;
+    static constexpr int W = 1200, H = 880;
     explicit HornsPanel (HornsProcessor&);
     ~HornsPanel() override;
     void paint (juce::Graphics&) override;
@@ -123,10 +124,11 @@ private:
     juce::TextButton versionBtn;
     std::array<juce::TextButton, 6> tabs;
     std::vector<std::unique_ptr<HornsPage>> pages;
+    std::unique_ptr<PresetBar> presetBar;
     juce::MidiKeyboardComponent keyboard;
     ChangelogView changelog;
     int page = 0;
-    juce::Rectangle<int> header, tabBar, pageArea, kbBar;
+    juce::Rectangle<int> header, presetArea, tabBar, pageArea, kbBar;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HornsPanel)
 };

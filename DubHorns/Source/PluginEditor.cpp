@@ -501,16 +501,8 @@ namespace mpc   // mesmo visual do MRM-0420 (RiddimMachine/Source/MrmStyle.h)
     }
 }
 
-class MusicosPage : public HornsPage, private Timer
+namespace musicosui
 {
-public:
-    explicit MusicosPage (HornsProcessor& p) : HornsPage (p)
-    {
-        setMouseCursor (MouseCursor::PointingHandCursor);
-        startTimerHz (6);
-    }
-
-    int current() const { return jlimit (-1, musicos::numPresets - 1, (int) proc.apvts.state.getProperty ("musico", -1)); }
     static int folderOf (int preset)
     {
         if (preset < 0) return -1;
@@ -524,157 +516,96 @@ public:
         for (int i = 0; i < musicos::numPresets; ++i) if (folderOf (i) == folder) out.add (i);
         return out;
     }
+}
 
-    void apply (int i)
-    {
-        if (i < 0 || i >= musicos::numPresets) return;
-        const auto& pr = musicos::presets[i];
-        const auto ids = HornsProcessor::instIds();
-        for (int k = 0; k < horns::kNumInst; ++k)
-        {
-            const auto& sc = pr.sec[k];
-            setParamValue (proc.apvts, ids[k] + "_on", (float) sc.on);
-            setParamValue (proc.apvts, ids[k] + "_lvl", sc.lvl);
-            setParamValue (proc.apvts, ids[k] + "_pan", sc.pan);
-            setParamValue (proc.apvts, ids[k] + "_oct", (float) (sc.oct + 2));
-            setParamValue (proc.apvts, ids[k] + "_harm", (float) sc.harm);
-        }
-        for (int k = 0; k < 14; ++k) setParamValue (proc.apvts, musicos::timbreIds[k], pr.t[k]);
-        setParamValue (proc.apvts, "echoOn", (float) pr.echoOn);
-        setParamValue (proc.apvts, "sync", (float) pr.sync);
-        setParamValue (proc.apvts, "fb", pr.fb);
-        setParamValue (proc.apvts, "send", pr.send);
-        setParamValue (proc.apvts, "tone", pr.tone);
-        for (int b = 0; b < 10; ++b) setParamValue (proc.apvts, "eq" + String (b), pr.eq[b]);
-        proc.apvts.state.setProperty ("musico", i, nullptr);
-        folderSel = folderOf (i);
-        proc.previewNote (60 + (int) proc.apvts.getRawParameterValue ("key")->load(), pr.artic);
-        repaint();
-    }
+// Visor azul de presets, sempre à vista entre o cabeçalho e as abas (igual ao MRM-0420)
+class PresetBar : public Component, private Timer
+{
+public:
+    explicit PresetBar (HornsProcessor& p) : proc (p) { setMouseCursor (MouseCursor::PointingHandCursor); startTimerHz (8); }
 
     void stepFolder (int d)
     {
-        const int cur = folderOf (current());
+        const int cur = musicosui::folderOf (proc.currentMusico());
         folderSel = ((cur >= 0 ? cur : folderSel) + d + musicos::numFolders) % musicos::numFolders;
-        const auto l = presetsOf (folderSel);
-        if (! l.isEmpty()) apply (l[0]);
+        const auto l = musicosui::presetsOf (folderSel);
+        if (! l.isEmpty()) proc.applyMusico (l[0], true);
+        repaint();
     }
     void stepPreset (int d)
     {
-        const int cur = current();
-        const auto l = presetsOf (cur >= 0 ? folderOf (cur) : folderSel);
+        const int cur = proc.currentMusico();
+        const auto l = musicosui::presetsOf (cur >= 0 ? musicosui::folderOf (cur) : folderSel);
         if (l.isEmpty()) return;
         const int pos = l.indexOf (cur), n = l.size();
-        apply (l[pos < 0 ? (d > 0 ? 0 : n - 1) : (pos + d + n) % n]);
+        proc.applyMusico (l[pos < 0 ? (d > 0 ? 0 : n - 1) : (pos + d + n) % n], true);
+        repaint();
     }
     void showList()
     {
         PopupMenu menu;
         menu.addSectionHeader (HU ("MÚSICOS DA JAMAICA POR ESTILO"));
-        const int cur = current();
+        const int cur = proc.currentMusico();
         for (int f = 0; f < musicos::numFolders; ++f)
         {
             PopupMenu sub;
-            const auto l = presetsOf (f);
+            const auto l = musicosui::presetsOf (f);
             for (int i : l) sub.addItem (i + 1, HU (musicos::presets[i].name) + HU ("   ·  ") + HU (musicos::presets[i].role), true, cur == i);
-            menu.addSubMenu (HU (musicos::folders[f]) + "   (" + String (l.size()) + ")", sub, true, nullptr, folderOf (cur) == f);
+            menu.addSubMenu (HU (musicos::folders[f]) + "   (" + String (l.size()) + ")", sub, true, nullptr, musicosui::folderOf (cur) == f);
         }
-        Component::SafePointer<MusicosPage> safe (this);
-        menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this), [safe] (int r) { if (safe != nullptr && r > 0) safe->apply (r - 1); });
+        Component::SafePointer<PresetBar> safe (this);
+        menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this), [safe] (int r)
+        { if (safe != nullptr && r > 0) { safe->proc.applyMusico (r - 1, true); safe->repaint(); } });
     }
 
     void resized() override
     {
-        const int y = 58;
-        keys[0] = { 20, y, 44, 34 };      keys[1] = { 70, y, 44, 34 };
-        keys[2] = { 20, y + 40, 44, 34 }; keys[3] = { 70, y + 40, 44, 34 };
-        listKey = { getWidth() - 20 - 112, y, 112, 74 };
-        lcd = { 204, y + 2, listKey.getX() - 14 - 204, 70 };
-        // teclas de todos os presets, uma coluna por estilo
-        const int top = 162, colW = (getWidth() - 40 - (musicos::numFolders - 1) * 8) / musicos::numFolders;
-        for (int f = 0; f < musicos::numFolders; ++f)
-        {
-            const auto l = presetsOf (f);
-            for (int k = 0; k < l.size(); ++k)
-                presetKeys[(size_t) l[k]] = { 20 + f * (colW + 8), top + 22 + k * 40, colW, 34 };
-            folderHead[(size_t) f] = { 20 + f * (colW + 8), top, colW, 18 };
-        }
-        card = { 20, 360, getWidth() - 40, 96 };
+        keys[0] = { 14, 6, 44, 32 };  keys[1] = { 64, 6, 44, 32 };
+        keys[2] = { 14, 44, 44, 32 }; keys[3] = { 64, 44, 44, 32 };
+        listKey = { getWidth() - 14 - 112, 6, 112, 70 };
+        lcd = { 198, 8, listKey.getX() - 14 - 198, 66 };
     }
 
     void paint (Graphics& g) override
     {
-        g.setColour (hc::cream); g.setFont (uiFont (19.0f, true, 0.05f));
-        g.drawText (HU ("MÚSICOS DA JAMAICA"), 20, 6, 700, 24, Justification::left);
-        g.setColour (hc::muted); g.setFont (uiFont (12.5f));
-        g.drawText (HU ("Cada preset carrega a estética de um músico ou naipe: instrumentos, timbre, rouco, sala, eco e EQ. O tom e a escala continuam os seus."),
-                    20, 30, getWidth() - 40, 18, Justification::left);
-
+        g.setGradientFill (ColourGradient (Colour (0xff241a12), 0, 0, Colour (0xff1a120c), 0, (float) getHeight(), false));
+        g.fillAll();
+        g.setColour (Colours::black); g.fillRect (0, getHeight() - 1, getWidth(), 1);
         const String L = String::fromUTF8 ("\xe2\x97\x80"), R = String::fromUTF8 ("\xe2\x96\xb6");
         for (int i = 0; i < 4; ++i) mpc::key (g, keys[i].toFloat(), i % 2 == 0 ? L : R, pressed == i);
         g.setColour (hc::cream); g.setFont (uiFont (10.0f, true, 0.25f));
-        g.drawText ("ESTILO", 122, keys[0].getY(), 76, 34, Justification::centredLeft);
-        g.drawText (HU ("MÚSICO"), 122, keys[2].getY(), 76, 34, Justification::centredLeft);
+        g.drawText ("ESTILO", 116, keys[0].getY(), 80, 32, Justification::centredLeft);
+        g.drawText (HU ("MÚSICO"), 116, keys[2].getY(), 80, 32, Justification::centredLeft);
 
         auto l = lcd.toFloat();
         mpc::lcd (g, l);
-        auto t = l.reduced (14.0f, 6.0f);
-        const int cur = current();
-        const int f = cur >= 0 ? folderOf (cur) : folderSel;
-        const auto list = presetsOf (f);
-        mpc::text (g, HU (musicos::folders[f]), t.withHeight (16.0f), Justification::centredLeft, 13.0f, 0.85f, 0.2f);
+        auto t = l.reduced (14.0f, 5.0f);
+        const int cur = proc.currentMusico();
+        const int f = cur >= 0 ? musicosui::folderOf (cur) : folderSel;
+        const auto list = musicosui::presetsOf (f);
+        mpc::text (g, HU ("PRESET  ·  ") + HU (musicos::folders[f]), t.withHeight (16.0f), Justification::centredLeft, 12.5f, 0.85f, 0.18f);
         if (cur >= 0)
         {
             const auto& pr = musicos::presets[cur];
             mpc::text (g, String (list.indexOf (cur) + 1).paddedLeft ('0', 2) + "/" + String (list.size()).paddedLeft ('0', 2),
                        t.withHeight (16.0f), Justification::centredRight, 12.0f, 0.8f);
             mpc::text (g, upper (HU (pr.name)), t.withTrimmedTop (17.0f).withHeight (22.0f), Justification::centredLeft, 17.0f, 1.0f, 0.04f);
-            mpc::text (g, HU (pr.role) + HU ("  ·  ") + upper (HU (horns::articName (pr.artic))), t.withTrimmedTop (41.0f), Justification::centredLeft, 10.5f, 0.85f, 0.06f);
+            mpc::text (g, HU (pr.role) + HU ("  ·  ECO ") + upper (String (horns::syncDivs()[(size_t) pr.sync].name)) + HU ("  ·  ")
+                          + upper (HU (pr.desc)), t.withTrimmedTop (40.0f), Justification::centredLeft, 10.0f, 0.85f, 0.05f);
         }
         else
         {
-            mpc::text (g, HU ("ESCOLHA UM MÚSICO  ·  \xe2\x97\x80 \xe2\x96\xb6"), t.withTrimmedTop (17.0f).withHeight (22.0f), Justification::centredLeft, 16.0f, 0.8f);
-            mpc::text (g, HU ("DEAN FRASER, VIN GORDON, TOMMY McCOOK, BOBBY ELLIS E OS NAIPES CLÁSSICOS"), t.withTrimmedTop (41.0f), Justification::centredLeft, 10.5f, 0.7f);
+            mpc::text (g, HU ("ESCOLHA UM PRESET  ·  \xe2\x97\x80 \xe2\x96\xb6"), t.withTrimmedTop (17.0f).withHeight (22.0f), Justification::centredLeft, 16.0f, 0.8f);
+            mpc::text (g, HU ("DUB, SKA, STUDIO ONE, CHANNEL ONE, WAILERS E OS ANOS 80 DE DEAN FRASER"), t.withTrimmedTop (40.0f), Justification::centredLeft, 10.0f, 0.7f);
         }
         mpc::shine (g, l);
 
         auto lk = listKey.toFloat();
         mpc::key (g, lk, "", pressed == 4);
         g.setColour (hc::cream); g.setFont (uiFont (14.0f, true, 0.12f));
-        g.drawText ("LISTA", lk.withTrimmedBottom (34.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), Justification::centredBottom);
+        g.drawText ("LISTA", lk.withTrimmedBottom (32.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), Justification::centredBottom);
         g.setFont (uiFont (7.5f, true, 0.12f)); g.setColour (hc::cream.withAlpha (0.6f));
-        g.drawText (HU ("POR ESTILO \xe2\x96\xbe"), lk.withTrimmedTop (44.0f).withHeight (14.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), Justification::centred);
-
-        // teclas por estilo
-        for (int ff = 0; ff < musicos::numFolders; ++ff)
-        {
-            g.setColour (ff == f ? hc::amber : hc::muted); g.setFont (uiFont (9.5f, true, 0.12f));
-            g.drawFittedText (HU (musicos::folders[ff]), folderHead[(size_t) ff], Justification::centredLeft, 1, 0.7f);
-        }
-        for (int i = 0; i < musicos::numPresets; ++i)
-            mpc::key (g, presetKeys[(size_t) i].toFloat(), upper (HU (musicos::presets[i].name)), pressed == 100 + i, cur == i, 10.5f);
-
-        // cartão do estilo
-        groupBox (g, card, cur >= 0 ? HU ("O ESTILO") : HU ("COMO USAR"));
-        g.setColour (hc::cream); g.setFont (uiFont (13.5f));
-        auto c = card.reduced (14, 10).withTrimmedTop (22);
-        if (cur >= 0)
-        {
-            const auto& pr = musicos::presets[cur];
-            g.drawFittedText (HU (pr.desc), c.removeFromTop (22), Justification::left, 1);
-            String naipe;
-            const char* sh[6] = { "TPT", "FLG", "ALT", "TEN", "TBN", "BAR" };
-            for (int k = 0; k < 6; ++k) if (pr.sec[k].on) naipe << (naipe.isEmpty() ? "" : HU (" · ")) << sh[k];
-            g.setColour (hc::muted); g.setFont (uiFont (12.0f));
-            g.drawFittedText (HU ("Carrega: naipe ") + naipe + HU ("  ·  rouco ") + String (roundToInt (pr.t[12] * 100)) + HU ("%  ·  sala ")
-                              + String (roundToInt (pr.t[13] * 100)) + HU ("%  ·  eco ") + String (horns::syncDivs()[(size_t) pr.sync].name)
-                              + HU ("  ·  articulação de demonstração: ") + horns::articName (pr.artic)
-                              + HU (".  Depois ajuste à vontade nas outras abas."), c, Justification::topLeft, 2);
-        }
-        else
-            g.drawFittedText (HU ("Use ◀ ▶ para andar pelos estilos e pelos músicos, ou toque numa tecla. O som aparece na hora: toque o teclado ou uma frase MIDI.\n"
-                                  "Homenagem ao jeito de tocar de cada um. Não são gravações dos músicos: é o motor do Dub Horns ajustado para lembrar o estilo."),
-                              c, Justification::topLeft, 3);
+        g.drawText (HU ("POR ESTILO \xe2\x96\xbe"), lk.withTrimmedTop (42.0f).withHeight (14.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), Justification::centred);
     }
 
     void mouseDown (const MouseEvent& e) override
@@ -683,18 +614,95 @@ public:
         pressed = -1;
         for (int i = 0; i < 4; ++i)
             if (keys[i].contains (pt)) { pressed = i; if (i < 2) stepFolder (i == 0 ? -1 : 1); else stepPreset (i == 2 ? -1 : 1); repaint(); return; }
-        if (listKey.contains (pt) || lcd.contains (pt)) { pressed = 4; repaint(); showList(); return; }
-        for (int i = 0; i < musicos::numPresets; ++i)
-            if (presetKeys[(size_t) i].contains (pt)) { pressed = 100 + i; apply (i); return; }
+        if (listKey.contains (pt) || lcd.contains (pt)) { pressed = 4; repaint(); showList(); }
     }
     void mouseUp (const MouseEvent&) override { pressed = -1; repaint(); }
 
 private:
-    void timerCallback() override { const int c = current(); if (c != shown) { shown = c; if (c >= 0) folderSel = folderOf (c); repaint(); } }
-    Rectangle<int> lcd, keys[4], listKey, card;
+    void timerCallback() override
+    {
+        const int c = proc.currentMusico();
+        if (c != shown) { shown = c; if (c >= 0) folderSel = musicosui::folderOf (c); repaint(); }
+    }
+    HornsProcessor& proc;
+    Rectangle<int> lcd, keys[4], listKey;
+    int pressed = -1, shown = -2, folderSel = 0;
+};
+
+// Aba MÚSICOS: todas as teclas de preset por estilo e o cartão do estilo escolhido
+class MusicosPage : public HornsPage, private Timer
+{
+public:
+    explicit MusicosPage (HornsProcessor& p) : HornsPage (p) { setMouseCursor (MouseCursor::PointingHandCursor); startTimerHz (6); }
+
+    void resized() override
+    {
+        const int top = 62, colW = (getWidth() - 40 - (musicos::numFolders - 1) * 8) / musicos::numFolders;
+        for (int f = 0; f < musicos::numFolders; ++f)
+        {
+            const auto l = musicosui::presetsOf (f);
+            for (int k = 0; k < l.size(); ++k)
+                presetKeys[(size_t) l[k]] = { 20 + f * (colW + 8), top + 24 + k * 44, colW, 38 };
+            folderHead[(size_t) f] = { 20 + f * (colW + 8), top, colW, 20 };
+        }
+        card = { 20, 340, getWidth() - 40, 116 };
+    }
+
+    void paint (Graphics& g) override
+    {
+        g.setColour (hc::cream); g.setFont (uiFont (19.0f, true, 0.05f));
+        g.drawText (HU ("MÚSICOS DA JAMAICA"), 20, 6, 700, 24, Justification::left);
+        g.setColour (hc::muted); g.setFont (uiFont (12.5f));
+        g.drawText (HU ("Toque numa tecla ou use o visor azul lá em cima. Cada preset carrega naipe, timbre, rouco, sala, eco e EQ; o tom e a escala continuam os seus."),
+                    20, 30, getWidth() - 40, 18, Justification::left);
+        const int cur = proc.currentMusico();
+        const int f = musicosui::folderOf (cur);
+        for (int ff = 0; ff < musicos::numFolders; ++ff)
+        {
+            g.setColour (ff == f ? hc::amber : hc::muted); g.setFont (uiFont (9.5f, true, 0.12f));
+            g.drawFittedText (HU (musicos::folders[ff]), folderHead[(size_t) ff], Justification::centredLeft, 2, 0.7f);
+        }
+        for (int i = 0; i < musicos::numPresets; ++i)
+            mpc::key (g, presetKeys[(size_t) i].toFloat(), upper (HU (musicos::presets[i].name)), pressed == i, cur == i, 10.5f);
+
+        groupBox (g, card, cur >= 0 ? HU ("O ESTILO") : HU ("COMO USAR"));
+        auto c = card.reduced (14, 10).withTrimmedTop (22);
+        if (cur >= 0)
+        {
+            const auto& pr = musicos::presets[cur];
+            g.setColour (hc::cream); g.setFont (uiFont (14.0f, true));
+            g.drawText (HU (pr.name) + HU ("  ·  ") + HU (pr.role), c.removeFromTop (20), Justification::left);
+            g.setFont (uiFont (13.5f));
+            g.drawFittedText (HU (pr.desc), c.removeFromTop (22), Justification::left, 1);
+            String naipe;
+            const char* sh[6] = { "TPT", "FLG", "ALT", "TEN", "TBN", "BAR" };
+            for (int k = 0; k < 6; ++k) if (pr.sec[k].on) naipe << (naipe.isEmpty() ? "" : HU (" · ")) << sh[k];
+            g.setColour (hc::muted); g.setFont (uiFont (12.0f));
+            g.drawFittedText (HU ("Carrega: naipe ") + naipe + HU ("  ·  rouco ") + String (roundToInt (pr.t[12] * 100)) + HU ("%  ·  sala ")
+                              + String (roundToInt (pr.t[13] * 100)) + HU ("%  ·  eco ") + String (horns::syncDivs()[(size_t) pr.sync].name)
+                              + HU (" com intensidade ") + String (roundToInt (pr.fb * 100)) + HU ("%.  Depois ajuste à vontade nas outras abas."), c, Justification::topLeft, 2);
+        }
+        else
+        {
+            g.setColour (hc::cream); g.setFont (uiFont (13.5f));
+            g.drawFittedText (HU ("Homenagem ao jeito de tocar de cada um. Não são gravações dos músicos: é o motor do Dub Horns ajustado para lembrar o estilo."),
+                              c, Justification::topLeft, 3);
+        }
+    }
+
+    void mouseDown (const MouseEvent& e) override
+    {
+        for (int i = 0; i < musicos::numPresets; ++i)
+            if (presetKeys[(size_t) i].contains (e.getPosition())) { pressed = i; proc.applyMusico (i, true); repaint(); return; }
+    }
+    void mouseUp (const MouseEvent&) override { pressed = -1; repaint(); }
+
+private:
+    void timerCallback() override { const int c = proc.currentMusico(); if (c != shown) { shown = c; repaint(); } }
+    Rectangle<int> card;
     std::array<Rectangle<int>, musicos::numPresets> presetKeys {};
     std::array<Rectangle<int>, musicos::numFolders> folderHead {};
-    int pressed = -1, shown = -2, folderSel = 5;
+    int pressed = -1, shown = -2;
 };
 
 //==============================================================================
@@ -1458,6 +1466,10 @@ void VuMeter::paint (Graphics& g)
 }
 
 static const char* kChangelog =
+    "v1.3 · 23/11/2026\n"
+    "• Timbre de sessão: pp escuro e ff brilhante como metal real, saxes com todos os harmônicos, zumbido do lábio/palheta, formantes e campana.\n"
+    "• Naipe com líder e afinação de cada músico; fita com head bump e sala tipo plate.\n"
+    "• Visor azul de presets sempre à vista; o plugin abre no preset de dub com o Tape Echo.\n\n"
     "v1.2 · 23/11/2026\n"
     "• Final de nota natural: fall e doit seguram a nota e caem junto com o volume (sem sirene robótica). Fim normal com o lábio relaxando.\n"
     "• Vibrato humano que para ao soltar a nota, afinação viva, golpe de língua, knobs Rouco e Sala.\n"
@@ -1526,6 +1538,8 @@ HornsPanel::HornsPanel (HornsProcessor& p)
     pages.push_back (std::make_unique<EqPage> (p));
     pages.push_back (std::make_unique<PhrasePage> (p));
     pages.push_back (std::make_unique<MusicosPage> (p));
+    presetBar = std::make_unique<PresetBar> (p);
+    addAndMakeVisible (*presetBar);
     for (auto& pg : pages) addChildComponent (*pg);
 
     keyboard.setAvailableRange (36, 96);
@@ -1551,6 +1565,7 @@ HornsPanel::~HornsPanel()
 {
     stopTimer();
     pages.clear();
+    presetBar.reset();
     setLookAndFeel (nullptr);
 }
 
@@ -1619,18 +1634,20 @@ void HornsPanel::resized()
 {
     const int x0 = 22, w = W - 44;
     header = { x0, 0, w, 96 };
-    tabBar = { x0, 96, w, 40 };
-    pageArea = { x0, 136, w, 468 };
-    kbBar = { x0, 604, w, 34 };
+    presetArea = { x0, 96, w, 82 };
+    tabBar = { x0, 178, w, 40 };
+    pageArea = { x0, 218, w, 468 };
+    kbBar = { x0, 686, w, 34 };
+    if (presetBar != nullptr) presetBar->setBounds (presetArea);
 
     keyBox.setBounds (x0 + 520, 34, 120, 28);
     scaleBox.setBounds (x0 + 712, 34, 170, 28);
     versionBtn.setBounds (x0 + 452, 34, 52, 26);
     vu.setBounds (x0 + w - 270, 12, 150, 74);
     master->setBounds (x0 + w - 106, 6, 84, 86);
-    for (int i = 0; i < 6; ++i) tabs[(size_t) i].setBounds (x0 + 14 + i * 172, 102, 166, 32);
+    for (int i = 0; i < 6; ++i) tabs[(size_t) i].setBounds (x0 + 14 + i * 172, 184, 166, 32);
     for (auto& pg : pages) pg->setBounds (pageArea);
-    keyboard.setBounds (x0 + 14, 640, w - 28, 150);
+    keyboard.setBounds (x0 + 14, 722, w - 28, 150);
     keyboard.setKeyWidth ((float) (w - 28 - 40) / 36.0f);
     keyboard.setLowestVisibleKey (48);
     changelog.setBounds (getLocalBounds());

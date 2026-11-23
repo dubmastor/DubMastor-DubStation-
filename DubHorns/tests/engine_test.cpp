@@ -92,6 +92,28 @@ int main (int argc, char** argv)
         CHECK (20 * std::log10 (early / sus) > -4.0, "fall: segura a nota um instante antes de cair (%.1f dB)", 20 * std::log10 (early / sus));
     }
 
+
+    // --- v1.3: dinâmica de metal real. Trompete: no pp o 10º harmônico fica bem abaixo do 1º; no ff ele cresce
+    {
+        auto tenth = [] (float vel)
+        {
+            const int sr = 48000; Engine e; Params p;
+            for (auto& i : p.inst) i.on = false;
+            p.inst[0].on = true; p.inst[0].oct = 0; p.echoOn = false; p.hiss = 0; p.drive = 0; p.band = 18000; p.lowcut = 20;
+            p.human = 0; p.vib = 0; p.breath = 0; p.room = 0;
+            e.prepare (sr, 256); e.setParams (p); e.noteOn (62, vel, Ten, 1);
+            std::vector<float> rec; run (e, sr, 256, &rec);
+            const double f0 = 440.0 * std::pow (2.0, (62 - 69) / 12.0);
+            auto mag = [&] (double f) { double re = 0, im = 0; const int a = sr / 2, n = sr / 4;
+                for (int i = 0; i < n; ++i) { const double w = 0.5 - 0.5 * std::cos (2 * 3.14159265 * i / n), x = rec[2 * (size_t) (a + i)] * w;
+                    re += x * std::cos (2 * 3.14159265 * f * i / sr); im += x * std::sin (2 * 3.14159265 * f * i / sr); }
+                return std::sqrt (re * re + im * im); };
+            return 20.0 * std::log10 (mag (10 * f0) / mag (f0));
+        };
+        const double pp = tenth (0.25f), ff = tenth (1.0f);
+        CHECK (ff - pp > 15.0, "trompete: ff tem bem mais harmonicos agudos que pp (10a-1a: pp %.1f dB, ff %.1f dB)", pp, ff);
+    }
+
     for (double sr : { 44100.0, 48000.0, 96000.0 })
     {
         Engine e;
