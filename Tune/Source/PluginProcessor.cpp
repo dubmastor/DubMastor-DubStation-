@@ -85,6 +85,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MastorTuneProcessor::createL
     p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "listen", 1 }, "Escutar Riddim", true));
     p.push_back (std::make_unique<AudioParameterChoice>(ParameterID { "voice", 1 }, "Voz", StringArray { "Grave", String::fromUTF8 (u8"Média"), "Aguda" }, 1));
     p.push_back (std::make_unique<AudioParameterFloat> (ParameterID { "mix", 1 }, "Mix", NormalisableRange<float> (0.0f, 100.0f), 100.0f, pct()));
+    p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "tuneBypass", 1 }, "Bypass do afinador", false));
 
     // --- EQ (gráfico com pontos)
     p.push_back (std::make_unique<AudioParameterBool>  (ParameterID { "eqOn", 1 }, "EQ On", false));
@@ -236,7 +237,7 @@ void MastorTuneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     const bool riddimOk = listen && scConnected && ear.hasSignal();
     riddimSig.store (riddimOk);
 
-    // --- harmonia usada agora: MRM > MIDI > riddim > manual
+    // --- harmonia usada agora: MRM > MIDI > Key Scout > riddim (sidechain) > manual
     int source = SrcManual, chordMask = 0, chordRoot = -1; bool chordMinor = false;
     int keyRoot = juce::jlimit (0, 11, (int) getP ("key")), scale = juce::jlimit (0, 11, (int) getP ("scale"));
     const bool autoKey = getP ("autoKey") > 0.5f;
@@ -248,6 +249,11 @@ void MastorTuneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     {
         source = SrcMidi; chordMask = midiMask;
     }
+    else if (scoutSignal.load() && scoutChordRoot.load() >= 0)
+    {
+        source = SrcScout; chordRoot = scoutChordRoot.load(); chordMinor = scoutChordMinor.load();
+        chordMask = mt::triadMask (chordRoot, chordMinor);
+    }
     else if (riddimOk)
     {
         source = SrcRiddim; chordRoot = ear.getChordRoot(); chordMinor = ear.getChordMinor();
@@ -256,6 +262,7 @@ void MastorTuneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     if (autoKey && (scale == mt::Maior || scale == mt::Menor))
     {
         if (mrmOpen.load() && mrmKeyRoot.load() >= 0) { keyRoot = mrmKeyRoot.load(); scale = mrmKeyMinor.load() ? mt::Menor : mt::Maior; if (source == SrcManual) source = SrcMrm; }
+        else if (scoutOpen.load() && scoutKey.load() >= 0) { keyRoot = scoutKey.load(); scale = scoutMinor.load() ? mt::Menor : mt::Maior; if (source == SrcManual) source = SrcScout; }
         else if (riddimOk && ear.getKeyRoot() >= 0)    { keyRoot = ear.getKeyRoot(); scale = ear.getKeyMinor() ? mt::Menor : mt::Maior; }
     }
     usedSource.store (source); usedKey.store (keyRoot); usedScale.store (scale);
@@ -266,7 +273,7 @@ void MastorTuneProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     ts.allowed = mt::scaleMask (keyRoot, scale);
     ts.chord   = (uint16_t) chordMask;
     ts.voice   = juce::jlimit (0, 2, (int) getP ("voice"));
-    ts.mix     = getP ("mix") / 100.0f;
+    ts.mix     = getP ("tuneBypass") > 0.5f ? 0.0f : getP ("mix") / 100.0f;   // bypass do afinador: só a voz original (mesma latência)
     engine.setSettings (ts);
 
     // --- módulos
@@ -422,6 +429,20 @@ void MastorTuneProcessor::timerCallback()
 
 void MastorTuneProcessor::updateHarmony()
 {
+    // Mastor Key Scout no master: tom e acorde sem sidechain
+    scoutlink::Data sd;
+    if (scoutReader.read (sd))
+    {
+        scoutOpen.store (true);
+        scoutSignal.store (sd.signal != 0);
+        scoutKey.store (sd.keyRoot); scoutMinor.store (sd.keyMinor != 0);
+        scoutChordRoot.store (sd.chordRoot); scoutChordMinor.store (sd.chordMinor != 0);
+    }
+    else
+    {
+        scoutOpen.store (false); scoutSignal.store (false); scoutKey.store (-1); scoutChordRoot.store (-1);
+    }
+
     mrmlink::Data d;
     if (mrmReader.read (d))
     {
@@ -462,6 +483,8 @@ MastorTuneProcessor::Status MastorTuneProcessor::getStatus() const
     s.source = usedSource.load();
     s.mrmOpen = mrmOpen.load(); s.mrmPlaying = mrmPlaying.load();
     s.riddimSignal = riddimSig.load(); s.riddimConnected = riddimConn.load(); s.midiChord = midiHeld.load();
+    s.scoutOpen = scoutOpen.load(); s.scoutSignal = scoutSignal.load(); s.scoutKey = scoutKey.load(); s.scoutMinor = scoutMinor.load();
+    s.tuneBypass = getP ("tuneBypass") > 0.5f;
     s.keyRoot = usedKey.load(); s.scale = usedScale.load(); s.keyAuto = getP ("autoKey") > 0.5f;
     s.chordRoot = usedChordRoot.load(); s.chordMinor = usedChordMinor.load();
     s.sungMidi = sungMidi.load(); s.target = targetNote.load();

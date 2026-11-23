@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#3d5a55">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Mastor Tune MT-0420: auto-tune para reggae no celular ou no navegador, sem instalar nada. Afina a voz sem mudar o timbre, do clean ao robô.">
-<title>Mastor Tune MT-0420 1.0 — Dub Station</title>
+<title>Mastor Tune MT-0420 1.1 — Dub Station</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --inkSoft:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -79,6 +79,16 @@ canvas{display:block;max-width:100%}
 footer{display:flex;justify-content:space-between;align-items:center;padding:4px 14px 12px;gap:10px;flex-wrap:wrap}
 .sig{font-family:"Brush Script MT","Segoe Script",cursive;font-size:30px;color:var(--ink);border-bottom:3px solid var(--gold);transform:rotate(-3deg)}
 .hidden{display:none!important}
+.kb{position:relative;height:84px;min-width:620px;display:flex}
+.kb .w{flex:1;background:linear-gradient(180deg,#f3ecd8,#dccfae);border:1px solid #6b5e48;border-radius:0 0 3px 3px;position:relative}
+.kb .w.off{background:linear-gradient(180deg,#8f877a,#6f675c)}
+.kb .w.off::after,.kb .b.off::after{content:'';position:absolute;left:15%;right:15%;bottom:22px;height:1.5px;background:rgba(43,36,29,.45);transform:rotate(-14deg)}
+.kb .b{position:absolute;top:0;height:58%;background:linear-gradient(180deg,#2a2520,#0d0b09);border:1px solid #000;border-radius:0 0 3px 3px;z-index:2;transform:translateX(-50%)}
+.kb .b.off{background:linear-gradient(180deg,#8a837a,#6a645c)}
+.kb .t{background:linear-gradient(180deg,#f3d9a0,#e7b860)!important;box-shadow:0 0 14px #ffa928}
+.kb .b.t{background:linear-gradient(180deg,#b06a10,#3a2206)!important}
+.kb .s::before{content:'';position:absolute;left:50%;bottom:10px;width:10px;height:10px;margin-left:-5px;border-radius:50%;border:2px solid #ff5a3c;box-sizing:border-box}
+.kb .lbl{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;color:#5c5144}
 input[type=file]{display:none}
 </style>
 </head>
@@ -107,7 +117,6 @@ input[type=file]{display:none}
         <button class="bk" id="mic"><span class="lamp"></span>MICROFONE</button>
         <button class="bk" id="voiceFileBtn"><span class="lamp"></span>ARQUIVO DE VOZ</button>
         <button class="bk" id="demo"><span class="lamp"></span>VOZ DE TESTE</button>
-        <button class="bk" id="bypass"><span class="lamp"></span>COMPARAR (BYPASS)</button>
       </div>
       <input type="file" id="voiceFile" accept="audio/*">
       <p class="hint">A voz de teste canta uma melodia desafinada de propósito: mexa no knob e ouça a diferença.</p>
@@ -186,12 +195,18 @@ input[type=file]{display:none}
       </div>
     </div>
   </div>
+  <div class="sec"><span class="tag">Teclado · nota cantada acesa · fora da escala apagadas</span>
+    <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap">
+      <button class="bk" id="bypass" style="min-width:150px;flex-direction:column;gap:2px"><span style="display:flex;align-items:center;gap:8px"><span class="lamp"></span>BYPASS DO AFINADOR</span><small style="font-size:8px;letter-spacing:.2em;opacity:.7">SÓ A VOZ ORIGINAL</small></button>
+      <div style="flex:1;min-width:260px;overflow-x:auto;background:#1a1714;border-radius:4px;padding:4px"><div class="kb" id="kb"></div></div>
+    </div>
+  </div>
 </main>
 <footer><span class="eng" id="footTxt"></span><span class="sig">DubMastor</span></footer>
 </div><div class="wood"></div></div>
 
 <script>
-const VERSION = '1.0';   // mesma versão do plugin (Tune/CMakeLists.txt)
+const VERSION = '1.1';   // mesma versão do plugin (Tune/CMakeLists.txt)
 document.getElementById('ver').textContent = VERSION;
 document.getElementById('footTxt').textContent = `MT-0420 v${VERSION} · GRÁTIS · NO PLUGIN: VST3 · AU · AAX`;
 document.title = `Mastor Tune MT-0420 ${VERSION} — Dub Station`;
@@ -496,7 +511,7 @@ function drawAll(){ drawBig(); drawEq(); drawSat(); drawEcho(); }
 function tick(){ anim+=1/30; analyseRiddim(); const sig=R.signal;
   $('ridTxt').textContent = !S.listen?'RIDDIM: PAUSADO':!ridSrc?'RIDDIM: SEM ARQUIVO':sig?'RIDDIM: OUVINDO':'RIDDIM: ESCUTANDO…'; $('ridDot').className='dot'+(sig?' am':'');
   $('chordTxt').textContent = sig&&R.chord>=0?'ACORDE '+NOTE[R.chord]+(R.chordMinor?'m':''):'--';
-  if(S.auto) refreshKeyLight(); sendTuner(); drawVu(); drawCurve();
+  if(S.auto) refreshKeyLight(); sendTuner(); drawVu(); drawCurve(); drawKb();
   if(!$('tab-proc').classList.contains('hidden')){ drawSat(); drawEcho(); drawMax(); if(S.eqOn) drawEq() } }
 let lastShown=''; function refreshKeyLight(){ const c=currentKey(), s=c.key+'-'+c.scale; if(s!==lastShown){ lastShown=s; refreshKey() } }
 
@@ -506,7 +521,15 @@ $('voiceFileBtn').onclick=()=>$('voiceFile').click(); $('voiceFile').onchange=e=
 $('ridFileBtn').onclick=()=>$('ridFile').click(); $('ridFile').onchange=e=>{ if(e.target.files[0]) useRiddim(e.target.files[0]) };
 $('listen').onclick=()=>{ S.listen=!S.listen; setOn('listen',S.listen); sendTuner() };
 $('bypass').onclick=()=>{ S.bypass=!S.bypass; setOn('bypass',S.bypass); sendTuner() };
-refreshKey(); drawAll(); drawVu(); drawCurve(); drawMax();
+// teclado de baixo (C2..B5): acende a nota corrigida (âmbar) e marca a cantada (anel vermelho); fora da escala = apagada
+const KB=[]; (()=>{ const kb=$('kb'); let whites=0; for(let m=36;m<=83;m++) if(![1,3,6,8,10].includes(m%12)) whites++; let wi=0;
+  for(let m=36;m<=83;m++){ const black=[1,3,6,8,10].includes(m%12); const d=document.createElement('div'); d.className=black?'b':'w';
+    if(black){ d.style.left=(wi/whites*100)+'%'; d.style.width=(60/whites)+'%' } else { wi++; if(m%12===0){const l=document.createElement('span'); l.className='lbl'; l.textContent='C'+(m/12-1); d.appendChild(l)} }
+    kb.appendChild(d); KB[m]=d } })();
+let kbSig='';
+function drawKb(){ const k=currentKey(), mask=scaleMask(k.key,k.scale), tg=(!S.bypass&&lastInfo.midi>0)?lastInfo.target:-1, sg=lastInfo.midi>0?Math.round(lastInfo.midi):-1, sig=mask+'/'+tg+'/'+sg;
+  if(sig===kbSig) return; kbSig=sig; for(let m=36;m<=83;m++){ const d=KB[m]; d.classList.toggle('off',!(mask&(1<<(m%12)))); d.classList.toggle('t',m===tg); d.classList.toggle('s',m===sg&&m!==tg) } }
+refreshKey(); drawAll(); drawVu(); drawCurve(); drawMax(); drawKb();
 </script>
 </body>
 </html>

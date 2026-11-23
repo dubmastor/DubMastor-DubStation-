@@ -4,7 +4,16 @@
 
 Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e testados para o **Cubase**.
 
-## 🎤 Novo: Mastor Tune MT-0420 1.0 — auto-tune para reggae
+## 🔎 Novo: Mastor Key Scout MKS-0420 1.0 — o olheiro do tom
+
+[![Mastor Key Scout MKS-0420](KeyScout/docs/interface.png)](KeyScout/)
+
+Vai no **master**: escuta o riddim, acha o **tom**, a **escala** e o **acorde de cada momento** e manda tudo para o
+**Mastor Tune** na faixa da voz, **sem sidechain e sem roteamento**. O áudio passa sem mudança e sem latência. Grátis.
+
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MKS-0420-1.0/MKS-0420-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MKS-0420-1.0/MKS-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/web/keyscout/)** · [Detalhes](KeyScout/)
+
+## 🎤 Novo: Mastor Tune MT-0420 1.1 — auto-tune para reggae
 
 [![Mastor Tune MT-0420](Tune/docs/interface-afinacao.png)](Tune/)
 
@@ -13,7 +22,7 @@ acha sozinho o tom, a escala e os acordes; com o **MRM-0420** aberto ele lê a h
 timeline (as notas em dúvida piscam em vermelho: toque e escolha a certa), MIDI da melodia para arrastar e aba
 **PROCESSAMENTO** com EQ gráfico, saturador, Big Knob, Tape Echo e Maximizer. Grátis.
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.0/MT-0420-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.0/MT-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/web/tune/)** · [Detalhes](Tune/)
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.1/MT-0420-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.1/MT-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/web/tune/)** · [Detalhes](Tune/)
 
 ## 🐢 Novo efeito: Mastor Half Dub MHD-050 1.0 — meia velocidade de fita
 
@@ -50,7 +59,8 @@ só para tudo, e a aba **CONTROL ROOM** com o Big Knob no master, o mute de cada
 | **Mastor Reggae Bass Machine MRBM-69 3.0** (legado) | Virou a aba **BASS MACHINE** do Mastor Reggae Bass MRB-69. A última versão separada fica para abrir projetos antigos | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-3.0/MRBM-69-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-3.0/MRBM-69-Windows-Instalador.exe) | [ReggaeBassMachine/](ReggaeBassMachine/) |
 | **Mastor Reggae Chord Machine MRCM-1240 2.4** (legado) | Virou a aba **CHORD MACHINE** do Mastor Reggae Keys MRK-80. A última versão separada fica para abrir projetos antigos | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.4/MRCM-1240-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.4/MRCM-1240-Windows-Instalador.exe) | [ReggaeChordMachine/](ReggaeChordMachine/) |
 | **Mastor Dub Horns MDH-70 1.3** | Instrumento: naipe de metais anos 70 (trompete, flugel, saxes e trombone) com harmonia no tom, timbres de estúdio jamaicano, Mastor Tape Echo, EQ gráfico de 10 bandas com Filtro Tubby e frases MIDI (ataques estilo Dean Fraser e introduções) com notas escolhidas por você; final de nota natural e aba Músicos com 24 presets (Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis…) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.3/MDH-70-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MDH-70-1.3/MDH-70-Windows-Instalador.exe) | [DubHorns/](DubHorns/) |
-| **Mastor Tune MT-0420 1.0** | Efeito de voz: auto-tune para reggae que afina sem mudar o timbre, knob CLEAN ↔ ROBÔ, ESCUTAR RIDDIM (acha tom e acordes sozinho), link com o MRM-0420, editor de notas na timeline com as dúvidas destacadas, MIDI da melodia e aba PROCESSAMENTO (EQ gráfico, saturador, Big Knob, Tape Echo, Maximizer). [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/tune/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.0/MT-0420-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.0/MT-0420-Windows-Instalador.exe) | [Tune/](Tune/) |
+| **Mastor Key Scout MKS-0420 1.0** | Efeito de master: escuta o riddim e acha o tom, a escala e o acorde de cada momento, e manda para o Mastor Tune sem sidechain; áudio passa sem mudança e sem latência; TRAVAR TOM e APRENDER DE NOVO. [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/keyscout/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MKS-0420-1.0/MKS-0420-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MKS-0420-1.0/MKS-0420-Windows-Instalador.exe) | [KeyScout/](KeyScout/) |
+| **Mastor Tune MT-0420 1.1** | Efeito de voz: auto-tune para reggae que afina sem mudar o timbre, knob CLEAN ↔ ROBÔ, ESCUTAR RIDDIM (acha tom e acordes sozinho), link com o Mastor Key Scout e o MRM-0420, teclado que apaga as notas fora da escala, bypass do afinador, editor de notas na timeline com as dúvidas destacadas, MIDI da melodia e aba PROCESSAMENTO (EQ gráfico, saturador, Big Knob, Tape Echo, Maximizer). [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/tune/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.1/MT-0420-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MT-0420-1.1/MT-0420-Windows-Instalador.exe) | [Tune/](Tune/) |
 | **Mastor Half Dub MHD-050 1.0** | Efeito novo: meia velocidade de fita (evolução do half-time). VELOCIDADE 1/1, 2/3, 1/2, 1/3, 1/4 e REV presa ao compasso, motor FITA ou GROOVE, três bandas com velocidade própria, botão DROP com POWER DOWN/UP, pads REWIND / TAPE STOP / REVERSE / SPIN-BACK (também por MIDI), eco de fita com WASHOUT, EQ gráfico editável e Mastor Big Knob. Abre com o efeito ligado. [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/halfdub/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MHD-050-1.0/MHD-050-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MHD-050-1.0/MHD-050-Windows-Instalador.exe) | [HalfDub/](HalfDub/) |
 | **Mastor Phone Vox MPV-01 1.6** | Efeito de voz (antigo Mastor Fone): rádio AM, telefone antigo e megafone, com o eco de fita e o maximizer do Big Knob, no visual Dub Station | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MPV-01-1.6/MPV-01-Windows-Instalador.exe) | [PhoneVox/](PhoneVox/) |
 | **Mastor Tape Echo MTE-12 2.6** | Eco de fita de 3 cabeças + reverb de mola, com EQ gráfico | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MTE-12-2.6/MTE-12-Windows-Instalador.exe) | [TapeEcho/](TapeEcho/) |
@@ -61,8 +71,8 @@ Todos os downloads ficam na página de **[Releases](https://github.com/dubmastor
 
 Um instalador só com a coleção inteira — na instalação dá para desmarcar os que não quiser:
 
-- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.6/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
-- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.6/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
+- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.7/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
+- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-2.7/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
 - **Pro Tools (AAX):** em preparação — veja [PROTOOLS.md](PROTOOLS.md).
 
 ## Instalação no Cubase
@@ -108,6 +118,7 @@ Padrão de nomes: **`Mastor <Nome> <SIGLA>`** no Cubase (fabricante **DubMastor*
 | `PhoneVox/` | Mastor Phone Vox MPV-01 (antigo Mastor Fone) | MPV-01 | `build-phonevox.yml` |
 | `HalfDub/` | Mastor Half Dub MHD-050 | MHD-050 | `build-halfdub.yml` |
 | `Tune/` | Mastor Tune MT-0420 | MT-0420 | `build-tune.yml` |
+| `KeyScout/` | Mastor Key Scout MKS-0420 | MKS-0420 | `build-keyscout.yml` |
 | `ReggaeChordMachine/` | Mastor Reggae Chord Machine MRCM-1240 (legado: aba CHORD MACHINE do MRK-80) | MRCM-1240 | `build-reggaechordmachine.yml` |
 | `ReggaeBass/` | Mastor Reggae Bass MRB-69 (antigo Dub Bass / MRDBI-07; absorveu o MRBM-69) | MRB-69 | `build-reggaebass.yml` |
 | `ReggaeDrumMachine/` | Mastor Reggae Drum Machine MRDM-12 (antigo Mastor Dub Drums Machine MDDM-12) | MRDM-12 | `build-reggaedrummachine.yml` |

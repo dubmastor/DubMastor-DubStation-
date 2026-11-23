@@ -89,6 +89,19 @@ private:
     float needle = 0.0f, vel = 0.0f, target = 0.0f; bool on = false;
 };
 
+// teclado de baixo: acende a nota cantada (e a nota corrigida) e apaga as notas fora do tom e da escala
+class ScaleKeyboard : public juce::Component
+{
+public:
+    void paint (juce::Graphics&) override;
+    void set (uint16_t allowedMask, float sungMidi, int targetMidi, bool bypassed);
+    static constexpr int kLow = 36, kHigh = 83;   // C2 .. B5
+private:
+    uint16_t mask = 0x0fff;
+    float sung = 0.0f; int target = -1; bool byp = false;
+    float glow = 0.0f;
+};
+
 // editor de notas (preso à timeline da DAW)
 class NoteEditor : public juce::Component
 {
@@ -190,7 +203,7 @@ public:
     void paintOverChildren (juce::Graphics&) override;
     void resized() override;
     void showTab (int t);
-    static constexpr int kW = 1200, kH = 960;
+    static constexpr int kW = 1200, kH = 1080;
 private:
     void timerCallback() override;
     void renderBackground();
@@ -218,12 +231,14 @@ private:
     SatView* satView = nullptr;
     EchoView* echoView = nullptr;
     MaxMeters* maxMeters = nullptr;
+    ScaleKeyboard* keyboard = nullptr;
+    LampKey* bypassKey = nullptr;
     MastorTuneProcessor::Status st;
     float anim = 0.0f;
 
     // áreas (coordenadas do painel 1200 x 960)
     juce::Rectangle<int> secTabs, secHarm, secKey, secKnob, secMeter, secNotes;
-    juce::Rectangle<int> secEq, secSat, secBk, secEcho, secMax;
+    juce::Rectangle<int> secEq, secSat, secBk, secEcho, secMax, secKeys;
     juce::Rectangle<float> mrmGlass, riddimGlass, infoBox, keyGlass, knobGlass, noteGlass, eqRead, maxRead, doubtGlass;
 };
 } // namespace mtui
