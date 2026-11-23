@@ -6,8 +6,8 @@
 
   const gm = { Kick: 36, SideStick: 37, Snare: 38, ClosedHat: 42, PedalHat: 44, OpenHat: 46,
                TomLow: 43, TomMid: 47, TomHigh: 50, Crash: 49 };
-  const Style = { Rockers: 0, OneDrop: 1, BoomBap: 2 };
-  const Hat = { Eighths: 0, Sixteenths: 1, Offbeat: 2, Triplets: 3 };
+  const Style = { Rockers: 0, OneDrop: 1, BoomBap: 2, Dembow: 3 };
+  const Hat = { Eighths: 0, Sixteenths: 1, Offbeat: 2, Triplets: 3, FlyingCymbal: 4, OpenOnOne: 5 };
   const Swing = { Straight: 0, Light: 1, Medium: 2, Heavy: 3, Shuffle: 4 };
   const Dyn = { Soft: 0, Medium: 1, Loud: 2, Accented: 3, Crescendo: 4, Breathing: 5 };
   const Drummer = { StyleScott: 0, SantaDavis: 1, CarltonBarrett: 2, SlyDunbar: 3, Digikal: 4 };
@@ -130,8 +130,9 @@
         case Style.Rockers: for (const st of [3, 7, 11, 15]) pickup(st, r * 0.22, 76); break;
         case Style.OneDrop: pickup(15, r * 0.18, 78); pickup(7, r * 0.10, 70); break;
         case Style.BoomBap: for (const st of [7, 10, 15]) pickup(st, r * 0.30, 88); break;
+        case Style.Dembow: break;   // dembow: o bumbo é só o quatro no chão
       }
-      if (s.style === Style.BoomBap) continue;
+      if (s.style === Style.BoomBap || s.style === Style.Dembow) continue;
       const extra = (st, p, vel) => {
         if (st % 2 === 0 && maskHas(s.kickMask, st / 2)) return;
         if (!b.has(stepPos(bar, st), gm.Kick) && rng.chance(p)) b.add(stepPos(bar, st), gm.Kick, vel);
@@ -167,6 +168,15 @@
           b.add(stepPos(bar, st) - 0.03, gm.Snare, 60);
           b.add(stepPos(bar, st), gm.Snare, 114);
         } else addBackbeat(b, stepPos(bar, st), s.backbeat, 110);
+      }
+      // DEMBOW (Steely & Clevie): caixa no "a" do 1 e no "e" do 2, repetida no 3 e no 4, com rufos
+      if (s.style === Style.Dembow) {
+        for (const st of [3, 6, 11, 14]) addBackbeat(b, stepPos(bar, st), s.backbeat, (st === 3 || st === 11) ? 104 : 96);
+        if (s.strict) continue;
+        if ((lastBar && s.bars > 1) || rng.chance(0.20 + r * 0.40))
+          for (const st of [12, 13, 15])
+            if (!b.has(stepPos(bar, st), gm.Snare)) b.add(stepPos(bar, st), gm.Snare, trunc(rng.range(64, 84)));
+        continue;
       }
       if (s.strict) continue;   // reggae de livro: só a batida principal
       const ghost = feelOf(s.drummer).ghosts;
@@ -212,6 +222,8 @@
     const hatAt = (beat) => b.ev.some((e) => isHat(e.note) && nearly(e.beat, t0 + beat));
     const inBar = (e) => e.beat >= t0 && e.beat < t0 + 4.0;
 
+    // figuras de hi-hat que já são a assinatura de quem as criou: nada por cima
+    if (s.hatPattern === Hat.FlyingCymbal || s.hatPattern === Hat.OpenOnOne) return;
     if (s.hatPattern === Hat.Triplets) {
       if (s.drummer === Drummer.CarltonBarrett)
         for (const e of b.ev)
@@ -300,6 +312,29 @@
             b.add(pos, open ? gm.OpenHat : gm.ClosedHat, vel, open ? 0.25 : 0.1);
           }
         hatSignature(b, bar, rng, r);
+        continue;
+      }
+      if (s.hatPattern === Hat.FlyingCymbal) {
+        // FLYING CYMBAL (Santa Davis / Bunny Lee): abre no contratempo, o pé fecha no tempo
+        const t0 = barStart(bar);
+        for (let beat = 0; beat < 4; ++beat) {
+          b.add(t0 + beat, gm.ClosedHat, beat % 2 === 0 ? 62 : 56);
+          for (const q of [0.25, 0.75])
+            if (rng.chance(0.30 + r * 0.30)) b.add(t0 + beat + q, gm.ClosedHat, trunc(rng.range(30, 42)));
+          b.add(t0 + beat + 0.5, gm.OpenHat, 100, 0.22);
+        }
+        continue;
+      }
+      if (s.hatPattern === Hat.OpenOnOne) {
+        // Carlton Barrett (Get Up Stand Up): ride de jazz no hi-hat, abre no 1 e no 3
+        const t0 = barStart(bar);
+        for (let e8 = 0; e8 < 8; ++e8) {
+          const at = t0 + e8 * 0.5;
+          if (e8 === 0 || e8 === 4) { b.add(at, gm.OpenHat, 96, 0.45); continue; }
+          b.add(at, gm.ClosedHat, (e8 === 1 || e8 === 5) ? 64 : (e8 % 2 === 0 ? 80 : 70));
+        }
+        for (const beat of [1, 3])
+          if (rng.chance(orn * 0.30)) b.add(t0 + beat + 2.0 / 3.0, gm.ClosedHat, trunc(rng.range(44, 58)));
         continue;
       }
       let skipNext = false;
@@ -495,8 +530,8 @@
     return p;
   }
 
-  function defaultKickMask(st) { return st === Style.OneDrop ? 0x44 : st === Style.BoomBap ? 0x29 : 0x11; }
-  function defaultSnareMask() { return 0x44; }
+  function defaultKickMask(st) { return st === Style.OneDrop ? 0x44 : st === Style.BoomBap ? 0x29 : st === Style.Dembow ? 0x55 : 0x11; }
+  function defaultSnareMask(st) { return st === Style.Dembow ? 0 : 0x44; }
   function defaults() {
     return { style: Style.Rockers, kickMask: 0x11, snareMask: 0x44, bars: 4, hatPattern: Hat.Eighths, swing: Swing.Straight,
              swingAll: true, dynamics: Dyn.Medium, randKick: 0.15, randSnare: 0.25, randHat: 0.30, randPerc: 0.20,

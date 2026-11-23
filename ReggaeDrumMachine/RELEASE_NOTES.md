@@ -1,3 +1,22 @@
+## Mastor Reggae Drum Machine MRDM-12 2.7 🟢🟡⚫
+
+- **118 GROOVES** no visor azul (antes 21), separados por baterista, tirados de uma pesquisa de créditos e transcrições:
+  - **Style Scott (22):** Night Nurse, Bounty Hunter, Minibus, Wa Do Dem, Police In Helicopter, Firehouse Rock, Cool Runnings, Zungguzung…
+  - **Santa Davis (21):** None Shall Escape the Judgement, Rock With Me Baby, A Dance In A Greenwich Farm, Westbound Train, Coming In From The Cold, Glass House…
+  - **Carlton Barrett (26):** No Woman No Cry, Get Up Stand Up, I Shot The Sheriff, Jamming, Could You Be Loved, Duppy Conqueror, Young Generation Dub…
+  - **Sly Dunbar (27):** Right Time, MPLA, Police And Thieves, Two Sevens Clash, General Penitentiary, World A Music, Murder She Wrote…
+  - **DIGIKAL (22):** Under Mi Sleng Teng, Tempo, Punaany, Duck, Agony, Ring The Alarm, Poco Man Jam, Fish Market, Dem Bow…
+- **Estilo DEMBOW** (Steely & Clevie, 1989): bumbo nos 4 tempos, caixa boom-ch-boom-chick e rufos no fim
+- **Hi-hat FLYING CYMBAL** (Santa Davis / Bunny Lee, 1974): abre no contratempo, o pé fecha no tempo
+- **Hi-hat ABRE NO 1** (Carlton Barrett em Get Up Stand Up): ride de jazz no hi-hat, abre no 1 e no 3
+- Grooves corrigidos pela pesquisa: Stalag 17 (bumbo "funde" do Nyabinghi, como Santa Davis conta), BPM de Big Ship, Shine Eye Gal e Sleng Teng iguais aos do MRBM-69
+- Lista completa com crédito e fonte de cada groove em `docs/GROOVES.md`
+- Versão para celular igual, com os mesmos 118 grooves, o Dembow e os hi-hats novos
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Drum Machine MRDM-12 2.6 🟢🟡⚫
 
 - **GROOVES no visor azul de MPC** (no módulo BATERISTA, igual ao do Mastor Riddim Machine): 21 presets tirados de músicas de cada baterista. **◀ ▶** passa pelas músicas do baterista escolhido; clique no visor para a lista completa, separada por baterista

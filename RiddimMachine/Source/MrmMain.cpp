@@ -859,9 +859,9 @@ void DrumLane::paint (juce::Graphics& g)
     {
         // estilo e hi-hat da bateria (a ALAVANCA sorteia os dois): sempre à vista
         auto& d = proc.getDrums().apvts;
-        const char* hats[] = { "HI-HAT 1/8", "HI-HAT 1/16", "HI-HAT CONTRATEMPO", "HI-HAT TERCINAS" };
+        const char* hats[] = { "HI-HAT 1/8", "HI-HAT 1/16", "HI-HAT CONTRATEMPO", "HI-HAT TERCINAS", "HI-HAT FLYING CYMBAL", "HI-HAT ABRE NO 1" };
         const auto style = (dubdrums::Style) juce::roundToInt (d.getRawParameterValue ("style")->load());
-        const int hat = juce::jlimit (0, 3, juce::roundToInt (d.getRawParameterValue ("hatPattern")->load()));
+        const int hat = juce::jlimit (0, 5, juce::roundToInt (d.getRawParameterValue ("hatPattern")->load()));
         g.setColour (col::amber.withAlpha (0.85f));
         g.setFont (stencil (8.0f, 0.15f));
         juce::ignoreUnused (style);   // o estilo fica nas teclas ESTILO DE REGGAE
@@ -1392,7 +1392,7 @@ MainPage::MainPage (MrmProcessor& p)
         juce::StringArray { "STYLE SCOTT", "SANTA DAVIS", "CARLTON BARRETT", "SLY DUNBAR", "DIGIKAL" }, 3);
     // harmonia: o skank é sempre no contratempo (sem seletor; a janela fixa é desenhada no paint)
     // bateria: o estilo de reggae (com o bumbo e a caixa dele, como no MRDM-12)
-    drumStyle = std::make_unique<MusicianKeys> (*d.apvts.getParameter ("style"), juce::StringArray { "ROCKERS", "ONE DROP", "BOOM BAP" }, 3);
+    drumStyle = std::make_unique<MusicianKeys> (*d.apvts.getParameter ("style"), juce::StringArray { "ROCKERS", "ONE DROP", "BOOM BAP", "DEMBOW" }, 4);
     drumStyle->onSelect = [this] (int st) { proc.getDrums().applyStyleDefaults (st); };
     addAndMakeVisible (*drumStyle);
     {

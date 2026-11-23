@@ -1,3 +1,13 @@
+## Mastor Riddim Machine MRM-0420 2.2 — DubStation
+
+- **118 GROOVES do MRDM-12 2.7 na aba BATERIA** (antes 21): músicas de Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL
+- Estilo de reggae **DEMBOW** nas teclas ESTILO DE REGGAE, e hi-hats **FLYING CYMBAL** e **ABRE NO 1**
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Riddim Machine MRM-0420 2.1 — DubStation
 
 - **GROOVES do MRDM-12 2.6 na aba BATERIA**: visor azul de MPC no módulo BATERISTA com 21 presets de músicas de cada baterista

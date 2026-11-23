@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Riddim Machine MRM-0420 2.1 — DubStation</title>
+<title>Mastor Riddim Machine MRM-0420 2.2 — DubStation</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -183,7 +183,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">2.1</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
+  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">2.2</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
   <div class="plaque">MRM-0420</div>
   <div class="brand"><div class="flag"></div><b>DUBSTATION</b></div>
 </header>
@@ -282,7 +282,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <script src="../chords/presetmenu.js"></script>
 <script>
 'use strict';
-const VERSION = '2.1';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
+const VERSION = '2.2';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
 document.getElementById('ver').textContent = VERSION;
 const C = window.MRCM, D = window.MDDM, B = window.MRBM;
 const $ = (id) => document.getElementById(id);
@@ -310,7 +310,7 @@ const lineSeed = (m) => (st.lineSeed && st.lineSeed[m]) || st.seed;   // NOVA LI
 const bassSettings = () => ({ style: st.bassist, seed: lineSeed(BASS), density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7, strict: true });   // reggae de livro, como no plugin
 const drumSettings = () => Object.assign(D.defaults(), { style: st.style, kickMask: D.defaultKickMask(st.style), snareMask: D.defaultSnareMask(st.style),
                                                          hatPattern: st.hat, drummer: st.drummer, seed: lineSeed(DRUMS), bars: 4, strict: true });
-const STYLE_NAMES = ['ROCKERS', 'ONE DROP', 'BOOM BAP'], HAT_NAMES = ['HI-HAT 1/8', 'HI-HAT 1/16', 'HI-HAT CONTRATEMPO', 'HI-HAT TERCINAS'];
+const STYLE_NAMES = ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'], HAT_NAMES = ['HI-HAT 1/8', 'HI-HAT 1/16', 'HI-HAT CONTRATEMPO', 'HI-HAT TERCINAS', 'HI-HAT FLYING CYMBAL', 'HI-HAT ABRE NO 1'];
 
 let drums, chords, bass;            // { events, loopBeats } de cada máquina (com as edições)
 let edited = [false, false, false];
@@ -560,7 +560,7 @@ function drawChords() {
 
 // ---------------------------------------------------------------- máquinas: liga/desliga, músicos, MIDI editável, baixar
 const MACHINES = [
-  { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3', extra: { who: 'ESTILO DE REGGAE', key: 'style', names: ['ROCKERS', 'ONE DROP', 'BOOM BAP'] },
+  { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3', extra: { who: 'ESTILO DE REGGAE', key: 'style', names: ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'] },
     names: ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL'] },
   { id: CHORDS, name: 'HARMONIA', model: 'MRCM-1240', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
     names: ['CONTRATEMPO'] },

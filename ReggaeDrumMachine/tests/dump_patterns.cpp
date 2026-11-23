@@ -18,9 +18,9 @@ int main()
 {
     const float rands[] = { 0.0f, 0.15f, 0.35f, 0.6f, 1.0f };
     int n = 0;
-    for (int style = 0; style < 3; ++style)
+    for (int style = 0; style < 4; ++style)
     for (int drummer = 0; drummer < numDrummers; ++drummer)
-    for (int hat = 0; hat < 4; ++hat)
+    for (int hat = 0; hat < 6; ++hat)
     for (int k = 0; k < 6; ++k)
     {
         Settings s;

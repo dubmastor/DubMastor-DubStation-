@@ -1,3 +1,11 @@
+## Mastor Dub Battery Reggae DBR 1.3 — Dub Station
+
+- **118 GROOVES na aba DUB DRUMS** (os do MRDM-12 2.7, antes 21), separados por baterista, com o BPM de cada gravação
+- Estilo **DEMBOW** e hi-hats **FLYING CYMBAL** e **ABRE NO 1** no gerador da aba DUB DRUMS
+- Versão para celular igual
+
+---
+
 ## Mastor Dub Battery Reggae DBR 1.2 — Dub Station
 
 O **Dub Battery Reggae** agora se chama **Mastor Dub Battery Reggae DBR**, no padrão dos outros plugins da Dub Station.
