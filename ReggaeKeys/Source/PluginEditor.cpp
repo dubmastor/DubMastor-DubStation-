@@ -2,6 +2,9 @@
 #include "SkinTextures.h"
 #include "BinaryData.h"
 
+class DubChordsProcessor;
+std::unique_ptr<juce::Component> makeChordMachinePanel (DubChordsProcessor&);   // Source/MachineEditorUnit.cpp
+
 using namespace vintage;
 
 namespace
@@ -175,8 +178,10 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     }
     tabInstrument.onClick = [this] { setPage (0); };
     tabChords.onClick     = [this] { setPage (1); };
-    chordsPage = std::make_unique<DubChordsPage> (proc, lnf);
-    addChildComponent (*chordsPage);
+    machinePanel = makeChordMachinePanel (proc.getMachine());
+    addChildComponent (*machinePanel);
+    addChildComponent (machineOnBtn);
+    machineOnAtt = std::make_unique<APVTS::ButtonAttachment> (s, "machineOn", machineOnBtn);
     modeOrgan.onClick = [this] { setModeParam (1); };
 
     // presets: 4 de piano (botões com LED) e 4 de órgão (teclas invertidas)
@@ -370,7 +375,6 @@ void RootsKeysEditor::applySkin (int newSkin)
     keyboard.setColour (juce::MidiKeyboardComponent::textLabelColourId, piano ? juce::Colour (0xff6a6a6e) : brownInk);
 
     for (auto* t : { &tabInstrument, &tabChords }) t->getProperties().set ("style", "chip");
-    if (chordsPage) chordsPage->setSkin (skin);
     updateVisibility();
     sendLookAndFeelChange();
     resized();
@@ -390,11 +394,13 @@ void RootsKeysEditor::updateVisibility()
     const bool piano = (skin != 1), inst = (page == 0);
     tabInstrument.setToggleState (inst, juce::dontSendNotification);
     tabChords.setToggleState (! inst, juce::dontSendNotification);
-    if (chordsPage) chordsPage->setVisible (! inst);
+    machinePanel->setVisible (! inst);
+    machineOnBtn.setVisible (! inst);
 
-    // área do teclado (fica nas duas abas)
-    wheels.setVisible (piano);
-    for (auto& b : organPreset) b.setVisible (! piano);
+    // área do teclado (a CHORD MACHINE tem o próprio teclado de acordes e usa a janela inteira)
+    keyboard.setVisible (inst);
+    wheels.setVisible (inst && piano);
+    for (auto& b : organPreset) b.setVisible (inst && ! piano);
 
     // instrumento
     lcd.setVisible (inst && piano);
@@ -430,7 +436,6 @@ void RootsKeysEditor::updateLcd()
 
 void RootsKeysEditor::timerCallback()
 {
-    if (page == 1 && chordsPage) chordsPage->refresh();
     applySkin ((int) proc.apvts.getRawParameterValue ("mode")->load());
 
     vuL.update (proc.meterL.load(), 1.0f / 30.0f);
@@ -510,7 +515,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.drawText ("DubMastor", 28, 8, 200, 18, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xfff2f2f2));
         g.setFont (juce::FontOptions (pianoTitleFace).withHeight (23.0f).withKerningFactor (0.06f));
-        g.drawText ("ROOTS KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
+        g.drawText ("REGGAE KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
         g.drawText ("DIGITAL PIANO SYNTHESIS  MRK-80  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
@@ -603,7 +608,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.drawText (versionText(), 112, 12, 60, 16, juce::Justification::centredLeft);
         g.setColour (ivory);
         g.setFont (juce::FontOptions (organTitleFace).withHeight (36.0f));
-        g.drawText ("Roots Keys", 28, 24, 320, 44, juce::Justification::centredLeft);
+        g.drawText ("Reggae Keys", 28, 24, 320, 44, juce::Justification::centredLeft);
 
         // trilho escuro da chave de modo
         g.setColour (brownInk);
@@ -667,6 +672,11 @@ void RootsKeysEditor::paint (juce::Graphics& g)
         backgroundPage = page;
     }
     g.drawImageAt (background, 0, 0);
+    if (page == 1)
+    {   // fundo da aba CHORD MACHINE (o painel do MRCM-1240 ocupa quase tudo)
+        g.setColour (juce::Colour (0xff1b1410));
+        g.fillRect (0, 77, kW, kH - 77);
+    }
 }
 
 void RootsKeysEditor::resized()
@@ -674,9 +684,17 @@ void RootsKeysEditor::resized()
     const bool piano = (skin != 1);
 
     // abas
-    tabInstrument.setBounds (222, 30, 92, 26);
-    tabChords.setBounds (318, 30, 92, 26);
-    if (chordsPage) chordsPage->setBounds (24, 86, 952, 538);
+    tabInstrument.setBounds (222, 30, 88, 26);
+    tabChords.setBounds (313, 30, 100, 26);
+    machineOnBtn.setBounds (600, 30, 150, 26);
+    {   // o painel do MRCM-1240 (1240 x 846) escalado para caber embaixo do cabeçalho
+        const int pw = 1240, ph = 846, top = 78;
+        const float sc = juce::jmin ((float) kW / (float) pw, (float) (kH - top) / (float) ph);
+        machinePanel->setTransform ({});
+        machinePanel->setBounds (0, 0, pw, ph);
+        const float x = ((float) kW - pw * sc) * 0.5f, y = (float) top + ((float) (kH - top) - ph * sc) * 0.5f;
+        machinePanel->setTransform (juce::AffineTransform::scale (sc).translated (x, y));
+    }
 
     // cabeçalho
     modePiano.setBounds (piano ? juce::Rectangle<int> (764, 28, 96, 26) : juce::Rectangle<int> (766, 27, 95, 26));

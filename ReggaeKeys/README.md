@@ -1,13 +1,16 @@
-# DubMastor Roots Keys 2.4
+# Mastor Reggae Keys MRK-80 3.0
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/RootsKeys-2.4/DubMastorRootsKeys-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
+
+(Antes se chamava **DubMastor Roots Keys** e **Mastor Roots Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240**, que virou a aba CHORD MACHINE.)
 
 | Modo piano | Modo órgão |
 |---|---|
 | ![Modo piano](docs/interface-piano.png) | ![Modo órgão](docs/interface-organ.png) |
-| ![Aba Dub Chords no piano](docs/interface-dubchords-piano.png) | ![Aba Dub Chords no órgão](docs/interface-dubchords-organ.png) |
+
+![Aba CHORD MACHINE](docs/interface-chord-machine.png)
 
 Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cada vez:
 
@@ -36,17 +39,17 @@ As duas rodas do lado do teclado funcionam com o mouse e com o MIDI:
 - **PITCH**: arraste para cima/baixo — ±2 semitons em todos os timbres e no órgão; ao soltar, volta ao centro como a roda de verdade.
 - **MOD**: arraste para definir — no piano faz **vibrato**; no órgão, acima da metade, liga a **Leslie rápida**. Duplo clique zera.
 
-## Aba DUB CHORDS — monte o riddim e arraste para a DAW
+## Aba CHORD MACHINE — o MRCM-1240 dentro do teclado
 
-O gerador de harmonia do **Dub Chords** dentro do Roots Keys. Clique em **DUB CHORDS** no cabeçalho:
+Clique em **CHORD MACHINE** no cabeçalho: é o **Mastor Reggae Chord Machine MRCM-1240** inteiro (o código vem direto de `ReggaeChordMachine/`, nada copiado), só com acordes **maior e menor**:
 
-- **Riddims prontos**: Roots menor, One drop, Rockers, Lovers, Steppers, Nyabinghi, Dub jazz e outros, para começar rápido.
-- **4 cartões de acorde**: tônica (12 notas), tipo (maior, menor, 7, m7, maj7, m6, sus2, sus4, dim, m9), duração (1/2 a 8 compassos) e ON. O plugin escolhe a inversão mais próxima do acorde anterior (condução de vozes).
-- **Duas mãos**: cada acorde sai com **6 notas** — a mesma inversão em duas oitavas, como um tecladista tocando com as duas mãos. Nos acordes de 4 notas cada mão toca as 3 que definem o som (sem a quinta; no m9, terça, sétima e nona).
-- **Ritmo**: *Auto* segue o instrumento (skank no piano, bubble no órgão) ou escolha skank, one drop, double skank, bubble ou steppers. **Tamanho da nota** (1/32, 1/16, 1/8, 1/4, 1/2 — começa sempre em **1/32**), registro da mão esquerda, velocity e swing.
-- **Toca no próprio instrumento**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCAR COM A DAW** segue o play, o BPM e o loop da DAW. O som passa pelo eco, flanger e maximizer, e o teclado acende junto.
-- **Grade (piano roll)**: o loop inteiro com as vozes das duas mãos, os nomes dos acordes e o cursor da DAW.
-- **Arraste para a DAW**: a **grade inteira** é arrastável, e ainda dá para arrastar **a progressão** ou **um acorde sozinho** (no cartão). Vem com o tempo do projeto e repetição x1, x2, x4 ou x8. **SALVAR .MID** grava em Documentos/Roots Keys.
+- **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano no contratempo com as duas mãos e, com **BUBBLE**, o bubble de Hammond.
+- **PRESETS**: o banco único de riddims (356 músicas, 155 riddims; ESTILOS, RIDDIMS A–Z, MÚSICAS A–Z, luzes H B D) e as 180 harmonias clássicas.
+- **Som**: com o **SOM INTERNO** desligado (o padrão), os acordes tocam no piano ou no órgão do instrumento, passando pelo eco, flanger, reverb e maximizer. Ligado, toca o som próprio da machine: piano M1 no skank e Hammond no bubble ao mesmo tempo (PIANO M1 e HAMMOND ajustam os níveis).
+- **Tocar**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCA COM A DAW** (no cabeçalho) segue o play, o BPM e o loop da DAW.
+- **MIDI**: EXPORTAR ou ARRASTAR para a timeline, com repetição 1x a 8x.
+
+Projetos salvos com a antiga aba DUB CHORDS abrem na CHORD MACHINE com os mesmos acordes (7, maj7, sus2 e sus4 viram maior; m7, m6, dim e m9 viram menor).
 
 ## Dois visuais
 
@@ -80,7 +83,7 @@ Um preset de piano nunca altera o órgão, e vice-versa.
 
 ## Compilar
 
-O GitHub Actions (`.github/workflows/build-reggaekeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `MRK-80-Windows.zip` / `MRK-80-macOS.zip` à release `RootsKeys-x.y` (uma por versão; ela não vira a "latest" do repositório).
+O GitHub Actions (`.github/workflows/build-reggaekeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa os instaladores e os zips à release `MRK-80-x.y` (uma por versão; ela não vira a "latest" do repositório).
 
 Localmente:
 ```bash
@@ -90,19 +93,23 @@ cmake --build build --config Release
 
 Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o render_demo && ./render_demo`
 
+Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, capturas da interface): `cmake -B build -DROOTSKEYS_TESTS=ON && cmake --build build --target RootsKeysTest && ./build/RootsKeysTest_artefacts/Release/RootsKeysTest docs`
+
 ## Arquivos
 - `Source/RootsKeysEngine.h` — piano, órgão, Leslie, reverb e maximizer (sem dependências)
 - `Source/TapeEchoDSP.h` — Mastor Tape Echo MTE-12 (cópia do Dub Station 2.1)
 - `Source/PluginProcessor.*` — parâmetros, presets, MIDI, medidores
 - `Source/PluginEditor.*` — interface com os dois visuais, abas e a placa Dub Station
-- `Source/DubChordsPage.*` — aba DUB CHORDS (cartões, ritmo, grade e arrastar MIDI)
-- `Source/DubChordsEngine.h` — motor de harmonia (cópia do `ReggaeChordMachine/Source/DubEngine.h`) + riddims prontos
+- `Source/MachineProcessorUnit.cpp` / `MachineEditorUnit.cpp` — compilam o MRCM-1240 (`ReggaeChordMachine/Source`) na aba CHORD MACHINE
 - `Source/VintageLookAndFeel.h` — knobs, faders, chaves e visor de cada visual
 - `Source/SkinTextures.h` — texturas procedurais (plástico preto e madeira)
 - `Source/VUMeter.h` — VU analógico
 - `Resources/` — fontes Archivo Black, Michroma e RootsKeys Display (licenças OFL em `Resources/licenses/`)
 
 "Korg" e "M1" são marcas da Korg Inc.; "Hammond" e "Leslie" são marcas da Hammond Suzuki. Este projeto não é afiliado a elas — os nomes indicam apenas o estilo de timbre emulado.
+
+## Novidades da 3.0
+- Nome novo **Mastor Reggae Keys MRK-80**; aba **CHORD MACHINE** com o MRCM-1240 inteiro (só maior e menor) no lugar da DUB CHORDS; banco único de riddims; versão para celular.
 
 ## Novidades da 2.4
 - Timbres de piano **GRAND**, **MT-40** (estilo Casio) e **FM EP** (estilo Yamaha DX), além do M1.

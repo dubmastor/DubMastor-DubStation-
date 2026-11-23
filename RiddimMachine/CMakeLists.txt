@@ -56,10 +56,10 @@ function(mrm_version dir out)
     set(${out} "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}" PARENT_SCOPE)
 endfunction()
 mrm_version(ReggaeDrums MRM_DRUMS_VER)        # a bateria é a do Mastor Reggae Drums MRD-12 (aba DUB DRUMS)
-mrm_version(ReggaeChordMachine MRM_CHORDS_VER)
+mrm_version(ReggaeKeys MRM_CHORDS_VER)          # a harmonia é a do Mastor Reggae Keys MRK-80 (aba CHORD MACHINE)
 mrm_version(ReggaeBass MRM_BASS_VER)            # o baixo é o do Mastor Reggae Bass MRB-69 (aba BASS MACHINE)
 mrm_version(BigKnob     MRM_KNOB_VER)
-message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRCM-1240 ${MRM_CHORDS_VER}, MRB-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
+message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRK-80 ${MRM_CHORDS_VER}, MRB-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
 
 set(MRM_SOURCES
     Source/MrmProcessor.cpp

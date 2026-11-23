@@ -187,7 +187,7 @@ Header::Header (MrmProcessor& p, std::function<void (int)> onTab)
 {
     setOpaque (true);
     const char* titles[MrmProcessor::numTabs] = { "RIDDIM", "HARMONIA", "BATERIA", "BAIXO", "CONTROL ROOM" };
-    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRCM-1240", "MRD-12", "MRB-69", u8 ("BIG KNOB  \xc2\xb7  MUTE") };
+    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRK-80", "MRD-12", "MRB-69", u8 ("BIG KNOB  \xc2\xb7  MUTE") };
     for (int i = 0; i < MrmProcessor::numTabs; ++i)
     {
         tabs[(size_t) i] = std::make_unique<TabKey> (titles[i], subs[i]);

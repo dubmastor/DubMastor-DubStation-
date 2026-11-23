@@ -3,7 +3,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include "RootsKeysEngine.h"
-#include "DubChordsEngine.h"
+
+class DubChordsProcessor;   // MRCM-1240 inteiro na aba CHORD MACHINE (Source/MachineProcessorUnit.cpp)
 
 struct Preset
 {
@@ -17,8 +18,7 @@ struct Preset
     float reverb;
 };
 
-class RootsKeysProcessor : public juce::AudioProcessor,
-                           private juce::AudioProcessorValueTreeState::Listener
+class RootsKeysProcessor : public juce::AudioProcessor
 {
 public:
     RootsKeysProcessor();
@@ -69,35 +69,21 @@ public:
         else            { uiModReq.store (juce::jlimit (0.0f, 1.0f, value));    modWheel.store (value); }
     }
 
-    // ---------------- aba DUB CHORDS (gerador de harmonia que toca o próprio piano/órgão)
-    static constexpr int dcSlots = 4;
-    std::vector<dub::ChordSlot> getDcSlots() const;          // só os acordes ligados
-    dub::ChordSlot getDcSlot (int i) const;                  // um cartão, ligado ou não
-    bool isDcSlotOn (int i) const;
-    dub::Settings getDcSettings() const;
-    int effectiveDcPattern() const;                          // "Auto" segue o instrumento
-    double getDcExportBpm() const;
-    void applyRiddim (int index);
-    // slot = -1: a progressão inteira; slot >= 0: só aquele acorde
-    bool writeDcMidiFile (const juce::File& file, int slot = -1) const;
-    std::atomic<double> dcPlayPos { -1.0 }, dcHostBpm { 0.0 };
-    std::atomic<bool> dcHostPlaying { false };
+    // ---------------- aba CHORD MACHINE (o Mastor Reggae Chord Machine MRCM-1240 inteiro, só maior e menor)
+    // SOM INTERNO da machine desligado: os acordes tocam no piano/órgão deste instrumento (com eco, flanger e maximizer).
+    // Ligado: o som próprio da machine (piano M1 no skank + Hammond no bubble, ao mesmo tempo), somado à saída.
+    DubChordsProcessor& getMachine() noexcept { return *machine; }
 
 private:
     rk::Engine engine;
     int currentProgram = 0;
     std::atomic<float>* dbParam[9] {};
 
-    // sequenciador Dub Chords (só na thread de áudio)
-    struct DcPending { int sample; bool on; int note; int vel; };
-    std::vector<dub::NoteEvent> dcLoop;
-    std::vector<DcPending> dcPending;
-    double dcLoopBeats = 0.0, dcExpectedPpq = 0.0, dcInternalPpq = 0.0, sampleRateHz = 48000.0;
-    bool dcWasPlaying = false, dcActive[128] {};
-    std::atomic<bool> dcDirty { true };
-    void parameterChanged (const juce::String&, float) override { dcDirty.store (true); }
-    void runDubChords (juce::MidiBuffer& midi, int numSamples);
-    void dcAllNotesOff (juce::MidiBuffer& midi, int sample);
+    std::unique_ptr<DubChordsProcessor> machine;
+    juce::AudioBuffer<float> machineBuf;
+    juce::MidiBuffer machineMidi;
+    void runMachine (juce::MidiBuffer& midi, int numSamples);
+    void migrateOldDubChords (const juce::ValueTree& oldState);   // projetos do Roots Keys 2.x (aba DUB CHORDS)
 
     void setParam (const juce::String& id, float value);
     float get (const char* id) const { return apvts.getRawParameterValue (id)->load(); }

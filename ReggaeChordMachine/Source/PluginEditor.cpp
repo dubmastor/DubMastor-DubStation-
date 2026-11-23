@@ -897,7 +897,11 @@ void DubChordsPanel::renderBackground()
     juce::String ver (JucePlugin_VersionString);
     if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
         ver = ver.upToLastOccurrenceOf (".", false, false);
+   #ifdef MCM_PANEL_TITLE   // dentro do Mastor Reggae Keys MRK-80 (aba CHORD MACHINE)
+    const juce::String title (MCM_PANEL_TITLE + ver);
+   #else
     const juce::String title ("MASTOR REGGAE CHORD MACHINE " + ver);
+   #endif
     {   // nome comprido: diminui a fonte se o título + a placa de latão não couberem antes das faixas da bandeira
         float fs = 30.0f;
         const float maxW = (float) plate.getWidth() - 330.0f - 32.0f - 26.0f - 260.0f;
@@ -910,7 +914,11 @@ void DubChordsPanel::renderBackground()
 
     {   // placa de latão com a sigla da máquina
         g.setFont (stencil (15.0f, 0.34f));
+       #ifdef MCM_PANEL_SIGLA
+        const juce::String t (MCM_PANEL_SIGLA);
+       #else
         const juce::String t ("MRCM-1240");
+       #endif
         const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t);
         auto pl = juce::Rectangle<float> (titleRight + 26.0f, 21.0f, tw + 64.0f, 32.0f);
         g.setColour (juce::Colours::black.withAlpha (0.28f));
@@ -950,7 +958,12 @@ void DubChordsPanel::renderBackground()
     }
     g.setColour (juce::Colour (0xfff3e6c8).withAlpha (0.75f));
     g.setFont (stencil (10.5f, 0.25f));
+   #ifdef MCM_PANEL_SIGLA
+    g.drawText (juce::String::fromUTF8 (MCM_PANEL_SIGLA "  \xc2\xb7  CHORD MACHINE MRCM-1240  \xc2\xb7  DUBMASTOR"),
+                plate.getX() + 34, 52, 600, 14, juce::Justification::left);
+   #else
     g.drawText (juce::String::fromUTF8 ("MRCM-1240  \xc2\xb7  RIDDIM CHORD GENERATOR  \xc2\xb7  DUBMASTOR"), plate.getX() + 34, 52, 600, 14, juce::Justification::left);
+   #endif
 
 
     // --- seções: moldura gravada + plaqueta preta com o nome

@@ -75,10 +75,12 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 - **Mastor Reggae Drums MRD-12** (`ReggaeDrums/`, antigo Dub Battery Reggae DBR) tem o MRDM-12 inteiro na aba DUB DRUMS.
 - **Mastor Reggae Bass MRB-69** (`ReggaeBass/`, antigo Dub Bass MRDBI-07) tem o MRBM-69 inteiro na aba BASS MACHINE
   (`Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`; nomes repetidos trocados em `MachineNames.h`).
-- **Mastor Reggae Keys MRK-80** (`ReggaeKeys/`) vai ganhar o MRCM-1240 na aba CHORD MACHINE (só maior e menor).
+- **Mastor Reggae Keys MRK-80** (`ReggaeKeys/`, antigo Roots Keys) tem o MRCM-1240 inteiro na aba CHORD MACHINE (só maior e menor;
+  `Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`). Projetos da antiga aba DUB CHORDS migram em `migrateOldDubChords`.
+  Versão para celular em `site/keys/` (usa `site/chords/engine.js`, que continua sendo o motor web da machine).
 - As machines separadas (MRDM-12, MRBM-69, MRCM-1240) ficam como **legado** no `plugins.json` (`"legado": "<instrumento>"`):
   saem do site e do pacote, a última release fica congelada (o workflow só publica por tag manual), mas a pasta continua
   porque o instrumento e o MRM-0420 compilam o código dela. Mudou uma machine? Teste o instrumento dela e o MRM-0420.
-- Ao renomear, o alvo do CMake e os IDs internos (`DubBatteryReggae`, `DubBatteryReggaeState`, `DubBassState`) ficam:
+- Ao renomear, o alvo do CMake e os IDs internos (`DubBatteryReggae`, `DubBatteryReggaeState`, `DubBassState`, `RootsKeys`, `PARAMS`) ficam:
   são eles que mantêm os projetos antigos abrindo.
 - Toda alteração de bateria vale para o MRD-12, o MRM-0420 e o código do MRDM-12.

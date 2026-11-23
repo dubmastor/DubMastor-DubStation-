@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "../../ReggaeChordMachine/Source/PluginProcessor.h"   // CHORD MACHINE (MRCM-1240)
 
 namespace
 {
@@ -83,39 +84,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
                                                   NormalisableRange<float> (-0.95f, 0.95f), 0.65f));
     l.add (pct ("flMix",    "Flanger Mix",    0.50f));
 
-    // ---------------- Dub Chords (aba de harmonia)
-    {
-        StringArray roots, quals, durs, pats;
-        for (int r = 0; r < 12; ++r) roots.add (dub::rootName (r));
-        quals = { "Maior", "menor", "7", "m7", "maj7", "m6", "sus2", "sus4", "dim", "m9" };
-        for (int d = 0; d < dub::numDurations; ++d) durs.add (dub::durationName (d));
-        pats.add ("Auto (segue o instrumento)");
-        for (int pt = 0; pt < dub::NumPatterns; ++pt) pats.add (dub::patternName (pt));
-        const int defRoot[4] = { 9, 2, 7, 0 }, defQual[4] = { 1, 1, 0, 0 };
-        l.add (std::make_unique<AudioParameterBool>  (ParameterID { "dcOn", 1 }, "Dub Chords: tocar com a DAW", false));
-        l.add (std::make_unique<AudioParameterBool>  (ParameterID { "dcPreview", 1 }, "Dub Chords: Preview", false));
-        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "dcBpm", 1 }, "Dub Chords: BPM do preview",
-                                                      NormalisableRange<float> (60.0f, 180.0f, 1.0f), 75.0f));
-        for (int i = 0; i < dcSlots; ++i)
-        {
-            const auto n = String (i), lbl = "Acorde " + String (i + 1) + " ";
-            l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcRoot" + n, 1 }, lbl + "tonica", roots, defRoot[i]));
-            l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcQual" + n, 1 }, lbl + "tipo", quals, defQual[i]));
-            l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcDur" + n, 1 }, lbl + "duracao", durs, 2));
-            if (i > 0)
-                l.add (std::make_unique<AudioParameterBool> (ParameterID { "dcAct" + n, 1 }, lbl + "ligado", i == 1));
-        }
-        l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcPattern", 1 }, "Dub Chords: padrao", pats, 0));
-        l.add (std::make_unique<AudioParameterInt>   (ParameterID { "dcRegister", 1 }, "Dub Chords: registro (mao esquerda)", 48, 72, 60));
-        l.add (pct ("dcVel",   "Dub Chords: velocity", 0.80f));
-        StringArray sizes;
-        for (int sz = 0; sz < dub::numNoteSizes; ++sz) sizes.add (dub::noteSizeName (sz));
-        l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcNoteSize", 1 }, "Dub Chords: tamanho da nota", sizes, 0));
-        l.add (pct ("dcSwing", "Dub Chords: swing", 0.0f));
-        l.add (std::make_unique<AudioParameterChoice> (ParameterID { "dcReps", 1 }, "Dub Chords: repetir no MIDI",
-                                                       StringArray { "x1", "x2", "x4", "x8" }, 1));
-    }
-
     l.add (pct ("reverb", "Reverb", 0.20f));
     l.add (pct ("master", "Master", 0.80f));
 
@@ -127,41 +95,37 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "maxCeiling", 1 }, "Maximizer Ceiling",
                                                   NormalisableRange<float> (-12.0f, 0.0f, 0.1f), -0.3f,
                                                   AudioParameterFloatAttributes().withLabel ("dB")));
+
+    // CHORD MACHINE (MRCM-1240): os acordes tocam junto com a DAW (o PREVIEW da aba toca sempre). No fim da lista:
+    // os parâmetros antigos não mudam de lugar.
+    l.add (std::make_unique<AudioParameterBool> (ParameterID { "machineOn", 1 }, "Chord Machine On", false));
     return l;
 }
 
 RootsKeysProcessor::RootsKeysProcessor()
     : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-      apvts (*this, nullptr, "PARAMS", createLayout())
+      apvts (*this, nullptr, "PARAMS", createLayout()),
+      machine (std::make_unique<DubChordsProcessor>())
 {
     for (int i = 0; i < 9; ++i)
         dbParam[i] = apvts.getRawParameterValue ("db" + juce::String (i + 1));
-    for (auto* prm : getParameters())
-        if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (prm))
-            if (rp->getParameterID().startsWith ("dc") || rp->getParameterID() == "mode")
-                apvts.addParameterListener (rp->getParameterID(), this);
+    // instância nova: os acordes da machine tocam no som deste instrumento (SOM INTERNO da machine desligado)
+    if (auto* prm = machine->apvts.getParameter ("sound")) prm->setValueNotifyingHost (0.0f);
 }
 
-RootsKeysProcessor::~RootsKeysProcessor()
-{
-    for (auto* prm : getParameters())
-        if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (prm))
-            apvts.removeParameterListener (rp->getParameterID(), this);
-}
+RootsKeysProcessor::~RootsKeysProcessor() = default;
 
 bool RootsKeysProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     return layouts.getMainOutputChannelSet() == juce::AudioChannelSet::stereo();
 }
 
-void RootsKeysProcessor::prepareToPlay (double sampleRate, int)
+void RootsKeysProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    sampleRateHz = sampleRate;
-    dcWasPlaying = false;
-    dcInternalPpq = 0.0;
-    std::fill (std::begin (dcActive), std::end (dcActive), false);
-    dcPending.reserve (512);
-    dcDirty.store (true);
+    machine->setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
+    machine->prepareToPlay (sampleRate, samplesPerBlock);
+    machineBuf.setSize (2, juce::jmax (1, samplesPerBlock));
+    machineMidi.ensureSize (2048);
     engine.prepare (sampleRate);
     setLatencySamples (engine.latencySamples());   // lookahead do maximizer
     keyboardState.reset();
@@ -220,8 +184,8 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.maxGainDb     = get ("maxGain");
     p.maxCeilDb     = get ("maxCeiling");
 
-    // aba DUB CHORDS: gera o skank/bubble sincronizado com a DAW e toca no próprio instrumento
-    runDubChords (midi, n);
+    // aba CHORD MACHINE: o MRCM-1240 gera o skank/bubble sincronizado com a DAW
+    runMachine (midi, n);
 
     // junta as notas do teclado da tela e atualiza as teclas pintadas
     keyboardState.processNextMidiBuffer (midi, 0, n, true);
@@ -258,6 +222,10 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     }
     if (pos < n) engine.render (L + pos, R + pos, n - pos);
 
+    // SOM INTERNO da machine ligado: o piano M1 + Hammond dela somados à saída
+    for (int ch = 0; ch < 2; ++ch)
+        buffer.addFrom (ch, 0, machineBuf, ch, 0, n);
+
     // medidores (média quadrática do bloco) para o VU
     float sl = 0, sr = 0;
     for (int i = 0; i < n; ++i) { sl += L[i] * L[i]; sr += R[i] * R[i]; }
@@ -265,212 +233,78 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     gainReduction.store (engine.gainReductionDb());
 }
 
-// =====================================================================  DUB CHORDS
-dub::ChordSlot RootsKeysProcessor::getDcSlot (int i) const
+// =====================================================================  CHORD MACHINE (MRCM-1240)
+void RootsKeysProcessor::runMachine (juce::MidiBuffer& midi, int numSamples)
 {
-    const auto n = juce::String (i);
-    dub::ChordSlot s;
-    s.root    = (int) apvts.getRawParameterValue ("dcRoot" + n)->load();
-    s.quality = (int) apvts.getRawParameterValue ("dcQual" + n)->load();
-    s.beats   = dub::durationBeats ((int) apvts.getRawParameterValue ("dcDur" + n)->load());
-    return s;
-}
+    machine->setPlayHead (getPlayHead());
+    machine->setNonRealtime (isNonRealtime());
+    machineBuf.setSize (2, numSamples, false, false, true);
+    machineBuf.clear();
+    machineMidi.clear();
+    machine->processBlock (machineBuf, machineMidi);   // limpa o buffer e escreve o som interno (se ligado)
 
-bool RootsKeysProcessor::isDcSlotOn (int i) const
-{
-    return i == 0 || apvts.getRawParameterValue ("dcAct" + juce::String (i))->load() > 0.5f;
-}
+    const bool heard = get ("machineOn") > 0.5f || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
+    const bool ownSound = machine->apvts.getRawParameterValue ("sound")->load() > 0.5f;
+    if (! heard) { machineBuf.clear(); return; }
+    if (ownSound) return;   // as notas já tocaram no som da machine (machineBuf vai para a saída)
 
-std::vector<dub::ChordSlot> RootsKeysProcessor::getDcSlots() const
-{
-    std::vector<dub::ChordSlot> v;
-    for (int i = 0; i < dcSlots; ++i)
-        if (isDcSlotOn (i)) v.push_back (getDcSlot (i));
-    return v;
-}
-
-int RootsKeysProcessor::effectiveDcPattern() const
-{
-    const int pat = (int) get ("dcPattern");
-    if (pat > 0) return pat - 1;
-    return (int) get ("mode") == 1 ? dub::Bubble : dub::SkankOffbeat;
-}
-
-dub::Settings RootsKeysProcessor::getDcSettings() const
-{
-    dub::Settings s;
-    s.pattern    = effectiveDcPattern();
-    s.centerNote = (int) get ("dcRegister");
-    s.velocity   = get ("dcVel");
-    s.noteSize   = (int) get ("dcNoteSize");
-    s.swing      = get ("dcSwing");
-    return s;
-}
-
-double RootsKeysProcessor::getDcExportBpm() const
-{
-    const double h = dcHostBpm.load();
-    return h > 0.0 ? h : (double) get ("dcBpm");
-}
-
-void RootsKeysProcessor::applyRiddim (int index)
-{
-    const auto& presets = dub::riddimPresets();
-    if (! juce::isPositiveAndBelow (index, (int) presets.size())) return;
-    const auto& r = presets[(size_t) index];
-    auto durIndex = [] (double beats)
+    // SOM INTERNO desligado: as notas (skank no canal 1, bubble no 3) tocam no piano/órgão deste instrumento
+    for (const auto meta : machineMidi)
     {
-        int best = 0;
-        for (int d = 0; d < dub::numDurations; ++d)
-            if (std::abs (dub::durationBeats (d) - beats) < std::abs (dub::durationBeats (best) - beats)) best = d;
-        return best;
+        auto m = meta.getMessage();
+        if (m.isNoteOnOrOff() || m.isAllNotesOff() || m.isAllSoundOff())
+        {
+            m.setChannel (1);
+            midi.addEvent (m, meta.samplePosition);
+        }
+    }
+}
+
+// Projetos do Roots Keys 2.x: a aba DUB CHORDS antiga vira a CHORD MACHINE com os mesmos acordes
+// (os tipos com tétrade ou suspensão viram o maior ou o menor mais perto, porque a machine só tem os dois).
+void RootsKeysProcessor::migrateOldDubChords (const juce::ValueTree& old)
+{
+    auto value = [&old] (const juce::String& id, double def)
+    {
+        for (const auto& c : old)
+            if (c.hasType ("PARAM") && c.getProperty ("id").toString() == id)
+                return (double) c.getProperty ("value", def);
+        return def;
     };
-    for (int i = 0; i < dcSlots; ++i)
+    bool any = false;
+    for (const auto& c : old)
+        if (c.hasType ("PARAM") && c.getProperty ("id").toString().startsWith ("dc")) { any = true; break; }
+    if (! any) return;
+
+    auto set = [this] (const juce::String& id, double v)
+    {
+        if (auto* p = machine->apvts.getParameter (id))
+            p->setValueNotifyingHost (p->convertTo0to1 ((float) v));
+    };
+    //                       Maior menor 7  m7 maj7 m6 sus2 sus4 dim m9
+    static const int toMinor[10] = { 0, 1, 0, 1, 0, 1, 0, 0, 1, 1 };
+    const int defRoot[4] = { 9, 2, 7, 0 }, defQual[4] = { 1, 1, 0, 0 };
+    for (int i = 0; i < 4; ++i)
     {
         const auto n = juce::String (i);
-        if (i < r.numChords)
-        {
-            setParam ("dcRoot" + n, (float) r.chords[i].root);
-            setParam ("dcQual" + n, (float) r.chords[i].quality);
-            setParam ("dcDur" + n, (float) durIndex (r.chords[i].beats));
-        }
-        if (i > 0) setParam ("dcAct" + n, i < r.numChords ? 1.0f : 0.0f);
+        set ("root" + n, value ("dcRoot" + n, defRoot[i]));
+        set ("qual" + n, toMinor[juce::jlimit (0, 9, (int) value ("dcQual" + n, defQual[i]))]);
+        set ("dur" + n, value ("dcDur" + n, 2));
+        set ("inv" + n, 0);
+        if (i > 0) set ("on" + n, value ("dcAct" + n, i == 1 ? 1 : 0));
     }
-}
-
-void RootsKeysProcessor::dcAllNotesOff (juce::MidiBuffer& midi, int sample)
-{
-    for (int nn = 0; nn < 128; ++nn)
-        if (dcActive[nn])
-        {
-            midi.addEvent (juce::MidiMessage::noteOff (1, nn), sample);
-            dcActive[nn] = false;
-        }
-}
-
-void RootsKeysProcessor::runDubChords (juce::MidiBuffer& midi, int numSamples)
-{
-    double bpm = 0.0, ppq = 0.0;
-    bool hostPlaying = false;
-    if (auto* ph = getPlayHead())
-        if (auto pos = ph->getPosition())
-        {
-            if (auto b = pos->getBpm())         bpm = *b;
-            if (auto q = pos->getPpqPosition()) ppq = *q;
-            hostPlaying = pos->getIsPlaying();
-        }
-    if (bpm > 0.0) dcHostBpm.store (bpm);
-    dcHostPlaying.store (hostPlaying);
-
-    const bool enabled = get ("dcOn") > 0.5f;
-    const bool preview = get ("dcPreview") > 0.5f;
-    bool playing = enabled && hostPlaying;
-    if (! hostPlaying && preview)
-    {
-        bpm = (double) get ("dcBpm");
-        ppq = dcInternalPpq;
-        playing = true;
-    }
-    if (! preview || hostPlaying) dcInternalPpq = 0.0;
-    if (bpm <= 0.0) bpm = 120.0;
-
-    if (dcDirty.exchange (false))
-        dcLoop = dub::buildLoop (getDcSlots(), getDcSettings(), dcLoopBeats);
-
-    const double blockBeats = (double) numSamples / sampleRateHz * bpm / 60.0;
-    if (! playing || dcLoopBeats <= 0.0)
-    {
-        if (dcWasPlaying) dcAllNotesOff (midi, 0);
-        dcWasPlaying = false;
-        dcPlayPos.store (-1.0);
-        return;
-    }
-
-    // salto no transporte (loop da DAW, reposicionamento): solta as notas presas
-    if (dcWasPlaying && std::abs (ppq - dcExpectedPpq) > 1.0e-3)
-        dcAllNotesOff (midi, 0);
-
-    const double end = ppq + blockBeats;
-    dcPending.clear();
-    auto collect = [&] (double t, bool on, const dub::NoteEvent& e)
-    {
-        double occ = t + std::ceil ((ppq - t) / dcLoopBeats) * dcLoopBeats;
-        while (occ < end)
-        {
-            if (occ >= ppq)
-                dcPending.push_back ({ juce::jlimit (0, numSamples - 1, (int) ((occ - ppq) / blockBeats * numSamples)), on, e.note, e.velocity });
-            occ += dcLoopBeats;
-        }
-    };
-    for (const auto& e : dcLoop)
-        if (e.channel == 1)
-        {
-            collect (e.start, true, e);
-            collect (e.start + e.length, false, e);
-        }
-    std::sort (dcPending.begin(), dcPending.end(), [] (const DcPending& a, const DcPending& b)
-    {
-        if (a.sample != b.sample) return a.sample < b.sample;
-        return (int) a.on < (int) b.on;   // note-off antes de note-on
-    });
-    for (const auto& pe : dcPending)
-    {
-        bool& isOn = dcActive[pe.note];
-        if (pe.on)
-        {
-            if (isOn) midi.addEvent (juce::MidiMessage::noteOff (1, pe.note), pe.sample);
-            midi.addEvent (juce::MidiMessage::noteOn (1, pe.note, (juce::uint8) pe.vel), pe.sample);
-            isOn = true;
-        }
-        else if (isOn)
-        {
-            midi.addEvent (juce::MidiMessage::noteOff (1, pe.note), pe.sample);
-            isOn = false;
-        }
-    }
-    dcWasPlaying = true;
-    dcExpectedPpq = end;
-    if (! hostPlaying) dcInternalPpq = end;
-    dcPlayPos.store (std::fmod (std::max (0.0, ppq), dcLoopBeats));
-}
-
-bool RootsKeysProcessor::writeDcMidiFile (const juce::File& file, int slot) const
-{
-    std::vector<dub::ChordSlot> slots;
-    if (slot >= 0) slots.push_back (getDcSlot (slot));
-    else           slots = getDcSlots();
-    double lb = 0.0;
-    const auto events = dub::buildLoop (slots, getDcSettings(), lb);
-    if (lb <= 0.0 || events.empty()) return false;
-
-    static const int repsTable[4] = { 1, 2, 4, 8 };
-    const int reps = repsTable[juce::jlimit (0, 3, (int) get ("dcReps"))];
-    const int tpq = 960;
-    const double bpm = getDcExportBpm();
-
-    juce::MidiMessageSequence meta, chords;
-    meta.addEvent (juce::MidiMessage::tempoMetaEvent ((int) std::round (60000000.0 / bpm)), 0.0);
-    meta.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
-    chords.addEvent (juce::MidiMessage::textMetaEvent (3, "Roots Keys - Skank"), 0.0);
-
-    for (int r = 0; r < reps; ++r)
-        for (const auto& e : events)
-        {
-            auto& seq = chords;
-            seq.addEvent (juce::MidiMessage::noteOn (e.channel, e.note, (juce::uint8) e.velocity), (e.start + r * lb) * tpq);
-            seq.addEvent (juce::MidiMessage::noteOff (e.channel, e.note), (e.start + e.length + r * lb) * tpq);
-        }
-    chords.sort(); chords.updateMatchedPairs();
-
-    juce::MidiFile mf;
-    mf.setTicksPerQuarterNote (tpq);
-    mf.addTrack (meta);
-    if (chords.getNumEvents() > 1) mf.addTrack (chords);
-
-    file.getParentDirectory().createDirectory();
-    file.deleteFile();
-    juce::FileOutputStream out (file);
-    return out.openedOk() && mf.writeTo (out);
+    set ("center",   value ("dcRegister", 60));
+    set ("velocity", juce::jlimit (0.1, 1.0, value ("dcVel", 0.8)));
+    set ("noteSize", value ("dcNoteSize", 0));
+    set ("swing",    value ("dcSwing", 0.0));
+    set ("bpm",      value ("dcBpm", 75.0));
+    set ("exportReps", value ("dcReps", 1));
+    // padrão: 0 = Auto (segue o instrumento: órgão = bubble), 4 = Bubble (órgão)
+    const int pattern = (int) value ("dcPattern", 0);
+    set ("bubble", (pattern == 4 || (pattern == 0 && value ("mode", 0) > 0.5)) ? 1 : 0);
+    set ("preview", 0);
+    set ("sound", 0);
+    apvts.getParameter ("machineOn")->setValueNotifyingHost (value ("dcOn", 0) > 0.5 ? 1.0f : 0.0f);
 }
 
 juce::AudioProcessorEditor* RootsKeysProcessor::createEditor()
@@ -530,7 +364,12 @@ void RootsKeysProcessor::getStateInformation (juce::MemoryBlock& destData)
     auto state = apvts.copyState();
     state.setProperty ("program", currentProgram, nullptr);
     if (auto xml = state.createXml())
+    {
+        juce::MemoryBlock m;   // a CHORD MACHINE vai junto, num filho que o Roots Keys antigo ignora
+        machine->getStateInformation (m);
+        xml->createNewChildElement ("ChordMachine")->setAttribute ("data", m.toBase64Encoding());
         copyXmlToBinary (*xml, destData);
+    }
 }
 
 void RootsKeysProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -538,9 +377,21 @@ void RootsKeysProcessor::setStateInformation (const void* data, int sizeInBytes)
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         if (xml->hasTagName (apvts.state.getType()))
         {
+            bool hadMachine = false;
+            if (auto* cm = xml->getChildByName ("ChordMachine"))
+            {
+                juce::MemoryBlock m;
+                if (m.fromBase64Encoding (cm->getStringAttribute ("data")) && m.getSize() > 0)
+                {
+                    machine->setStateInformation (m.getData(), (int) m.getSize());
+                    hadMachine = true;
+                }
+                xml->removeChildElement (cm, true);
+            }
             auto tree = juce::ValueTree::fromXml (*xml);
             currentProgram = (int) tree.getProperty ("program", 0);
             apvts.replaceState (tree);
+            if (! hadMachine) migrateOldDubChords (tree);
         }
 }
 

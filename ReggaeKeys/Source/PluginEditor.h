@@ -4,7 +4,6 @@
 #include "PluginProcessor.h"
 #include "VintageLookAndFeel.h"
 #include "VUMeter.h"
-#include "DubChordsPage.h"
 
 // Drawbar estilo Hammond: puxar PARA BAIXO aumenta o volume (0..8)
 class DrawbarComponent : public juce::Component
@@ -104,7 +103,7 @@ public:
 
     // usado pelo gerador de capturas de tela
     void applySkin (int newSkin);
-    void setMetersForScreenshot (float l, float r) { timerCallback(); vuL.setNeedle (l); vuR.setNeedle (r); grLabel.setText ("GR -1.2", juce::dontSendNotification); updateLcd(); if (chordsPage) chordsPage->refresh(); }
+    void setMetersForScreenshot (float l, float r) { timerCallback(); vuL.setNeedle (l); vuR.setNeedle (r); grLabel.setText ("GR -1.2", juce::dontSendNotification); updateLcd(); }
 
 private:
     using APVTS = juce::AudioProcessorValueTreeState;
@@ -125,8 +124,10 @@ private:
 
     // cabeçalho
     juce::TextButton modePiano { "PIANO" }, modeOrgan { "ORGAN" };
-    juce::TextButton tabInstrument { "INSTRUMENTO" }, tabChords { "DUB CHORDS" };
-    std::unique_ptr<DubChordsPage> chordsPage;
+    juce::TextButton tabInstrument { "INSTRUMENTO" }, tabChords { "CHORD MACHINE" };
+    std::unique_ptr<juce::Component> machinePanel;            // o MRCM-1240 inteiro (Source/MachineEditorUnit.cpp)
+    juce::ToggleButton machineOnBtn { "TOCA COM A DAW" };      // parâmetro machineOn
+    std::unique_ptr<APVTS::ButtonAttachment> machineOnAtt;
 
     // piano anos 80
     LcdDisplay lcd;
@@ -171,7 +172,7 @@ private:
     void setModeParam (int m);
     void updateVisibility();
 public:
-    void setPage (int newPage);   // 0 = instrumento, 1 = Dub Chords
+    void setPage (int newPage);   // 0 = instrumento, 1 = CHORD MACHINE
 private:
     void timerCallback() override;
 

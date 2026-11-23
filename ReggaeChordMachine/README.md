@@ -1,10 +1,12 @@
-# Mastor Reggae Chord Machine MRCM-1240 2.5
+# Mastor Reggae Chord Machine MRCM-1240 2.4 (legado)
+
+> O MRCM-1240 virou a aba **CHORD MACHINE** do **Mastor Reggae Keys MRK-80** (pasta `ReggaeKeys/`). Esta pasta continua: o MRK-80 e o MRM-0420 compilam o código dela. A versão 2.4 fica para download só para abrir projetos antigos.
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.5/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.5/MastorReggaeChordMachine-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.4/MastorReggaeChordMachine-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRCM-1240-2.4/MastorReggaeChordMachine-macOS.zip)**
 
-**📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/chords/)**: monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
+**📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/keys/)** (dentro do MRK-80): monte os acordes, ouça e baixe o MIDI direto no navegador (mesmo motor de acordes do plugin).
 
 ![Interface do Mastor Reggae Chord Machine MRCM-1240](docs/interface.png)
 
