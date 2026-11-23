@@ -73,6 +73,8 @@ jobs:
           $R presets
           $R daws
           $R layer
+          # menu de GROOVES em dois caminhos: por baterista (fases) e por estilo (todos os bateristas), salvo no projeto
+          $R menu test-out/menu.png
 
       - uses: actions/upload-artifact@v4
         with:

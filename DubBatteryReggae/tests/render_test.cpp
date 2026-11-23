@@ -6,9 +6,11 @@
 //   dbr_render choke             -> HH fechado corta o HH aberto
 //   dbr_render estado            -> salva e recarrega o estado (parâmetros, samples, aba, Dub Drums)
 //   dbr_render presets           -> carrega todos os presets de fábrica e grava/relê um do usuário
+//   dbr_render menu              -> menu de grooves em dois caminhos (por baterista / por estilo) e o estado dele
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/BatteryProcessor.h"
 #include "../Source/BatteryEditor.h"
+#include "../../ReggaeDrumMachine/Source/GroovePresets.h"
 
 namespace
 {
@@ -115,6 +117,74 @@ int main (int argc, char** argv)
         const float after = r.run (10, {});
         std::printf ("choke: aberto %.3f -> depois do fechado %.5f\n", open, after);
         return open > 0.05f && after < 0.001f ? 0 : fail ("choke");
+    }
+
+    // GROOVES em dois caminhos: POR BATERISTA (fase da carreira) e POR ESTILO (todos os bateristas)
+    if (arg1 == "menu")
+    {
+        auto& d = proc.getDrums();
+        GrooveSelector sel (d);
+        int bad = 0;
+        auto check = [&] (bool ok, const char* what) { if (! ok) { std::printf ("FALHOU: %s\n", what); ++bad; } };
+        auto find = [] (const char* song) { for (int i = 0; i < dubdrums::numGroovePresets; ++i) if (juce::String (dubdrums::groovePresets[i].song) == song) return i; return -1; };
+
+        // 1) POR BATERISTA: Carlton Barrett começa nos Upsetters (1970) e anda fase por fase
+        d.apvts.state.setProperty ("grooveView", 0, nullptr);
+        set (d.apvts, "drummer", 2.0f);
+        sel.step (1);
+        const auto& first = dubdrums::groovePresets[d.getGroove()];
+        std::printf ("por baterista: %s / %s / %s\n", first.song, first.phase, sel.pathText().toRawUTF8());
+        check (first.drummer == 2 && first.phaseOrder == 0 && first.year == 1970, "por baterista: comeca na primeira fase");
+        check (sel.pathText().contains ("UPSETTERS"), "caminho mostra a fase");
+        int lastPhase = 0, count = 1;
+        for (int k = 1; k < 26; ++k)
+        {
+            sel.step (1);
+            const auto& gp = dubdrums::groovePresets[d.getGroove()];
+            check (gp.drummer == 2 && gp.phaseOrder >= lastPhase, "por baterista: so o Carlton, fase em ordem");
+            lastPhase = gp.phaseOrder; ++count;
+        }
+        sel.step (1);
+        check (d.getGroove() == find (first.song) && count == 26, "por baterista: 26 musicas e volta ao comeco");
+
+        // 2) POR ESTILO: FLYING CYMBAL passa pelo Santa Davis e pelo Sly Dunbar, a chave do baterista acompanha
+        d.apvts.state.setProperty ("grooveView", 1, nullptr);
+        d.loadGroove (find ("None Shall Escape the Judgement"));
+        check (sel.pathText() == "POR ESTILO  -  FLYING CYMBAL", "caminho por estilo");
+        bool sawSly = false, drummerFollows = true;
+        for (int k = 0; k < 9; ++k)
+        {
+            sel.step (1);
+            const auto& gp = dubdrums::groovePresets[d.getGroove()];
+            check (gp.family == 3, "por estilo: so flying cymbal");
+            sawSly |= gp.drummer == 3;
+            drummerFollows &= (int) d.apvts.getRawParameterValue ("drummer")->load() == gp.drummer;
+        }
+        check (sawSly, "por estilo: inclui o Sly Dunbar");
+        check (drummerFollows, "por estilo: a chave do baterista acompanha a musica");
+        check (d.getGroove() == find ("None Shall Escape the Judgement"), "por estilo: 9 musicas e volta");
+
+        // 3) a escolha do caminho fica salva no projeto
+        juce::MemoryBlock mb;
+        proc.getStateInformation (mb);
+        BatteryProcessor other;
+        other.setStateInformation (mb.getData(), (int) mb.getSize());
+        check ((int) other.getDrums().apvts.state.getProperty ("grooveView", 0) == 1, "estado: caminho por estilo salvo");
+        if (arg2 != "0")   // dbr_render menu menu.png -> imagem da aba DUB DRUMS com o caminho POR ESTILO
+        {
+            proc.currentTab = 1;
+            std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditor());
+            ed->setSize (BatteryRoot::baseW, BatteryRoot::baseH);
+            pump (6);
+            auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 1.0f);
+            juce::File png (juce::File::getCurrentWorkingDirectory().getChildFile (arg2));
+            png.deleteFile();
+            juce::FileOutputStream os (png);
+            juce::PNGImageFormat fmt;
+            fmt.writeImageToStream (img, os);
+        }
+        std::printf ("menu: %s\n", bad == 0 ? "ok" : "com falhas");
+        return bad == 0 ? 0 : 1;
     }
 
     // TIMBRE 2 e JUNTAR COM: um toque soa os dois timbres / acende os dois pads

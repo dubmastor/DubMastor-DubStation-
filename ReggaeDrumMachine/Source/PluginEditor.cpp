@@ -1145,9 +1145,17 @@ void DubDrumsPanel::paint (juce::Graphics& g)
         const bool showGroove = gr >= 0 && dubdrums::groovePresets[gr].drummer == d && proc.grooveIntact();
         g.setColour (showGroove ? colours::ink : colours::inkSoft);
         g.setFont (stencil (9.0f, 0.1f));
+       #if DD_GROOVE_MENU_V2
+        // menu em dois caminhos: embaixo do visor fica o caminho escolhido (POR BATERISTA / POR ESTILO)
+        const auto path = grooveSelector.pathText();
+        g.drawFittedText (gr >= 0 && dubdrums::groovePresets[gr].drummer == d && path.isNotEmpty() ? path
+                                     : juce::String (bands[d]) + "  -  " + (choice ("kit") == 1 && d != 4 ? "KIT DIGITAL" : sigs[d]),
+                          info.toNearestInt(), juce::Justification::centred, 1, 0.8f);
+       #else
         g.drawFittedText (showGroove ? juce::String::fromUTF8 (dubdrums::groovePresets[gr].note)
                                      : juce::String (bands[d]) + "  -  " + (choice ("kit") == 1 && d != 4 ? "KIT DIGITAL" : sigs[d]),
                           info.toNearestInt(), juce::Justification::centred, 1, 0.8f);
+       #endif
     }
     glowText (g, dynDisplay.toFloat(), kDynNames[juce::jlimit (0, 5, choice ("dynamics"))], 17.0f);
 
@@ -2003,6 +2011,72 @@ GrooveSelector::GrooveSelector (DubDrumsProcessor& p) : proc (p)
 
 GrooveSelector::~GrooveSelector() { stopTimer(); }
 
+#if DD_GROOVE_MENU_V2
+namespace
+{
+    // ordem do menu: fase (ou família), ano, música
+    void sortGrooves (juce::Array<int>& list, bool byPhase)
+    {
+        std::sort (list.begin(), list.end(), [byPhase] (int a, int b)
+        {
+            const auto& x = dubdrums::groovePresets[a];
+            const auto& y = dubdrums::groovePresets[b];
+            const int kx = byPhase ? x.phaseOrder : x.drummer, ky = byPhase ? y.phaseOrder : y.drummer;
+            if (kx != ky) return kx < ky;
+            if (x.year != y.year) return x.year < y.year;
+            return a < b;
+        });
+    }
+
+    juce::Array<int> groovesOfFamily (int family)
+    {
+        juce::Array<int> list;
+        for (int i = 0; i < dubdrums::numGroovePresets; ++i)
+            if (dubdrums::groovePresets[i].family == family) list.add (i);
+        sortGrooves (list, false);
+        return list;
+    }
+
+    juce::String grooveItemText (int i)
+    {
+        const auto& gp = dubdrums::groovePresets[i];
+        return juce::String (gp.year) + "   " + juce::String::fromUTF8 (gp.song) + "  -  " + juce::String::fromUTF8 (gp.artist)
+             + "  -  " + (gp.approx ? "~" : "") + juce::String (gp.bpm) + " BPM";
+    }
+}
+
+int GrooveSelector::viewMode() const
+{
+    return (int) proc.apvts.state.getProperty ("grooveView", 0) == 1 ? 1 : 0;
+}
+
+int GrooveSelector::currentFamily() const
+{
+    const int gr = proc.getGroove();
+    if (gr >= 0) return dubdrums::groovePresets[gr].family;
+    return juce::jlimit (0, dubdrums::numGrooveFamilies - 1, (int) proc.apvts.state.getProperty ("grooveFamily", 0));
+}
+
+juce::String GrooveSelector::pathText() const
+{
+    const int gr = proc.getGroove();
+    if (gr < 0) return {};
+    const auto& gp = dubdrums::groovePresets[gr];
+    return viewMode() == 1 ? juce::String ("POR ESTILO  -  ") + dubdrums::grooveFamilyNames[gp.family]
+                           : juce::String ("POR BATERISTA  -  ") + gp.phase;
+}
+
+juce::Array<int> GrooveSelector::activeList() const
+{
+    if (viewMode() == 1) return groovesOfFamily (currentFamily());
+    auto list = groovesOf (drummer());
+    sortGrooves (list, true);
+    return list;
+}
+#else
+juce::Array<int> GrooveSelector::activeList() const { return groovesOf (drummer()); }
+#endif
+
 int GrooveSelector::drummer() const
 {
     return juce::jlimit (0, dubdrums::numDrummers - 1, (int) proc.apvts.getRawParameterValue ("drummer")->load());
@@ -2021,7 +2095,8 @@ juce::Rectangle<float> GrooveSelector::lcdRect() const
 
 void GrooveSelector::timerCallback()
 {
-    const juce::String key = juce::String (drummer()) + ":" + juce::String (proc.getGroove()) + ":" + (proc.grooveIntact() ? "1" : "0");
+    const juce::String key = juce::String (drummer()) + ":" + juce::String (proc.getGroove()) + ":" + (proc.grooveIntact() ? "1" : "0")
+                            + ":" + proc.apvts.state.getProperty ("grooveView", 0).toString();
     if (key != shownKey) { shownKey = key; repaint(); if (auto* parent = getParentComponent()) parent->repaint (getBounds().withHeight (getHeight() + 22)); }
 }
 
@@ -2052,7 +2127,7 @@ void GrooveSelector::paint (juce::Graphics& g)
     blueLcd (g, r);
     auto t = r.reduced (7.0f, 2.0f);
     const int d = drummer(), gr = proc.getGroove();
-    const auto list = groovesOf (d);
+    const auto list = activeList();
     if (gr >= 0 && dubdrums::groovePresets[gr].drummer == d)
     {
         const auto& gp = dubdrums::groovePresets[gr];
@@ -2080,7 +2155,7 @@ void GrooveSelector::paint (juce::Graphics& g)
 
 void GrooveSelector::step (int delta)
 {
-    const auto list = groovesOf (drummer());
+    const auto list = activeList();
     if (list.isEmpty()) return;
     const int at = list.indexOf (proc.getGroove());
     const int next = at < 0 ? (delta > 0 ? 0 : list.size() - 1) : (at + delta + list.size()) % list.size();
@@ -2088,6 +2163,83 @@ void GrooveSelector::step (int delta)
     repaint();
 }
 
+#if DD_GROOVE_MENU_V2
+void GrooveSelector::showList()
+{
+    // ORGANIZAR POR: BATERISTA (fase da carreira) ou ESTILO (a família do groove, de todos os bateristas)
+    static const char* names[] = { "STYLE SCOTT", "SANTA DAVIS", "CARLTON BARRETT", "SLY DUNBAR", "DIGIKAL (MAQUINAS)" };
+    enum { kByDrummer = 9001, kByStyle = 9002 };
+    const int current = proc.getGroove(), mode = viewMode();
+    juce::PopupMenu menu;
+    menu.addSectionHeader ("ORGANIZAR POR");
+    menu.addItem (kByDrummer, "BATERISTA  (fases da carreira)", true, mode == 0);
+    menu.addItem (kByStyle,   "ESTILO DE REGGAE  (todos os bateristas)", true, mode == 1);
+    menu.addSeparator();
+    auto addItems = [current] (juce::PopupMenu& m, const juce::Array<int>& list)
+    {
+        for (int i : list) m.addItem (i + 1, grooveItemText (i), true, i == current);
+    };
+    if (mode == 0)
+    {
+        for (int d = 0; d < dubdrums::numDrummers; ++d)
+        {
+            juce::PopupMenu sub;
+            auto list = groovesOf (d);
+            sortGrooves (list, true);
+            bool hasCurrent = false;
+            for (int ph = 0; ph < 8; ++ph)
+            {
+                juce::Array<int> part;
+                for (int i : list) if (dubdrums::groovePresets[i].phaseOrder == ph) part.add (i);
+                if (part.isEmpty()) continue;
+                juce::PopupMenu phase;
+                addItems (phase, part);
+                const bool here = part.contains (current);
+                hasCurrent |= here;
+                sub.addSubMenu (juce::String (dubdrums::groovePresets[part[0]].phase) + "  (" + juce::String (part.size()) + ")", phase, true, nullptr, here);
+            }
+            menu.addSubMenu (juce::String (names[d]) + "  (" + juce::String (list.size()) + ")", sub, true, nullptr, hasCurrent);
+        }
+    }
+    else
+    {
+        for (int f = 0; f < dubdrums::numGrooveFamilies; ++f)
+        {
+            const auto list = groovesOfFamily (f);
+            juce::PopupMenu sub;
+            bool hasCurrent = false;
+            for (int d = 0; d < dubdrums::numDrummers; ++d)
+            {
+                juce::Array<int> part;
+                for (int i : list) if (dubdrums::groovePresets[i].drummer == d) part.add (i);
+                if (part.isEmpty()) continue;
+                juce::PopupMenu who;
+                addItems (who, part);
+                const bool here = part.contains (current);
+                hasCurrent |= here;
+                sub.addSubMenu (juce::String (names[d]) + "  (" + juce::String (part.size()) + ")", who, true, nullptr, here);
+            }
+            menu.addSubMenu (juce::String (dubdrums::grooveFamilyNames[f]) + "  (" + juce::String (list.size()) + ")", sub, true, nullptr, hasCurrent);
+        }
+    }
+    juce::Component::SafePointer<GrooveSelector> safe (this);
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int result)
+    {
+        if (safe == nullptr || result <= 0) return;
+        if (result == kByDrummer || result == kByStyle)
+        {
+            safe->proc.apvts.state.setProperty ("grooveView", result == kByStyle ? 1 : 0, nullptr);
+            safe->shownKey = {};
+            safe->repaint();
+            juce::MessageManager::callAsync ([safe] { if (safe != nullptr) safe->showList(); });   // reabre já no caminho novo
+            return;
+        }
+        safe->proc.apvts.state.setProperty ("grooveFamily", dubdrums::groovePresets[result - 1].family, nullptr);
+        safe->proc.loadGroove (result - 1);
+        safe->repaint();
+    });
+}
+#else
 void GrooveSelector::showList()
 {
     juce::PopupMenu menu;
@@ -2114,6 +2266,7 @@ void GrooveSelector::showList()
         }
     });
 }
+#endif
 
 void GrooveSelector::mouseDown (const juce::MouseEvent& e)
 {

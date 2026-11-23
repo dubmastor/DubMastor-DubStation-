@@ -141,6 +141,15 @@ private:
     juce::Rectangle<float> keyRect (int side) const;   // -1 = ◀, 1 = ▶
     juce::Rectangle<float> lcdRect() const;
     int drummer() const;
+    juce::Array<int> activeList() const;   // as músicas que ◀ ▶ percorrem (e o n/N do visor)
+   #if DD_GROOVE_MENU_V2
+public:
+    // menu em dois caminhos (Battery 1.4): 0 = POR BATERISTA (fase da carreira), 1 = POR ESTILO
+    int viewMode() const;
+    juce::String pathText() const;          // o caminho atual, gravado embaixo do visor
+private:
+    int currentFamily() const;
+   #endif
     DubDrumsProcessor& proc;
     int pressed = 0;
     juce::String shownKey;

@@ -1,3 +1,15 @@
+## Mastor Dub Battery Reggae DBR 1.4 — Dub Station
+
+- **Menu de GROOVES em dois caminhos** (aba DUB DRUMS): clique no visor azul e escolha **ORGANIZAR POR**
+  - **BATERISTA**: baterista → fase da carreira → músicas por ano (ex.: Carlton Barrett → Upsetters 1970-71, Wailers na Island 1973-74, Tuff Gong 1976-80…)
+  - **ESTILO DE REGGAE**: One Drop, Rockers / Rub a Dub, Steppers, Flying Cymbal, Digital e Dembow → baterista → músicas
+  - ◀ ▶ seguem o caminho escolhido: por estilo, passam por todos os bateristas daquele estilo e a chave BATERISTA acompanha
+  - O visor mostra a posição na lista (ex.: 3/9) e, embaixo, o caminho (ex.: POR ESTILO - FLYING CYMBAL); a escolha fica salva no projeto
+  - Cada música aparece com ano, artista e BPM
+- Versão para celular igual, com as teclas POR BATERISTA | POR ESTILO
+
+---
+
 ## Mastor Dub Battery Reggae DBR 1.3 — Dub Station
 
 - **118 GROOVES na aba DUB DRUMS** (os do MRDM-12 2.7, antes 21), separados por baterista, com o BPM de cada gravação

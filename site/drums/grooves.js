@@ -27,7 +27,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1982,
-"note": "ARO NO CONTRATEMPO, BUMBO 1 E 3"
+"note": "ARO NO CONTRATEMPO, BUMBO 1 E 3",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -55,7 +58,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1981,
-"note": "RUB A DUB: CAIXA SECA, HI-HAT 1/16"
+"note": "RUB A DUB: CAIXA SECA, HI-HAT 1/16",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -83,7 +89,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1979,
-"note": "CAIXA E ARO JUNTOS NO 2 E NO 4"
+"note": "CAIXA E ARO JUNTOS NO 2 E NO 4",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -111,7 +120,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1182,
-"note": "HI-HAT NO CONTRATEMPO, ARO"
+"note": "HI-HAT NO CONTRATEMPO, ARO",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -139,7 +151,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1984,
-"note": "BUMBO 1 E 3, CAIXA 2 E 4 (DUB)"
+"note": "BUMBO 1 E 3, CAIXA 2 E 4 (DUB)",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -167,7 +182,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7447,
-"note": "PRIMEIRO HIT DOS RADICS"
+"note": "PRIMEIRO HIT DOS RADICS",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -195,7 +213,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2662,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -223,7 +244,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7351,
-"note": "RADICS COM VIRADAS DE TOM"
+"note": "RADICS COM VIRADAS DE TOM",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -251,7 +275,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5919,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -279,7 +306,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3627,
-"note": "ROCKERS - ARO - HH CONTRATEMPO"
+"note": "ROCKERS - ARO - HH CONTRATEMPO",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -307,7 +337,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7580,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -335,7 +368,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 4361,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -363,7 +399,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7824,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -391,7 +430,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6611,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -419,7 +461,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 4154,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -447,7 +492,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2861,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -475,7 +523,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1273,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 0,
@@ -503,7 +554,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9649,
-"note": "RELAXADO, ATRAS DO TEMPO"
+"note": "RELAXADO, ATRAS DO TEMPO",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -531,7 +585,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2921,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -559,7 +616,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5824,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -587,7 +647,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3487,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "OUTROS PRODUTORES E DUB 1979-84",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 0,
@@ -615,7 +678,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6328,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "ROOTS RADICS COM JUNJO LAWES 1979-83",
+"phaseOrder": 0,
+"family": 1
 },
 {
 "drummer": 1,
@@ -643,7 +709,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1974,
-"note": "FLYING CYMBAL: ABRE NO CONTRA"
+"note": "FLYING CYMBAL: ABRE NO CONTRA",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -671,7 +740,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1975,
-"note": "FLYING CYMBAL, BUMBO CORRIDO"
+"note": "FLYING CYMBAL, BUMBO CORRIDO",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -699,7 +771,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1973,
-"note": "BUMBO FUNDE NYABINGHI, SOA FUNK"
+"note": "BUMBO FUNDE NYABINGHI, SOA FUNK",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 1,
@@ -727,7 +802,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1972,
-"note": "ARO NA BATIDA, VIRADAS DE FUSA"
+"note": "ARO NA BATIDA, VIRADAS DE FUSA",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 1,
@@ -755,7 +833,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3311,
-"note": "ROCKERS - CAIXA - FLYING CYMBAL"
+"note": "ROCKERS - CAIXA - FLYING CYMBAL",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -783,7 +864,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6276,
-"note": "ROCKERS - CAIXA - FLYING CYMBAL"
+"note": "ROCKERS - CAIXA - FLYING CYMBAL",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -811,7 +895,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8827,
-"note": "ROCKERS - CAIXA - FLYING CYMBAL"
+"note": "ROCKERS - CAIXA - FLYING CYMBAL",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -839,7 +926,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2567,
-"note": "ROCKERS - CAIXA - FLYING CYMBAL"
+"note": "ROCKERS - CAIXA - FLYING CYMBAL",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -867,7 +957,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9422,
-"note": "ROCKERS - CAIXA - FLYING CYMBAL"
+"note": "ROCKERS - CAIXA - FLYING CYMBAL",
+"phase": "FLYING CYMBAL - BUNNY LEE 1974-76",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 1,
@@ -895,7 +988,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8159,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 1,
@@ -923,7 +1019,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3575,
-"note": "VIRADA DE TERCINA CAIXA-TOM"
+"note": "VIRADA DE TERCINA CAIXA-TOM",
+"phase": "BOB MARLEY 1979-83",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 1,
@@ -951,7 +1050,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8627,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "BOB MARLEY 1979-83",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 1,
@@ -979,7 +1081,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8991,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "BOB MARLEY 1979-83",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 1,
@@ -1007,7 +1112,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 4886,
-"note": "ACENTO NO 1, O 4 NO TEMPO"
+"note": "ACENTO NO 1, O 4 NO TEMPO",
+"phase": "PETER TOSH 1983-87",
+"phaseOrder": 3,
+"family": 1
 },
 {
 "drummer": 1,
@@ -1035,7 +1143,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9315,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "PETER TOSH 1983-87",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 1,
@@ -1063,7 +1174,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1470,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "PETER TOSH 1983-87",
+"phaseOrder": 3,
+"family": 1
 },
 {
 "drummer": 1,
@@ -1091,7 +1205,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1962,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "PETER TOSH 1983-87",
+"phaseOrder": 3,
+"family": 1
 },
 {
 "drummer": 1,
@@ -1119,7 +1236,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9695,
-"note": "NYABINGHI: BUMBO FUNDE"
+"note": "NYABINGHI: BUMBO FUNDE",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 1,
@@ -1147,7 +1267,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7860,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 1,
@@ -1175,7 +1298,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2564,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 1,
@@ -1203,7 +1329,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6698,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "SOUL SYNDICATE E ROOTS 1972-78",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1231,7 +1360,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1979,
-"note": "O 1 VAZIO, ARO NA BATIDA"
+"note": "O 1 VAZIO, ARO NA BATIDA",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1259,7 +1391,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1977,
-"note": "BUMBO NOS QUATRO TEMPOS"
+"note": "BUMBO NOS QUATRO TEMPOS",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 2
 },
 {
 "drummer": 2,
@@ -1287,7 +1422,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1973,
-"note": "TERCINA NO HI-HAT, ARO"
+"note": "TERCINA NO HI-HAT, ARO",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1315,7 +1453,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1377,
-"note": "ONE DROP LEVE, CAIXA NA BATIDA"
+"note": "ONE DROP LEVE, CAIXA NA BATIDA",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1343,7 +1484,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1978,
-"note": "HI-HAT NO CONTRATEMPO, ARO"
+"note": "HI-HAT NO CONTRATEMPO, ARO",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1371,7 +1515,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6497,
-"note": "HH NO 2 E NO 4 COM SWING"
+"note": "HH NO 2 E NO 4 COM SWING",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1399,7 +1546,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 4564,
-"note": "HI-HAT DE RIDE, ABRE NO 1"
+"note": "HI-HAT DE RIDE, ABRE NO 1",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1427,7 +1577,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3790,
-"note": "BUMBO SAI DO 3, HH SOLTO"
+"note": "BUMBO SAI DO 3, HH SOLTO",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1455,7 +1608,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3281,
-"note": "BUMBO PULSANDO, ARO VARIANDO"
+"note": "BUMBO PULSANDO, ARO VARIANDO",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 2
 },
 {
 "drummer": 2,
@@ -1483,7 +1639,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 4135,
-"note": "LEVADA SOUL RETA, CAIXA GRAVE"
+"note": "LEVADA SOUL RETA, CAIXA GRAVE",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 1
 },
 {
 "drummer": 2,
@@ -1511,7 +1670,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7064,
-"note": "ACENTOS NO 1 E NO 3"
+"note": "ACENTOS NO 1 E NO 3",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1539,7 +1701,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8703,
-"note": "HH SUTIL, BUMBO ENXUTO"
+"note": "HH SUTIL, BUMBO ENXUTO",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1567,7 +1732,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5067,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1595,7 +1763,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5463,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1623,7 +1794,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5474,
-"note": "ONE DROP - ARO - HH TERCINA"
+"note": "ONE DROP - ARO - HH TERCINA",
+"phase": "WAILERS NA ISLAND 1973-74",
+"phaseOrder": 1,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1651,7 +1825,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5286,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "UPSETTERS - LEE PERRY 1970-71",
+"phaseOrder": 0,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1679,7 +1856,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2251,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "UPSETTERS - LEE PERRY 1970-71",
+"phaseOrder": 0,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1707,7 +1887,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9198,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "UPSETTERS - LEE PERRY 1970-71",
+"phaseOrder": 0,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1735,7 +1918,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2263,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "UPSETTERS - LEE PERRY 1970-71",
+"phaseOrder": 0,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1763,7 +1949,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2700,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1791,7 +1980,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6852,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1819,7 +2011,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3203,
-"note": "ONE DROP - ARO - HH TERCINA"
+"note": "ONE DROP - ARO - HH TERCINA",
+"phase": "TUFF GONG 1976-80",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1847,7 +2042,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8237,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "FORA DOS WAILERS 1976",
+"phaseOrder": 3,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1875,7 +2073,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6140,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "FORA DOS WAILERS 1976",
+"phaseOrder": 3,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1903,7 +2104,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1511,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "FORA DOS WAILERS 1976",
+"phaseOrder": 3,
+"family": 0
 },
 {
 "drummer": 2,
@@ -1931,7 +2135,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5259,
-"note": "TERCINAS, FANTASMAS E ACENTOS"
+"note": "TERCINAS, FANTASMAS E ACENTOS",
+"phase": "FORA DOS WAILERS 1976",
+"phaseOrder": 3,
+"family": 0
 },
 {
 "drummer": 3,
@@ -1959,7 +2166,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1976,
-"note": "TOQUE DUPLO NO ARO"
+"note": "TOQUE DUPLO NO ARO",
+"phase": "CHANNEL ONE - REVOLUTIONARIES 1976",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 3,
@@ -1987,7 +2197,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1676,
-"note": "BUMBO DOBRADO PUXANDO O 3"
+"note": "BUMBO DOBRADO PUXANDO O 3",
+"phase": "CHANNEL ONE - REVOLUTIONARIES 1976",
+"phaseOrder": 1,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2015,7 +2228,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1979,
-"note": "STEPPERS COM CAIXA E ARO"
+"note": "STEPPERS COM CAIXA E ARO",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2043,7 +2259,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1980,
-"note": "STEPPERS PESADO, SYNDRUM"
+"note": "STEPPERS PESADO, SYNDRUM",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2071,7 +2290,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1981,
-"note": "RUB A DUB COM SWISH NO HI-HAT"
+"note": "RUB A DUB COM SWISH NO HI-HAT",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2099,7 +2321,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2923,
-"note": "STEPPERS MILITANTE"
+"note": "STEPPERS MILITANTE",
+"phase": "CHANNEL ONE - REVOLUTIONARIES 1976",
+"phaseOrder": 1,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2127,7 +2352,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2264,
-"note": "ONE DROP - ARO - HH 1/8"
+"note": "ONE DROP - ARO - HH 1/8",
+"phase": "SESSOES 1976-78",
+"phaseOrder": 2,
+"family": 0
 },
 {
 "drummer": 3,
@@ -2155,7 +2383,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6998,
-"note": "QUATRO RETO, UM TAKE SO"
+"note": "QUATRO RETO, UM TAKE SO",
+"phase": "SESSOES 1976-78",
+"phaseOrder": 2,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2183,7 +2414,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5691,
-"note": "ROCKERS - ARO - HH 1/16"
+"note": "ROCKERS - ARO - HH 1/16",
+"phase": "SESSOES 1976-78",
+"phaseOrder": 2,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2211,7 +2445,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 1345,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "SESSOES 1976-78",
+"phaseOrder": 2,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2239,7 +2476,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3012,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "SESSOES 1976-78",
+"phaseOrder": 2,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2267,7 +2507,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7145,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "SESSOES 1976-78",
+"phaseOrder": 2,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2295,7 +2538,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 3376,
-"note": "MARCHA, BATERIA NA FRENTE"
+"note": "MARCHA, BATERIA NA FRENTE",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2323,7 +2569,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9479,
-"note": "STEPPERS PESADO, CAIXA + ARO"
+"note": "STEPPERS PESADO, CAIXA + ARO",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2351,7 +2600,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9024,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2379,7 +2631,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9835,
-"note": "ROCKERS - CAIXA - HH 1/8"
+"note": "ROCKERS - CAIXA - HH 1/8",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2407,7 +2662,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 2199,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "BLACK UHURU 1979-81",
+"phaseOrder": 3,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2435,7 +2693,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 5168,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "TAXI ANOS 80",
+"phaseOrder": 4,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2463,7 +2724,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9176,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "TAXI ANOS 80",
+"phaseOrder": 4,
+"family": 2
 },
 {
 "drummer": 3,
@@ -2491,7 +2755,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8534,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "TAXI ANOS 80",
+"phaseOrder": 4,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2519,7 +2786,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 8409,
-"note": "BATERIA ELETRONICA DO SLY"
+"note": "BATERIA ELETRONICA DO SLY",
+"phase": "TAXI ANOS 80",
+"phaseOrder": 4,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2547,7 +2817,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 7262,
-"note": "MPC-60, DANCA AFRICANA"
+"note": "MPC-60, DANCA AFRICANA",
+"phase": "CHAKA DEMUS & PLIERS 1992-93",
+"phaseOrder": 5,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2575,7 +2848,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 6862,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "CHAKA DEMUS & PLIERS 1992-93",
+"phaseOrder": 5,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2603,7 +2879,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9673,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "CHAKA DEMUS & PLIERS 1992-93",
+"phaseOrder": 5,
+"family": 1
 },
 {
 "drummer": 3,
@@ -2631,7 +2910,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 4719,
-"note": "FLY CYMBAL ANTES DO FLYING"
+"note": "FLY CYMBAL ANTES DO FLYING",
+"phase": "ANTES DO ROCKERS 1971-73",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 3,
@@ -2659,7 +2941,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9547,
-"note": "FLY CYMBAL DE 1971"
+"note": "FLY CYMBAL DE 1971",
+"phase": "ANTES DO ROCKERS 1971-73",
+"phaseOrder": 0,
+"family": 3
 },
 {
 "drummer": 3,
@@ -2687,7 +2972,10 @@ window.MDDM_GROOVES = [
 "kit": 0,
 "bars": 4,
 "seed": 9339,
-"note": "ROCKERS - ARO - HH 1/8"
+"note": "ROCKERS - ARO - HH 1/8",
+"phase": "TAXI ANOS 80",
+"phaseOrder": 4,
+"family": 1
 },
 {
 "drummer": 4,
@@ -2715,7 +3003,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 1985,
-"note": "CASIO MT-40: PRESET ROCK"
+"note": "CASIO MT-40: PRESET ROCK",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2743,7 +3034,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 1986,
-"note": "OBERHEIM DX: CAIXA COM ARO"
+"note": "OBERHEIM DX: CAIXA COM ARO",
+"phase": "KING TUBBY - FIREHOUSE 1985",
+"phaseOrder": 1,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2771,7 +3065,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 8432,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2799,7 +3096,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 4082,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2827,7 +3127,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 5370,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2855,7 +3158,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 6042,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2883,7 +3189,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 5520,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2911,7 +3220,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 1904,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2939,7 +3251,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 5102,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2967,7 +3282,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 5288,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "SLENG TENG E JAMMY'S 1985-87",
+"phaseOrder": 0,
+"family": 4
 },
 {
 "drummer": 4,
@@ -2995,7 +3313,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 2432,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "OUTROS PRODUTORES 1985-89",
+"phaseOrder": 2,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3023,7 +3344,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 9588,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "OUTROS PRODUTORES 1985-89",
+"phaseOrder": 2,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3051,7 +3375,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 9048,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "OUTROS PRODUTORES 1985-89",
+"phaseOrder": 2,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3079,7 +3406,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 9484,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "OUTROS PRODUTORES 1985-89",
+"phaseOrder": 2,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3107,7 +3437,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 6618,
-"note": "ROCKERS - ARO - HH 1/16"
+"note": "ROCKERS - ARO - HH 1/16",
+"phase": "OUTROS PRODUTORES 1985-89",
+"phaseOrder": 2,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3135,7 +3468,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 5680,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "KING TUBBY - FIREHOUSE 1985",
+"phaseOrder": 1,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3163,7 +3499,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 3540,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "OUTROS PRODUTORES 1985-89",
+"phaseOrder": 2,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3191,7 +3530,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 4332,
-"note": "POCOMANIA: A BASE DO DEMBOW"
+"note": "POCOMANIA: A BASE DO DEMBOW",
+"phase": "DEMBOW 1989-90",
+"phaseOrder": 3,
+"family": 5
 },
 {
 "drummer": 4,
@@ -3219,7 +3561,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 7190,
-"note": "DEMBOW: BOOM-CH-BOOM-CHICK"
+"note": "DEMBOW: BOOM-CH-BOOM-CHICK",
+"phase": "DEMBOW 1989-90",
+"phaseOrder": 3,
+"family": 5
 },
 {
 "drummer": 4,
@@ -3247,7 +3592,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 1630,
-"note": "DEMBOW DE BOBBY DIGITAL"
+"note": "DEMBOW DE BOBBY DIGITAL",
+"phase": "DEMBOW 1989-90",
+"phaseOrder": 3,
+"family": 5
 },
 {
 "drummer": 4,
@@ -3275,7 +3623,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 4614,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "RAGGA E RELICKS",
+"phaseOrder": 4,
+"family": 4
 },
 {
 "drummer": 4,
@@ -3303,6 +3654,10 @@ window.MDDM_GROOVES = [
 "kit": 1,
 "bars": 4,
 "seed": 9270,
-"note": "ROCKERS - CAIXA - HH 1/16"
+"note": "ROCKERS - CAIXA - HH 1/16",
+"phase": "RAGGA E RELICKS",
+"phaseOrder": 4,
+"family": 4
 }
 ];
+window.MDDM_GROOVE_FAMILIES = ["ONE DROP", "ROCKERS / RUB A DUB", "STEPPERS", "FLYING CYMBAL", "DIGITAL", "DEMBOW"];
