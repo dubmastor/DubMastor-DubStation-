@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Musicians.h"
 
 using namespace juce;
 
@@ -74,6 +75,9 @@ AudioProcessorValueTreeState::ParameterLayout HornsProcessor::createLayout()
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "hiss", 1 },    "Chiado de fita", NormalisableRange<float> (0, 1), def.hiss, fmt (pct)));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "human", 1 },   "Humanizar",   NormalisableRange<float> (0, 1), def.human, fmt (pct)));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "width", 1 },   HU ("Abertura estéreo"), NormalisableRange<float> (0, 1), def.width, fmt (pct)));
+    // v1.2
+    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "growl", 1 },   "Rouco (growl)", NormalisableRange<float> (0, 1), def.growl, fmt (pct)));
+    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "room", 1 },    HU ("Sala do estúdio"), NormalisableRange<float> (0, 1), def.room, fmt (pct)));
 
     // Mastor Tape Echo
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "echoOn", 1 },  "Echo ligado", def.echoOn));
@@ -120,6 +124,37 @@ HornsProcessor::HornsProcessor()
     phraseAudio.events.reserve (horns::kMaxEvents);
     phraseAudio.name.reserve (128);
     sched.reserve (1024);
+    applyMusico (musicos::defaultPreset, false);   // abre no "Tubby · naipe no eco": o delay já na frente
+}
+
+void HornsProcessor::applyMusico (int index, bool preview)
+{
+    if (index < 0 || index >= musicos::numPresets) return;
+    const auto& pr = musicos::presets[index];
+    auto set = [this] (const String& id, float plain)
+    {
+        if (auto* p = apvts.getParameter (id))
+        {
+            p->beginChangeGesture(); p->setValueNotifyingHost (p->convertTo0to1 (plain)); p->endChangeGesture();
+        }
+    };
+    const auto ids = instIds();
+    for (int k = 0; k < horns::kNumInst; ++k)
+    {
+        const auto& sc = pr.sec[k];
+        set (ids[k] + "_on", (float) sc.on); set (ids[k] + "_lvl", sc.lvl); set (ids[k] + "_pan", sc.pan);
+        set (ids[k] + "_oct", (float) (sc.oct + 2)); set (ids[k] + "_harm", (float) sc.harm);
+    }
+    for (int k = 0; k < 14; ++k) set (musicos::timbreIds[k], pr.t[k]);
+    set ("echoOn", (float) pr.echoOn); set ("sync", (float) pr.sync); set ("fb", pr.fb); set ("send", pr.send); set ("tone", pr.tone);
+    for (int b = 0; b < 10; ++b) set ("eq" + String (b), pr.eq[b]);
+    apvts.state.setProperty ("musico", index, nullptr);
+    if (preview) previewNote (60 + (int) param ("key"), pr.artic);
+}
+
+int HornsProcessor::currentMusico() const
+{
+    return jlimit (-1, musicos::numPresets - 1, (int) apvts.state.getProperty ("musico", -1));
 }
 
 bool HornsProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -167,6 +202,7 @@ void HornsProcessor::fillParams (horns::Params& P, double bpm) const
     P.bright = param ("bright"); P.breath = param ("breath"); P.vib = param ("vib"); P.scoop = param ("scoop");
     P.attack = param ("attack"); P.release = param ("release"); P.drive = param ("drive"); P.band = param ("band");
     P.lowcut = param ("lowcut"); P.hiss = param ("hiss"); P.human = param ("human"); P.width = param ("width");
+    P.growl = param ("growl"); P.room = param ("room");
     P.echoOn = param ("echoOn") > 0.5f; P.sync = (int) param ("sync"); P.echoMs = param ("echoTime");
     P.fb = param ("fb"); P.send = param ("send"); P.ret = param ("ret"); P.tone = param ("tone"); P.bass = param ("bass");
     P.wow = param ("wow"); P.sat = param ("sat");

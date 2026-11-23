@@ -105,7 +105,7 @@ inline const std::array<Harmony, 7>& harmonies()
 constexpr int kNumHarmonies = 7;
 
 // ------------------------------------------------------------------ instrumentos
-enum Wave { Saw, Square, Tri };
+enum Wave { Saw, Square, Tri, Pulse };   // Pulse = pulso estreito (35%): todos os harmônicos, como o tubo cônico do sax
 struct OscDef { Wave wave; float gain; float detuneCents; };
 struct InstDef
 {
@@ -115,6 +115,17 @@ struct InstDef
     float cut, env, q;                // filtro: corte base, abertura do envelope, Q
     float f1, g1, f2, g2;             // formantes (Hz, dB)
     float atk, breath, breathF, vib, scoop, gain;
+    // v1.2 — final de nota natural e caráter do músico
+    float fallDepth;                  // semitons que o fall percorre (o doit sobe ~metade)
+    float stair;                      // 0 = glissando liso (vara do trombone) .. 1 = escadinha cromática (chaves do sax)
+    float growl;                      // quanto o "rouco" pega neste instrumento
+    float drift;                      // afinação viva: desvio lento em cents
+    float vibRate;                    // vibrato típico (Hz)
+    // v1.3 — realismo
+    float f3, g3;                     // 3º formante (corpo do instrumento)
+    float bellHp;                     // a campana irradia pouco grave (passa-altas)
+    float buzz;                       // zumbido do lábio / palheta no ritmo da nota
+    float nl;                         // quanto os harmônicos crescem com a força (pp escuro, ff rasgado)
 };
 constexpr int kNumInst = 6;
 
@@ -123,22 +134,34 @@ inline const std::array<InstDef, kNumInst>& instruments()
     static const std::array<InstDef, kNumInst> d {{
         { "trumpet",  "TROMPETE",     "Brilhante, ataque rapido", 52, 86,
           3, { { Saw, .50f, 0 }, { Saw, .32f, 7 }, { Square, .10f, -5 } },
-          950, 4200, 1.2f, 1250, 6, 2700, 4, .030f, .45f, 2800, 1.0f,  60, 1.00f },
+          950, 7000, 1.2f, 1300, 6, 2500, 4, .030f, .45f, 2800, 1.0f,  60, 1.00f,
+          9.0f, .25f, .30f, 4.0f, 5.4f,
+          4200, 2, 250, .30f, 2.2f },
         { "flugel",   "FLUGELHORN",   "Redondo e aveludado", 52, 84,
           2, { { Saw, .40f, 0 }, { Tri, .55f, 4 }, { Saw, 0, 0 } },
-          650, 2000, 0.8f,  900, 5, 1800, 2, .050f, .55f, 2000, 1.1f,  50, 1.15f },
+          650, 2000, 0.8f,  900, 5, 1800, 2, .050f, .55f, 2000, 1.1f,  50, 1.15f,
+          7.0f, .20f, .15f, 4.0f, 5.0f,
+          3200, 1, 180, .22f, .55f },
         { "alto",     "SAX ALTO",     "Nasal e cortante", 49, 81,
-          3, { { Square, .42f, 0 }, { Saw, .34f, 4 }, { Square, .14f, -9 } },
-          1100, 3200, 2.2f, 1500, 8, 3000, 3, .035f, .90f, 3500, 1.3f,  90, 0.90f },
+          3, { { Saw, .48f, 0 }, { Pulse, .34f, 4 }, { Saw, .12f, -9 } },
+          1100, 3200, 2.2f, 1500, 8, 3000, 3, .035f, .90f, 3500, 1.3f,  90, 0.90f,
+          7.0f, .55f, .60f, 6.0f, 5.6f,
+           700, 3, 160, .60f, 1.2f },
         { "tenor",    "SAX TENOR",    "Encorpado e rouco, o das pontadas", 44, 77,
-          3, { { Square, .46f, 0 }, { Saw, .40f, 5 }, { Saw, .12f, -8 } },
-          800, 2600, 2.4f, 1050, 8, 2400, 3, .040f, 1.0f, 2600, 1.3f, 110, 1.00f },
+          3, { { Saw, .52f, 0 }, { Pulse, .36f, 5 }, { Saw, .12f, -8 } },
+          800, 2600, 2.4f, 1050, 8, 2400, 3, .040f, 1.0f, 2600, 1.3f, 110, 1.00f,
+          8.0f, .50f, 1.0f, 6.0f, 5.2f,
+           520, 3, 110, .70f, 1.3f },
         { "trombone", "TROMBONE",     "Grave, gordo, ataque lento", 40, 72,
           2, { { Saw, .58f, 0 }, { Saw, .30f, -6 }, { Saw, 0, 0 } },
-          450, 2200, 1.3f,  600, 6, 1400, 3, .055f, .40f, 1500, 0.7f,  80, 1.15f },
+          450, 2200, 1.3f,  600, 6, 1400, 3, .055f, .40f, 1500, 0.7f,  80, 1.15f,
+          6.0f, .00f, .45f, 5.0f, 4.8f,
+          2600, 2,  70, .28f, 1.2f },
         { "bari",     "SAX BARITONO", "A base grave do naipe", 36, 65,
-          2, { { Square, .50f, 0 }, { Saw, .45f, 5 }, { Saw, 0, 0 } },
-          500, 1800, 2.0f,  650, 7, 1600, 3, .050f, .80f, 1800, 1.0f,  90, 1.00f },
+          2, { { Saw, .55f, 0 }, { Pulse, .40f, 5 }, { Saw, 0, 0 } },
+          500, 1800, 2.0f,  650, 7, 1600, 3, .050f, .80f, 1800, 1.0f,  90, 1.00f,
+          6.0f, .45f, .90f, 6.0f, 4.9f,
+           380, 3,  55, .60f, .80f },
     }};
     return d;
 }

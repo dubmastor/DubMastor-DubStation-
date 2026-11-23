@@ -44,6 +44,8 @@ public:
     void previewNote (int note, int artic);      // toca uma nota do naipe (ao escolher na lista)
     bool writeMidiFile (const juce::File& file) const;
     horns::Params currentParams() const;         // parâmetros atuais (para curvas e displays)
+    void applyMusico (int index, bool preview);  // preset da aba Músicos / visor azul (naipe, timbre, eco, EQ)
+    int  currentMusico() const;                  // -1 = nenhum
 
     float getVuLevel() const      { return vuLevel.load(); }
     float getEchoMs() const       { return echoMsNow.load(); }

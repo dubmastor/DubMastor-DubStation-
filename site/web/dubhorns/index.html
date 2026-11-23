@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1f1610">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Mastor Dub Horns MDH-70: naipe de metais anos 70 para tocar no celular ou no navegador, sem instalar nada.">
-<title>Mastor Dub Horns MDH-70 v1.1 — Dub Station</title>
+<title>Mastor Dub Horns MDH-70 v1.3 — Dub Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Righteous&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -180,6 +180,32 @@ table.ev td.pos{font-family:var(--mono);color:var(--cream)}
 .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(18,12,8,.82);z-index:40;flex-direction:column;gap:10px;text-align:center;padding:20px}
 .unit{position:relative}
 .overlay .big{font-family:var(--disp);font-size:22px;color:var(--amber)}
+/* músicos: visor azul de MPC, igual à Riddim Machine */
+.presetbar{padding:10px 14px;background:linear-gradient(180deg,#241a12,#1a120c);border-bottom:1px solid #000}
+.mpcrow{display:flex;gap:12px;align-items:stretch}
+.mpckeys{display:grid;grid-template-columns:44px 44px auto;gap:6px 6px;align-items:center}
+.mpckeys label{font-size:10px;letter-spacing:2.5px;color:var(--cream);font-weight:700;padding-left:4px}
+.mk{font-family:var(--body);font-weight:700;color:var(--cream);background:linear-gradient(180deg,#2c2925,#141210);border:none;border-radius:4px;
+  box-shadow:0 2px 0 rgba(0,0,0,.5),inset 0 -3px 0 rgba(74,140,240,.35);cursor:pointer;height:34px;font-size:13px}
+.mk:active,.mk.lit{box-shadow:0 1px 0 rgba(0,0,0,.5),inset 0 -3px 0 rgba(74,140,240,.95)}
+.mk.lit{color:#e8f3ff}
+.mpclcd{flex:1;min-width:0;border-radius:4px;padding:7px 14px;border:4px solid #0a0c10;position:relative;overflow:hidden;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.07) 0 1px,transparent 1px 3px),linear-gradient(180deg,#4a8cf0,#2e66cc 55%,#1d4aa8);
+  color:#e8f3ff;text-shadow:0 0 2px rgba(255,255,255,.35);font-weight:700;letter-spacing:.06em}
+.mpclcd::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.16),transparent 45%);pointer-events:none}
+.mpclcd .f{display:flex;justify-content:space-between;font-size:12px;opacity:.85;letter-spacing:.2em}
+.mpclcd .n{font-size:18px;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mpclcd .r{font-size:10.5px;opacity:.85}
+.mpclist{width:112px;flex:none;height:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:14px;letter-spacing:.12em}
+.mpclist small{font-size:8px;opacity:.6}
+.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.mgrid .col h4{margin:0 0 6px;font-size:9.5px;letter-spacing:1.2px;color:var(--muted);font-weight:700;min-height:24px}
+.mgrid .col h4.cur{color:var(--amber)}
+.mgrid .mk{width:100%;height:36px;margin-bottom:6px;font-size:10.5px;line-height:1.1;padding:0 6px;text-transform:uppercase}
+@media (max-width:860px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))} .mpcrow{flex-wrap:wrap;gap:8px}
+  .mpclcd{flex-basis:100%;order:-1;padding:6px 10px} .mpclcd .n{font-size:16px} .mpclcd .f{font-size:10px;letter-spacing:.12em}
+  .mpckeys{grid-template-columns:40px 40px auto 40px 40px auto;flex:1} .mpckeys label{font-size:9px;letter-spacing:1.5px}
+  .mpclist{width:84px;height:34px;flex-direction:row;font-size:12px} .mpclist small{display:none}}
 textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;background:#120c08;color:var(--cream);border:1px solid var(--line);border-radius:6px;margin-top:8px;display:none}
 </style>
 </head>
@@ -205,7 +231,7 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
       <div class="sub">Dub Station · Horn Section · MDH-70</div>
       <div class="stripes"><i></i><i></i><i></i></div>
     </div>
-    <button class="ver" id="verbtn" title="Histórico de versões">v1.1</button>
+    <button class="ver" id="verbtn" title="Histórico de versões">v1.3</button>
     <a class="ver" href="../../" style="text-decoration:none" title="Voltar ao site do Dub Station">← Dub Station</a>
     <div class="globalkey">
       <label>Tom</label><select id="gkey"></select>
@@ -217,12 +243,24 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
     <button class="power" id="power">POWER</button>
   </header>
 
+  <div class="presetbar">
+    <div class="mpcrow">
+      <div class="mpckeys">
+        <button class="mk" id="mfPrev">◀</button><button class="mk" id="mfNext">▶</button><label>ESTILO</label>
+        <button class="mk" id="mpPrev">◀</button><button class="mk" id="mpNext">▶</button><label>MÚSICO</label>
+      </div>
+      <div class="mpclcd" id="mLcd"><div class="f"><span>PRESET · <span id="mFolder"></span></span><span id="mPos"></span></div><div class="n" id="mName">ESCOLHA UM MÚSICO · ◀ ▶</div><div class="r" id="mRole">DEAN FRASER, VIN GORDON, TOMMY McCOOK, BOBBY ELLIS E OS NAIPES CLÁSSICOS</div></div>
+      <button class="mk mpclist" id="mList">LISTA<small>POR ESTILO ▾</small></button>
+    </div>
+    <select id="mSelect" style="display:none"></select>
+  </div>
   <nav class="tabs">
     <button data-tab="naipe" class="active">Naipe</button>
     <button data-tab="timbre">Timbre '70s</button>
     <button data-tab="echo">Mastor Tape Echo</button>
     <button data-tab="eq">Equalizador</button>
     <button data-tab="frases">Frases MIDI</button>
+    <button data-tab="musicos">Músicos</button>
   </nav>
 
   <!-- NAIPE -->
@@ -289,6 +327,15 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
   </section>
 
   <!-- FRASES -->
+  <!-- MÚSICOS -->
+  <section class="panel" id="tab-musicos">
+    <h2>Músicos da Jamaica</h2>
+    <p class="hint">Toque numa tecla ou use o visor azul lá em cima. Cada preset carrega a estética de um músico ou naipe: instrumentos, timbre, rouco, sala, eco e EQ. O tom e a escala continuam os seus. Homenagem ao jeito de tocar de cada um: não são gravações, é o motor do Dub Horns ajustado para lembrar o estilo.</p>
+
+    <div class="mgrid" id="mGrid"></div>
+    <div class="group"><h3 id="mCardH">Como usar</h3><div id="mCard" style="font-size:13px;line-height:1.5">Use ◀ ▶ para andar pelos estilos e pelos músicos, ou toque numa tecla. Depois é só tocar o teclado ou uma frase MIDI.</div></div>
+  </section>
+
   <section class="panel" id="tab-frases">
     <h2>Sugestões MIDI · ataques & introduções</h2>
     <p class="hint">As sugestões trazem o <b>ritmo e a articulação</b>. As notas são suas: escolha em cada linha, ou ligue <b>Escolher pelo teclado</b> e toque as notas em sequência. O naipe inteiro toca cada nota com as harmonias da aba Naipe.</p>
@@ -356,8 +403,20 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
 <script>
 "use strict";
 /* ================== VERSÃO ================== */
-const VERSION = '1.1';
+const VERSION = '1.3';
 const CHANGELOG = [
+  {v:'1.3', date:'23/11/2026', items:[
+    'Timbre mais realista: em pp o metal fica escuro e em ff os harmônicos agudos crescem (como medido em trompete e trombone de verdade); saxes com todos os harmônicos (tubo cônico) em vez de som oco de clarinete.',
+    'Zumbido do lábio e da palheta no ritmo da nota, 3º formante e campana em cada instrumento.',
+    'Naipe de sessão: um líder entra primeiro, os outros chegam alguns ms depois, cada músico com a sua afinação. Fita com "head bump" no grave e sala com cara de plate.',
+    'Visor azul de presets sempre à vista, entre o cabeçalho e as abas. O plugin abre no preset "Tubby · naipe no eco", com o delay na frente.'
+  ]},
+  {v:'1.2', date:'23/11/2026', items:[
+    'Final de nota natural: o fall e o doit seguram a nota, caem (ou sobem) acelerando e o volume some junto. Nada de sirene robótica no fim.',
+    'Fim normal com o lábio relaxando (poucos cents), vibrato que começa depois do ataque, varia como o de um músico e para quando a nota é solta.',
+    'Afinação viva, golpe de língua no ataque, knob Rouco (growl do sax estilo Dean Fraser) e knob Sala (sala de gravação).',
+    'Aba Músicos: 24 presets no padrão da Riddim Machine (visor azul, estilo ◀ ▶, músico ◀ ▶, lista) com Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis, Roland Alphonso, Rico Rodriguez e naipes clássicos.'
+  ]},
   {v:'1.1', date:'21/11/2026', items:[
     'Agora também é plugin VST3 (Windows e Mac) e AU (Mac), publicado no GitHub e no site do Dub Station.',
     'Tape Echo: a realimentação não dispara mais sozinha (saturação com ganho unitário).',
@@ -393,23 +452,24 @@ const mtof = m => 440*Math.pow(2,(m-69)/12);
 const INST = {
   trumpet:{name:'Trompete', ds:'Brilhante, ataque rápido', range:[52,86],
     osc:[{t:'sawtooth',g:.5},{t:'sawtooth',g:.32,d:7},{t:'square',g:.1,d:-5}],
-    cut:950,env:4200,q:1.2,f1:1250,g1:6,f2:2700,g2:4,atk:.03,br:.45,brF:2800,vib:1,scoop:60,gain:1},
+    cut:950,env:7000,q:1.2,f1:1300,g1:6,f2:2500,g2:4,atk:.03,br:.45,brF:2800,vib:1,scoop:60,gain:1,fall:9,stair:.25,growl:.3,drift:4,vibRate:5.4,f3:4200,g3:2,bell:250,buzz:.3,nl:2.2},
   flugel:{name:'Flugelhorn', ds:'Redondo e aveludado', range:[52,84],
     osc:[{t:'sawtooth',g:.4},{t:'triangle',g:.55,d:4}],
-    cut:650,env:2000,q:.8,f1:900,g1:5,f2:1800,g2:2,atk:.05,br:.55,brF:2000,vib:1.1,scoop:50,gain:1.15},
+    cut:650,env:2000,q:.8,f1:900,g1:5,f2:1800,g2:2,atk:.05,br:.55,brF:2000,vib:1.1,scoop:50,gain:1.15,fall:7,stair:.2,growl:.15,drift:4,vibRate:5,f3:3200,g3:1,bell:180,buzz:.22,nl:.55},
   alto:{name:'Sax Alto', ds:'Nasal, cortante', range:[49,81],
-    osc:[{t:'square',g:.42},{t:'sawtooth',g:.34,d:4},{t:'square',g:.14,d:-9}],
-    cut:1100,env:3200,q:2.2,f1:1500,g1:8,f2:3000,g2:3,atk:.035,br:.9,brF:3500,vib:1.3,scoop:90,gain:.9},
+    osc:[{t:'sawtooth',g:.48},{t:'pulse',g:.34,d:4},{t:'sawtooth',g:.12,d:-9}],
+    cut:1100,env:3200,q:2.2,f1:1500,g1:8,f2:3000,g2:3,atk:.035,br:.9,brF:3500,vib:1.3,scoop:90,gain:.9,fall:7,stair:.55,growl:.6,drift:6,vibRate:5.6,f3:700,g3:3,bell:160,buzz:.6,nl:1.2},
   tenor:{name:'Sax Tenor', ds:'Encorpado, rouco — o sax das pontadas', range:[44,77],
-    osc:[{t:'square',g:.46},{t:'sawtooth',g:.4,d:5},{t:'sawtooth',g:.12,d:-8}],
-    cut:800,env:2600,q:2.4,f1:1050,g1:8,f2:2400,g2:3,atk:.04,br:1,brF:2600,vib:1.3,scoop:110,gain:1},
+    osc:[{t:'sawtooth',g:.52},{t:'pulse',g:.36,d:5},{t:'sawtooth',g:.12,d:-8}],
+    cut:800,env:2600,q:2.4,f1:1050,g1:8,f2:2400,g2:3,atk:.04,br:1,brF:2600,vib:1.3,scoop:110,gain:1,fall:8,stair:.5,growl:1,drift:6,vibRate:5.2,f3:520,g3:3,bell:110,buzz:.7,nl:1.3},
   trombone:{name:'Trombone', ds:'Grave, gordo, ataque mais lento', range:[40,72],
     osc:[{t:'sawtooth',g:.58},{t:'sawtooth',g:.3,d:-6}],
-    cut:450,env:2200,q:1.3,f1:600,g1:6,f2:1400,g2:3,atk:.055,br:.4,brF:1500,vib:.7,scoop:80,gain:1.15},
+    cut:450,env:2200,q:1.3,f1:600,g1:6,f2:1400,g2:3,atk:.055,br:.4,brF:1500,vib:.7,scoop:80,gain:1.15,fall:6,stair:0,growl:.45,drift:5,vibRate:4.8,f3:2600,g3:2,bell:70,buzz:.28,nl:1.2},
   bari:{name:'Sax Barítono', ds:'Base grave do naipe', range:[36,65],
-    osc:[{t:'square',g:.5},{t:'sawtooth',g:.45,d:5}],
-    cut:500,env:1800,q:2,f1:650,g1:7,f2:1600,g2:3,atk:.05,br:.8,brF:1800,vib:1,scoop:90,gain:1}
+    osc:[{t:'sawtooth',g:.55},{t:'pulse',g:.4,d:5}],
+    cut:500,env:1800,q:2,f1:650,g1:7,f2:1600,g2:3,atk:.05,br:.8,brF:1800,vib:1,scoop:90,gain:1,fall:6,stair:.45,growl:.9,drift:6,vibRate:4.9,f3:380,g3:3,bell:55,buzz:.6,nl:.8}
 };
+const INST_TUNE = {}; for(const k in INST) INST_TUNE[k]=(Math.random()*2-1)*7;   // cada músico afina um pouco diferente
 const HARM = [
   {v:'uni',n:'Uníssono',deg:0,semi:0},
   {v:'3+',n:'3ª acima',deg:2,semi:4},
@@ -431,7 +491,7 @@ const S = {
     trombone:{on:true, level:.7, pan:.35, oct:0, harm:'3-'},
     bari:{on:false, level:.65, pan:0, oct:-1, harm:'5-'}
   },
-  t:{bright:.55, breath:.4, vib:.3, attack:1, release:.3, scoop:.4, drive:.35, band:9000, lowcut:80, hiss:.15, human:.5, width:.7},
+  t:{bright:.55, breath:.4, vib:.3, attack:1, release:.3, scoop:.4, drive:.35, band:9000, lowcut:80, hiss:.15, human:.5, width:.7, growl:.3, room:.25},
   echo:{on:true, sync:'8d', time:375, fb:.45, send:.3, ret:.75, tone:3200, bass:220, wow:.3, sat:.5, heads:[true,false,false]},
   eq:[0,0,0,0,0,0,0,0,0,0], tubby:20, tubbyQ:1,
   seq:{bpm:74, loop:true, click:true, swing:.1, len:32, events:[], name:''}
@@ -444,6 +504,17 @@ function makeCurve(g){
   const n=2048, c=new Float32Array(n);
   for(let i=0;i<n;i++){const x=i/(n-1)*2-1; c[i]=Math.tanh(g*x)/g;}
   return c;
+}
+function pulseWave(duty){   // pulso estreito: todos os harmônicos (sax = tubo cônico)
+  const n=64, re=new Float32Array(n), im=new Float32Array(n);
+  for(let k=1;k<n;k++) re[k]=2/(k*Math.PI)*Math.sin(k*Math.PI*duty);
+  return ctx.createPeriodicWave(re,im);
+}
+function makeRoomIR(){
+  const sr=ctx.sampleRate, len=Math.floor(sr*1.1), b=ctx.createBuffer(2,len,sr);
+  for(let c=0;c<2;c++){ const d=b.getChannelData(c); let lp=0; const k=1-Math.exp(-2*Math.PI*4200/sr);
+    for(let i=0;i<len;i++){ const t=i/sr; const n=(Math.random()*2-1)*Math.exp(-t/0.24)*(t<0.008?0:1); lp+=(n-lp)*k; d[i]=lp; } }
+  return b;
 }
 function initAudio(){
   if(ctx){ if(ctx.state==='suspended') ctx.resume(); return; }
@@ -459,7 +530,9 @@ function initAudio(){
   N.lp = ctx.createBiquadFilter(); N.lp.type='lowpass'; N.lp.Q.value=.6;
   N.lp2 = ctx.createBiquadFilter(); N.lp2.type='lowpass'; N.lp2.Q.value=.5;
   N.bus.connect(N.hp); N.hp.connect(N.driveIn); N.driveIn.connect(N.drive); N.drive.connect(N.driveOut);
-  N.driveOut.connect(N.lp); N.lp.connect(N.lp2);
+  N.bump = ctx.createBiquadFilter(); N.bump.type='lowshelf'; N.bump.frequency.value=95;   // "head bump" da fita
+  N.driveOut.connect(N.bump); N.bump.connect(N.lp); N.lp.connect(N.lp2);
+  N.pulse = pulseWave(.35); N.gate = pulseWave(.2);
   // EQ
   const freqs=[31,62,125,250,500,1000,2000,4000,8000,16000];
   N.eq = freqs.map((f,i)=>{const b=ctx.createBiquadFilter(); b.type=i===0?'lowshelf':i===9?'highshelf':'peaking'; b.frequency.value=f; b.Q.value=1.1; b.gain.value=0; return b;});
@@ -471,6 +544,11 @@ function initAudio(){
   N.dry = ctx.createGain(); N.post.connect(N.dry);
   N.masterG = ctx.createGain();
   N.dry.connect(N.masterG);
+  // sala do estúdio (resposta curta gerada aqui: paredes da sala de gravação)
+  N.roomSend = ctx.createGain(); N.roomSend.gain.value=0;
+  N.room = ctx.createConvolver(); N.room.buffer = makeRoomIR();
+  N.roomHP = ctx.createBiquadFilter(); N.roomHP.type='highpass'; N.roomHP.frequency.value=180;
+  N.post.connect(N.roomHP); N.roomHP.connect(N.roomSend); N.roomSend.connect(N.room); N.room.connect(N.masterG);
   // ECHO
   N.send = ctx.createGain(); N.post.connect(N.send);
   N.throwG = ctx.createGain(); N.throwG.gain.value=0; N.post.connect(N.throwG);
@@ -514,9 +592,11 @@ function applyTimbre(){
   N.drive.curve = makeCurve(1+T.drive*3);
   N.driveIn.gain.setTargetAtTime(1,t,.03);
   N.driveOut.gain.setTargetAtTime(1+T.drive*1.2,t,.03);
+  N.bump.gain.setTargetAtTime(1+2.5*T.drive,t,.03);
   N.lp.frequency.setTargetAtTime(T.band,t,.03);
   N.lp2.frequency.setTargetAtTime(Math.min(20000,T.band*1.4),t,.03);
   N.hissG.gain.setTargetAtTime(T.hiss*T.hiss*.03,t,.05);
+  N.roomSend.gain.setTargetAtTime(T.room*.55,t,.05);
 }
 const SYNC = [
   {v:'free',n:'Livre (ms)'},{v:'4',n:'1/4',b:1},{v:'4d',n:'1/4 pontuada',b:1.5},{v:'4t',n:'1/4 tercina',b:2/3},
@@ -567,70 +647,143 @@ function diatonic(midi, steps, semiFallback){
   const base=midi-rel, tot=idx+st, o=Math.floor(tot/len), i=tot-o*len;
   return base+o*12+sc[i];
 }
-function voice(key, midi, vel, t0, artic){
-  const I=INST[key], st=S.inst[key], T=S.t;
+// v1.2: o fim da nota decide se soa gente ou máquina.
+//  fall / doit: segura um instante, depois cai (ou sobe) acelerando e o volume some JUNTO;
+//  profundidade, duração e curva mudam a cada nota; sax cai "pelas chaves", trombone desliza liso.
+//  fim normal: o lábio relaxa uns poucos cents. Vibrato começa depois do ataque, oscila de
+//  velocidade, mexe no volume e no brilho e PARA quando a nota é solta. Afinação viva,
+//  golpe de língua e rouco (growl) para os saxes.
+function voice(key, midi, vel, t0, artic, dl, tune){
+  const I=INST[key], st=S.inst[key], T=S.t, R=Math.random;
   const v=vel/127;
-  t0 += Math.random()*.02*T.human;
-  const det=(Math.random()*2-1)*7*T.human;
+  t0 += dl!==undefined ? dl : R()*.02*T.human;
+  const det=(R()*2-1)*4*T.human + (tune||0);
   const f=mtof(midi);
   const out=ctx.createGain(); out.gain.value=0;
+  const endG=ctx.createGain(); endG.gain.value=1;
   const lvl=ctx.createGain(); lvl.gain.value=st.level*I.gain;
   const pan=ctx.createStereoPanner(); pan.pan.value=Math.max(-1,Math.min(1,st.pan*(.3+T.width)));
+  const pre=ctx.createGain(); pre.gain.value=1;
   const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=I.q;
   const f1=ctx.createBiquadFilter(); f1.type='peaking'; f1.frequency.value=I.f1; f1.Q.value=1.4; f1.gain.value=I.g1;
   const f2=ctx.createBiquadFilter(); f2.type='peaking'; f2.frequency.value=I.f2; f2.Q.value=2; f2.gain.value=I.g2;
-  lp.connect(f1); f1.connect(f2); f2.connect(out); out.connect(lvl); lvl.connect(pan); pan.connect(nodes.bus);
+  const srcs=[];
+  // rouco: aspereza da palheta (modulação por ruído grave + um pouco de distorção assimétrica)
+  const gA=T.growl*I.growl;
+  if(gA>.01){
+    const sh=ctx.createWaveShaper(); const n=1024, c=new Float32Array(n);
+    for(let i=0;i<n;i++){const x=i/(n-1)*2-1; c[i]=x+gA*.22*(x*Math.abs(x)-.3*x);} sh.curve=c;
+    pre.connect(sh); sh.connect(lp);
+    const gn=ctx.createBufferSource(); gn.buffer=noiseBuf; gn.loop=true;
+    const gl1=ctx.createBiquadFilter(); gl1.type='lowpass'; gl1.frequency.value=55+25*R(); gl1.Q.value=.5;
+    const gl2=ctx.createBiquadFilter(); gl2.type='lowpass'; gl2.frequency.value=gl1.frequency.value; gl2.Q.value=.5;
+    const gg=ctx.createGain(); gg.gain.value=gA*.7*16;
+    gn.connect(gl1); gl1.connect(gl2); gl2.connect(gg); gg.connect(pre.gain); srcs.push([gn,R()*1.5]);
+  } else pre.connect(lp);
+  // v1.3: o metal real escurece no pp e rasga no ff; 3º formante e campana
+  const f3=ctx.createBiquadFilter(); f3.type='peaking'; f3.frequency.value=I.f3; f3.Q.value=1.6; f3.gain.value=I.g3;
+  const bell=ctx.createBiquadFilter(); bell.type='highpass'; bell.frequency.value=I.bell; bell.Q.value=.6;
+  const nlG=1+I.nl*2.6*.8*v*.95*(.4+.8*T.bright);
+  const nls=ctx.createWaveShaper(); { const n=1024,c=new Float32Array(n); for(let i=0;i<n;i++){const x=(i/(n-1)*2-1)*1.5; c[i]=Math.tanh(nlG*x)/nlG*(1+.35*(nlG-1));} nls.curve=c; }
+  const nlIn=ctx.createGain(); nlIn.gain.value=1/1.5;
+  lp.connect(nlIn); nlIn.connect(nls); nls.connect(f1); f1.connect(f2); f2.connect(f3); f3.connect(bell); bell.connect(out); out.connect(endG); endG.connect(lvl); lvl.connect(pan); pan.connect(nodes.bus);
 
   const atk=I.atk*(.4+T.attack*.9);
-  const scoopC=T.scoop*I.scoop + (artic==='scoop'?260:0);
-  const scoopT=.04+T.scoop*.05+(artic==='scoop'?.09:0);
+  // afinação em cents, uma só para os osciladores: scoop, assentar, fall/doit
+  const pitch=ctx.createConstantSource(); pitch.offset.value=0;
+  const scoopC=T.scoop*I.scoop*(.65+.7*R())*(artic==='stac'?.45:1) + (artic==='scoop'?200+120*R():0);
+  const scoopT=.035+T.scoop*.045+(artic==='scoop'?.08+.04*R():0);
+  const settle=(R()*2-1)*9*(.3+T.human);
+  pitch.offset.setValueAtTime(-scoopC+settle, t0);
+  pitch.offset.setTargetAtTime(0, t0, scoopT/3);
   const oscs=I.osc.map(o=>{
-    const osc=ctx.createOscillator(); osc.type=o.t; osc.detune.value=det+(o.d||0);
-    const g=ctx.createGain(); g.gain.value=o.g; osc.connect(g); g.connect(lp);
-    osc.frequency.setValueAtTime(f*Math.pow(2,-scoopC/1200), t0);
-    osc.frequency.exponentialRampToValueAtTime(f, t0+scoopT);
+    const osc=ctx.createOscillator(); if(o.t==='pulse') osc.setPeriodicWave(nodes.pulse); else osc.type=o.t; osc.frequency.value=f; osc.detune.value=det+(o.d||0);
+    const g=ctx.createGain(); g.gain.value=o.g; osc.connect(g); g.connect(pre);
+    pitch.connect(osc.detune);
     return osc;
   });
-  // vibrato atrasado
-  const lfo=ctx.createOscillator(); lfo.frequency.value=4.6+Math.random()*.9;
-  const lg=ctx.createGain(); lg.gain.setValueAtTime(0,t0); lg.gain.linearRampToValueAtTime(f*.011*T.vib*I.vib, t0+.55);
-  lfo.connect(lg); oscs.forEach(o=>lg.connect(o.frequency));
+  // zumbido do lábio / palheta: ruído que abre e fecha no ritmo de cada ciclo da nota
+  const bzA=I.buzz*(.35+.65*T.breath)*.32*1.6;
+  const bz=ctx.createBufferSource(); bz.buffer=noiseBuf; bz.loop=true;
+  const bzG=ctx.createGain(); bzG.gain.value=bzA*.5;
+  const gate=ctx.createOscillator(); gate.setPeriodicWave(nodes.gate); gate.frequency.value=f; gate.detune.value=det;
+  const gateG=ctx.createGain(); gateG.gain.value=bzA*.5; gate.connect(gateG); gateG.connect(bzG.gain); pitch.connect(gate.detune);
+  bz.connect(bzG); bzG.connect(pre); srcs.push([bz,R()*1.5]); oscs.push(gate);
+  // afinação viva: dois balanços lentos
+  const dA=I.drift*(.25+T.human);
+  const dr=[[.11+.1*R(),dA*.6],[.23+.15*R(),dA*.4]].map(([fr,a])=>{const o=ctx.createOscillator(); o.frequency.value=fr; const g=ctx.createGain(); g.gain.value=a; o.connect(g); oscs.forEach(x=>g.connect(x.detune)); return o;});
+  // vibrato humano: atrasado, velocidade oscilando, mexe no volume e no brilho
+  const vibC=20*T.vib*I.vib, vibStart=t0+.16+.14*R();
+  const lfo=ctx.createOscillator(); lfo.frequency.value=I.vibRate*(.92+.16*R());
+  const jit=ctx.createOscillator(); jit.frequency.value=.3+.2*R(); const jg=ctx.createGain(); jg.gain.value=lfo.frequency.value*.06; jit.connect(jg); jg.connect(lfo.frequency);
+  const lg=ctx.createGain(); lg.gain.setValueAtTime(0,t0); lg.gain.setValueAtTime(0,vibStart); lg.gain.linearRampToValueAtTime(vibC,vibStart+.45);
+  lfo.connect(lg); oscs.forEach(o=>lg.connect(o.detune));
+  const ampSus=v*(.68+.08*R());
+  const tg=ctx.createGain(); tg.gain.setValueAtTime(0,t0); tg.gain.setValueAtTime(0,vibStart); tg.gain.linearRampToValueAtTime(ampSus*.45*vibC/100,vibStart+.45);
+  lfo.connect(tg); tg.connect(out.gain);
   // filtro: o "blat" do metal abre com a força
   const kt=Math.pow(f/440,.45);
-  const base=I.cut*kt*(.55+T.bright*.9);
-  const peak=Math.min(16000, base + I.env*kt*T.bright*(.35+v*1.1));
+  const base=I.cut*kt*(.55+T.bright*.9)*(.45+.75*v);   // pp fecha, ff abre
+  const peak=Math.min(16000, base + I.env*kt*T.bright*(.08+v*v*1.37));
+  const bgn=ctx.createGain(); bgn.gain.setValueAtTime(0,t0); bgn.gain.setValueAtTime(0,vibStart); bgn.gain.linearRampToValueAtTime(base*.6*vibC/100,vibStart+.45);
+  lfo.connect(bgn); bgn.connect(lp.frequency);
   lp.frequency.setValueAtTime(base*.5,t0);
   lp.frequency.linearRampToValueAtTime(peak,t0+atk*1.3);
   lp.frequency.setTargetAtTime(base+(peak-base)*.5,t0+atk*1.3,.18);
   // amplitude
   out.gain.setValueAtTime(0,t0);
   out.gain.linearRampToValueAtTime(v*.95,t0+atk);
-  out.gain.setTargetAtTime(v*.72,t0+atk,.12);
+  out.gain.setTargetAtTime(ampSus,t0+atk,.12);
   // sopro
   const ns=ctx.createBufferSource(); ns.buffer=noiseBuf; ns.loop=true;
   const nf=ctx.createBiquadFilter(); nf.type='bandpass'; nf.frequency.value=I.brF; nf.Q.value=1.2;
   const ng=ctx.createGain(); const bAmt=T.breath*I.br*.22*(.5+v);
   ng.gain.setValueAtTime(0,t0); ng.gain.linearRampToValueAtTime(bAmt,t0+atk*.7); ng.gain.setTargetAtTime(bAmt*.3,t0+atk,.08);
   ns.connect(nf); nf.connect(ng); ng.connect(out);
+  // golpe de língua: um "t" de ar no começo
+  const tn=ctx.createBufferSource(); tn.buffer=noiseBuf;
+  const tf=ctx.createBiquadFilter(); tf.type='bandpass'; tf.frequency.value=Math.min(I.brF*1.6,7000); tf.Q.value=.9;
+  const tgn=ctx.createGain(); const tAmp=(.05+.11*v)*(.4+T.breath)*(artic==='stac'?1.3:1)*(I.br+.4);
+  tgn.gain.setValueAtTime(tAmp,t0); tgn.gain.setTargetAtTime(0,t0,.007);
+  tn.connect(tf); tf.connect(tgn); tgn.connect(lvl);
 
-  oscs.forEach(o=>o.start(t0)); lfo.start(t0); ns.start(t0, Math.random()*1.5);
+  oscs.forEach(o=>o.start(t0)); dr.forEach(o=>o.start(t0)); lfo.start(t0); jit.start(t0); pitch.start(t0);
+  ns.start(t0, R()*1.5); tn.start(t0, R()*1.5); srcs.forEach(([s0,o])=>s0.start(t0,o));
   const minEnd=t0+Math.max(atk,scoopT)+.02;
+  let stopped=false;
   return {
     stop(t){
+      if(stopped) return; stopped=true;
       t=Math.max(t,minEnd);
-      let rel=.05+T.release*.45, end;
-      if(artic==='fall'){
-        oscs.forEach(o=>{o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*Math.pow(2,-8/12),t+.38);});
-        out.gain.setTargetAtTime(0,t+.06,.1); lp.frequency.setTargetAtTime(base*.4,t,.12); end=t+.9;
-      } else if(artic==='doit'){
-        oscs.forEach(o=>{o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*Math.pow(2,5/12),t+.28);});
-        out.gain.setTargetAtTime(0,t+.08,.08); end=t+.8;
+      const rel=.05+T.release*.45; let end;
+      [lg,tg,bgn].forEach(g=>{g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0,t,.03);});   // o músico para o vibrato
+      if(artic==='fall'||artic==='doit'){
+        const fall=artic==='fall', vr=.8+.4*R(), hold=.035+.05*R();
+        const depth=fall? -I.fall*vr : (I.fall*.45+.8)*vr;
+        const len=fall? (.24+.14*R()+T.release*.18) : (.16+.10*R()+T.release*.12);
+        const ex=fall? 1.9+.6*R() : 1.6+.5*R();
+        const N=96, pc=new Float32Array(N), gc=new Float32Array(N);
+        let stair=0, wob=0;
+        for(let i=0;i<N;i++){ const u=i/(N-1);
+          let sm=depth*Math.pow(u,ex); stair+=(Math.round(sm)-stair)*.6;
+          sm=sm*(1-I.stair*.6)+stair*I.stair*.6; wob+=((R()*2-1)*.35-wob)*.3;
+          pc[i]=(sm+wob*u)*100; gc[i]=Math.pow(1-u,1.7); }
+        pc[0]=0;
+        pitch.offset.cancelScheduledValues(t); pitch.offset.setTargetAtTime(0,t,.01);
+        pitch.offset.setValueCurveAtTime(pc,t+hold,len);
+        endG.gain.setValueAtTime(1,t+hold); endG.gain.setValueCurveAtTime(gc,t+hold+.001,len);
+        lp.frequency.setTargetAtTime(base*.4,t+hold,len/2.5);
+        ng.gain.setTargetAtTime(bAmt*(fall?.55:.4),t+hold,.03); ng.gain.setTargetAtTime(0,t+hold+len*.4,len/4);
+        end=t+hold+len+.06;
       } else {
+        const sag=-(6+10*R())*(.4+.8*I.drift/6);
+        pitch.offset.setTargetAtTime(sag,t,rel/2.5);
         out.gain.setTargetAtTime(0,t,rel/3.5); lp.frequency.setTargetAtTime(base*.45,t,rel/3);
         ng.gain.setTargetAtTime(0,t,rel/4); end=t+rel*2.5+.1;
       }
-      oscs.forEach(o=>o.stop(end)); lfo.stop(end); ns.stop(end);
-      oscs[0].onended=()=>{ try{pan.disconnect();}catch(e){} };
+      oscs.forEach(o=>o.stop(end)); dr.forEach(o=>o.stop(end)); lfo.stop(end); jit.stop(end); pitch.stop(end); ns.stop(end);
+      try{tn.stop(end);}catch(e){} srcs.forEach(([s0])=>s0.stop(end));
+      oscs[0].onended=()=>{ try{pan.disconnect(); tgn.disconnect();}catch(e){} };
     }
   };
 }
@@ -648,7 +801,11 @@ function sectionNotes(midi){
 function sectionOn(midi, vel, t, artic){
   if(!ctx) return [];
   t=t??ctx.currentTime;
-  return sectionNotes(midi).map(([k,m])=>voice(k,m,vel,t,artic));
+  // o naipe tem um líder; os outros chegam alguns ms depois
+  const list=sectionNotes(midi), order=['trumpet','tenor','alto','flugel','trombone','bari'];
+  const lead=order.find(k=>list.some(([kk])=>kk===k)), H=S.t.human;
+  return list.map(([k,m])=>{ const isL=k===lead; const dl=isL? Math.random()*.006*H : (.004+Math.random()*.022)*H;
+    return voice(k,m,isL?vel:vel*(.92+.08*Math.random()),t,artic,dl,INST_TUNE[k]*(.3+H)); });
 }
 
 /* ================== UI: KNOBS ================== */
@@ -762,22 +919,24 @@ renderInsts();
 
 /* ================== TIMBRE ================== */
 const TIMBRES=[
-  {n:"Randy's '72 · brilhante e seco", t:{bright:.68,breath:.32,vib:.28,attack:.8,release:.22,scoop:.3,drive:.3,band:10500,lowcut:90,hiss:.12,human:.45,width:.6}},
-  {n:'Channel One · punch', t:{bright:.78,breath:.3,vib:.22,attack:.6,release:.2,scoop:.35,drive:.5,band:11500,lowcut:110,hiss:.1,human:.4,width:.7}},
-  {n:"Tubby's dubplate", t:{bright:.52,breath:.42,vib:.3,attack:1,release:.35,scoop:.45,drive:.55,band:7600,lowcut:130,hiss:.3,human:.55,width:.8}},
-  {n:'Black Ark haze', t:{bright:.42,breath:.55,vib:.35,attack:1.2,release:.45,scoop:.5,drive:.65,band:6200,lowcut:100,hiss:.42,human:.65,width:.9}},
-  {n:'Treasure Isle · rocksteady suave', t:{bright:.36,breath:.45,vib:.45,attack:1.3,release:.4,scoop:.35,drive:.2,band:8200,lowcut:70,hiss:.18,human:.5,width:.6}},
-  {n:'Rádio AM de Kingston', t:{bright:.6,breath:.3,vib:.3,attack:.9,release:.3,scoop:.3,drive:.7,band:4800,lowcut:320,hiss:.35,human:.5,width:.3}}
+  {n:"Randy's '72 · brilhante e seco", t:{bright:.68,breath:.32,vib:.28,attack:.8,release:.22,scoop:.3,drive:.3,band:10500,lowcut:90,hiss:.12,human:.45,width:.6,room:.3}},
+  {n:'Channel One · punch', t:{bright:.78,breath:.3,vib:.22,attack:.6,release:.2,scoop:.35,drive:.5,band:11500,lowcut:110,hiss:.1,human:.4,width:.7,room:.2}},
+  {n:"Tubby's dubplate", t:{bright:.52,breath:.42,vib:.3,attack:1,release:.35,scoop:.45,drive:.55,band:7600,lowcut:130,hiss:.3,human:.55,width:.8,room:.25}},
+  {n:'Black Ark haze', t:{bright:.42,breath:.55,vib:.35,attack:1.2,release:.45,scoop:.5,drive:.65,band:6200,lowcut:100,hiss:.42,human:.65,width:.9,room:.55}},
+  {n:'Treasure Isle · rocksteady suave', t:{bright:.36,breath:.45,vib:.45,attack:1.3,release:.4,scoop:.35,drive:.2,band:8200,lowcut:70,hiss:.18,human:.5,width:.6,room:.4}},
+  {n:'Rádio AM de Kingston', t:{bright:.6,breath:.3,vib:.3,attack:.9,release:.3,scoop:.3,drive:.7,band:4800,lowcut:320,hiss:.35,human:.5,width:.3,room:.15}}
 ];
 const tk=[];
 tk.push(K('kTone',{label:'Brilho',min:0,max:1,def:.55,get:()=>S.t.bright,set:v=>S.t.bright=v,fmt:pct}));
 tk.push(K('kTone',{label:'Sopro',min:0,max:1,def:.4,get:()=>S.t.breath,set:v=>S.t.breath=v,fmt:pct}));
 tk.push(K('kTone',{label:'Vibrato',min:0,max:1,def:.3,get:()=>S.t.vib,set:v=>S.t.vib=v,fmt:pct}));
+tk.push(K('kTone',{label:'Rouco',min:0,max:1,def:.3,get:()=>S.t.growl,set:v=>S.t.growl=v,fmt:pct}));
 tk.push(K('kTone',{label:'Scoop',min:0,max:1,def:.4,get:()=>S.t.scoop,set:v=>S.t.scoop=v,fmt:pct}));
 tk.push(K('kTone',{label:'Ataque',min:.3,max:2.5,def:1,get:()=>S.t.attack,set:v=>S.t.attack=v,fmt:v=>v.toFixed(1)+'×'}));
 tk.push(K('kTone',{label:'Release',min:0,max:1,def:.3,get:()=>S.t.release,set:v=>S.t.release=v,fmt:v=>Math.round((.05+v*.45)*1000)+'ms'}));
 tk.push(K('kTape',{label:'Saturação',min:0,max:1,def:.35,get:()=>S.t.drive,set:v=>{S.t.drive=v;applyTimbre();},fmt:pct}));
 tk.push(K('kTape',{label:'Banda (agudo)',min:2500,max:18000,log:true,def:9000,get:()=>S.t.band,set:v=>{S.t.band=v;applyTimbre();},fmt:hz}));
+tk.push(K('kTape',{label:'Sala',min:0,max:1,def:.25,get:()=>S.t.room,set:v=>{S.t.room=v;applyTimbre();},fmt:pct}));
 tk.push(K('kTape',{label:'Corte grave',min:20,max:500,log:true,def:80,get:()=>S.t.lowcut,set:v=>{S.t.lowcut=v;applyTimbre();},fmt:hz}));
 tk.push(K('kTape',{label:'Chiado fita',min:0,max:1,def:.15,get:()=>S.t.hiss,set:v=>{S.t.hiss=v;applyTimbre();},fmt:pct}));
 tk.push(K('kHuman',{label:'Humanizar',min:0,max:1,def:.5,get:()=>S.t.human,set:v=>S.t.human=v,fmt:pct}));
@@ -786,6 +945,63 @@ tk.push(K('kHuman',{label:'Abertura estéreo',min:0,max:1,def:.7,get:()=>S.t.wid
   TIMBRES.forEach(p=>{const b=document.createElement('button'); b.className='btn'; b.textContent=p.n;
     b.onclick=()=>{Object.assign(S.t,p.t); tk.forEach(k=>k.refresh()); applyTimbre(); w.querySelectorAll('.btn').forEach(z=>z.classList.toggle('sel',z===b)); if(ctx) audition();};
     w.appendChild(b);});
+})();
+
+/* ================== MÚSICOS (padrão Riddim Machine) ================== */
+const MUSICOS_FOLDERS = ["DUB · KING TUBBY / BLACK ARK", "SKA 63-66 · SKATALITES", "ROCKSTEADY 66-68", "STUDIO ONE 68-79", "ROOTS · CHANNEL ONE 75-79", "WAILERS · ISLAND 73-80", "80s · DEAN FRASER"];
+const MUSICO_INICIAL = 0;   // Tubby · naipe no eco
+const MUSICOS = [{"f":"DUB · KING TUBBY / BLACK ARK","n":"Tubby · naipe no eco","r":"TPT · TEN · TBN · DUB","d":"Naipe estreito de console, chiado e fita: notas soltas jogadas no Tape Echo.","a":1,"sec":[{"on":1,"lvl":0.75,"pan":-0.35,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.8,"pan":0.15,"oct":-1,"harm":0},{"on":1,"lvl":0.7,"pan":0.35,"oct":0,"harm":2},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.52,"breath":0.42,"vib":0.3,"scoop":0.45,"attack":1.0,"release":0.35,"drive":0.55,"band":7600,"lowcut":130,"hiss":0.3,"human":0.55,"width":0.8,"growl":0.35,"room":0.2},"echo":{"on":1,"sync":5,"fb":0.62,"send":0.45,"tone":2600},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]},{"f":"DUB · KING TUBBY / BLACK ARK","n":"Black Ark · fumaça","r":"TEN · TBN · BAR","d":"O naipe enfumaçado da Black Ark: abafado, com muito ar, sala grande e eco escuro.","a":3,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.8,"pan":-0.2,"oct":-1,"harm":0},{"on":1,"lvl":0.72,"pan":0.25,"oct":0,"harm":2},{"on":1,"lvl":0.6,"pan":0,"oct":-1,"harm":3}],"t":{"bright":0.4,"breath":0.58,"vib":0.36,"scoop":0.5,"attack":1.2,"release":0.45,"drive":0.65,"band":6200,"lowcut":100,"hiss":0.42,"human":0.65,"width":0.9,"growl":0.45,"room":0.6},"echo":{"on":1,"sync":2,"fb":0.55,"send":0.4,"tone":2200},"eq":[2,2,1,1,0,-1,-1,-2,-4,-6]},{"f":"DUB · KING TUBBY / BLACK ARK","n":"Rádio AM de Kingston","r":"TPT · TEN","d":"Naipe pelo radinho: só médio, saturado, para quebras e intros de dub.","a":1,"sec":[{"on":1,"lvl":0.78,"pan":-0.2,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.8,"pan":0.2,"oct":-1,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.6,"breath":0.3,"vib":0.3,"scoop":0.3,"attack":0.9,"release":0.3,"drive":0.75,"band":4800,"lowcut":320,"hiss":0.35,"human":0.5,"width":0.3,"growl":0.3,"room":0.15},"echo":{"on":1,"sync":4,"fb":0.5,"send":0.35,"tone":2400},"eq":[-6,-4,-2,0,2,4,3,0,-4,-8]},{"f":"SKA 63-66 · SKATALITES","n":"Roland Alphonso","r":"SAX TENOR · STUDIO ONE","d":"Tenor de jazz no ska: solto, vibrato largo e bastante sopro. O \"Chief Musician\".","a":0,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.55,"breath":0.55,"vib":0.55,"scoop":0.45,"attack":1.1,"release":0.4,"drive":0.3,"band":8200,"lowcut":90,"hiss":0.2,"human":0.6,"width":0.5,"growl":0.4,"room":0.4},"echo":{"on":1,"sync":4,"fb":0.3,"send":0.18,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"SKA 63-66 · SKATALITES","n":"Don Drummond","r":"TROMBONE · SKATALITES","d":"Trombone grave e melancólico, frases em tom menor, ataque macio e cauda longa.","a":0,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.9,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.42,"breath":0.45,"vib":0.25,"scoop":0.5,"attack":1.4,"release":0.5,"drive":0.3,"band":7600,"lowcut":70,"hiss":0.2,"human":0.55,"width":0.4,"growl":0.25,"room":0.45},"echo":{"on":1,"sync":4,"fb":0.3,"send":0.2,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"SKA 63-66 · SKATALITES","n":"Johnny \"Dizzy\" Moore","r":"TROMPETE · SKATALITES","d":"Trompete brilhante de ska: ataque rápido e notas curtas, certeiras.","a":1,"sec":[{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.78,"breath":0.3,"vib":0.3,"scoop":0.3,"attack":0.7,"release":0.22,"drive":0.35,"band":9500,"lowcut":110,"hiss":0.18,"human":0.5,"width":0.5,"growl":0.15,"room":0.35},"echo":{"on":1,"sync":4,"fb":0.3,"send":0.18,"tone":3200},"eq":[0,0,0,-1,0,1,2,2.5,1,-1]},{"f":"SKA 63-66 · SKATALITES","n":"Naipe Skatalites","r":"TPT · ALT · TEN · TBN","d":"O naipe de quatro do ska: trompete em cima, alto e tenor no meio, trombone embaixo.","a":1,"sec":[{"on":1,"lvl":0.75,"pan":-0.35,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.65,"pan":0.25,"oct":0,"harm":2},{"on":1,"lvl":0.75,"pan":0.1,"oct":-1,"harm":0},{"on":1,"lvl":0.7,"pan":-0.1,"oct":0,"harm":3},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.62,"breath":0.4,"vib":0.38,"scoop":0.35,"attack":0.9,"release":0.28,"drive":0.35,"band":8400,"lowcut":95,"hiss":0.2,"human":0.65,"width":0.75,"growl":0.3,"room":0.45},"echo":{"on":1,"sync":4,"fb":0.3,"send":0.18,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"ROCKSTEADY 66-68","n":"Tommy McCook · Supersonics","r":"SAX TENOR · TREASURE ISLE","d":"Tenor suave e aveludado da Treasure Isle: pouco brilho, vibrato tranquilo, tudo redondo.","a":0,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.36,"breath":0.48,"vib":0.45,"scoop":0.35,"attack":1.3,"release":0.42,"drive":0.2,"band":8000,"lowcut":70,"hiss":0.18,"human":0.5,"width":0.5,"growl":0.2,"room":0.4},"echo":{"on":1,"sync":5,"fb":0.35,"send":0.2,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"ROCKSTEADY 66-68","n":"Naipe Supersonics","r":"TPT · TEN · TBN","d":"Trio macio do rocksteady: frases longas em terças, sem agressividade.","a":0,"sec":[{"on":1,"lvl":0.7,"pan":-0.3,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.8,"pan":0.15,"oct":-1,"harm":0},{"on":1,"lvl":0.7,"pan":0.35,"oct":0,"harm":2},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.4,"breath":0.45,"vib":0.45,"scoop":0.35,"attack":1.3,"release":0.4,"drive":0.2,"band":8200,"lowcut":70,"hiss":0.18,"human":0.55,"width":0.65,"growl":0.2,"room":0.4},"echo":{"on":1,"sync":5,"fb":0.35,"send":0.2,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"STUDIO ONE 68-79","n":"Vin Gordon \"Don D Junior\"","r":"TROMBONE · STUDIO ONE","d":"Trombone gordo e cantado, herdeiro do Don Drummond: legato, scoop no ataque e fall comprido.","a":2,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.9,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.5,"breath":0.42,"vib":0.3,"scoop":0.55,"attack":1.3,"release":0.45,"drive":0.4,"band":7800,"lowcut":65,"hiss":0.16,"human":0.55,"width":0.4,"growl":0.35,"room":0.35},"echo":{"on":1,"sync":5,"fb":0.4,"send":0.25,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"STUDIO ONE 68-79","n":"Bobby Ellis","r":"TROMPETE · STUDIO ONE","d":"Trompete claro e lírico do arranjador da Studio One: afinação firme, vibrato curto.","a":0,"sec":[{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.62,"breath":0.32,"vib":0.28,"scoop":0.3,"attack":0.9,"release":0.3,"drive":0.3,"band":9000,"lowcut":100,"hiss":0.15,"human":0.4,"width":0.5,"growl":0.1,"room":0.35},"echo":{"on":1,"sync":5,"fb":0.4,"send":0.25,"tone":3200},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]},{"f":"STUDIO ONE 68-79","n":"Cedric \"Im\" Brooks","r":"SAX TENOR · STUDIO ONE","d":"Tenor espiritual e largo, muito ar na palheta, vibrato lento; pede eco longo.","a":3,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.4,"breath":0.65,"vib":0.5,"scoop":0.5,"attack":1.4,"release":0.55,"drive":0.3,"band":7400,"lowcut":75,"hiss":0.22,"human":0.6,"width":0.5,"growl":0.45,"room":0.45},"echo":{"on":1,"sync":2,"fb":0.5,"send":0.3,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"STUDIO ONE 68-79","n":"Im & Dave","r":"TEN + TPT","d":"Tenor e trompete em uníssono de oitava: a dupla de sopros da Studio One.","a":0,"sec":[{"on":1,"lvl":0.75,"pan":-0.3,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.8,"pan":0.3,"oct":-1,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.52,"breath":0.5,"vib":0.4,"scoop":0.4,"attack":1.1,"release":0.4,"drive":0.3,"band":8200,"lowcut":85,"hiss":0.18,"human":0.55,"width":0.7,"growl":0.35,"room":0.4},"echo":{"on":1,"sync":5,"fb":0.4,"send":0.25,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"ROOTS · CHANNEL ONE 75-79","n":"Revolutionaries horns","r":"TEN · ALT · TBN","d":"O naipe de Channel One (McCook, Headley Bennett, Vin Gordon): pontadas secas com punch de rockers.","a":1,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.65,"pan":-0.3,"oct":0,"harm":1},{"on":1,"lvl":0.8,"pan":0.05,"oct":-1,"harm":0},{"on":1,"lvl":0.72,"pan":0.35,"oct":0,"harm":2},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.75,"breath":0.3,"vib":0.25,"scoop":0.35,"attack":0.6,"release":0.2,"drive":0.5,"band":11000,"lowcut":110,"hiss":0.1,"human":0.45,"width":0.75,"growl":0.35,"room":0.2},"echo":{"on":1,"sync":5,"fb":0.4,"send":0.25,"tone":3200},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]},{"f":"ROOTS · CHANNEL ONE 75-79","n":"McCook & Ellis · Blazing Horns","r":"TEN + TPT · DUB","d":"Tenor e trompete feitos para o dub: gravados em Channel One, mixados no Tubby. Eco generoso.","a":2,"sec":[{"on":1,"lvl":0.78,"pan":-0.35,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.82,"pan":0.3,"oct":-1,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.58,"breath":0.42,"vib":0.32,"scoop":0.42,"attack":1.0,"release":0.35,"drive":0.55,"band":7600,"lowcut":130,"hiss":0.28,"human":0.55,"width":0.8,"growl":0.35,"room":0.25},"echo":{"on":1,"sync":5,"fb":0.55,"send":0.38,"tone":2800},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]},{"f":"ROOTS · CHANNEL ONE 75-79","n":"Herman Marquis","r":"SAX ALTO · AGGROVATORS","d":"Alto cortante e nasal das sessões de Bunny Lee: corta a mix do rockers.","a":1,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.7,"breath":0.4,"vib":0.35,"scoop":0.4,"attack":0.8,"release":0.25,"drive":0.45,"band":9500,"lowcut":140,"hiss":0.18,"human":0.5,"width":0.5,"growl":0.4,"room":0.25},"echo":{"on":1,"sync":5,"fb":0.4,"send":0.25,"tone":3200},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]},{"f":"ROOTS · CHANNEL ONE 75-79","n":"Rico Rodriguez","r":"TROMBONE · WAREIKA","d":"Trombone rústico e bluesy, sempre perto do blues: rouco, scoop largo, falls preguiçosos.","a":2,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.9,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.48,"breath":0.5,"vib":0.35,"scoop":0.65,"attack":1.2,"release":0.5,"drive":0.45,"band":7200,"lowcut":70,"hiss":0.22,"human":0.7,"width":0.4,"growl":0.65,"room":0.4},"echo":{"on":1,"sync":5,"fb":0.45,"send":0.28,"tone":3200},"eq":[1,1.5,1,0.5,1,0,-1,-1.5,-3,-5]},{"f":"WAILERS · ISLAND 73-80","n":"Naipe Exodus","r":"TPT · TEN · TBN","d":"O naipe Madden · DaCosta · Gordon dos discos do Marley: preciso, junto e limpo.","a":1,"sec":[{"on":1,"lvl":0.78,"pan":-0.35,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.8,"pan":0.05,"oct":-1,"harm":0},{"on":1,"lvl":0.72,"pan":0.35,"oct":0,"harm":2},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.66,"breath":0.3,"vib":0.25,"scoop":0.28,"attack":0.8,"release":0.25,"drive":0.3,"band":11000,"lowcut":100,"hiss":0.08,"human":0.3,"width":0.7,"growl":0.2,"room":0.3},"echo":{"on":1,"sync":5,"fb":0.35,"send":0.2,"tone":3200},"eq":[0,0,0,-1,0,1,2,2.5,1,-1]},{"f":"WAILERS · ISLAND 73-80","n":"Glen DaCosta","r":"SAX TENOR · ZAP POW","d":"Tenor preciso e cheio, de arranjador: ataque limpo, vibrato no fim da nota.","a":0,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.58,"breath":0.38,"vib":0.35,"scoop":0.3,"attack":0.9,"release":0.32,"drive":0.3,"band":10500,"lowcut":90,"hiss":0.1,"human":0.35,"width":0.5,"growl":0.3,"room":0.3},"echo":{"on":1,"sync":5,"fb":0.35,"send":0.2,"tone":3200},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]},{"f":"WAILERS · ISLAND 73-80","n":"David Madden","r":"TROMPETE · ZAP POW","d":"Trompete jazzístico do \"Mystic Mood\": brilhante mas macio, doits no fim das frases.","a":4,"sec":[{"on":1,"lvl":0.85,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.66,"breath":0.34,"vib":0.35,"scoop":0.35,"attack":0.9,"release":0.32,"drive":0.3,"band":10500,"lowcut":100,"hiss":0.1,"human":0.4,"width":0.5,"growl":0.15,"room":0.3},"echo":{"on":1,"sync":5,"fb":0.35,"send":0.2,"tone":3200},"eq":[0,0,0,-1,0,1,2,2.5,1,-1]},{"f":"80s · DEAN FRASER","n":"Dean Fraser · Black Horn Man","r":"SAX TENOR · JOE GIBBS","d":"Tenor rico e encorpado, rouco quente e vibrato expressivo: as pontadas e falls que viraram assinatura.","a":2,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.9,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.6,"breath":0.45,"vib":0.45,"scoop":0.45,"attack":0.9,"release":0.38,"drive":0.4,"band":9500,"lowcut":85,"hiss":0.15,"human":0.55,"width":0.5,"growl":0.7,"room":0.3},"echo":{"on":1,"sync":5,"fb":0.4,"send":0.25,"tone":3200},"eq":[1,1.5,1,0,1,1.5,1,0,-1.5,-3]},{"f":"80s · DEAN FRASER","n":"Dean Fraser · Dancehall Sax","r":"SAX TENOR · DIGITAL 80s","d":"O tenor que dava o toque humano no reggae digital: mais brilho, mais limpo, eco curto.","a":1,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.9,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.72,"breath":0.35,"vib":0.4,"scoop":0.4,"attack":0.7,"release":0.28,"drive":0.3,"band":13000,"lowcut":110,"hiss":0.05,"human":0.45,"width":0.5,"growl":0.55,"room":0.3},"echo":{"on":1,"sync":7,"fb":0.3,"send":0.18,"tone":3200},"eq":[0,0,0,-1,0,1,2,2.5,1,-1]},{"f":"80s · DEAN FRASER","n":"Fraser · Nambo · Chico","r":"TEN · TBN · TPT","d":"O naipe dos anos 80 (Dean Fraser, Nambo Robinson, Chico Chin): pontadas cheias e afiadas.","a":1,"sec":[{"on":1,"lvl":0.75,"pan":-0.35,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.85,"pan":0,"oct":-1,"harm":0},{"on":1,"lvl":0.75,"pan":0.35,"oct":0,"harm":2},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.72,"breath":0.3,"vib":0.32,"scoop":0.35,"attack":0.7,"release":0.24,"drive":0.35,"band":12500,"lowcut":110,"hiss":0.05,"human":0.4,"width":0.8,"growl":0.45,"room":0.3},"echo":{"on":1,"sync":5,"fb":0.3,"send":0.18,"tone":3200},"eq":[0,0,0,-1,0,1,2,2.5,1,-1]},{"f":"80s · DEAN FRASER","n":"Nambo Robinson","r":"TROMBONE · 80s","d":"Trombone gordo e cantado dos anos 80, firme no grave e com fall largo.","a":2,"sec":[{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0},{"on":1,"lvl":0.9,"pan":0,"oct":0,"harm":0},{"on":0,"lvl":0.7,"pan":0,"oct":0,"harm":0}],"t":{"bright":0.58,"breath":0.38,"vib":0.32,"scoop":0.45,"attack":1.1,"release":0.4,"drive":0.35,"band":11000,"lowcut":70,"hiss":0.06,"human":0.45,"width":0.4,"growl":0.4,"room":0.3},"echo":{"on":1,"sync":5,"fb":0.35,"send":0.2,"tone":3200},"eq":[0,0,-1,0,1.5,2.5,1.5,0,-2,-4]}];
+
+const ART_IDS=['ten','stac','fall','scoop','doit'];
+const INST_KEYS=['trumpet','flugel','alto','tenor','trombone','bari'];
+const HARM_IDS=['uni','3+','3-','5-','5+','6-','4+'];
+let musico=-1, mFolderSel=0;
+const mFolderOf=i=>i<0?-1:MUSICOS_FOLDERS.indexOf(MUSICOS[i].f);
+const mPresetsOf=f=>MUSICOS.map((p,i)=>[p,i]).filter(([p])=>p.f===MUSICOS_FOLDERS[f]).map(([,i])=>i);
+function applyMusico(i){
+  const P=MUSICOS[i]; if(!P) return;
+  INST_KEYS.forEach((k,j)=>{const c=P.sec[j], st=S.inst[k]; st.on=!!c.on; st.level=c.lvl; st.pan=c.pan; st.oct=c.oct; st.harm=HARM_IDS[c.harm];});
+  Object.assign(S.t,P.t);
+  S.echo.on=!!P.echo.on; S.echo.sync=SYNC[P.echo.sync].v; S.echo.fb=P.echo.fb; S.echo.send=P.echo.send; S.echo.tone=P.echo.tone;
+  S.eq=P.eq.slice();
+  renderInsts(); knobsAll.forEach(k=>k.refresh()); tk.forEach(k=>k.refresh());
+  syncSel.value=S.echo.sync; syncUI(); echoOn.classList.toggle('on',S.echo.on); echoOn.textContent=S.echo.on?'ECHO LIGADO':'ECHO DESLIGADO';
+  bandEls.forEach((e,j)=>{e.r.value=S.eq[j]; e.bv.textContent=(S.eq[j]>0?'+':'')+S.eq[j];});
+  applyAll(); applyEcho();
+  musico=i; mFolderSel=mFolderOf(i); renderMusicos();
+  if(ctx){ const a=ART_IDS[P.a]; const vs=sectionOn(60+S.key.root,100,ctx.currentTime,a); const t=ctx.currentTime+(a==='stac'?.14:.45); vs.forEach(v=>v.stop(t)); }
+}
+function renderMusicos(){
+  const f=musico>=0?mFolderOf(musico):mFolderSel, list=mPresetsOf(f);
+  document.getElementById('mFolder').textContent=MUSICOS_FOLDERS[f];
+  const grid=document.getElementById('mGrid');
+  grid.querySelectorAll('h4').forEach((h,j)=>h.classList.toggle('cur',j===f));
+  grid.querySelectorAll('.mk').forEach(b=>b.classList.toggle('lit',+b.dataset.i===musico));
+  if(musico<0) return;
+  const P=MUSICOS[musico];
+  document.getElementById('mPos').textContent=String(list.indexOf(musico)+1).padStart(2,'0')+'/'+String(list.length).padStart(2,'0');
+  document.getElementById('mName').textContent=P.n.toUpperCase();
+  document.getElementById('mRole').textContent=P.r+'  ·  '+ARTS[P.a][1].toUpperCase();
+  const sh=['TPT','FLG','ALT','TEN','TBN','BAR'];
+  document.getElementById('mCardH').textContent='O estilo';
+  document.getElementById('mCard').innerHTML=`${P.d}<br><span style="color:var(--muted);font-size:12px">Carrega: naipe ${P.sec.map((c,j)=>c.on?sh[j]:null).filter(Boolean).join(' · ')} · rouco ${Math.round(P.t.growl*100)}% · sala ${Math.round(P.t.room*100)}% · eco ${SYNC[P.echo.sync].n}. Depois ajuste à vontade nas outras abas.</span>`;
+  document.getElementById('mSelect').value=musico;
+}
+(function(){
+  const grid=document.getElementById('mGrid');
+  MUSICOS_FOLDERS.forEach((fn,f)=>{const col=document.createElement('div'); col.className='col'; col.innerHTML=`<h4>${fn}</h4>`;
+    mPresetsOf(f).forEach(i=>{const b=document.createElement('button'); b.className='mk'; b.dataset.i=i; b.textContent=MUSICOS[i].n; b.onclick=()=>applyMusico(i); col.appendChild(b);});
+    grid.appendChild(col);});
+  const sel=document.getElementById('mSelect');
+  MUSICOS_FOLDERS.forEach((fn,f)=>{const g=document.createElement('optgroup'); g.label=fn; mPresetsOf(f).forEach(i=>g.appendChild(new Option(MUSICOS[i].n+' · '+MUSICOS[i].r,i))); sel.appendChild(g);});
+  sel.onchange=()=>applyMusico(+sel.value);
+  const stepF=d=>{const cur=mFolderOf(musico); mFolderSel=((cur>=0?cur:mFolderSel)+d+MUSICOS_FOLDERS.length)%MUSICOS_FOLDERS.length; applyMusico(mPresetsOf(mFolderSel)[0]);};
+  const stepP=d=>{const l=mPresetsOf(musico>=0?mFolderOf(musico):mFolderSel), n=l.length, pos=l.indexOf(musico); applyMusico(l[pos<0?(d>0?0:n-1):(pos+d+n)%n]);};
+  document.getElementById('mfPrev').onclick=()=>stepF(-1); document.getElementById('mfNext').onclick=()=>stepF(1);
+  document.getElementById('mpPrev').onclick=()=>stepP(-1); document.getElementById('mpNext').onclick=()=>stepP(1);
+  const showList=()=>{ sel.style.display=sel.style.display==='none'?'block':'none'; if(sel.style.display==='block'){ sel.size=Math.min(14,sel.options.length+MUSICOS_FOLDERS.length); sel.style.width='100%'; sel.style.marginBottom='12px'; sel.focus(); } };
+  document.getElementById('mList').onclick=showList; document.getElementById('mLcd').onclick=showList;
+  renderMusicos();
 })();
 
 /* ================== ECHO ================== */
@@ -1120,6 +1336,7 @@ document.getElementById('octDn').onclick=()=>{S.oct=Math.max(1,S.oct-1); buildKe
 document.getElementById('octUp').onclick=()=>{S.oct=Math.min(6,S.oct+1); buildKeyboard();};
 document.getElementById('vel').oninput=e=>{S.vel=+e.target.value; document.getElementById('velLbl').textContent=S.vel;};
 buildKeyboard();
+applyMusico(MUSICO_INICIAL);   // abre no "Tubby · naipe no eco": o delay já na frente
 
 /* MIDI */
 let midiInit=false;

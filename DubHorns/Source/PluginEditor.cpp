@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include "Musicians.h"
 
 using namespace juce;
 
@@ -384,27 +385,29 @@ public:
         auto add = [&] (std::vector<std::unique_ptr<KnobCtl>>& v, const char* id, const char* name)
         { addAndMakeVisible (*v.emplace_back (std::make_unique<KnobCtl> (p.apvts, id, HU (name)))); };
         add (tone, "bright", "Brilho"); add (tone, "breath", "Sopro"); add (tone, "vib", "Vibrato");
+        add (tone, "growl", "Rouco");
         add (tone, "scoop", "Scoop");   add (tone, "attack", "Ataque"); add (tone, "release", "Release");
-        add (tape, "drive", "Saturação"); add (tape, "band", "Banda (agudo)"); add (tape, "lowcut", "Corte grave"); add (tape, "hiss", "Chiado");
+        add (tape, "drive", "Saturação"); add (tape, "band", "Banda (agudo)"); add (tape, "room", "Sala");
+        add (tape, "lowcut", "Corte grave"); add (tape, "hiss", "Chiado");
         add (human, "human", "Humanizar"); add (human, "width", "Abertura estéreo");
 
         // valores: bright breath vib scoop attack release drive band lowcut hiss human width
         presets = {
-            { "Randy's '72 · brilhante e seco",  { .68f, .32f, .28f, .30f, .8f, .22f, .30f, 10500, 90, .12f, .45f, .6f } },
-            { "Channel One · punch",             { .78f, .30f, .22f, .35f, .6f, .20f, .50f, 11500, 110, .10f, .40f, .7f } },
-            { "Tubby's dubplate",                { .52f, .42f, .30f, .45f, 1.f, .35f, .55f, 7600, 130, .30f, .55f, .8f } },
-            { "Black Ark haze",                  { .42f, .55f, .35f, .50f, 1.2f, .45f, .65f, 6200, 100, .42f, .65f, .9f } },
-            { "Treasure Isle · rocksteady suave", { .36f, .45f, .45f, .35f, 1.3f, .40f, .20f, 8200, 70, .18f, .50f, .6f } },
-            { "Rádio AM de Kingston",            { .60f, .30f, .30f, .30f, .9f, .30f, .70f, 4800, 320, .35f, .50f, .3f } },
+            { "Randy's '72 · brilhante e seco",  { .68f, .32f, .28f, .30f, .8f, .22f, .30f, 10500, 90, .12f, .45f, .6f, .30f } },
+            { "Channel One · punch",             { .78f, .30f, .22f, .35f, .6f, .20f, .50f, 11500, 110, .10f, .40f, .7f, .20f } },
+            { "Tubby's dubplate",                { .52f, .42f, .30f, .45f, 1.f, .35f, .55f, 7600, 130, .30f, .55f, .8f, .25f } },
+            { "Black Ark haze",                  { .42f, .55f, .35f, .50f, 1.2f, .45f, .65f, 6200, 100, .42f, .65f, .9f, .55f } },
+            { "Treasure Isle · rocksteady suave", { .36f, .45f, .45f, .35f, 1.3f, .40f, .20f, 8200, 70, .18f, .50f, .6f, .40f } },
+            { "Rádio AM de Kingston",            { .60f, .30f, .30f, .30f, .9f, .30f, .70f, 4800, 320, .35f, .50f, .3f, .15f } },
         };
-        static const char* ids[12] = { "bright", "breath", "vib", "scoop", "attack", "release", "drive", "band", "lowcut", "hiss", "human", "width" };
+        static const char* ids[13] = { "bright", "breath", "vib", "scoop", "attack", "release", "drive", "band", "lowcut", "hiss", "human", "width", "room" };
         for (size_t k = 0; k < presets.size(); ++k)
         {
             auto& b = *buttons.emplace_back (std::make_unique<TextButton> (HU (presets[k].n)));
             addAndMakeVisible (b);
             b.onClick = [this, k]
             {
-                for (int i = 0; i < 12; ++i) setParamValue (proc.apvts, ids[i], presets[k].v[i]);
+                for (int i = 0; i < 13; ++i) setParamValue (proc.apvts, ids[i], presets[k].v[i]);
                 for (size_t j = 0; j < buttons.size(); ++j) buttons[j]->setToggleState (j == k, dontSendNotification);
                 proc.previewNote (60 + (int) proc.apvts.getRawParameterValue ("key")->load(), horns::Ten);
             };
@@ -426,8 +429,9 @@ public:
                               "• Scoop faz a nota entrar um pouco abaixo e subir, como o músico de verdade.\n\n"
                               "• Banda e Corte grave imitam a mesa e a fita dos anos 70: menos agudo, menos grave, mais médio.\n\n"
                               "• Humanizar solta um pouco o tempo e a afinação entre os músicos do naipe.\n\n"
-                              "• As articulações fall, scoop e doit são escolhidas nas Frases MIDI."),
-                          hint.reduced (14, 12).withTrimmedTop (22), Justification::topLeft, 20);
+                              "• Rouco é a aspereza da palheta, o tenor estilo Dean Fraser. Sala é a sala de gravação.\n\n"
+                              "• Fall e doit seguram a nota e caem junto com o volume, como o músico de verdade."),
+                          hint.reduced (14, 12).withTrimmedTop (22), Justification::topLeft, 28);
     }
     void resized() override
     {
@@ -435,23 +439,270 @@ public:
         const int bw = (row.getWidth() - 5 * 8) / 6;
         for (auto& b : buttons) { b->setBounds (row.removeFromLeft (bw)); row.removeFromLeft (8); }
         const int top = 110, kh = 104, kw = 84;
-        gTone  = { 20, top, 3 * kw + 30, 2 * kh + 46 };
-        gTape  = { gTone.getRight() + 16, top, 2 * kw + 30, 2 * kh + 46 };
+        gTone  = { 20, top, 4 * kw + 30, 2 * kh + 46 };
+        gTape  = { gTone.getRight() + 16, top, 3 * kw + 30, 2 * kh + 46 };
         gHuman = { gTape.getRight() + 16, top, kw + 30, 2 * kh + 46 };
         auto place = [&] (std::vector<std::unique_ptr<KnobCtl>>& v, Rectangle<int> g, int cols)
         {
             for (int i = 0; i < (int) v.size(); ++i)
                 v[(size_t) i]->setBounds (g.getX() + 15 + (i % cols) * kw, g.getY() + 32 + (i / cols) * kh, kw, kh - 6);
         };
-        place (tone, gTone, 3); place (tape, gTape, 2); place (human, gHuman, 1);
+        place (tone, gTone, 4); place (tape, gTape, 3); place (human, gHuman, 1);
         hint = { gHuman.getRight() + 16, top, getWidth() - gHuman.getRight() - 36, 2 * kh + 46 };
     }
 private:
-    struct T { const char* n; float v[12]; };
+    struct T { const char* n; float v[13]; };
     std::vector<T> presets;
     std::vector<std::unique_ptr<KnobCtl>> tone, tape, human;
     std::vector<std::unique_ptr<TextButton>> buttons;
     Rectangle<int> gTone, gTape, gHuman, hint;
+};
+
+//==============================================================================
+//  MÚSICOS — presets no padrão da Riddim Machine (visor azul de MPC: ESTILO ◀ ▶, MÚSICO ◀ ▶, LISTA)
+//==============================================================================
+namespace mpc   // mesmo visual do MRM-0420 (RiddimMachine/Source/MrmStyle.h)
+{
+    const Colour light { 0xffe8f3ff };
+    static void lcd (Graphics& g, Rectangle<float> r)
+    {
+        g.setColour (Colour (0xff0a0c10)); g.fillRoundedRectangle (r.expanded (4.0f), 5.0f);
+        g.setColour (Colours::white.withAlpha (0.25f)); g.drawRoundedRectangle (r.expanded (4.0f).translated (0, 1.0f), 5.0f, 1.0f);
+        ColourGradient gl (Colour (0xff4a8cf0), r.getX(), r.getY(), Colour (0xff1d4aa8), r.getX(), r.getBottom(), false);
+        gl.addColour (0.55, Colour (0xff2e66cc));
+        g.setGradientFill (gl); g.fillRoundedRectangle (r, 3.0f);
+        g.setColour (Colours::black.withAlpha (0.07f));
+        for (float y = r.getY() + 2.0f; y < r.getBottom() - 1.0f; y += 3.0f) g.drawHorizontalLine ((int) y, r.getX() + 2.0f, r.getRight() - 2.0f);
+        g.setColour (Colours::black.withAlpha (0.35f)); g.drawRoundedRectangle (r.reduced (0.5f), 3.0f, 1.0f);
+    }
+    static void shine (Graphics& g, Rectangle<float> r)
+    {
+        g.setGradientFill (ColourGradient (Colours::white.withAlpha (0.16f), r.getX(), r.getY(), Colours::transparentWhite, r.getX(), r.getY() + r.getHeight() * 0.45f, false));
+        g.fillRoundedRectangle (r, 3.0f);
+    }
+    static void text (Graphics& g, const String& t, Rectangle<float> r, Justification j, float size, float alpha = 1.0f, float kerning = 0.08f)
+    {
+        g.setFont (uiFont (size, true, kerning));
+        g.setColour (Colours::white.withAlpha (0.22f * alpha));
+        for (auto o : { Point<float> (-0.8f, 0), { 0.8f, 0 }, { 0, -0.8f }, { 0, 0.8f } }) g.drawText (t, r.translated (o.x, o.y), j, true);
+        g.setColour (light.withAlpha (alpha)); g.drawText (t, r, j, true);
+    }
+    static void key (Graphics& g, Rectangle<float> r, const String& t, bool down, bool lit = false, float size = 14.0f)
+    {
+        g.setColour (Colours::black.withAlpha (0.45f)); g.fillRoundedRectangle (r.translated (0, 2.0f), 3.0f);
+        auto cap = r.translated (0, down ? 1.5f : 0.0f);
+        g.setGradientFill (ColourGradient (Colour (0xff2c2925), cap.getX(), cap.getY(), Colour (0xff141210), cap.getX(), cap.getBottom(), false));
+        g.fillRoundedRectangle (cap, 3.0f);
+        g.setColour (Colour (0xff4a8cf0).withAlpha (down || lit ? 0.95f : 0.35f));
+        g.fillRoundedRectangle (cap.withTop (cap.getBottom() - 3.0f).reduced (5.0f, 0.0f).translated (0, -1.5f), 1.0f);
+        g.setColour (lit ? mpc::light : hc::cream);
+        g.setFont (uiFont (size, true, 0.05f));
+        g.drawFittedText (t, cap.withTrimmedBottom (3.0f).reduced (6.0f, 0.0f).toNearestInt(), Justification::centred, 2, 0.8f);
+    }
+}
+
+namespace musicosui
+{
+    static int folderOf (int preset)
+    {
+        if (preset < 0) return -1;
+        for (int f = 0; f < musicos::numFolders; ++f)
+            if (String::fromUTF8 (musicos::presets[preset].folder) == String::fromUTF8 (musicos::folders[f])) return f;
+        return -1;
+    }
+    static Array<int> presetsOf (int folder)
+    {
+        Array<int> out;
+        for (int i = 0; i < musicos::numPresets; ++i) if (folderOf (i) == folder) out.add (i);
+        return out;
+    }
+}
+
+// Visor azul de presets, sempre à vista entre o cabeçalho e as abas (igual ao MRM-0420)
+class PresetBar : public Component, private Timer
+{
+public:
+    explicit PresetBar (HornsProcessor& p) : proc (p) { setMouseCursor (MouseCursor::PointingHandCursor); startTimerHz (8); }
+
+    void stepFolder (int d)
+    {
+        const int cur = musicosui::folderOf (proc.currentMusico());
+        folderSel = ((cur >= 0 ? cur : folderSel) + d + musicos::numFolders) % musicos::numFolders;
+        const auto l = musicosui::presetsOf (folderSel);
+        if (! l.isEmpty()) proc.applyMusico (l[0], true);
+        repaint();
+    }
+    void stepPreset (int d)
+    {
+        const int cur = proc.currentMusico();
+        const auto l = musicosui::presetsOf (cur >= 0 ? musicosui::folderOf (cur) : folderSel);
+        if (l.isEmpty()) return;
+        const int pos = l.indexOf (cur), n = l.size();
+        proc.applyMusico (l[pos < 0 ? (d > 0 ? 0 : n - 1) : (pos + d + n) % n], true);
+        repaint();
+    }
+    void showList()
+    {
+        PopupMenu menu;
+        menu.addSectionHeader (HU ("MÚSICOS DA JAMAICA POR ESTILO"));
+        const int cur = proc.currentMusico();
+        for (int f = 0; f < musicos::numFolders; ++f)
+        {
+            PopupMenu sub;
+            const auto l = musicosui::presetsOf (f);
+            for (int i : l) sub.addItem (i + 1, HU (musicos::presets[i].name) + HU ("   ·  ") + HU (musicos::presets[i].role), true, cur == i);
+            menu.addSubMenu (HU (musicos::folders[f]) + "   (" + String (l.size()) + ")", sub, true, nullptr, musicosui::folderOf (cur) == f);
+        }
+        Component::SafePointer<PresetBar> safe (this);
+        menu.showMenuAsync (PopupMenu::Options().withTargetComponent (this), [safe] (int r)
+        { if (safe != nullptr && r > 0) { safe->proc.applyMusico (r - 1, true); safe->repaint(); } });
+    }
+
+    void resized() override
+    {
+        keys[0] = { 14, 6, 44, 32 };  keys[1] = { 64, 6, 44, 32 };
+        keys[2] = { 14, 44, 44, 32 }; keys[3] = { 64, 44, 44, 32 };
+        listKey = { getWidth() - 14 - 112, 6, 112, 70 };
+        lcd = { 198, 8, listKey.getX() - 14 - 198, 66 };
+    }
+
+    void paint (Graphics& g) override
+    {
+        g.setGradientFill (ColourGradient (Colour (0xff241a12), 0, 0, Colour (0xff1a120c), 0, (float) getHeight(), false));
+        g.fillAll();
+        g.setColour (Colours::black); g.fillRect (0, getHeight() - 1, getWidth(), 1);
+        const String L = String::fromUTF8 ("\xe2\x97\x80"), R = String::fromUTF8 ("\xe2\x96\xb6");
+        for (int i = 0; i < 4; ++i) mpc::key (g, keys[i].toFloat(), i % 2 == 0 ? L : R, pressed == i);
+        g.setColour (hc::cream); g.setFont (uiFont (10.0f, true, 0.25f));
+        g.drawText ("ESTILO", 116, keys[0].getY(), 80, 32, Justification::centredLeft);
+        g.drawText (HU ("MÚSICO"), 116, keys[2].getY(), 80, 32, Justification::centredLeft);
+
+        auto l = lcd.toFloat();
+        mpc::lcd (g, l);
+        auto t = l.reduced (14.0f, 5.0f);
+        const int cur = proc.currentMusico();
+        const int f = cur >= 0 ? musicosui::folderOf (cur) : folderSel;
+        const auto list = musicosui::presetsOf (f);
+        mpc::text (g, HU ("PRESET  ·  ") + HU (musicos::folders[f]), t.withHeight (16.0f), Justification::centredLeft, 12.5f, 0.85f, 0.18f);
+        if (cur >= 0)
+        {
+            const auto& pr = musicos::presets[cur];
+            mpc::text (g, String (list.indexOf (cur) + 1).paddedLeft ('0', 2) + "/" + String (list.size()).paddedLeft ('0', 2),
+                       t.withHeight (16.0f), Justification::centredRight, 12.0f, 0.8f);
+            mpc::text (g, upper (HU (pr.name)), t.withTrimmedTop (17.0f).withHeight (22.0f), Justification::centredLeft, 17.0f, 1.0f, 0.04f);
+            mpc::text (g, HU (pr.role) + HU ("  ·  ECO ") + upper (String (horns::syncDivs()[(size_t) pr.sync].name)) + HU ("  ·  ")
+                          + upper (HU (pr.desc)), t.withTrimmedTop (40.0f), Justification::centredLeft, 10.0f, 0.85f, 0.05f);
+        }
+        else
+        {
+            mpc::text (g, HU ("ESCOLHA UM PRESET  ·  \xe2\x97\x80 \xe2\x96\xb6"), t.withTrimmedTop (17.0f).withHeight (22.0f), Justification::centredLeft, 16.0f, 0.8f);
+            mpc::text (g, HU ("DUB, SKA, STUDIO ONE, CHANNEL ONE, WAILERS E OS ANOS 80 DE DEAN FRASER"), t.withTrimmedTop (40.0f), Justification::centredLeft, 10.0f, 0.7f);
+        }
+        mpc::shine (g, l);
+
+        auto lk = listKey.toFloat();
+        mpc::key (g, lk, "", pressed == 4);
+        g.setColour (hc::cream); g.setFont (uiFont (14.0f, true, 0.12f));
+        g.drawText ("LISTA", lk.withTrimmedBottom (32.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), Justification::centredBottom);
+        g.setFont (uiFont (7.5f, true, 0.12f)); g.setColour (hc::cream.withAlpha (0.6f));
+        g.drawText (HU ("POR ESTILO \xe2\x96\xbe"), lk.withTrimmedTop (42.0f).withHeight (14.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), Justification::centred);
+    }
+
+    void mouseDown (const MouseEvent& e) override
+    {
+        const auto pt = e.getPosition();
+        pressed = -1;
+        for (int i = 0; i < 4; ++i)
+            if (keys[i].contains (pt)) { pressed = i; if (i < 2) stepFolder (i == 0 ? -1 : 1); else stepPreset (i == 2 ? -1 : 1); repaint(); return; }
+        if (listKey.contains (pt) || lcd.contains (pt)) { pressed = 4; repaint(); showList(); }
+    }
+    void mouseUp (const MouseEvent&) override { pressed = -1; repaint(); }
+
+private:
+    void timerCallback() override
+    {
+        const int c = proc.currentMusico();
+        if (c != shown) { shown = c; if (c >= 0) folderSel = musicosui::folderOf (c); repaint(); }
+    }
+    HornsProcessor& proc;
+    Rectangle<int> lcd, keys[4], listKey;
+    int pressed = -1, shown = -2, folderSel = 0;
+};
+
+// Aba MÚSICOS: todas as teclas de preset por estilo e o cartão do estilo escolhido
+class MusicosPage : public HornsPage, private Timer
+{
+public:
+    explicit MusicosPage (HornsProcessor& p) : HornsPage (p) { setMouseCursor (MouseCursor::PointingHandCursor); startTimerHz (6); }
+
+    void resized() override
+    {
+        const int top = 62, colW = (getWidth() - 40 - (musicos::numFolders - 1) * 8) / musicos::numFolders;
+        for (int f = 0; f < musicos::numFolders; ++f)
+        {
+            const auto l = musicosui::presetsOf (f);
+            for (int k = 0; k < l.size(); ++k)
+                presetKeys[(size_t) l[k]] = { 20 + f * (colW + 8), top + 24 + k * 44, colW, 38 };
+            folderHead[(size_t) f] = { 20 + f * (colW + 8), top, colW, 20 };
+        }
+        card = { 20, 340, getWidth() - 40, 116 };
+    }
+
+    void paint (Graphics& g) override
+    {
+        g.setColour (hc::cream); g.setFont (uiFont (19.0f, true, 0.05f));
+        g.drawText (HU ("MÚSICOS DA JAMAICA"), 20, 6, 700, 24, Justification::left);
+        g.setColour (hc::muted); g.setFont (uiFont (12.5f));
+        g.drawText (HU ("Toque numa tecla ou use o visor azul lá em cima. Cada preset carrega naipe, timbre, rouco, sala, eco e EQ; o tom e a escala continuam os seus."),
+                    20, 30, getWidth() - 40, 18, Justification::left);
+        const int cur = proc.currentMusico();
+        const int f = musicosui::folderOf (cur);
+        for (int ff = 0; ff < musicos::numFolders; ++ff)
+        {
+            g.setColour (ff == f ? hc::amber : hc::muted); g.setFont (uiFont (9.5f, true, 0.12f));
+            g.drawFittedText (HU (musicos::folders[ff]), folderHead[(size_t) ff], Justification::centredLeft, 2, 0.7f);
+        }
+        for (int i = 0; i < musicos::numPresets; ++i)
+            mpc::key (g, presetKeys[(size_t) i].toFloat(), upper (HU (musicos::presets[i].name)), pressed == i, cur == i, 10.5f);
+
+        groupBox (g, card, cur >= 0 ? HU ("O ESTILO") : HU ("COMO USAR"));
+        auto c = card.reduced (14, 10).withTrimmedTop (22);
+        if (cur >= 0)
+        {
+            const auto& pr = musicos::presets[cur];
+            g.setColour (hc::cream); g.setFont (uiFont (14.0f, true));
+            g.drawText (HU (pr.name) + HU ("  ·  ") + HU (pr.role), c.removeFromTop (20), Justification::left);
+            g.setFont (uiFont (13.5f));
+            g.drawFittedText (HU (pr.desc), c.removeFromTop (22), Justification::left, 1);
+            String naipe;
+            const char* sh[6] = { "TPT", "FLG", "ALT", "TEN", "TBN", "BAR" };
+            for (int k = 0; k < 6; ++k) if (pr.sec[k].on) naipe << (naipe.isEmpty() ? "" : HU (" · ")) << sh[k];
+            g.setColour (hc::muted); g.setFont (uiFont (12.0f));
+            g.drawFittedText (HU ("Carrega: naipe ") + naipe + HU ("  ·  rouco ") + String (roundToInt (pr.t[12] * 100)) + HU ("%  ·  sala ")
+                              + String (roundToInt (pr.t[13] * 100)) + HU ("%  ·  eco ") + String (horns::syncDivs()[(size_t) pr.sync].name)
+                              + HU (" com intensidade ") + String (roundToInt (pr.fb * 100)) + HU ("%.  Depois ajuste à vontade nas outras abas."), c, Justification::topLeft, 2);
+        }
+        else
+        {
+            g.setColour (hc::cream); g.setFont (uiFont (13.5f));
+            g.drawFittedText (HU ("Homenagem ao jeito de tocar de cada um. Não são gravações dos músicos: é o motor do Dub Horns ajustado para lembrar o estilo."),
+                              c, Justification::topLeft, 3);
+        }
+    }
+
+    void mouseDown (const MouseEvent& e) override
+    {
+        for (int i = 0; i < musicos::numPresets; ++i)
+            if (presetKeys[(size_t) i].contains (e.getPosition())) { pressed = i; proc.applyMusico (i, true); repaint(); return; }
+    }
+    void mouseUp (const MouseEvent&) override { pressed = -1; repaint(); }
+
+private:
+    void timerCallback() override { const int c = proc.currentMusico(); if (c != shown) { shown = c; repaint(); } }
+    Rectangle<int> card;
+    std::array<Rectangle<int>, musicos::numPresets> presetKeys {};
+    std::array<Rectangle<int>, musicos::numFolders> folderHead {};
+    int pressed = -1, shown = -2;
 };
 
 //==============================================================================
@@ -1215,6 +1466,14 @@ void VuMeter::paint (Graphics& g)
 }
 
 static const char* kChangelog =
+    "v1.3 · 23/11/2026\n"
+    "• Timbre de sessão: pp escuro e ff brilhante como metal real, saxes com todos os harmônicos, zumbido do lábio/palheta, formantes e campana.\n"
+    "• Naipe com líder e afinação de cada músico; fita com head bump e sala tipo plate.\n"
+    "• Visor azul de presets sempre à vista; o plugin abre no preset de dub com o Tape Echo.\n\n"
+    "v1.2 · 23/11/2026\n"
+    "• Final de nota natural: fall e doit seguram a nota e caem junto com o volume (sem sirene robótica). Fim normal com o lábio relaxando.\n"
+    "• Vibrato humano que para ao soltar a nota, afinação viva, golpe de língua, knobs Rouco e Sala.\n"
+    "• Aba MÚSICOS: 24 presets no padrão da Riddim Machine (Dean Fraser, Vin Gordon, Tommy McCook, Bobby Ellis...).\n\n"
     "v1.1 · 21/11/2026\n"
     "• Agora é plugin VST3 (Windows e Mac) e AU (Mac), com app standalone, publicado no GitHub e no site do Dub Station.\n"
     "• Tape Echo: a realimentação não dispara mais sozinha (saturação com ganho unitário).\n"
@@ -1234,18 +1493,18 @@ ChangelogView::ChangelogView()
 void ChangelogView::paint (Graphics& g)
 {
     g.fillAll (Colours::black.withAlpha (0.7f));
-    auto box = getLocalBounds().withSizeKeepingCentre (620, 360);
+    auto box = getLocalBounds().withSizeKeepingCentre (720, 440);
     g.setColour (hc::plate); g.fillRoundedRectangle (box.toFloat(), 10);
     g.setColour (hc::amber); g.drawRoundedRectangle (box.toFloat(), 10, 1.5f);
     g.setFont (uiFont (20.0f, true, 0.05f));
     g.drawText (HU ("HISTÓRICO DE VERSÕES"), box.reduced (22, 16).removeFromTop (26), Justification::left);
     g.setColour (hc::cream); g.setFont (uiFont (13.0f));
-    g.drawFittedText (HU (kChangelog), box.reduced (22, 16).withTrimmedTop (36).withTrimmedBottom (44), Justification::topLeft, 20);
+    g.drawFittedText (HU (kChangelog), box.reduced (22, 16).withTrimmedTop (36).withTrimmedBottom (44), Justification::topLeft, 28);
 }
 
 void ChangelogView::resized()
 {
-    auto box = getLocalBounds().withSizeKeepingCentre (620, 360);
+    auto box = getLocalBounds().withSizeKeepingCentre (720, 440);
     close.setBounds (box.getX() + 22, box.getBottom() - 46, 100, 30);
 }
 
@@ -1263,11 +1522,11 @@ HornsPanel::HornsPanel (HornsProcessor& p)
     versionBtn.onClick = [this] { changelog.setVisible (true); changelog.toFront (false); };
     addAndMakeVisible (versionBtn);
 
-    const char* names[5] = { "NAIPE", "TIMBRE '70s", "MASTOR TAPE ECHO", "EQUALIZADOR", "FRASES MIDI" };
-    for (int i = 0; i < 5; ++i)
+    const char* names[6] = { "NAIPE", "TIMBRE '70s", "MASTOR TAPE ECHO", "EQUALIZADOR", "FRASES MIDI", "MÚSICOS" };
+    for (int i = 0; i < 6; ++i)
     {
         auto& t = tabs[(size_t) i];
-        t.setButtonText (names[i]);
+        t.setButtonText (HU (names[i]));
         t.setRadioGroupId (1);
         t.setClickingTogglesState (true);
         t.onClick = [this, i] { if (tabs[(size_t) i].getToggleState()) showPage (i); };
@@ -1278,6 +1537,9 @@ HornsPanel::HornsPanel (HornsProcessor& p)
     pages.push_back (std::make_unique<EchoPage> (p));
     pages.push_back (std::make_unique<EqPage> (p));
     pages.push_back (std::make_unique<PhrasePage> (p));
+    pages.push_back (std::make_unique<MusicosPage> (p));
+    presetBar = std::make_unique<PresetBar> (p);
+    addAndMakeVisible (*presetBar);
     for (auto& pg : pages) addChildComponent (*pg);
 
     keyboard.setAvailableRange (36, 96);
@@ -1303,6 +1565,7 @@ HornsPanel::~HornsPanel()
 {
     stopTimer();
     pages.clear();
+    presetBar.reset();
     setLookAndFeel (nullptr);
 }
 
@@ -1371,18 +1634,20 @@ void HornsPanel::resized()
 {
     const int x0 = 22, w = W - 44;
     header = { x0, 0, w, 96 };
-    tabBar = { x0, 96, w, 40 };
-    pageArea = { x0, 136, w, 468 };
-    kbBar = { x0, 604, w, 34 };
+    presetArea = { x0, 96, w, 82 };
+    tabBar = { x0, 178, w, 40 };
+    pageArea = { x0, 218, w, 468 };
+    kbBar = { x0, 686, w, 34 };
+    if (presetBar != nullptr) presetBar->setBounds (presetArea);
 
     keyBox.setBounds (x0 + 520, 34, 120, 28);
     scaleBox.setBounds (x0 + 712, 34, 170, 28);
     versionBtn.setBounds (x0 + 452, 34, 52, 26);
     vu.setBounds (x0 + w - 270, 12, 150, 74);
     master->setBounds (x0 + w - 106, 6, 84, 86);
-    for (int i = 0; i < 5; ++i) tabs[(size_t) i].setBounds (x0 + 14 + i * 172, 102, 166, 32);
+    for (int i = 0; i < 6; ++i) tabs[(size_t) i].setBounds (x0 + 14 + i * 172, 184, 166, 32);
     for (auto& pg : pages) pg->setBounds (pageArea);
-    keyboard.setBounds (x0 + 14, 640, w - 28, 150);
+    keyboard.setBounds (x0 + 14, 722, w - 28, 150);
     keyboard.setKeyWidth ((float) (w - 28 - 40) / 36.0f);
     keyboard.setLowestVisibleKey (48);
     changelog.setBounds (getLocalBounds());
