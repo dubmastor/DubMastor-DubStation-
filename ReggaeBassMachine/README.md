@@ -1,8 +1,8 @@
-# Mastor Reggae Bass Machine MRBM-69 2.9 — Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 3.0 — Gerador de Reggae Bass Lines
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.9/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-2.9/MRBM-69-macOS.zip)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-3.0/MRBM-69-Windows.zip)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRBM-69-3.0/MRBM-69-macOS.zip)**
 
 ![Interface do Reggae Bass Machine](docs/interface.png)
 

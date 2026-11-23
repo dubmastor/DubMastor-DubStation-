@@ -23,14 +23,14 @@ inline const Preset presets[numPresets] = {
     { "DIGITAL 85-89",        "Digital (King Jammy)",   90 },
     { "DANCEHALL 90s",        "Ragga 90",               96 },
     { "DANCEHALL 90s",        "Dancehall 90s",         100 },
-    { "DANCEHALL 2000s",      "Dancehall 2000",        104 },
+    { "DANCEHALL 2000s",      "Dancehall 2000",         52 },
     { "LOVERS ROCK 75-95",    "Lovers lento",           70 },
     { "LOVERS ROCK 75-95",    "Lovers rock",            76 },
     { "NEW ROOTS 2000s",      "New roots",              72 },
     { "NEW ROOTS 2000s",      "New roots groove",       78 },
     { "DUB",                  "Dub pesado",             64 },
     { "DUB",                  "Dub",                    70 },
-    { "STEPPERS UK 80s-90s",  "Steppers UK",           130 },
-    { "STEPPERS UK 80s-90s",  "Steppers rapido",       140 },
+    { "STEPPERS UK 80s-90s",  "Steppers UK",            65 },
+    { "STEPPERS UK 80s-90s",  "Steppers rapido",        70 },
 };
 }

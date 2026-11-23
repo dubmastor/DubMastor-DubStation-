@@ -146,13 +146,13 @@ void BpmWindow::mouseDrag (const juce::MouseEvent& e)
 {
     if (styleClick) return;
     styleName = {};
-    att.setValueAsPartOfGesture (juce::jlimit (60.0f, 180.0f, std::round (dragStart - (float) e.getDistanceFromDragStartY() * 0.35f)));
+    att.setValueAsPartOfGesture (juce::jlimit (50.0f, 180.0f, std::round (dragStart - (float) e.getDistanceFromDragStartY() * 0.35f)));
 }
 void BpmWindow::mouseDoubleClick (const juce::MouseEvent& e) { if (! onStyleArea (e.getPosition())) { styleName = {}; att.setValueAsCompleteGesture (75.0f); } }
 void BpmWindow::mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& w)
 {
     const int step = w.deltaY > 0 ? 1 : w.deltaY < 0 ? -1 : 0;
-    if (step != 0) att.setValueAsCompleteGesture (juce::jlimit (60.0f, 180.0f, value + (float) step));
+    if (step != 0) att.setValueAsCompleteGesture (juce::jlimit (50.0f, 180.0f, value + (float) step));
 }
 
 void BpmWindow::paint (juce::Graphics& g)

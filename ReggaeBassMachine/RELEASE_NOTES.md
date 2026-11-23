@@ -1,3 +1,9 @@
+# Mastor Reggae Bass Machine MRBM-69 — 3.0 · Gerador de Reggae Bass Lines
+
+- **BPM dos riddims corrigido:** os 10 riddims de dancehall que estavam acima de 100 BPM (Speed, Hard Drive, Coolie Dance, Bad Company, Applause, Stepz, Red Bull & Guinness, Power Cut, Wipe Out, Tremor) estavam dobrados e agora ficam na metade (51 e 52)
+- BPM interno a partir de 50
+- Versão para celular igual
+
 # Mastor Reggae Bass Machine MRBM-69 — 2.9 · Gerador de Reggae Bass Lines
 
 - **Visor de riddims em LCD azul estilo MPC**: moldura cinza, tela azul com letras claras de matriz (=RIDDIM= 081/160, nome, BASS e TEMPO); setas < > dentro da tela

@@ -258,7 +258,7 @@ BpmPanel::BpmPanel (MrmProcessor& p)
 
 void BpmPanel::setBpm (float v)
 {
-    att.setValueAsCompleteGesture (juce::jlimit (60.0f, 180.0f, std::round (v)));
+    att.setValueAsCompleteGesture (juce::jlimit (50.0f, 180.0f, std::round (v)));
 }
 
 void BpmPanel::choosePreset (int i)
@@ -461,7 +461,7 @@ void BpmPanel::mouseDrag (const juce::MouseEvent& e)
     if (! display.contains (e.getMouseDownPosition()) || std::abs (e.getDistanceFromDragStartY()) < 3) return;
     if (! dragging) { dragging = true; att.beginGesture(); }
     chosen = -1;
-    att.setValueAsPartOfGesture (juce::jlimit (60.0f, 180.0f, std::round (dragStart - (float) e.getDistanceFromDragStartY() * 0.35f)));
+    att.setValueAsPartOfGesture (juce::jlimit (50.0f, 180.0f, std::round (dragStart - (float) e.getDistanceFromDragStartY() * 0.35f)));
 }
 
 void BpmPanel::mouseUp (const juce::MouseEvent& e)

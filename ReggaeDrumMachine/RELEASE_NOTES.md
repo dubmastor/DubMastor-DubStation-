@@ -1,3 +1,12 @@
+## Mastor Reggae Drum Machine MRDM-12 2.5 🟢🟡⚫
+
+- **BPM a partir de 50:** os riddims mais lentos (contados com a caixa no 2 e no 4) agora cabem no BPM, sem travar em 60
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Drum Machine MRDM-12 2.4 🟢🟡⚫
 
 - **Visual de console anos 70**: faixa verde-oliva no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)

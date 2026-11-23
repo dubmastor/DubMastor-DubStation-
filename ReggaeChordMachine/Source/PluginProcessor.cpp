@@ -51,7 +51,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bubble", 1 }, "Bubble (orgao)", false));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "swing", 1 }, "Swing", 0.0f, 1.0f, 0.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "preview", 1 }, "Preview (clock interno)", false));
-    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (55.0f, 180.0f, 1.0f), 75.0f));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (50.0f, 180.0f, 1.0f), 75.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "volume", 1 }, "Volume", 0.0f, 1.0f, 0.75f));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "pianoLvl", 1 }, "Piano M1", 0.0f, 1.0f, 0.8f));

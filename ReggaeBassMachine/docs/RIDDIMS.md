@@ -175,7 +175,7 @@ transcrições das linhas originais.** Harmonia com `~` é aproximada (de ouvido
 | 15 | Joker | Red Rat - Chunny Mouth | 2000 | Shocking Vibes Crew | Marlon Cooke / Donald Dennis | ~ Em (1) · C (1) | 100 | JAMMYS |
 | 16 | Doorslam | Capleton - Bust It | 2000 | Harvel "Gadaffi" Hart (Annex) | Annex Crew | ~ Am (2) | 100 | JAMMYS |
 | 17 | Scarface | Mr. Vegas - Original Trend | 2000 | Patrick Roberts (Shocking Vibes) | Shocking Vibes Crew | ~ Cm (2) | 98 | JAMMYS |
-| 18 | Speed | Madd Anju - Look Like | 2000 | Desmond & Rupert Blake | Desmond & Rupert Blake | ~ Gm (2) | 102 | JAMMYS |
+| 18 | Speed | Madd Anju - Look Like | 2000 | Desmond & Rupert Blake | Desmond & Rupert Blake | ~ Gm (2) | 51 | JAMMYS |
 | 19 | Rice And Peas | Spragga Benz & Elephant Man - Warrior Cause | 2001 | Rohan "Snow Cone" Fuller | Paul "Teetimus" Edmund | ~ Dm (1) · C (1) | 100 | JAMMYS |
 | 20 | Trilogy | Spragga Benz & Red Square - Gi Wi Dem | 2001 | King Jammy / Ward 21 | Ward 21 (programação) | ~ Em (2) | 100 | JAMMYS |
 
@@ -185,21 +185,21 @@ transcrições das linhas originais.** Harmonia com `~` é aproximada (de ouvido
 |---|---|---|---|---|---|---|---|---|
 | 1 | Diwali | Sean Paul - Get Busy / Wayne Wonder - No Letting Go | 2002 | Steven "Lenky" Marsden | Lenky (programação) | Am (1) · Em (1) | 100 | JAMMYS |
 | 2 | Martial Arts | Sizzla - Karate | 2002 | Craig "Leftside" Parks / Scatta | Leftside (programação) | ~ Em (2) | 100 | JAMMYS |
-| 3 | Hard Drive | Ce'Cile & Tanya Stephens - Buss Back Sketell | 2002 | Christopher Clarke / Gregory Harriot | programação | ~ Am (2) | 102 | JAMMYS |
+| 3 | Hard Drive | Ce'Cile & Tanya Stephens - Buss Back Sketell | 2002 | Christopher Clarke / Gregory Harriot | programação | ~ Am (2) | 51 | JAMMYS |
 | 4 | Famine | Merciless - Pick A Number | 2002 | Leftside / Dia / Scatta | Leftside (programação) | ~ Cm (2) | 100 | JAMMYS |
-| 5 | Coolie Dance | Ce'Cile - Give It To Me | 2003 | Scatta & Eva Burrell | Scatta (programação) | ~ Dm (1) · Bb (1) | 104 | JAMMYS |
+| 5 | Coolie Dance | Ce'Cile - Give It To Me | 2003 | Scatta & Eva Burrell | Scatta (programação) | ~ Dm (1) · Bb (1) | 52 | JAMMYS |
 | 6 | Chrome | Capleton - In Her Heart | 2003 | Michael Sterling / Craig Marsh / Daniel Lewis | programação | ~ Gm (2) | 100 | JAMMYS |
-| 7 | Bad Company | Ce'Cile - More Than One Time | 2003 | Cordel "Scatta" Burrell | Scatta (programação) | ~ F#m (2) | 102 | JAMMYS |
-| 8 | Applause | Sean Paul - Temperature | 2004 | Rohan "Snow Cone" Fuller | Snow Cone (programação) | Bbm (1) · Ab (1) · Bbm (1) · C (1) | 104 | JAMMYS |
+| 7 | Bad Company | Ce'Cile - More Than One Time | 2003 | Cordel "Scatta" Burrell | Scatta (programação) | ~ F#m (2) | 51 | JAMMYS |
+| 8 | Applause | Sean Paul - Temperature | 2004 | Rohan "Snow Cone" Fuller | Snow Cone (programação) | Bbm (1) · Ab (1) · Bbm (1) · C (1) | 52 | JAMMYS |
 | 9 | Military | Assassin - Step Pon Dem | 2004 | Christopher Birch | Christopher Birch (programação) | ~ Em (2) | 100 | JAMMYS |
-| 10 | Stepz | Tami Chynn - Hyperventilating | 2004 | Michael Jarrett / Craig "Serani" Marsh | Serani (programação) | ~ Am (1) · F (1) | 104 | JAMMYS |
+| 10 | Stepz | Tami Chynn - Hyperventilating | 2004 | Michael Jarrett / Craig "Serani" Marsh | Serani (programação) | ~ Am (1) · F (1) | 52 | JAMMYS |
 | 11 | Kasablanca | Jagwa - Mi Mean That | 2004 | Sly Dunbar / Computer Paul / Alberto Blackwood | Sly & Robbie | ~ Dm (2) | 100 | ROBBIE |
 | 12 | Blackout | Vybz Kartel - Picture This | 2004 | — | programação | ~ Cm (2) | 100 | JAMMYS |
 | 13 | Sleng Teng Resurrection | Luciano - Dancehall Style | 2005 | King Jammy (Jammys) | King Jammy (relick) | ~ D (1) · G (1) | 96 | JAMMYS |
 | 14 | Forty Sup'emmh | Pinchers - Mama Mama | 2006 | Steely & Clevie | Steely & Clevie | ~ Gm (1) · F (1) | 96 | JAMMYS |
-| 15 | Red Bull & Guinness | Delly Ranks & Chino - Red Bull & Guinness | 2006 | Delly Ranks / Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Em (2) | 104 | JAMMYS |
+| 15 | Red Bull & Guinness | Delly Ranks & Chino - Red Bull & Guinness | 2006 | Delly Ranks / Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Em (2) | 52 | JAMMYS |
 | 16 | Ghetto Whiskey | Mavado & Vybz Kartel - Sunrise | 2006 | Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Cm (1) · Ab (1) | 100 | JAMMYS |
-| 17 | Power Cut | Einstein - Caliber | 2006 | Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Am (2) | 102 | JAMMYS |
-| 18 | Wipe Out | Flippa Mafia - Look Alike | 2006 | — | programação | ~ Gm (2) | 102 | JAMMYS |
+| 17 | Power Cut | Einstein - Caliber | 2006 | Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Am (2) | 51 | JAMMYS |
+| 18 | Wipe Out | Flippa Mafia - Look Alike | 2006 | — | programação | ~ Gm (2) | 51 | JAMMYS |
 | 19 | After Dark | Sean Paul - All Alone | 2007 | Di Genius / DJ Sunshine | Di Genius (programação) | ~ Fm (1) · C# (1) | 96 | JAMMYS |
-| 20 | Tremor | Craig Dennis - Actor | 2007 | Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Bm (2) | 104 | JAMMYS |
+| 20 | Tremor | Craig Dennis - Actor | 2007 | Stephen "Di Genius" McGregor | Di Genius (programação) | ~ Bm (2) | 52 | JAMMYS |

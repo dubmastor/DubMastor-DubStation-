@@ -205,7 +205,7 @@ int main()
             CHECK (r.folder >= 0 && r.folder < numFolders, "%s: pasta", r.name);
             if (r.folder >= 0 && r.folder < numFolders) ++perFolder[r.folder];
             CHECK (r.numChords >= 1 && r.numChords <= 4, "%s: acordes", r.name);
-            CHECK (r.bpm >= 55 && r.bpm <= 180 && r.style >= 0 && r.style < NumStyles && r.drum >= 0 && r.drum < NumDrumStyles && r.timbre >= 0 && r.timbre < 3,
+            CHECK (r.bpm >= 50 && r.bpm <= 100 && r.style >= 0 && r.style < NumStyles && r.drum >= 0 && r.drum < NumDrumStyles && r.timbre >= 0 && r.timbre < 3,
                    "%s: valores fora dos parametros", r.name);
             CHECK (r.year >= 1964 && r.year <= 2010, "%s: ano", r.name);
             std::vector<ChordSlot> sl;

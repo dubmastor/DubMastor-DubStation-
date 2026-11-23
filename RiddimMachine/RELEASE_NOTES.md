@@ -1,3 +1,13 @@
+## Mastor Riddim Machine MRM-0420 2.0 — DubStation
+
+- **BPM corrigido em todos os presets:** nada passa de 100 BPM. Os riddims que estavam acima estavam dobrados e agora ficam na metade (ex.: Could You Be Loved 52, Temperature 63); os presets de BPM DANCEHALL 2000 (52) e STEPPERS UK (65 e 70) também
+- BPM de 50 a 180 (antes 60), em todas as máquinas
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Riddim Machine MRM-0420 1.9 — DubStation
 
 - **Visual de console anos 70**: faixa verde-petróleo atrás do nome; dentro das abas, cada máquina mostra a sua cor e a placa de latão com a própria sigla (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota)

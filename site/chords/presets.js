@@ -346,7 +346,7 @@
      "dur": 1
     }
    ],
-   "bpm": 107,
+   "bpm": 54,
    "kit": 1,
    "drummer": 2,
    "bassist": 4,
@@ -459,7 +459,7 @@
      "dur": 1
     }
    ],
-   "bpm": 104,
+   "bpm": 52,
    "kit": 1,
    "drummer": 2,
    "bassist": 4,
@@ -1397,7 +1397,7 @@
      "dur": 1
     }
    ],
-   "bpm": 119,
+   "bpm": 60,
    "kit": 0,
    "drummer": 3,
    "bassist": 3,
@@ -1547,7 +1547,7 @@
      "dur": 1
     }
    ],
-   "bpm": 104,
+   "bpm": 52,
    "kit": 0,
    "drummer": 2,
    "bassist": 0,
@@ -3533,7 +3533,7 @@
      "dur": 1
     }
    ],
-   "bpm": 102,
+   "bpm": 51,
    "kit": 1,
    "drummer": 1,
    "bassist": 4,
@@ -4017,7 +4017,7 @@
      "dur": 1
     }
    ],
-   "bpm": 125,
+   "bpm": 63,
    "kit": 0,
    "drummer": 3,
    "bassist": 3,
@@ -4174,7 +4174,7 @@
      "dur": 1
     }
    ],
-   "bpm": 125,
+   "bpm": 63,
    "kit": 0,
    "drummer": 4,
    "bassist": 2,
