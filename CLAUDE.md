@@ -87,3 +87,10 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 - Ao renomear, o alvo do CMake e os IDs internos (`DubBatteryReggae`, `DubBatteryReggaeState`, `DubBassState`, `RootsKeys`, `PARAMS`) ficam:
   são eles que mantêm os projetos antigos abrindo.
 - Toda alteração de bateria vale para o MRD-12, o MRM-0420 e o código do MRDM-12.
+
+## Mastor Reggae Organ MRO-68 (ReggaeOrgan/)
+Usa direto, sem cópia, o órgão (`RootsKeysEngine.h`, `TapeEchoDSP.h`), o visual (`VintageLookAndFeel.h`, `SkinTextures.h`, `VUMeter.h`)
+e as fontes de `ReggaeKeys/`, e o banco de riddims de `RiddimBank/Source`. Mudou o motor do órgão no MRK-80 ou o banco?
+Rode também o teste do MRO-68 (`ReggaeOrgan/tests/render_test.cpp`). Tudo nele é na contagem com a caixa no 2 e no 4.
+O motor de grooves (`ReggaeOrgan/Source/GrooveEngine.h`) tem uma cópia em JavaScript na versão para celular (`site/web/reggaeorgan/`):
+ao mudar um, mude o outro (mesmo gerador aleatório: o mesmo compasso tem que sair igual).
