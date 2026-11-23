@@ -6,8 +6,8 @@ on:
     paths:
       - 'ReggaeBassMachine/**'
       - 'RiddimBank/Source/**'
-      - 'ReggaeDubBassInstrument/Source/BassVoice.h'
-      - 'ReggaeDubBassInstrument/Source/Maximizer.h'
+      - 'ReggaeBass/Source/BassVoice.h'
+      - 'ReggaeBass/Source/Maximizer.h'
       - 'ReggaeDrumMachine/Source/DrumSynth.h'
       - 'ReggaeDrumMachine/Source/PatternGenerator.h'
       - 'ReggaeChordMachine/Source/DubSynth.h'
@@ -22,8 +22,8 @@ on:
     paths:
       - 'ReggaeBassMachine/**'
       - 'RiddimBank/Source/**'
-      - 'ReggaeDubBassInstrument/Source/BassVoice.h'
-      - 'ReggaeDubBassInstrument/Source/Maximizer.h'
+      - 'ReggaeBass/Source/BassVoice.h'
+      - 'ReggaeBass/Source/Maximizer.h'
       - 'ReggaeDrumMachine/Source/DrumSynth.h'
       - 'ReggaeDrumMachine/Source/PatternGenerator.h'
       - 'ReggaeChordMachine/Source/DubSynth.h'
@@ -167,7 +167,9 @@ jobs:
   # /releases/latest/download dos outros plugins.
   release:
     needs: build
-    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRBM-69-') || inputs.tag != '') }}
+    # LEGADO: o MRBM-69 virou a aba BASS MACHINE do Mastor Reggae Bass MRB-69. O código continua compilado e testado
+    # (o MRB-69 e o MRM-0420 usam esta pasta), mas a release MRBM-69-3.0 fica congelada: só sai release por tag manual.
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (startsWith(github.ref, 'refs/tags/MRBM-69-') || inputs.tag != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
