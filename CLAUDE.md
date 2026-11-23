@@ -67,6 +67,9 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 ## Instalador completo (Dub Station, todos os plugins)
 - Workflow `.github/workflows/build-pacote.yml`, script `.github/scripts/pacote.py`. Lê a lista do `plugins.json`: plugin novo entra sozinho.
 - Release `DubStation-<versão>` com `DubStation-Windows-Instalador.exe` e `DubStation-macOS-Instalador.pkg` (nunca `latest`).
+- `"pausado": true` no `pacote` do `plugins.json`: o workflow não compila nem publica (só manual), o site fica sem o bloco do
+  instalador completo e a checagem exige que não haja link. Para liberar: tirar `pausado`, devolver o bloco `completo` em
+  `site/index.html` e os links no README.
 - **Sempre que a versão de um plugin subir**, atualize `plugins.json` → `pacote` → `plugins` com a nova versão, suba `pacote` → `versao` e troque `DubStation-x.y` nos links do site e do README. A checagem falha se esquecer.
 - Pro Tools (AAX): todo CMakeLists inclui `.github/cmake/aax.cmake` e põe `${DM_AAX}` no fim de `FORMATS`. Plugin novo também. O AAX é compilado sempre (SDK do JUCE 8) e só entra no instalador público quando assinado pela PACE (passo a passo em `PROTOOLS.md`).
 
