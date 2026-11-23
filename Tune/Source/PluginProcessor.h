@@ -10,6 +10,7 @@
 #include "../../BigKnob/Source/TubbyFilter.h"
 #include "../../BigKnob/Source/DubFX.h"
 #include "../../RiddimMachine/Source/MrmLink.h"
+#include "../../KeyScout/Source/ScoutLink.h"
 
 class MastorTuneProcessor : public juce::AudioProcessor, private juce::Timer
 {
@@ -50,11 +51,13 @@ public:
     static const juce::StringArray& divisionNames();
 
     // ---- para a interface
-    enum Source { SrcManual = 0, SrcRiddim, SrcMidi, SrcMrm };
+    enum Source { SrcManual = 0, SrcRiddim, SrcMidi, SrcMrm, SrcScout };
     struct Status
     {
         int   source = SrcManual;          // de onde veio a harmonia agora
         bool  mrmOpen = false, mrmPlaying = false, riddimSignal = false, riddimConnected = false, midiChord = false;
+        bool  scoutOpen = false, scoutSignal = false; int scoutKey = -1; bool scoutMinor = false;
+        bool  tuneBypass = false;
         int   keyRoot = 9, scale = mt::Menor; // tom usado agora
         bool  keyAuto = true;
         int   chordRoot = -1; bool chordMinor = false;
@@ -94,6 +97,7 @@ private:
     dub::LoudnessMeter loudness;
     NoteTrack notes;
     mrmlink::Reader mrmReader;
+    scoutlink::Reader scoutReader;
 
     juce::AudioBuffer<float> work, dryCopy, bkBuf;
     std::array<std::vector<float>, 2> bypassDelay;
@@ -111,6 +115,8 @@ private:
     // harmonia (thread de mensagens -> áudio)
     std::atomic<int>  mrmChordMask { 0 }, mrmKeyRoot { -1 };
     std::atomic<bool> mrmKeyMinor { false }, mrmOpen { false }, mrmPlaying { false };
+    std::atomic<bool> scoutOpen { false }, scoutSignal { false }, scoutMinor { false }, scoutChordMinor { false };
+    std::atomic<int>  scoutKey { -1 }, scoutChordRoot { -1 };
     std::atomic<int>  usedSource { SrcManual }, usedKey { 9 }, usedScale { 1 }, usedChordRoot { -1 };
     std::atomic<bool> usedChordMinor { false }, riddimSig { false }, riddimConn { false }, midiHeld { false };
     std::atomic<float> sungMidi { 0 }, inDb { -100 }, outPk[2] { { 0 }, { 0 } }, grDb { 0 }, lufsS { -70 };

@@ -85,6 +85,12 @@ int main (int argc, char** argv)
     panel.showTab (0);
     pump();
     save (panel, out.getChildFile ("mt-card.png"), 0.5f);
+    // teclado com uma escala menor (pentatônica): as notas fora ficam apagadas
+    setP (proc, "autoKey", 0.0f); setP (proc, "scale", 9.0f); setP (proc, "tuneBypass", 1.0f);
+    for (int b = 0; b < 4; ++b) proc.processBlock (buf, midi);
+    pump (8);
+    save (panel, out.getChildFile ("mt-teclado-penta.png"), 1.0f);
+    setP (proc, "autoKey", 1.0f); setP (proc, "scale", 1.0f); setP (proc, "tuneBypass", 0.0f);
 
     // estado salvo e aberto de novo (notas corrigidas vão junto)
     juce::MemoryBlock mb;
