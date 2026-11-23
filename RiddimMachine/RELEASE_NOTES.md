@@ -1,11 +1,22 @@
-## Mastor Riddim Machine MRM-0420 2.3 — DubStation
+## Mastor Riddim Machine MRM-0420 2.4 — DubStation
 
 - **BANCO ÚNICO DE RIDDIMS nos PRESETS da aba RIDDIM:** 356 músicas em 10 estilos e 155 riddims de A a Z, o mesmo banco do MRCM-1240, do MRDM-12 e do MRBM-69 (`RiddimBank/`). A música vai inteira para as três máquinas: harmonia conferida, BPM, kit, baterista e baixista mais próximos de quem gravou
 - Visor azul com o estilo e os anos, a música, os acordes, o BPM (ORIGINAL quando medido), o kit, os músicos e as **luzes H B D** (harmonia, baixo e bateria da gravação original). ◀ ▶ passam por estilo e por música; LISTA e PRESETS abrem **ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z** e a opção **Só completos**
 - **ALAVANCA** sorteia uma música do banco (só ROCKERS e ONE DROP: caixa no 2 e no 4)
 - Projetos antigos abrem igual: o preset antigo aparece como a música certa do banco
 - Teste novo `mrm_render banco`: as 321 músicas com harmonia carregam certo nas três máquinas e ficam salvas no projeto
-- Versão para celular 2.3 com o mesmo banco
+- Versão para celular 2.4 com o mesmo banco
+
+---
+
+## Mastor Riddim Machine MRM-0420 2.3 — DubStation
+
+- **Link de harmonia com o novo Mastor Tune MT-0420**: com os dois abertos na mesma DAW, o MRM publica os 4 acordes, o acorde que está tocando e o BPM, e o Mastor Tune afina a voz pela harmonia do riddim, sem roteamento
+- O resto continua igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
 
 ## Mastor Riddim Machine MRM-0420 2.2 — DubStation
 
