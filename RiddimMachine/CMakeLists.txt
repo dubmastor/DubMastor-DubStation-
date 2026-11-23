@@ -76,7 +76,7 @@ set(MRM_SOURCES
     ../ReggaeDrumMachine/Source/PatternGenerator.cpp)
 set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
-    ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)     # timbres do piano M1 / Hammond
+    ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)     # timbres do piano M1 / Hammond
 set(MRM_DEFINES
     DD_VERSION_SHORT="${MRM_DRUMS_VER}"
     MRM_DRUMS_VER="${MRM_DRUMS_VER}"

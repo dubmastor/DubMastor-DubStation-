@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Confere se o som interno do MRCM-1240 usa o timbre ATUAL do Roots Keys.
 
-Lê RootsKeys/Source/PluginProcessor.cpp (valores de abertura dos parâmetros + presets
+Lê ReggaeKeys/Source/PluginProcessor.cpp (valores de abertura dos parâmetros + presets
 "Piano: M1 Classic" e "Organ: Roots Percussion") e compara com as constantes de
 ReggaeChordMachine/Source/RootsKeysSound.h (rkdefaults::RootsKeysPiano / RootsKeysOrgan).
 Se alguém mudar o timbre do Roots Keys e esquecer o MRCM-1240, o CI falha aqui.
@@ -13,7 +13,7 @@ import re
 import sys
 
 root = pathlib.Path(__file__).resolve().parents[2]
-rk = (root / "RootsKeys/Source/PluginProcessor.cpp").read_text(encoding="utf-8")
+rk = (root / "ReggaeKeys/Source/PluginProcessor.cpp").read_text(encoding="utf-8")
 syn = (root / "ReggaeChordMachine/Source/RootsKeysSound.h").read_text(encoding="utf-8")
 
 def num(x):

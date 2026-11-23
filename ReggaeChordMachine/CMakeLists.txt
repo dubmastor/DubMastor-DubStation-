@@ -49,7 +49,7 @@ target_sources(DubChords PRIVATE
     Source/PluginEditor.cpp)
 
 # timbres compartilhados com o Roots Keys (piano M1 + Hammond)
-set(DUBSTATION_SHARED ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)
+set(DUBSTATION_SHARED ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)
 target_include_directories(DubChords PRIVATE ${DUBSTATION_SHARED})
 
 target_compile_definitions(DubChords PUBLIC

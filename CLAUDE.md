@@ -54,7 +54,7 @@ O MRM-0420 compila o código destas pastas direto, sem cópia:
 - `ReggaeChordMachine/` — Mastor Reggae Chord Machine MRCM-1240
 - `ReggaeBassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `ReggaeBass/Source`)
 - `BigKnob/` — Mastor Big Knob (aba CONTROL ROOM)
-- `RootsKeys/Source/` — timbres do piano M1 / Hammond
+- `ReggaeKeys/Source/` — timbres do piano M1 / Hammond
 
 **Sempre que mudar uma dessas máquinas, atualize o MRM-0420 também:**
 1. Compile e rode o teste offline do MRM-0420 (`RiddimMachine/tests/render_test.cpp`, alvo `mrm_render`); todos os modos precisam passar.
@@ -75,7 +75,7 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 - **Mastor Reggae Drums MRD-12** (`ReggaeDrums/`, antigo Dub Battery Reggae DBR) tem o MRDM-12 inteiro na aba DUB DRUMS.
 - **Mastor Reggae Bass MRB-69** (`ReggaeBass/`, antigo Dub Bass MRDBI-07) tem o MRBM-69 inteiro na aba BASS MACHINE
   (`Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`; nomes repetidos trocados em `MachineNames.h`).
-- **Mastor Reggae Keys MRK-80** (`RootsKeys/`) vai ganhar o MRCM-1240 na aba CHORD MACHINE (só maior e menor).
+- **Mastor Reggae Keys MRK-80** (`ReggaeKeys/`) vai ganhar o MRCM-1240 na aba CHORD MACHINE (só maior e menor).
 - As machines separadas (MRDM-12, MRBM-69, MRCM-1240) ficam como **legado** no `plugins.json` (`"legado": "<instrumento>"`):
   saem do site e do pacote, a última release fica congelada (o workflow só publica por tag manual), mas a pasta continua
   porque o instrumento e o MRM-0420 compilam o código dela. Mudou uma machine? Teste o instrumento dela e o MRM-0420.

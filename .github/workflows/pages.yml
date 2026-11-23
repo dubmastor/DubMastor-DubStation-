@@ -19,7 +19,7 @@ on:
       - 'Build Mastor Reggae Drum Machine MRDM-12'
       - 'Build Mastor Reggae Bass MRB-69'
       - 'Build Mastor Riddim Machine MRM-0420'
-      - 'Build Mastor Roots Keys MRK-80'
+      - 'Build Mastor Reggae Keys MRK-80'
       - 'Build Mastor Tape Echo MTE-12'
     types: [completed]
   workflow_dispatch:

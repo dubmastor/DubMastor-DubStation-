@@ -80,7 +80,7 @@ Um preset de piano nunca altera o órgão, e vice-versa.
 
 ## Compilar
 
-O GitHub Actions (`.github/workflows/build-rootskeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `MRK-80-Windows.zip` / `MRK-80-macOS.zip` à release `RootsKeys-x.y` (uma por versão; ela não vira a "latest" do repositório).
+O GitHub Actions (`.github/workflows/build-reggaekeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa `MRK-80-Windows.zip` / `MRK-80-macOS.zip` à release `RootsKeys-x.y` (uma por versão; ela não vira a "latest" do repositório).
 
 Localmente:
 ```bash

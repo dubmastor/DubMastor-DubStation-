@@ -51,7 +51,7 @@ target_sources(DubBass PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
     ${MRB_MACHINE_SOURCES})
-target_include_directories(DubBass PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)   # teclado de acompanhamento
+target_include_directories(DubBass PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)   # teclado de acompanhamento
 if(UNIX AND NOT APPLE)
     # teste de compilação no Linux sem ALSA/JACK/Xrandr/Xcursor (como no Mastor Reggae Drums)
     target_compile_definitions(DubBass PUBLIC JUCE_ALSA=0 JUCE_JACK=0 JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0)
@@ -79,7 +79,7 @@ if(DUBBASS_TESTS)
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp
         ${MRB_MACHINE_SOURCES})
-    target_include_directories(DubBassTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../RootsKeys/Source)
+    target_include_directories(DubBassTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)
     target_compile_definitions(DubBassTest PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
