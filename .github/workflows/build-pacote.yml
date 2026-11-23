@@ -40,6 +40,7 @@ jobs:
     outputs:
       plugins: ${{ steps.l.outputs.plugins }}
       versao: ${{ steps.l.outputs.versao }}
+      pausado: ${{ steps.l.outputs.pausado }}
     steps:
       - uses: actions/checkout@v4
       - id: l
@@ -47,9 +48,13 @@ jobs:
           echo "plugins=$(python3 .github/scripts/pacote.py lista)" >> "$GITHUB_OUTPUT"
           V=$(python3 -c "import json;print(json.load(open('plugins.json'))['pacote']['versao'])")
           test -n "$V"; echo "versao=$V" >> "$GITHUB_OUTPUT"; echo "Pacote $V"
+          # "pausado": true no plugins.json -> não compila nem publica (só por workflow_dispatch)
+          P=$(python3 -c "import json;print('true' if json.load(open('plugins.json'))['pacote'].get('pausado') else 'false')")
+          echo "pausado=$P" >> "$GITHUB_OUTPUT"; echo "Pausado: $P"
 
   build:
     needs: lista
+    if: ${{ needs.lista.outputs.pausado != 'true' || github.event_name == 'workflow_dispatch' }}
     name: ${{ matrix.plugin.sigla }} (${{ matrix.os.name }})
     strategy:
       fail-fast: false
@@ -153,7 +158,7 @@ jobs:
 
   instalador:
     needs: [lista, build]
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && (needs.lista.outputs.pausado != 'true' || github.event_name == 'workflow_dispatch') }}
     strategy:
       fail-fast: false
       matrix:
