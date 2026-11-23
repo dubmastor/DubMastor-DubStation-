@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%274%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23ffa928%27/%3E%3Crect x=%2717%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%274%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%2717%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3C/svg%3E">
-<title>Mastor Dub Battery Reggae DBR 1.4 — Dub Station (navegador)</title>
+<title>Mastor Dub Battery Reggae DBR 1.5 — Dub Station (navegador)</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -164,7 +164,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 <div class="rack"><div class="wood"></div><div class="unit">
 <i class="screw tl"></i><i class="screw tr"></i><i class="screw bl"></i><i class="screw br"></i>
 <header>
-  <div><h1>DUB BATTERY REGGAE DBR&nbsp;1.4</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
+  <div><h1>DUB BATTERY REGGAE DBR&nbsp;1.5</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -252,6 +252,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
       <button class="gkey" id="gNext" aria-label="próximo groove">▶</button>
     </div>
     <div class="gnote" id="gNote"></div>
+    <div id="bank" style="margin-top:10px"></div>
     <div class="info" id="drumInfo" hidden></div>
   </section>
   <section class="mod"><div class="tag">LOOP</div>
@@ -296,6 +297,8 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 
 <script src="../drums/generator.js"></script>
 <script src="../drums/grooves.js"></script>
+<script src="../riddimbank.js"></script>
+<script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
 const G = window.MDDM;
@@ -921,6 +924,13 @@ function loadGroove(i) {
 }
 $('gPrev').onclick = () => loadGroove(stepGroove(D, -1));
 $('gNext').onclick = () => loadGroove(stepGroove(D, 1));
+// BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins): o groove da música no BPM dela
+let bankPick = -1;
+riddimBankMenu($('bank'), {
+  label: `BANCO DE RIDDIMS ▾  ${window.RIDDIM_BANK.entries.length} músicas`,
+  current: () => bankPick,
+  onPick: (e, i) => { bankPick = i; loadGroove(e.groove); D.bpm = e.bpm; $('bpm').value = D.bpm; drumChanged(); },
+});
 $('gList').onchange = (e) => { const i = +e.target.value; if (GROOVES[i]) D.gfamily = GROOVES[i].family; loadGroove(i); };
 for (const [id, v] of [['gvD', 0], ['gvS', 1]])
   $(id).onclick = () => { D.gview = v; fillGrooveList(); drumChanged(); };
