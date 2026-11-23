@@ -1,3 +1,16 @@
+## Mastor Riddim Machine MRM-0420 1.8 — DubStation
+
+- **PRESETS no visor azul de MPC** (aba RIDDIM): **ESTILO ◀ ▶** e **MÚSICA ◀ ▶** carregam o riddim na hora, como os presets do Dub Battery Reggae; o visor mostra o estilo, a posição (ex.: 05/21), a música, os acordes, o BPM, o kit e os músicos; clique no visor ou em **LISTA** para escolher por estilo
+- **Presets separados só por estilo de reggae:** EARLY REGGAE, ROOTS, ROCKERS, LOVERS ROCK, RUB A DUB, DIGITAL, DANCEHALL e NEW ROOTS (o Gregory Isaacs entra no estilo de cada fase), músicas em ordem alfabética
+- **BPM original de cada música:** 99 dos 180 riddims agora vêm com o BPM medido da gravação (SongBPM/GetSongBPM/Tunebat, contado com a caixa no 2 e no 4); os outros mostram "~" (andamento típico do estilo, sem medição)
+- **PRESET DE BPM no visor azul** (igual ao do Dub Battery Reggae): ◀ ▶ passa pelos 24 BPMs de época e estilo; as 24 teclas continuam embaixo
+- **NOVA LINHA** na bateria e no baixo: outra sugestão só daquela máquina (semente própria), sem mexer na outra nem no JACKPOT
+- Banco do MRCM-1240 2.2; versão para celular igual (visor azul, NOVA LINHA e preset de BPM)
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Riddim Machine MRM-0420 1.7 — DubStation
 
 - **Aba BAIXO com os 160 riddims clássicos do MRBM-69 2.8** (20 por estilo de reggae, por baixista e por década, com a era digital do King Jammys): o visor âmbar no alto da aba carrega harmonia, BPM e estilo do baixista, e a harmonia vale para o MRM-0420 inteiro

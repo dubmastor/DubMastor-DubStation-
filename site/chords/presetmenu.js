@@ -1,4 +1,4 @@
-// Menu de PRESETS em cascata (MRCM-1240 e MRM-0420 no navegador): pasta (estilo e época) > letras (A - G...) > música.
+// Menu de PRESETS em cascata (MRCM-1240 e MRM-0420 no navegador): estilo de reggae > música.
 // Abre clicando (toque no celular) ou passando o mouse (computador). Usa o banco de presets.js (DUB_PRESETS).
 (function (root) {
   const CSS = `
@@ -49,24 +49,16 @@
       sm.addEventListener('click', (e) => { if (d.open && performance.now() - (d.hoverAt || 0) < 700) e.preventDefault(); });
     };
 
-    P.folders.forEach((f) => {
+    P.folders.forEach((f) => {   // estilo de reggae > música
       const idx = order.filter((i) => P.presets[i].folder === f);
       const fd = document.createElement('details'); fd.className = 'pf';
       fd.innerHTML = `<summary><span>${f}</span><span style="opacity:.6">${idx.length}</span></summary>`;
-      let gd = null, group = null;
       idx.forEach((i) => {
         const p = P.presets[i];
-        if (p.group !== group) {
-          group = p.group;
-          const names = idx.filter((j) => P.presets[j].group === group).map((j) => P.presets[j].name.replace(/ \(.*$/, ''));
-          gd = document.createElement('details'); gd.className = 'pg';
-          gd.innerHTML = `<summary><span>MÚSICAS ${group}</span><small>${names.join(' · ')}</small></summary>`;
-          fd.appendChild(gd); wire(gd);
-        }
         const b = document.createElement('button'); b.type = 'button'; b.className = 'song'; b.dataset.i = i;
         b.innerHTML = `${p.name}<small>${opts.itemText(p)}</small>`;
         b.onclick = () => { close(); opts.onPick(p, i); };
-        gd.appendChild(b); songs.push(b);
+        fd.appendChild(b); songs.push(b);
       });
       pm.appendChild(fd); wire(fd);
     });

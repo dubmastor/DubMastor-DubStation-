@@ -404,6 +404,16 @@ void MrmProcessor::newRiddim()
     timerCallback();   // bateria e baixo recebem a semente na hora
 }
 
+void MrmProcessor::newLine (int machine)
+{
+    auto& st = machine == Drums ? drums.apvts : bass.apvts;
+    const int cur = juce::roundToInt (getParam (st, "seed"));
+    int s = cur;
+    juce::Random rng;
+    while (s == cur) s = 1 + rng.nextInt (999);
+    setParam (st, "seed", (float) s);    // a semente do JACKPOT não muda: a outra máquina fica como está
+}
+
 static void setRiddimParam (juce::AudioProcessorValueTreeState& s, const juce::String& id, float v)
 {
     if (auto* p = s.getParameter (id))

@@ -317,13 +317,30 @@ void BpmPanel::resized()
     steps[2] = { sx, 48, 54, 42 };      // -5
     steps[3] = { sx + 60, 48, 54, 42 }; // +5
     tapKey = { sx + 126, 0, 84, 90 };
+    // PRESET DE BPM no visor azul (igual ao PRESET do Dub Battery Reggae): ◀ visor ▶
+    stepL = { 436, 0, 40, 32 };
+    stepR = { getWidth() - 40, 0, 40, 32 };
+    presetLcd = { 486, 2, getWidth() - 40 - 486 - 10, 28 };
 }
 
 juce::Rectangle<int> BpmPanel::keyArea (int i) const
 {
-    const int x0 = 436, w = getWidth() - x0, cols = 8, gap = 6;
-    const int kw = (w - gap * (cols - 1)) / cols, kh = (getHeight() - 2 * gap) / 3;
-    return { x0 + (i % cols) * (kw + gap), (i / cols) * (kh + gap), kw, kh };
+    const int x0 = 436, w = getWidth() - x0, cols = 12, gap = 5, top = 40;
+    const int kw = (w - gap * (cols - 1)) / cols, kh = (getHeight() - top - gap) / 2;
+    return { x0 + (i % cols) * (kw + gap), top + (i / cols) * (kh + gap), kw, kh };
+}
+
+void BpmPanel::stepPreset (int delta)
+{
+    int i = chosen;
+    if (i < 0)
+    {   // sem preset aceso: começa pelo mais perto do BPM atual
+        int best = 0;
+        for (int k = 1; k < bpmpresets::numPresets; ++k)
+            if (std::abs (bpmpresets::presets[k].bpm - value) < std::abs (bpmpresets::presets[best].bpm - value)) best = k;
+        i = delta > 0 ? best - 1 : best + 1;
+    }
+    choosePreset ((i + delta + bpmpresets::numPresets) % bpmpresets::numPresets);
 }
 
 static void bpmKey (juce::Graphics& g, juce::Rectangle<float> r, bool lit, bool down)
@@ -377,20 +394,43 @@ void BpmPanel::paint (juce::Graphics& g)
         g.drawText (juce::String::fromUTF8 ("BATA NO TEMPO"), r.withTrimmedTop (56.0f).withHeight (14.0f), juce::Justification::centred);
     }
 
-    // presets por época e estilo
+    // PRESET DE BPM: ◀ visor azul ▶ e as 24 teclas por época e estilo
+    mpc::key (g, stepL.toFloat(), juce::String::fromUTF8 ("\xe2\x97\x80"), pressed == 300, 12.0f);
+    mpc::key (g, stepR.toFloat(), juce::String::fromUTF8 ("\xe2\x96\xb6"), pressed == 301, 12.0f);
+    {
+        auto l = presetLcd.toFloat();
+        mpc::lcd (g, l);
+        auto t = l.reduced (10.0f, 2.0f);
+        mpc::text (g, "BPM", t, juce::Justification::centredLeft, 9.0f, 0.7f, 0.25f);
+        if (chosen >= 0)
+        {
+            const auto& pr = bpmpresets::presets[chosen];
+            mpc::text (g, juce::String (chosen + 1).paddedLeft ('0', 2) + "  " + juce::String (pr.style) + u8 ("  \xc2\xb7  ")
+                          + juce::String (pr.name).toUpperCase(), t.withTrimmedLeft (40.0f), juce::Justification::centredLeft, 13.0f);
+            mpc::text (g, juce::String (pr.bpm) + " BPM", t, juce::Justification::centredRight, 14.0f);
+        }
+        else
+        {
+            mpc::text (g, u8 ("PRESET DE BPM  \xc2\xb7  \xe2\x97\x80 \xe2\x96\xb6 ESCOLHE O ESTILO"), t.withTrimmedLeft (40.0f), juce::Justification::centredLeft, 12.0f, 0.75f);
+            mpc::text (g, juce::String (juce::roundToInt (value)) + " BPM", t, juce::Justification::centredRight, 14.0f);
+        }
+        mpc::shine (g, l);
+    }
     for (int i = 0; i < bpmpresets::numPresets; ++i)
     {
         const auto& pr = bpmpresets::presets[i];
         auto r = keyArea (i).toFloat();
         const bool lit = chosen == i;
         bpmKey (g, r, lit, pressed == i);
-        auto t = r.translated (0, pressed == i ? 1.5f : 0.0f).reduced (4.0f, 3.0f);
+        auto t = r.translated (0, pressed == i ? 1.5f : 0.0f).reduced (2.0f, 2.0f);
         g.setColour (lit ? col::amber : col::cream.withAlpha (0.75f));
-        g.setFont (stencil (7.0f, 0.1f));
-        g.drawFittedText (pr.style, t.withHeight (11.0f).toNearestInt(), juce::Justification::centred, 1, 0.7f);
+        g.setFont (stencil (6.5f, 0.02f));
+        juce::String shortStyle (pr.style);   // tecla pequena: sem REGGAE, ROCK e UK
+        shortStyle = shortStyle.replace ("EARLY REGGAE", "EARLY").replace ("LOVERS ROCK", "LOVERS").replace (" UK", "");
+        g.drawFittedText (shortStyle, t.withHeight (9.0f).toNearestInt(), juce::Justification::centred, 1, 0.55f);
         g.setColour (lit ? col::amber : col::cream);
-        g.setFont (stencil (13.0f, 0.05f));
-        g.drawText (juce::String (pr.bpm), t.withTrimmedTop (11.0f).withTrimmedBottom (4.0f), juce::Justification::centred);
+        g.setFont (stencil (12.5f, 0.03f));
+        g.drawText (juce::String (pr.bpm), t.withTrimmedTop (9.0f).withTrimmedBottom (3.0f), juce::Justification::centred);
     }
 }
 
@@ -410,6 +450,8 @@ void BpmPanel::mouseDown (const juce::MouseEvent& e)
             return;
         }
     if (tapKey.contains (pt)) { pressed = 200; tap (juce::Time::getMillisecondCounterHiRes()); return; }
+    if (stepL.contains (pt)) { pressed = 300; stepPreset (-1); return; }
+    if (stepR.contains (pt) || presetLcd.contains (pt)) { pressed = 301; stepPreset (1); return; }
     for (int i = 0; i < bpmpresets::numPresets; ++i)
         if (keyArea (i).contains (pt)) { pressed = i; choosePreset (i); return; }
 }
@@ -436,6 +478,189 @@ void BpmPanel::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheel
     if (! display.contains (e.getPosition())) return;
     const int step = w.deltaY > 0 ? 1 : w.deltaY < 0 ? -1 : 0;
     if (step != 0) { chosen = -1; setBpm (value + (float) step); }
+}
+
+//==============================================================================
+// RiddimPresetPanel: PRESETS no visor azul de MPC (estilo > música), carrega na hora
+static const char* const kKits[] = { "ROCKERS", "ONE DROP" };
+
+RiddimPresetPanel::RiddimPresetPanel (MrmProcessor& p) : proc (p)
+{
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
+    startTimerHz (8);
+}
+
+int RiddimPresetPanel::current() const { return proc.getChords().getLastPreset(); }
+
+int RiddimPresetPanel::styleOf (int preset) const
+{
+    if (preset < 0) return -1;
+    for (int f = 0; f < dubpresets::numFolders; ++f)
+        if (juce::String (dubpresets::presets[preset].folder) == dubpresets::folders[f]) return f;
+    return -1;
+}
+
+juce::Array<int> RiddimPresetPanel::songsOf (int style) const
+{
+    juce::Array<int> out;   // ordem do menu: nome em ordem alfabética
+    for (int i : dubpresets::menuOrder)
+        if (juce::String (dubpresets::presets[i].folder) == dubpresets::folders[style]) out.add (i);
+    return out;
+}
+
+void RiddimPresetPanel::stepStyle (int delta)
+{
+    const int cur = styleOf (current());
+    styleSel = ((cur >= 0 ? cur : styleSel) + delta + dubpresets::numFolders) % dubpresets::numFolders;
+    const auto songs = songsOf (styleSel);
+    if (! songs.isEmpty()) proc.applyRiddimPreset (songs[0]);
+    repaint();
+}
+
+void RiddimPresetPanel::stepSong (int delta)
+{
+    const int cur = current();
+    const int st = cur >= 0 ? styleOf (cur) : styleSel;
+    const auto songs = songsOf (st);
+    if (songs.isEmpty()) return;
+    const int pos = songs.indexOf (cur);
+    const int n = songs.size();
+    const int next = pos < 0 ? (delta > 0 ? 0 : n - 1) : (pos + delta + n) % n;
+    proc.applyRiddimPreset (songs[next]);
+    repaint();
+}
+
+void RiddimPresetPanel::showList()
+{
+    juce::PopupMenu menu;
+    menu.addSectionHeader (u8 ("RIDDIMS CL\xc3\x81SSICOS POR ESTILO DE REGGAE"));
+    const int cur = current();
+    for (int f = 0; f < dubpresets::numFolders; ++f)
+    {
+        juce::PopupMenu sub;
+        const auto songs = songsOf (f);
+        for (int i : songs)
+        {
+            const auto& pr = dubpresets::presets[i];
+            sub.addItem (i + 1, u8 (pr.name) + u8 ("   \xc2\xb7  ") + (pr.bpmReal ? "" : "~") + juce::String (pr.bpm) + " BPM", true, cur == i);
+        }
+        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (songs.size()) + ")", sub, true, nullptr, styleOf (cur) == f);
+    }
+    juce::Component::SafePointer<RiddimPresetPanel> safe (this);
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int r)
+    {
+        if (safe != nullptr && r > 0) { safe->proc.applyRiddimPreset (r - 1); safe->repaint(); }
+    });
+}
+
+void RiddimPresetPanel::timerCallback()
+{
+    const int c = current();
+    if (c != shown) { shown = c; if (c >= 0) styleSel = styleOf (c); repaint(); }
+}
+
+void RiddimPresetPanel::resized()
+{
+    // ESTILO ◀ ▶ em cima, MÚSICA ◀ ▶ embaixo, o visor no meio e a LISTA na direita
+    keys[0] = { 0, 0, 44, 34 };   keys[1] = { 50, 0, 44, 34 };
+    keys[2] = { 0, 40, 44, 34 };  keys[3] = { 50, 40, 44, 34 };
+    listKey = { getWidth() - 112, 0, 112, 74 };
+    lcd = { 184, 2, getWidth() - 184 - 112 - 14, 70 };
+}
+
+void RiddimPresetPanel::paint (juce::Graphics& g)
+{
+    const juce::String L = juce::String::fromUTF8 ("\xe2\x97\x80"), R = juce::String::fromUTF8 ("\xe2\x96\xb6");
+    for (int i = 0; i < 4; ++i)
+        mpc::key (g, keys[i].toFloat(), i % 2 == 0 ? L : R, pressed == i);
+    engraved (g, "ESTILO", juce::Rectangle<float> (100.0f, 0.0f, 76.0f, 34.0f), juce::Justification::centredLeft, 10.0f, 0.25f, col::ink);
+    engraved (g, u8 ("M\xc3\x9aSICA"), juce::Rectangle<float> (100.0f, 40.0f, 76.0f, 34.0f), juce::Justification::centredLeft, 10.0f, 0.25f, col::ink);
+
+    auto l = lcd.toFloat();
+    mpc::lcd (g, l);
+    auto t = l.reduced (14.0f, 6.0f);
+    const int cur = current();
+    const int st = cur >= 0 ? styleOf (cur) : styleSel;
+    const auto songs = songsOf (st);
+    mpc::text (g, juce::String (dubpresets::folders[st]), t.withHeight (16.0f), juce::Justification::centredLeft, 13.0f, 0.85f, 0.25f);
+    if (cur >= 0)
+    {
+        const auto& pr = dubpresets::presets[cur];
+        mpc::text (g, juce::String (songs.indexOf (cur) + 1).paddedLeft ('0', 2) + "/" + juce::String (songs.size()).paddedLeft ('0', 2),
+                   t.withHeight (16.0f), juce::Justification::centredRight, 12.0f, 0.8f);
+        mpc::text (g, u8 (pr.name).toUpperCase(), t.withTrimmedTop (17.0f).withHeight (22.0f), juce::Justification::centredLeft, 17.0f, 1.0f, 0.04f);
+        juce::StringArray ch;
+        for (int k = 0; k < pr.numChords; ++k)
+            ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
+        mpc::text (g, ch.joinIntoString (" - ") + u8 ("  \xc2\xb7  ") + (pr.bpmReal ? juce::String (pr.bpm) + " BPM ORIGINAL" : "~" + juce::String (pr.bpm) + " BPM")
+                      + u8 ("  \xc2\xb7  ") + kKits[pr.kit] + u8 ("  \xc2\xb7  ")
+                      + juce::String (dubdrums::drummerName ((dubdrums::Drummer) pr.drummer)).toUpperCase() + " + " + juce::String (mbm::styleName (pr.bassist)).toUpperCase(),
+                   t.withTrimmedTop (41.0f), juce::Justification::centredLeft, 10.5f, 0.85f, 0.06f);
+    }
+    else
+    {
+        mpc::text (g, u8 ("ESCOLHA UM RIDDIM  \xc2\xb7  \xe2\x97\x80 \xe2\x96\xb6"), t.withTrimmedTop (17.0f).withHeight (22.0f), juce::Justification::centredLeft, 16.0f, 0.8f);
+        mpc::text (g, u8 ("HARMONIA, BPM ORIGINAL, BATERIA E OS M\xc3\x9aSICOS DE CADA M\xc3\x9aSICA"), t.withTrimmedTop (41.0f), juce::Justification::centredLeft, 10.5f, 0.7f);
+    }
+    mpc::shine (g, l);
+
+    auto lk = listKey.toFloat();
+    mpc::key (g, lk, "", pressed == 4);
+    g.setColour (col::cream);
+    g.setFont (stencil (14.0f, 0.12f));
+    g.drawText ("LISTA", lk.withTrimmedBottom (34.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), juce::Justification::centredBottom);
+    g.setFont (stencil (7.5f, 0.12f));
+    g.setColour (col::cream.withAlpha (0.6f));
+    g.drawText (u8 ("POR ESTILO \xe2\x96\xbe"), lk.withTrimmedTop (44.0f).withHeight (14.0f).translated (0, pressed == 4 ? 1.5f : 0.0f), juce::Justification::centred);
+}
+
+void RiddimPresetPanel::mouseDown (const juce::MouseEvent& e)
+{
+    const auto pt = e.getPosition();
+    pressed = -1;
+    for (int i = 0; i < 4; ++i)
+        if (keys[i].contains (pt))
+        {
+            pressed = i;
+            if (i < 2) stepStyle (i == 0 ? -1 : 1); else stepSong (i == 2 ? -1 : 1);
+            repaint();
+            return;
+        }
+    if (listKey.contains (pt) || lcd.contains (pt)) { pressed = 4; repaint(); showList(); }
+}
+
+void RiddimPresetPanel::mouseUp (const juce::MouseEvent&) { pressed = -1; repaint(); }
+
+//==============================================================================
+// NewLineKey
+void NewLineKey::paint (juce::Graphics& g)
+{
+    auto r = getLocalBounds().toFloat().reduced (2.0f);
+    const float a = dimmed ? 0.4f : 1.0f;
+    g.setColour (juce::Colours::black.withAlpha (0.45f * a));
+    g.fillRoundedRectangle (r.translated (0, 2.0f), 4.0f);
+    auto cap = r.translated (0, down ? 1.5f : 0.0f).withTrimmedBottom (2.0f);
+    juce::ColourGradient cg (juce::Colour (0xff2c2925), cap.getX(), cap.getY(), juce::Colour (0xff141210), cap.getX(), cap.getBottom(), false);
+    g.setGradientFill (cg);
+    g.fillRoundedRectangle (cap, 4.0f);
+    g.setColour (col::amber.withAlpha ((down ? 0.9f : 0.45f) * a));
+    g.fillRoundedRectangle (cap.withTop (cap.getBottom() - 3.0f).reduced (8.0f, 0.0f).translated (0, -1.5f), 1.0f);
+    g.setColour (col::amber.withAlpha (a));
+    g.setFont (stencil (24.0f, 0.0f));
+    g.drawText (juce::String::fromUTF8 ("\xe2\x86\xbb"), cap.withHeight (cap.getHeight() * 0.5f).translated (0, 4.0f), juce::Justification::centred);
+    g.setColour (col::cream.withAlpha (a));
+    g.setFont (stencil (10.0f, 0.12f));
+    g.drawText ("NOVA LINHA", cap.withTrimmedTop (cap.getHeight() * 0.52f).withHeight (14.0f), juce::Justification::centred);
+    g.setFont (stencil (7.0f, 0.1f));
+    g.setColour (col::cream.withAlpha (0.55f * a));
+    g.drawText (machine == MrmProcessor::Drums ? "OUTRA BATERIA" : "OUTRO BAIXO", cap.withTrimmedTop (cap.getHeight() * 0.52f + 14.0f).withHeight (12.0f), juce::Justification::centred);
+}
+
+void NewLineKey::mouseUp (const juce::MouseEvent& e)
+{
+    down = false;
+    repaint();
+    if (getLocalBounds().contains (e.getPosition())) proc.newLine (machine);
 }
 
 //==============================================================================
@@ -1132,7 +1357,7 @@ void GrilleSpeaker::paint (juce::Graphics& g)
 MainPage::MainPage (MrmProcessor& p)
     : proc (p), drumLane (p), chordLane (p), bassRoll (p.getBass()), bassLane (p, bassRoll),
       reels (*p.apvts.getParameter ("seed")),
-      riddimDrag (p, -1, "ARRASTE O RIDDIM", u8 ("TUDO ALINHADO")), bpmPanel (p)
+      riddimDrag (p, -1, "ARRASTE O RIDDIM", u8 ("TUDO ALINHADO")), bpmPanel (p), presetPanel (p)
 {
     setLookAndFeel (&lnf);
     auto& c = proc.getChords();
@@ -1246,6 +1471,11 @@ MainPage::MainPage (MrmProcessor& p)
     addAndMakeVisible (*echoPower);
     addAndMakeVisible (speaker);
     addAndMakeVisible (bpmPanel);
+    addAndMakeVisible (presetPanel);
+    newDrums = std::make_unique<NewLineKey> (proc, MrmProcessor::Drums);
+    newBass  = std::make_unique<NewLineKey> (proc, MrmProcessor::Bass);
+    addAndMakeVisible (*newDrums);
+    addAndMakeVisible (*newBass);
 
     setSize (kW, kH);
     startTimerHz (30);
@@ -1280,32 +1510,26 @@ void MainPage::showPresets()
     auto& c = proc.getChords();
     juce::PopupMenu menu;
     menu.addSectionHeader (u8 ("RIDDIMS CL\xc3\x81SSICOS  \xc2\xb7  HARMONIA, BPM E OS M\xc3\x9aSICOS CERTOS"));
-    // pasta (estilo e época) > letras (A - G...) > música: abre passando o mouse ou clicando
+    // estilo de reggae > música (abre passando o mouse ou clicando)
     for (int f = 0; f < dubpresets::numFolders; ++f)
     {
-        juce::Array<int> idx;   // ordem do menu (gerada no banco): letras e nome em ordem alfabética
+        juce::PopupMenu sub;
+        int count = 0;
+        bool ticked = false;
         for (int i : dubpresets::menuOrder)
-            if (juce::String (dubpresets::presets[i].folder) == dubpresets::folders[f]) idx.add (i);
-        juce::PopupMenu folderMenu, sub;
-        juce::String group;
-        bool folderTicked = false, groupTicked = false;
-        auto flush = [&] { if (group.isNotEmpty()) folderMenu.addSubMenu (juce::String::fromUTF8 ("M\xc3\x9aSICAS  ") + group, sub, true, nullptr, groupTicked); sub = {}; groupTicked = false; };
-        for (int i : idx)
         {
             const auto& pr = dubpresets::presets[i];
-            if (group != pr.group) { flush(); group = pr.group; }
+            if (juce::String (pr.folder) != dubpresets::folders[f]) continue;
             juce::StringArray ch;
             for (int k = 0; k < pr.numChords; ++k)
                 ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
-            static const char* kits[] = { "ROCKERS", "ONE DROP" };
             const bool tick = c.getLastPreset() == i;
-            groupTicked = groupTicked || tick; folderTicked = folderTicked || tick;
-            sub.addItem (i + 1, u8 (pr.name) + "   " + ch.joinIntoString (" - ") + u8 ("   \xc2\xb7  ") + juce::String (pr.bpm) + " BPM "
-                                    + kits[pr.kit] + u8 ("  \xc2\xb7  ") + juce::String (dubdrums::drummerName ((dubdrums::Drummer) pr.drummer)).toUpperCase()
+            ticked = ticked || tick; ++count;
+            sub.addItem (i + 1, u8 (pr.name) + "   " + ch.joinIntoString (" - ") + u8 ("   \xc2\xb7  ") + (pr.bpmReal ? "" : "~") + juce::String (pr.bpm) + " BPM "
+                                    + kKits[pr.kit] + u8 ("  \xc2\xb7  ") + juce::String (dubdrums::drummerName ((dubdrums::Drummer) pr.drummer)).toUpperCase()
                                     + " + " + mbm::styleName (pr.bassist), true, tick);
         }
-        flush();
-        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (idx.size()) + ")", folderMenu, true, nullptr, folderTicked);
+        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (count) + ")", sub, true, nullptr, ticked);
     }
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presets),
                         [this] (int r) { if (r > 0) proc.applyRiddimPreset (r - 1); });
@@ -1326,6 +1550,8 @@ void MainPage::timerCallback()
         row.undo.setVisible (edits[m]);
         const bool dim = ! proc.isMachineOn (m);
         if (row.drag->dimmed != dim) { row.drag->dimmed = dim; row.drag->repaint(); }
+        if (auto* nk = m == MrmProcessor::Drums ? newDrums.get() : m == MrmProcessor::Bass ? newBass.get() : nullptr)
+            if (nk->dimmed != dim) { nk->dimmed = dim; nk->repaint(); }
         row.lane->setAlpha (dim ? 0.45f : 1.0f);
     }
 
@@ -1350,8 +1576,9 @@ void MainPage::resized()
     machineSection = { 52, 316, 1176, 330 };
     knobSection    = { 52, 668, 1176, 130 };
     sirenSection   = { 52, 820, 1176, 122 };
-    bpmBox         = { 52, 964, 1176, 140 };
-    constexpr int D = 296;   // o que vem depois da sirene e do BPM desce
+    presetBox      = { 52, 964, 1176, 100 };
+    bpmBox         = { 52, 1086, 1176, 136 };
+    constexpr int D = 414;   // o que vem depois da sirene, dos PRESETS e do BPM desce
     jackpotSection = { 52, 820 + D, 520, 162 };
     riddimSection  = { 592, 820 + D, 386, 162 };
     speakerArea    = { 992, 808 + D, 236, 186 };
@@ -1382,7 +1609,9 @@ void MainPage::resized()
         row.undo.setBounds (70, y + 74, 148, 18);
         if (row.musicians)
             row.musicians->setBounds (m == MrmProcessor::Drums ? juce::Rectangle<int> (234, y + 46, 290, 48) : juce::Rectangle<int> (234, y + 16, 290, 78));
-        row.lane->setBounds (534, y, 550, 96);
+        const bool newKey = m != MrmProcessor::Chords;   // NOVA LINHA na bateria e no baixo
+        row.lane->setBounds (534, y, newKey ? 446 : 550, 96);
+        if (newKey) (m == MrmProcessor::Drums ? newDrums : newBass)->setBounds (986, y + 4, 100, 88);
         row.drag->setBounds (1094, y + 4, 122, 88);
     }
 
@@ -1416,7 +1645,8 @@ void MainPage::resized()
     exportBtn.setBounds (786, 838 + D, 178, 40);
     riddimDrag.setBounds (606, 886 + D, 358, 84);
 
-    bpmPanel.setBounds (64, 984, 1152, 110);
+    presetPanel.setBounds (64, 980, 1152, 76);
+    bpmPanel.setBounds (64, 1104, 1152, 110);
     speaker.setBounds (speakerArea);
     renderBackground();
 }
@@ -1467,7 +1697,7 @@ void MainPage::renderBackground()
     section (g, jackpotSection, u8 ("JACKPOT  \xc2\xb7  SEMENTE  \xc2\xb7  ALAVANCA"));
     {
         // placa da alavanca: o que ela sorteia
-        auto plate = juce::Rectangle<float> (526.0f, 1136.0f, 40.0f, 126.0f);   // 840 + 296 (abaixo da sirene e do BPM)
+        auto plate = juce::Rectangle<float> (526.0f, 1254.0f, 40.0f, 126.0f);   // 840 + 414 (abaixo da sirene, dos PRESETS e do BPM)
         g.setColour (juce::Colour (0xff1c1915));
         g.fillRoundedRectangle (plate, 5.0f);
         g.setColour (col::jamGold.withAlpha (0.8f));
@@ -1486,7 +1716,8 @@ void MainPage::renderBackground()
     engraved (g, u8 ("BYPASS: DESLIGA O BIG KNOB INTEIRO"), juce::Rectangle<float> (196.0f, 727.0f, 220.0f, 11.0f), juce::Justification::centred, 6.5f, 0.15f);
     engraved (g, u8 ("TUDO NA ABA CONTROL ROOM"), juce::Rectangle<float> (196.0f, 784.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
 
-    section (g, bpmBox, u8 ("BPM  \xc2\xb7  DIGITE, BATA NO TEMPO OU ESCOLHA PELO ESTILO E \xc3\x89POCA"));
+    section (g, presetBox, u8 ("PRESETS  \xc2\xb7  RIDDIMS CL\xc3\x81SSICOS POR ESTILO DE REGGAE  \xc2\xb7  BPM DA GRAVA\xc3\x87\xc3\x83O ORIGINAL"));
+    section (g, bpmBox, u8 ("BPM  \xc2\xb7  DIGITE, BATA NO TEMPO OU ESCOLHA O PRESET DE BPM"));
     section (g, sirenSection, u8 ("DUB SIREN  \xc2\xb7  A SIRENE DO MASTOR BIG KNOB"));
     engraved (g, u8 ("SEGURE O FIRE  \xc2\xb7  O DELAY CONTINUA DEPOIS"), juce::Rectangle<float> (196.0f, 882.0f, 380.0f, 9.0f), juce::Justification::centredLeft, 7.0f, 0.2f);
     engraved (g, "FORMA DA ONDA", juce::Rectangle<float> (360.0f, 848.0f, 216.0f, 12.0f), juce::Justification::centredRight, 8.5f, 0.3f);
@@ -1536,6 +1767,6 @@ void MainPage::renderBackground()
     }
 
     // gravações da seção RIDDIM
-    engraved (g, "ARRASTE PARA A TIMELINE DA DAW", juce::Rectangle<float> (606.0f, 1268.0f, 358.0f, 10.0f), juce::Justification::centred, 7.0f, 0.2f);
+    engraved (g, "ARRASTE PARA A TIMELINE DA DAW", juce::Rectangle<float> (606.0f, 1386.0f, 358.0f, 10.0f), juce::Justification::centred, 7.0f, 0.2f);
 }
 } // namespace mrmui

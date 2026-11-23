@@ -121,12 +121,12 @@ int main (int argc, char** argv)
     {
         // banco de presets: cada um aplica raiz/qualidade/duração e liga só os acordes do preset; o baixo segue
         auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts;
-        bool ok = dubpresets::numPresets == 180 && dubpresets::numFolders == 9;
+        bool ok = dubpresets::numPresets == 180 && dubpresets::numFolders == 8;
         for (int f = 0; f < dubpresets::numFolders; ++f)
         {
             int n = 0;
             for (int i = 0; i < dubpresets::numPresets; ++i) n += juce::String (dubpresets::presets[i].folder) == dubpresets::folders[f];
-            if (n != 20) { ok = false; std::printf ("pasta %s tem %d presets\n", dubpresets::folders[f], n); }
+            if (n < 10) { ok = false; std::printf ("pasta %s tem %d presets\n", dubpresets::folders[f], n); }
         }
         for (int i = 0; i < dubpresets::numPresets && ok; ++i)
         {
@@ -145,6 +145,19 @@ int main (int argc, char** argv)
                                          || ((int) get (c, "qual" + n) == dub::Min) != pr.chords[k].minor)) ok = false;
             }
             if (! ok) std::printf ("preset %d (%s) FALHOU\n", i, pr.name);
+        }
+        {   // NOVA LINHA: semente nova só na máquina pedida, a outra e o JACKPOT ficam
+            auto& d = proc.getDrums().apvts;
+            const float ds = get (d, "seed"), bs = get (b, "seed"), js = get (proc.apvts, "seed");
+            proc.newLine (MrmProcessor::Drums);
+            pump();
+            const bool drumsOk = get (d, "seed") != ds && get (b, "seed") == bs && get (proc.apvts, "seed") == js;
+            const float ds2 = get (d, "seed");
+            proc.newLine (MrmProcessor::Bass);
+            pump();
+            const bool bassOk = get (b, "seed") != bs && get (d, "seed") == ds2;
+            std::printf ("nova linha: bateria %s, baixo %s\n", drumsOk ? "ok" : "FALHOU", bassOk ? "ok" : "FALHOU");
+            ok = ok && drumsOk && bassOk;
         }
         std::printf ("presets: %s (%d presets em %d pastas)\n", ok ? "ok" : "FALHOU", dubpresets::numPresets, dubpresets::numFolders);
         return ok ? 0 : 1;

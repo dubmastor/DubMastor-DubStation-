@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Riddim Machine MRM-0420 1.7 — DubStation</title>
+<title>Mastor Riddim Machine MRM-0420 1.8 — DubStation</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -59,7 +59,7 @@ h1{margin:0;font-size:clamp(17px,3vw,28px);letter-spacing:.14em;font-weight:900;
 /* máquinas */
 .machine{display:grid;gap:10px;grid-template-columns:minmax(0,1fr);border-top:1px solid rgba(43,36,29,.18);padding:12px 0}
 .machine:first-of-type{border-top:0;padding-top:0}
-@media (min-width:900px){.machine{grid-template-columns:150px 250px minmax(0,1fr) 120px;align-items:center}}
+@media (min-width:900px){.machine{grid-template-columns:150px 250px minmax(0,1fr) 120px;align-items:center}.machine.nl{grid-template-columns:150px 250px minmax(0,1fr) 110px 120px}}
 .mname{font-weight:900;letter-spacing:.2em;font-size:17px;text-align:center}
 .mname small{display:block;font-size:9px;letter-spacing:.3em;color:var(--ink2);margin-top:2px}
 .power{display:flex;align-items:center;gap:10px;justify-content:center;background:linear-gradient(180deg,#3a3632,#141210);border-radius:6px;padding:7px 10px;color:var(--amber);font-weight:800;letter-spacing:.14em;font-size:12px;cursor:pointer;margin-top:6px;border:0;width:100%}
@@ -99,6 +99,26 @@ canvas.lane{width:100%;height:118px;border-radius:5px;background:#120d08;box-sha
 .presetsel{width:100%;margin:2px 0 10px;padding:12px;border:0;border-radius:6px;font:900 13px/1 inherit;font-family:inherit;letter-spacing:.14em;color:var(--gold);cursor:pointer;
   background:linear-gradient(180deg,#1e9c4c,#0b5a26);box-shadow:0 0 0 3px #1a1714}
 .presetsel option,.presetsel optgroup{color:#1b140c;background:#efe5cc;letter-spacing:0}
+.mpcrow{display:grid;grid-template-columns:auto minmax(0,1fr) 92px;gap:10px;align-items:stretch}
+.mpckeys{display:grid;grid-template-columns:auto 40px 40px;gap:6px 6px;align-items:center}
+.mpckeys span{font-size:10px;font-weight:900;letter-spacing:.22em;color:var(--ink)}
+.mpckeys button,.bpmstep button,.mpclist{appearance:none;border:0;border-radius:4px;cursor:pointer;color:var(--cream);height:36px;
+  background:linear-gradient(180deg,#2c2925,#141210);box-shadow:inset 0 -3px 0 rgba(74,140,240,.45),0 2px 0 #000;font-family:inherit;font-weight:900;font-size:14px;line-height:1}
+.mpckeys button:active,.bpmstep button:active,.mpclist:active{transform:translateY(1px);box-shadow:inset 0 -3px 0 rgba(74,140,240,.9),0 1px 0 #000}
+.mpclist{height:auto;font-size:13px;letter-spacing:.12em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.mpclist small{font-size:8px;opacity:.6;letter-spacing:.1em}
+.mpclcd{border:4px solid #0a0c10;border-radius:6px;padding:7px 12px;color:#e8f3ff;cursor:pointer;min-width:0;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.07) 0 1px,transparent 1px 3px),linear-gradient(180deg,#4a8cf0,#2e66cc 55%,#1d4aa8);
+  text-shadow:0 0 6px rgba(255,255,255,.35);box-shadow:0 0 0 1px rgba(255,255,255,.22),inset 0 8px 14px rgba(255,255,255,.12)}
+.mpclcd .l1{display:flex;justify-content:space-between;font-size:11px;font-weight:900;letter-spacing:.24em;opacity:.9}
+.mpclcd .l2{font-size:16px;font-weight:900;letter-spacing:.04em;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.mpclcd .l3{font-size:10px;font-weight:800;letter-spacing:.06em;opacity:.88;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bpmstep{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:6px;margin-top:10px}
+.bpmstep .mpclcd{padding:5px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;font-weight:900;letter-spacing:.08em;white-space:nowrap;overflow:hidden}
+.bpmstep .mpclcd span{overflow:hidden;text-overflow:ellipsis}
+.bpmstep .mpclcd b{font-size:13px}
+.machine .newline{border-style:solid;border-color:rgba(255,169,40,.35)}
+@media (max-width:620px){.mpcrow{grid-template-columns:minmax(0,1fr)}.mpckeys{grid-template-columns:auto 1fr 1fr}}
 .bpmsec{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 90px;gap:8px;align-items:stretch}
 .bpmbig{background:linear-gradient(180deg,#2a2016,#120e0a);border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
 .bpmbig small{font-size:9px;letter-spacing:.2em;color:var(--amber);opacity:.7;font-weight:800}
@@ -159,14 +179,13 @@ footer a{color:var(--ink)}
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">1.6</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
+  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">1.8</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
   <div class="plaque">MRM-0420</div>
   <div class="brand"><div class="flag"></div><b>DUBSTATION</b></div>
 </header>
 
 <section class="mod"><div class="tag">HARMONIA</div>
   <div class="lbl" style="margin-top:0">VALE PARA O SKANK (MRCM-1240) E PARA O BAIXO (MRBM-69)</div>
-  <div id="presets"></div>
   <div class="chords" id="chords"></div>
 </section>
 
@@ -206,12 +225,24 @@ footer a{color:var(--ink)}
   </div>
 </section>
 
+<section class="mod"><div class="tag">PRESETS · RIDDIMS POR ESTILO DE REGGAE</div>
+  <div class="mpcrow">
+    <div class="mpckeys"><span>ESTILO</span><button id="psL" aria-label="Estilo anterior">◀</button><button id="psR" aria-label="Próximo estilo">▶</button>
+      <span>MÚSICA</span><button id="pmL" aria-label="Música anterior">◀</button><button id="pmR" aria-label="Próxima música">▶</button></div>
+    <div class="mpclcd" id="plcd" title="Lista por estilo"><div class="l1"><span id="pStyle"></span><span id="pPos"></span></div><div class="l2" id="pName"></div><div class="l3" id="pInfo"></div></div>
+    <button class="mpclist" id="plist">LISTA<small>POR ESTILO ▾</small></button>
+  </div>
+  <div id="presets" style="margin-top:6px"></div>
+  <div class="lbl" style="margin-top:2px">BPM DA GRAVAÇÃO ORIGINAL (~ = ANDAMENTO TÍPICO, SEM MEDIÇÃO) · HARMONIA, BATERIA E OS MÚSICOS DE CADA MÚSICA</div>
+</section>
+
 <section class="mod"><div class="tag">BPM · DIGITE, TAP OU ESTILO</div>
   <div class="bpmsec">
     <label class="bpmbig"><small>BPM</small><input id="bpmIn" type="number" min="60" max="180" step="1" inputmode="numeric" aria-label="BPM"><small>TOQUE E DIGITE</small></label>
     <div class="bpmsteps"><button data-d="-1">−1</button><button data-d="1">+1</button><button data-d="-5">−5</button><button data-d="5">+5</button></div>
     <button class="bpmtap" id="tap">TAP<small>BATA NO TEMPO</small></button>
   </div>
+  <div class="bpmstep"><button id="bpL" aria-label="Preset de BPM anterior">◀</button><div class="mpclcd" id="bpLcd"></div><button id="bpR" aria-label="Próximo preset de BPM">▶</button></div>
   <div class="bpmkeys" id="bpmKeys"></div>
   <div class="lbl" style="margin-top:6px">PRESETS DE BPM POR ÉPOCA E ESTILO DE REGGAE · O MESMO DO PLUGIN</div>
 </section>
@@ -247,7 +278,7 @@ footer a{color:var(--ink)}
 <script src="../chords/presetmenu.js"></script>
 <script>
 'use strict';
-const VERSION = '1.7';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
+const VERSION = '1.8';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
 document.getElementById('ver').textContent = VERSION;
 const C = window.MRCM, D = window.MDDM, B = window.MRBM;
 const $ = (id) => document.getElementById(id);
@@ -271,9 +302,10 @@ const DRUMS = 0, CHORDS = 1, BASS = 2;
 const chordSlots = () => st.slots.map((s, i) => ({ root: s.root, quality: s.quality, beats: (i === 0 || s.on) ? C.DURATIONS[s.dur].beats : 0, inversion: s.inv }));
 const chordSettings = () => ({ pattern: st.pattern, centerNote: 60, velocity: Math.fround(0.8), noteSize: 0, swing: 0, bubble: false });
 const bassSlots = () => st.slots.map((s, i) => ({ root: s.root, quality: s.quality, beats: (i === 0 || s.on) ? B.DURATIONS[s.dur] : 0 }));
-const bassSettings = () => ({ style: st.bassist, seed: st.seed, density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7, strict: true });   // reggae de livro, como no plugin
+const lineSeed = (m) => (st.lineSeed && st.lineSeed[m]) || st.seed;   // NOVA LINHA: semente só desta máquina
+const bassSettings = () => ({ style: st.bassist, seed: lineSeed(BASS), density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7, strict: true });   // reggae de livro, como no plugin
 const drumSettings = () => Object.assign(D.defaults(), { style: st.style, kickMask: D.defaultKickMask(st.style), snareMask: D.defaultSnareMask(st.style),
-                                                         hatPattern: st.hat, drummer: st.drummer, seed: st.seed, bars: 4, strict: true });
+                                                         hatPattern: st.hat, drummer: st.drummer, seed: lineSeed(DRUMS), bars: 4, strict: true });
 const STYLE_NAMES = ['ROCKERS', 'ONE DROP', 'BOOM BAP'], HAT_NAMES = ['HI-HAT 1/8', 'HI-HAT 1/16', 'HI-HAT CONTRATEMPO', 'HI-HAT TERCINAS'];
 
 let drums, chords, bass;            // { events, loopBeats } de cada máquina (com as edições)
@@ -540,9 +572,18 @@ function buildMachines() {
         <button class="b nolamp undo" data-k="undo">DESFAZER EDIÇÃO</button></div>
       <div>${m.extra ? `<div class="lbl" style="margin-top:0">${m.extra.who}</div><div class="btns c3" data-k="extra" style="margin-bottom:8px">${m.extra.names.map((n, i) => `<button class="b" data-x="${i}">${n}</button>`).join('')}</div>` : ''}<div class="lbl" style="margin-top:0">${m.who}</div><div class="btns ${m.cols}" data-k="who">${m.names.map((n, i) => `<button class="b" data-w="${i}">${n}</button>`).join('')}</div></div>
       <canvas class="lane" data-k="lane"></canvas>
+      ${m.id !== CHORDS ? `<button class="drag newline" data-k="nl">↻ NOVA LINHA<small>${m.id === DRUMS ? 'OUTRA BATERIA' : 'OUTRO BAIXO'}</small></button>` : ''}
       <button class="drag" data-k="dl">⬇ BAIXAR ${m.name}<small>SÓ ESTA MÁQUINA</small></button>`;
     el.querySelector('[data-k=power]').onclick = () => { st.on[m.id] = !st.on[m.id]; save(); audio.applyMix(); drawAll(); };
     el.querySelector('[data-k=undo]').onclick = () => rebuild([m.id]);
+    if (m.id !== CHORDS) {
+      el.classList.add('nl');
+      el.querySelector('[data-k=nl]').onclick = () => {
+        st.lineSeed = st.lineSeed || {}; const cur = lineSeed(m.id); let s = cur;
+        while (s === cur) s = 1 + Math.floor(Math.random() * 999);
+        st.lineSeed[m.id] = s; save(); rebuild([m.id]);
+      };
+    }
     if (m.extra) el.querySelector('[data-k=extra]').onclick = (ev) => { const b = ev.target.closest('[data-x]'); if (!b) return; st[m.extra.key] = +b.dataset.x; save(); rebuild([m.id]); };
     el.querySelector('[data-k=who]').onclick = (ev) => { const b = ev.target.closest('[data-w]'); if (!b) return; st[m.key] = +b.dataset.w; save(); rebuild([m.id]); };
     el.querySelector('[data-k=dl]').onclick = () => download(midiFile([m.id], 1, false), `MRM-0420 ${m.name} ${chordText()}.mid`);
@@ -694,7 +735,7 @@ function download(bytes, name) {
 let spinning = false;
 function newSeed() {
   let s = st.seed; while (s === st.seed) s = 1 + Math.floor(Math.random() * 999);
-  st.seed = s; save(); spinning = true;
+  st.seed = s; st.lineSeed = {}; save(); spinning = true;
   const reels = [...$('reels').children], digits = String(s).padStart(3, '0'), t0 = performance.now();
   (function spin() {
     const t = performance.now() - t0; let done = true;
@@ -712,14 +753,44 @@ function applyPreset(p) {
   st.riddim = window.DUB_PRESETS.presets.indexOf(p);
   if (p.bpm) { st.bpm = p.bpm; st.style = p.kit; st.drummer = p.drummer; st.bassist = p.bassist; audio.setBpm(); }
 }
-(function presets() {   // pasta > letras > música (passe o mouse ou toque)
-  const KITS = ['ROCKERS', 'ONE DROP'];
-  presetMenu($('presets'), {
-    label: 'PRESETS ▾  180 riddims clássicos: harmonia, BPM e músicos',
-    itemText: (p) => `${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')} · ${p.bpm} BPM ${KITS[p.kit]} · ${MACHINES[0].names[p.drummer]} + ${String(B.styleNames[p.bassist]).toUpperCase()}`,
+const KITS = ['ROCKERS', 'ONE DROP'];
+const P = window.DUB_PRESETS;
+const songsOf = (f) => P.menuOrder.filter((i) => P.presets[i].folder === P.folders[f]);
+let styleSel = 0;
+const bpmText = (p) => (p.bpmReal ? '' : '~') + p.bpm + ' BPM';
+function drawPresetLcd() {
+  const cur = st.riddim >= 0 && P.presets[st.riddim] ? st.riddim : -1;
+  if (cur >= 0) styleSel = P.folders.indexOf(P.presets[cur].folder);
+  const songs = songsOf(styleSel);
+  $('pStyle').textContent = P.folders[styleSel];
+  if (cur >= 0) {
+    const p = P.presets[cur];
+    $('pPos').textContent = String(songs.indexOf(cur) + 1).padStart(2, '0') + '/' + String(songs.length).padStart(2, '0');
+    $('pName').textContent = p.name;
+    $('pInfo').textContent = `${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')} · ${p.bpmReal ? p.bpm + ' BPM ORIGINAL' : '~' + p.bpm + ' BPM'} · ${KITS[p.kit]} · ${MACHINES[0].names[p.drummer]} + ${String(B.styleNames[p.bassist]).toUpperCase()}`;
+  } else {
+    $('pPos').textContent = ''; $('pName').textContent = 'ESCOLHA UM RIDDIM ◀ ▶';
+    $('pInfo').textContent = 'HARMONIA, BPM ORIGINAL, BATERIA E OS MÚSICOS DE CADA MÚSICA';
+  }
+}
+function pickPreset(i) { applyPreset(P.presets[i]); save(); rebuild(); showLuck(true); drawPresetLcd(); }
+(function presets() {   // visor azul de MPC: estilo e música com ◀ ▶; LISTA abre estilo > música
+  const menu = presetMenu($('presets'), {
+    label: 'PRESETS ▾',
+    itemText: (p) => `${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')} · ${bpmText(p)} ${KITS[p.kit]} · ${MACHINES[0].names[p.drummer]} + ${String(B.styleNames[p.bassist]).toUpperCase()}`,
     current: () => st.riddim,
-    onPick: (p) => { applyPreset(p); save(); rebuild(); showLuck(true); },
+    onPick: (p, i) => pickPreset(i),
   });
+  $('presets').querySelector('.pbtn').style.display = 'none';
+  const list = (e) => { e.stopPropagation(); menu.open(); };
+  $('plist').onclick = list; $('plcd').onclick = list;
+  const stepStyle = (d) => { const cur = st.riddim >= 0 ? P.folders.indexOf(P.presets[st.riddim].folder) : styleSel;
+    styleSel = (cur + d + P.folders.length) % P.folders.length; pickPreset(songsOf(styleSel)[0]); };
+  const stepSong = (d) => { const songs = songsOf(styleSel), pos = songs.indexOf(st.riddim), n = songs.length;
+    pickPreset(songs[pos < 0 ? (d > 0 ? 0 : n - 1) : (pos + d + n) % n]); };
+  $('psL').onclick = () => stepStyle(-1); $('psR').onclick = () => stepStyle(1);
+  $('pmL').onclick = () => stepSong(-1); $('pmR').onclick = () => stepSong(1);
+  drawPresetLcd();
 })();
 
 // BPM POR ÉPOCA E ESTILO (mesma tabela do plugin: RiddimMachine/Source/BpmPresets.h)
@@ -740,10 +811,22 @@ function setBpm(v, chosen = -1) {
   st.bpm = Math.max(60, Math.min(180, v)); bpmChosen = chosen; $('bpmStyle').value = '';
   save(); audio.setBpm(); drawAll();
 }
+function drawBpmLcd() {
+  const l = $('bpLcd'); if (!l) return;
+  if (bpmChosen >= 0) { const [style, name, bpm] = BPM_PRESETS[bpmChosen];
+    l.innerHTML = `<span>${String(bpmChosen + 1).padStart(2, '0')} ${style} · ${name.toUpperCase()}</span><b>${bpm} BPM</b>`; }
+  else l.innerHTML = `<span>PRESET DE BPM · ◀ ▶</span><b>${st.bpm} BPM</b>`;
+}
+function stepBpmPreset(d) {
+  let i = bpmChosen;
+  if (i < 0) { let best = 0; BPM_PRESETS.forEach((p, k) => { if (Math.abs(p[2] - st.bpm) < Math.abs(BPM_PRESETS[best][2] - st.bpm)) best = k; }); i = d > 0 ? best - 1 : best + 1; }
+  i = (i + d + BPM_PRESETS.length) % BPM_PRESETS.length; setBpm(BPM_PRESETS[i][2], i);
+}
 function drawBpm() {
   if (document.activeElement !== $('bpmIn')) $('bpmIn').value = st.bpm;
   if (bpmChosen >= 0 && BPM_PRESETS[bpmChosen][2] !== st.bpm) bpmChosen = -1;
   document.querySelectorAll('#bpmKeys button').forEach((b, i) => b.classList.toggle('on', i === bpmChosen));
+  drawBpmLcd();
 }
 (function bpmStyles() {
   const sel = $('bpmStyle'), groups = {}, keys = $('bpmKeys');
@@ -754,6 +837,7 @@ function drawBpm() {
     k.onclick = () => setBpm(bpm, i); keys.appendChild(k);
   });
   sel.onchange = () => { const i = +sel.value, p = BPM_PRESETS[i]; if (!p) return; setBpm(p[2], i); };
+  $('bpL').onclick = () => stepBpmPreset(-1); $('bpR').onclick = () => stepBpmPreset(1);
   const inp = $('bpmIn');
   inp.onchange = () => setBpm(inp.value);
   inp.onkeydown = (e) => { if (e.key === 'Enter') inp.blur(); };
@@ -778,6 +862,7 @@ function randomRiddim() {
   newSeed(); rebuild(); showLuck(true);
 }
 function showLuck(flash) {
+  if (typeof drawPresetLcd === 'function' && $('pName')) try { drawPresetLcd(); } catch (e) {}
   const l = $('luck');
   const rp = window.DUB_PRESETS.presets[st.riddim];
   l.innerHTML = (rp ? `RIDDIM <b>${rp.name}</b> · <b>${st.bpm} BPM</b> · ` : '') + `HARMONIA <b>${chordSlots().filter((x) => x.beats > 0).map(C.chordLabel).join(' - ')}</b> · BATERIA <b>${STYLE_NAMES[st.style]}</b> · <b>${HAT_NAMES[st.hat]}</b> · BATERISTA <b>${MACHINES[0].names[st.drummer]}</b> · BAIXISTA <b>${String(B.styleNames[st.bassist]).toUpperCase()}</b> · SEMENTE <b>${st.seed}</b>`;

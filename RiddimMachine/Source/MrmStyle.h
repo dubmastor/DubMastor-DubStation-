@@ -235,4 +235,58 @@ inline void brassPlate (juce::Graphics& g, juce::Rectangle<float> pl, const juce
     g.setColour (juce::Colour (0xff2a1d06));
     g.drawText (t, inner, juce::Justification::centred);
 }
+
+// visor azul de MPC (LCD com luz de fundo azul e texto claro), para escolher presets
+namespace mpc
+{
+    const juce::Colour light { 0xffe8f3ff };
+    inline void lcd (juce::Graphics& g, juce::Rectangle<float> r)
+    {
+        g.setColour (juce::Colour (0xff0a0c10));
+        g.fillRoundedRectangle (r.expanded (4.0f), 5.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.25f));
+        g.drawRoundedRectangle (r.expanded (4.0f).translated (0, 1.0f), 5.0f, 1.0f);
+        juce::ColourGradient gl (juce::Colour (0xff4a8cf0), r.getX(), r.getY(), juce::Colour (0xff1d4aa8), r.getX(), r.getBottom(), false);
+        gl.addColour (0.55, juce::Colour (0xff2e66cc));
+        g.setGradientFill (gl);
+        g.fillRoundedRectangle (r, 3.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.07f));          // grade de pixels do LCD
+        for (float y = r.getY() + 2.0f; y < r.getBottom() - 1.0f; y += 3.0f)
+            g.drawHorizontalLine ((int) y, r.getX() + 2.0f, r.getRight() - 2.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.35f));          // sombra interna em cima
+        g.drawRoundedRectangle (r.reduced (0.5f), 3.0f, 1.0f);
+    }
+    inline void shine (juce::Graphics& g, juce::Rectangle<float> r)
+    {
+        juce::ColourGradient sh (juce::Colours::white.withAlpha (0.16f), r.getX(), r.getY(),
+                                 juce::Colours::transparentWhite, r.getX(), r.getY() + r.getHeight() * 0.45f, false);
+        g.setGradientFill (sh);
+        g.fillRoundedRectangle (r, 3.0f);
+    }
+    inline void text (juce::Graphics& g, const juce::String& t, juce::Rectangle<float> r, juce::Justification j,
+                      float size, float alpha = 1.0f, float kerning = 0.08f)
+    {
+        g.setFont (stencil (size, kerning));
+        g.setColour (juce::Colours::white.withAlpha (0.22f * alpha));
+        for (auto o : { juce::Point<float> (-0.8f, 0), { 0.8f, 0 }, { 0, -0.8f }, { 0, 0.8f } })
+            g.drawText (t, r.translated (o.x, o.y), j, true);
+        g.setColour (light.withAlpha (alpha));
+        g.drawText (t, r, j, true);
+    }
+    // tecla preta com seta (◀ ▶) ao lado do visor
+    inline void key (juce::Graphics& g, juce::Rectangle<float> r, const juce::String& t, bool down, float size = 14.0f)
+    {
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.fillRoundedRectangle (r.translated (0, 2.0f), 3.0f);
+        auto cap = r.translated (0, down ? 1.5f : 0.0f);
+        juce::ColourGradient cg (juce::Colour (0xff2c2925), cap.getX(), cap.getY(), juce::Colour (0xff141210), cap.getX(), cap.getBottom(), false);
+        g.setGradientFill (cg);
+        g.fillRoundedRectangle (cap, 3.0f);
+        g.setColour (juce::Colour (0xff4a8cf0).withAlpha (down ? 0.9f : 0.35f));
+        g.fillRoundedRectangle (cap.withTop (cap.getBottom() - 3.0f).reduced (5.0f, 0.0f).translated (0, -1.5f), 1.0f);
+        g.setColour (col::cream);
+        g.setFont (stencil (size, 0.05f));
+        g.drawText (t, cap.withTrimmedBottom (3.0f), juce::Justification::centred);
+    }
+}
 } // namespace mrmui

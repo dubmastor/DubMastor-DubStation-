@@ -1,3 +1,13 @@
+## Mastor Reggae Chord Machine MRCM-1240 2.2 🟢🟡⚫
+
+- **PRESETS separados só por estilo de reggae:** EARLY REGGAE, ROOTS, ROCKERS, LOVERS ROCK, RUB A DUB, DIGITAL, DANCEHALL e NEW ROOTS (sem a década no nome; o Gregory Isaacs entra no estilo de cada fase), músicas em ordem alfabética
+- **BPM original** de 99 músicas no banco (usado pelo MRM-0420); as outras ficam com o andamento típico do estilo
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Chord Machine MRCM-1240 2.1 🟢🟡⚫
 
 - **PRESETS com subdivisões:** cada pasta de estilo e época agora se divide por **letras** (A - G, H - L...), 5 músicas em cada grupo, em ordem alfabética; abre passando o mouse ou clicando e marca a pasta e o grupo do preset atual

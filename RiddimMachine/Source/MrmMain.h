@@ -111,7 +111,8 @@ private:
     void timerCallback() override;
     void openEntry();
     void commitEntry();
-    juce::Rectangle<int> display, steps[4], tapKey, keyArea (int i) const;
+    juce::Rectangle<int> display, steps[4], tapKey, stepL, stepR, presetLcd, keyArea (int i) const;
+    void stepPreset (int delta);
     MrmProcessor& proc;
     juce::ParameterAttachment att;
     juce::TextEditor entry;
@@ -121,6 +122,44 @@ private:
     double dawBpm = 0.0;
     std::vector<double> taps;
     double tapFlash = 0.0;
+};
+
+// PRESETS no visor azul de MPC: estilo de reggae e música com as teclas ◀ ▶ (carrega na hora, como os presets
+// do Dub Battery Reggae); clique no visor para a lista por estilo
+class RiddimPresetPanel : public juce::Component, private juce::Timer
+{
+public:
+    explicit RiddimPresetPanel (MrmProcessor&);
+    void paint (juce::Graphics&) override;
+    void resized() override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void stepStyle (int delta);
+    void stepSong (int delta);
+    void showList();
+private:
+    void timerCallback() override;
+    int current() const;
+    juce::Array<int> songsOf (int style) const;
+    int styleOf (int preset) const;
+    MrmProcessor& proc;
+    juce::Rectangle<int> lcd, keys[4], listKey;     // ◀ ▶ estilo, ◀ ▶ música
+    int pressed = -1, shown = -2, styleSel = 0;
+};
+
+// NOVA LINHA: outra sugestão só para a bateria ou só para o baixo (semente própria da máquina)
+class NewLineKey : public juce::Component
+{
+public:
+    NewLineKey (MrmProcessor& p, int m) : proc (p), machine (m) { setMouseCursor (juce::MouseCursor::PointingHandCursor); }
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override { down = true; repaint(); }
+    void mouseUp (const juce::MouseEvent&) override;
+    bool dimmed = false;
+private:
+    MrmProcessor& proc;
+    int machine;
+    bool down = false;
 };
 
 // Arraste para a timeline: uma máquina só (machine >= 0) ou o riddim inteiro (machine = -1)
@@ -268,7 +307,7 @@ private:
 class MainPage : public juce::Component, private juce::Timer
 {
 public:
-    static constexpr int kW = 1280, kH = 1298;
+    static constexpr int kW = 1280, kH = 1416;
     explicit MainPage (MrmProcessor&);
     ~MainPage() override;
     void paint (juce::Graphics&) override;
@@ -334,11 +373,13 @@ private:
     std::array<std::unique_ptr<BigDial>, 6> sirenDials;                 // PITCH, RATE, DEPTH, DELAY, REPEATS, LEVEL
     std::unique_ptr<MuteKey> muteDrums, muteBass, muteRiddim;
     BpmPanel bpmPanel;
+    RiddimPresetPanel presetPanel;
+    std::unique_ptr<NewLineKey> newDrums, newBass;
     GrilleSpeaker speaker;
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;
-    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection, sirenSection, bpmBox;
+    juce::Rectangle<int> woodL, woodR, plate, harmonySection, machineSection, jackpotSection, riddimSection, speakerArea, knobSection, sirenSection, bpmBox, presetBox;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPage)
 };

@@ -1219,33 +1219,29 @@ void DubChordsPanel::resized()
 }
 
 //==============================================================================
-// PRESETS: um submenu por estilo, com a década e os acordes de cada preset
+// PRESETS: um submenu por estilo de reggae, com a década e os acordes de cada preset
 void DubChordsPanel::showPresets()
 {
     juce::PopupMenu menu;
     menu.addSectionHeader (juce::String::fromUTF8 ("HARMONIAS CLÁSSICAS DO REGGAE"));
-    // pasta (estilo e época) > letras (A - G...) > música: abre passando o mouse ou clicando
+    // estilo de reggae > música (abre passando o mouse ou clicando)
     for (int f = 0; f < dubpresets::numFolders; ++f)
     {
-        juce::PopupMenu folderMenu, sub;
-        juce::String group;
+        juce::PopupMenu sub;
         int count = 0;
-        bool folderTicked = false, groupTicked = false;
-        auto flush = [&] { if (group.isNotEmpty()) folderMenu.addSubMenu (juce::String::fromUTF8 ("MÚSICAS  ") + group, sub, true, nullptr, groupTicked); sub = {}; groupTicked = false; };
+        bool ticked = false;
         for (int i : dubpresets::menuOrder)
         {
             const auto& pr = dubpresets::presets[i];
             if (juce::String (pr.folder) != dubpresets::folders[f]) continue;
-            if (group != pr.group) { flush(); group = pr.group; }
             juce::StringArray ch;
             for (int k = 0; k < pr.numChords; ++k)
                 ch.add (juce::String (dub::rootName (pr.chords[k].root)) + (pr.chords[k].minor ? "m" : ""));
             const bool tick = proc.getLastPreset() == i;
-            groupTicked = groupTicked || tick; folderTicked = folderTicked || tick; ++count;
+            ticked = ticked || tick; ++count;
             sub.addItem (i + 1, juce::String::fromUTF8 (pr.name) + "   (" + pr.era + ")   " + ch.joinIntoString (" - "), true, tick);
         }
-        flush();
-        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (count) + ")", folderMenu, true, nullptr, folderTicked);
+        menu.addSubMenu (juce::String (dubpresets::folders[f]) + "   (" + juce::String (count) + ")", sub, true, nullptr, ticked);
     }
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presetBtn),
                         [this] (int r) { if (r > 0) { proc.applyPreset (r - 1); repaint(); } });

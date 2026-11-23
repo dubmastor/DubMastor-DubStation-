@@ -6,7 +6,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 # Mastor Riddim Machine MRM-0420 (DubStation): MRDM-12 + MRCM-1240 + MRBM-69 + Mastor Big Knob num só instrumento
 # Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-project(MastorRiddimMachine VERSION 1.7.0)
+project(MastorRiddimMachine VERSION 1.8.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

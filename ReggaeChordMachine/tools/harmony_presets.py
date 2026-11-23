@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Banco de RIDDIMS (PRESETS) da DubStation (MRCM-1240 e MRM-0420): 9 pastas por estilo e época, 20 músicas cada.
+"""Banco de RIDDIMS (PRESETS) da DubStation (MRCM-1240 e MRM-0420): 180 músicas em 8 estilos de reggae.
 
 Fonte única: gera Source/HarmonyPresets.h (plugins) e ../site/chords/presets.js (versões do navegador).
 Uso: python3 tools/harmony_presets.py   (rodar na pasta ReggaeChordMachine)
@@ -12,7 +12,7 @@ Sétimas viram tríades (o MRCM-1240 toca tríades); quando a música tem mais p
 
 Fontes (nov/2026): cifras feitas por pessoas (Ultimate Guitar, E-Chords, GuitarTabs.cc, GuitarTabsExplorer,
 Ukulele-Tabs, Recifra) e, onde marcado [auto], detecção automática (ChordU/ChordIntel), que vale conferir de ouvido.
-O BPM é o andamento típico do estilo e da época, não uma medição de cada gravação.
+O BPM é o da gravação original quando está em REAL_BPM; nos outros, o andamento típico do estilo e da época.
 """
 import json, os
 
@@ -255,25 +255,76 @@ for f in FOLDERS:
     assert sum(1 for b in BANK if b[0] == f) == 20, f
 assert len({b[2] for b in BANK}) == len(BANK), 'nome repetido'
 
-presets = [dict(folder=f, era=e, name=n, chords=parse(s), **riddim(f, o)) for f, e, n, s, o in BANK]
+# BPM REAL de cada gravação (nov/2026, SongBPM / GetSongBPM / Tunebat / ChordU), contado como a bateria do MRDM-12
+# conta (caixa no 2 e no 4): os sites dão o reggae no dobro (ex.: Israelites 146) e aqui fica a metade (73).
+# Quem não está aqui não tem medição confiável: fica o andamento típico do estilo e da época (o menu mostra "~").
+REAL_BPM = {
+    'Israelites (Desmond Dekker 1968)': 73, "54-46 That's My Number (Toots 1968)": 79, 'Monkey Man (Toots 1969)': 64,
+    'Duppy Conqueror (Wailers 1970)': 89, 'You Can Get It (Jimmy Cliff 1970)': 64, 'The Harder They Come (Jimmy Cliff 1972)': 104,
+    'Rivers of Babylon (Melodians 1970)': 107, '007 Shanty Town (Desmond Dekker 1967)': 97, 'The Tide Is High (Paragons 1967)': 98,
+    'Let Your Yeah Be Yeah (Pioneers 1971)': 65, 'I Can See Clearly Now (Johnny Nash 1972)': 61,
+    'Satta Massagana (Abyssinians 1969)': 77, 'Pressure Drop (Toots 1969)': 73, 'Marcus Garvey (Burning Spear 1975)': 92,
+    'Police and Thieves (Junior Murvin 1976)': 64, 'Natural Mystic (Bob Marley 1977)': 66, 'Exodus (Bob Marley 1977)': 67,
+    'Jamming (Bob Marley 1977)': 62, 'One Love (Bob Marley 1977)': 77, 'Roots (Bob Marley 1977)': 65,
+    'Stir It Up (Bob Marley 1973)': 74, 'I Shot the Sheriff (Bob Marley 1973)': 97, 'Get Up Stand Up (Bob Marley 1973)': 74,
+    'Concrete Jungle (Bob Marley 1973)': 96, 'Lively Up Yourself (Bob Marley 1973)': 65, 'Kinky Reggae (Bob Marley 1973)': 70,
+    'Them Belly Full (Bob Marley 1974)': 70, 'Chase the Devil (Max Romeo 1976)': 75, 'One Step Forward (Max Romeo 1976)': 71,
+    'Legalize It (Peter Tosh 1976)': 73, 'Uptown Top Ranking (Althea & Donna 1977)': 81, 'Now That We Found Love (Third World 1978)': 119,
+    'Money in My Pocket (Dennis Brown 1979)': 69, 'One Drop (Bob Marley 1979)': 61, 'Could You Be Loved (Bob Marley 1980)': 104,
+    'Buffalo Soldier (Bob Marley 1983)': 65, 'Three Little Birds (Bob Marley 1977)': 74, 'Equal Rights (Peter Tosh 1977)': 76,
+    "Steppin' Razor (Peter Tosh 1977)": 64, 'Downpressor Man (Peter Tosh 1977)': 75,
+    'Shine Eye Gal (Black Uhuru 1979)': 69, 'Sensimilla (Barrington Levy 1980)': 76, 'Fire House Rock (Wailing Souls 1981)': 65,
+    'Bam Bam (Sister Nancy 1982)': 83, 'Here I Come (Barrington Levy 1984)': 85, 'Peeni Walli (Eek-A-Mouse 1984) [auto]': 73,
+    'Wa-Do-Dem (Eek-A-Mouse 1981) [auto]': 77, 'The Mouse and the Man (Eek-A-Mouse 1983) [auto]': 78,
+    'Zungguzungguguzungguzeng (Yellowman 1983) [auto]': 82,
+    'My Number One (Gregory Isaacs)': 79, 'Night Nurse (Gregory Isaacs 1982)': 74, 'Cool Down the Pace (Gregory Isaacs 1982)': 76,
+    'Under Mi Sleng Teng (Wayne Smith 1985) [auto]': 82, 'Ring the Alarm (Tenor Saw 1985)': 86, 'Boops (Super Cat 1986) [auto]': 80,
+    'Ting-A-Ling (Shabba Ranks 1990) [auto]': 63,
+    'Many Rivers to Cross (Jimmy Cliff 1969)': 69, 'Help Me Make It Through the Night (John Holt 1974)': 79,
+    'Waiting in Vain (Bob Marley 1977)': 79, 'Is This Love (Bob Marley 1978)': 61, 'Red Red Wine (UB40 1983)': 89,
+    'Wild World (Maxi Priest 1988)': 84, 'Kingston Town (UB40 1989)': 102, 'Tempted to Touch (Beres Hammond 1990)': 82,
+    'Close to You (Maxi Priest 1990)': 96, 'Everything I Own (Ken Boothe 1974)': 77, 'Silly Games (Janet Kay 1979)': 61,
+    'Good Thing Going (Sugar Minott 1981)': 78, 'I Wanna Wake Up With You (Boris Gardiner 1986)': 82, 'Here I Am (UB40 1990)': 93,
+    "Can't Help Falling in Love (UB40 1993)": 87,
+    'Mr. Loverman (Shabba Ranks 1992)': 87, 'Informer (Snow 1992)': 98, 'Here Comes the Hotstepper (Ini Kamoze 1994)': 125,
+    "You Don't Love Me (Dawn Penn 1994)": 74, 'Boombastic (Shaggy 1995)': 80, 'Under Mi Sensi (Barrington Levy 1985)': 76,
+    "It Wasn't Me (Shaggy 2000)": 95, 'Get Busy (Sean Paul 2003)': 100, 'Temperature (Sean Paul 2005)': 125,
+    'Murder She Wrote (Chaka Demus & Pliers 1992) [auto]': 95, 'Bam Bam (Chaka Demus & Pliers 1992) [auto]': 95,
+    'Tease Me (Chaka Demus & Pliers 1993) [auto]': 68, 'Bad Boys (Inner Circle 1993)': 87, "It's Me Again Jah (Luciano 1994) [auto]": 77,
+    'Wanna Be Loved (Buju Banton 1995) [auto]': 73, 'Angel (Shaggy 2000)': 85,
+    'Welcome to Jamrock (Damian Marley 2005)': 77, 'Ganja Farmer (Marlon Asher 2005)': 80, "She's Royal (Tarrus Riley 2006)": 79,
+    'Herbalist (Alborosie 2008)': 71, 'Kingston Town (Alborosie 2008)': 74, 'Smile Jamaica (Chronixx 2014)': 74,
+    "Don't Haffi Dread (Morgan Heritage 1999)": 76, "Can't Satisfy Her (I Wayne 2004) [auto]": 86,
+    'Youths Dem Cold (Richie Spice 2006) [auto]': 81, 'Longing For (Jah Cure 2006) [auto]': 84, 'Who Knows (Protoje 2014)': 81,
+    "Skankin' Sweet (Chronixx 2017) [auto]": 78,
+}
+unknown = set(REAL_BPM) - {b[2] for b in BANK}
+assert not unknown, unknown
 
-# subdivisões de cada pasta: o menu fica pasta > letras > música (ordem alfabética, 4 grupos de 5, ex.: "A - F").
-# A ordem do banco não muda (o índice do preset fica salvo nos projetos); cada preset só ganha o grupo.
-def initial(p):
-    c = p['name'].upper().lstrip("'")[0]
-    return c if c.isalpha() else '#'
-menu_order = []   # índices na ordem do menu (pasta, letras, nome)
-for f in FOLDERS:
-    items = sorted([p for p in presets if p['folder'] == f], key=lambda p: (initial(p) != '#', p['name'].upper()))
-    for g in range(0, len(items), 5):
-        chunk = items[g:g + 5]
-        a, z = initial(chunk[0]), initial(chunk[-1])
-        label = a if a == z else f'{a} - {z}'
-        for p in chunk: p['group'] = label
+# PASTAS SÓ POR ESTILO DE REGGAE (sem década no nome). O Gregory Isaacs entra no estilo de cada fase:
+# anos 70 no LOVERS ROCK, anos 80 (Roots Radics) no RUB A DUB, Babylon Too Rough no ROOTS.
+STYLE = { EAR: 'EARLY REGGAE', R70: 'ROOTS', RK: 'ROCKERS', RD: 'RUB A DUB', DG: 'DIGITAL', LR: 'LOVERS ROCK',
+          DH: 'DANCEHALL', NR: 'NEW ROOTS' }
+STYLES = ['EARLY REGGAE', 'ROOTS', 'ROCKERS', 'LOVERS ROCK', 'RUB A DUB', 'DIGITAL', 'DANCEHALL', 'NEW ROOTS']
+def style_of(f, era, name):
+    if f != GI: return STYLE[f]
+    if name.startswith('Babylon Too Rough'): return 'ROOTS'
+    return 'LOVERS ROCK' if era == '70s' else 'RUB A DUB'
+
+presets = []
+for f, e, n, s, o in BANK:
+    r = riddim(f, o)                     # BPM e músicos do jeito que foram escolhidos
+    real = n in REAL_BPM
+    if real: r['bpm'] = REAL_BPM[n]
+    presets.append(dict(folder=style_of(f, e, n), era=e, name=n, chords=parse(s), bpmReal=int(real), **r))
+
+menu_order = []   # ordem do menu: estilo > nome (alfabética); a ordem do banco não muda (o índice fica salvo nos projetos)
+for st in STYLES:
+    items = sorted([p for p in presets if p['folder'] == st], key=lambda p: p['name'].upper().lstrip("'"))
+    assert len(items) >= 10, st
     menu_order += [presets.index(p) for p in items]
-    labels = [p['group'] for p in items]
-    assert len(set(labels)) == len(labels) // 5, (f, labels)
-folders = FOLDERS
+assert len(menu_order) == len(presets)
+folders = STYLES
 
 here = os.path.dirname(os.path.abspath(__file__))
 h = ['// Gerado por tools/harmony_presets.py — não editar à mão.',
@@ -282,16 +333,16 @@ h = ['// Gerado por tools/harmony_presets.py — não editar à mão.',
      'struct Chord { int root; int minor; int dur; };   // tônica 0..11 (C = 0), 1 = menor, duração 0..5 (1/2, 1, 2, 3, 4, 8 comp.)',
      '// bpm sugerido, kit (0 ROCKERS, 1 ONE DROP), baterista do MRDM-12 (0 STYLE SCOTT, 1 SANTA DAVIS, 2 CARLTON BARRETT, 3 SLY DUNBAR, 4 DIGIKAL),',
      '// baixista do MRBM-69 (0 FAMILY MAN, 1 FLABBA, 2 DERRICK BARNETT, 3 ROBBIE, 4 LEROY SIBBLES, 5 FULLY FULLWOOD, 6 JAMMYS)',
-     '// group: subdivisão da pasta no menu (período), na ordem do ano da gravação',
-     'struct Preset { const char* folder; const char* era; const char* name; int numChords; Chord chords[4]; int bpm, kit, drummer, bassist; const char* group; };', '',
+     '// bpmReal: 1 = BPM medido da gravação original, 0 = andamento típico do estilo e da época',
+     'struct Preset { const char* folder; const char* era; const char* name; int numChords; Chord chords[4]; int bpm, kit, drummer, bassist, bpmReal; };', '',
      f'inline constexpr int numFolders = {len(folders)};',
      'inline const char* const folders[numFolders] = { ' + ', '.join(json.dumps(f) for f in folders) + ' };', '',
      f'inline constexpr int numPresets = {len(presets)};',
      'inline const Preset presets[numPresets] = {']
 for p in presets:
     ch = ', '.join(f'{{ {r}, {m}, {d} }}' for r, m, d in p['chords'])
-    h.append(f'    {{ {json.dumps(p["folder"])}, {json.dumps(p["era"])}, {json.dumps(p["name"], ensure_ascii=False)}, {len(p["chords"])}, {{ {ch} }}, {p["bpm"]}, {p["kit"]}, {p["drummer"]}, {p["bassist"]}, {json.dumps(p["group"])} }},')
-h += ['};', '', '// ordem do menu: pasta > letras > música (nome em ordem alfabética)',
+    h.append(f'    {{ {json.dumps(p["folder"])}, {json.dumps(p["era"])}, {json.dumps(p["name"], ensure_ascii=False)}, {len(p["chords"])}, {{ {ch} }}, {p["bpm"]}, {p["kit"]}, {p["drummer"]}, {p["bassist"]}, {p["bpmReal"]} }},')
+h += ['};', '', '// ordem do menu: estilo > música (nome em ordem alfabética)',
       'inline const int menuOrder[numPresets] = { ' + ', '.join(str(i) for i in menu_order) + ' };', '}', '']
 open(os.path.join(here, '..', 'Source', 'HarmonyPresets.h'), 'w', encoding='utf-8').write('\n'.join(h))
 
@@ -300,7 +351,7 @@ js = ('// Gerado por ReggaeChordMachine/tools/harmony_presets.py — não editar
       '(function (root) {\n  root.DUB_PRESETS = ' +
       json.dumps({'folders': folders, 'menuOrder': menu_order, 'presets': [{'folder': p['folder'], 'era': p['era'], 'name': p['name'],
                   'chords': [{'root': r, 'quality': m, 'dur': d} for r, m, d in p['chords']],
-                  'bpm': p['bpm'], 'kit': p['kit'], 'drummer': p['drummer'], 'bassist': p['bassist'], 'group': p['group']} for p in presets]},
+                  'bpm': p['bpm'], 'kit': p['kit'], 'drummer': p['drummer'], 'bassist': p['bassist'], 'bpmReal': p['bpmReal']} for p in presets]},
                  ensure_ascii=False, indent=1) + ';\n})(typeof window !== "undefined" ? window : globalThis);\n')
 open(os.path.join(here, '..', '..', 'site', 'chords', 'presets.js'), 'w', encoding='utf-8').write(js)
 print('ok', len(presets), 'presets em', len(folders), 'pastas')
