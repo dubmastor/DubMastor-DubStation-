@@ -1,4 +1,5 @@
 #include "MrmProcessor.h"
+#include "../../RiddimBank/Source/RiddimBank.h"
 #include "MrmEditor.h"
 
 namespace
@@ -476,12 +477,36 @@ void MrmProcessor::applyRiddimPreset (int index)
     syncLinks();       // o baixo e a bateria recebem harmonia e BPM novos agora
 }
 
-// ALAVANCA do JACKPOT: um riddim novo inteiro, sempre reggae. Sorteia uma das músicas do banco de RIDDIMS
-// (harmonia, BPM e os músicos certos dela), o hi-hat e a semente. Tudo aparece na tela; é só apertar PLAY.
+// BANCO ÚNICO DE RIDDIMS: a música inteira (harmonia conferida, BPM, kit, baterista e baixista mais próximos
+// de quem gravou) nas três máquinas de uma vez. Caixa na batida principal, como nos presets.
+void MrmProcessor::applyBankRiddim (int index)
+{
+    if (index < 0 || index >= riddimbank::numEntries || riddimbank::entries[index].numChords <= 0) return;
+    const auto& e = riddimbank::entries[index];
+    chords.applyBankEntry (index);
+    setRiddimParam (apvts, "bpm", (float) e.bpm);
+    setRiddimParam (drums.apvts, "style", (float) e.kit);
+    drums.applyStyleDefaults (e.kit);
+    setRiddimParam (drums.apvts, "drummer", (float) e.drummer);
+    setRiddimParam (drums.apvts, "backbeat", 0.0f);   // caixa na batida principal
+    setRiddimParam (drums.apvts, "fill", 0.0f);
+    setRiddimParam (bass.apvts, "style", (float) e.bassStyle);
+    setRiddimParam (bass.apvts, "timbre", (float) e.timbre);   // timbre da época: ROOTS, SUPER TONE (digital e ragga) ou 808 (dancehall)
+    syncLinks();       // o baixo e a bateria recebem harmonia e BPM novos agora
+}
+
+int MrmProcessor::currentBankRiddim() const { return chords.getBankEntry(); }
+
+// ALAVANCA do JACKPOT: um riddim novo inteiro, sempre reggae. Sorteia uma música do BANCO ÚNICO com harmonia
+// e kit de reggae (ROCKERS ou ONE DROP: caixa no 2 e no 4), o hi-hat e a semente. Tudo aparece na tela; é só apertar PLAY.
 void MrmProcessor::randomRiddim()
 {
     juce::Random rng;
-    applyRiddimPreset (rng.nextInt (dubpresets::numPresets));
+    juce::Array<int> pool;
+    for (int i = 0; i < riddimbank::numEntries; ++i)
+        if (riddimbank::entries[i].numChords > 0 && riddimbank::entries[i].kit <= 1) pool.add (i);
+    if (pool.isEmpty()) applyRiddimPreset (rng.nextInt (dubpresets::numPresets));
+    else applyBankRiddim (pool[rng.nextInt (pool.size())]);
     setRiddimParam (drums.apvts, "hatPattern", (float) rng.nextInt (3));   // colcheia, semicolcheia ou contratempo
     newRiddim();       // a semente nova gira os rolos do JACKPOT
 }

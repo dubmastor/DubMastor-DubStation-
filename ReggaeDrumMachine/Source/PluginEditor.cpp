@@ -1,6 +1,7 @@
 // Interface do Mastor Reggae Drum Machine MRDM-12 (antigo Dub Drums) — visual copiado do DubMastor Dub Chords
 #include "PluginEditor.h"
 #include "GroovePresets.h"
+#include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 #ifndef DD_VERSION_SHORT
  #define DD_VERSION_SHORT "1.0"
@@ -2096,7 +2097,7 @@ juce::Rectangle<float> GrooveSelector::lcdRect() const
 void GrooveSelector::timerCallback()
 {
     const juce::String key = juce::String (drummer()) + ":" + juce::String (proc.getGroove()) + ":" + (proc.grooveIntact() ? "1" : "0")
-                            + ":" + proc.apvts.state.getProperty ("grooveView", 0).toString();
+                            + ":" + proc.apvts.state.getProperty ("grooveView", 0).toString() + ":" + juce::String (proc.getBankEntry()) + ":" + juce::String (riddimbank::creditPhase());
     if (key != shownKey) { shownKey = key; repaint(); if (auto* parent = getParentComponent()) parent->repaint (getBounds().withHeight (getHeight() + 22)); }
 }
 
@@ -2128,7 +2129,20 @@ void GrooveSelector::paint (juce::Graphics& g)
     auto t = r.reduced (7.0f, 2.0f);
     const int d = drummer(), gr = proc.getGroove();
     const auto list = activeList();
-    if (gr >= 0 && dubdrums::groovePresets[gr].drummer == d)
+    if (const int b = proc.getBankEntry(); b >= 0 && gr == riddimbank::entries[b].groove && dubdrums::groovePresets[gr].drummer == d)
+    {   // música do BANCO ÚNICO: o nome dela, o groove que toca e as luzes H B D
+        const auto& e = riddimbank::entries[b];
+        const auto& gp = dubdrums::groovePresets[gr];
+        blueText (g, juce::String::fromUTF8 (e.name).toUpperCase(), t.removeFromTop (t.getHeight() * 0.55f).withTrimmedRight (30.0f),
+                  juce::Justification::centredLeft, 13.0f);
+        if (riddimbank::showCredits (e))
+            blueText (g, riddimbank::creditsText (e), t, juce::Justification::centredLeft, 9.0f, 0.8f);
+        else
+            blueText (g, (e.grooveOriginal ? juce::String ("GROOVE ORIGINAL") : "GROOVE: " + juce::String::fromUTF8 (gp.song).toUpperCase())
+                             + "  " + juce::String (e.bpm) + " BPM  " + riddimbank::lights (e), t, juce::Justification::centredLeft, 9.0f, 0.8f);
+        blueText (g, "BANCO", r.reduced (7.0f, 3.0f).removeFromTop (14.0f), juce::Justification::topRight, 8.5f, 0.6f);
+    }
+    else if (gr >= 0 && dubdrums::groovePresets[gr].drummer == d)
     {
         const auto& gp = dubdrums::groovePresets[gr];
         const bool intact = proc.grooveIntact();
@@ -2222,10 +2236,26 @@ void GrooveSelector::showList()
             menu.addSubMenu (juce::String (dubdrums::grooveFamilyNames[f]) + "  (" + juce::String (list.size()) + ")", sub, true, nullptr, hasCurrent);
         }
     }
+    menu.addSeparator();
+    riddimbank::addMenus (menu, proc.getBankEntry());   // BANCO ÚNICO (o mesmo do MRCM-1240, MRBM-69 e MRM-0420)
     juce::Component::SafePointer<GrooveSelector> safe (this);
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int result)
     {
-        if (safe == nullptr || result <= 0) return;
+        if (safe == nullptr || result == 0) return;
+        if (result == riddimbank::toggleCompleteId)
+        {
+            riddimbank::onlyComplete() = ! riddimbank::onlyComplete();
+            juce::MessageManager::callAsync ([safe] { if (safe != nullptr) safe->showList(); });
+            return;
+        }
+        if (const int e = riddimbank::entryFromMenuResult (result); e >= 0)
+        {
+            const int gr = riddimbank::entries[e].groove;
+            safe->proc.apvts.state.setProperty ("grooveFamily", dubdrums::groovePresets[gr].family, nullptr);
+            safe->proc.applyBankEntry (e);
+            safe->repaint();
+            return;
+        }
         if (result == kByDrummer || result == kByStyle)
         {
             safe->proc.apvts.state.setProperty ("grooveView", result == kByStyle ? 1 : 0, nullptr);
@@ -2234,6 +2264,7 @@ void GrooveSelector::showList()
             juce::MessageManager::callAsync ([safe] { if (safe != nullptr) safe->showList(); });   // reabre já no caminho novo
             return;
         }
+        if (result < 0 || result > dubdrums::numGroovePresets) return;
         safe->proc.apvts.state.setProperty ("grooveFamily", dubdrums::groovePresets[result - 1].family, nullptr);
         safe->proc.loadGroove (result - 1);
         safe->repaint();
@@ -2256,10 +2287,20 @@ void GrooveSelector::showList()
         }
         menu.addSubMenu (names[d], sub, true, nullptr, current >= 0 && dubdrums::groovePresets[current].drummer == d);
     }
+    menu.addSeparator();
+    riddimbank::addMenus (menu, proc.getBankEntry());   // BANCO ÚNICO (o mesmo do MRCM-1240, MRBM-69 e MRM-0420)
     juce::Component::SafePointer<GrooveSelector> safe (this);
     menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this), [safe] (int result)
     {
-        if (safe != nullptr && result > 0)
+        if (safe == nullptr || result == 0) return;
+        if (result == riddimbank::toggleCompleteId)
+        {
+            riddimbank::onlyComplete() = ! riddimbank::onlyComplete();
+            juce::MessageManager::callAsync ([safe] { if (safe != nullptr) safe->showList(); });
+            return;
+        }
+        if (const int e = riddimbank::entryFromMenuResult (result); e >= 0) { safe->proc.applyBankEntry (e); safe->repaint(); return; }
+        if (result > 0 && result <= dubdrums::numGroovePresets)
         {
             safe->proc.loadGroove (result - 1);
             safe->repaint();

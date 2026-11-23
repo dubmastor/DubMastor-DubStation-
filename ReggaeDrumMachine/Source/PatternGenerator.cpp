@@ -808,7 +808,11 @@ Pattern generate (const Settings& in)
     Feel feel = feelOf (s.drummer);
     if (s.machine) { feel.swingDelta = 0.0; for (auto& l : feel.late) l = 0.0; }   // a máquina não "senta" atrás do tempo
     const float rand[4] = { s.randKick, s.randSnare, s.randHat, s.randPerc };
-    const double timingAmount[4] = { 0.006, 0.012, 0.014, 0.012 }; // em semínimas, no máximo
+    // microtempo humano em semínimas, no máximo (com a aleatoriedade da peça em 100%). Calibrado pela medição de
+    // bateria de reggae tocada por percussionistas em bateria acústica com MIDI (Wright & Berdahl, Stanford CS229, 2005:
+    // desvio médio |MT| de 0,0188 tempo e desvio padrão de 0,0248): ±A uniforme dá média A/2, então hi-hat 0,036 ≈ 0,018.
+    // O bumbo varia menos (é a âncora), a caixa um pouco menos que o prato. O atraso fixo de cada baterista (late) soma a isso.
+    const double timingAmount[4] = { 0.024, 0.030, 0.036, 0.030 };
 
     auto finish = [&] (const std::vector<NoteEvent>& raw, double len, int barOverride, std::vector<NoteEvent>& out,
                        const std::vector<std::pair<double, double>>& fills)

@@ -20,7 +20,7 @@ import json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 REG = json.loads((RAIZ / "plugins.json").read_text())
-PLUGINS = REG["plugins"]
+PLUGINS = [p for p in REG["plugins"] if not p.get("legado")]   # legado: a machine virou aba de um instrumento, não entra no pacote
 SITE = "https://dubmastor.github.io/DubMastor-DubStation-/"
 
 # pastas padrão de cada formato

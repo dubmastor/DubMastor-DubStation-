@@ -1,4 +1,8 @@
-## Mastor Reggae Drum Machine MRDM-12 2.7 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.7 — legado
+
+- O MRDM-12 virou a aba DUB DRUMS do Mastor Reggae Drums MRD-12; as novidades da bateria (banco único de riddims, créditos, balanço calibrado) saem lá e no MRM-0420
+
+## Mastor Reggae Drum Machine MRDM-12 2.7 🟢🟡⚫ (última versão separada)
 
 - **118 GROOVES** no visor azul (antes 21), separados por baterista, tirados de uma pesquisa de créditos e transcrições:
   - **Style Scott (22):** Night Nurse, Bounty Hunter, Minibus, Wa Do Dem, Police In Helicopter, Firehouse Rock, Cool Runnings, Zungguzung…

@@ -63,6 +63,12 @@ public:
     void loadRiddim (int index);
     int currentRiddim() const { return (int) apvts.state.getProperty ("riddim", -1); }
 
+    // BANCO ÚNICO DE RIDDIMS (RiddimBank/Source/RiddimBank.h, o mesmo das outras machines): harmonia e BPM
+    // da música; o baixo é o do riddim do MRBM quando ele existe, senão o baixista mais próximo de quem gravou.
+    // O número fica salvo no projeto (propriedade "bank"; -1 = nenhum).
+    void applyBankEntry (int index);
+    int currentBank() const { return (int) apvts.state.getProperty ("bank", -1); }
+
     // osciloscópio: últimas amostras da saída (mono)
     static constexpr int kScopeSize = 8192;
     void copyScope (float* dest, int n) const

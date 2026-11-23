@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%274%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23ffa928%27/%3E%3Crect x=%2717%27 y=%274%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%274%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3Crect x=%2717%27 y=%2717%27 width=%2711%27 height=%2711%27 rx=%272%27 fill=%27%23b9b4a8%27/%3E%3C/svg%3E">
-<title>Mastor Dub Battery Reggae DBR 1.4 — Dub Station (navegador)</title>
+<title>Mastor Reggae Drums MRD-12 2.0 — Dub Station (navegador)</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -164,7 +164,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 <div class="rack"><div class="wood"></div><div class="unit">
 <i class="screw tl"></i><i class="screw tr"></i><i class="screw bl"></i><i class="screw br"></i>
 <header>
-  <div><h1>DUB BATTERY REGGAE DBR&nbsp;1.4</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE DRUMS MRD-12&nbsp;2.0</h1><div class="sub">16 PAD REGGAE DRUM SAMPLER · NO NAVEGADOR</div></div>
   <div class="plaque">DUB STATION</div><div class="flag"></div>
 </header>
 
@@ -252,6 +252,7 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
       <button class="gkey" id="gNext" aria-label="próximo groove">▶</button>
     </div>
     <div class="gnote" id="gNote"></div>
+    <div id="bank" style="margin-top:10px"></div>
     <div class="info" id="drumInfo" hidden></div>
   </section>
   <section class="mod"><div class="tag">LOOP</div>
@@ -296,6 +297,8 @@ canvas#pat{display:block;min-width:760px;width:100%;height:250px}
 
 <script src="../drums/generator.js"></script>
 <script src="../drums/grooves.js"></script>
+<script src="../riddimbank.js"></script>
+<script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
 const G = window.MDDM;
@@ -311,7 +314,11 @@ const SAMPLES = [['DM-KICKS1.wav','DM KICK 1'],['DM-SNARES28.wav','DM ARO 28'],[
   ['DM-HATs39.wav','DM HAT 39'],['SYN-KICK3.wav','SINT BUMBO 3'],['DM-HATs17.wav','DM HAT 17 ABERTO'],['SYN-TOM2.wav','SINT TOM 2'],
   ['SYN-SHAKER.wav','SINT SHAKER'],['DM-PRATOS1.wav','DM PRATO 1'],['SYN-TOM1.wav','SINT TOM 1'],['SYN-BLOCO.wav','SINT BLOCO'],
   // biblioteca: mais timbres para o < SAMPLE > e o TIMBRE 2 de qualquer pad
-  ['DM-HATs1.wav','DM HAT 1'],['DM-HATs4.wav','DM HAT 4'],['DM-HATs5.wav','DM HAT 5'],['DM-HATs7.wav','DM HAT 7'],['DM-HATs8.wav','DM HAT 8'],['DM-HATs9.wav','DM HAT 9'],['DM-HATs10.wav','DM HAT 10'],['DM-HATs11.wav','DM HAT 11'],['DM-HATs12.wav','DM HAT 12'],['DM-HATs13.wav','DM HAT 13'],['DM-HATs14.wav','DM HAT 14'],['DM-HATs15.wav','DM HAT 15'],['DM-HATs16.wav','DM HAT 16'],['DM-PRATOS2.wav','DM PRATO 2'],['DM-PRATOS3.wav','DM PRATO 3'],['DM-PRATOS4.wav','DM PRATO 4'],['DM-PRATOS5.wav','DM PRATO 5'],['SYN-PRATO.wav','SINT PRATO']];
+  ['DM-HATs1.wav','DM HAT 1'],['DM-HATs4.wav','DM HAT 4'],['DM-HATs5.wav','DM HAT 5'],['DM-HATs7.wav','DM HAT 7'],['DM-HATs8.wav','DM HAT 8'],['DM-HATs9.wav','DM HAT 9'],['DM-HATs10.wav','DM HAT 10'],['DM-HATs11.wav','DM HAT 11'],['DM-HATs12.wav','DM HAT 12'],['DM-HATs13.wav','DM HAT 13'],['DM-HATs14.wav','DM HAT 14'],['DM-HATs15.wav','DM HAT 15'],['DM-HATs16.wav','DM HAT 16'],['DM-PRATOS2.wav','DM PRATO 2'],['DM-PRATOS3.wav','DM PRATO 3'],['DM-PRATOS4.wav','DM PRATO 4'],['DM-PRATOS5.wav','DM PRATO 5'],['SYN-PRATO.wav','SINT PRATO'],
+  // kit SLENG TENG: Casio MT-40 do KIT DIGITAL do MRDM-12 (ReggaeDrums/tools/render_mt40.cpp), índices 34 a 42 como no plugin
+  ['MT40-BUMBO.wav','MT-40 BUMBO'],['MT40-ARO.wav','MT-40 ARO'],['MT40-CAIXA.wav','MT-40 CAIXA'],['MT40-HH-FECHADO.wav','MT-40 HH FECHADO'],
+  ['MT40-HH-ABERTO.wav','MT-40 HH ABERTO'],['MT40-TOM-GRAVE.wav','MT-40 TOM GRAVE'],['MT40-TOM.wav','MT-40 TOM'],['MT40-TOM-AGUDO.wav','MT-40 TOM AGUDO'],
+  ['MT40-PRATO.wav','MT-40 PRATO']];
 const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const noteName = (n) => NOTE_NAMES[n % 12] + (Math.floor(n / 12) - 2);
 const CHOKES = ['NENHUM', 'HI-HAT', 'GRUPO A', 'GRUPO B'];
@@ -328,6 +335,8 @@ const FACTORY = [
                          s(10,'link',14); s(13,'level',-9); }],
   ['DUB PESADO', (s) => { for (let p = 0; p < 16; p++) s(p,'tune',-2); s(0,'tune',-4); s(0,'cutoff',1800); s(0,'level',3);
                           s(2,'cutoff',4500); s(2,'release',900); s(13,'cutoff',6000); }],
+  ['SLENG TENG (CASIO MT-40)', (s) => { for (let p = 0; p < 16; p++) { s(p,'sustain',0); s(p,'cutoff',12000); } s(13,'level',-6);
+                          [[0,34],[5,34],[9,34],[1,35],[2,36],[3,36],[4,36],[6,37],[8,37],[10,38],[7,39],[11,40],[14,41],[13,42]].forEach(([p, k]) => s(p,'sample',k)); }],
 ];
 
 function loadJSON(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
@@ -517,7 +526,7 @@ function midiFile(onlyBar) {
   else { const src = onlyBar < 0 ? p.intro : p.events; for (const e of src) if (e.bar === onlyBar) evs.push({ t: Math.max(0, e.beat - (onlyBar < 0 ? 0 : onlyBar * 4)), e }); intro = 0; len = 4; }
   const ppq = 960, chFor = (bar) => !D.colorMidi ? D.channel : (bar < 0 ? 5 : Math.min(4, bar + 1)), raw = [];
   const meta = (tick, type, text) => { const b = [...new TextEncoder().encode(text)]; raw.push({ tick, ord: 0, bytes: [0xff, type, ...vlq(b.length), ...b] }); };
-  meta(0, 3, onlyBar === undefined ? 'Dub Battery Reggae' : onlyBar < 0 ? 'Dub Battery Intro' : 'Dub Battery Compasso ' + (onlyBar + 1));
+  meta(0, 3, onlyBar === undefined ? 'Mastor Reggae Drums MRD-12' : onlyBar < 0 ? 'MRD-12 Intro' : 'MRD-12 Compasso ' + (onlyBar + 1));
   raw.push({ tick: 0, ord: 0, bytes: [0xff, 0x58, 4, 4, 2, 24, 8] });
   const us = Math.round(60000000 / D.bpm); raw.push({ tick: 0, ord: 0, bytes: [0xff, 0x51, 3, (us >> 16) & 255, (us >> 8) & 255, us & 255] });
   if (onlyBar === undefined) { if (intro > 0) meta(0, 6, 'Intro'); for (let b = 0; b < Math.round(len / 4); b++) meta(Math.round((intro + b * 4) * ppq), 6, 'Compasso ' + (b + 1)); }
@@ -921,6 +930,13 @@ function loadGroove(i) {
 }
 $('gPrev').onclick = () => loadGroove(stepGroove(D, -1));
 $('gNext').onclick = () => loadGroove(stepGroove(D, 1));
+// BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins): o groove da música no BPM dela
+let bankPick = -1;
+riddimBankMenu($('bank'), {
+  label: `BANCO DE RIDDIMS ▾  ${window.RIDDIM_BANK.entries.length} músicas`,
+  current: () => bankPick,
+  onPick: (e, i) => { bankPick = i; loadGroove(e.groove); D.bpm = e.bpm; $('bpm').value = D.bpm; drumChanged(); },
+});
 $('gList').onchange = (e) => { const i = +e.target.value; if (GROOVES[i]) D.gfamily = GROOVES[i].family; loadGroove(i); };
 for (const [id, v] of [['gvD', 0], ['gvS', 1]])
   $(id).onclick = () => { D.gview = v; fillGrooveList(); drumChanged(); };

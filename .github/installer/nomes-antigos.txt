@@ -2,12 +2,12 @@
 # Os instaladores apagam os plugins com estes nomes, para não aparecerem duplicados na DAW.
 MBK-76|DubMastor Big Knob
 MTE-12|FitaEco TE-12
-MRK-80|DubMastor Roots Keys|Mastor Roots Keys|Dub Station Roots Keys
+MRK-80|DubMastor Roots Keys|Mastor Roots Keys|Dub Station Roots Keys|Mastor Roots Keys MRK-80
 MDH-70|Mastor Dub Horns
 MPV-01|Mastor Fone
 MRCM-1240|Mastor Dub Chords Machine MDCM-404|DubMastor Dub Chords
-MRDBI-07|Dub Bass - Dub Station
+MRB-69|Dub Bass - Dub Station|Mastor Reggae Dub Bass Instrument MRDBI-07
 MRDM-12|DubMastor Dub Drums|Mastor Dub Drums Machine MDDM-12
 MRBM-69|Mastor Bass Machine MBM-710
 MRM-0420|
-DBR|Dub Battery Reggae
+MRD-12|Dub Battery Reggae|Mastor Dub Battery Reggae DBR

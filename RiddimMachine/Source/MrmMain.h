@@ -144,7 +144,7 @@ private:
     int styleOf (int preset) const;
     MrmProcessor& proc;
     juce::Rectangle<int> lcd, keys[4], listKey;     // ◀ ▶ estilo, ◀ ▶ música
-    int pressed = -1, shown = -2, styleSel = 0;
+    int pressed = -1, shown = -2, styleSel = 0, shownPhase = -1;
 };
 
 // NOVA LINHA: outra sugestão só para a bateria ou só para o baixo (semente própria da máquina)
@@ -366,6 +366,7 @@ private:
     juce::TextButton exportBtn { "EXPORTAR" };
     std::unique_ptr<PowerSwitch> fxPower, echoPower;
     std::unique_ptr<MusicianKeys> drumStyle, filterMode;   // estilo de reggae da bateria; HIGH/LOW PASS do Big Knob
+    std::unique_ptr<MusicianKeys> bassTimbre;              // TIMBRE do baixo: ROOTS, SUPER TONE (Casio da era digital) ou 808
     std::unique_ptr<BigDial> bigKnob;
     std::unique_ptr<PowerSwitch> knobBypass, sirenHold;                 // BYPASS do Big Knob; HOLD da sirene
     std::unique_ptr<SirenFire> sirenFire;

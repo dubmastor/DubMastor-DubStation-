@@ -120,8 +120,9 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
   <div class="plaque">MRBM-69</div><div class="flag"></div>
 </header>
 
-<section class="mod riddim"><div class="tag">RIDDIM CLÁSSICO · 160 PRESETS</div>
+<section class="mod riddim"><div class="tag">RIDDIM CLÁSSICO · BANCO ÚNICO + 160 PRESETS DO MRBM-69</div>
   <div class="rdisp" id="rdisp"></div>
+  <div id="bank" style="margin-top:8px"></div>
   <div class="rrow"><div class="btns c3" id="rmode" style="flex:1;min-width:240px"></div></div>
   <div class="rrow"><select id="rgroup" aria-label="grupo"></select><select id="rpick" aria-label="riddim"></select>
     <button class="b nolamp" id="rprev">◀</button><button class="b nolamp" id="rnext">▶</button></div>
@@ -193,6 +194,8 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 
 <script src="engine.js"></script>
 <script src="riddims.js"></script>
+<script src="../riddimbank.js"></script>
+<script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
 const M = window.MRBM;
@@ -327,6 +330,8 @@ const RD = window.MRBM_RIDDIMS;
 const RMODES = ['ESTILO', 'BAIXISTA', 'DÉCADA'];
 if (st.rmode === undefined) st.rmode = 0;
 if (st.riddim === undefined) st.riddim = -1;
+if (st.bank === undefined) st.bank = -1;
+const RB = window.RIDDIM_BANK, RBT = window.riddimBankText;
 function rgroups() {
   const key = r => st.rmode === 0 ? RD.folders[r.f] : st.rmode === 1 ? r.b : r.d;
   const map = new Map();
@@ -347,6 +352,12 @@ function fillRiddimSelects(keepGroup) {
 function showRiddim() {
   const r = RD.riddims[st.riddim];
   const pad = n => String(n).padStart(3, '0');
+  const e = RB.entries[st.bank];
+  if (e) {   // música do BANCO ÚNICO
+    $('rdisp').innerHTML = `<div class="l"><span>=BANCO= ${pad(st.bank + 1)}/${RB.entries.length}</span><span>[${RB.styles[e.style]}]</span></div><b>${e.name.toUpperCase()}${e.year ? ' ' + e.year : ''}</b>`
+      + `<div class="l"><span>BASS:${String(M.styleNames[e.bassStyle]).toUpperCase()}</span><span>TEMPO:${pad(e.bpm)}${e.bpmMeasured ? '' : '~'}</span></div><div class="l"><span>${RBT.chordsText(e)} ${RBT.lights(e)}</span></div>`;
+    return;
+  }
   $('rdisp').innerHTML = r
     ? `<div class="l"><span>=RIDDIM= ${pad(st.riddim + 1)}/160</span><span>[${RD.short[r.f]}]</span></div><b>${r.n.toUpperCase()} ${r.y}</b>`
       + `<div class="l"><span>BASS:${r.b.toUpperCase()}</span><span>TEMPO:${pad(r.bpm)}${r.a ? '~' : ''}</span></div><div class="l"><span>${r.o} · ${r.p}</span></div>`
@@ -354,7 +365,7 @@ function showRiddim() {
 }
 function loadRiddim(i) {
   const r = RD.riddims[i]; if (!r) return;
-  st.riddim = i;
+  st.riddim = i; st.bank = -1;
   st.chords.forEach((c, k) => { if (k < r.c.length) { c.root = r.c[k][0]; c.quality = r.c[k][1]; c.dur = r.c[k][2]; } if (k > 0) c.on = k < r.c.length; });
   Object.assign(st, { style: r.s, density: r.den, variation: r.v, swing: r.sw, seed: 1, bpm: r.bpm, drumStyle: r.dr, drumsOn: true, timbre: r.t });
   for (const id of ['density', 'variation', 'swing', 'bpm']) { $(id).value = st[id]; $('o-' + id).textContent = SLIDERS[id][0](st[id]); }
@@ -364,6 +375,23 @@ function loadRiddim(i) {
 }
 const rmodeRefresh = buttons($('rmode'), RMODES, () => st.rmode, i => { st.rmode = i; save(); fillRiddimSelects(); });
 refreshers.push(rmodeRefresh);
+// BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins): harmonia conferida e BPM da música; o baixo é o do riddim do
+// MRBM-69 quando ele existe, senão o do baixista mais próximo de quem gravou
+function loadBank(i) {
+  const e = RB.entries[i]; if (!e || !e.chords.length) return;
+  if (e.mrbm >= 0) loadRiddim(e.mrbm);
+  else {
+    Object.assign(st, { style: e.bassStyle, density: e.density, variation: e.variation, swing: e.swing, seed: 1, drumStyle: e.bassDrum, drumsOn: true, timbre: e.timbre });
+    st.riddim = -1;
+    try { localStorage.removeItem('mrbm69-edits'); } catch (x) {}
+    setFlap(M.styleNames[st.style], true);
+  }
+  st.chords.forEach((c, k) => { if (k < e.chords.length) { c.root = e.chords[k][0]; c.quality = e.chords[k][1]; c.dur = e.chords[k][2]; } if (k > 0) c.on = k < e.chords.length; });
+  st.bpm = e.bpm; st.bank = i;
+  for (const id of ['density', 'variation', 'swing', 'bpm']) { $(id).value = st[id]; $('o-' + id).textContent = SLIDERS[id][0](st[id]); }
+  engine.tempoChanged(); changedGen(); publish(); showRiddim(); fillRiddimSelects();
+}
+riddimBankMenu($('bank'), { label: `BANCO DE RIDDIMS ▾  ${RB.entries.length} músicas · ${RB.families.length} riddims`, current: () => st.bank, onPick: (e, i) => loadBank(i) });
 $('rgroup').onchange = () => fillRiddimSelects(+$('rgroup').value);
 $('rpick').onchange = () => { const v = +$('rpick').value; if (v >= 0) loadRiddim(v); };
 $('rprev').onclick = () => loadRiddim(st.riddim <= 0 ? RD.riddims.length - 1 : st.riddim - 1);

@@ -8,20 +8,23 @@ on:
     branches: [main]
     paths:
       - 'RiddimMachine/**'
+      - 'RiddimBank/Source/**'
       - 'ReggaeChordMachine/Source/**'
       - 'ReggaeChordMachine/CMakeLists.txt'
       - 'ReggaeDrumMachine/Source/**'
       - 'ReggaeDrumMachine/Samples/**'
       - 'ReggaeDrumMachine/CMakeLists.txt'
+      - 'ReggaeDrums/CMakeLists.txt'
+      - 'ReggaeBass/CMakeLists.txt'
       - 'ReggaeBassMachine/Source/**'
       - 'ReggaeBassMachine/CMakeLists.txt'
-      - 'ReggaeDubBassInstrument/Source/**'
+      - 'ReggaeBass/Source/**'
       - 'BigKnob/Source/**'
       - 'BigKnob/CMakeLists.txt'
-      - 'RootsKeys/Source/**'
+      - 'ReggaeKeys/Source/**'
       - 'ReggaeChordMachine/Source/**'
       - 'ReggaeDrumMachine/Source/**'
-      - 'RootsKeys/Source/RootsKeysEngine.h'
+      - 'ReggaeKeys/Source/RootsKeysEngine.h'
       - '.github/workflows/build-riddimmachine.yml'
       - '.github/scripts/**'
       - '.github/installer/**'
@@ -30,9 +33,10 @@ on:
   pull_request:
     paths:
       - 'RiddimMachine/**'
+      - 'RiddimBank/Source/**'
       - 'ReggaeChordMachine/Source/**'
       - 'ReggaeDrumMachine/Source/**'
-      - 'RootsKeys/Source/RootsKeysEngine.h'
+      - 'ReggaeKeys/Source/RootsKeysEngine.h'
       - '.github/workflows/build-riddimmachine.yml'
       - '.github/scripts/**'
       - '.github/installer/**'
@@ -95,6 +99,7 @@ jobs:
           $R play-riddim.wav intro
           $R daw-intro.wav intro
           $R estado
+          $R banco
           $R inicial
           $R presets
           $R aleatorio

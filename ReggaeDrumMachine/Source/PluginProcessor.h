@@ -65,6 +65,11 @@ public:
     int  getGroove() const;              // último groove carregado; -1 = nenhum
     bool grooveIntact() const;           // os controles ainda estão como o groove deixou
 
+    // BANCO ÚNICO DE RIDDIMS (RiddimBank/Source/RiddimBank.h, o mesmo das outras machines): o groove da
+    // música (o original, quando o banco tem, senão o do baterista mais próximo de quem gravou) no BPM dela.
+    void applyBankEntry (int index);
+    int  getBankEntry() const;           // -1 = nenhuma
+
     // posição tocando agora, na linha do tempo "intro + loop" (em semínimas); -1 = parado
     double getPlayheadBeat() const noexcept       { return playheadBeat.load(); }
     bool isHostPlaying() const noexcept           { return hostPlaying.load(); }
@@ -77,6 +82,7 @@ public:
     bool writeMidiFile (const juce::File& target, int bar = kAllBars) const;
     juce::String suggestedFileName (int bar = kAllBars) const;
     int mapNote (int gmNote) const;               // nota GM -> nota escolhida pelo usuário
+    int unmapNote (int outNote) const;   // nota que saiu pelo mapa de NOTAS -> peça GM (o Battery toca o pad certo)
 
 private:
     void parameterChanged (const juce::String&, float) override;

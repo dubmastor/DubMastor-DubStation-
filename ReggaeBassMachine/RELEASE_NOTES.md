@@ -1,4 +1,8 @@
-# Mastor Reggae Bass Machine MRBM-69 — 3.0 · Gerador de Reggae Bass Lines
+# Mastor Reggae Bass Machine MRBM-69 — 3.0 · legado
+
+- O MRBM-69 virou a aba BASS MACHINE do Mastor Reggae Bass MRB-69; as novidades do baixo (banco único de riddims, créditos) saem lá e no MRM-0420
+
+# Mastor Reggae Bass Machine MRBM-69 — 3.0 · Gerador de Reggae Bass Lines (última versão separada)
 
 - **BPM dos riddims corrigido:** os 10 riddims de dancehall que estavam acima de 100 BPM (Speed, Hard Drive, Coolie Dance, Bad Company, Applause, Stepz, Red Bull & Guinness, Power Cut, Wipe Out, Tremor) estavam dobrados e agora ficam na metade (51 e 52)
 - BPM interno a partir de 50

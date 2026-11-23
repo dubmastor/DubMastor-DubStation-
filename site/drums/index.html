@@ -175,6 +175,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
       <button class="gkey" id="gNext" aria-label="próximo groove">▶</button>
     </div>
     <div class="gnote" id="gNote"></div>
+    <div id="bank" style="margin-top:10px"></div>
     <div class="info" id="drumInfo" hidden></div>
   </section>
 
@@ -237,6 +238,8 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 
 <script src="generator.js"></script>
 <script src="grooves.js"></script>
+<script src="../riddimbank.js"></script>
+<script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
 const G = window.MDDM, gm = G.gm;
@@ -559,6 +562,13 @@ function loadGroove(i) {
 $('gPrev').onclick = () => loadGroove(stepGroove(st, -1));
 $('gNext').onclick = () => loadGroove(stepGroove(st, 1));
 $('gList').onchange = (e) => loadGroove(+e.target.value);
+// BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins): o groove da música (o original ou o do baterista mais próximo) no BPM dela
+let bankPick = -1;
+riddimBankMenu($('bank'), {
+  label: `BANCO DE RIDDIMS ▾  ${window.RIDDIM_BANK.entries.length} músicas`,
+  current: () => bankPick,
+  onPick: (e, i) => { bankPick = i; loadGroove(e.groove); st.bpm = e.bpm; $('bpm').value = st.bpm; save(); regenerate(); refresh(); },
+});
 
 buttons('style', STYLE_NAMES, 'style', (i) => { st.kickMask = G.defaultKickMask(i); st.snareMask = G.defaultSnareMask(i); });
 buttons('backbeat', ['CAIXA', 'ARO', 'AMBOS'], 'backbeat');

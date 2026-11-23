@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Riddim Machine MRM-0420 2.3 — DubStation</title>
+<title>Mastor Riddim Machine MRM-0420 2.4 — DubStation</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -183,13 +183,13 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">2.3</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
+  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">2.4</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
   <div class="plaque">MRM-0420</div>
   <div class="brand"><div class="flag"></div><b>DUBSTATION</b></div>
 </header>
 
 <section class="mod"><div class="tag">HARMONIA</div>
-  <div class="lbl" style="margin-top:0">VALE PARA O SKANK (MRCM-1240) E PARA O BAIXO (MRBM-69)</div>
+  <div class="lbl" style="margin-top:0">VALE PARA O SKANK (MRK-80) E PARA O BAIXO (MRB-69)</div>
   <div class="chords" id="chords"></div>
 </section>
 
@@ -211,9 +211,9 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
   </div>
   <div class="lbl">MUTE DAS MÁQUINAS</div>
   <div class="mutes">
-    <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRDM-12</small></button>
-    <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRBM-69</small></button>
-    <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRCM-1240</small></button>
+    <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRD-12</small></button>
+    <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRB-69</small></button>
+    <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRK-80</small></button>
   </div>
 </section>
 
@@ -229,15 +229,15 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
   </div>
 </section>
 
-<section class="mod"><div class="tag">PRESETS · RIDDIMS POR ESTILO DE REGGAE</div>
+<section class="mod"><div class="tag">PRESETS · BANCO ÚNICO DE RIDDIMS</div>
   <div class="mpcrow">
     <div class="mpckeys"><span>ESTILO</span><button id="psL" aria-label="Estilo anterior">◀</button><button id="psR" aria-label="Próximo estilo">▶</button>
       <span>MÚSICA</span><button id="pmL" aria-label="Música anterior">◀</button><button id="pmR" aria-label="Próxima música">▶</button></div>
     <div class="mpclcd" id="plcd" title="Lista por estilo"><div class="l1"><span id="pStyle"></span><span id="pPos"></span></div><div class="l2" id="pName"></div><div class="l3" id="pInfo"></div></div>
-    <button class="mpclist" id="plist">LISTA<small>POR ESTILO ▾</small></button>
+    <button class="mpclist" id="plist">LISTA<small>BANCO ÚNICO ▾</small></button>
   </div>
   <div id="presets" style="margin-top:6px"></div>
-  <div class="lbl" style="margin-top:2px">BPM DA GRAVAÇÃO ORIGINAL (~ = ANDAMENTO TÍPICO, SEM MEDIÇÃO) · HARMONIA, BATERIA E OS MÚSICOS DE CADA MÚSICA</div>
+  <div class="lbl" style="margin-top:2px">LUZES H B D = HARMONIA, BAIXO E BATERIA DA GRAVAÇÃO ORIGINAL · ~ = ANDAMENTO TÍPICO, SEM MEDIÇÃO</div>
 </section>
 
 <section class="mod"><div class="tag">BPM · DIGITE, TAP OU ESTILO</div>
@@ -278,11 +278,11 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <script src="../chords/engine.js"></script>
 <script src="../drums/generator.js"></script>
 <script src="../bassmachine/engine.js"></script>
-<script src="../chords/presets.js"></script>
-<script src="../chords/presetmenu.js"></script>
+<script src="../riddimbank.js"></script>
+<script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
-const VERSION = '2.3';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
+const VERSION = '2.4';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
 document.getElementById('ver').textContent = VERSION;
 const C = window.MRCM, D = window.MDDM, B = window.MRBM;
 const $ = (id) => document.getElementById(id);
@@ -560,11 +560,11 @@ function drawChords() {
 
 // ---------------------------------------------------------------- máquinas: liga/desliga, músicos, MIDI editável, baixar
 const MACHINES = [
-  { id: DRUMS, name: 'BATERIA', model: 'MRDM-12', who: 'BATERISTA', key: 'drummer', cols: 'c3', extra: { who: 'ESTILO DE REGGAE', key: 'style', names: ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'] },
+  { id: DRUMS, name: 'BATERIA', model: 'MRD-12', who: 'BATERISTA', key: 'drummer', cols: 'c3', extra: { who: 'ESTILO DE REGGAE', key: 'style', names: ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'] },
     names: ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL'] },
-  { id: CHORDS, name: 'HARMONIA', model: 'MRCM-1240', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
+  { id: CHORDS, name: 'HARMONIA', model: 'MRK-80', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
     names: ['CONTRATEMPO'] },
-  { id: BASS, name: 'BAIXO', model: 'MRBM-69', who: 'BAIXISTA', key: 'bassist', cols: 'c3', names: B.styleNames },
+  { id: BASS, name: 'BAIXO', model: 'MRB-69', who: 'BAIXISTA', key: 'bassist', cols: 'c3', names: B.styleNames },
 ];
 const DRUM_ROWS = [gm.OpenHat, gm.ClosedHat, gm.SideStick, gm.Snare, gm.Kick], DRUM_NAMES = ['HH AB.', 'HI-HAT', 'ARO', 'CAIXA', 'BUMBO'];
 function buildMachines() {
@@ -725,9 +725,9 @@ function midiFile(which, reps, riddim) {
       }
     tracks.push(track(name, evs));
   };
-  if (which.includes(DRUMS) && st.on[DRUMS]) add('MRM-0420 Bateria (MRDM-12)', drums, 10, (e) => e.beat, (e) => 1 + (e.bar % 4));
-  if (which.includes(CHORDS) && st.on[CHORDS]) add('MRM-0420 Skank (MRCM-1240)', chords, 1, (e) => e.start, (e) => 1 + e.slot);
-  if (which.includes(BASS) && st.on[BASS]) add('MRM-0420 Baixo (MRBM-69)', bass, 1, (e) => e.start, (e) => 1 + (e.slot || 0));
+  if (which.includes(DRUMS) && st.on[DRUMS]) add('MRM-0420 Bateria (MRD-12)', drums, 10, (e) => e.beat, (e) => 1 + (e.bar % 4));
+  if (which.includes(CHORDS) && st.on[CHORDS]) add('MRM-0420 Skank (MRK-80)', chords, 1, (e) => e.start, (e) => 1 + e.slot);
+  if (which.includes(BASS) && st.on[BASS]) add('MRM-0420 Baixo (MRB-69)', bass, 1, (e) => e.start, (e) => 1 + (e.slot || 0));
   return new Uint8Array([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length, tpq >> 8, tpq & 255, ...tracks.flat()]);
 }
 function download(bytes, name) {
@@ -749,48 +749,49 @@ function newSeed() {
 }
 $('jackpot').onclick = () => { newSeed(); rebuild([DRUMS, BASS]); };
 
-// PRESETS de harmonia (o mesmo banco do MRCM-1240): pastas por estilo, de 70 a 2000
-// PRESET de riddim: a harmonia da música, o BPM sugerido, o estilo da bateria e os músicos das máquinas
-// mais próximos de quem gravou (mesmo banco do plugin: ReggaeChordMachine/tools/harmony_presets.py)
-function applyPreset(p) {
-  st.slots.forEach((s, k) => { const c = p.chords[k]; if (c) Object.assign(s, { root: c.root, quality: c.quality, dur: c.dur, inv: -1, on: true }); else s.on = false; });
-  st.riddim = window.DUB_PRESETS.presets.indexOf(p);
-  if (p.bpm) { st.bpm = p.bpm; st.style = p.kit; st.drummer = p.drummer; st.bassist = p.bassist; audio.setBpm(); }
+// BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins: RiddimBank/Source/RiddimBank.h): a música inteira — harmonia
+// conferida, BPM, kit, baterista e baixista mais próximos de quem gravou — nas três máquinas de uma vez
+const RB = window.RIDDIM_BANK, RBT = window.riddimBankText;
+if (st.bank === undefined) st.bank = st.riddim >= 0 && RB.fromMrcm[st.riddim] !== undefined ? RB.fromMrcm[st.riddim] : -1;   // projeto antigo
+function applyBank(i) {
+  const e = RB.entries[i]; if (!e || !e.chords.length) return;
+  st.slots.forEach((s, k) => { const c = e.chords[k]; if (c) Object.assign(s, { root: c[0], quality: c[1], dur: c[2], inv: -1, on: true }); else s.on = false; });
+  st.bank = i; st.riddim = e.mrcm;
+  st.bpm = e.bpm; st.style = e.kit; st.drummer = e.drummer; st.bassist = e.bassStyle; audio.setBpm();
 }
-const KITS = ['ROCKERS', 'ONE DROP'];
-const P = window.DUB_PRESETS;
-const songsOf = (f) => P.menuOrder.filter((i) => P.presets[i].folder === P.folders[f]);
-let styleSel = 0;
-const bpmText = (p) => (p.bpmReal ? '' : '~') + p.bpm + ' BPM';
+const KITS = ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'];
+const songsOf = (s) => RB.songOrder.filter((i) => RB.entries[i].style === s && RBT.usable(RB, i));
+let styleSel = 0, creditPhase = 0;   // a linha de baixo do visor alterna a cada 4 s entre os músicos e os créditos
+setInterval(() => { creditPhase = 1 - creditPhase; if (RB.entries[st.bank] && RB.entries[st.bank].credits) drawPresetLcd(); }, 4000);
 function drawPresetLcd() {
-  const cur = st.riddim >= 0 && P.presets[st.riddim] ? st.riddim : -1;
-  if (cur >= 0) styleSel = P.folders.indexOf(P.presets[cur].folder);
+  const cur = st.bank >= 0 && RB.entries[st.bank] ? st.bank : -1;
+  if (cur >= 0) styleSel = RB.entries[cur].style;
   const songs = songsOf(styleSel);
-  $('pStyle').textContent = P.folders[styleSel];
+  $('pStyle').textContent = RB.styles[styleSel] + ' ' + RB.styleYears[styleSel];
   if (cur >= 0) {
-    const p = P.presets[cur];
-    $('pPos').textContent = String(songs.indexOf(cur) + 1).padStart(2, '0') + '/' + String(songs.length).padStart(2, '0');
-    $('pName').textContent = p.name;
-    $('pInfo').textContent = `${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')} · ${p.bpmReal ? p.bpm + ' BPM ORIGINAL' : '~' + p.bpm + ' BPM'} · ${KITS[p.kit]} · ${MACHINES[0].names[p.drummer]} + ${String(B.styleNames[p.bassist]).toUpperCase()}`;
+    const e = RB.entries[cur];
+    $('pPos').innerHTML = RBT.lights(e) + ' ' + String(songs.indexOf(cur) + 1).padStart(2, '0') + '/' + String(songs.length).padStart(2, '0');
+    $('pName').textContent = e.name + (e.year ? ' ' + e.year : '');
+    $('pInfo').textContent = e.credits && creditPhase ? e.credits.toUpperCase() : `${RBT.chordsText(e)} · ${e.bpmMeasured ? e.bpm + ' BPM ORIGINAL' : '~' + e.bpm + ' BPM'} · ${KITS[e.kit]} · ${MACHINES[0].names[e.drummer]} + ${String(B.styleNames[e.bassStyle]).toUpperCase()}`;
   } else {
     $('pPos').textContent = ''; $('pName').textContent = 'ESCOLHA UM RIDDIM ◀ ▶';
-    $('pInfo').textContent = 'HARMONIA, BPM ORIGINAL, BATERIA E OS MÚSICOS DE CADA MÚSICA';
+    $('pInfo').textContent = `BANCO ÚNICO: ${RB.entries.length} MÚSICAS · ${RB.families.length} RIDDIMS · HARMONIA, BPM E OS MÚSICOS CERTOS`;
   }
 }
-function pickPreset(i) { applyPreset(P.presets[i]); save(); rebuild(); showLuck(true); drawPresetLcd(); }
-(function presets() {   // visor azul de MPC: estilo e música com ◀ ▶; LISTA abre estilo > música
-  const menu = presetMenu($('presets'), {
-    label: 'PRESETS ▾',
-    itemText: (p) => `${p.chords.map((c) => C.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')} · ${bpmText(p)} ${KITS[p.kit]} · ${MACHINES[0].names[p.drummer]} + ${String(B.styleNames[p.bassist]).toUpperCase()}`,
-    current: () => st.riddim,
-    onPick: (p, i) => pickPreset(i),
-  });
+function pickPreset(i) { applyBank(i); save(); rebuild(); showLuck(true); drawPresetLcd(); }
+(function presets() {   // visor azul de MPC: estilo e música com ◀ ▶; LISTA abre ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z
+  const menu = riddimBankMenu($('presets'), { current: () => st.bank, onPick: (e, i) => pickPreset(i) });
   $('presets').querySelector('.pbtn').style.display = 'none';
   const list = (e) => { e.stopPropagation(); menu.open(); };
   $('plist').onclick = list; $('plcd').onclick = list;
-  const stepStyle = (d) => { const cur = st.riddim >= 0 ? P.folders.indexOf(P.presets[st.riddim].folder) : styleSel;
-    styleSel = (cur + d + P.folders.length) % P.folders.length; pickPreset(songsOf(styleSel)[0]); };
-  const stepSong = (d) => { const songs = songsOf(styleSel), pos = songs.indexOf(st.riddim), n = songs.length;
+  const stepStyle = (d) => {
+    const cur = st.bank >= 0 ? RB.entries[st.bank].style : styleSel;
+    for (let k = 1; k <= RB.styles.length; k++) {
+      styleSel = (cur + d * k + RB.styles.length * k) % RB.styles.length;
+      const songs = songsOf(styleSel); if (songs.length) { pickPreset(songs[0]); return; }
+    }
+  };
+  const stepSong = (d) => { const songs = songsOf(styleSel), pos = songs.indexOf(st.bank), n = songs.length; if (!n) return;
     pickPreset(songs[pos < 0 ? (d > 0 ? 0 : n - 1) : (pos + d + n) % n]); };
   $('psL').onclick = () => stepStyle(-1); $('psR').onclick = () => stepStyle(1);
   $('pmL').onclick = () => stepSong(-1); $('pmR').onclick = () => stepSong(1);
@@ -861,14 +862,15 @@ function drawBpm() {
 // skank no contratempo, caixa no 2 e no 4 e o baixo de um dos baixistas do MRBM-69 (modo "de livro", sem cromatismo)
 const rnd = (n) => Math.floor(Math.random() * n);
 function randomRiddim() {
-  applyPreset(window.DUB_PRESETS.presets[rnd(window.DUB_PRESETS.presets.length)]);   // harmonia, BPM e os músicos dela
+  const pool = RB.entries.map((e, i) => i).filter((i) => RB.entries[i].chords.length && RB.entries[i].kit <= 1);   // ROCKERS ou ONE DROP
+  applyBank(pool[rnd(pool.length)]);   // harmonia, BPM e os músicos dela
   st.hat = rnd(3);
   newSeed(); rebuild(); showLuck(true);
 }
 function showLuck(flash) {
   if (typeof drawPresetLcd === 'function' && $('pName')) try { drawPresetLcd(); } catch (e) {}
   const l = $('luck');
-  const rp = window.DUB_PRESETS.presets[st.riddim];
+  const rp = RB.entries[st.bank];
   l.innerHTML = (rp ? `RIDDIM <b>${rp.name}</b> · <b>${st.bpm} BPM</b> · ` : '') + `HARMONIA <b>${chordSlots().filter((x) => x.beats > 0).map(C.chordLabel).join(' - ')}</b> · BATERIA <b>${STYLE_NAMES[st.style]}</b> · <b>${HAT_NAMES[st.hat]}</b> · BATERISTA <b>${MACHINES[0].names[st.drummer]}</b> · BAIXISTA <b>${String(B.styleNames[st.bassist]).toUpperCase()}</b> · SEMENTE <b>${st.seed}</b>`;
   if (flash) { l.classList.remove('flash'); void l.offsetWidth; l.classList.add('flash'); }
 }

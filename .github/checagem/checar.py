@@ -40,6 +40,11 @@ readme = (RAIZ / "README.md").read_text()
 
 for p in reg:
     sig, pasta, nome = p["sigla"], p["pasta"], p["nome"]
+    if p.get("legado"):
+        # machine que virou aba de um instrumento: o código continua (outros plugins compilam a pasta),
+        # mas o plugin separado saiu do site e do pacote; a última release fica como legado
+        warn(sig, f"legado: virou parte do {p['legado']} (sem card no site, fora do pacote)")
+        continue
     cm_path = RAIZ / pasta / "CMakeLists.txt"
     if not cm_path.exists():
         err(sig, f"pasta {pasta}/ sem CMakeLists.txt"); continue
@@ -121,6 +126,10 @@ if not pac:
 else:
     pv = pac["versao"]
     for p in reg:
+        if p.get("legado"):
+            if p["sigla"] in pac["plugins"]:
+                err("DubStation", f"{p['sigla']} é legado e não pode estar no instalador completo")
+            continue
         v = versao(p["pasta"])
         if pac["plugins"].get(p["sigla"]) != v:
             err("DubStation", f"{p['sigla']} está na {v}, o instalador completo registra {pac['plugins'].get(p['sigla'])}: "

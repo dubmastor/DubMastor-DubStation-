@@ -1,0 +1,271 @@
+name: Build Mastor Reggae Drums MRD-12
+
+# O Mastor Reggae Drums MRD-12 usa o código do MRDM-12 direto da pasta dele:
+# quando o MRDM-12 muda, o Battery é recompilado e testado também.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ReggaeDrums/**'
+      - 'RiddimBank/Source/**'
+      - 'ReggaeDrumMachine/Source/**'
+      - 'ReggaeDrumMachine/CMakeLists.txt'
+      - '.github/workflows/build-dubbatteryreggae.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
+    tags:
+      - 'MRD-12-*'
+  pull_request:
+    paths:
+      - 'ReggaeDrums/**'
+      - 'RiddimBank/Source/**'
+      - 'ReggaeDrumMachine/Source/**'
+      - '.github/workflows/build-dubbatteryreggae.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: ReggaeDrums
+
+jobs:
+  render-test:
+    name: Teste offline (abas, 16 pads, groove, choke, estado e presets)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout JUCE 8.0.4
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: 8.0.4
+          path: JUCE
+
+      - name: Dependências do Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev \
+                                  libxcomposite-dev libxext-dev libfreetype-dev libfontconfig1-dev
+
+      - name: Compilar o teste
+        run: |
+          cmake -B build-test -DCMAKE_BUILD_TYPE=Release -DDBR_FORMATS=VST3 -DDBR_RENDER_TEST=ON -DJUCE_DIR="${{ github.workspace }}/JUCE"
+          cmake --build build-test --target dbr_render --parallel 4
+
+      - name: Rodar o teste
+        run: |
+          mkdir -p test-out && cd test-out
+          R=../build-test/dbr_render_artefacts/Release/dbr_render
+          $R battery.png 0
+          $R dubdrums.png 1
+          $R pads.wav
+          $R groove.wav
+          $R choke
+          $R estado
+          $R presets
+          $R daws
+          $R layer
+          # menu de GROOVES em dois caminhos: por baterista (fases) e por estilo (todos os bateristas), salvo no projeto
+          $R menu test-out/menu.png
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ReggaeDrums-teste
+          path: ReggaeDrums/test-out
+
+  build:
+    needs: render-test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+          - os: macos-latest
+            name: macOS
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout JUCE 8.0.4
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: 8.0.4
+          path: JUCE
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_DIR="${{ github.workspace }}/JUCE"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel 4
+
+      # --- Validação com pluginval (carrega o plugin, processa áudio, testa estado e interface)
+      - name: Validate VST3 with pluginval (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip -OutFile pluginval.zip
+          Expand-Archive pluginval.zip -DestinationPath pluginval
+          # nível 10 (o mais rigoroso): estado, automação, buses, tempo real, várias taxas e tamanhos de bloco
+          ./pluginval/pluginval.exe --strictness-level 10 --timeout-ms 900000 --validate "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" 2>&1 | Tee-Object -Variable pvlog
+          $code = $LASTEXITCODE
+          Write-Host "pluginval exit code: $code"
+          if ($code -ne 0) { exit 1 }
+
+      # --- Validador oficial da Steinberg (conformidade VST3: Cubase, Studio One, Reaper, Ableton, FL Studio, Bitwig)
+      - name: Validate VST3 with Steinberg validator (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: .
+        run: |
+          git clone --depth 1 --branch v3.7.14_build_55 https://github.com/steinbergmedia/vst3sdk.git vst3sdk
+          cd vst3sdk
+          git submodule update --init --depth 1 base pluginterfaces public.sdk cmake
+          Set-Content public.sdk/samples/vst-hosting/CMakeLists.txt "add_subdirectory(validator)"
+          cmake -B build -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=ON -DSMTG_RUN_VST_VALIDATOR=OFF
+          cmake --build build --config Release --target validator --parallel 4
+          $v = Get-ChildItem -Recurse -Filter validator.exe build | Select-Object -First 1
+          & $v.FullName "${{ github.workspace }}/ReggaeDrums/build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" 2>&1 | Tee-Object -Variable vlog
+          $code = $LASTEXITCODE
+          $vlog | Select-String -Pattern "Failed|ERROR" -Context 6,0 | ForEach-Object { Write-Host $_ }
+          if ($code -ne 0) { Write-Host "validator falhou: $code"; exit 1 }
+
+      - name: Check universal binary + validate (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          VST3="build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3"
+          BIN="$VST3/Contents/MacOS/Mastor Reggae Drums MRD-12"
+          echo "== Arquiteturas do binário"; lipo -info "$BIN"
+          lipo -info "$BIN" | grep -q x86_64 && lipo -info "$BIN" | grep -q arm64
+          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
+          unzip -q pluginval.zip
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate "$VST3"
+          echo "== auval (validador da Apple para AU: Logic, GarageBand, Ableton e outros no Mac)"
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "build/DubBatteryReggae_artefacts/Release/AU/Mastor Reggae Drums MRD-12.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 2
+          auval -v aumu Dbr1 Dblb
+          echo "== pluginval no AU (o formato que o Logic usa)"
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 10 --timeout-ms 1200000 --validate ~/Library/Audio/Plug-Ins/Components/"Mastor Reggae Drums MRD-12.component"
+
+      - name: Collect + package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item -Recurse "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" out/
+          Copy-Item "build/DubBatteryReggae_artefacts/Release/Standalone/Mastor Reggae Drums MRD-12.exe" out/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path out/* -DestinationPath ../MRD-12-Windows.zip
+
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Reggae Drums MRD-12" -Sigla MRD-12 -Saida ../MRD-12-Windows-Instalador.exe
+
+      - name: Conferir runtime embutido (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --quiet pefile
+          python "${{ github.workspace }}/.github/scripts/conferir-runtime-windows.py" out
+
+      - name: Collect + package (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p out
+          cp -R "build/DubBatteryReggae_artefacts/Release/VST3/Mastor Reggae Drums MRD-12.vst3" out/
+          cp -R "build/DubBatteryReggae_artefacts/Release/AU/Mastor Reggae Drums MRD-12.component" out/
+          cp -R "build/DubBatteryReggae_artefacts/Release/Standalone/Mastor Reggae Drums MRD-12.app" out/
+          # assinatura ad-hoc para o macOS aceitar o plugin localmente
+          codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
+          cd out && ditto -c -k --sequesterRsrc . ../../MRD-12-macOS.zip
+
+      - name: Instalador (macOS)
+        if: runner.os == 'macOS'
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Reggae Drums MRD-12" MRD-12 ../MRD-12-macOS-Instalador.pkg
+
+      # instala o .pkg de verdade no runner e confere que o AU aparece para o macOS (Logic/GarageBand)
+      - name: Testar o instalador (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          sudo installer -pkg ../MRD-12-macOS-Instalador.pkg -target /
+          ls -la "/Library/Audio/Plug-Ins/VST3/" "/Library/Audio/Plug-Ins/Components/" | grep "Reggae Drums"
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 3
+          auval -v aumu Dbr1 Dblb | tail -3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MRD-12-${{ matrix.name }}
+          path: |
+            MRD-12-${{ matrix.name }}.zip
+            MRD-12-${{ matrix.name }}-Instalador.*
+
+
+  # Release própria do Mastor Reggae Drums MRD-12: MRD-12-<versão do CMakeLists>, criada/atualizada a cada push
+  # na main que mexa no MRD-12 (ou por tag MRD-12-x.y). Não vira a "latest", para não mexer
+  # nos links /releases/latest/download dos outros plugins.
+  release:
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MRD-12-') || inputs.tag != '') }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ReggaeDrums/RELEASE_NOTES.md
+            ReggaeDrums/CMakeLists.txt
+          sparse-checkout-cone-mode: false
+
+      - name: Versão
+        id: ver
+        run: |
+          V=$(sed -n 's/^project(DubBatteryReggae VERSION \([0-9]*\.[0-9]*\).*/\1/p' ReggaeDrums/CMakeLists.txt)
+          echo "Versão do MRD-12: $V"
+          test -n "$V"
+          echo "tag=MRD-12-$V" >> "$GITHUB_OUTPUT"
+          echo "name=Mastor Reggae Drums MRD-12 $V" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: MRD-12-*
+          merge-multiple: true
+
+      - name: Conferir os arquivos
+        run: |
+          ls -la dist
+          test -n "$(ls dist/*.zip 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.exe 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.pkg 2>/dev/null)"
+          # o plugin do Windows não pode depender do Visual C++ Redistributable (senão não abre em PCs sem ele)
+          d=$(mktemp -d); unzip -q dist/*-Windows.zip -d "$d"
+          dll=$(find "$d" -path '*x86_64-win*' -type f | head -1)
+          if objdump -p "$dll" | grep -iE 'DLL Name: (VCRUNTIME|MSVCP)'; then echo "::error::plugin depende do runtime do Visual C++"; exit 1; fi
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.name }}
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
+          body_path: ReggaeDrums/RELEASE_NOTES.md
+          make_latest: 'false'

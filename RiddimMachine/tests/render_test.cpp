@@ -8,12 +8,14 @@
 //   mrm_render edicao                  -> MIDI editável da harmonia, da bateria e do baixo vai para o riddim
 //   mrm_render maquinas                -> ARRASTE de cada máquina e máquina desligada fora do riddim
 //   mrm_render samples                 -> o kit da bateria é o dos samples DM (os WAVs de ReggaeDrumMachine/Samples)
+//   mrm_render banco                  -> BANCO ÚNICO DE RIDDIMS: cada música vai inteira para as três máquinas e fica salva no projeto
 //   mrm_render estado                  -> salva e recarrega o estado (aba, BPM, harmonia, edições, Big Knob)
 #include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/MrmProcessor.h"
 #include "../Source/MrmEditor.h"
 #include "../../ReggaeDrumMachine/Source/DMSamples.h"
+#include "../../RiddimBank/Source/RiddimBank.h"
 
 namespace
 {
@@ -160,6 +162,61 @@ int main (int argc, char** argv)
             ok = ok && drumsOk && bassOk;
         }
         std::printf ("presets: %s (%d presets em %d pastas)\n", ok ? "ok" : "FALHOU", dubpresets::numPresets, dubpresets::numFolders);
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "banco")
+    {
+        // cada música do banco com harmonia: acordes no MRCM e no MRBM, BPM único, kit, baterista e baixista dela
+        auto& c = proc.getChords().apvts; auto& b = proc.getBass().apvts; auto& d = proc.getDrums().apvts;
+        int tested = 0, bad = 0;
+        for (int i = 0; i < riddimbank::numEntries; ++i)
+        {
+            const auto& e = riddimbank::entries[i];
+            if (e.numChords <= 0) continue;
+            ++tested;
+            proc.applyBankRiddim (i);
+            pump (2);
+            bool ok = proc.currentBankRiddim() == i
+                   && (int) std::lround (get (proc.apvts, "bpm")) == e.bpm && (int) std::lround (get (b, "bpm")) == e.bpm
+                   && (int) get (d, "style") == e.kit && (int) get (d, "drummer") == e.drummer && (int) get (b, "style") == e.bassStyle
+                   && (int) get (b, "timbre") == e.timbre
+                   && get (b, "drumsOn") < 0.5f;
+            for (int k = 0; k < 4; ++k)
+            {
+                const juce::String n (k);
+                const bool on = k == 0 || get (c, "on" + n) > 0.5f;
+                if (on != (k < e.numChords)) ok = false;
+                if (k < e.numChords && ((int) get (c, "root" + n) != e.chords[k].root || (int) get (b, "root" + n) != e.chords[k].root
+                                        || (int) get (c, "dur" + n) != e.chords[k].dur || (int) get (b, "dur" + n) != e.chords[k].dur
+                                        || ((int) get (c, "qual" + n) == dub::Min) != (e.chords[k].minor != 0))) ok = false;
+            }
+            if (! ok && ++bad < 8) std::printf ("  banco %d (%s) FALHOU\n", i, e.name);
+        }
+        // harmonia pendente não carrega (nada muda)
+        int pending = -1;
+        for (int i = 0; i < riddimbank::numEntries && pending < 0; ++i) if (riddimbank::entries[i].numChords == 0) pending = i;
+        const int before = proc.currentBankRiddim();
+        if (pending >= 0) proc.applyBankRiddim (pending);
+        const bool pendingOk = proc.currentBankRiddim() == before;
+        // o número da música fica salvo no projeto
+        int pick = -1;
+        for (int i = riddimbank::numEntries - 1; i >= 0 && pick < 0; --i) if (riddimbank::entries[i].numChords > 0 && riddimbank::entries[i].mrcm < 0) pick = i;
+        proc.applyBankRiddim (pick);
+        pump (2);
+        juce::MemoryBlock mb;
+        proc.getStateInformation (mb);
+        MrmProcessor again;
+        again.setStateInformation (mb.getData(), (int) mb.getSize());
+        pump (2);
+        const bool saved = again.currentBankRiddim() == pick;
+        // projeto antigo: o preset do MRCM-1240 aparece como a música do banco
+        proc.applyRiddimPreset (0);
+        pump (2);
+        const bool legacy = proc.currentBankRiddim() == riddimbank::fromMrcm[0];
+        const bool ok = bad == 0 && tested > 300 && pendingOk && saved && legacy;
+        std::printf ("banco: %s (%d musicas testadas, %d falharam, pendente ignorada: %s, salvo no projeto: %s, preset antigo -> banco: %s)\n",
+                     ok ? "ok" : "FALHOU", tested, bad, pendingOk ? "sim" : "nao", saved ? "sim" : "nao", legacy ? "sim" : "nao");
         return ok ? 0 : 1;
     }
 

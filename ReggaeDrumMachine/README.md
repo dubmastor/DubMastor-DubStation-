@@ -1,4 +1,6 @@
-# Mastor Reggae Drum Machine MRDM-12 2.7
+# Mastor Reggae Drum Machine MRDM-12 2.7 (legado)
+
+> O MRDM-12 virou a aba **DUB DRUMS** do **Mastor Reggae Drums MRD-12** (pasta `ReggaeDrums/`). Esta pasta continua: o MRD-12 e o MRM-0420 compilam o código dela. A versão 2.7 fica para download só para abrir projetos antigos.
 
 *(antigo Mastor Dub Drums Machine MDDM-12 e DubMastor Dub Drums)*
 
