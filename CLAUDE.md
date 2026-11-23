@@ -21,6 +21,7 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
    teclado na tela que funciona no toque, layout de celular, link "← Dub Station" e a mesma versão do plugin.
    No card do site, o botão verde "▶ Tocar no celular / navegador". Plugin novo sem versão web não passa na checagem.
    Os plugins antigos marcados como `"web": "pendente"` no `plugins.json` devem ganhar a sua quando forem atualizados.
+   Plugin com `"oculto": true` no `plugins.json` fica fora do site por enquanto (sem card); a checagem só avisa e falha se o card continuar lá.
 4. **Registro.** Plugin novo entra no `plugins.json` (sigla, pasta, nome, tipo, web) e ganha um workflow
    `build-<pasta em minúsculas>.yml` copiado de um existente (com instaladores, pluginval e auval).
 5. **Checagem.** Rodar `python3 .github/checagem/checar.py` antes de enviar. O workflow `checagem.yml`

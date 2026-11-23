@@ -69,11 +69,15 @@ for p in reg:
     if not (RAIZ / f".github/workflows/build-{pasta.lower()}.yml").exists():
         err(sig, f"falta o workflow .github/workflows/build-{pasta.lower()}.yml")
 
-    # site: card com nome + versão e links da versão atual
-    card = re.search(r'(?s)<article class="card[^"]*"[^>]*>(?:(?!</article>).)*?<h3>' + re.escape(nome) + r' <small>([^<]+)</small></h3>.*?</article>', site)
-    if not card:
+    # site: card com nome + versão e links da versão atual ("oculto": true = fora do site por enquanto)
+    if p.get("oculto"):
+        warn(sig, "oculto: fora do site por enquanto (sem card)")
+        if f"<h3>{nome} <small>" in site:
+            err(sig, "está marcado como oculto, mas o site ainda tem o card")
+    card = None if p.get("oculto") else re.search(r'(?s)<article class="card[^"]*"[^>]*>(?:(?!</article>).)*?<h3>' + re.escape(nome) + r' <small>([^<]+)</small></h3>.*?</article>', site)
+    if not card and not p.get("oculto"):
         err(sig, "o site não tem o card deste plugin (título '<h3>nome <small>versão</small></h3>')")
-    else:
+    elif card:
         c = card.group(0)
         if card.group(1) != v:
             err(sig, f"site mostra a versão {card.group(1)}, o código está na {v}")
