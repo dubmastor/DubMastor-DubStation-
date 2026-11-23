@@ -2,7 +2,7 @@
 
 - **BANCO ÚNICO DE RIDDIMS nos PRESETS da aba RIDDIM:** 356 músicas em 10 estilos e 155 riddims de A a Z, o mesmo banco do MRCM-1240, do MRDM-12 e do MRBM-69 (`RiddimBank/`). A música vai inteira para as três máquinas: harmonia conferida, BPM, kit, baterista e baixista mais próximos de quem gravou
 - Visor azul com o estilo e os anos, a música, os acordes, o BPM (ORIGINAL quando medido), o kit, os músicos e as **luzes H B D** (harmonia, baixo e bateria da gravação original). ◀ ▶ passam por estilo e por música; LISTA e PRESETS abrem **ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z** e a opção **Só completos**
-- **TIMBRE do baixo na aba RIDDIM:** ROOTS, **SUPER TONE** (o baixo digital Casio da era Sleng Teng) ou 808, direto na linha do BAIXO, acima dos baixistas
+- **TIMBRE do baixo na aba RIDDIM:** ROOTS, **SUPER TONE** (o baixo digital Casio da era Sleng Teng) ou 808, direto na linha do BAIXO, acima dos baixistas. Cada música do banco já escolhe o timbre da época: SUPER TONE no digital e no ragga, 808 no dancehall, ROOTS no resto (dá para trocar na hora)
 - **ALAVANCA** sorteia uma música do banco (só ROCKERS e ONE DROP: caixa no 2 e no 4)
 - Projetos antigos abrem igual: o preset antigo aparece como a música certa do banco
 - Teste novo `mrm_render banco`: as 321 músicas com harmonia carregam certo nas três máquinas e ficam salvas no projeto

@@ -491,6 +491,7 @@ void MrmProcessor::applyBankRiddim (int index)
     setRiddimParam (drums.apvts, "backbeat", 0.0f);   // caixa na batida principal
     setRiddimParam (drums.apvts, "fill", 0.0f);
     setRiddimParam (bass.apvts, "style", (float) e.bassStyle);
+    setRiddimParam (bass.apvts, "timbre", (float) e.timbre);   // timbre da época: ROOTS, SUPER TONE (digital e ragga) ou 808 (dancehall)
     syncLinks();       // o baixo e a bateria recebem harmonia e BPM novos agora
 }
 

@@ -180,6 +180,7 @@ int main (int argc, char** argv)
             bool ok = proc.currentBankRiddim() == i
                    && (int) std::lround (get (proc.apvts, "bpm")) == e.bpm && (int) std::lround (get (b, "bpm")) == e.bpm
                    && (int) get (d, "style") == e.kit && (int) get (d, "drummer") == e.drummer && (int) get (b, "style") == e.bassStyle
+                   && (int) get (b, "timbre") == e.timbre
                    && get (b, "drumsOn") < 0.5f;
             for (int k = 0; k < 4; ++k)
             {
