@@ -1,4 +1,4 @@
-## Mastor Reggae Drum Machine MRDM-12 2.5 🟢🟡⚫
+## Mastor Reggae Drum Machine MRDM-12 2.6 🟢🟡⚫
 
 - **GROOVES no visor azul de MPC** (no módulo BATERISTA, igual ao do Mastor Riddim Machine): 21 presets tirados de músicas de cada baterista. **◀ ▶** passa pelas músicas do baterista escolhido; clique no visor para a lista completa, separada por baterista
   - **Style Scott:** Night Nurse, Rock 'n' Groove, Looking My Love, Big Ship, Man of Mystery
@@ -6,17 +6,30 @@
   - **Carlton Barrett:** One Drop, Exodus, Stir It Up, Three Little Birds, Is This Love
   - **Sly Dunbar:** Right Time, I Need a Roof, Shine Eye Gal, Sinsemilla, Sponji Reggae
   - **DIGIKAL:** Under Mi Sleng Teng (Casio MT-40) e Tempo (DX/DMX)
-- Cada groove ajusta estilo, bumbo, caixa/aro, hi-hat, swing, dinâmica, aleatoriedade, viradas, kit e BPM da gravação ("~" quando o BPM é aproximado). O visor mostra a música, o artista, o ano e o BPM; um "*" aparece quando você mexe em algo depois de carregar
+- Cada groove ajusta estilo, bumbo, caixa/aro, hi-hat, swing, dinâmica, aleatoriedade, viradas, kit e BPM da gravação (61 a 100 BPM, contado com a caixa no 2 e no 4; "~" quando é aproximado). O visor mostra a música, o artista, o ano e o BPM; um "*" aparece quando você mexe em algo depois de carregar
 - **Sem flam:** quando duas notas da mesma peça caem coladas, fica só a nota no tempo certo (o flam parecia defeito)
 - Versão para celular igual, com o mesmo visor de grooves
 
-### Da 2.4
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
+## Mastor Reggae Drum Machine MRDM-12 2.5 🟢🟡⚫
+
+- **BPM a partir de 50:** os riddims mais lentos (contados com a caixa no 2 e no 4) agora cabem no BPM, sem travar em 60
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
+## Mastor Reggae Drum Machine MRDM-12 2.4 🟢🟡⚫
 
 - **Visual de console anos 70**: faixa verde-oliva no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)
 - **Placa de latão com a sigla MRDM-12** no lugar de "DUB STATION"
 - Mesmo visual na versão para navegador
 
-### Da 2.3
+## Mastor Reggae Drum Machine MRDM-12 2.3 🟢🟡⚫
 
 - **Instaladores**: `.pkg` para Mac (VST3 + AU em /Library/Audio/Plug-Ins, app em /Applications) e `.exe` para Windows (VST3 na pasta comum de todas as DAWs)
 - O instalador do Mac **tira a quarentena** (o aviso de "danificado") e relê os Audio Units para o Logic/GarageBand

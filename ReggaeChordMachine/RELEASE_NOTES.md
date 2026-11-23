@@ -1,3 +1,13 @@
+## Mastor Reggae Chord Machine MRCM-1240 2.4 🟢🟡⚫
+
+- **BPM dos presets corrigido:** nenhum riddim passa de 100 BPM; os que estavam acima (Rivers of Babylon, The Harder They Come, Now That We Found Love, Could You Be Loved, Kingston Town, Here Comes the Hotstepper, Temperature) estavam dobrados e agora ficam na metade, contados com a caixa no 2 e no 4
+- BPM interno a partir de 50
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Chord Machine MRCM-1240 2.3 🟢🟡⚫
 
 - **Visual de console anos 70**: faixa mostarda no alto da placa creme, com o nome em letras creme; cada machine da DubStation tem a sua cor (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota, MRM-0420 verde-petróleo)

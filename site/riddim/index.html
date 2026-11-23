@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Riddim Machine MRM-0420 2.0 — DubStation</title>
+<title>Mastor Riddim Machine MRM-0420 2.1 — DubStation</title>
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -183,7 +183,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <body>
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
-  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">2.0</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
+  <div><h1>MASTOR RIDDIM MACHINE <span id="ver">2.1</span></h1><div class="sub">BATERIA + HARMONIA + BAIXO + CONTROL ROOM · RIDDIM STARTER</div></div>
   <div class="plaque">MRM-0420</div>
   <div class="brand"><div class="flag"></div><b>DUBSTATION</b></div>
 </header>
@@ -242,7 +242,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 
 <section class="mod"><div class="tag">BPM · DIGITE, TAP OU ESTILO</div>
   <div class="bpmsec">
-    <label class="bpmbig"><small>BPM</small><input id="bpmIn" type="number" min="60" max="180" step="1" inputmode="numeric" aria-label="BPM"><small>TOQUE E DIGITE</small></label>
+    <label class="bpmbig"><small>BPM</small><input id="bpmIn" type="number" min="50" max="180" step="1" inputmode="numeric" aria-label="BPM"><small>TOQUE E DIGITE</small></label>
     <div class="bpmsteps"><button data-d="-1">−1</button><button data-d="1">+1</button><button data-d="-5">−5</button><button data-d="5">+5</button></div>
     <button class="bpmtap" id="tap">TAP<small>BATA NO TEMPO</small></button>
   </div>
@@ -282,7 +282,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <script src="../chords/presetmenu.js"></script>
 <script>
 'use strict';
-const VERSION = '2.0';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
+const VERSION = '2.1';   // mesma versão do plugin (RiddimMachine/CMakeLists.txt)
 document.getElementById('ver').textContent = VERSION;
 const C = window.MRCM, D = window.MDDM, B = window.MRBM;
 const $ = (id) => document.getElementById(id);
@@ -805,14 +805,14 @@ const BPM_PRESETS = [
   ['ROCKERS 75-79', 'Rockers', 78], ['ROCKERS 75-79', 'Rockers rápido', 82],
   ['RUB A DUB 80-84', 'Rub a dub (Volcano)', 84], ['RUB A DUB 80-84', 'Rub a dub rápido', 88],
   ['DIGITAL 85-89', 'Digital (Sleng Teng)', 82], ['DIGITAL 85-89', 'Digital (King Jammy)', 90],
-  ['DANCEHALL 90s', 'Ragga 90', 96], ['DANCEHALL 90s', 'Dancehall 90s', 100], ['DANCEHALL 2000s', 'Dancehall 2000', 104],
+  ['DANCEHALL 90s', 'Ragga 90', 96], ['DANCEHALL 90s', 'Dancehall 90s', 100], ['DANCEHALL 2000s', 'Dancehall 2000', 52],
   ['LOVERS ROCK 75-95', 'Lovers lento', 70], ['LOVERS ROCK 75-95', 'Lovers rock', 76],
   ['NEW ROOTS 2000s', 'New roots', 72], ['NEW ROOTS 2000s', 'New roots groove', 78],
-  ['DUB', 'Dub pesado', 64], ['DUB', 'Dub', 70], ['STEPPERS UK 80s-90s', 'Steppers UK', 130], ['STEPPERS UK 80s-90s', 'Steppers rápido', 140]];
+  ['DUB', 'Dub pesado', 64], ['DUB', 'Dub', 70], ['STEPPERS UK 80s-90s', 'Steppers UK', 65], ['STEPPERS UK 80s-90s', 'Steppers rápido', 70]];
 let bpmChosen = -1;   // preset de BPM aceso (apaga quando o BPM muda)
 function setBpm(v, chosen = -1) {
   v = Math.round(+v); if (!isFinite(v) || v <= 0) { drawAll(); return; }
-  st.bpm = Math.max(60, Math.min(180, v)); bpmChosen = chosen; $('bpmStyle').value = '';
+  st.bpm = Math.max(50, Math.min(180, v)); bpmChosen = chosen; $('bpmStyle').value = '';
   save(); audio.setBpm(); drawAll();
 }
 function drawBpmLcd() {

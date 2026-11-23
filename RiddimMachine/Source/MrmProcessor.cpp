@@ -55,7 +55,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MrmProcessor::createLayout()
     AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add (std::make_unique<AudioParameterBool>  (ParameterID { "play", 1 }, "Play riddim", false));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "bpm", 1 }, "BPM",
-                                                       NormalisableRange<float> (60.0f, 180.0f, 1.0f), 75.0f));
+                                                       NormalisableRange<float> (50.0f, 180.0f, 1.0f), 75.0f));
     StringArray lengths;
     for (int i = 0; i < numLengths; ++i) lengths.add (String (kLengths[i]) + " compassos");
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "riddimBars", 1 }, "Tamanho do riddim", lengths, 2));
@@ -308,7 +308,7 @@ void MrmProcessor::buildLinks()
     auto identity = [] (float v) { return juce::roundToInt (v); };
     auto plain    = [] (int c) { return (float) c; };
     auto boolIn   = [] (float v) { return v > 0.5f ? 1 : 0; };
-    auto bpmIn    = [] (float v) { return juce::jlimit (60, 180, juce::roundToInt (v)); };
+    auto bpmIn    = [] (float v) { return juce::jlimit (50, 180, juce::roundToInt (v)); };
 
     // BPM: um só para todos
     links.push_back ({ { { &apvts, "bpm", bpmIn, plain }, { &chords.apvts, "bpm", bpmIn, plain },

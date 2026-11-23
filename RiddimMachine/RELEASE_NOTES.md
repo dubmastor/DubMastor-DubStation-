@@ -1,17 +1,31 @@
-## Mastor Riddim Machine MRM-0420 2.0 — DubStation
+## Mastor Riddim Machine MRM-0420 2.1 — DubStation
 
-- **GROOVES do MRDM-12 2.5 na aba BATERIA**: visor azul de MPC no módulo BATERISTA com 21 presets de músicas de cada baterista
+- **GROOVES do MRDM-12 2.6 na aba BATERIA**: visor azul de MPC no módulo BATERISTA com 21 presets de músicas de cada baterista
   (Style Scott, Santa Davis, Carlton Barrett, Sly Dunbar e DIGIKAL). ◀ ▶ passa pelas músicas do baterista; clique no visor para a lista.
-  O groove ajusta a bateria e o BPM; a harmonia e o baixo continuam como estão
+  O groove ajusta a bateria e o BPM do riddim todo; a harmonia e o baixo continuam como estão
 - **Sem flam** na bateria: duas notas coladas da mesma peça viram uma só, no tempo certo
 
-### Da 1.9
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
+## Mastor Riddim Machine MRM-0420 2.0 — DubStation
+
+- **BPM corrigido em todos os presets:** nada passa de 100 BPM. Os riddims que estavam acima estavam dobrados e agora ficam na metade (ex.: Could You Be Loved 52, Temperature 63); os presets de BPM DANCEHALL 2000 (52) e STEPPERS UK (65 e 70) também
+- BPM de 50 a 180 (antes 60), em todas as máquinas
+- Versão para celular igual
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
+## Mastor Riddim Machine MRM-0420 1.9 — DubStation
 
 - **Visual de console anos 70**: faixa verde-petróleo atrás do nome; dentro das abas, cada máquina mostra a sua cor e a placa de latão com a própria sigla (MRDM-12 oliva, MRCM-1240 mostarda, MRBM-69 terracota)
 - Aba BAIXO com o visor de riddims em LCD azul estilo MPC do MRBM-69 2.9
 - Mesma faixa na versão para navegador
 
-### Da 1.8
+## Mastor Riddim Machine MRM-0420 1.8 — DubStation
 
 - **PRESETS no visor azul de MPC** (aba RIDDIM): **ESTILO ◀ ▶** e **MÚSICA ◀ ▶** carregam o riddim na hora, como os presets do Dub Battery Reggae; o visor mostra o estilo, a posição (ex.: 05/21), a música, os acordes, o BPM, o kit e os músicos; clique no visor ou em **LISTA** para escolher por estilo
 - **Presets separados só por estilo de reggae:** EARLY REGGAE, ROOTS, ROCKERS, LOVERS ROCK, RUB A DUB, DIGITAL, DANCEHALL e NEW ROOTS (o Gregory Isaacs entra no estilo de cada fase), músicas em ordem alfabética

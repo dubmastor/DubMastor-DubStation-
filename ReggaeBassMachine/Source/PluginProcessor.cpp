@@ -54,7 +54,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
 
     // preview
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "preview", 1 }, "Play (preview)", false));
-    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (55.0f, 180.0f, 1.0f), 75.0f));
+    layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (50.0f, 180.0f, 1.0f), 75.0f));
 
     // som interno
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));

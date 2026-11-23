@@ -1,9 +1,9 @@
-# Mastor Riddim Machine MRM-0420 2.0 — DubStation
+# Mastor Riddim Machine MRM-0420 2.1 — DubStation
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.0/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.0/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
-(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.0/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.0/MRM-0420-macOS.zip))
+**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.1/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.1/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
+(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.1/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.1/MRM-0420-macOS.zip))
 
 ![MRM-0420, aba RIDDIM](docs/interface-riddim.png)
 
@@ -61,7 +61,7 @@ A **harmonia é uma só** para o MRCM-1240 e o MRBM-69 (mexer nos acordes em qua
 | **PLAY RIDDIM** | Toca todas as máquinas juntas, sem a DAW rodando, começando pela intro |
 | **BIG KNOB · BYPASS** | Na seção do Big Knob da aba RIDDIM: desliga o Big Knob inteiro (filtro, eco, sirene e maximizer) para comparar com e sem |
 | **DUB SIREN** | Seção própria na aba RIDDIM, logo abaixo do Big Knob: a sirene do Mastor Big Knob. **FIRE** toca enquanto você segura (as repetições continuam no delay), **HOLD** deixa ligada, **FORMA DA ONDA** (seno, triângulo, quadrada, sobe, desce = o "piu-piu" clássico) e os botões PITCH, RATE, DEPTH, DELAY, REPEATS e LEVEL (duplo clique volta ao padrão) |
-| **BPM** (seção da aba RIDDIM) | Um BPM para todas. **Clique no visor e digite** (60 a 180), ou arraste e gire a roda do mouse; teclas **−1, +1, −5, +5** e **TAP** (bata no tempo). Embaixo, **24 teclas de BPM por época e estilo**, a escolhida acende. No visor do alto (transporte), arraste, roda do mouse, duplo clique = 75 ou clique em **ESTILO ▾** para o BPM POR ÉPOCA E ESTILO: ROCKSTEADY 66-68 (74/80), EARLY REGGAE 68-72 (84/90), ROOTS 70s (66/72/76), ROCKERS 75-79 (78/82), RUB A DUB 80-84 (84/88), DIGITAL 85-89 (82/90), DANCEHALL 90s (96/100) e 2000s (104), LOVERS ROCK (70/76), NEW ROOTS (72/78), DUB (64/70), STEPPERS UK (130/140). Com a DAW tocando, mostra o BPM da DAW |
+| **BPM** (seção da aba RIDDIM) | Um BPM para todas. **Clique no visor e digite** (50 a 180), ou arraste e gire a roda do mouse; teclas **−1, +1, −5, +5** e **TAP** (bata no tempo). Embaixo, **24 teclas de BPM por época e estilo**, a escolhida acende. No visor do alto (transporte), arraste, roda do mouse, duplo clique = 75 ou clique em **ESTILO ▾** para o BPM POR ÉPOCA E ESTILO: ROCKSTEADY 66-68 (74/80), EARLY REGGAE 68-72 (84/90), ROOTS 70s (66/72/76), ROCKERS 75-79 (78/82), RUB A DUB 80-84 (84/88), DIGITAL 85-89 (82/90), DANCEHALL 90s (96/100) e 2000s (52), LOVERS ROCK (70/76), NEW ROOTS (72/78), DUB (64/70), STEPPERS UK (65/70). Com a DAW tocando, mostra o BPM da DAW |
 
 ## Abas das máquinas
 Uma máquina por aba, cada uma com o painel **completo**, igual ao plugin separado (com o mesmo código: o que muda nas

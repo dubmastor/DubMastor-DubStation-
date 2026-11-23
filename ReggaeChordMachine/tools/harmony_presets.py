@@ -238,7 +238,7 @@ def riddim(folder, over):
         elif k == 'dr': r['drummer'] = DRUM[v]
         elif k == 'bx': r['bassist'] = BASS[v]
         else: raise ValueError(kv)
-    assert 60 <= r['bpm'] <= 180
+    assert 50 <= r['bpm'] <= 180, r
     return r
 
 def parse(spec):
@@ -260,8 +260,8 @@ assert len({b[2] for b in BANK}) == len(BANK), 'nome repetido'
 # Quem não está aqui não tem medição confiável: fica o andamento típico do estilo e da época (o menu mostra "~").
 REAL_BPM = {
     'Israelites (Desmond Dekker 1968)': 73, "54-46 That's My Number (Toots 1968)": 79, 'Monkey Man (Toots 1969)': 64,
-    'Duppy Conqueror (Wailers 1970)': 89, 'You Can Get It (Jimmy Cliff 1970)': 64, 'The Harder They Come (Jimmy Cliff 1972)': 104,
-    'Rivers of Babylon (Melodians 1970)': 107, '007 Shanty Town (Desmond Dekker 1967)': 97, 'The Tide Is High (Paragons 1967)': 98,
+    'Duppy Conqueror (Wailers 1970)': 89, 'You Can Get It (Jimmy Cliff 1970)': 64, 'The Harder They Come (Jimmy Cliff 1972)': 52,
+    'Rivers of Babylon (Melodians 1970)': 54, '007 Shanty Town (Desmond Dekker 1967)': 97, 'The Tide Is High (Paragons 1967)': 98,
     'Let Your Yeah Be Yeah (Pioneers 1971)': 65, 'I Can See Clearly Now (Johnny Nash 1972)': 61,
     'Satta Massagana (Abyssinians 1969)': 77, 'Pressure Drop (Toots 1969)': 73, 'Marcus Garvey (Burning Spear 1975)': 92,
     'Police and Thieves (Junior Murvin 1976)': 64, 'Natural Mystic (Bob Marley 1977)': 66, 'Exodus (Bob Marley 1977)': 67,
@@ -269,8 +269,8 @@ REAL_BPM = {
     'Stir It Up (Bob Marley 1973)': 74, 'I Shot the Sheriff (Bob Marley 1973)': 97, 'Get Up Stand Up (Bob Marley 1973)': 74,
     'Concrete Jungle (Bob Marley 1973)': 96, 'Lively Up Yourself (Bob Marley 1973)': 65, 'Kinky Reggae (Bob Marley 1973)': 70,
     'Them Belly Full (Bob Marley 1974)': 70, 'Chase the Devil (Max Romeo 1976)': 75, 'One Step Forward (Max Romeo 1976)': 71,
-    'Legalize It (Peter Tosh 1976)': 73, 'Uptown Top Ranking (Althea & Donna 1977)': 81, 'Now That We Found Love (Third World 1978)': 119,
-    'Money in My Pocket (Dennis Brown 1979)': 69, 'One Drop (Bob Marley 1979)': 61, 'Could You Be Loved (Bob Marley 1980)': 104,
+    'Legalize It (Peter Tosh 1976)': 73, 'Uptown Top Ranking (Althea & Donna 1977)': 81, 'Now That We Found Love (Third World 1978)': 60,
+    'Money in My Pocket (Dennis Brown 1979)': 69, 'One Drop (Bob Marley 1979)': 61, 'Could You Be Loved (Bob Marley 1980)': 52,
     'Buffalo Soldier (Bob Marley 1983)': 65, 'Three Little Birds (Bob Marley 1977)': 74, 'Equal Rights (Peter Tosh 1977)': 76,
     "Steppin' Razor (Peter Tosh 1977)": 64, 'Downpressor Man (Peter Tosh 1977)': 75,
     'Shine Eye Gal (Black Uhuru 1979)': 69, 'Sensimilla (Barrington Levy 1980)': 76, 'Fire House Rock (Wailing Souls 1981)': 65,
@@ -282,13 +282,13 @@ REAL_BPM = {
     'Ting-A-Ling (Shabba Ranks 1990) [auto]': 63,
     'Many Rivers to Cross (Jimmy Cliff 1969)': 69, 'Help Me Make It Through the Night (John Holt 1974)': 79,
     'Waiting in Vain (Bob Marley 1977)': 79, 'Is This Love (Bob Marley 1978)': 61, 'Red Red Wine (UB40 1983)': 89,
-    'Wild World (Maxi Priest 1988)': 84, 'Kingston Town (UB40 1989)': 102, 'Tempted to Touch (Beres Hammond 1990)': 82,
+    'Wild World (Maxi Priest 1988)': 84, 'Kingston Town (UB40 1989)': 51, 'Tempted to Touch (Beres Hammond 1990)': 82,
     'Close to You (Maxi Priest 1990)': 96, 'Everything I Own (Ken Boothe 1974)': 77, 'Silly Games (Janet Kay 1979)': 61,
     'Good Thing Going (Sugar Minott 1981)': 78, 'I Wanna Wake Up With You (Boris Gardiner 1986)': 82, 'Here I Am (UB40 1990)': 93,
     "Can't Help Falling in Love (UB40 1993)": 87,
-    'Mr. Loverman (Shabba Ranks 1992)': 87, 'Informer (Snow 1992)': 98, 'Here Comes the Hotstepper (Ini Kamoze 1994)': 125,
+    'Mr. Loverman (Shabba Ranks 1992)': 87, 'Informer (Snow 1992)': 98, 'Here Comes the Hotstepper (Ini Kamoze 1994)': 63,
     "You Don't Love Me (Dawn Penn 1994)": 74, 'Boombastic (Shaggy 1995)': 80, 'Under Mi Sensi (Barrington Levy 1985)': 76,
-    "It Wasn't Me (Shaggy 2000)": 95, 'Get Busy (Sean Paul 2003)': 100, 'Temperature (Sean Paul 2005)': 125,
+    "It Wasn't Me (Shaggy 2000)": 95, 'Get Busy (Sean Paul 2003)': 100, 'Temperature (Sean Paul 2005)': 63,
     'Murder She Wrote (Chaka Demus & Pliers 1992) [auto]': 95, 'Bam Bam (Chaka Demus & Pliers 1992) [auto]': 95,
     'Tease Me (Chaka Demus & Pliers 1993) [auto]': 68, 'Bad Boys (Inner Circle 1993)': 87, "It's Me Again Jah (Luciano 1994) [auto]": 77,
     'Wanna Be Loved (Buju Banton 1995) [auto]': 73, 'Angel (Shaggy 2000)': 85,
@@ -316,6 +316,7 @@ for f, e, n, s, o in BANK:
     r = riddim(f, o)                     # BPM e músicos do jeito que foram escolhidos
     real = n in REAL_BPM
     if real: r['bpm'] = REAL_BPM[n]
+    assert 50 <= r['bpm'] <= 100, (n, r['bpm'])   # acima de 100 é o BPM dobrado (a caixa conta no 2 e no 4)
     presets.append(dict(folder=style_of(f, e, n), era=e, name=n, chords=parse(s), bpmReal=int(real), **r))
 
 menu_order = []   # ordem do menu: estilo > nome (alfabética); a ordem do banco não muda (o índice fica salvo nos projetos)

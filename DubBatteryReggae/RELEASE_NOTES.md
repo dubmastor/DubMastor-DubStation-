@@ -2,7 +2,7 @@
 
 O **Dub Battery Reggae** agora se chama **Mastor Dub Battery Reggae DBR**, no padrão dos outros plugins da Dub Station.
 
-- **GROOVES no visor azul de MPC** na aba DUB DRUMS (os do MRDM-12 2.5): 21 presets de músicas de Style Scott, Santa Davis,
+- **GROOVES no visor azul de MPC** na aba DUB DRUMS (os do MRDM-12 2.6): 21 presets de músicas de Style Scott, Santa Davis,
   Carlton Barrett, Sly Dunbar e DIGIKAL (Night Nurse, Exodus, Stalag 17, Shine Eye Gal, Under Mi Sleng Teng…), com o BPM da gravação.
   ◀ ▶ passa pelas músicas do baterista; clique no visor para a lista completa
 - **Sem flam**: duas notas coladas da mesma peça viram uma só, no tempo certo

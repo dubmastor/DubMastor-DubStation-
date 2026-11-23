@@ -76,7 +76,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubDrumsProcessor::createLay
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "colorMidi", 1 }, "MIDI colorido (um canal por compasso)", true));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { "sound", 1 }, "Som interno", true));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "bpm", 1 }, "BPM do preview",
-                                                       NormalisableRange<float> (60.0f, 180.0f, 1.0f), 75.0f));
+                                                       NormalisableRange<float> (50.0f, 180.0f, 1.0f), 75.0f));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "volume", 1 }, "Volume",
                                                        NormalisableRange<float> (0.0f, 1.0f, 0.01f), 0.7f));
 
