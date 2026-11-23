@@ -63,6 +63,7 @@ struct FactoryPreset
 {
     const char* name;
     std::function<void (std::function<void (int pad, P, float)>)> apply;
+    std::vector<std::pair<int, int>> samples {};   // timbre de fábrica por pad (pad, índice na biblioteca); o resto fica o do pad
 };
 
 inline const std::vector<FactoryPreset>& factoryPresets()
@@ -103,6 +104,18 @@ inline const std::vector<FactoryPreset>& factoryPresets()
                 set (2, P::cutoff, 4500.0f); set (2, P::release, 900.0f);
                 set (13, P::cutoff, 6000.0f);
             } },
+        // SLENG TENG (1985): o Casio MT-40 do KIT DIGITAL do MRDM-12 nos pads, curto e seco como a máquina
+        { "SLENG TENG (CASIO MT-40)", [] (auto set)
+            {
+                for (int p = 0; p < numPads; ++p) { set (p, P::sustain, 0.0f); set (p, P::cutoff, 12000.0f); }
+                set (13, P::level, -6.0f);
+            },
+            { { 0, 34 }, { 5, 34 }, { 9, 34 },              // bumbos
+              { 1, 35 },                                       // aro
+              { 2, 36 }, { 3, 36 }, { 4, 36 },                 // caixas
+              { 6, 37 }, { 8, 37 }, { 10, 38 },                // hi-hats
+              { 7, 39 }, { 11, 40 }, { 14, 41 },               // surdo e tons
+              { 13, 42 } } },                                  // prato
     };
     return list;
 }

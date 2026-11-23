@@ -345,6 +345,12 @@ def build():
         s = slug(e["nome"] + "-" + (e["artista"] or "")) or "riddim"
         seen[s] += 1
         e["id"] = s if seen[s] == 1 else f"{s}-{seen[s]}"
+    cred = {k: v for k, v in cor.get("creditos", {}).items() if not k.startswith("_")}
+    for e in entries:
+        k = key(e["nome"], e["artista"] or "")
+        e["_key"] = k if k in cred else BASE_KEY(k)
+        e["creditos"] = credits_of(e, cred)
+        del e["_key"]
     return entries, cm, bm, dm
 
 
@@ -460,6 +466,38 @@ def cstr(x):
     return json.dumps(x or "", ensure_ascii=False)
 
 
+
+# ------------------------------------------------------------------ créditos
+# Estúdio só quando o produtor/selo identifica o estúdio onde gravava (documentado na história do reggae);
+# senão fica em branco. Correções e créditos pesquisados entram em correcoes.json -> "creditos".
+STUDIO_DE = [
+    (r"studio one|coxsone", "Studio One"), (r"channel one|hoo ?kim|hookim", "Channel One"),
+    (r"junjo|volcano", "Channel One"), (r"treasure isle|duke reid", "Treasure Isle"),
+    (r"black ark", "Black Ark"), (r"jamm(y|ie)s?\b", "Jammys (Waterhouse)"), (r"penthouse", "Penthouse"),
+    (r"music works|gussie clarke", "Music Works"), (r"randy'?s", "Randy's"), (r"dynamic sounds", "Dynamic Sounds"),
+    (r"joe gibbs", "Joe Gibbs"), (r"bobby digital", "Digital B"), (r"madhouse", "Madhouse"),
+]
+def norm_prod(p):
+    p = (p or "").strip()
+    if p in ("—", "-", "não confirmado"): return ""
+    return re.sub(r"Henry ['\"]Junjo['\"] Lawes", "Henry 'Junjo' Lawes", p)
+def credits_of(e, cred):
+    c = dict(cred.get(e["_key"], {})) if e.get("_key") else {}
+    prod = c.get("produtor") or norm_prod(e["produtor"])
+    est = c.get("estudio") or next((st for pat, st in STUDIO_DE if prod and re.search(pat, prod, re.I)), "")
+    if est == "Black Ark" and (e["ano"] or 0) < 1974: est = ""
+    baixo = c.get("baixo") or (e["baixo"]["quemGravou"] if e["original"]["baixo"] else "")
+    bat = c.get("bateria") or ""
+    if not bat and e["bateria"]["groove"]["original"]:
+        d = e["bateria"]["baterista"]
+        bat = "bateria eletrônica" if d == "DIGIKAL" else d.title()
+    parts = []
+    if prod: parts.append("PROD. " + prod)
+    if est: parts.append("ESTÚDIO " + est)
+    if baixo: parts.append("BAIXO " + baixo)
+    if bat: parts.append("BATERIA " + bat)
+    return " · ".join(parts)
+
 def write_code(entries, fams):
     """riddimbank.h (plugins) e site/riddimbank.js (versões do navegador): o mesmo banco, para todas as machines."""
     idx = {e["id"]: i for i, e in enumerate(entries)}
@@ -476,7 +514,7 @@ def write_code(entries, fams):
                          mrbm=-1 if b["riddimMRBM"] is None else b["riddimMRBM"], bassDrum=b["bateriaInterna"], timbre=b["timbre"],
                          density=b["densidade"], variation=b["variacao"], swing=b["swing"],
                          mrcm=-1 if ix["MRCM"] is None else ix["MRCM"], mrdm=-1 if ix["MRDM"] is None else ix["MRDM"],
-                         orig=orig, harmony=HS[e["harmoniaStatus"]]))
+                         orig=orig, harmony=HS[e["harmoniaStatus"]], credits=e.get("creditos", "")))
     songOrder = sorted(range(len(rows)), key=lambda i: (re.sub(r"^(the |a )", "", rows[i]["name"].lower()), rows[i]["artist"].lower()))
     famRows, members = [], []
     for f in fams:
@@ -498,7 +536,8 @@ def write_code(entries, fams):
          "// orig: 1 = harmonia, 2 = baixo, 4 = bateria vindos da gravação · harmony: 0 conferida, 1 aproximada, 2 pendente (sem acordes)",
          "struct Entry { const char* id; const char* name; const char* artist; int year; int style; const char* riddim;",
          "               int numChords; Chord chords[4]; int bpm, bpmMeasured, drummer, kit, groove, grooveOriginal;",
-         "               int bassStyle, mrbm, bassDrum, timbre; float density, variation, swing; int mrcm, mrdm, orig, harmony; };",
+         "               int bassStyle, mrbm, bassDrum, timbre; float density, variation, swing; int mrcm, mrdm, orig, harmony;",
+         "               const char* credits; };   // produção, estúdio, baixo e bateria de quem gravou (vazio = sem crédito confirmado)",
          "struct Family { const char* name; char letter; int year; int style; int first, count; };   // members[first .. first+count-1], o primeiro é a origem", "",
          f"inline constexpr int numStyles = {len(STYLES)};",
          "inline const char* const styles[numStyles] = { " + ", ".join(cstr(x) for x in STYLES) + " };",
@@ -509,7 +548,7 @@ def write_code(entries, fams):
         H.append(f'    {{ {cstr(r["id"])}, {cstr(r["name"])}, {cstr(r["artist"])}, {r["year"]}, {r["style"]}, {cstr(r["riddim"])}, '
                  f'{len(r["chords"])}, {{ {ch} }}, {r["bpm"]}, {r["bpmMeasured"]}, {r["drummer"]}, {r["kit"]}, {r["groove"]}, {r["grooveOriginal"]}, '
                  f'{r["bassStyle"]}, {r["mrbm"]}, {r["bassDrum"]}, {r["timbre"]}, {r["density"]:.2f}f, {r["variation"]:.2f}f, {r["swing"]:.2f}f, '
-                 f'{r["mrcm"]}, {r["mrdm"]}, {r["orig"]}, {r["harmony"]} }},')
+                 f'{r["mrcm"]}, {r["mrdm"]}, {r["orig"]}, {r["harmony"]}, {cstr(r["credits"])} }},')
     H += ["};", "", "// MÚSICAS de A a Z", "inline const int songOrder[numEntries] = { " + ", ".join(map(str, songOrder)) + " };", "",
           f"inline constexpr int numFamilies = {len(famRows)};", "inline const Family families[numFamilies] = {"]
     for f in famRows:

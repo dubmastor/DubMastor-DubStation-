@@ -761,7 +761,8 @@ function applyBank(i) {
 }
 const KITS = ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'];
 const songsOf = (s) => RB.songOrder.filter((i) => RB.entries[i].style === s && RBT.usable(RB, i));
-let styleSel = 0;
+let styleSel = 0, creditPhase = 0;   // a linha de baixo do visor alterna a cada 4 s entre os músicos e os créditos
+setInterval(() => { creditPhase = 1 - creditPhase; if (RB.entries[st.bank] && RB.entries[st.bank].credits) drawPresetLcd(); }, 4000);
 function drawPresetLcd() {
   const cur = st.bank >= 0 && RB.entries[st.bank] ? st.bank : -1;
   if (cur >= 0) styleSel = RB.entries[cur].style;
@@ -771,7 +772,7 @@ function drawPresetLcd() {
     const e = RB.entries[cur];
     $('pPos').innerHTML = RBT.lights(e) + ' ' + String(songs.indexOf(cur) + 1).padStart(2, '0') + '/' + String(songs.length).padStart(2, '0');
     $('pName').textContent = e.name + (e.year ? ' ' + e.year : '');
-    $('pInfo').textContent = `${RBT.chordsText(e)} · ${e.bpmMeasured ? e.bpm + ' BPM ORIGINAL' : '~' + e.bpm + ' BPM'} · ${KITS[e.kit]} · ${MACHINES[0].names[e.drummer]} + ${String(B.styleNames[e.bassStyle]).toUpperCase()}`;
+    $('pInfo').textContent = e.credits && creditPhase ? e.credits.toUpperCase() : `${RBT.chordsText(e)} · ${e.bpmMeasured ? e.bpm + ' BPM ORIGINAL' : '~' + e.bpm + ' BPM'} · ${KITS[e.kit]} · ${MACHINES[0].names[e.drummer]} + ${String(B.styleNames[e.bassStyle]).toUpperCase()}`;
   } else {
     $('pPos').textContent = ''; $('pName').textContent = 'ESCOLHA UM RIDDIM ◀ ▶';
     $('pInfo').textContent = `BANCO ÚNICO: ${RB.entries.length} MÚSICAS · ${RB.families.length} RIDDIMS · HARMONIA, BPM E OS MÚSICOS CERTOS`;

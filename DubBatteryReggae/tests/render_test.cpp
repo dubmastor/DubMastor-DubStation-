@@ -308,6 +308,17 @@ int main (int argc, char** argv)
             std::printf ("preset %02d %-14s  pad1 tune %+.1f  pad3 decay %.0f\n", i + 1, proc.getPresetName().toRawUTF8(),
                          proc.padValue (0, dbr::P::tune), proc.padValue (2, dbr::P::decay));
         }
+        {   // SLENG TENG: os timbres Casio MT-40 entram nos pads; o preset seguinte volta os timbres de fábrica
+            int st = -1;
+            for (int i = 0; i < proc.getNumFactoryPresets(); ++i) if (names[i].startsWith ("SLENG TENG")) st = i;
+            proc.loadPreset (st);
+            const bool casio = st >= 0 && proc.factorySampleName (proc.factoryIndexOf (0)) == "MT-40 BUMBO"
+                            && proc.factorySampleName (proc.factoryIndexOf (2)) == "MT-40 CAIXA" && proc.factoryIndexOf (12) == 12;
+            proc.loadPreset (0);
+            const bool back = proc.factoryIndexOf (0) == 0 && proc.factoryIndexOf (2) == 2;
+            std::printf ("sleng teng (casio mt-40): %s\n", casio && back ? "ok" : "FALHOU");
+            if (! (casio && back)) return 1;
+        }
         set (proc.apvts, dbr::pid (0, dbr::P::tune), 5.5f);
         proc.setFactorySample (0, 9);
         if (! proc.savePreset ("teste ci")) return fail ("gravar preset");

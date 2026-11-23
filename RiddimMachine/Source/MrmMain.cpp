@@ -551,6 +551,7 @@ void RiddimPresetPanel::timerCallback()
 {
     const int c = current();
     if (c != shown) { shown = c; if (c >= 0) styleSel = styleOf (c); repaint(); }
+    else if (const int ph = riddimbank::creditPhase(); ph != shownPhase) { shownPhase = ph; if (c >= 0 && *riddimbank::entries[c].credits) repaint (lcd); }
 }
 
 void RiddimPresetPanel::resized()
@@ -599,6 +600,9 @@ void RiddimPresetPanel::paint (juce::Graphics& g)
         }
         mpc::text (g, (u8 (e.name) + (e.year > 0 ? " " + juce::String (e.year) : juce::String())).toUpperCase(),
                    t.withTrimmedTop (17.0f).withHeight (22.0f), juce::Justification::centredLeft, 17.0f, 1.0f, 0.04f);
+        if (riddimbank::showCredits (e))
+            mpc::text (g, riddimbank::creditsText (e), t.withTrimmedTop (41.0f), juce::Justification::centredLeft, 10.5f, 0.85f, 0.06f);
+        else
         mpc::text (g, riddimbank::chordsText (e) + (e.harmony == 1 ? "~" : "") + u8 ("  \xc2\xb7  ")
                       + (e.bpmMeasured ? juce::String (e.bpm) + " BPM ORIGINAL" : "~" + juce::String (e.bpm) + " BPM")
                       + u8 ("  \xc2\xb7  ") + kKits[juce::jlimit (0, 3, e.kit)] + u8 ("  \xc2\xb7  ")

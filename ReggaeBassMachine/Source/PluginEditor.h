@@ -182,13 +182,13 @@ public:
     void mouseDown (const juce::MouseEvent&) override;
     void mouseMove (const juce::MouseEvent&) override { repaint(); }
     void mouseExit (const juce::MouseEvent&) override { repaint(); }
-    void refresh() { if (shown != proc.currentRiddim() || shownBank != proc.currentBank()) { shown = proc.currentRiddim(); shownBank = proc.currentBank(); repaint(); } }
+    void refresh();
 private:
     void showMenu();
     void load (int index) { proc.loadRiddim (index); shown = -2; refresh(); }
     void loadBank (int index) { proc.applyBankEntry (index); shown = -2; refresh(); }
     BassMachineProcessor& proc;
-    int shown = -2, shownBank = -2;
+    int shown = -2, shownBank = -2, shownPhase = -1;
 };
 
 //==============================================================================

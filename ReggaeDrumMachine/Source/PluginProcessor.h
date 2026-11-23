@@ -82,6 +82,7 @@ public:
     bool writeMidiFile (const juce::File& target, int bar = kAllBars) const;
     juce::String suggestedFileName (int bar = kAllBars) const;
     int mapNote (int gmNote) const;               // nota GM -> nota escolhida pelo usuário
+    int unmapNote (int outNote) const;   // nota que saiu pelo mapa de NOTAS -> peça GM (o Battery toca o pad certo)
 
 private:
     void parameterChanged (const juce::String&, float) override;

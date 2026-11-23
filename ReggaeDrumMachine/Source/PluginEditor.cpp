@@ -2097,7 +2097,7 @@ juce::Rectangle<float> GrooveSelector::lcdRect() const
 void GrooveSelector::timerCallback()
 {
     const juce::String key = juce::String (drummer()) + ":" + juce::String (proc.getGroove()) + ":" + (proc.grooveIntact() ? "1" : "0")
-                            + ":" + proc.apvts.state.getProperty ("grooveView", 0).toString() + ":" + juce::String (proc.getBankEntry());
+                            + ":" + proc.apvts.state.getProperty ("grooveView", 0).toString() + ":" + juce::String (proc.getBankEntry()) + ":" + juce::String (riddimbank::creditPhase());
     if (key != shownKey) { shownKey = key; repaint(); if (auto* parent = getParentComponent()) parent->repaint (getBounds().withHeight (getHeight() + 22)); }
 }
 
@@ -2135,8 +2135,11 @@ void GrooveSelector::paint (juce::Graphics& g)
         const auto& gp = dubdrums::groovePresets[gr];
         blueText (g, juce::String::fromUTF8 (e.name).toUpperCase(), t.removeFromTop (t.getHeight() * 0.55f).withTrimmedRight (30.0f),
                   juce::Justification::centredLeft, 13.0f);
-        blueText (g, (e.grooveOriginal ? juce::String ("GROOVE ORIGINAL") : "GROOVE: " + juce::String::fromUTF8 (gp.song).toUpperCase())
-                         + "  " + juce::String (e.bpm) + " BPM  " + riddimbank::lights (e), t, juce::Justification::centredLeft, 9.0f, 0.8f);
+        if (riddimbank::showCredits (e))
+            blueText (g, riddimbank::creditsText (e), t, juce::Justification::centredLeft, 9.0f, 0.8f);
+        else
+            blueText (g, (e.grooveOriginal ? juce::String ("GROOVE ORIGINAL") : "GROOVE: " + juce::String::fromUTF8 (gp.song).toUpperCase())
+                             + "  " + juce::String (e.bpm) + " BPM  " + riddimbank::lights (e), t, juce::Justification::centredLeft, 9.0f, 0.8f);
         blueText (g, "BANCO", r.reduced (7.0f, 3.0f).removeFromTop (14.0f), juce::Justification::topRight, 8.5f, 0.6f);
     }
     else if (gr >= 0 && dubdrums::groovePresets[gr].drummer == d)

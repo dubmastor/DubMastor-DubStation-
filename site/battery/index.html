@@ -314,7 +314,11 @@ const SAMPLES = [['DM-KICKS1.wav','DM KICK 1'],['DM-SNARES28.wav','DM ARO 28'],[
   ['DM-HATs39.wav','DM HAT 39'],['SYN-KICK3.wav','SINT BUMBO 3'],['DM-HATs17.wav','DM HAT 17 ABERTO'],['SYN-TOM2.wav','SINT TOM 2'],
   ['SYN-SHAKER.wav','SINT SHAKER'],['DM-PRATOS1.wav','DM PRATO 1'],['SYN-TOM1.wav','SINT TOM 1'],['SYN-BLOCO.wav','SINT BLOCO'],
   // biblioteca: mais timbres para o < SAMPLE > e o TIMBRE 2 de qualquer pad
-  ['DM-HATs1.wav','DM HAT 1'],['DM-HATs4.wav','DM HAT 4'],['DM-HATs5.wav','DM HAT 5'],['DM-HATs7.wav','DM HAT 7'],['DM-HATs8.wav','DM HAT 8'],['DM-HATs9.wav','DM HAT 9'],['DM-HATs10.wav','DM HAT 10'],['DM-HATs11.wav','DM HAT 11'],['DM-HATs12.wav','DM HAT 12'],['DM-HATs13.wav','DM HAT 13'],['DM-HATs14.wav','DM HAT 14'],['DM-HATs15.wav','DM HAT 15'],['DM-HATs16.wav','DM HAT 16'],['DM-PRATOS2.wav','DM PRATO 2'],['DM-PRATOS3.wav','DM PRATO 3'],['DM-PRATOS4.wav','DM PRATO 4'],['DM-PRATOS5.wav','DM PRATO 5'],['SYN-PRATO.wav','SINT PRATO']];
+  ['DM-HATs1.wav','DM HAT 1'],['DM-HATs4.wav','DM HAT 4'],['DM-HATs5.wav','DM HAT 5'],['DM-HATs7.wav','DM HAT 7'],['DM-HATs8.wav','DM HAT 8'],['DM-HATs9.wav','DM HAT 9'],['DM-HATs10.wav','DM HAT 10'],['DM-HATs11.wav','DM HAT 11'],['DM-HATs12.wav','DM HAT 12'],['DM-HATs13.wav','DM HAT 13'],['DM-HATs14.wav','DM HAT 14'],['DM-HATs15.wav','DM HAT 15'],['DM-HATs16.wav','DM HAT 16'],['DM-PRATOS2.wav','DM PRATO 2'],['DM-PRATOS3.wav','DM PRATO 3'],['DM-PRATOS4.wav','DM PRATO 4'],['DM-PRATOS5.wav','DM PRATO 5'],['SYN-PRATO.wav','SINT PRATO'],
+  // kit SLENG TENG: Casio MT-40 do KIT DIGITAL do MRDM-12 (DubBatteryReggae/tools/render_mt40.cpp), índices 34 a 42 como no plugin
+  ['MT40-BUMBO.wav','MT-40 BUMBO'],['MT40-ARO.wav','MT-40 ARO'],['MT40-CAIXA.wav','MT-40 CAIXA'],['MT40-HH-FECHADO.wav','MT-40 HH FECHADO'],
+  ['MT40-HH-ABERTO.wav','MT-40 HH ABERTO'],['MT40-TOM-GRAVE.wav','MT-40 TOM GRAVE'],['MT40-TOM.wav','MT-40 TOM'],['MT40-TOM-AGUDO.wav','MT-40 TOM AGUDO'],
+  ['MT40-PRATO.wav','MT-40 PRATO']];
 const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const noteName = (n) => NOTE_NAMES[n % 12] + (Math.floor(n / 12) - 2);
 const CHOKES = ['NENHUM', 'HI-HAT', 'GRUPO A', 'GRUPO B'];
@@ -331,6 +335,8 @@ const FACTORY = [
                          s(10,'link',14); s(13,'level',-9); }],
   ['DUB PESADO', (s) => { for (let p = 0; p < 16; p++) s(p,'tune',-2); s(0,'tune',-4); s(0,'cutoff',1800); s(0,'level',3);
                           s(2,'cutoff',4500); s(2,'release',900); s(13,'cutoff',6000); }],
+  ['SLENG TENG (CASIO MT-40)', (s) => { for (let p = 0; p < 16; p++) { s(p,'sustain',0); s(p,'cutoff',12000); } s(13,'level',-6);
+                          [[0,34],[5,34],[9,34],[1,35],[2,36],[3,36],[4,36],[6,37],[8,37],[10,38],[7,39],[11,40],[14,41],[13,42]].forEach(([p, k]) => s(p,'sample',k)); }],
 ];
 
 function loadJSON(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }

@@ -492,7 +492,8 @@
     const feel = feelOf(s.drummer);
     if (s.machine) { feel.swingDelta = 0.0; feel.late = [0, 0, 0, 0]; }
     const rand = [s.randKick, s.randSnare, s.randHat, s.randPerc];
-    const timingAmount = [0.006, 0.012, 0.014, 0.012];
+    // microtempo calibrado pela medição de bateria de reggae (Wright & Berdahl, Stanford 2005: |MT| médio 0,0188 tempo) — igual ao C++
+    const timingAmount = [0.024, 0.030, 0.036, 0.030];
 
     const finish = (raw, len, barOverride, out, fills) => {
       for (const src of raw) {

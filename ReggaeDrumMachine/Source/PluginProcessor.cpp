@@ -517,6 +517,13 @@ int DubDrumsProcessor::mapNote (int gmNote) const
     return gmNote;
 }
 
+int DubDrumsProcessor::unmapNote (int outNote) const
+{
+    for (const auto& pc : pieces)
+        if (mapNote (pc.gmNote) == outNote) return pc.gmNote;
+    return outNote;
+}
+
 // Linha do tempo: [intro (toca uma vez)] [loop] [loop] [loop] ...
 template <typename Fn>
 void DubDrumsProcessor::forEachEventIn (const dubdrums::Pattern& pattern, double start, double end, Fn&& fn)

@@ -45,6 +45,11 @@ inline juce::String itemText (const Entry& e)
          + juce::String (e.bpm) + " BPM    " + lights (e);
 }
 
+// CRÉDITOS no visor: a linha de baixo alterna a cada 4 s entre os músicos da máquina e os créditos da gravação
+inline int creditPhase() { return (int) ((juce::Time::getMillisecondCounter() / 4000u) % 2u); }
+inline bool showCredits (const Entry& e) { return *e.credits && creditPhase() == 1; }
+inline juce::String creditsText (const Entry& e) { return juce::String::fromUTF8 (e.credits).toUpperCase(); }
+
 inline bool usable (int i) { return i >= 0 && i < numEntries && entries[i].numChords > 0; }
 
 inline void addItem (juce::PopupMenu& m, int i, int current, bool onlyComplete)

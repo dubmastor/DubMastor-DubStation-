@@ -42,6 +42,16 @@ samples = [
     ("DM-PRATOS4.wav", "DM PRATO 4"),
     ("DM-PRATOS5.wav", "DM PRATO 5"),
     ("SYN-PRATO.wav",   "SINT PRATO"),
+    # --- kit SLENG TENG: Casio MT-40 do KIT DIGITAL do MRDM-12 (tools/render_mt40.cpp)
+    ("MT40-BUMBO.wav",      "MT-40 BUMBO"),
+    ("MT40-ARO.wav",        "MT-40 ARO"),
+    ("MT40-CAIXA.wav",      "MT-40 CAIXA"),
+    ("MT40-HH-FECHADO.wav", "MT-40 HH FECHADO"),
+    ("MT40-HH-ABERTO.wav",  "MT-40 HH ABERTO"),
+    ("MT40-TOM-GRAVE.wav",  "MT-40 TOM GRAVE"),
+    ("MT40-TOM.wav",        "MT-40 TOM"),
+    ("MT40-TOM-AGUDO.wav",  "MT-40 TOM AGUDO"),
+    ("MT40-PRATO.wav",      "MT-40 PRATO"),
 ]
 out = ["// Gerado por tools/make_samples_header.py a partir de Samples/*.wav — não editar à mão.",
        "// Timbres de fábrica do DUB BATTERY REGGAE: 0..15 = um por pad (notas 36..51), depois a biblioteca.",

@@ -1730,8 +1730,11 @@ void RiddimBox::paint (juce::Graphics& g)
                           t.removeFromTop (19.0f).toNearestInt(), juce::Justification::centredLeft, 1, 0.75f);
         g.setFont (mono (10.0f, false));
         g.setColour (ink.withAlpha (0.85f));
-        g.drawFittedText ("BASS:" + juce::String (mbm::styleName (e.bassStyle)).toUpperCase() + "  TEMPO:" + juce::String (e.bpm).paddedLeft ('0', 3)
-                          + "  " + riddimbank::lights (e), t.toNearestInt(), juce::Justification::centredLeft, 1, 0.7f);
+        if (riddimbank::showCredits (e))
+            g.drawFittedText (riddimbank::creditsText (e), t.toNearestInt(), juce::Justification::centredLeft, 1, 0.6f);
+        else
+            g.drawFittedText ("BASS:" + juce::String (mbm::styleName (e.bassStyle)).toUpperCase() + "  TEMPO:" + juce::String (e.bpm).paddedLeft ('0', 3)
+                              + "  " + riddimbank::lights (e), t.toNearestInt(), juce::Justification::centredLeft, 1, 0.7f);
         return;
     }
     if (idx < 0)
@@ -1757,6 +1760,16 @@ void RiddimBox::paint (juce::Graphics& g)
     g.drawFittedText (juce::String::fromUTF8 ("BASS:") + juce::String::fromUTF8 (rd.bass).toUpperCase()
                       + "  TEMPO:" + juce::String (rd.bpm).paddedLeft ('0', 3) + (rd.approx ? "~" : ""),
                       t.toNearestInt(), juce::Justification::centredLeft, 1, 0.7f);
+}
+
+void RiddimBox::refresh()
+{
+    const int ph = riddimbank::creditPhase();
+    if (shown != proc.currentRiddim() || shownBank != proc.currentBank() || (ph != shownPhase && proc.currentBank() >= 0))
+    {
+        shown = proc.currentRiddim(); shownBank = proc.currentBank(); shownPhase = ph;
+        repaint();
+    }
 }
 
 void RiddimBox::mouseDown (const juce::MouseEvent& e)

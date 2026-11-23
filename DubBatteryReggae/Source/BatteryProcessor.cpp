@@ -465,7 +465,12 @@ void BatteryProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     // --- eventos que tocam os pads: MIDI da DAW + groove do Dub Drums + cliques na interface
     events.clear();
     events.addEvents (midi, 0, n, 0);
-    events.addEvents (drumsMidi, 0, n, 0);
+    for (const auto meta : drumsMidi)   // o groove toca o pad da peça, mesmo com o mapa de NOTAS mudado na aba DUB DRUMS
+    {
+        auto m = meta.getMessage();
+        if (m.isNoteOnOrOff()) m.setNoteNumber (drums.unmapNote (m.getNoteNumber()));
+        events.addEvent (m, meta.samplePosition);
+    }
     {
         juce::MidiBuffer ui;
         uiNotes.removeNextBlockOfMessages (ui, n);
@@ -605,7 +610,9 @@ void BatteryProcessor::loadPreset (int index)
     resetPadsToDefault();
     if (index < nf)
     {
-        factoryPresets()[(size_t) index].apply ([this] (int pad, P p, float v) { setParamPlain (padParam (pad, p), v); });
+        const auto& fp = factoryPresets()[(size_t) index];
+        fp.apply ([this] (int pad, P p, float v) { setParamPlain (padParam (pad, p), v); });
+        for (auto [pad, smp] : fp.samples) setFactorySample (pad, smp);
     }
     else
     {

@@ -74,7 +74,7 @@
       const e = B.entries[i];
       const b = document.createElement('button'); b.type = 'button'; b.className = 'song' + (i === cur ? ' on' : '');
       b.disabled = !usable(B, i);
-      b.innerHTML = `${prefix ? '<span class="orig">ORIGEM</span>' : ''}${title(e)}${lights(e)}<small>${chordsText(e)} · ${e.bpmMeasured ? '' : '~'}${e.bpm} BPM${e.riddim && e.riddim !== e.name ? ' · ' + e.riddim + ' riddim' : ''}</small>`;
+      b.innerHTML = `${prefix ? '<span class="orig">ORIGEM</span>' : ''}${title(e)}${lights(e)}<small>${chordsText(e)} · ${e.bpmMeasured ? '' : '~'}${e.bpm} BPM${e.riddim && e.riddim !== e.name ? ' · ' + e.riddim + ' riddim' : ''}${e.credits ? '<br>' + e.credits : ''}</small>`;
       b.onclick = () => { close(); opts.onPick(e, i); };
       return b;
     };

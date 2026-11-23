@@ -144,7 +144,7 @@ private:
     int styleOf (int preset) const;
     MrmProcessor& proc;
     juce::Rectangle<int> lcd, keys[4], listKey;     // ◀ ▶ estilo, ◀ ▶ música
-    int pressed = -1, shown = -2, styleSel = 0;
+    int pressed = -1, shown = -2, styleSel = 0, shownPhase = -1;
 };
 
 // NOVA LINHA: outra sugestão só para a bateria ou só para o baixo (semente própria da máquina)
