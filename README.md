@@ -4,6 +4,18 @@
 
 Plugins de dub por **DubMastor**, em VST3 (Windows e Mac) e AU (Mac). Feitos e testados para o **Cubase**.
 
+## 🎹 Novo: Mastor Reggae Organ MRO-68 1.0 — o órgão dos organistas jamaicanos
+
+[![Mastor Reggae Organ MRO-68](ReggaeOrgan/docs/interface.png)](ReggaeOrgan/)
+
+**Bubble, chop e fills no andamento da DAW**, na contagem da Dub Station (caixa no 2 e no 4), com o Hammond do Reggae Keys MRK-80.
+Escolha o groove pelo **MÚSICO** (Beckford, Jackie Mittoo, Ansel Collins, Winston Wright, Wire Lindo, Tyrone Downie, Gladdy
+Anderson, Steely), pela **ÉPOCA** (os 10 estilos do banco) ou pelo **RIDDIM** (as 356 músicas do banco único). Ajuste na
+**GRADE** de 16 semicolcheias (mão direita e mão esquerda, acento ou fantasma), com feel, batida, duração da nota, swing, ghost
+e JACKPOT; edite o **MIDI** no visor e arraste para a timeline (tudo ou uma camada).
+
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.0/MRO-68-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.0/MRO-68-macOS-Instalador.pkg)** · **📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/)** · [Detalhes](ReggaeOrgan/)
+
 ## 🔎 Novo: Mastor Key Scout MKS-0420 1.0 — o olheiro do tom
 
 [![Mastor Key Scout MKS-0420](KeyScout/docs/interface.png)](KeyScout/)
@@ -52,6 +64,7 @@ só para tudo, e a aba **CONTROL ROOM** com o Big Knob no master, o mute de cada
 |---|---|---|---|---|
 | **Mastor Reggae Drums MRD-12 2.0** | Instrumento: sampler de bateria com 16 pads estilo MPC / SP-404 (notas 36–51, mapa do MRDM-12), visor do sample com início e fim, envelope AHDSR gráfico, LAYER (timbre 2 e juntar pads), 34 timbres DM, choke, presets de fábrica e GRAVAR; aba **DUB DRUMS** com o MRDM-12 inteiro (bateristas, GROOVES de 118 músicas no visor azul, groove nos pads, MIDI colorido por compasso). [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/battery/) | [⬇️ macOS (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRD-12-2.0/MRD-12-macOS-Instalador.pkg) | [⬇️ Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRD-12-2.0/MRD-12-Windows-Instalador.exe) | [ReggaeDrums/](ReggaeDrums/) |
 | **Mastor Riddim Machine MRM-0420 2.4** | Instrumento / gerador MIDI da DubStation: MRDM-12 + MRCM-1240 + MRBM-69 + Mastor Big Knob num só. Aba RIDDIM com a harmonia única (skank e baixo), chave e músicos de cada máquina, MIDI editável e arrastável por máquina, JACKPOT (NOVO RIDDIM e ALAVANCA de riddim 100% aleatório), PRESETS de harmonia e alto-falante; abas de cada máquina completas e CONTROL ROOM (Big Knob no master, mute DRUMS / BASS / RIDDIM e TAPE ECHO) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.4/MRM-0420-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.4/MRM-0420-Windows-Instalador.exe) | [RiddimMachine/](RiddimMachine/) |
+| **Mastor Reggae Organ MRO-68 1.0** | Instrumento / gerador de grooves: o órgão de reggae (bubble, chop e fills) na contagem com a caixa no 2 e no 4, com o Hammond do Reggae Keys MRK-80; grooves por MÚSICO (8 organistas jamaicanos), ÉPOCA (10 estilos) ou RIDDIM (banco único, 356 músicas); GRADE de 16 semicolcheias editável, feel, batida, duração da nota, swing, ghost, JACKPOT, fills Mittoo/Wright/Downie/Gladdy, visor MIDI editável e arraste por camada. [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.0/MRO-68-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.0/MRO-68-Windows-Instalador.exe) | [ReggaeOrgan/](ReggaeOrgan/) |
 | **Mastor Big Knob MBK-76 3.2** | Estação de dub: filtro big knob estilo King Tubby (com bypass), eco de fita com cabeçotes, presets de EQ e liga/desliga, sirene de dub, VUs e maximizer | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MBK-76-3.2/MBK-76-Windows-Instalador.exe) | [BigKnob/](BigKnob/) |
 | **Mastor Reggae Keys MRK-80 3.0** | Instrumento (antigo Roots Keys) com a aba **CHORD MACHINE** (o MRCM-1240 inteiro, só maior e menor, com o banco único de riddims, tocando neste piano/órgão): piano (timbres M1, Grand, MT-40 e FM EP) e órgão estilo Hammond com Leslie, eco de fita, flanger dub, maximizer, VUs e teclado que acende com o MIDI. [▶ Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/) | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-Windows-Instalador.exe) | [ReggaeKeys/](ReggaeKeys/) |
 | **Mastor Reggae Bass MRB-69 2.0** | Instrumento (antigo Dub Bass / MRDBI-07) com a aba **BASS MACHINE** (o MRBM-69 inteiro tocando por este som): baixo de reggae Bass (senoide), Super Tone (digital King Jammy) ou 808, envelope gráfico, saturação com válvula animada ou fita de rolo, EQ editável na tela, reverb, bass boost em 60 Hz, teclado C1–C4 e maximizer com VU digital estilo Ozone | [⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRB-69-2.0/MRB-69-macOS-Instalador.pkg) | [⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRB-69-2.0/MRB-69-Windows-Instalador.exe) | [ReggaeBass/](ReggaeBass/) |
@@ -111,6 +124,7 @@ Padrão de nomes: **`Mastor <Nome> <SIGLA>`** no Cubase (fabricante **DubMastor*
 
 | Pasta | Plugin (nome no Cubase) | Sigla | Workflow |
 |---|---|---|---|
+| `ReggaeOrgan/` | Mastor Reggae Organ MRO-68 (usa o órgão e o visual de `ReggaeKeys/Source` e o banco `RiddimBank/`) | MRO-68 | `build-reggaeorgan.yml` |
 | `BigKnob/` | Mastor Big Knob MBK-76 (antigo DubMastor Big Knob) | MBK-76 | `build-bigknob.yml` |
 | `TapeEcho/` | Mastor Tape Echo MTE-12 (antigo Dub Station 2.6 / FitaEco TE-12) | MTE-12 | `build-tapeecho.yml` |
 | `ReggaeKeys/` | Mastor Reggae Keys MRK-80 (antigo Roots Keys; absorveu o MRCM-1240) | MRK-80 | `build-reggaekeys.yml` |
