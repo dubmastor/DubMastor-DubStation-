@@ -181,7 +181,7 @@
 - **Showtime** (1997, Dave Kelly (Madhouse)) · DANCEHALL · Gm:2 · 98 BPM — Slurp (Alias, 1997) · original.
 - **Sitting And Watching** (1978, Sly & Robbie) · RUB A DUB · Em:1 Am:1 · 76 BPM — Sitting And Watching (Dennis Brown, 1978) · original.
 - **Skylarking** (1972, Studio One) · EARLY REGGAE · Em:1 D:1 · 72 BPM — Skylarking (Horace Andy, 1972) · original.
-- **Sleng Teng** (1985, produtor não informado) · DIGITAL · D:1 G:1 · 90 BPM — Budy Bye (Johnny Osbourne, 1985) · original; Under Mi Sleng Teng (Wayne Smith, 1985); Sleng Teng Resurrection (Luciano, 2005). Também chamado Sleng Teng Resurrection.
+- **Sleng Teng** (1985, King Jammy (Jammys)) · DIGITAL · D:1 G:1 · 82 BPM — Under Mi Sleng Teng (Wayne Smith, 1985) · original; Budy Bye (Johnny Osbourne, 1985); Sleng Teng Resurrection (Luciano, 2005). Também chamado Sleng Teng Resurrection.
 - **Small Axe** (1970, Lee Perry (Upsetters)) · EARLY REGGAE · Eb:1/2 Bb:1/2 F:1 · 78 BPM — Small Axe (Wailers, 1970) · original.
 - **Soap** (1989, Mafia & Fluxy) · DIGITAL · Dm:1 Bb:1 · 92 BPM — Tata Fool (Dennis Star / Beenie Man, 1989) · original.
 - **Speed** (2000, Desmond & Rupert Blake) · DANCEHALL · Gm:2 · 51 BPM — Look Like (Madd Anju, 2000) · original.

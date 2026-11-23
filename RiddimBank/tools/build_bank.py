@@ -401,7 +401,8 @@ def families(entries):
         groups.setdefault(f, []).append(e)
     out = []
     for f, es in groups.items():
-        es = sorted(es, key=lambda e: (e["ano"] or 9999, e["nome"]))
+        base = re.sub(r"\s*/.*$", "", f).lower()
+        es = sorted(es, key=lambda e: (e["ano"] or 9999, 0 if base in e["nome"].lower() else 1, e["nome"]))
         orig = es[0]
         info = fams.get(f, {})
         out.append(OrderedDict(
@@ -411,7 +412,7 @@ def families(entries):
             bpm=orig["bpm"], nota=info.get("nota", ""), fonte=info.get("fonte", ""),
             versoes=[OrderedDict(id=e["id"], nome=e["nome"], artista=e["artista"], ano=e["ano"],
                                  papel="original" if e is orig else "versão",
-                                 partesOriginais="".join(k[0].upper() for k, v in e["original"].items() if v))
+                                 partesOriginais="".join({"harmonia": "H", "baixo": "B", "bateria": "D"}[k] for k, v in e["original"].items() if v))
                      for e in es]))
     out.sort(key=lambda r: (r["letra"], r["nome"].lower()))
     return out
