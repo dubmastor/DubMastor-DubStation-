@@ -162,10 +162,10 @@ struct Params
     }};
     // timbre
     float bright = 0.55f, breath = 0.40f, vib = 0.30f, scoop = 0.40f, attack = 1.0f, release = 0.30f;
-    float drive = 0.35f, band = 9000.0f, lowcut = 80.0f, hiss = 0.15f, human = 0.50f, width = 0.70f;
+    float drive = 0.0f, band = 9000.0f, lowcut = 80.0f, hiss = 0.15f, human = 0.50f, width = 0.70f;
     float growl = 0.30f, room = 0.25f;     // v1.2: rouco do sax e sala do estúdio
     // Mastor Tape Echo
-    bool echoOn = true; int sync = 5; float echoMs = 375.0f;
+    bool echoOn = false; int sync = 5; float echoMs = 375.0f;   // v1.5: o Tape Echo começa desligado (padrão do kit)
     float fb = 0.45f, send = 0.30f, ret = 0.75f, tone = 3200.0f, bass = 220.0f, wow = 0.30f, sat = 0.50f;
     std::array<bool, 3> head { true, false, false };
     bool throwOn = false, selfOsc = false;
@@ -243,6 +243,13 @@ struct Voice
     float gL = 0.7f, gR = 0.7f;
     int ctr = 0;
     Rng rng;
+    // v1.5: banco aditivo com espectro dinâmico (tabela de 9 forças, pp..ff, calculada no começo da nota)
+    static constexpr int kMaxH = 48, kSpecN = 9;
+    static constexpr float kAddGain = 0.62f;   // mesmo volume do motor antigo em mf
+    int nh = 1;
+    float spec[kSpecN][kMaxH] {};
+    float hA[kMaxH] {}, hD[kMaxH] {}, hTau[kMaxH] {}, shim[kMaxH] {}, shimDepth[kMaxH] {};
+    float brightScale = 1.0f, specL = 0.0f;
 
     void start (int instIdx, int midi, float vel, int articIn, int srcId, int srcNoteIn,
                 const Params& P, float sampleRate, uint32_t ageIn, Rng& r, float delaySec = -1.0f, float sessionCents = 0.0f)
@@ -266,6 +273,34 @@ struct Voice
         }
         baseFreq = 440.0f * std::exp2 ((float) (midi - 69) / 12.0f);
         vel = std::clamp (vel, 0.05f, 1.0f);
+
+        {   // espectro dinâmico: um conjunto de harmônicos para cada força, normalizado (mesma energia)
+            const auto& SP = spectra()[(size_t) instIdx];
+            nh = std::clamp ((int) (std::min (0.42f * sr, 15000.0f) / (baseFreq * 1.19f)), 1, kMaxH);
+            for (int j = 0; j < kSpecN; ++j)
+            {
+                const float L = (float) j / (float) (kSpecN - 1);
+                float e = 0.0f;
+                for (int k = 0; k < nh; ++k)
+                {
+                    const float a = std::pow (10.0f, harmonicDb (SP, k + 1, baseFreq * (float) (k + 1), L) / 20.0f);
+                    spec[j][k] = a; e += a * a;
+                }
+                const float nrm = 1.0f / std::sqrt (std::max (1.0e-12f, e));
+                for (int k = 0; k < nh; ++k) spec[j][k] *= nrm;
+            }
+            // no ataque os harmônicos entram em ordem: os agudos chegam um pouco depois dos graves
+            for (int k = 0; k < nh; ++k) { hA[k] = 0.0f; hD[k] = 0.0f; hTau[k] = std::min (0.05f, 0.0015f + 0.0028f * (float) k); }
+            // vida no timbre: cada harmônico oscila um pouco, devagar e sem padrão (a palheta do sax mexe mais que o lábio)
+            const bool reed = instIdx == 2 || instIdx == 3 || instIdx == 5;
+            for (int k = 0; k < nh; ++k)
+            {
+                shim[k] = rng.next() * 0.5f;
+                shimDepth[k] = (reed ? 0.16f : 0.09f) * (0.25f + 0.75f * std::min (1.0f, (float) k / 10.0f)) * (0.5f + P.human);
+            }
+            brightScale = 0.75f + 0.7f * P.bright;
+            specL = 0.0f;
+        }
 
         const float atk = D.atk * (0.4f + P.attack * 0.9f);
         // scoop: cada nota entra um pouco diferente (e quase nada nas pontadas secas)
@@ -416,8 +451,23 @@ struct Voice
         else cut += (cutTarget - cut) * cutCoef16;
         // metal de verdade: o brilho acompanha o volume (fica escuro quando some)
         const float lvl = std::clamp ((amp / std::max (1.0e-4f, ampPeak)) * endGain, 0.0f, 1.0f);
-        lp.set (std::max (120.0f, cut * (0.45f + 0.55f * lvl) * (1.0f + vibVal * 0.6f)), q, sr);
         nlG = 1.0f + nlK * 2.6f * lvl * ampPeak * brightK;
+
+        // força do sopro agora -> harmônicos (o brilho acompanha o volume, sem salto)
+        specL = std::clamp ((amp / 0.95f) * std::max (0.0f, endGain) * brightScale * (1.0f + vibVal * 0.25f), 0.0f, 1.0f);
+        const float pos = specL * (float) (kSpecN - 1);
+        const int j0 = std::min (kSpecN - 2, (int) pos);
+        const float fr = pos - (float) j0;
+        const bool attacking = ampStage == 0 && ! releasing;
+        for (int k = 0; k < nh; ++k)
+        {
+            shim[k] += (rng.next() - shim[k]) * 0.012f;          // passeio lento (~5 Hz)
+            const float target = (spec[j0][k] + (spec[j0 + 1][k] - spec[j0][k]) * fr) * (1.0f + shimDepth[k] * std::clamp (shim[k] * 20.0f, -1.5f, 1.5f));   // ~±1 dB
+            const float tau = attacking ? hTau[k] : 0.006f;
+            const float c16 = 1.0f - std::exp (-16.0f / (tau * sr));
+            const float next = hA[k] + (target - hA[k]) * c16;
+            hD[k] = (next - hA[k]) / 16.0f;
+        }
     }
 
     // soma a voz em L/R por n amostras
@@ -431,25 +481,20 @@ struct Voice
             pOff -= pOff * pCoef;
             endGain += endGainStep; trem += tremStep;
 
-            float x = 0.0f;
-            for (int i = 0; i < numOsc; ++i)
+            // banco aditivo: sen(k·θ) pela recorrência de Chebyshev (um seno e um cosseno por amostra)
+            float& p = ph[0];
+            p += dt; if (p >= 1.0f) p -= 1.0f;
+            const float th = 2.0f * kPi * p;
+            const float c2 = 2.0f * std::cos (th);
+            float sPrev = 0.0f, sCur = std::sin (th), x = 0.0f;
+            for (int k = 0; k < nh; ++k)
             {
-                const float d = std::min (0.45f, dt * detRatio[i]);
-                float& p = ph[i];
-                p += d; if (p >= 1.0f) p -= 1.0f;
-                float v;
-                switch (wave[i])
-                {
-                    case Saw:    v = 2.0f * p - 1.0f - polyBlep (p, d); break;
-                    case Square: { float p2 = p + 0.5f; if (p2 >= 1.0f) p2 -= 1.0f;
-                                   v = (p < 0.5f ? 1.0f : -1.0f) + polyBlep (p, d) - polyBlep (p2, d); } break;
-                    case Pulse:  { float p2 = p + 0.65f; if (p2 >= 1.0f) p2 -= 1.0f;
-                                   v = (p < 0.35f ? 1.0f : -1.0f) + polyBlep (p, d) - polyBlep (p2, d) - 0.3f; } break;
-                    case Tri:
-                    default:     v = 4.0f * std::fabs (p - 0.5f) - 1.0f; break;
-                }
-                x += v * oscGain[i];
+                hA[k] += hD[k];
+                x += hA[k] * sCur;
+                const float sNext = c2 * sCur - sPrev;
+                sPrev = sCur; sCur = sNext;
             }
+            x *= kAddGain;
             // zumbido do lábio / da palheta: ruído que abre e fecha no ritmo de cada ciclo da nota
             if (buzzAmt > 0.0f && ph[0] < 0.2f) x += buzzAmt * rng.next() * (1.0f - ph[0] * 5.0f) * 2.0f;
             // rouco: aspereza na palheta antes do filtro (fica dentro do timbre do instrumento)
@@ -460,10 +505,7 @@ struct Voice
                 x *= 1.0f + growlAmt * 0.7f * gm;
                 x += growlAmt * 0.22f * (x * std::fabs (x) - 0.3f * x);
             }
-            lp.process (x);
-            float y0 = lp.lpOut;
-            if (nlG > 1.001f) y0 = std::tanh (nlG * y0) / nlG * (1.0f + 0.35f * (nlG - 1.0f));
-            float y = bell.process (f3.process (f2.process (f1.process (y0))));
+            float y = x;   // v1.5: o timbre (formantes, campana, brilho) já vem do espectro dinâmico
 
             bf.process (rng.next());
             if (! releasing)

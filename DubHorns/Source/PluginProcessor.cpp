@@ -124,7 +124,10 @@ HornsProcessor::HornsProcessor()
     phraseAudio.events.reserve (horns::kMaxEvents);
     phraseAudio.name.reserve (128);
     sched.reserve (1024);
-    applyMusico (musicos::defaultPreset, false);   // abre no "Tubby · naipe no eco": o delay já na frente
+    applyMusico (musicos::defaultPreset, false);   // abre no som do "Tubby · naipe no eco"...
+    // ...mas o Tape Echo e a saturação de fita começam desligados (padrão de fábrica do kit)
+    if (auto* e = apvts.getParameter ("echoOn")) e->setValueNotifyingHost (0.0f);
+    if (auto* d = apvts.getParameter ("drive"))  d->setValueNotifyingHost (0.0f);
 }
 
 void HornsProcessor::applyMusico (int index, bool preview)
