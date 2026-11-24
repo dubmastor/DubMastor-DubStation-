@@ -5,19 +5,11 @@ on:
     branches: [main]
     paths:
       - 'ReggaeGuitar/**'
-      - 'ReggaeKeys/Source/**'
-      - '.github/workflows/build-reggaeguitar.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRG-68-*'
   pull_request:
     paths:
       - 'ReggaeGuitar/**'
-      - 'ReggaeKeys/Source/**'
-      - '.github/workflows/build-reggaeguitar.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

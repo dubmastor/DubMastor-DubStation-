@@ -4,26 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeOrgan/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeKeys/Resources/**'
-      - 'RiddimBank/**'
-      - '.github/workflows/build-reggaeorgan.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRO-68-*'
   pull_request:
     paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeOrgan/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeKeys/Resources/**'
-      - 'RiddimBank/**'
-      - '.github/workflows/build-reggaeorgan.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

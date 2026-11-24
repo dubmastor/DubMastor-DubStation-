@@ -5,17 +5,11 @@ on:
     branches: [main]
     paths:
       - 'ReggaePercussion/**'
-      - '.github/workflows/build-reggaepercussion.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRP-77-*'
   pull_request:
     paths:
       - 'ReggaePercussion/**'
-      - '.github/workflows/build-reggaepercussion.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

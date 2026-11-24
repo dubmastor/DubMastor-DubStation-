@@ -5,17 +5,11 @@ on:
     branches: [main]
     paths:
       - 'TapeEcho/**'
-      - '.github/workflows/build-tapeecho.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MTE-12-*'
   pull_request:
     paths:
       - 'TapeEcho/**'
-      - '.github/workflows/build-tapeecho.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

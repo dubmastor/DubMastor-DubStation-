@@ -60,13 +60,14 @@ O MRM-0420 compila o código destas pastas direto, sem cópia:
 - `BigKnob/` — Mastor Big Knob (aba CONTROL ROOM)
 - `ReggaeKeys/Source/` — timbres do piano M1 / Hammond
 
-**Sempre que mudar uma dessas máquinas, atualize o MRM-0420 também:**
+**Regra do dono (nov/2026): o MRM-0420 só é atualizado (versão, build, release) quando ele pedir.** O `build-riddimmachine.yml` só roda por tag
+ou manual. Quando ele pedir para atualizar o MRM-0420:
 1. Compile e rode o teste offline do MRM-0420 (`RiddimMachine/tests/render_test.cpp`, alvo `mrm_render`); todos os modos precisam passar.
 2. Se a mudança criar uma classe de interface ou um namespace com nome já usado por outra máquina, renomeie no lado do MRM com os headers `RiddimMachine/Source/*Names.h` (não mexa no código da máquina só por isso).
 3. Se mudar parâmetros de harmonia (`root`, `qual`, `dur`, `inv`, `on`), BPM, `seed`, músicos (`drummer`, `pattern`, `style`) ou o tamanho do painel, ajuste `MrmProcessor::buildLinks`, a aba RIDDIM (`MrmMain.cpp`) ou o corte do título (`kCrop*` em `MrmEditor.cpp`).
 4. Atualize as imagens em `RiddimMachine/docs/`, o `RiddimMachine/RELEASE_NOTES.md` e, se for o caso, a versão para celular `site/riddim/`.
 
-O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer uma dessas pastas muda.
+O workflow `.github/workflows/build-riddimmachine.yml` não roda mais sozinho quando essas pastas mudam (só por tag `MRM-0420-x.y` ou manual).
 
 ## Instalador completo (Dub Station, todos os plugins)
 - Workflow `.github/workflows/build-pacote.yml`, script `.github/scripts/pacote.py`. Lê a lista do `plugins.json`: plugin novo entra sozinho.
@@ -74,10 +75,13 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 - `"pausado": true` no `pacote` do `plugins.json`: o workflow não compila nem publica (só manual), o site fica sem o bloco do
   instalador completo e a checagem exige que não haja link. Para liberar: tirar `pausado`, devolver o bloco `completo` em
   `site/index.html` e os links no README.
-- **Sempre que a versão de um plugin subir**, atualize `plugins.json` → `pacote` → `plugins` com a nova versão, suba `pacote` → `versao` e troque `DubStation-x.y` nos links do site e do README. A checagem falha se esquecer.
-- **Fila das máquinas Mac (otimização de nov/2026):** todo workflow de build tem `concurrency` com `cancel-in-progress` (um push novo
-  cancela o build anterior da mesma branch/PR); o instalador completo não roda em PR (só na `main`, por tag ou manual); as machines legado
-  (MRDM-12, MRBM-69, MRCM-1240) só compilam por tag ou manual. Releases: fica só a última de cada plugin (as antigas e as dos nomes antigos foram apagadas).
+- **Regra do dono (nov/2026): o instalador completo só é atualizado quando ele pedir** (alguns plugins ainda estão em teste). Plugin que sobe de versão
+  NÃO mexe no `pacote` do `plugins.json` nem nos links `DubStation-x.y`; a checagem só avisa. Quando ele pedir: atualize `pacote` → `plugins`,
+  suba `pacote` → `versao`, troque `DubStation-x.y` no site e no README e rode o `build-pacote.yml` (só por tag ou manual).
+- **Fila das máquinas Mac (regra do dono: otimizar o workflow a cada comando):** todo workflow de build tem `concurrency` com `cancel-in-progress`
+  (um push novo cancela o build anterior da mesma branch/PR); cada plugin só compila quando a PASTA DELE muda (mexer em código compartilhado
+  ou no próprio workflow não dispara build: rode manual se precisar); instalador completo, MRM-0420 e machines legado (MRDM-12, MRBM-69, MRCM-1240)
+  só por tag ou manual. Antes de enviar, cancele os runs que ficaram redundantes. Releases: fica só a última de cada plugin (as antigas e as dos nomes antigos foram apagadas).
 - Pro Tools (AAX): todo CMakeLists inclui `.github/cmake/aax.cmake` e põe `${DM_AAX}` no fim de `FORMATS`. Plugin novo também. O AAX é compilado sempre (SDK do JUCE 8) e só entra no instalador público quando assinado pela PACE (passo a passo em `PROTOOLS.md`).
 
 

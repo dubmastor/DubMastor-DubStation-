@@ -5,29 +5,11 @@ on:
     branches: [main]
     paths:
       - 'KeyScout/**'
-      - 'Tune/Source/TuneDSP.h'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - '.github/workflows/build-keyscout.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MKS-0420-*'
   pull_request:
     paths:
       - 'KeyScout/**'
-      - 'Tune/Source/TuneDSP.h'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - '.github/workflows/build-keyscout.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

@@ -5,17 +5,11 @@ on:
     branches: [main]
     paths:
       - 'PhoneVox/**'
-      - '.github/workflows/build-phonevox.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MPV-01-*'
   pull_request:
     paths:
       - 'PhoneVox/**'
-      - '.github/workflows/build-phonevox.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

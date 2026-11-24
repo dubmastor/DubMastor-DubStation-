@@ -4,32 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeBass/**'
-      - 'ReggaeBassMachine/Source/**'
-      - 'RiddimBank/Source/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeDrumMachine/Source/DrumSynth.h'
-      - 'ReggaeDrumMachine/Source/PatternGenerator.h'
-      - 'ReggaeChordMachine/Source/DubSynth.h'
-      - '.github/workflows/build-reggaedubbassinstrument.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRB-69-*'
   pull_request:
     paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeBass/**'
-      - 'ReggaeBassMachine/Source/**'
-      - 'RiddimBank/Source/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeDrumMachine/Source/DrumSynth.h'
-      - 'ReggaeDrumMachine/Source/PatternGenerator.h'
-      - 'ReggaeChordMachine/Source/DubSynth.h'
-      - '.github/workflows/build-reggaedubbassinstrument.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

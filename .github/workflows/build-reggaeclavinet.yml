@@ -5,19 +5,11 @@ on:
     branches: [main]
     paths:
       - 'ReggaeClavinet/**'
-      - 'RiddimBank/**'
-      - '.github/workflows/build-reggaeclavinet.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRCL-71-*'
   pull_request:
     paths:
       - 'ReggaeClavinet/**'
-      - 'RiddimBank/**'
-      - '.github/workflows/build-reggaeclavinet.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:

@@ -7,14 +7,8 @@ name: Build Dub Station — instalador completo
 # Pro Tools: o AAX é compilado sempre (SDK do JUCE 8), mas só entra no instalador depois de
 # assinado pela PACE (secrets em PROTOOLS.md); sem assinatura vai para o artefato AAX-nao-assinado-*.
 on:
+  # regra do dono: só compila e publica quando ele pedir (tag ou Actions › Run workflow)
   push:
-    branches: [main]
-    paths:
-      - 'plugins.json'
-      - '.github/scripts/pacote.py'
-      - '.github/cmake/**'
-      - '.github/installer/**'
-      - '.github/workflows/build-pacote.yml'
     tags:
       - 'DubStation-*'
   workflow_dispatch:
