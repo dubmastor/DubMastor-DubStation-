@@ -947,7 +947,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
                              "Os discos Unpolished e Ras Mek Peace foram gravados ao vivo, direto em fita de dois canais, "
                              "sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.\n\n"
                              "O timbre: bubble oco (8' + 4' + 2 2/3'), chop cheio sem percuss\xc3\xa3o, Leslie lenta e discreta, "
-                             "key click aparente, sem reverb e sem eco; o EQ corta o grave do caminho do baixo, tira um pouco de m\xc3\xa9" "dio e compensa o volume na SA\xc3\x8d" "DA.\n\n"
+                             "sem key click, sem reverb e sem eco; o EQ corta o grave do caminho do baixo, tira um pouco de m\xc3\xa9" "dio e compensa o volume na SA\xc3\x8d" "DA.\n\n"
                              "Nenhuma fonte diz qual \xc3\xb3rg\xc3\xa3o ele usava: os registros s\xc3\xa3o uma aproxima\xc3\xa7\xc3\xa3o de ouvido."),
                          juce::dontSendNotification);
     midniteInfo.setFont (VintageLookAndFeel::mono (9.5f, false));

@@ -73,7 +73,7 @@ separados. Leslie de dois rotores (corneta e tambor, com presets, LENTA/RÁPIDA,
   duplo clique zera. Presets: PLANO, ROOTS QUENTE, DUB ESCURO, DIGITAL 80 e ABRE O BAIXO. Começa plano.
 - **TIMBRE MIDNITE**: o órgão cru e seco do Ron Benjamin (Midnite, St. Croix). Os discos *Unpolished* e *Ras Mek Peace*
   foram gravados ao vivo direto em fita de dois canais, sem reverb, sem eco e sem EQ. O botão carrega bubble oco (8' + 4' + 2⅔'),
-  chop cheio sem percussão, Leslie lenta e discreta, key click aparente, sem reverb e sem eco, e o EQ que tira o grave do caminho
+  chop cheio sem percussão, Leslie lenta e discreta, sem key click, sem reverb e sem eco, e o EQ que tira o grave do caminho
   do baixo e um pouco de médio, com o volume compensado na SAÍDA. Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
 
 ## Código

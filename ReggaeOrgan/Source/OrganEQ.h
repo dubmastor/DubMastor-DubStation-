@@ -42,7 +42,7 @@ inline const EqPreset& eqPreset (int i)
 
 // TIMBRE MIDNITE (Ron Benjamin, Midnite · St. Croix, 1997-2015): órgão cru e seco, como nos discos gravados
 // ao vivo direto em fita de dois canais (Unpolished, Ras Mek Peace), sem reverb e sem eco; bubble oco
-// (8' + 4' + 2⅔'), chop cheio sem percussão, Leslie lenta e discreta, key click aparente; o EQ tira o grave
+// (8' + 4' + 2⅔'), chop cheio, sem percussão e sem key click, Leslie lenta e discreta; o EQ tira o grave
 // do caminho do baixo pesado, tira um pouco de médio e compensa o volume na SAÍDA. Registros e EQ são uma aproximação de ouvido.
 struct OrganTimbre
 {
@@ -60,7 +60,7 @@ inline const OrganTimbre& midniteTimbre()
     static const OrganTimbre t {
         "MIDNITE",
         { 0, 0, 8, 6, 4, 0, 0, 0, 0 }, { 8, 6, 8, 6, 0, 0, 0, 0, 0 },
-        false, 0.12f, 0.55f, 0.0f,
+        false, 0.12f, 0.0f, 0.0f,        // sem percussão e sem key click: nada de ataque percussivo
         2, 0, 0.45f,
         { true, 110.0f, -2.0f, 220.0f, -2.5f, 1100.0f, 0.9f, -1.5f, 6500.0f, kMidniteOutDb }
     };
