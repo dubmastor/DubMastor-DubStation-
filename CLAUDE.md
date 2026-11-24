@@ -22,6 +22,9 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
    No card do site, o botão verde "▶ Tocar no celular / navegador". Plugin novo sem versão web não passa na checagem.
    Os plugins antigos marcados como `"web": "pendente"` no `plugins.json` devem ganhar a sua quando forem atualizados.
    Plugin com `"oculto": true` no `plugins.json` fica fora do site por enquanto (sem card); a checagem só avisa e falha se o card continuar lá.
+   Plugin com `"so_celular": true` está **em teste**: o card fica no site só com o botão da versão para celular, sem download
+   (a checagem falha se houver link de release no card) e o README não leva link de download. Regra do dono: todo VST novo
+   começa assim; só depois de aprovado ganha os downloads (tirar `so_celular` e devolver os links).
 4. **Registro.** Plugin novo entra no `plugins.json` (sigla, pasta, nome, tipo, web) e ganha um workflow
    `build-<pasta em minúsculas>.yml` copiado de um existente (com instaladores, pluginval e auval).
 5. **Checagem.** Rodar `python3 .github/checagem/checar.py` antes de enviar. O workflow `checagem.yml`
