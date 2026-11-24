@@ -261,6 +261,30 @@ nav.tabs button.need::after{content:"GERAR";font-family:var(--mono);font-size:9p
 .pieces{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-top:10px}
 .pc2{display:flex;flex-direction:column;gap:3px;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-weight:700}
 .pc2 select{font-size:14px;text-transform:none;letter-spacing:0}
+/* show: 10 riddims salvos */
+.show{background:linear-gradient(180deg,#2c1d12,#1a110a);border:2px solid #000;border-radius:12px;padding:14px;margin-top:12px}
+.show .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:10px}
+.slot{background:#120c07;border:1px solid var(--line);border-radius:9px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center}
+.slot.full{border-color:var(--amber)}.slot.cur{box-shadow:0 0 0 2px var(--amber) inset;background:#2a1a0c}
+.slot .num{font-family:var(--disp);font-size:22px;color:var(--amber);width:30px;text-align:center}
+.slot .nm{font-weight:700;color:var(--cream);font-size:13px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .inf{grid-column:2;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.slot .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.slot .acts .btn{flex:1;min-height:34px;padding:4px 6px;font-size:12px;white-space:nowrap}.slot .acts .btn.green{flex:1 1 100%}
+.slot.empty .nm{color:var(--muted);font-weight:400}
+@media (max-width:600px){.show .sgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.slot{padding:6px}.slot .acts .btn{font-size:11px}}
+/* mixagem entre as machines */
+.console{background:linear-gradient(180deg,#26201b,#141110);border:2px solid #000;border-radius:12px;padding:12px 12px 8px;margin-top:12px}
+.chs{display:flex;gap:6px;overflow-x:auto;padding:8px 2px 6px;scrollbar-width:thin}
+.ch{flex:0 0 64px;display:flex;flex-direction:column;align-items:center;gap:5px;background:#0f0c0a;border:1px solid #3a2d22;border-top:3px solid var(--c);border-radius:8px;padding:6px 4px}
+.ch.off{opacity:.5}
+.ch .cn{font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--cream);text-align:center;line-height:1.1;min-height:22px}
+.ch .fw{display:flex;gap:4px;align-items:stretch;height:150px}
+.ch .fw input[type=range]{writing-mode:vertical-lr;direction:rtl;width:26px;height:150px;margin:0;accent-color:var(--c);cursor:ns-resize}
+.ch .vu{width:8px;height:150px;background:#000;border-radius:3px;position:relative;overflow:hidden}
+.ch .vu i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#4f9a5a 0 60%,#e6b83a 60% 85%,#c8402f 85%)}
+.ch .db{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.ch .pn{width:56px;accent-color:var(--c)}
+.ch .ms2{display:flex;gap:3px}.ch .ms2 .btn{min-height:28px;min-width:26px;padding:2px 6px;font-size:11px}
 /* mixer / efeitos */
 .strips{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
 .strip{border-top:3px solid var(--c)}
@@ -504,7 +528,7 @@ const INST=[
  presets:{'One Drop':['X..x......x.....','........x.......','......x......x..',E],'Rockers':['X.x.X.x.........',E,'........X.x.....','............X.x.'],'Steppers':['X.x.x.x.X.x.x.x.',E,E,E],'Rub a Dub':['X.....x.X.......','...x............','..........x..x..',E],'Digital':['X..x..x.X..x..x.',E,E,E]},
  TB:{'BASS':{k:'sine',gl:.05},'SUPER TONE':{k:'super',gl:.03},'808 curto':{k:'808',dec:.22,gl:.06},'808 médio':{k:'808',dec:.45,gl:.06},'808 longo':{k:'808',dec:.9,gl:.06}},
  play(t,ns,l,v,d,p,o){bassV(t,mtof(ns[0]),v,d,p,o,this.TB[this.t])},
- p:{vol:.85,pan:0,tone:.4,echo:0,dur:3},
+ p:{vol:.68,pan:0,tone:.4,echo:0,dur:3},
  notes:(l,c)=>[deg(c,l,33)]},
 {id:'harm',name:'Riddim',color:'#e6b83a',th:['#3b2a1c','#1c130c','#ffd27a','#f2a541','#efe2c4'],riddim:true},
 {id:'organ',name:'Órgão',full:'Mastor Reggae Organ',code:'MRO-68',color:'#4f9a5a',th:['#1f4a2a','#0b1d10','#d8f5c8','#7cc47f','#e4f2dc'],kind:'mel',
@@ -600,7 +624,7 @@ function initAudio(){ctx=new (window.AudioContext||window.webkitAudioContext)();
  const sIn=G(),sOut=G();dry=G();wet=G();shaper=ctx.createWaveShaper();big=G();const lim=ctx.createDynamicsCompressor();lim.threshold.value=-3;lim.ratio.value=20;lim.attack.value=.002;lim.release.value=.08;an=ctx.createAnalyser();an.fftSize=1024;
  bus.connect(hp);hp.connect(lp);lp.connect(sIn);sIn.connect(dry);sIn.connect(shaper);shaper.connect(wet);dry.connect(sOut);wet.connect(sOut);sOut.connect(big);big.connect(lim);lim.connect(an);an.connect(ctx.destination);
  eIn=G();dl=ctx.createDelay(2);fb=G();ef=ctx.createBiquadFilter();ef.type='lowpass';eOut=G();eIn.connect(dl);dl.connect(ef);ef.connect(fb);fb.connect(dl);ef.connect(eOut);eOut.connect(bus);
- M.forEach(I=>{const c={in:G(),pan:ctx.createStereoPanner(),send:G()};c.in.connect(c.pan);c.pan.connect(bus);c.in.connect(c.send);c.send.connect(eIn);chans[I.id]=c;applyCh(I)});
+ M.forEach(I=>{const c={in:G(),pan:ctx.createStereoPanner(),send:G(),an:ctx.createAnalyser()};c.an.fftSize=512;c.in.connect(c.pan);c.pan.connect(bus);c.pan.connect(c.an);c.in.connect(c.send);c.send.connect(eIn);chans[I.id]=c;applyCh(I)});
  applyFX();loadDM()}
 function applyCh(I){const c=chans[I.id];if(!c)return;c.in.gain.value=I.p.vol;c.pan.pan.value=I.p.pan;c.send.gain.value=I.p.echo}
 function applyFX(){if(!ctx)return;hp.frequency.value=FX.eqBy?10:FX.hpf;lp.frequency.value=FX.eqBy?22000:FX.lpf;
@@ -696,6 +720,8 @@ const mp=mk(`<section class="panel" id="p-main" style="${thVars(MN)}">${cab(MN,'
 <div class="mbar"><input type="search" id="cq" placeholder="Buscar música, artista ou riddim" aria-label="Buscar"><button class="btn" id="conly">Só completos</button><button class="btn" id="cclear">Limpar</button></div>
 <div class="mbody"><div class="mcol navc" id="mnav"></div><div class="mcol" id="mlist"></div><div class="mcol" id="mdet"></div></div>
 <div class="legend2"><span><b style="font-family:var(--mono);color:var(--cream)">R</b> riddim/harmonia · <b style="font-family:var(--mono);color:var(--cream)">D</b> drum · <b style="font-family:var(--mono);color:var(--cream)">B</b> bass</span><span class="lt"><i class="g"></i></span> original da gravação (harmonia conferida)<span class="lt"><i class="y"></i></span> escolhida pelo músico mais próximo (harmonia aproximada)<span class="lt"><i class="r"></i></span> falta (harmonia pendente)</div></div>
+<div class="show" id="showbox"><h3 style="margin:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span class="dubt" style="font-size:22px">SHOW</span><span class="cnt">10 riddims salvos para tocar ao vivo · ficam neste navegador</span><span style="flex:1"></span><button class="btn" id="shexp">Exportar show</button><label class="btn" style="cursor:pointer">Importar show<input type="file" id="shimp" accept=".json,application/json" hidden></label></h3><div class="sgrid" id="sgrid"></div></div>
+<div class="console" id="mixmain"><h3 style="margin:0 0 2px;display:flex;align-items:center;gap:8px"><span class="dubt" style="font-size:22px">MIXAGEM</span><span class="cnt">volume, pan, mute e solo de cada machine · os mesmos controles das abas</span></h3><div class="chs" data-console></div></div>
 <div class="group" style="margin-top:12px"><h3>Machines <span class="row"><button class="btn" id="allon">Ligar todas</button><button class="btn" id="alloff">Desligar todas</button></span></h3><div class="mgrid" id="mgrid"></div></div>
 <div class="dub" style="margin-top:12px"><div><div class="dubt">DUB</div><p class="hint" style="margin:6px 0 10px">Segure a sirene para tocar. Ela passa pelo Tape Echo do master.</p>
 <div class="row" style="gap:16px;align-items:center"><button class="siren" id="siren" aria-label="Sirene (segure)">SIRENE</button><div><select id="smode" aria-label="Tipo de sirene"><option>Clássica</option><option>Laser</option><option>Whoop</option><option>Alarme</option></select><div class="knobs" id="sirk"></div></div></div></div>
@@ -992,7 +1018,7 @@ function renderGrid(I){const g=document.querySelector(`#p-${I.id} .grid`);if(!g)
 
 /* mixer */
 const MX=byId.mix;
-const mx=mk(`<section class="panel" id="p-mix" style="${thVars(MX)}">${cab(MX,'Mixer','Todas as machines')}<div class="pbody"><p class="hint">Os knobs são os mesmos das abas — mexer aqui muda lá também.</p><div class="row tools"><button class="btn" id="unsolo">Tirar todos os solos</button><button class="btn" id="unmute">Desmutar tudo</button></div><div class="strips" id="strips"></div></div></section>`);
+const mx=mk(`<section class="panel" id="p-mix" style="${thVars(MX)}">${cab(MX,'Mixer','Todas as machines')}<div class="pbody"><p class="hint">Os knobs são os mesmos das abas — mexer aqui muda lá também.</p><div class="row tools"><button class="btn" id="unsolo">Tirar todos os solos</button><button class="btn" id="unmute">Desmutar tudo</button></div><div class="console" style="margin:0 0 12px"><div class="chs" data-console></div></div><div class="strips" id="strips"></div></div></section>`);
 panels.append(mx);
 M.forEach(I=>{const s=mk(`<div class="group strip" data-strip="${I.id}" style="--c:${I.color}"><h3><span class="n"><span class="dot" data-dot="${I.id}"></span>${I.name} · ${I.code}</span><span class="row">${msBtns(I)}</span></h3><div class="knobs"></div></div>`);
  $('strips').append(s);instKnobs(I,s.querySelector('.knobs'),true)});
@@ -1025,11 +1051,11 @@ const [hpF,hpI]=lg(20,1000),[lpF,lpI]=lg(400,20000);
 $('eqk').append(knob('HPF',0,1,hpI(FX.hpf),v=>hz(hpF(v)),v=>{FX.hpf=hpF(v);applyFX()},'fx.hpf'),knob('LPF',0,1,lpI(FX.lpf),v=>hz(lpF(v)),v=>{FX.lpf=lpF(v);applyFX()},'fx.lpf'));
 $('eqpre').onclick=e=>{const b=e.target.closest('[data-eq]');if(!b)return;const[h,l]=EQP[b.dataset.eq];FX.hpf=h;FX.lpf=l;binds['fx.hpf'][0](hpI(h),true);binds['fx.lpf'][0](lpI(l),true);applyFX()};
 $('eqby').onclick=()=>{FX.eqBy=!FX.eqBy;$('eqby').classList.toggle('on',FX.eqBy);$('eqg').classList.toggle('bypassed',FX.eqBy);applyFX()};
-$('satk').append(knob('Drive',0,1,FX.sat.drive,pct,v=>{FX.sat.drive=v;applyFX()}));
+$('satk').append(knob('Drive',0,1,FX.sat.drive,pct,v=>{FX.sat.drive=v;applyFX()},'fx.drive'));
 $('satm').onchange=e=>{FX.sat.mode=+e.target.value;applyFX()};
 $('satby').onclick=()=>{FX.sat.on=!FX.sat.on;$('satby').textContent=FX.sat.on?'Ligado':'Desligado';$('satby').classList.toggle('on',FX.sat.on);$('satf').classList.toggle('bypassed',!FX.sat.on);applyFX()};
 const ET=['1/16','1/8','3/16','1/4','3/8'],ETs=[1,2,3,4,6];
-$('echok').append(knob('Tempo',0,4,2,v=>ET[v],v=>{FX.echo.time=ETs[v];applyFX()},'',1),knob('Feedback',0,.9,FX.echo.fb,pct,v=>{FX.echo.fb=v;applyFX()}),knob('Tom',0,1,FX.echo.tone,pct,v=>{FX.echo.tone=v;applyFX()}));
+$('echok').append(knob('Tempo',0,4,2,v=>ET[v],v=>{FX.echo.time=ETs[v];applyFX()},'',1),knob('Feedback',0,.9,FX.echo.fb,pct,v=>{FX.echo.fb=v;applyFX()},'fx.fb'),knob('Tom',0,1,FX.echo.tone,pct,v=>{FX.echo.tone=v;applyFX()},'fx.etone'));
 $('echoby').onclick=()=>{FX.echo.on=!FX.echo.on;$('echoby').textContent=FX.echo.on?'Ligado':'Desligado';$('echoby').classList.toggle('on',FX.echo.on);$('echof').classList.toggle('bypassed',!FX.echo.on);applyFX()};
 const bigF=v=>v<.01?'−∞ dB':(20*Math.log10(v)).toFixed(1)+' dB';$('bigk').append(knob('Saída',0,1.5,1,bigF,v=>{FX.big=v;applyFX()},'fx.big'));$('bigk2').append(knob('Saída',0,1.5,1,bigF,v=>{FX.big=v;applyFX()},'fx.big'));
 
@@ -1060,7 +1086,61 @@ function showStep(s,b){document.querySelectorAll('.cell.play,.ghead.now').forEac
  const p=panels.querySelector('.panel.active');if(p){p.querySelectorAll(`.cell[data-s="${s}"]`).forEach(c=>c.classList.add('play'));const h=p.querySelector(`[data-h="${s}"]`);if(h)h.classList.add('now')}
  if(s%8===0)lcdText(b,s)}
 const sc=$('scope'),sx=sc.getContext('2d'),buf=new Uint8Array(1024),flash={};
-function frame(){if(ctx){const now=ctx.currentTime;
+/* ---------- mixagem entre as machines (Principal e Mixer) ---------- */
+const setK=(key,v)=>(binds[key]||[]).forEach(f=>f(v,true));
+function buildConsoles(){document.querySelectorAll('[data-console]').forEach(box=>{box.innerHTML='';M.forEach(I=>{
+ const ch=mk(`<div class="ch" data-chs="${I.id}" style="--c:${I.color}"><div class="cn"><span class="dot" data-dot="${I.id}"></span> ${I.name}</div>
+ <div class="fw"><input type="range" min="0" max="1.2" step=".01" value="${I.p.vol}" aria-label="Volume ${I.name}"><div class="vu"><i data-vu="${I.id}"></i></div></div>
+ <div class="db"></div><span class="db" style="margin-top:2px">PAN</span><input class="pn" type="range" min="-1" max="1" step=".02" value="${I.p.pan}" aria-label="Pan ${I.name}"><div class="ms2">${msBtns(I)}</div></div>`);
+ const f=ch.querySelector('.fw input'),pn=ch.querySelector('.pn'),db=ch.querySelector('.db');
+ const showDb=v=>db.textContent=v<.005?'−∞':(20*Math.log10(v)).toFixed(1);showDb(I.p.vol);
+ const fset=(v)=>{f.value=v;showDb(v)};(binds[I.id+'.vol']=binds[I.id+'.vol']||[]).push(fset);
+ (binds[I.id+'.pan']=binds[I.id+'.pan']||[]).push(v=>pn.value=v);
+ f.oninput=()=>{const v=+f.value;I.p.vol=v;showDb(v);if(ctx)applyCh(I);(binds[I.id+'.vol']||[]).forEach(s=>s!==fset&&s(v,true))};
+ f.ondblclick=()=>{f.value=I.p0.vol;f.oninput()};
+ pn.oninput=()=>{const v=+pn.value;I.p.pan=v;if(ctx)applyCh(I);setK(I.id+'.pan',v)};pn.ondblclick=()=>{pn.value=0;pn.oninput()};
+ box.append(ch)})});renderToggles()}
+M.forEach(I=>I.p0={...I.p});
+buildConsoles();
+const vuBuf=new Float32Array(512);
+function meters(){if(!ctx)return;document.querySelectorAll('[data-vu]').forEach(el=>{const c=chans[el.dataset.vu];if(!c||!c.an)return;c.an.getFloatTimeDomainData(vuBuf);let pk=0;for(let i=0;i<vuBuf.length;i++){const a=Math.abs(vuBuf[i]);if(a>pk)pk=a}
+ const db=pk>0?20*Math.log10(pk):-60,h=Math.max(0,Math.min(100,(db+48)/48*100));const old=+(el.dataset.h||0),nh=h>old?h:Math.max(h,old-1.5);el.dataset.h=nh;el.style.height=nh+'%'})}
+
+/* ---------- SHOW: 10 riddims salvos (localStorage + exportar/importar) ---------- */
+const SHOW_KEY='mrm-show-10';let SHOW=[];try{SHOW=JSON.parse(localStorage.getItem(SHOW_KEY)||'[]')}catch(e){}
+while(SHOW.length<10)SHOW.push(null);SHOW=SHOW.slice(0,10);let showCur=-1;
+const saveShow=()=>{try{localStorage.setItem(SHOW_KEY,JSON.stringify(SHOW))}catch(e){}};
+function snap(name){return{v:1,name,date:Date.now(),ready:!!H.ready,bpm:H.bpm,chords:H.chords.map(c=>({r:c.r,q:c.q,len:c.len})),cur:H.cur?{...H.cur}:null,
+ fx:{hpf:FX.hpf,lpf:FX.lpf,eqBy:FX.eqBy,sat:{...FX.sat},echo:{...FX.echo},big:FX.big},
+ m:Object.fromEntries(M.map(I=>[I.id,{pat:I.pat.map(r=>[...r]),mute:I.mute,solo:I.solo,t:I.t,preset:I.preset,p:{...I.p},musician:I.musician||null,style:I.style||null,need:!!I.need,orig:!!I.orig,
+  follow:I.id==='pick'?!!I.follow:undefined,fill:I.id==='mif'?!!I.fill:undefined,snd:I.snd?[...I.snd]:undefined,tr:I.tr?I.tr.map(t=>({...t})):undefined,sw:I.sw}]))}}
+function restore(st){if(!st)return;H.ready=st.ready;$('setup').hidden=true;H.cur=st.cur;H.ctx=null;H.chords=st.chords.map(c=>({...c}));buildSeq();setBpm(st.bpm);
+ Object.assign(FX,{hpf:st.fx.hpf,lpf:st.fx.lpf,eqBy:st.fx.eqBy,big:st.fx.big});Object.assign(FX.sat,st.fx.sat);Object.assign(FX.echo,st.fx.echo);
+ for(const I of M){const x=st.m[I.id];if(!x)continue;I.mute=x.mute;I.solo=x.solo;I.preset=x.preset;I.musician=x.musician;I.style=x.style;I.need=x.need;I.orig=x.orig;
+  if(x.snd)I.snd=[...x.snd];if(x.tr)I.tr=x.tr.map(t=>({...t}));if(x.sw!==undefined)I.sw=x.sw;if(I.id==='pick')I.follow=x.follow;if(I.id==='mif')I.fill=x.fill;
+  if(x.t in I.TB){I.t=x.t;document.querySelectorAll(`[data-tbsync="${I.id}"]`).forEach(e=>e.value=x.t);const s=document.querySelector(`#p-${I.id} [data-tb]`);if(s)s.value=x.t}
+  if(I.syncLanes)I.syncLanes();
+  I.pat=x.pat.map(r=>[...r]);const ps=document.querySelector(`#p-${I.id} [data-pre]`);if(ps&&I.presets[x.preset])ps.value=x.preset;
+  Object.assign(I.p,x.p);['vol','pan','echo','tone','dur'].forEach(k=>I.p[k]!==undefined&&setK(I.id+'.'+k,I.p[k]));if(ctx)applyCh(I);renderGrid(I);I.renderGen&&I.renderGen()}
+ setK('fx.hpf',hpI(FX.hpf));setK('fx.lpf',lpI(FX.lpf));setK('fx.big',FX.big);setK('fx.drive',FX.sat.drive);setK('fx.fb',FX.echo.fb);setK('fx.etone',FX.echo.tone);applyFX();
+ $('satby').textContent=FX.sat.on?'Ligado':'Desligado';$('satby').classList.toggle('on',FX.sat.on);$('satf').classList.toggle('bypassed',!FX.sat.on);$('echoby').textContent=FX.echo.on?'Ligado':'Desligado';$('echoby').classList.toggle('on',FX.echo.on);$('echof').classList.toggle('bypassed',!FX.echo.on);$('eqby').classList.toggle('on',FX.eqBy);$('eqg').classList.toggle('bypassed',FX.eqBy);
+ renderChords();renderToggles();renderMenu()}
+function renderShow(){$('sgrid').innerHTML=SHOW.map((x,i)=>x?`<div class="slot full ${i===showCur?'cur':''}"><span class="num">${i+1}</span><div><div class="nm" title="${esc(x.name)}">${esc(x.name)}</div></div><div class="inf">${x.bpm} BPM · ${x.chords.map(cname).join(' ')}</div>
+ <div class="acts"><button class="btn green" data-shload="${i}">▶ Tocar</button><button class="btn" data-shsave="${i}" title="Salvar o riddim atual por cima">Salvar</button><button class="btn" data-shren="${i}" aria-label="Renomear">✎</button><button class="btn" data-shdel="${i}" aria-label="Apagar">×</button></div></div>`
+ :`<div class="slot empty"><span class="num">${i+1}</span><div class="nm">vazio</div><div class="acts"><button class="btn" data-shsave="${i}">Salvar aqui</button></div></div>`).join('')}
+$('sgrid').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.shsave!==undefined){const i=+d.shsave;if(!H.ready){toastMsg('Crie ou carregue um riddim antes de salvar');return}
+  const def=SHOW[i]?SHOW[i].name:(H.cur&&H.cur.s?H.cur.s:'Riddim '+(i+1));const nm=prompt(`Nome do riddim no lugar ${i+1}:`,def);if(nm===null)return;
+  if(SHOW[i]&&!SHOW[i].name.startsWith(nm)&&!confirm(`Substituir "${SHOW[i].name}"?`))return;SHOW[i]=snap(nm.trim()||def);showCur=i;saveShow();renderShow();toastMsg(`Salvo no lugar ${i+1}`)}
+ else if(d.shload!==undefined){const i=+d.shload;restore(SHOW[i]);showCur=i;renderShow();if(!playing)$('play').click()}
+ else if(d.shren!==undefined){const i=+d.shren,nm=prompt('Novo nome:',SHOW[i].name);if(nm&&nm.trim()){SHOW[i].name=nm.trim();saveShow();renderShow()}}
+ else if(d.shdel!==undefined){const i=+d.shdel;if(confirm(`Apagar "${SHOW[i].name}" do lugar ${i+1}?`)){SHOW[i]=null;if(showCur===i)showCur=-1;saveShow();renderShow()}}});
+$('shexp').onclick=()=>{const blob=new Blob([JSON.stringify({app:'MRM-0420',show:SHOW},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='show-riddim-machine.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+$('shimp').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{const j=JSON.parse(t);if(!j||!Array.isArray(j.show))throw 0;SHOW=j.show.slice(0,10);while(SHOW.length<10)SHOW.push(null);saveShow();renderShow();toastMsg('Show importado')}).catch(()=>toastMsg('Arquivo de show inválido'));e.target.value=''};
+function toastMsg(m){let t=$('mrmtoast');if(!t){t=mk('<div id="mrmtoast" style="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#120c07;color:var(--cream);border:1px solid var(--amber);border-radius:8px;padding:10px 16px;z-index:99;font-size:14px;box-shadow:0 8px 24px #000a"></div>');document.body.append(t)}t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,2200)}
+renderShow();
+
+function frame(){meters();if(ctx){const now=ctx.currentTime;
   while(uiQ.length&&uiQ[0].t<=now){const q=uiQ.shift();showStep(q.s,q.b)}
   while(hitQ.length&&hitQ[0].t<=now){flash[hitQ.shift().id]=now}
   document.querySelectorAll('[data-dot]').forEach(d=>d.classList.toggle('hit',now-(flash[d.dataset.dot]||-9)<.09));
