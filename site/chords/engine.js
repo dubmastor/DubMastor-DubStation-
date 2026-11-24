@@ -27,12 +27,18 @@
     { name: '1/32', sub: 'FUSA', beats: 0.125 }, { name: '1/16', sub: 'SEMICOLCHEIA', beats: 0.25 },
     { name: '1/8', sub: 'COLCHEIA', beats: 0.5 }, { name: '1/4', sub: 'SEMÍNIMA', beats: 1.0 },
     { name: '1/2', sub: 'MÍNIMA', beats: 2.0 }];
-  const PATTERNS = ['CONTRATEMPO'];
+  const PATTERNS = ['CONTRATEMPO', 'BANG BANG'];
   const INVERSIONS = ['FUND', '1ª INV', '2ª INV'];
 
-  // só o contratempo (os outros padrões saíram na 1.7)
-  function patternHits() {
-    return [{ step: 2, vel: 1.0 }, { step: 6, vel: 1.0 }, { step: 10, vel: 1.0 }, { step: 14, vel: 1.0 }];
+  // CONTRATEMPO: o acorde (o "bang" da mão direita) no "&" de cada tempo (caixa no 2 e no 4)
+  // BANG BANG: o bang dobrado — no "&" e de novo no "a" de cada tempo, o segundo um pouco mais fraco
+  function patternHits(pattern) {
+    const h = [];
+    for (let beat = 0; beat < 4; beat++) {
+      h.push({ step: beat * 4 + 2, vel: 1.0 });
+      if (pattern === 1) h.push({ step: beat * 4 + 3, vel: 0.8 });
+    }
+    return h;
   }
 
 

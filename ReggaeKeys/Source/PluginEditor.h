@@ -132,7 +132,8 @@ private:
     // piano anos 80
     LcdDisplay lcd;
     juce::TextButton pianoPreset[4];
-    juce::TextButton pianoTimbre[4];   // M1 / GRAND / MT-40 / FM EP
+    static constexpr int kNumTimbres = 13;   // M1 / GRAND / MT-40 / FM EP / CP-80 / C7 / M1 GRAND / M1 COMP / HONKY / CZ-101 / RHODES / SUITCASE / WURLI
+    juce::TextButton pianoTimbre[kNumTimbres];
     Knob faderBright, faderDecay, faderChorus, faderLevel;   // faders verticais
     WheelsComponent wheels;
 

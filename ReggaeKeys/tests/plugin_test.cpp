@@ -86,18 +86,32 @@ int main (int argc, char** argv)
         bool fin = true;
         const double rms = render (p, 6.0, fin);
         check (fin && rms > 1.0e-3, "CHORD MACHINE toca no piano do MRK-80 (rms " + juce::String (rms, 5) + ")");
-        setP (p.apvts, "mode", 1.0f);
-        const double rmsOrgan = render (p, 6.0, fin);
-        check (fin && rmsOrgan > 1.0e-3, "CHORD MACHINE toca no orgao do MRK-80 (rms " + juce::String (rmsOrgan, 5) + ")");
+        setP (p.apvts, "mode", 1.0f);   // projeto antigo no modo orgao: 3.1 toca no piano
+        const double rmsOld = render (p, 6.0, fin);
+        check (fin && std::abs (rmsOld - rms) < rms * 0.25, "modo orgao antigo toca no piano (rms " + juce::String (rmsOld, 5) + ")");
+        // BANG BANG: o bang dobrado, no & e no a de cada tempo (caixa no 2 e no 4)
+        setP (p.getMachine().apvts, "pattern", 1.0f);
+        double beats = 0;
+        const auto ev = dub::buildLoop (p.getMachine().getSlots(), p.getMachine().getSettings(), beats);
+        int onAnd = 0, onA = 0, other = 0;
+        for (const auto& e : ev)
+        {
+            if (e.channel != dub::ChSkank) continue;
+            const int st = (int) std::lround (e.start * 4.0) % 4;
+            if (st == 2) ++onAnd; else if (st == 3) ++onA; else ++other;
+        }
+        check (onAnd > 0 && onA == onAnd && other == 0, "BANG BANG: skank no & e no a (" + juce::String (onAnd) + " / " + juce::String (onA) + ")");
+        const double rmsBang = render (p, 6.0, fin);
+        check (fin && rmsBang > rms, "BANG BANG toca mais (rms " + juce::String (rmsBang, 5) + ")");
     }
-    {   // 3) SOM INTERNO ligado: o som da propria machine (piano M1 + Hammond) na saida
+    {   // 3) SOM INTERNO ligado (projeto antigo): 3.1 toca skank e bubble no piano do instrumento, sem o Hammond da machine
         RootsKeysProcessor p;
         setP (p.apvts, "machineOn", 1.0f);
         setP (p.getMachine().apvts, "sound", 1.0f);
         setP (p.getMachine().apvts, "bubble", 1.0f);
         bool fin = true;
         const double rms = render (p, 6.0, fin);
-        check (fin && rms > 1.0e-3, "SOM INTERNO da machine (skank + bubble) na saida (rms " + juce::String (rms, 5) + ")");
+        check (fin && rms > 1.0e-3, "SOM INTERNO antigo: skank + bubble no piano (rms " + juce::String (rms, 5) + ")");
     }
     {   // 4) projeto salvo: a machine volta igual
         RootsKeysProcessor a, b;
@@ -137,7 +151,7 @@ int main (int argc, char** argv)
                  && juce::roundToInt (getP (mb, "bpm")) == 82 && getP (mb, "sound") < 0.5f,
                "projeto antigo: padrao Auto no orgao vira bubble, registro e BPM mantidos");
         check (getP (p.apvts, "machineOn") > 0.5f && juce::roundToInt (getP (p.apvts, "mode")) == 1,
-               "projeto antigo: 'tocar com a DAW' vira CHORD MACHINE ligada, modo orgao mantido");
+               "projeto antigo: 'tocar com a DAW' vira CHORD MACHINE ligada (o valor do modo fica guardado)");
     }
     {   // 6) capturas da interface
         RootsKeysProcessor p;
@@ -158,10 +172,8 @@ int main (int argc, char** argv)
         save ("interface-piano.png");
         rk->setPage (1);
         save ("interface-chord-machine.png");
-        setP (p.apvts, "mode", 1.0f);
-        for (int f = 0; f < 12; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
-        rk->setPage (0);
-        save ("interface-organ.png");
+        setP (p.getMachine().apvts, "pattern", 1.0f);
+        save ("interface-chord-machine-bang-bang.png");
     }
 
     std::printf ("\n%s\n", failures == 0 ? "TUDO OK" : "HA FALHAS");

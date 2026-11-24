@@ -75,6 +75,7 @@ public:
     // layer = -1: as três camadas em trilhas separadas; 0..2: só uma camada
     bool writeMidiFile (const juce::File& file, int layer = -1) const;
     static const juce::StringArray& drawbarNames();
+    const mro::LeslieDSP& leslieState() { return trio.leslie(); }   // para a animação da Leslie
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();

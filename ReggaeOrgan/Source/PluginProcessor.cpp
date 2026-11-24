@@ -89,7 +89,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
         l.add (std::make_unique<AudioParameterInt> (ParameterID { "cdb" + String (i + 1), 1 }, "Chop drawbar " + drawbarNames()[i], 0, 8, m.chopDb[i]));
 
     // ---- som
-    l.add (choice ("leslie", "Leslie (mao direita)", { "Desligada", "Lenta", "Rapida" }, m.leslie));
     l.add (onOff ("perc", "Percussao (mao direita)", m.perc));
     l.add (pct ("drive", "Drive", m.drive));
     l.add (pct ("click", "Key click", 0.35f));
@@ -100,6 +99,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
     l.add (pct ("reverb", "Reverb", 0.15f));
     l.add (pct ("master", "Master", 0.80f));
     l.add (onOff ("maxOn", "Maximizer", true));
+    // ---- Leslie de dois rotores (1.1)
+    {
+        StringArray names;
+        for (int i = 0; i < NumLesliePresets; ++i) names.add (String::fromUTF8 (lesliePreset (i).name));
+        l.add (choice ("lesPreset", "Leslie preset", names, leslieFromMusician (m.leslie)));
+    }
+    l.add (choice ("lesSpeed", "Leslie velocidade", { "Lenta", "Rapida" }, m.leslie == 2 ? 1 : 0));
+    l.add (onOff ("lesBrake", "Leslie freio", false));
+    l.add (pct ("lesDepth", "Leslie profundidade", m.leslie ? lesliePreset (leslieFromMusician (m.leslie)).depth : 0.8f));
+    l.add (choice ("instr", "Instrumento", { "Hammond B3", "Rhodes Stage", "Rhodes Suitcase", "Wurlitzer 200A", "FM EP (DX7)" }, 0));
     return l;
 }
 
@@ -156,7 +165,13 @@ void ReggaeOrganProcessor::applyMusician (int mIndex)
         setParam ("bdb" + juce::String (i + 1), (float) m.bubbleDb[i]);
         setParam ("cdb" + juce::String (i + 1), (float) m.chopDb[i]);
     }
-    setParam ("leslie", (float) m.leslie);
+    {
+        const int lp = leslieFromMusician (m.leslie);
+        setParam ("lesPreset", (float) lp);
+        setParam ("lesSpeed", m.leslie == 2 ? 1.0f : 0.0f);
+        setParam ("lesBrake", 0.0f);
+        if (lp > 0) setParam ("lesDepth", lesliePreset (lp).depth);
+    }
     setParam ("perc", m.perc ? 1.0f : 0.0f);
     setParam ("drive", m.drive);
     apvts.state.setProperty ("epochSel", -1, nullptr);
@@ -294,7 +309,10 @@ SoundParams ReggaeOrganProcessor::getSound() const
     sp.bubbleLevel   = get ("bubbleLvl");
     sp.ghostLevel    = get ("ghost");
     sp.chopLevel     = get ("chopLvl");
-    sp.leslie        = (int) get ("leslie");
+    sp.lesPreset     = (int) get ("lesPreset");
+    sp.lesSpeed      = (int) get ("lesSpeed");
+    sp.lesBrake      = get ("lesBrake") > 0.5f;
+    sp.lesDepth      = get ("lesDepth");
     sp.perc          = get ("perc") > 0.5f;
     sp.drive         = get ("drive");
     sp.click         = get ("click");
@@ -305,6 +323,7 @@ SoundParams ReggaeOrganProcessor::getSound() const
     sp.reverb        = get ("reverb");
     sp.master        = get ("master");
     sp.maxOn         = get ("maxOn") > 0.5f;
+    sp.instr         = (int) get ("instr");
     return sp;
 }
 
@@ -562,7 +581,23 @@ void ReggaeOrganProcessor::setStateInformation (const void* data, int sizeInByte
                 if (! ev.empty()) setEdits (ev, (int) t.getProperty ("bars", 1));
                 tree.removeChild (t, nullptr);
             }
+            // projetos da 1.0: a Leslie antiga (desligada / lenta / rápida) vira o preset 122 CLÁSSICA
+            juce::ValueTree oldLes, newLes;
+            for (auto c : tree)
+                if (c.hasType ("PARAM"))
+                {
+                    if (c.getProperty ("id").toString() == "leslie")    oldLes = c;
+                    if (c.getProperty ("id").toString() == "lesPreset") newLes = c;
+                }
             apvts.replaceState (tree);
+            if (oldLes.isValid() && ! newLes.isValid())
+            {
+                const int v = juce::roundToInt ((double) oldLes.getProperty ("value", 0));
+                const int lp = leslieFromMusician (v);
+                setParam ("lesPreset", (float) lp);
+                setParam ("lesSpeed", v == 2 ? 1.0f : 0.0f);
+                setParam ("lesDepth", lp > 0 ? lesliePreset (lp).depth : 0.8f);
+            }
         }
 }
 

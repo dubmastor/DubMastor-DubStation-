@@ -175,6 +175,7 @@ private:
     Knob center, velocity, swing;
     Knob bpm, pianoLvl, organLvl, reps;
     juce::Rectangle<int> patternArea;   // skank sempre no contratempo (janela fixa)
+    std::unique_ptr<ChoiceWindow> patternWin;   // só no Reggae Keys MRK-80: CONTRATEMPO ou BANG BANG
     Toggle bubble, sound;
     PreviewButton previewBtn;
     std::unique_ptr<ButtonAttach> previewAtt;

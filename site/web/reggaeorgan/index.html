@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#3e2110">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Mastor Reggae Organ MRO-68: grooves de órgão de reggae (bubble, chop e fills) dos organistas jamaicanos, por músico, época ou riddim, na contagem com a caixa no 2 e no 4. Toque no celular e baixe o MIDI.">
-<title>Mastor Reggae Organ MRO-68 v1.0 — Dub Station</title>
+<title>Mastor Reggae Organ MRO-68 v1.1 — Dub Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 <style>
@@ -89,6 +89,13 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
 .db b{font-size:11px;color:var(--ivory)}
 .db.br input{accent-color:#8a4a22}.db.bk input{accent-color:#555}
 .page[hidden]{display:none}
+.lesbox{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
+#lesCv{width:260px;height:300px;display:block;border-radius:8px;background:#1a1009}
+.lesgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lesgrid .chip{min-height:46px;line-height:1.2}
+.lesgrid .chip small{display:block;font-weight:400;font-size:9px;opacity:.75}
+.lesread{font-size:10px;margin-top:6px;opacity:.75}
+@media (max-width:760px){.lesbox{grid-template-columns:1fr}#lesCv{margin:0 auto}}
 .kb{position:relative;height:130px;margin-top:10px;background:var(--brown);border-radius:6px;padding:8px 8px 6px;border-top:5px solid #7a1a14;user-select:none;touch-action:none}
 .kb .keys{position:relative;height:100%}
 .w{position:absolute;top:0;bottom:0;background:var(--ivory);border:1px solid #a89a82;border-radius:0 0 4px 4px}
@@ -180,13 +187,29 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
   <div class="console"><h3>MÃO DIREITA · CHOP + FILLS</h3><p>cheio (888), com Leslie e eco</p><div class="dbs" id="dbC"></div></div>
   <div class="panel">
     <h2>SOM</h2>
-    <div class="row" id="leslie"></div>
+    <div class="lbl" style="margin-top:0">INSTRUMENTO <small>(drawbars só no B3)</small></div>
+    <div class="row" id="instr"></div>
     <div class="row" style="margin-top:6px"><button class="chip" id="echoOn">ECO DE FITA</button></div>
     <div class="sl"><label>DRIVE</label><input type="range" id="drive" min="0" max="1" step="0.01"><output></output></div>
     <div class="sl"><label>ECO VOL</label><input type="range" id="echoVol" min="0" max="1" step="0.01"><output></output></div>
     <div class="sl"><label>ECO REP</label><input type="range" id="echoInt" min="0" max="0.85" step="0.01"><output></output></div>
     <div class="sl"><label>MASTER</label><input type="range" id="master" min="0" max="1" step="0.01"><output></output></div>
   </div>
+ </div>
+ <div class="panel">
+   <h2>LESLIE <small>mão direita (chop e fills) · corneta e tambor girando separados</small></h2>
+   <div class="lesbox">
+     <canvas id="lesCv"></canvas>
+     <div>
+       <div class="lbl" style="margin-top:0">PRESETS</div>
+       <div class="lesgrid" id="lesPresets"></div>
+       <div class="lbl">VELOCIDADE</div>
+       <div class="row" id="lesSpeed"></div>
+       <div class="row" style="margin-top:6px"><button class="chip" id="lesBrake">FREIO (PARA OS ROTORES)</button></div>
+       <div class="sl"><label>PROFUNDIDADE</label><input type="range" id="lesDepth" min="0" max="1" step="0.01"><output></output></div>
+       <div class="lesread" id="lesRead"></div>
+     </div>
+   </div>
  </div>
 </div>
 
@@ -201,7 +224,7 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
 <script src="../../riddimbankmenu.js"></script>
 <script>
 'use strict';
-const VERSION = '1.0';
+const VERSION = '1.1';
 document.getElementById('verTxt').textContent = VERSION;
 
 // ====================================================================== motor de grooves (igual ao GrooveEngine.h)
@@ -218,6 +241,17 @@ const MUS = [
   {name:'GLADDY',who:'GLADSTONE ANDERSON · ROOTS RADICS 1979-84',rh:'..X...X...X...X.',lh:'...x...x...x...x',beat:0,swing:.15,human:.30,ghost:.55,fillStyle:3,fillEvery:4,bpm:78,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],leslie:0,drive:.15},
   {name:'STEELY',who:'WYCLIFFE "STEELY" JOHNSON · DIGITAL 1985-95',rh:'..X...X...X...X.',lh:'.X.X.X.X.X.X.X.X',beat:2,swing:0,human:.05,ghost:.55,fillStyle:2,fillEvery:8,bpm:92,bdb:[0,0,8,6,4,0,0,0,6],cdb:[8,8,8,8,0,0,0,0,4],leslie:0,drive:.10},
 ];
+// LESLIE: dois rotores (corneta = agudos, tambor = graves). Velocidades em rotações por segundo (lenta, rápida)
+// e tempo para chegar na velocidade (s). A corneta acelera rápido; o tambor, pesado, demora.
+const LES = [
+  {name:'SEM LESLIE',  sub:'som direto',            on:false},
+  {name:'122 CLÁSSICA',sub:'a do Hammond B3',       horn:[0.83,6.7], drum:[0.67,5.8], tH:[0.9,0.6], tD:[3.5,2.4], depth:.8,  speed:0},
+  {name:'ROOTS SUAVE', sub:'lenta, macia no chop',   horn:[0.62,5.9], drum:[0.50,5.1], tH:[1.1,0.8], tD:[4.0,3.0], depth:.55, speed:0},
+  {name:'147 GRAVE',   sub:'tambor mais presente',  horn:[0.80,6.3], drum:[0.72,6.0], tH:[1.0,0.7], tD:[3.0,2.2], depth:.9,  speed:0},
+  {name:'CHORALE',     sub:'meio-termo, coral',     horn:[1.60,6.7], drum:[1.30,5.8], tH:[0.8,0.6], tD:[2.6,2.0], depth:.75, speed:0},
+  {name:'DUB TREMOLO', sub:'rápida e funda',        horn:[0.83,7.2], drum:[0.67,6.4], tH:[0.7,0.45],tD:[2.8,1.8], depth:1.0, speed:1},
+].map(p=>({on:true,...p}));
+const lesFromMusician=v=>v===2?5:(v===1?1:0);
 const EPOCHS = [ // musician, beat, feel(-1 = grade do músico), bpm
   ['ROCKSTEADY','1966-68',1,0,1,80],['EARLY REGGAE','1968-72',2,0,-1,84],['ROOTS','1972-79',3,0,-1,74],['ROCKERS','1975-80',5,1,-1,76],
   ['LOVERS ROCK','1969-94',4,0,-1,72],['RUB A DUB','1979-84',6,0,-1,78],['DIGITAL','1985-89',7,1,-1,92],['RAGGA','1990-95',7,2,-1,94],
@@ -309,7 +343,7 @@ function detectChord(held){
 // ====================================================================== estado
 const S = {mus:1,epoch:-1,bank:-1,grid:gridFrom(MUS[1].rh,MUS[1].lh),beat:0,nota:0,swing:.12,human:.3,ghost:.5,seed:1,
   bubbleOn:true,chopOn:true,fillsOn:true,bubbleLvl:.85,chopLvl:.75,fillStyle:0,fillEvery:4,chordSrc:0,bpm:80,
-  leslie:0,drive:.2,echoOn:false,echoVol:.45,echoInt:.4,master:.8,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],
+  instr:0,lesPreset:0,lesSpeed:0,lesBrake:false,lesDepth:.8,drive:.2,echoOn:false,echoVol:.45,echoInt:.4,master:.8,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],
   quickFeel:2,quickDen:2,page:0,brush:1,edits:null,
   slots:[{root:9,minor:true,dur:1,on:true},{root:2,minor:true,dur:1,on:true},{root:9,minor:true,dur:1,on:true},{root:4,minor:true,dur:1,on:true}]};
 const chords=()=>S.slots.filter((s,i)=>i===0||s.on).map(s=>({root:s.root,minor:s.minor,beats:DURS[s.dur][0]}));
@@ -331,14 +365,24 @@ function initAudio(){
   const accent=ctx.createGain(), ghost=ctx.createGain(), chop=ctx.createGain();
   accent.connect(out); ghost.connect(out);
   const shaper=ctx.createWaveShaper(); shaper.curve=makeDrive(S.drive);
-  const les=ctx.createDelay(.02); les.delayTime.value=.004;
-  const lfo=ctx.createOscillator(), lfoD=ctx.createGain(), trem=ctx.createGain(), lfoT=ctx.createGain();
-  lfo.frequency.value=.8; lfoD.gain.value=0; lfoT.gain.value=0; lfo.connect(lfoD).connect(les.delayTime); lfo.connect(lfoT).connect(trem.gain); lfo.start();
-  chop.connect(shaper).connect(les).connect(trem).connect(out);
+  // Leslie de dois rotores: crossover em 800 Hz; cada rotor tem vibrato (atraso), tremolo (volume) e giro no estéreo
+  const trem=ctx.createGain(), dry=ctx.createGain(), wet=ctx.createGain();
+  chop.connect(shaper); shaper.connect(dry).connect(trem); wet.connect(trem); trem.connect(out);
+  const rotor=(type,vib,am,pan,base)=>{ const f=ctx.createBiquadFilter(); f.type=type; f.frequency.value=800; f.Q.value=.6;
+    const d=ctx.createDelay(.02); d.delayTime.value=base; const g=ctx.createGain(); const p=ctx.createStereoPanner();
+    const o=ctx.createOscillator(); o.frequency.value=0; const kV=ctx.createGain(), kA=ctx.createGain(), kP=ctx.createGain();
+    o.connect(kV).connect(d.delayTime); o.connect(kA).connect(g.gain); o.connect(kP).connect(p.pan); o.start();
+    shaper.connect(f).connect(d).connect(g).connect(p).connect(wet); return {o,g,kV,kA,kP,vib,am,pan}; };
+  const horn=rotor('highpass',.0007,.38,.75,.002), drum=rotor('lowpass',.00025,.22,.3,.003);
   const echoIn=ctx.createGain(), dl=ctx.createDelay(2), fb=ctx.createGain(), lp=ctx.createBiquadFilter(), echoOut=ctx.createGain();
   lp.type='lowpass'; lp.frequency.value=2800; echoIn.gain.value=0;
   trem.connect(echoIn).connect(dl).connect(lp).connect(fb).connect(dl); lp.connect(echoOut).connect(out);
-  buses={out,accent,ghost,chop,shaper,lfo,lfoD,lfoT,trem,echoIn,dl,fb};
+  // pianos elétricos (mesmo modelo do MRK-80): entrada própria em cada caminho, com o tremolo da maleta do Suitcase
+  const epIn={}, epTrem={}, tl=ctx.createOscillator(), td=ctx.createGain(); tl.frequency.value=4.8; td.gain.value=.175; tl.connect(td); tl.start();
+  for(const [k,b] of [['accent',accent],['ghost',ghost],['chop',chop]]){
+    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=20; epIn[k]=ctx.createGain(); epIn[k].connect(hp).connect(b);
+    epTrem[k]=ctx.createGain(); epTrem[k].gain.value=.825; td.connect(epTrem[k].gain); epTrem[k].connect(epIn[k]); }
+  buses={out,accent,ghost,chop,shaper,trem,dry,wet,horn,drum,echoIn,dl,fb,epIn,epTrem};
   buildWaves(); applySound();
 }
 function applySound(){
@@ -348,20 +392,92 @@ function applySound(){
   B.ghost.gain.setTargetAtTime(S.bubbleLvl*.33*(.12+.88*S.ghost),t,.03);
   B.chop.gain.setTargetAtTime(S.chopLvl*.22,t,.03);
   B.shaper.curve=makeDrive(S.drive);
-  const fast=S.leslie===2, on=S.leslie>0;
-  B.lfo.frequency.setTargetAtTime(fast?6.5:.8,t,fast?.4:1.2);
-  B.lfoD.gain.setTargetAtTime(on?.0006:0,t,.05); B.lfoT.gain.setTargetAtTime(on?.15:0,t,.05);
-  B.trem.gain.setTargetAtTime(on?.85:1,t,.05);
+  const P=LES[S.lesPreset], on=!!P.on;
+  B.dry.gain.setTargetAtTime(on?0:1,t,.03); B.wet.gain.setTargetAtTime(on?1:0,t,.03);
+  for(const [R,k] of [[B.horn,'H'],[B.drum,'D']]){
+    const tgt=lesTarget(k), tau=lesTau(k);
+    R.o.frequency.setTargetAtTime(tgt,t,tau);
+    const d=on?S.lesDepth:0;
+    R.kV.gain.setTargetAtTime(R.vib*d,t,.05); R.kA.gain.setTargetAtTime(R.am*d,t,.05); R.kP.gain.setTargetAtTime(R.pan*d,t,.05);
+    R.g.gain.setTargetAtTime(1-R.am*d,t,.05);
+  }
   B.echoIn.gain.setTargetAtTime(S.echoOn?S.echoVol:0,t,.03);
   B.dl.delayTime.setTargetAtTime(60/S.bpm*.75,t,.05); B.fb.gain.setTargetAtTime(S.echoInt,t,.03);
 }
+// Rhodes Stage / Rhodes Suitcase / Wurlitzer 200A: mesmo modelo do Reggae Keys MRK-80 (RootsKeysEngine.h, tipos 10, 11 e 12)
+const epCurves=new Map();
+function epCurve(kind,bark){ const key=kind+':'+bark.toFixed(2); if(epCurves.has(key)) return epCurves.get(key);
+  const c=new Float32Array(1025); for(let i=0;i<1025;i++){ const x=i/512-1; c[i]=kind===3?Math.tanh(bark*x)/Math.tanh(bark):(x+bark*.55*x*x)/(1+bark*.55); }
+  epCurves.set(key,c); return c; }
+function epNote(bus,note,t0,t1,kind){
+  const f=440*Math.pow(2,(note-69)/12), v=bus==='chop'?.85:(bus==='accent'?.8:.6), br=bus==='chop'?.6:.45, decay=bus==='chop'?.45:.3;
+  const wurli=kind===3, suit=kind===2, ks=Math.pow(2,-(note-60)/18);
+  const tBody=Math.min(14,Math.max(.3,(wurli?1+3.5*decay:2.2+8*decay)*ks));
+  const ratio=[1,2,wurli?5.4:7.1], amp=[1,wurli?.1:.1+.22*v,(wurli?.1+.25*v:(.22+.5*v)*(suit?1.6:1))*(.6+.8*br)];
+  const tau=[tBody,tBody*.4,wurli?.025:(suit?.11:.06)];
+  const bark=wurli?1+3.5*v*v*(.6+.8*br):(.15+1.1*v*v)*(.5+br)*(suit?.7:1);
+  const off=Math.max(t0+.02,t1), rel=wurli?.04:.065, end=off+rel*7;
+  const sum=ctx.createGain(); sum.gain.value=1/(amp[0]+amp[1]+amp[2]);
+  ratio.forEach((r,i)=>{ if(f*r>.45*ctx.sampleRate) return; const o=ctx.createOscillator(); o.frequency.value=f*r;
+    const a=ctx.createGain(); a.gain.setValueAtTime(amp[i],t0); a.gain.setTargetAtTime(0,t0,tau[i]); o.connect(a).connect(sum); o.start(t0); o.stop(end); });
+  const sh=ctx.createWaveShaper(); sh.curve=epCurve(kind,bark); sh.oversample='2x';
+  const g=ctx.createGain(), lvl=[0,.215,.245,.068][kind]*(.25+.75*Math.pow(v,1.2))*10;   // ×10: perto do volume do órgão
+  g.gain.setValueAtTime(.0001,t0); g.gain.linearRampToValueAtTime(lvl,t0+.0015); g.gain.setTargetAtTime(.0001,off,rel);
+  sum.connect(sh).connect(g).connect(suit?buses.epTrem[bus]:buses.epIn[bus]);
+}
 function playNote(bus, note, t0, t1){
+  if(S.instr>0){ epNote(bus,note,t0,t1,S.instr); return; }
   const o=ctx.createOscillator(), g=ctx.createGain();
   o.setPeriodicWave(bus==='chop'?waves.c:waves.b); o.frequency.value=440*Math.pow(2,(note-69)/12)/2;
   const end=Math.max(t0+.002,t1);
   g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(1,t0+.002); g.gain.setValueAtTime(1,end); g.gain.linearRampToValueAtTime(0,end+.008);
   o.connect(g).connect(buses[bus]); o.start(t0); o.stop(end+.03);
 }
+
+// ====================================================================== LESLIE: alvo de velocidade e animação
+function lesTarget(k){ const P=LES[S.lesPreset]; if(!P.on||S.lesBrake) return 0; return (k==='H'?P.horn:P.drum)[S.lesSpeed]; }
+function lesTau(k){ const P=LES[S.lesPreset]; if(!P.on) return .3; const t=(k==='H'?P.tH:P.tD)[S.lesBrake?0:S.lesSpeed]; return t/3; }   // ~95% em t segundos
+const LS={aH:0,aD:0,rH:0,rD:0,last:0};
+function drawLeslie(ts){
+  const cv=$('lesCv'); if(!cv||S.page!==2){ LS.last=ts; requestAnimationFrame(drawLeslie); return; }
+  const dt=Math.min(.1,LS.last?(ts-LS.last)/1000:0); LS.last=ts;
+  for(const k of ['H','D']){ const tgt=lesTarget(k), tau=lesTau(k), r='r'+k, a='a'+k;
+    LS[r]+= (tgt-LS[r])*(1-Math.exp(-dt/Math.max(.01,tau))); LS[a]=(LS[a]+LS[r]*2*Math.PI*dt)%(2*Math.PI); }
+  const dpr=window.devicePixelRatio||1, W=260, H=300; if(cv.width!==W*dpr){ cv.width=W*dpr; cv.height=H*dpr; }
+  const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  // gabinete de madeira
+  const wood=g.createLinearGradient(0,0,W,0); wood.addColorStop(0,'#5b3519'); wood.addColorStop(.5,'#7a4a22'); wood.addColorStop(1,'#4a2a12');
+  g.fillStyle=wood; g.beginPath(); g.roundRect(14,8,W-28,H-16,10); g.fill();
+  g.strokeStyle='rgba(0,0,0,.35)'; for(let x=20;x<W-20;x+=7){ g.beginPath(); g.moveTo(x,10); g.lineTo(x+2,H-10); g.stroke(); }
+  const P=LES[S.lesPreset], on=!!P.on;
+  // janela de cima: corneta (vista de cima, em perspectiva)
+  const win=(y,h)=>{ g.fillStyle='#120c08'; g.beginPath(); g.roundRect(30,y,W-60,h,8); g.fill(); };
+  win(26,110); win(160,110);
+  const cx=W/2, cyH=81, cyD=215, R=86;
+  // tambor (graves): cilindro com a abertura que gira
+  g.fillStyle='#3a2a1c'; g.beginPath(); g.ellipse(cx,cyD,R*.78,30,0,0,2*Math.PI); g.fill();
+  for(let i=0;i<2;i++){ const a=LS.aD+i*Math.PI, x=Math.cos(a), z=Math.sin(a);
+    g.fillStyle=`rgba(255,192,97,${on?.25+.55*Math.max(0,z):.12})`; g.beginPath(); g.ellipse(cx+x*R*.62,cyD+z*10,10+12*Math.abs(z),22,0,0,2*Math.PI); g.fill(); }
+  g.strokeStyle='#6b4a2a'; g.lineWidth=2; g.beginPath(); g.ellipse(cx,cyD,R*.78,30,0,0,2*Math.PI); g.stroke();
+  // corneta (agudos): duas bocas, uma de verdade e um contrapeso
+  const hx=Math.cos(LS.aH), hz=Math.sin(LS.aH);
+  const drawHorn=(sgn,real)=>{ const x=cx+sgn*hx*R*.82, y=cyH+sgn*hz*24, near=sgn*hz>0;
+    g.strokeStyle=real?'#c9b48a':'#6f6250'; g.lineWidth=near?7:5; g.beginPath(); g.moveTo(cx,cyH); g.lineTo(x,y); g.stroke();
+    g.fillStyle=real?(on?`rgba(255,192,97,${near?1:.55})`:'#7d6c52'):'#4d4335'; g.beginPath(); g.ellipse(x,y,real?(near?14:9):6,real?(near?16:11):7,0,0,2*Math.PI); g.fill(); };
+  if(hz>0){ drawHorn(-1,false); drawHorn(1,true); } else { drawHorn(1,true); drawHorn(-1,false); }
+  g.fillStyle='#2a2018'; g.beginPath(); g.arc(cx,cyH,9,0,2*Math.PI); g.fill();
+  // grades (venezianas) por cima das janelas
+  g.strokeStyle='rgba(122,74,34,.55)'; g.lineWidth=3;
+  for(let y=34;y<132;y+=12){ g.beginPath(); g.moveTo(32,y); g.lineTo(W-32,y); g.stroke(); }
+  for(let y=168;y<266;y+=12){ g.beginPath(); g.moveTo(32,y); g.lineTo(W-32,y); g.stroke(); }
+  // lâmpada de velocidade
+  const spin=Math.max(LS.rH/6.7,LS.rD/5.8);
+  g.fillStyle=on?`rgb(${120+130*Math.min(1,spin)},${60+40*(1-Math.min(1,spin))},30)`:'#444'; g.beginPath(); g.arc(W-30,H-20,6,0,2*Math.PI); g.fill();
+  g.fillStyle='#efe6cf'; g.font='bold 10px monospace'; g.fillText(on?P.name:'SEM LESLIE',26,H-16);
+  $('lesRead').textContent=on?`CORNETA ${LS.rH.toFixed(2)} rot/s · TAMBOR ${LS.rD.toFixed(2)} rot/s${S.lesBrake?' · FREIO':''}`:'Leslie desligada: o som vai direto';
+  requestAnimationFrame(drawLeslie);
+}
+requestAnimationFrame(drawLeslie);
 
 // ====================================================================== sequenciador
 let playing=false, startTime=0, nextBeat=0, timer=null; const LOOK=.12, held=new Set(); let keysChord=null;
@@ -400,7 +516,7 @@ function setStatus(t){ document.getElementById('status').textContent=t; }
 // ====================================================================== os três caminhos
 function applyMusician(i){
   const m=MUS[i]; S.mus=i; S.edits=null; S.epoch=-1;
-  Object.assign(S,{grid:gridFrom(m.rh,m.lh),beat:m.beat,swing:m.swing,human:m.human,ghost:m.ghost,fillStyle:m.fillStyle,fillEvery:m.fillEvery,bpm:m.bpm,leslie:m.leslie,drive:m.drive,bdb:[...m.bdb],cdb:[...m.cdb]});
+  Object.assign(S,{grid:gridFrom(m.rh,m.lh),beat:m.beat,swing:m.swing,human:m.human,ghost:m.ghost,fillStyle:m.fillStyle,fillEvery:m.fillEvery,bpm:m.bpm,lesPreset:lesFromMusician(m.leslie),lesSpeed:m.leslie===2?1:0,lesBrake:false,lesDepth:m.leslie?LES[lesFromMusician(m.leslie)].depth:.8,drive:m.drive,bdb:[...m.bdb],cdb:[...m.cdb]});
   buildWaves(); renderDrawbars(); refresh(); applySound();
   if(!playing) setStatus(m.who+'  ·  dê PLAY');
 }
@@ -544,7 +660,8 @@ function setPage(p){ S.page=p; [0,1,2].forEach(k=>$('p'+k).hidden=k!==p); refres
 function refresh(){
   [...$('mus').children].forEach((b,i)=>b.classList.toggle('on',i===S.mus));
   $('epoch').value=String(S.epoch);
-  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','leslie','brush'].forEach(refreshChips);
+  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','lesPresets','lesSpeed','instr','brush'].forEach(refreshChips);
+  $('lesBrake').classList.toggle('on',S.lesBrake);
   for(const k of ['bubbleOn','chopOn','fillsOn','echoOn']) $(k).classList.toggle('on',S[k]);
   $('backBtn').disabled=!S.edits; $('backBtn').classList.toggle('on',!!S.edits);
   sliders.forEach(f=>f()); renderSlots(); drawGrid(); if(S.page===1) drawRoll();
@@ -587,11 +704,19 @@ chips('nota',['1/32','1/16','1/8'],()=>S.nota,i=>{ S.nota=i; S.edits=null; });
 chips('fillStyle',['MITTOO','WRIGHT','DOWNIE','GLADDY'],()=>S.fillStyle,i=>{ S.fillStyle=i; S.edits=null; });
 chips('fillEvery',['2','4','8'],()=>[2,4,8].indexOf(S.fillEvery),i=>{ S.fillEvery=[2,4,8][i]; S.edits=null; });
 chips('chordSrc',['DO PLUGIN','DO TECLADO'],()=>S.chordSrc,i=>{ S.chordSrc=i; });
-chips('leslie',['SEM LESLIE','LENTA','RÁPIDA'],()=>S.leslie,i=>{ S.leslie=i; });
+(function lesUI(){
+  const el=$('lesPresets'); el.innerHTML='';
+  LES.forEach((p,i)=>{ const b=document.createElement('button'); b.className='chip'; b.innerHTML=`${p.name}<small>${p.sub}</small>`;
+    b.onclick=()=>{ S.lesPreset=i; if(p.on){ S.lesSpeed=p.speed; S.lesDepth=p.depth; S.lesBrake=false; } refresh(); applySound(); }; el.appendChild(b); });
+  el._get=()=>S.lesPreset;
+})();
+chips('instr',['B3','RHODES','SUITCASE','WURLI'],()=>S.instr,i=>{ S.instr=i; });
+chips('lesSpeed',['LENTA (CHORALE)','RÁPIDA (TREMOLO)'],()=>S.lesSpeed,i=>{ S.lesSpeed=i; S.lesBrake=false; });
+$('lesBrake').onclick=()=>{ S.lesBrake=!S.lesBrake; refresh(); applySound(); };
 chips('brush',['BUBBLE','CHOP','FILLS'],()=>S.brush,i=>{ S.brush=i; });
 const clearEd=()=>{ S.edits=null; };
 slider('bpm','bpm',v=>v); slider('swing','swing',undefined,clearEd); slider('human','human',undefined,clearEd); slider('ghost','ghost'); slider('seed','seed',v=>v,clearEd);
-slider('bubbleLvl','bubbleLvl'); slider('chopLvl','chopLvl'); slider('drive','drive'); slider('echoVol','echoVol'); slider('echoInt','echoInt'); slider('master','master');
+slider('lesDepth','lesDepth'); slider('bubbleLvl','bubbleLvl'); slider('chopLvl','chopLvl'); slider('drive','drive'); slider('echoVol','echoVol'); slider('echoInt','echoInt'); slider('master','master');
 // BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins e das outras machines)
 if(window.RIDDIM_BANK && window.riddimBankMenu){
   const RB=window.RIDDIM_BANK;

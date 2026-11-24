@@ -165,10 +165,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 
     // modo (troca o visual)
     for (auto* b : { &modePiano, &modeOrgan })
-    {
-        b->setClickingTogglesState (false);
-        addAndMakeVisible (b);
-    }
+        b->setClickingTogglesState (false);   // 3.1: só piano (o órgão foi para o Mastor Reggae Organ MRO-68): botões fora da tela
     modePiano.onClick = [this] { setModeParam (0); };
     for (auto* t : { &tabInstrument, &tabChords })
     {
@@ -195,13 +192,13 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
         organPreset[i].setButtonText (kOrganPresetShort[i]);
         organPreset[i].getProperties().set ("style", "reverseKey");
         organPreset[i].onClick = [this, i] { proc.setCurrentProgram (RootsKeysProcessor::getNumPianoPresets() + i); };
-        addChildComponent (organPreset[i]);
+        // (3.1: os presets de órgão não entram na tela)
     }
 
     // piano: timbres
     {
-        const char* names[4] = { "M1", "GRAND", "MT-40", "FM EP" };
-        for (int i = 0; i < 4; ++i)
+        const char* names[kNumTimbres] = { "M1", "GRAND", "MT-40", "FM EP", "CP-80", "C7", "M1 GRAND", "M1 COMP", "HONKY", "CZ-101", "RHODES", "SUITCASE", "WURLI" };
+        for (int i = 0; i < kNumTimbres; ++i)
         {
             pianoTimbre[i].setButtonText (names[i]);
             pianoTimbre[i].getProperties().set ("style", "chip");
@@ -288,7 +285,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     addAndMakeVisible (keyboard);
 
     setSize (kW, kH);
-    applySkin ((int) s.getRawParameterValue ("mode")->load());
+    applySkin (0);
     startTimerHz (30);
 }
 
@@ -425,8 +422,10 @@ void RootsKeysEditor::updateLcd()
     auto pct = [this] (const char* id) { return juce::String (juce::roundToInt (proc.apvts.getRawParameterValue (id)->load() * 100.0f)).paddedLeft (' ', 2); };
     const int prog = proc.getCurrentProgram();
     const int type = (int) proc.apvts.getRawParameterValue ("pianoType")->load();
-    static const char* typeNames[4] = { "M1", "GRAND PIANO", "MT-40", "FM EP" };
-    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 3, type)]
+    static const char* typeNames[kNumTimbres] = { "M1", "GRAND PIANO", "MT-40", "FM EP", "YAMAHA CP-80", "YAMAHA C7", "M1 GRAND PIANO",
+                                                  "M1 PIANO 16 COMP", "HONKY TONK", "CASIO CZ-101",
+                                                  "RHODES STAGE", "RHODES SUITCASE", "WURLITZER 200A" };
+    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, kNumTimbres - 1, type)]
                           : prog < RootsKeysProcessor::getNumPianoPresets()
                               ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
                               : juce::String ("P--  Piano: Edit");
@@ -436,7 +435,7 @@ void RootsKeysEditor::updateLcd()
 
 void RootsKeysEditor::timerCallback()
 {
-    applySkin ((int) proc.apvts.getRawParameterValue ("mode")->load());
+    applySkin (0);
 
     vuL.update (proc.meterL.load(), 1.0f / 30.0f);
     vuR.update (proc.meterR.load(), 1.0f / 30.0f);
@@ -446,9 +445,10 @@ void RootsKeysEditor::timerCallback()
     for (int i = 0; i < 4; ++i)
     {
         pianoPreset[i].setToggleState (prog == i && (int) proc.apvts.getRawParameterValue ("pianoType")->load() == 0, juce::dontSendNotification);
-        pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
         organPreset[i].setToggleState (prog == np + i, juce::dontSendNotification);
     }
+    for (int i = 0; i < kNumTimbres; ++i)
+        pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
     if (skin == 0)
     {
         updateLcd();
@@ -519,8 +519,6 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
         g.drawText ("DIGITAL PIANO SYNTHESIS  MRK-80  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
-        g.setFont (VintageLookAndFeel::mono (10.0f, false));
-        g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 
         // caixas de som com tela de tecido e faixa vermelha/dourada
         for (auto sp : { kSpeakerL, kSpeakerR })
@@ -578,7 +576,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.setFont (VintageLookAndFeel::mono (9.0f, false));
             g.setColour (juce::Colour (0xff95959a));
             for (int i = 0; i < 4; ++i)
-                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 228, 96, 12, juce::Justification::centred);
+                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 230, 96, 12, juce::Justification::centred);
 
             sectionTitle (kEcho, "TAPE ECHO", "MTE-12", plasticText, plasticMuted);
             sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
@@ -703,9 +701,17 @@ void RootsKeysEditor::resized()
     // piano
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
-        pianoPreset[i].setBounds (290 + i * 106, 198, 84, 26);
-    for (int i = 0; i < 4; ++i)
-        pianoTimbre[i].setBounds (290 + i * 106, 166, 84, 24);
+        pianoPreset[i].setBounds (290 + i * 106, 207, 84, 22);
+    {
+        // timbres em duas linhas de 7, agrupados por família (o índice do botão continua sendo o do parâmetro)
+        static const int order[kNumTimbres] = { 7, 0, 6, 1, 8, 4, 5,          // Korg M1, acústicos e Yamaha CP-80 / C7
+                                                10, 11, 12, 3, 9, 2 };      // Rhodes, Suitcase, Wurli, FM EP, CZ-101, MT-40
+        for (int slot = 0; slot < kNumTimbres; ++slot)
+        {
+            const int row = slot < 7 ? 0 : 1, col = slot < 7 ? slot : slot - 7;
+            pianoTimbre[order[slot]].setBounds (276 + col * 64, 164 + row * 21, 61, 19);
+        }
+    }
     {
         Knob* fs[4] = { &faderBright, &faderDecay, &faderChorus, &faderLevel };
         for (int i = 0; i < 4; ++i)

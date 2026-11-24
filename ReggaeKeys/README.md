@@ -1,27 +1,24 @@
-# Mastor Reggae Keys MRK-80 3.0
+# Mastor Reggae Keys MRK-80 3.1
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.1/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.1/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
 
 (Antes se chamava **DubMastor Roots Keys** e **Mastor Roots Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240**, que virou a aba CHORD MACHINE.)
 
-| Modo piano | Modo órgão |
-|---|---|
-| ![Modo piano](docs/interface-piano.png) | ![Modo órgão](docs/interface-organ.png) |
+![Piano](docs/interface-piano.png)
 
 ![Aba CHORD MACHINE](docs/interface-chord-machine.png)
 
-Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cada vez:
+Instrumento VST3 / AU / Standalone de **piano** para reggae e dub: 13 timbres (Korg M1, acústicos, Yamaha, pianos elétricos e digitais), todos por síntese, sem samples.
 
-- **Piano estilo Korg M1** — o piano brilhante do M1 recriado por síntese aditiva (sem samples da Korg): ataque brilhante, presença em 2–4 kHz, decaimento em dois estágios, ruído de martelo e chorus estéreo.
-- **Órgão tonewheel estilo Hammond B3** — 9 drawbars, percussão single-trigger (2º/3º harmônico, rápida/lenta), key click, overdrive valvulado e caixa Leslie com aceleração realista.
+Na 3.1 o **órgão saiu** do MRK-80: o Hammond (drawbars, percussão, Leslie) agora está no **[Mastor Reggae Organ MRO-68](../ReggaeOrgan/)**. Projetos antigos no modo órgão abrem no piano, e o bubble da CHORD MACHINE toca no piano.
 
 Cadeia de saída: **Tape Echo Mastor Tape Echo MTE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
 
 ## Timbres de piano
 
-Quatro botões logo abaixo do visor do modo piano (o visor mostra o timbre escolhido):
+Treze botões, em duas linhas, logo abaixo do visor do modo piano (o visor mostra o timbre escolhido). O plugin abre no **M1 COMP**:
 
 | Timbre | Som |
 |---|---|
@@ -29,6 +26,15 @@ Quatro botões logo abaixo do visor do modo piano (o visor mostra o timbre escol
 | **GRAND** | piano de cauda: mais harmônicos, cordas mais "duras", ataque de martelo grave, sustentação longa e o leve batimento entre as cordas de cada nota |
 | **MT-40** | teclado digital de brinquedo estilo Casio MT-40: onda de pulso, sem sensibilidade ao toque, ~6 bits a 16 kHz, bem lo-fi |
 | **FM EP** | piano elétrico FM estilo Yamaha DX: corpo 1:1 + "tine" metálico 1:14 que some rápido; o toque mais forte abre o brilho |
+| **CP-80** | piano de cauda elétrico estilo Yamaha CP-80: cordas curtas, captador piezo, meio "honky", pouco grave e sustentação curta |
+| **C7** | cauda de concerto estilo Yamaha C7: ataque rápido, brilho em volta de 3 kHz que corta a mistura, cordas mais limpas |
+| **M1 GRAND** | o Grand Piano do Korg M1: cauda com a "presença" do M1 em 2,8 kHz, pouca inarmonicidade e o decaimento do loop da ROM |
+| **M1 COMP** | o Piano 16 do Korg M1 comprimido como no reggae e dancehall dos anos 90: ataque duro, cauda alta, quase não muda com o toque (**timbre de fábrica**) |
+| **HONKY** | piano de armário Honky Tonk: cordas desafinadas entre si (batimento rápido), caixa de meio, pouco agudo e curto — o piano dos estúdios de Kingston |
+| **CZ-101** | piano do Casio CZ-101 por phase distortion: começa com brilho de serra e o DCW fecha para o seno; sem velocity |
+| **RHODES** | Rhodes Stage: tine com fundamental redonda, "sino" inarmônico curto e o bark do captador magnético que cresce com o toque |
+| **SUITCASE** | Rhodes Suitcase: mais sino e mais doce, com o tremolo do amplificador da maleta |
+| **WURLI** | Wurlitzer 200A: palheta de aço, curto e nasal, harmônicos ímpares que rosnam no toque forte |
 
 BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
 
@@ -112,7 +118,7 @@ Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, 
 - Nome novo **Mastor Reggae Keys MRK-80**; aba **CHORD MACHINE** com o MRCM-1240 inteiro (só maior e menor) no lugar da DUB CHORDS; banco único de riddims; versão para celular.
 
 ## Novidades da 2.4
-- Timbres de piano **GRAND**, **MT-40** (estilo Casio) e **FM EP** (estilo Yamaha DX), além do M1.
+- Timbres de piano **GRAND**, **MT-40** (estilo Casio), **FM EP** (estilo Yamaha DX), **CP-80** e **C7** (Yamaha) **M1 GRAND** (Grand Piano do Korg M1), **M1 COMP** (o de fábrica), **HONKY** (Honky Tonk) **CZ-101** (Casio), **RHODES**, **SUITCASE** e **WURLI**, além do M1.
 - Rodas **PITCH** e **MOD** usáveis com o mouse; pitch bend (±2 semitons) e vibrato agora soam (também pelo MIDI).
 
 ## Novidades da 2.3
