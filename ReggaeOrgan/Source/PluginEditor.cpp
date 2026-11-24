@@ -652,6 +652,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
         addAndMakeVisible (*chopDb[i]);
     }
     setupChips (leslie, "leslie", { "SEM LESLIE", "LENTA", u8 ("R\xc3\x81PIDA") });
+    setupChips (instr, "instr", { "B3", "RHODES", "SUITC.", "WURLI", "DX EP" });
     for (auto* b : { &percBtn, &echoBtn, &maxBtn }) { b->getProperties().set ("style", "rocker"); addAndMakeVisible (b); }
     percAtt = std::make_unique<APVTS::ButtonAttachment> (s, "perc", percBtn);
     echoAtt = std::make_unique<APVTS::ButtonAttachment> (s, "echoOn", echoBtn);
@@ -772,6 +773,7 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
     {
         for (int i = 0; i < 9; ++i) { v.push_back (bubbleDb[i].get()); v.push_back (chopDb[i].get()); }
         addC (leslie);
+        addC (instr);
         for (auto* b : { &percBtn, &echoBtn, &maxBtn }) v.push_back (b);
         for (auto* k : { &drive, &click, &echoVol, &echoInt, &echoRate, &reverb, &master }) addK (*k);
         v.push_back (&vu);
@@ -791,7 +793,7 @@ void ReggaeOrganEditor::setPage (int p)
 
 void ReggaeOrganEditor::timerCallback()
 {
-    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &leslie, &brush })
+    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &leslie, &instr, &brush })
         refreshChips (*c);
     const int mus = proc.getCurrentProgram();
     for (int i = 0; i < mro::NumMusicians; ++i) musBtn[i].setToggleState (i == mus, juce::dontSendNotification);
@@ -967,6 +969,7 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
         consolePanel (kBubCon, u8 ("M\xc3\x83O ESQUERDA \xc2\xb7 BUBBLE"), u8 ("SECO E GRAVE: S\xc3\x93 O 8' E UM POUCO DE 4'"));
         consolePanel (kChopCon, u8 ("M\xc3\x83O DIREITA \xc2\xb7 CHOP + FILLS"), u8 ("CHEIO (888), COM LESLIE, PERC E ECO"));
         ivoryPanel (kSound, "SOM", "");
+        smallLabel (u8 ("INSTRUMENTO (DRAWBARS E LESLIE S\xc3\x93 NO B3)"), kSound.getX() + 14, kSound.getY() + 358, 230);
     }
 
     g.setColour (brownInk);
@@ -1074,6 +1077,7 @@ void ReggaeOrganEditor::resized()
         for (int i = 0; i < 4; ++i) placeKnob (*r1[i], { sx + 26 + i * 56, kSound.getY() + 222 }, 38, 56);
         Knob* r2[3] = { &echoVol, &echoInt, &echoRate };
         for (int i = 0; i < 3; ++i) placeKnob (*r2[i], { sx + 54 + i * 56, kSound.getY() + 312 }, 38, 56);
+        layoutChips (instr, { sx, kSound.getY() + 372, sw, 24 }, 3);
     }
 
     keyboard.setBounds (152, 653, 812, 127);

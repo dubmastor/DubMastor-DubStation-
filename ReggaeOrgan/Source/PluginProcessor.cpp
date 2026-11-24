@@ -100,6 +100,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
     l.add (pct ("reverb", "Reverb", 0.15f));
     l.add (pct ("master", "Master", 0.80f));
     l.add (onOff ("maxOn", "Maximizer", true));
+    l.add (choice ("instr", "Instrumento", { "Hammond B3", "Rhodes Stage", "Rhodes Suitcase", "Wurlitzer 200A", "FM EP (DX7)" }, 0));
     return l;
 }
 
@@ -305,6 +306,7 @@ SoundParams ReggaeOrganProcessor::getSound() const
     sp.reverb        = get ("reverb");
     sp.master        = get ("master");
     sp.maxOn         = get ("maxOn") > 0.5f;
+    sp.instr         = (int) get ("instr");
     return sp;
 }
 

@@ -200,7 +200,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 
     // piano: timbres
     {
-        const char* names[kNumTimbres] = { "M1", "GRAND", "MT-40", "FM EP", "CP-80", "C7", "M1 GRAND", "M1 COMP", "HONKY", "CZ-101" };
+        const char* names[kNumTimbres] = { "M1", "GRAND", "MT-40", "FM EP", "CP-80", "C7", "M1 GRAND", "M1 COMP", "HONKY", "CZ-101", "RHODES", "SUITCASE", "WURLI" };
         for (int i = 0; i < kNumTimbres; ++i)
         {
             pianoTimbre[i].setButtonText (names[i]);
@@ -426,7 +426,8 @@ void RootsKeysEditor::updateLcd()
     const int prog = proc.getCurrentProgram();
     const int type = (int) proc.apvts.getRawParameterValue ("pianoType")->load();
     static const char* typeNames[kNumTimbres] = { "M1", "GRAND PIANO", "MT-40", "FM EP", "YAMAHA CP-80", "YAMAHA C7", "M1 GRAND PIANO",
-                                                  "M1 PIANO 16 COMP", "HONKY TONK", "CASIO CZ-101" };
+                                                  "M1 PIANO 16 COMP", "HONKY TONK", "CASIO CZ-101",
+                                                  "RHODES STAGE", "RHODES SUITCASE", "WURLITZER 200A" };
     const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, kNumTimbres - 1, type)]
                           : prog < RootsKeysProcessor::getNumPianoPresets()
                               ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
@@ -707,11 +708,14 @@ void RootsKeysEditor::resized()
     for (int i = 0; i < 4; ++i)
         pianoPreset[i].setBounds (290 + i * 106, 207, 84, 22);
     {
-        // timbres em duas linhas de 5, agrupados por família (o índice do botão continua sendo o do parâmetro)
-        static const int order[kNumTimbres] = { 0, 6, 7, 1, 8,      // Korg M1 e acústicos
-                                                4, 5, 3, 9, 2 };    // Yamaha CP-80, C7, FM EP, Casio CZ-101, MT-40
+        // timbres em duas linhas de 7, agrupados por família (o índice do botão continua sendo o do parâmetro)
+        static const int order[kNumTimbres] = { 7, 0, 6, 1, 8, 4, 5,          // Korg M1, acústicos e Yamaha CP-80 / C7
+                                                10, 11, 12, 3, 9, 2 };      // Rhodes, Suitcase, Wurli, FM EP, CZ-101, MT-40
         for (int slot = 0; slot < kNumTimbres; ++slot)
-            pianoTimbre[order[slot]].setBounds (280 + (slot % 5) * 89, 164 + (slot / 5) * 21, 84, 19);
+        {
+            const int row = slot < 7 ? 0 : 1, col = slot < 7 ? slot : slot - 7;
+            pianoTimbre[order[slot]].setBounds (276 + col * 64, 164 + row * 21, 61, 19);
+        }
     }
     {
         Knob* fs[4] = { &faderBright, &faderDecay, &faderChorus, &faderLevel };

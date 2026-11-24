@@ -1,4 +1,10 @@
-# Mastor Reggae Organ MRO-68 1.0
+# Mastor Reggae Organ MRO-68 1.1
+
+## 1.1
+
+- **INSTRUMENTO** (aba ÓRGÃO, seção SOM): além do **Hammond B3**, o mesmo groove (bubble, chop e fills) pode tocar em 4 pianos elétricos com o motor do Reggae Keys MRK-80: **RHODES** (Rhodes Stage), **SUITC.** (Rhodes Suitcase com tremolo), **WURLI** (Wurlitzer 200A) e **DX EP** (FM EP estilo Yamaha DX7). Drawbars, Leslie e percussão só valem no B3. Projetos antigos abrem no B3.
+
+## 1.0
 
 Instrumento novo da linha Dub Station: **o órgão de reggae dos organistas jamaicanos**, pronto no andamento da DAW.
 Mesmo Hammond do Mastor Reggae Keys MRK-80, tocado como dois organistas dividindo as partes. Contagem da Dub Station:

@@ -104,7 +104,8 @@ struct Params
     // Piano
     float pianoLevel  = 0.8f;
     int   pianoType = 0;       // 0 = M1, 1 = Grand Piano, 2 = MT-40 (Casio), 3 = FM EP (Yamaha DX), 4 = Yamaha CP-80, 5 = Yamaha C7, 6 = M1 Grand Piano (Korg),
-                               //   7 = M1 Piano 16 comprimido, 8 = Honky Tonk (piano de armário), 9 = Casio CZ-101 (phase distortion)
+                               //   7 = M1 Piano 16 comprimido, 8 = Honky Tonk (piano de armário), 9 = Casio CZ-101 (phase distortion),
+                               //   10 = Rhodes Stage, 11 = Rhodes Suitcase (tremolo), 12 = Wurlitzer 200A
     float pianoBright = 0.6f;
     float pianoDecay  = 0.5f;
     float pianoChorus = 0.5f;
@@ -249,7 +250,10 @@ struct PianoVoice
     float bph[MaxP], binc[MaxP], bdep[MaxP];
     // MT-40 (Casio) e FM EP (Yamaha DX)
     float oPh = 0, oInc = 0, oEnv = 0, oCoef = 0, oLp = 0, oLpCoef = 0, oHold = 0, oHoldCnt = 0, oHoldLen = 1;
-    float pdD = 0.5f, pdCoef = 1, pdTarget = 0.5f;   // CZ-101: "DCW" (quanto a fase entorta) e o seu envelope
+    float pdD = 0.5f, pdCoef = 1, pdTarget = 0.5f;
+    // pianos elétricos (Rhodes / Wurlitzer): 3 parciais + não linearidade do captador
+    float epPh[3] {}, epInc[3] {}, epAmp[3] {}, epCoef[3] {};
+    float epBark = 0, epGain = 0, epDcX = 0, epDcY = 0, epDcR = 0.997f, trPh = 0, trInc = 0, trDep = 0;   // CZ-101: "DCW" (quanto a fase entorta) e o seu envelope
     float cPh[2] {}, mPh[2] {}, cInc[2] {}, mInc[2] {}, idx[2] {}, idxCoef[2] {}, cAmp[2] {}, cE1 = 0, cE2 = 0, cC1 = 0, cC2 = 0;
 
     void start (int n, float vel, float sr, const Params& p, uint64_t stamp)
@@ -260,6 +264,7 @@ struct PianoVoice
         if (type == 1 || (type >= 4 && type <= 6) || type == 8) { startGrand (n, vel, sr, p, type); return; }
         if (type == 2) { startCasio (n, sr, p); return; }
         if (type == 9) { startCz (n, sr, p); return; }
+        if (type >= 10) { startEp (n, vel, sr, p, type); return; }
         const bool comp = type == 7;   // M1 Piano 16 "comprimido até o talo", como no dancehall dos anos 90
         if (type == 3) { startFm (n, vel, sr, p); return; }
 
@@ -305,7 +310,43 @@ struct PianoVoice
         nzFilt.set (std::min (6.0f * f, 7000.0f), 0.9f, sr);
     }
 
-    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 9 ? 9 : t); }
+    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 12 ? 12 : t); }
+
+    // ---- PIANOS ELÉTRICOS
+    //  10 Rhodes Stage    — tine (barra de metal) batida por martelo: fundamental redonda, "sino" inarmônico curto
+    //                       e o "bark" do captador magnético (2º harmônico que cresce com a força do toque)
+    //  11 Rhodes Suitcase — o mesmo com mais sino, mais doce, e o tremolo do amplificador da maleta
+    //  12 Wurlitzer 200A  — palheta de aço: mais curto, nasal, harmônicos ímpares que rosnam quando se toca forte
+    void startEp (int n, float vel, float sr, const Params& p, int kind)
+    {
+        const float f  = midiToHz ((float) n);
+        const float v  = clampf (vel, 0.0f, 1.0f);
+        const float br = p.pianoBright;
+        const float ks = std::pow (2.0f, -((float) n - 60.0f) / 18.0f);
+        const bool wurli = kind == 12, suit = kind == 11;
+        const float tBody = clampf ((wurli ? 1.0f + 3.5f * p.pianoDecay : 2.2f + 8.0f * p.pianoDecay) * ks, 0.3f, 14.0f);
+        const float ratio[3] = { 1.0f, 2.0f, wurli ? 5.4f : 7.1f };            // o 3º é o "sino" do tine / o ataque da palheta
+        const float amp[3]   = { 1.0f,
+                                 wurli ? 0.10f : 0.10f + 0.22f * v,
+                                 (wurli ? 0.10f + 0.25f * v : (0.22f + 0.5f * v) * (suit ? 1.6f : 1.0f)) * (0.6f + 0.8f * br) };
+        const float tau[3]   = { tBody, tBody * 0.4f, wurli ? 0.025f : (suit ? 0.11f : 0.06f) };
+        for (int i = 0; i < 3; ++i)
+        {
+            const float fi = f * ratio[i];
+            epPh[i] = i == 0 ? 0.0f : rng.uni();
+            epInc[i] = fi < 0.45f * sr ? fi / sr : 0.0f;
+            epAmp[i] = epInc[i] > 0 ? amp[i] : 0.0f;
+            epCoef[i] = std::exp (-1.0f / (tau[i] * sr));
+        }
+        epBark = wurli ? 1.0f + 3.5f * v * v * (0.6f + 0.8f * br)                 // Wurli: drive do tanh
+                       : (0.15f + 1.1f * v * v) * (0.5f + br) * (suit ? 0.7f : 1.0f);   // Rhodes: bark assimétrico
+        epGain = (kind == 10 ? 0.11f : 0.13f) * (0.25f + 0.75f * std::pow (v, 1.2f));
+        epDcX = epDcY = 0; epDcR = 1.0f - kTwoPi * 20.0f / sr;
+        trPh = 0; trInc = 4.8f / sr; trDep = suit ? 0.35f : 0.0f;
+        np = 0; nzEnv = 0; nzLvl = 0;
+        att = 0; attInc = 1.0f / (0.0008f * sr);
+        rel = 1; relCoef = 1;
+    }
 
     // ---- CASIO CZ-101: piano por phase distortion — começa entortado (brilho de serra) e o DCW fecha para o seno
     void startCz (int n, float sr, const Params& p)
@@ -430,6 +471,8 @@ struct PianoVoice
         if (type == 4) t = note > 88 ? 0.9f : 0.12f;
         if (type == 8) t = note > 88 ? 0.8f : 0.13f;
         if (type == 9) t = 0.08f;
+        if (type == 10 || type == 11) t = 0.16f;   // abafador de feltro no tine
+        if (type == 12) t = 0.10f;
         if (type == 2) t = 0.06f;
         if (type == 3) t = 0.22f;
         relCoef = std::exp (-1.0f / (t * sr));
@@ -452,6 +495,30 @@ struct PianoVoice
             oEnv *= oCoef;
             if (releasing) rel *= relCoef;
             if (rel < 1.0e-4f || oEnv < 1.0e-4f) active = false;
+            return out;
+        }
+        if (type >= 10)
+        {
+            float x = 0;
+            for (int i = 0; i < 3; ++i)
+            {
+                x += S (epPh[i]) * epAmp[i];
+                epPh[i] += epInc[i] * fm; if (epPh[i] >= 1.0f) epPh[i] -= 1.0f;
+                epAmp[i] *= epCoef[i];
+            }
+            float y = type == 12 ? std::tanh (epBark * x) / std::tanh (epBark)   // palheta saturando no captador eletrostático
+                                 : x + epBark * x * x;                            // captador magnético: assimetria = bark
+            const float d = y - epDcX + epDcR * epDcY; epDcX = y; epDcY = d;     // tira o DC que a assimetria cria
+            float out = d * epGain;
+            if (trDep > 0.0f)
+            {
+                trPh += trInc; if (trPh >= 1.0f) trPh -= 1.0f;
+                out *= 1.0f - trDep * (0.5f + 0.5f * S (trPh));
+            }
+            att = std::min (1.0f, att + attInc);
+            out *= att * rel;
+            if (releasing) rel *= relCoef;
+            if (rel < 1.0e-4f || epAmp[0] < 1.0e-5f) active = false;
             return out;
         }
         if (type == 9)

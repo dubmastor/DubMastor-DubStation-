@@ -1,6 +1,6 @@
 ## Mastor Riddim Machine MRM-0420 2.5 — DubStation
 
-- O skank do piano agora toca no **M1 Grand Piano** (o Grand Piano do Korg M1), o novo timbre de fábrica do Reggae Keys MRK-80 3.1.
+- O skank do piano agora toca no **M1 COMP** (o Piano 16 do Korg M1 comprimido), o novo timbre de fábrica do Reggae Keys MRK-80 3.1.
 
 ### Mastor Riddim Machine MRM-0420 2.4
 

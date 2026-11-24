@@ -197,10 +197,11 @@ int main()
     }
     // 7) Timbres novos do piano: Grand, MT-40 (Casio) e FM EP (Yamaha DX)
     {
-        const char* names[10] = { "demo_piano_m1_ref.wav", "demo_piano_grand.wav", "demo_piano_mt40.wav", "demo_piano_fm_ep.wav",
+        const char* names[13] = { "demo_piano_m1_ref.wav", "demo_piano_grand.wav", "demo_piano_mt40.wav", "demo_piano_fm_ep.wav",
                                  "demo_piano_yamaha_cp80.wav", "demo_piano_yamaha_c7.wav", "demo_piano_m1_grand.wav",
-                                 "demo_piano_m1_comp.wav", "demo_piano_honky_tonk.wav", "demo_piano_casio_cz101.wav" };
-        for (int t = 1; t <= 9; ++t)
+                                 "demo_piano_m1_comp.wav", "demo_piano_honky_tonk.wav", "demo_piano_casio_cz101.wav",
+                                 "demo_rhodes_stage.wav", "demo_rhodes_suitcase.wav", "demo_wurlitzer.wav" };
+        for (int t = 1; t <= 12; ++t)
         {
             rk::Params p; p.mode = 0; p.pianoType = t; p.reverb = 0.22f;
             std::vector<Ev> ev;
@@ -212,12 +213,12 @@ int main()
         }
     }
     // 8) Pitch bend: +1 = +2 semitons (razão 1,1225) em todos os timbres e no órgão
-    static const char* kNomes[11] = { "M1", "Grand", "MT-40", "FM EP", "CP-80", "C7", "M1 Gr", "M1 Comp", "Honky", "CZ-101", "orgao" };
-    for (int t = 0; t <= 10; ++t)
+    static const char* kNomes[14] = { "M1", "Grand", "MT-40", "FM EP", "CP-80", "C7", "M1 Gr", "M1 Comp", "Honky", "CZ-101", "Rhodes", "Suitcase", "Wurli", "orgao" };
+    for (int t = 0; t <= 13; ++t)
     {
         auto pitchOf = [&] (float bend)
         {
-            rk::Params p; p.mode = t == 10 ? 1 : 0; p.pianoType = t == 10 ? 0 : t; p.reverb = 0; p.maxOn = false;
+            rk::Params p; p.mode = t == 13 ? 1 : 0; p.pianoType = t == 13 ? 0 : t; p.reverb = 0; p.maxOn = false;
             float db[9] = { 0, 0, 8, 0, 0, 0, 0, 0, 0 }; std::memcpy (p.drawbar, db, sizeof db); p.leslieMix = 0; p.drive = 0;
             rk::Engine e; e.params = p; e.prepare (48000);
             e.setPitchBend (bend);

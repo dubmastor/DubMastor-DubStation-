@@ -25,7 +25,15 @@ struct SoundParams
     float echoVol = 0.5f, echoIntensity = 0.4f, echoRate = 0.5f;
     float reverb = 0.15f, master = 0.8f;
     bool  maxOn = true;
+    int   instr = 0;           // 0 Hammond B3 · 1 Rhodes Stage · 2 Rhodes Suitcase · 3 Wurlitzer 200A · 4 FM EP (DX7)
 };
+
+// instrumento -> timbre de piano elétrico do motor do MRK-80 (o 0 é o órgão)
+inline int epPianoType (int instr)
+{
+    static const int t[5] = { 0, 10, 11, 12, 3 };
+    return t[instr < 0 ? 0 : (instr > 4 ? 4 : instr)];
+}
 
 class OrganTrio
 {
@@ -49,8 +57,14 @@ public:
         for (int i = 0; i < NumEngines; ++i)
         {
             rk::Params& p = eng[i].params;
-            p.mode = 1;                       // sempre órgão
             const bool rh = (i == Chop);
+            // HAMMOND: o órgão de sempre. Os pianos elétricos tocam o MESMO groove (bubble, chop e fills)
+            // com o timbre do MRK-80; os drawbars, a Leslie e a percussão só valem no Hammond.
+            p.mode = sp.instr == 0 ? 1 : 0;
+            p.pianoType   = epPianoType (sp.instr);
+            p.pianoBright = rh ? 0.6f : 0.45f;     // bubble mais redondo, chop mais brilhante
+            p.pianoDecay  = rh ? 0.45f : 0.3f;
+            p.pianoChorus = sp.instr == 2 ? 0.15f : (rh ? 0.35f : 0.2f);
             for (int d = 0; d < 9; ++d) p.drawbar[d] = rh ? sp.chopDb[d] : sp.bubbleDb[d];
             p.percOn     = rh && sp.perc;
             p.perc3rd    = true;
@@ -62,6 +76,7 @@ public:
             p.organLevel = i == Accent ? sp.bubbleLevel
                          : i == Ghost  ? sp.bubbleLevel * (0.12f + 0.88f * sp.ghostLevel)
                                        : sp.chopLevel;
+            p.pianoLevel = p.organLevel;
             // eco de fita só na mão direita (o bubble seco segura o groove), como num rack de dub
             p.echoOn        = rh && sp.echoOn;
             p.echoMode      = 7;

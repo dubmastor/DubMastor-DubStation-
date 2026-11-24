@@ -218,6 +218,7 @@ private:
     // aba ÓRGÃO
     std::unique_ptr<OrganDrawbar> bubbleDb[9], chopDb[9];
     Chips leslie;
+    Chips instr;   // Hammond B3 ou um dos 4 pianos elétricos (Rhodes Stage, Suitcase, Wurlitzer, DX EP)
     juce::ToggleButton percBtn { "PERC" }, echoBtn { "ECHO" }, maxBtn { "MAX" };
     std::unique_ptr<APVTS::ButtonAttachment> percAtt, echoAtt, maxAtt;
     Knob drive, click, echoVol, echoInt, echoRate, reverb, master;

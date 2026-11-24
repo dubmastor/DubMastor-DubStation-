@@ -7,6 +7,7 @@
 #include <cstring>
 #include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include "GroovePlayer.h"
 
@@ -248,6 +249,34 @@ int main()
         writeWav (name.c_str(), L, R, sr);
     }
 
+    // ---- pianos elétricos no lugar do Hammond: o mesmo groove soa em todos, sem NaN e sem passar do teto
+    {
+        const char* nomes[5] = { "B3", "Rhodes Stage", "Rhodes Suitcase", "Wurlitzer", "DX EP" };
+        for (int ins = 0; ins < 5; ++ins)
+        {
+            const float sr = 48000.0f; const int N = (int) (6.0f * sr);
+            SoundParams sp; sp.instr = ins;
+            auto trioP = std::make_unique<OrganTrio>(); OrganTrio& trio = *trioP;   // no heap: 3 motores não cabem na pilha junto com o outro teste
+            trio.prepare (sr); trio.setParams (sp);
+            std::vector<float> L ((size_t) N), R ((size_t) N);
+            const int chord[3] = { 57, 60, 64 };
+            int pos = 0;
+            for (int k = 0; k < 8; ++k)   // skank/chop no contratempo: o "e" de cada tempo a 100 BPM
+            {
+                const int on = (int) ((k + 0.5) * 0.6 * sr), off = on + (int) (0.6 * sr / 16);
+                trio.render (&L[(size_t) pos], &R[(size_t) pos], on - pos); pos = on;
+                for (int nn : chord) trio.engine (OrganTrio::Chop).noteOn (nn, 0.8f);
+                trio.render (&L[(size_t) pos], &R[(size_t) pos], off - pos); pos = off;
+                for (int nn : chord) trio.engine (OrganTrio::Chop).noteOff (nn);
+            }
+            trio.render (&L[(size_t) pos], &R[(size_t) pos], N - pos);
+            float pk = 0; double e = 0;
+            for (int i = 0; i < N; ++i) { pk = std::max (pk, std::fabs (L[(size_t) i])); e += (double) L[(size_t) i] * L[(size_t) i]; }
+            const double db = 10.0 * std::log10 (e / N + 1e-12);
+            char msg[120]; std::snprintf (msg, sizeof msg, "instrumento %s soa (%.1f dB RMS) sem NaN e abaixo do teto", nomes[ins], db);
+            CHECK (pk > 0.02f && pk <= 1.0f && std::isfinite (db) && db > -45.0, msg);
+        }
+    }
     std::printf (fails ? "\n%d FALHA(S)\n" : "\nTudo certo.\n", fails);
     return fails ? 1 : 0;
 }
