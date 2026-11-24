@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <string>
 #include "../Source/HornEngine.h"
 #include "../Source/PhraseStyles.h"
 #include "../Source/Transcriber.h"
@@ -129,7 +130,18 @@ int main (int argc, char** argv)
                 for (const auto& e : pd.ev) ok = ok && e[0] >= 0 && e[0] < pd.len && e[1] >= 1 && e[3] >= 0 && e[3] < kNumArtic;
                 CHECK (ok, "frase '%s' (%s) dentro do formato", pd.name, st.name);
             }
-        CHECK (phraseStyles().size() == 8 && n >= 40, "biblioteca: %zu estilos e %d frases", phraseStyles().size(), n);
+        {   // v1.6: o skank do ska é no contratempo (o '&' de cada tempo)
+            bool skankOk = false;
+            for (const auto& st : phraseStyles())
+                if (std::string (st.name) == "SKA · SKANK")
+                {
+                    skankOk = st.pats.size() >= 6;
+                    for (size_t i = 0; i < 4 && i < st.pats.size(); ++i)
+                        for (const auto& e : st.pats[i].ev) skankOk = skankOk && e[0] % 4 == 2;
+                }
+            CHECK (skankOk, "SKA · SKANK: as pontadas caem no contratempo ('&')");
+        }
+        CHECK (phraseStyles().size() == 10 && n >= 52, "biblioteca: %zu estilos e %d frases", phraseStyles().size(), n);
 
         // o trompete toca uma frase conhecida; a transcrição tem que achar as notas
         const int sr = 44100; const double bpm = 74, s16 = 60.0 / bpm / 4.0;

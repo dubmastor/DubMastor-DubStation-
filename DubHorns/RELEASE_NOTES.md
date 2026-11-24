@@ -1,3 +1,12 @@
+## Mastor Dub Horns MDH-70 1.6 🟢🟡⚫
+
+**Frases de ska: temas e o skank do naipe.**
+
+- **SKA · TEMAS** (aba Frases MIDI, estilos ◀ ▶ ou LISTA): 6 temas originais no jeito dos naipes de ska — chamada e resposta, menor de jazz, fanfarra, motivo repetido, ponte em notas longas (para abrir em 3ªs ou 6ªs nas VOZES DO NAIPE) e o final (shout). Melodia pensada para o naipe em uníssono, com antecipações no "&" do 4 e finais com fall.
+- **SKA · SKANK**: 6 skanks do naipe no contratempo (o "&" de cada tempo, com a caixa no 2 e no 4) — I · IV · V, com empurrão, curto e longo, de duas notas, com corrida no 4º compasso e com parada no 4.
+- As notas continuam sendo as suas: as frases usam os graus do tom e da escala escolhidos lá em cima. Também na versão para celular.
+- Versão para celular 1.6
+
 ## Mastor Dub Horns MDH-70 1.5 🟢🟡⚫
 
 **Timbre novo de metal e as vozes do naipe jamaicano.**
