@@ -2,7 +2,7 @@ name: Build Monstro Machine MM-2500
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'academia-de-beats/**']
     paths:
       - 'AcademiaDeBeats/MonstroMachine/**'
       - '.github/workflows/build-monstromachine.yml'
