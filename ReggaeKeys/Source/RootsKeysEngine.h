@@ -139,6 +139,9 @@ struct Params
     // GTR SKANK: a guitarra do skank (motor do MRG-68) tocando junto com o piano — sempre começa desligada
     bool  gtrOn    = false;
     float gtrLevel = 1.0f;
+    // PAN (MRK-80 3.3): balanço estéreo do piano e da guitarra do skank, -1 (esquerda) .. 1 (direita); 0 = como antes
+    float pianoPan = 0.0f;
+    float gtrPan   = 0.0f;
     float flMix      = 0.5f;
     // Master / Maximizer
     float reverb = 0.18f;
@@ -917,6 +920,9 @@ public:
         const float maxCeil = std::pow (10.0f, p.maxCeilDb / 20.0f);
         const float bendRatio = bend == 0.0f ? 1.0f : std::pow (2.0f, bend * 2.0f / 12.0f);
         const float vibInc = 5.5f / sr;
+        // balanço: o lado oposto ao PAN cai até zero; no centro não muda nada
+        const float panL = clampf (1.0f - p.pianoPan, 0.0f, 1.0f), panR = clampf (1.0f + p.pianoPan, 0.0f, 1.0f);
+        const float gPanL = clampf (1.0f - p.gtrPan, 0.0f, 1.0f), gPanR = clampf (1.0f + p.gtrPan, 0.0f, 1.0f);
 
         for (int s = 0; s < n; ++s)
         {
@@ -938,7 +944,7 @@ public:
             // piano: chorus estéreo
             float pl, pr;
             chorus.process (pin, p.pianoChorus, pl, pr);
-            pl *= p.pianoLevel; pr *= p.pianoLevel;
+            pl *= p.pianoLevel * panL; pr *= p.pianoLevel * panR;
 
             // órgão: pré de válvula (soft clip) -> Leslie
             const float od = std::tanh (oin * drv * 0.5f) * drvComp * 2.0f;
@@ -960,7 +966,7 @@ public:
             float pk = 0;
             for (int s = 0; s < n; ++s)
             {
-                bufL[s] += gl[s] * p.gtrLevel; bufR[s] += gr[s] * p.gtrLevel;
+                bufL[s] += gl[s] * p.gtrLevel * gPanL; bufR[s] += gr[s] * p.gtrLevel * gPanR;
                 pk = std::max (pk, std::fabs (gl[s]) + std::fabs (gr[s]));
             }
             gtrTail = pk > 1.0e-5f;   // desligou o botão: a cauda termina de tocar

@@ -243,6 +243,9 @@ private:
     std::unique_ptr<APVTS::ButtonAttachment> echoAtt;
     GuitarIconToggle gtrButton;   // GTR SKANK (LED + ícone de guitarra elétrica) (guitarra do skank junto com o piano)
     std::unique_ptr<APVTS::ButtonAttachment> gtrAtt;
+    Knob kPianoPan, kGtrPan;      // 3.3: PAN do piano e da guitarra
+    juce::ToggleButton previewBtn { "PREVIEW" };   // 3.3: toca a CHORD MACHINE aqui na aba INSTRUMENTO
+    std::unique_ptr<juce::ButtonParameterAttachment> previewAtt;
     juce::ComboBox echoModeBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> echoModeAtt;
     Knob eRate, eIntensity, eVol, eSpring, eWow, eAge;

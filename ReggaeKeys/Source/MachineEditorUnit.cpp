@@ -3,6 +3,7 @@
 #define createPluginFilter mrkUnused_createChordMachine
 #define MCM_PANEL_TITLE "CHORD MACHINE  -  MASTOR REGGAE KEYS "
 #define MCM_PANEL_SIGLA "MRK-80"
+#define MCM_MEGA_BANK "MRK-80"   // presets no padrão do mega banco da Riddim Machine (favoritos em DubMastor/MRK-80.settings)
 #include "../../ReggaeChordMachine/Source/PluginEditor.cpp"
 
 // o painel inteiro do MRCM-1240 (o editor do Roots Keys não vê as classes dele)

@@ -73,6 +73,8 @@ public:
     // SOM INTERNO da machine desligado: os acordes tocam no piano/órgão deste instrumento (com eco, flanger e maximizer).
     // Ligado: o som próprio da machine (piano M1 no skank + Hammond no bubble, ao mesmo tempo), somado à saída.
     DubChordsProcessor& getMachine() noexcept { return *machine; }
+    // PREVIEW da machine (clock interno): o botão PREVIEW da aba INSTRUMENTO usa o mesmo parâmetro da aba CHORD MACHINE
+    juce::RangedAudioParameter* machinePreviewParam();
 
 private:
     rk::Engine engine;

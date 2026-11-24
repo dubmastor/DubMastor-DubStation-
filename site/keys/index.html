@@ -168,7 +168,6 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
     <div class="slider"><span>PAN PIANO</span><input type="range" min="-100" max="100" step="1" id="pianoPan"><output id="o_pianoPan"></output></div>
     <div class="row" style="display:flex;gap:8px;margin:10px 0 4px;align-items:center"><div class="toggle" id="gtr"><i></i>GUITAR SKANK</div><span class="hint" style="margin:0">a guitarra do Mastor Reggae Guitar MRG-68 junto com o piano</span></div>
     <div class="slider"><span>PAN GUITAR</span><input type="range" min="-100" max="100" step="1" id="gtrPan"><output id="o_gtrPan"></output></div>
-    <div class="slider"><span>VOL GUITAR</span><input type="range" min="0" max="100" step="1" id="gtrLvl"><output id="o_gtrLvl"></output></div>
   </div>
   <div class="hint">Toque com vários dedos ao mesmo tempo. No plugin, a aba CHORD MACHINE (abaixo) toca neste piano, com eco, flanger e maximizer. O órgão Hammond agora fica no Mastor Reggae Organ MRO-68.</div>
 </section>
@@ -244,7 +243,7 @@ const DEFAULTS = {
            { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false } ],
   pattern: 0, noteSize: 0, center: 60, velocity: 80, swing: 0, bubble: false,
   bpm: 75, pianoLvl: 80, organLvl: 60, reps: 1, mode: 0, octave: 4, timbre: 0,
-  pianoPan: 0, gtr: false, gtrPan: 35, gtrLvl: 70,   // 3.3: PAN do piano e GUITAR SKANK (começa desligado) com PAN
+  pianoPan: 0, gtr: false, gtrPan: 0, gtrLvl: 70,   // 3.3: PAN do piano e GUITAR SKANK (começa desligado) com PAN
 };
 function load() {
   try {
@@ -728,7 +727,6 @@ for (const id of ['preview', 'preview2', 'preview3']) $(id).onclick = () => setP
 const panTxt = (v) => (v === 0 ? 'C' : (v < 0 ? 'L' : 'R') + Math.abs(v));
 slider('pianoPan', panTxt, () => { audio.setLevels(); save(); });
 slider('gtrPan', panTxt, () => { audio.setLevels(); save(); });
-slider('gtrLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
 function refreshGtr() { $('gtr').classList.toggle('on', st.gtr); }
 $('gtr').onclick = () => { st.gtr = !st.gtr; refreshGtr(); };
 refreshGtr();

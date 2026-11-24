@@ -87,6 +87,9 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
   Versão para celular em `site/keys/` (usa `site/chords/engine.js`, que continua sendo o motor web da machine).
   Desde a 3.1 o MRK-80 é **só piano** (o órgão foi para o MRO-68): `mode` fica só para projetos antigos, skank e bubble tocam no piano,
   e só ele mostra o padrão do skank (parâmetro `pattern` do MRCM: CONTRATEMPO ou BANG BANG; no MRCM-1240 e no MRM-0420 fica 0).
+  Desde a 3.3 o PRESETS da aba CHORD MACHINE do MRK-80 usa o mega banco (`MCM_MEGA_BANK` em `MachineEditorUnit.cpp` → `riddimbank::addMegaMenus`:
+  estilos, riddims A–Z, músicas A–Z e favoritos, só entradas com `harmony < 2`); o MRCM-1240 e o MRM-0420 continuam com o menu antigo.
+  PAN do piano e do GUITAR SKANK (`pianoPan`, `gtrPan`, no centro de fábrica) e PREVIEW na aba INSTRUMENTO (`machinePreviewParam`).
 - As machines separadas (MRDM-12, MRBM-69, MRCM-1240) ficam como **legado** no `plugins.json` (`"legado": "<instrumento>"`):
   saem do site e do pacote, a última release fica congelada (o workflow só publica por tag manual), mas a pasta continua
   porque o instrumento e o MRM-0420 compilam o código dela. Mudou uma machine? Teste o instrumento dela e o MRM-0420.
