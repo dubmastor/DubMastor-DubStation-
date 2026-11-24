@@ -212,17 +212,25 @@ struct Waveguide
     int N = 100, wi = 0, excLen = 0, pos = 0, muteAt = -1;
     double c = 0, wPrev = 0, lPrev = 0, aPrev = 0, ring = 0.9965, muteG = 0.8, bright = 0.5;
 
+    // Período com o allpass fracionário estável: notas acima de sr/6.5 (ex.: MIDI 127 a 44,1 kHz) ficam
+    // presas nesse teto. Sem isso d < -1 e o allpass explodia em NaN (pluginval manda notas 0..127).
+    void setPeriod (double sr, double hz)
+    {
+        const double s0 = 0.5;
+        hz = std::clamp (std::isfinite (hz) ? hz : 440.0, sr / (kMax - 16), sr / 6.5);
+        const double P = sr / hz;
+        N = std::clamp ((int) std::floor (P - s0 - 0.1), 4, kMax - 4);
+        const double d = std::clamp (P - s0 - N, 0.05, 1.1);
+        c = (1 - d) / (1 + d);
+    }
     void start (double sr, double hz, float vel, double pickPos, float dark, uint32_t seed)
     {
-        const double P = sr / hz, s0 = 0.5;
-        N = std::clamp ((int) std::floor (P - s0 - 0.1), 4, kMax - 4);
-        const double d = P - s0 - N;
-        c = (1 - d) / (1 + d);
+        setPeriod (sr, hz);
         std::fill (dl, dl + kMax, 0.0f);
         wi = 0; wPrev = lPrev = aPrev = 0; pos = 0;
         excLen = N;
         Rng r (seed);
-        const int k = std::max (2, (int) std::floor (pickPos * N));
+        const int k = std::clamp ((int) std::floor (pickPos * N), 2, N - 2);
         const double a = 0.55 - 0.35 * vel + dark * 0.3;
         double lp = 0, mean = 0;
         for (int i = 0; i < N; ++i)
@@ -242,10 +250,7 @@ struct Waveguide
     }
     void retune (double sr, double hz)   // bend e vibrato nas notas de lead (mantém a corda vibrando)
     {
-        const double P = sr / hz, s0 = 0.5;
-        N = std::clamp ((int) std::floor (P - s0 - 0.1), 4, kMax - 4);
-        const double d = P - s0 - N;
-        c = (1 - d) / (1 + d);
+        setPeriod (sr, hz);
     }
     inline float tick()
     {
