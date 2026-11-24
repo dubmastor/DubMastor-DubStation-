@@ -82,4 +82,15 @@ if(RG_SNAPSHOT)
         JucePlugin_VersionString="${PROJECT_VERSION}")
     target_link_libraries(ReggaeGuitarSnapshot PRIVATE juce::juce_audio_utils
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+    juce_add_console_app(ReggaeGuitarStress PRODUCT_NAME "ReggaeGuitarStress")
+    target_sources(ReggaeGuitarStress PRIVATE tests/audio_stress.cpp Source/PluginProcessor.cpp Source/PluginEditor.cpp)
+    target_include_directories(ReggaeGuitarStress PRIVATE Source ../ReggaeKeys/Source)
+    target_compile_definitions(ReggaeGuitarStress PRIVATE
+        JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
+        JucePlugin_Name="Mastor Reggae Guitar MRG-68" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
+        JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0
+        JucePlugin_VersionString="${PROJECT_VERSION}")
+    target_link_libraries(ReggaeGuitarStress PRIVATE juce::juce_audio_utils
+        juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 endif()
