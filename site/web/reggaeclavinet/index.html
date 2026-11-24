@@ -202,7 +202,7 @@ input[type=range]{flex:1;min-width:0;width:100%;height:26px;accent-color:var(--c
         <div class="lb">FILL (FIM DA FRASE)</div><div class="row" id="fill"></div>
         <div class="row" style="margin-top:6px" id="fillEvery"></div>
         <div class="lb">NOTAS</div><div class="row" id="nota"></div>
-        <div class="sl"><label>REGISTRO</label><input type="range" id="center" min="41" max="65" step="1"><output id="o_center"></output></div>
+        <div class="sl"><label>REGISTRO</label><input type="range" id="center" min="17" max="53" step="1"><output id="o_center"></output></div>
         <div class="sl"><label>DENSIDADE</label><input type="range" id="density" min="0" max="1" step="0.01"><output id="o_density"></output></div>
         <div class="sl"><label>SWING</label><input type="range" id="swing" min="0" max="1" step="0.01"><output id="o_swing"></output></div>
         <div class="sl"><label>VELOCITY</label><input type="range" id="velocity" min="0.2" max="1" step="0.01"><output id="o_velocity"></output></div>
@@ -274,11 +274,12 @@ const DEF = { page: 1, bpm: 76, base: true, timbre: 0, filters: [1, 0, 1, 0], pi
   wahOn: false, wahSens: 0.6, wahRange: 0.7, phOn: false, phRate: 0.4, phDepth: 0.55, echoOn: false, echoTime: 1, echoFb: 0.4, echoMix: 0.45,
   maxOn: true, rev: 0.2, master: 0.8, src: 0,
   slots: [{ root: 9, minor: true, dur: 1, on: true }, { root: 2, minor: true, dur: 1, on: true }, { root: 7, minor: false, dur: 1, on: true }, { root: 4, minor: true, dur: 1, on: true }],
-  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 53, reg: 5, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
+  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 29, reg: 6, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
 let S = JSON.parse(JSON.stringify(DEF));
 try { const sv = JSON.parse(localStorage.getItem('mrcl71') || 'null'); if (sv && typeof sv === 'object') S = Object.assign(S, sv); } catch (e) {}
 if ((S.reg | 0) < 4) { S.center = 53; S.reg = 4; S.edits = null; }   // oitava 2 do Cubase (C2 = MIDI 48), pedido de 23/nov
-if ((S.reg | 0) < 5) { Object.assign(S, { timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08, reg: 5 }); }   // timbre novo (modelo físico)
+if ((S.reg | 0) < 5) { Object.assign(S, { timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08 }); }   // timbre novo (modelo físico)
+if ((S.reg | 0) < 6) { S.reg = 6; S.center = clamp(S.center - 24, 17, 53); S.edits = null; }   // duas oitavas abaixo (pedido de 24/nov)
 const save = () => { try { localStorage.setItem('mrcl71', JSON.stringify(S)); } catch (e) {} };
 
 // ------------------------------------------------------------------ gerador das linhas (na contagem com a caixa no 2 e no 4)
@@ -415,7 +416,7 @@ function setupAudio() {
   const rv = ac.createConvolver(); rv.buffer = impulse(1.6); revWet = ac.createGain(); rv.connect(revWet); revWet.connect(master);
   // instrumento: voz -> filtro dos botões -> wah -> phaser -> eco -> master
   inst = ac.createGain();
-  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 85; hp.Q.value = 0.7;
+  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 28; hp.Q.value = 0.7;
   const nasal = ac.createBiquadFilter(); nasal.type = 'peaking'; nasal.frequency.value = 1500; nasal.Q.value = 1.1; nasal.gain.value = 4;
   const amp = ac.createWaveShaper(); const cv = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; cv[i] = Math.tanh(1.6 * x) / Math.tanh(1.6); } amp.curve = cv;
   inst.connect(hp); hp.connect(nasal); nasal.connect(amp);
@@ -546,7 +547,7 @@ function drawRoll() {
   const line = current(), beats = line.bars * 4; let lo = 127, hi = 0;
   for (const e of line.events) { lo = Math.min(lo, e.note); hi = Math.max(hi, e.note); }
   if (hi < lo) { lo = S.center - 8; hi = S.center + 16; }
-  lo = Math.max(24, lo - 3); hi = Math.min(108, hi + 3); if (hi - lo < 20) { const m = (hi + lo) >> 1; lo = m - 10; hi = m + 10; }
+  lo = Math.max(12, lo - 3); hi = Math.min(108, hi + 3); if (hi - lo < 20) { const m = (hi + lo) >> 1; lo = m - 10; hi = m + 10; }
   const x0 = 30, y0 = 18, w = W - x0 - 6, h = H - y0 - 6, rh = h / (hi - lo + 1), xOf = (b) => x0 + b / beats * w, yOf = (n) => y0 + h - (n - lo + 1) * rh;
   rollGeo = { x0, y0, w, h, rh, lo, hi, beats };
   for (let n = lo; n <= hi; n++) { if ([1, 3, 6, 8, 10].includes(n % 12)) { g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(x0, yOf(n), w, rh); }
@@ -687,7 +688,7 @@ function changed() { S.edits = null; regen(); save(); refresh(); }
 
 // teclado na tela (toque, várias notas)
 (function keyboard() {
-  const host = $('keys'), lo = 48, hi = 72, whites = []; for (let n = lo; n <= hi; n++) if (![1, 3, 6, 8, 10].includes(n % 12)) whites.push(n);
+  const host = $('keys'), lo = 24, hi = 48, whites = []; for (let n = lo; n <= hi; n++) if (![1, 3, 6, 8, 10].includes(n % 12)) whites.push(n);
   const ww = 100 / whites.length, els = {};
   whites.forEach((n, i) => { const k = document.createElement('div'); k.className = 'w'; k.style.left = i * ww + '%'; k.style.width = ww + '%'; k.dataset.n = n;
     if (n % 12 === 0) k.innerHTML = `<span class="lab">${noteName(n)}</span>`; host.appendChild(k); els[n] = k; });
