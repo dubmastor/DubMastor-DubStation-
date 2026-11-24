@@ -57,8 +57,8 @@ inline const std::vector<PatternDef>& stabPatterns()
           { { 2, 1, 0, Stac }, { 6, 1, 2, Stac }, { 10, 1, 0, Stac }, { 14, 1, 2, Stac }, { 18, 1, 4, Stac }, { 22, 1, 4, Stac }, { 26, 2, 2, Ten } } },
         { "Scoop + corte", "2 comp.", "Nota que entra por baixo (scoop) e um corte seco logo depois.", 32,
           { { 8, 2, 4, Scoop }, { 11, 1, 4, Stac }, { 24, 2, 6, Scoop }, { 27, 1, 4, Stac } } },
-        { "Pickup no 3 (one drop)", "2 comp.", "Tres semicolcheias levando ao tempo 3, onde cai o bumbo.", 32,
-          { { 5, 1, 2, Stac }, { 6, 1, 3, Stac }, { 7, 1, 4, Stac }, { 8, 4, 4, Ten }, { 21, 1, 4, Stac }, { 22, 1, 5, Stac }, { 23, 1, 6, Stac }, { 24, 6, 7, Fall } } },
+        { "Pickup na batida (one drop)", "2 comp.", "Tres semicolcheias levando a batida do one drop (bumbo e aro juntos): no 2 e depois no 4.", 32,
+          { { 1, 1, 2, Stac }, { 2, 1, 3, Stac }, { 3, 1, 4, Stac }, { 4, 4, 4, Ten }, { 25, 1, 4, Stac }, { 26, 1, 5, Stac }, { 27, 1, 6, Stac }, { 28, 4, 7, Fall } } },
         { "Doit sustentado", "2 comp.", "Nota longa que sobe no final. Deixe o eco com intensidade alta.", 32,
           { { 4, 4, 4, Doit }, { 20, 4, 5, Doit } } },
     };

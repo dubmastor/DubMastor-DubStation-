@@ -5,6 +5,7 @@
 - **SKA · TEMAS** (aba Frases MIDI, estilos ◀ ▶ ou LISTA): 6 temas originais no jeito dos naipes de ska — chamada e resposta, menor de jazz, fanfarra, motivo repetido, ponte em notas longas (para abrir em 3ªs ou 6ªs nas VOZES DO NAIPE) e o final (shout). Melodia pensada para o naipe em uníssono, com antecipações no "&" do 4 e finais com fall.
 - **SKA · SKANK**: 6 skanks do naipe no contratempo (o "&" de cada tempo, com a caixa no 2 e no 4) — I · IV · V, com empurrão, curto e longo, de duas notas, com corrida no 4º compasso e com parada no 4.
 - As notas continuam sendo as suas: as frases usam os graus do tom e da escala escolhidos lá em cima. Também na versão para celular.
+- **Contagem da Dub Station no ROOTS ONE DROP**: as frases que miravam o "3" agora caem na batida do one drop, com bumbo e aro juntos no 2 e no 4 — *Pickup na batida*, *Lamento no 2* e *Nota solta na batida*. O GUIA ONE DROP também passou a marcar o bumbo no 2 e no 4.
 - Versão para celular 1.6
 
 ## Mastor Dub Horns MDH-70 1.5 🟢🟡⚫

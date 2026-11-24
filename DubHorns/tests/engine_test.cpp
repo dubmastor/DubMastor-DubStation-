@@ -141,6 +141,21 @@ int main (int argc, char** argv)
                 }
             CHECK (skankOk, "SKA · SKANK: as pontadas caem no contratempo ('&')");
         }
+        {   // contagem da Dub Station: no one drop a batida (bumbo + aro) é no 2 e no 4, nunca no 3
+            bool batidaOk = false;
+            for (const auto& st : phraseStyles())
+                if (std::string (st.name) == "ROOTS ONE DROP")
+                    for (const auto& pd : st.pats)
+                        if (std::string (pd.name) == "Pickup na batida (one drop)")
+                        {
+                            batidaOk = true;
+                            for (const auto& e : pd.ev) if (e[3] != Stac) batidaOk = batidaOk && (e[0] % 16 == 4 || e[0] % 16 == 12);
+                        }
+            for (const auto& st : phraseStyles())
+                for (const auto& pd : st.pats)
+                    batidaOk = batidaOk && std::string (pd.name).find (" no 3") == std::string::npos;
+            CHECK (batidaOk, "ROOTS ONE DROP: frases caem na batida do 2 e do 4");
+        }
         CHECK (phraseStyles().size() == 10 && n >= 52, "biblioteca: %zu estilos e %d frases", phraseStyles().size(), n);
 
         // o trompete toca uma frase conhecida; a transcrição tem que achar as notas

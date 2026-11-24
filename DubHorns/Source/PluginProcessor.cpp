@@ -410,13 +410,13 @@ void HornsProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
             collect (on + len, 0, e.note, e.artic);
         }
 
-        // guia one drop no clock interno
+        // guia one drop no clock interno: bumbo e aro juntos no 2 e no 4 (contagem da Dub Station)
         if (internal && param ("guide") > 0.5f)
         {
             for (double occ = std::ceil (ppq * 4.0 - 1.0e-9) / 4.0; occ < end; occ += 0.25)
             {
                 const int s16 = (int) std::llround (occ * 4.0) % 16;
-                const bool accent = s16 == 8, tick = (s16 % 4) == 0 || (s16 % 4) == 2;
+                const bool accent = s16 == 4 || s16 == 12, tick = (s16 % 4) == 0 || (s16 % 4) == 2;
                 if (! accent && ! tick) continue;
                 const int at = jlimit (0, n - 1, (int) ((occ - ppq) / blockBeats * n));
                 auto fire = [&] (float freq, float env, float decaySec)
