@@ -91,49 +91,87 @@ private:
     }
 };
 
-// botão GTR SKANK: o LED do teclado e, no lugar do texto, uma guitarra desenhada (corpo de dois bojos, braço e mão)
+// botão GTR SKANK: o LED do teclado e, no lugar do texto, uma Tele desenhada
+// (corpo de um corte só, escudo preto, placa da ponte cromada, braço de maple e mão com as tarraxas de um lado)
 class GuitarIconToggle : public juce::ToggleButton
 {
 public:
     GuitarIconToggle() : juce::ToggleButton ("") {}
 
-    static juce::Path guitarShape (bool details)
+    // coordenadas 0..1, guitarra em pé (mão em cima)
+    static juce::Path teleBody()
     {
         juce::Path p;
-        if (! details)
-        {
-            p.addEllipse (0.22f, 0.62f, 0.56f, 0.32f);   // bojo de baixo
-            p.addEllipse (0.29f, 0.45f, 0.42f, 0.24f);   // bojo de cima
-            p.addRoundedRectangle (0.455f, 0.12f, 0.09f, 0.42f, 0.02f);   // braço
-            p.addRoundedRectangle (0.425f, 0.0f, 0.15f, 0.14f, 0.035f);   // mão
-            p.setUsingNonZeroWinding (true);
-        }
-        else
-        {
-            p.addEllipse (0.44f, 0.60f, 0.12f, 0.12f);   // boca / captador
-            p.addRoundedRectangle (0.38f, 0.80f, 0.24f, 0.035f, 0.01f);   // ponte
-        }
+        p.startNewSubPath (0.445f, 0.50f);
+        p.lineTo (0.31f, 0.50f);
+        p.quadraticTo (0.20f, 0.51f, 0.20f, 0.62f);       // ombro do lado grave
+        p.quadraticTo (0.21f, 0.70f, 0.19f, 0.80f);
+        p.quadraticTo (0.20f, 0.97f, 0.50f, 0.975f);      // fundo
+        p.quadraticTo (0.80f, 0.97f, 0.80f, 0.82f);
+        p.quadraticTo (0.79f, 0.72f, 0.77f, 0.66f);
+        p.quadraticTo (0.72f, 0.60f, 0.62f, 0.62f);       // o corte (cutaway) do lado agudo
+        p.quadraticTo (0.57f, 0.60f, 0.555f, 0.50f);
+        p.closeSubPath();
+        return p;
+    }
+    static juce::Path teleNeck()
+    {
+        juce::Path p;
+        p.addRectangle (0.458f, 0.10f, 0.084f, 0.43f);
+        p.startNewSubPath (0.458f, 0.115f);               // mão com as 6 tarraxas de um lado
+        p.lineTo (0.44f, 0.035f);
+        p.quadraticTo (0.45f, 0.0f, 0.50f, 0.005f);
+        p.lineTo (0.60f, 0.03f);
+        p.quadraticTo (0.625f, 0.05f, 0.60f, 0.075f);
+        p.lineTo (0.542f, 0.115f);
+        p.closeSubPath();
+        p.setUsingNonZeroWinding (true);
+        return p;
+    }
+    static juce::Path telePickguard()
+    {
+        juce::Path p;
+        p.startNewSubPath (0.44f, 0.535f);
+        p.lineTo (0.33f, 0.54f);
+        p.quadraticTo (0.27f, 0.57f, 0.28f, 0.64f);
+        p.quadraticTo (0.30f, 0.71f, 0.39f, 0.72f);
+        p.lineTo (0.45f, 0.69f);
+        p.lineTo (0.45f, 0.60f);
+        p.closeSubPath();
         return p;
     }
 
     void paintButton (juce::Graphics& g, bool highlighted, bool down) override
     {
         getLookAndFeel().drawToggleButton (g, *this, highlighted, down);
-        auto box = getLocalBounds().toFloat().reduced (1.0f).withTrimmedLeft (16.0f);
-        const float sz = juce::jmin (box.getHeight() - 2.0f, box.getWidth());
+        auto box = getLocalBounds().toFloat().reduced (1.0f).withTrimmedLeft (14.0f);
+        const float sz = juce::jmin (box.getHeight(), box.getWidth()) * 1.02f;
         const auto area = juce::Rectangle<float> (sz, sz).withCentre (box.getCentre());
-        const auto tf = juce::AffineTransform::rotation (juce::degreesToRadians (38.0f), 0.5f, 0.5f)
+        const auto tf = juce::AffineTransform::rotation (juce::degreesToRadians (40.0f), 0.5f, 0.5f)
                             .scaled (sz, sz).translated (area.getX(), area.getY());
         const bool on = getToggleState();
-        const juce::Colour body = on ? juce::Colour (0xfff2e6c8) : juce::Colour (0xffb9b9be);
-        auto shape = guitarShape (false);
-        g.setColour (body);
-        g.fillPath (shape, tf);
-        g.setColour (on ? juce::Colour (0xff8e2a20) : juce::Colour (0xff3a3a3d));   // boca e ponte
-        g.fillPath (guitarShape (true), tf);
-        g.setColour (juce::Colours::black.withAlpha (0.45f));                   // cordas
-        juce::Path s; s.startNewSubPath (0.5f, 0.03f); s.lineTo (0.5f, 0.82f);
-        g.strokePath (s, juce::PathStrokeType (0.6f), tf);
+        const juce::Colour body   = on ? juce::Colour (0xffe9c27a) : juce::Colour (0xff9a9a9f);   // butterscotch
+        const juce::Colour maple  = on ? juce::Colour (0xfff3dfab) : juce::Colour (0xffb9b9be);
+        const juce::Colour guard  = juce::Colour (0xff141416);
+        const juce::Colour chrome = on ? juce::Colour (0xffe4e6e9) : juce::Colour (0xffc4c5c8);
+
+        g.setColour (body);    g.fillPath (teleBody(), tf);
+        g.setColour (guard);   g.fillPath (telePickguard(), tf);
+        g.setColour (maple);   g.fillPath (teleNeck(), tf);
+        g.setColour (chrome);
+        {
+            juce::Path plate; plate.addRoundedRectangle (0.43f, 0.80f, 0.17f, 0.11f, 0.015f);          // placa da ponte
+            juce::Path ctrl;  ctrl.addRoundedRectangle (0.66f, 0.74f, 0.07f, 0.17f, 0.02f);            // placa dos controles
+            juce::Path neckPu; neckPu.addRoundedRectangle (0.455f, 0.635f, 0.09f, 0.04f, 0.01f);      // captador do braço
+            g.fillPath (plate, tf); g.fillPath (ctrl, tf); g.fillPath (neckPu, tf);
+        }
+        g.setColour (juce::Colour (0xff141416));
+        {
+            juce::Path bridgePu; bridgePu.addRoundedRectangle (0.465f, 0.81f, 0.07f, 0.035f, 0.008f); // captador da ponte
+            g.fillPath (bridgePu, tf);
+        }
+        g.setColour (juce::Colours::black.withAlpha (0.55f));                                          // contorno fino
+        g.strokePath (teleBody(), juce::PathStrokeType (0.012f), tf);
     }
 };
 
@@ -198,7 +236,7 @@ private:
     // eco de fita FitaEco TE-12
     juce::ToggleButton echoButton { "ECHO" };
     std::unique_ptr<APVTS::ButtonAttachment> echoAtt;
-    GuitarIconToggle gtrButton;   // GTR SKANK (LED + ícone de guitarra) (guitarra do skank junto com o piano)
+    GuitarIconToggle gtrButton;   // GTR SKANK (LED + ícone de Tele) (guitarra do skank junto com o piano)
     std::unique_ptr<APVTS::ButtonAttachment> gtrAtt;
     juce::ComboBox echoModeBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> echoModeAtt;

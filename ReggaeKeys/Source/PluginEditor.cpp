@@ -798,7 +798,7 @@ void RootsKeysEditor::resized()
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
         pianoPreset[i].setBounds (290 + i * 106, 207, 84, 22);
-    gtrButton.setBounds (714, 272, 58, 26);
+    gtrButton.setBounds (711, 272, 64, 44);
     {
         // timbres em duas linhas de 7, agrupados por família (o índice do botão continua sendo o do parâmetro)
         static const int order[kNumTimbres] = { 7, 0, 6, 1, 8, 4, 5,          // Korg M1, acústicos e Yamaha CP-80 / C7
