@@ -1,6 +1,6 @@
 {
   "_leia": "Registro dos plugins. Todo plugin novo entra aqui. A checagem automática (.github/checagem/checar.py) compara este arquivo com o CMakeLists, o site, o README e as notas de release em todo push e pull request. 'web' é a pasta da versão para celular/navegador dentro de site/ ('pendente' só para os plugins antigos que ainda não têm). 'categoria' é a página do site (efeitos, instrumentos ou machines). 'padrao': false marca o plugin que ainda não segue o padrão de nomes e de releases (a checagem só confere a versão dele).",
-  "pacote": {"_leia": "Instalador completo (todos os plugins). Quando a versão de qualquer plugin subir, atualize a versão dele aqui e suba 'versao'. A checagem confere.", "versao": "3.7", "pausado": true, "plugins": {"MBK-76": "3.2", "MTE-12": "2.6", "MPV-01": "1.6", "MRK-80": "3.2", "MRB-69": "2.0", "MDH-70": "1.6", "MRD-12": "2.0", "MRM-0420": "2.6", "MHD-050": "1.0", "MT-0420": "1.1", "MKS-0420": "1.0", "MRO-68": "1.2", "MPG-11": "1.0", "MRG-68": "1.0", "MRCL-71": "1.0", "MIF": "1.0"}},
+  "pacote": {"_leia": "Instalador completo (todos os plugins). Quando a versão de qualquer plugin subir, atualize a versão dele aqui e suba 'versao'. A checagem confere.", "versao": "3.8", "pausado": true, "plugins": {"MBK-76": "3.2", "MTE-12": "2.6", "MPV-01": "1.6", "MRK-80": "3.2", "MRB-69": "2.0", "MDH-70": "1.6", "MRD-12": "2.0", "MRM-0420": "2.6", "MHD-050": "1.0", "MT-0420": "1.1", "MKS-0420": "1.0", "MRO-68": "1.2", "MPG-11": "1.0", "MRG-68": "1.0", "MRCL-71": "1.0", "MOH-88": "1.0", "MIF": "1.0"}},
   "plugins": [
     {"sigla": "MBK-76", "pasta": "BigKnob", "nome": "Mastor Big Knob MBK-76", "tipo": "efeito", "web": "pendente", "categoria": "efeitos"},
     {"sigla": "MTE-12", "pasta": "TapeEcho", "nome": "Mastor Tape Echo MTE-12", "tipo": "efeito", "web": "pendente", "categoria": "efeitos"},
@@ -20,6 +20,7 @@
     {"sigla": "MRM-0420", "pasta": "RiddimMachine", "nome": "Mastor Riddim Machine MRM-0420", "tipo": "instrumento", "web": "riddim", "categoria": "machines"},
     {"sigla": "MT-0420", "pasta": "Tune", "nome": "Mastor Tune MT-0420", "tipo": "efeito", "web": "web/tune", "categoria": "efeitos"},
     {"sigla": "MKS-0420", "pasta": "KeyScout", "nome": "Mastor Key Scout MKS-0420", "tipo": "efeito", "web": "web/keyscout", "categoria": "efeitos"},
-    {"sigla": "MRCL-71", "pasta": "ReggaeClavinet", "nome": "Mastor Reggae Clavinet MRCL-71", "tipo": "instrumento", "web": "web/reggaeclavinet", "categoria": "instrumentos"}
+    {"sigla": "MRCL-71", "pasta": "ReggaeClavinet", "nome": "Mastor Reggae Clavinet MRCL-71", "tipo": "instrumento", "web": "web/reggaeclavinet", "categoria": "instrumentos"},
+    {"sigla": "MOH-88", "pasta": "OrchHit", "nome": "Mastor Orch Hit MOH-88", "tipo": "instrumento", "web": "web/orchhit", "categoria": "instrumentos"}
   ]
 }
