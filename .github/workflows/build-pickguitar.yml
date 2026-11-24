@@ -1,0 +1,216 @@
+name: Build Mastor Pick Guitar MPG-11
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'PickGuitar/**'
+      - 'HalfDub/Source/TapeEcho.h'
+      - 'ReggaeKeys/Source/VUMeter.h'
+      - 'ReggaeKeys/Source/SkinTextures.h'
+      - '.github/workflows/build-pickguitar.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
+    tags:
+      - 'MPG-11-*'
+  pull_request:
+    paths:
+      - 'PickGuitar/**'
+      - 'HalfDub/Source/TapeEcho.h'
+      - 'ReggaeKeys/Source/VUMeter.h'
+      - 'ReggaeKeys/Source/SkinTextures.h'
+      - '.github/workflows/build-pickguitar.yml'
+      - '.github/scripts/**'
+      - '.github/installer/**'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: PickGuitar
+
+jobs:
+  dsp-test:
+    name: Teste do motor (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar e rodar o teste do motor (padrão de fábrica, contagem, pica-pau, MIDI, 8 guitarristas em WAV)
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -I Source -I ../HalfDub/Source tests/render_test.cpp -o render_test
+          ./render_test
+
+  build:
+    needs: dsp-test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+          - os: macos-latest
+            name: macOS
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout JUCE 8.0.4
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: 8.0.4
+          path: JUCE
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DJUCE_DIR="${{ github.workspace }}/JUCE"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel 4
+
+      # --- Validação com pluginval (carrega o plugin, processa áudio, testa estado e interface)
+      - name: Validate VST3 with pluginval (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip -OutFile pluginval.zip
+          Expand-Archive pluginval.zip -DestinationPath pluginval
+          ./pluginval/pluginval.exe --strictness-level 5 --timeout-ms 600000 --validate "build/PickGuitar_artefacts/Release/VST3/Mastor Pick Guitar MPG-11.vst3" 2>&1 | Tee-Object -Variable pvlog
+          $code = $LASTEXITCODE
+          Write-Host "pluginval exit code: $code"
+          if ($code -ne 0) { exit 1 }
+
+      - name: Check universal binary + validate (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          VST3="build/PickGuitar_artefacts/Release/VST3/Mastor Pick Guitar MPG-11.vst3"
+          BIN="$VST3/Contents/MacOS/Mastor Pick Guitar MPG-11"
+          echo "== Arquiteturas do binário"; lipo -info "$BIN"
+          lipo -info "$BIN" | grep -q x86_64 && lipo -info "$BIN" | grep -q arm64
+          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
+          unzip -q pluginval.zip
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --timeout-ms 900000 --validate "$VST3"
+          echo "== auval (validador da Apple para AU)"
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "build/PickGuitar_artefacts/Release/AU/Mastor Pick Guitar MPG-11.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 2
+          auval -v aumu Mpg1 Dblb
+
+      - name: Collect + package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item -Recurse "build/PickGuitar_artefacts/Release/VST3/Mastor Pick Guitar MPG-11.vst3" out/
+          Copy-Item "build/PickGuitar_artefacts/Release/Standalone/Mastor Pick Guitar MPG-11.exe" out/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path out/* -DestinationPath ../MPG-11-Windows.zip
+
+      - name: Instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ${{ github.workspace }}/.github/scripts/instalador-windows.ps1 -Origem out -Produto "Mastor Pick Guitar MPG-11" -Sigla MPG-11 -Saida ../MPG-11-Windows-Instalador.exe
+
+      - name: Conferir runtime embutido (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --quiet pefile
+          python "${{ github.workspace }}/.github/scripts/conferir-runtime-windows.py" out
+
+      - name: Collect + package (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p out
+          cp -R "build/PickGuitar_artefacts/Release/VST3/Mastor Pick Guitar MPG-11.vst3" out/
+          cp -R "build/PickGuitar_artefacts/Release/AU/Mastor Pick Guitar MPG-11.component" out/
+          cp -R "build/PickGuitar_artefacts/Release/Standalone/Mastor Pick Guitar MPG-11.app" out/
+          # assinatura ad-hoc para o macOS aceitar o plugin localmente
+          codesign --force --deep -s - out/*.vst3 out/*.component out/*.app
+          cd out && ditto -c -k --sequesterRsrc . ../../MPG-11-macOS.zip
+
+      - name: Instalador (macOS)
+        if: runner.os == 'macOS'
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/instalador-macos.sh" out "Mastor Pick Guitar MPG-11" MPG-11 ../MPG-11-macOS-Instalador.pkg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MPG-11-${{ matrix.name }}
+          path: |
+            MPG-11-${{ matrix.name }}.zip
+            MPG-11-${{ matrix.name }}-Instalador.*
+
+  # Release própria do MPG-11: MPG-11-<versão do CMakeLists>, criada/atualizada a cada
+  # push na main que mexa no plugin (ou por tag MPG-11-x.y). Não vira a "latest", para não mexer nos
+  # links /releases/latest/download dos outros plugins.
+  release:
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && !cancelled() && needs.build.result == 'success' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/MPG-11-') || inputs.tag != '') }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            PickGuitar/RELEASE_NOTES.md
+            PickGuitar/CMakeLists.txt
+          sparse-checkout-cone-mode: false
+
+      - name: Versão
+        id: ver
+        run: |
+          V=$(sed -n 's/^project(PickGuitar VERSION \([0-9]*\.[0-9]*\).*/\1/p' PickGuitar/CMakeLists.txt)
+          echo "Versão do MPG-11: $V"
+          test -n "$V"
+          echo "tag=MPG-11-$V" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: MPG-11-*
+          merge-multiple: true
+
+      # release própria MPG-11-<versão> (push na main ou tag MPG-11-x.y)
+      # (se o GitHub não deixar criar a release, o build continua valendo: os zips vão pela release existente)
+      - name: Conferir os arquivos
+        run: |
+          ls -la dist
+          test -n "$(ls dist/*.zip 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.exe 2>/dev/null)"
+          test -n "$(ls dist/*-Instalador.pkg 2>/dev/null)"
+          # o plugin do Windows não pode depender do Visual C++ Redistributable (senão não abre em PCs sem ele)
+          d=$(mktemp -d); unzip -q dist/*-Windows.zip -d "$d"
+          dll=$(find "$d" -path '*x86_64-win*' -type f | head -1)
+          if objdump -p "$dll" | grep -iE 'DLL Name: (VCRUNTIME|MSVCP)'; then echo "::error::plugin depende do runtime do Visual C++"; exit 1; fi
+
+      - uses: softprops/action-gh-release@v2
+        if: ${{ inputs.tag == '' || inputs.tag == null }}
+        continue-on-error: true
+        with:
+          tag_name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ (startsWith(github.ref, 'refs/tags/') && github.ref_name) || steps.ver.outputs.tag }}
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
+          body_path: PickGuitar/RELEASE_NOTES.md
+          make_latest: 'false'
+
+      # só anexa os zips a uma release que já existe (sem mexer no nome nem nas notas dela)
+      - uses: softprops/action-gh-release@v2
+        if: ${{ inputs.tag != '' && inputs.tag != null }}
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: |
+            dist/*.zip
+            dist/*-Instalador.exe
+            dist/*-Instalador.pkg
