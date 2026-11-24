@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1a120c">
-<meta name="robots" content="noindex">
-<meta name="description" content="Mastor Reggae Clavinet MRCL-71 (versão de teste): clavinet de reggae que segue a harmonia do riddim e sugere linhas no estilo dos tecladistas jamaicanos, na contagem com a caixa no 2 e no 4.">
-<title>Mastor Reggae Clavinet MRCL-71 v1.0 (teste) — Dub Station</title>
+<meta name="description" content="Mastor Reggae Clavinet MRCL-71 1.0: clavinet de reggae que segue a harmonia do riddim e sugere linhas no estilo dos tecladistas jamaicanos, na contagem com a caixa no 2 e no 4.">
+<title>Mastor Reggae Clavinet MRCL-71 v1.0 — Dub Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -126,14 +125,14 @@ input[type=range]{flex:1;min-width:0;width:100%;height:26px;accent-color:var(--c
 <body>
 <div id="overlay"><div class="box">
   <h2>MASTOR REGGAE CLAVINET</h2>
-  <p>Versão de teste do MRCL-71: o clavinet segue a harmonia do riddim e sugere linhas no estilo dos tecladistas jamaicanos, sempre na contagem com a caixa no 2 e no 4. Use fones ou caixa de som.</p>
+  <p>Mastor Reggae Clavinet MRCL-71: o clavinet segue a harmonia do riddim e sugere linhas no estilo dos tecladistas jamaicanos, sempre na contagem com a caixa no 2 e no 4. Use fones ou caixa de som.</p>
   <button class="play" id="unlock">▶ LIBERAR O ÁUDIO</button>
 </div></div>
 <div class="wrap">
 <header>
   <a class="back" href="../../">← Dub Station</a>
   <div class="brand"><small>DubMastor</small><h1>REGGAE CLAVINET</h1>
-    <span class="sig">CLAVINET SYNTHESIS · MRCL-71 · v<span id="verTxt"></span> <span class="test">VERSÃO DE TESTE</span></span></div>
+    <span class="sig">CLAVINET SYNTHESIS · MRCL-71 · v<span id="verTxt"></span></span></div>
   <div class="plate">MRCL-71</div>
 </header>
 <div class="tabs">
@@ -227,7 +226,7 @@ input[type=range]{flex:1;min-width:0;width:100%;height:26px;accent-color:var(--c
   </div>
 </div>
 </div>
-<p class="note" style="color:#888;margin-top:14px">Versão de teste para aprovação. Os músicos são inspirados no estilo de cada um (créditos de clavinet em discos de reggae), não são transcrições. No plugin, a CLAVINET MACHINE vai ouvir o Mastor Reggae Piano MRP-80 ou o MRM-0420 direto na DAW; aqui no navegador a harmonia vem do banco de riddims ou dos acordes que você escolher.</p>
+<p class="note" style="color:#888;margin-top:14px">Os músicos são inspirados no estilo de cada um (créditos de clavinet em discos de reggae), não são transcrições. No plugin, a CLAVINET MACHINE segue os acordes do MIDI que chega na trilha (o do MRP-80, do MRM-0420 ou de outra trilha) ou os do próprio plugin; aqui no navegador a harmonia vem do banco de riddims ou dos acordes que você escolher.</p>
 </div>
 
 <script src="../../riddimbank.js"></script>
@@ -643,8 +642,8 @@ function refresh() {
   for (const k of ['wahOn', 'phOn', 'echoOn', 'maxOn']) $(k).classList.toggle('on', !!S[k]);
   $('baseBtn').classList.toggle('on', !!S.base);
   document.querySelectorAll('[data-src]').forEach((b) => b.classList.toggle('on', +b.dataset.src === S.src));
-  $('srcNote').textContent = ['No plugin: ouve o Mastor Reggae Piano MRP-80 na DAW. Aqui: escolha o riddim no banco ou os acordes abaixo.',
-    'No plugin: ouve a harmonia do Mastor Riddim Machine MRM-0420. Aqui: escolha o riddim no banco ou os acordes abaixo.',
+  $('srcNote').textContent = ['No plugin: segue o MIDI do Mastor Reggae Piano MRP-80 que chega na trilha. Aqui: escolha o riddim no banco ou os acordes abaixo.',
+    'No plugin: segue o MIDI do Mastor Riddim Machine MRM-0420 que chega na trilha. Aqui: escolha o riddim no banco ou os acordes abaixo.',
     'No plugin: lê os acordes do MIDI da trilha. Aqui: escolha os acordes abaixo.'][S.src];
   // acordes
   const host = $('chords'); host.innerHTML = '';
