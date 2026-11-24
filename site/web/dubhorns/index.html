@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1f1610">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Mastor Dub Horns MDH-70: naipe de metais anos 70 para tocar no celular ou no navegador, sem instalar nada.">
-<title>Mastor Dub Horns MDH-70 v1.3 — Dub Station</title>
+<title>Mastor Dub Horns MDH-70 v1.4 — Dub Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Righteous&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -181,6 +181,7 @@ table.ev td.pos{font-family:var(--mono);color:var(--cream)}
 .unit{position:relative}
 .overlay .big{font-family:var(--disp);font-size:22px;color:var(--amber)}
 /* músicos: visor azul de MPC, igual à Riddim Machine */
+.dropping{outline:3px dashed var(--amber);outline-offset:-8px;background:rgba(242,165,65,.08)}
 .presetbar{padding:10px 14px;background:linear-gradient(180deg,#241a12,#1a120c);border-bottom:1px solid #000}
 .mpcrow{display:flex;gap:12px;align-items:stretch}
 .mpckeys{display:grid;grid-template-columns:44px 44px auto;gap:6px 6px;align-items:center}
@@ -231,7 +232,7 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
       <div class="sub">Dub Station · Horn Section · MDH-70</div>
       <div class="stripes"><i></i><i></i><i></i></div>
     </div>
-    <button class="ver" id="verbtn" title="Histórico de versões">v1.3</button>
+    <button class="ver" id="verbtn" title="Histórico de versões">v1.4</button>
     <a class="ver" href="../../" style="text-decoration:none" title="Voltar ao site do Dub Station">← Dub Station</a>
     <div class="globalkey">
       <label>Tom</label><select id="gkey"></select>
@@ -337,14 +338,17 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
   </section>
 
   <section class="panel" id="tab-frases">
-    <h2>Sugestões MIDI · ataques & introduções</h2>
-    <p class="hint">As sugestões trazem o <b>ritmo e a articulação</b>. As notas são suas: escolha em cada linha, ou ligue <b>Escolher pelo teclado</b> e toque as notas em sequência. O naipe inteiro toca cada nota com as harmonias da aba Naipe.</p>
+    <h2>Frases MIDI · por década e estilo</h2>
+    <p class="hint">Frases <b>originais</b> com o ritmo e a articulação de cada época; as notas são suas (escolha em cada linha ou ligue <b>Escolher pelo teclado</b>). Para transcrever um áudio, <b>arraste um MP3/WAV</b> nesta aba ou toque em <b>Transcrever áudio</b>.</p>
     <div class="phr">
       <div>
-        <div class="row" style="margin-bottom:8px">
-          <button class="btn sel" data-lib="stabs">Ataques curtos</button>
-          <button class="btn" data-lib="intros">Frases de introdução</button>
+        <div class="mpclcd" id="fLcd" style="margin-bottom:6px;cursor:pointer"><div class="f"><span id="fEra"></span><span id="fPos"></span></div><div class="n" id="fName"></div></div>
+        <div class="row" style="margin-bottom:4px">
+          <button class="mk" id="fPrev" style="width:44px">◀</button><button class="mk" id="fNext" style="width:44px">▶</button>
+          <span style="font-size:10px;letter-spacing:2.5px;font-weight:700">ESTILO</span>
+          <select id="fSelect" style="margin-left:auto;max-width:150px"></select>
         </div>
+        <div class="hint" id="fDesc" style="margin:0 0 8px;min-height:30px"></div>
         <div class="row" style="margin-bottom:8px;font-size:12px;color:var(--muted)">
           Ao carregar:
           <select id="fillMode">
@@ -353,6 +357,12 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
           </select>
         </div>
         <div class="lib" id="lib"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn green" id="trBtn">🎧 Transcrever áudio</button>
+          <select id="trMode"><option value="solo">metal sozinho</option><option value="mix">música inteira</option></select>
+          <input type="file" id="trFile" accept="audio/*,.mp3,.wav,.aif,.aiff,.flac,.ogg,.m4a" style="display:none">
+        </div>
+        <div class="hint" id="trMsg" style="margin:6px 0 0"></div>
       </div>
       <div>
         <div class="row">
@@ -403,8 +413,12 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
 <script>
 "use strict";
 /* ================== VERSÃO ================== */
-const VERSION = '1.3';
+const VERSION = '1.4';
 const CHANGELOG = [
+  {v:'1.4', date:'23/11/2026', items:[
+    'Frases MIDI por década e estilo, no padrão da Riddim Machine (visor azul, ESTILO ◀ ▶, LISTA): 41 frases originais em 8 estilos — Ska, Rocksteady, Early Reggae, Roots One Drop, Rockers, Dub, Dancehall e Digital & Ragga.',
+    'Transcrição de áudio: arraste um MP3/WAV na aba Frases e os metais viram uma frase MIDI, com scoop, fall, doit e staccato reconhecidos. Modo "metal sozinho" ou "música inteira".'
+  ]},
   {v:'1.3', date:'23/11/2026', items:[
     'Timbre mais realista: em pp o metal fica escuro e em ff os harmônicos agudos crescem (como medido em trompete e trombone de verdade); saxes com todos os harmônicos (tubo cônico) em vez de som oco de clarinete.',
     'Zumbido do lábio e da palheta no ritmo da nota, 3º formante e campana em cada instrumento.',
@@ -1086,43 +1100,10 @@ window.addEventListener('resize',()=>{drawEQ();drawRoll();buildKeyboard();});
 
 /* ================== FRASES ================== */
 // s = semicolcheia de início, d = duração em semicolcheias, g = grau (0 = tônica, 7 = oitava), a = articulação
-const LIB={
-  stabs:[
-    {n:'Skank de metais (2 e 4)',tag:'2 comp.',len:32,d:'Pontadas secas no 2 e no 4, junto com a guitarra. Base de tudo.',
-      e:[[4,1,4,'stac'],[12,1,4,'stac'],[20,1,2,'stac'],[28,1,2,'stac']]},
-    {n:'Ataque duplo',tag:'2 comp.',len:32,d:'Duas semicolcheias no "e" do 2, a segunda segura. Resposta caindo no final.',
-      e:[[6,1,4,'stac'],[7,2,4,'ten'],[22,1,5,'stac'],[23,3,4,'fall']]},
-    {n:'Pontada com fall',tag:'2 comp.',len:32,d:'Uma nota forte que despenca — o gesto típico do sax tenor em dub.',
-      e:[[10,3,7,'fall'],[26,3,6,'fall']]},
-    {n:'Pergunta curta',tag:'2 comp.',len:32,d:'Três notas subindo, resposta descendo com fall.',
-      e:[[12,1,2,'stac'],[13,1,3,'stac'],[14,2,4,'ten'],[28,1,4,'stac'],[29,1,3,'stac'],[30,2,2,'fall']]},
-    {n:'Contratempo seco',tag:'2 comp.',len:32,d:'Todos os "e" do primeiro compasso, respondido no segundo. Bom pra rockers.',
-      e:[[2,1,0,'stac'],[6,1,2,'stac'],[10,1,0,'stac'],[14,1,2,'stac'],[18,1,4,'stac'],[22,1,4,'stac'],[26,2,2,'ten']]},
-    {n:'Scoop + corte',tag:'2 comp.',len:32,d:'Nota que entra por baixo (scoop) e um corte seco logo depois.',
-      e:[[8,2,4,'scoop'],[11,1,4,'stac'],[24,2,6,'scoop'],[27,1,4,'stac']]},
-    {n:'Pickup no 3 (one drop)',tag:'2 comp.',len:32,d:'Três semicolcheias levando ao tempo 3, onde cai o bumbo do one drop.',
-      e:[[5,1,2,'stac'],[6,1,3,'stac'],[7,1,4,'stac'],[8,4,4,'ten'],[21,1,4,'stac'],[22,1,5,'stac'],[23,1,6,'stac'],[24,6,7,'fall']]},
-    {n:'Doit sustentado',tag:'2 comp.',len:32,d:'Nota longa que sobe no final (doit). Deixe o eco com intensidade alta.',
-      e:[[4,4,4,'doit'],[20,4,5,'doit']]}
-  ],
-  intros:[
-    {n:'Fanfarra rocksteady',tag:'4 comp.',len:64,d:'Abertura em arpejo, segura no topo e resolve caindo na tônica.',
-      e:[[0,4,0,'scoop'],[4,4,2,'ten'],[8,4,4,'ten'],[12,4,7,'ten'],[16,12,6,'fall'],[32,2,4,'stac'],[34,2,4,'stac'],[36,4,5,'ten'],[40,8,4,'ten'],[48,2,2,'ten'],[50,2,1,'ten'],[52,12,0,'fall']]},
-    {n:'Chamada menor',tag:'4 comp.',len:64,d:'Linha descendente melancólica, ótima em menor ou dórico.',
-      e:[[0,6,4,'scoop'],[6,2,3,'ten'],[8,4,2,'ten'],[12,4,0,'ten'],[16,14,1,'fall'],[32,2,4,'stac'],[34,2,5,'stac'],[36,2,4,'stac'],[38,2,3,'stac'],[40,8,2,'ten'],[48,3,1,'ten'],[51,3,0,'ten'],[54,10,0,'fall']]},
-    {n:'Escada',tag:'4 comp.',len:64,d:'Colcheias subindo a escala, segura com doit, desce de volta e termina em fall.',
-      e:[[0,2,0],[2,2,1],[4,2,2],[6,2,3],[8,2,4],[10,2,5],[12,2,6],[14,2,7],[16,14,7,'doit'],[32,2,7],[34,2,6],[36,2,5],[38,2,4],[40,2,3],[42,2,2],[44,2,1],[46,2,0],[48,14,0,'fall']].map(x=>[x[0],x[1],x[2],x[3]||'ten'])},
-    {n:'Pergunta e resposta',tag:'4 comp.',len:64,d:'Dois compassos perguntam subindo, dois respondem descendo — deixe o eco preencher os buracos.',
-      e:[[2,2,0,'ten'],[4,2,2,'ten'],[6,6,4,'ten'],[14,1,4,'stac'],[16,8,5,'fall'],[34,2,4,'ten'],[36,2,2,'ten'],[38,6,1,'ten'],[46,1,1,'stac'],[48,12,0,'fall']]},
-    {n:'Entrada de dub (para o eco)',tag:'4 comp.',len:64,d:'Notas isoladas e secas, feitas pra jogar no Tape Echo com Dub Throw.',
-      e:[[0,1,4,'stac'],[8,1,4,'stac'],[24,8,7,'fall'],[40,1,2,'stac'],[44,1,4,'stac'],[48,12,0,'scoop']]},
-    {n:'Toque de clarim',tag:'2 comp.',len:32,d:'Repetição rítmica na tônica abrindo para a 5ª — chamada direta pra banda entrar.',
-      e:[[0,1,0,'stac'],[1,1,0,'stac'],[2,2,0,'ten'],[4,4,4,'ten'],[12,1,0,'stac'],[13,1,0,'stac'],[14,2,0,'ten'],[16,4,4,'ten'],[20,10,7,'fall']]}
-  ]
-};
 const DURS=[[1,'1/16'],[2,'1/8'],[3,'1/8 pont.'],[4,'1/4'],[6,'1/4 pont.'],[8,'1/2'],[12,'1/2 pont.'],[16,'inteira']];
 const ARTS=[['ten','normal'],['stac','staccato'],['fall','fall'],['scoop','scoop'],['doit','doit']];
-let libKind='stabs', selPat=null, selRow=-1, recMode=false;
+const FRASE_ESTILOS = [{"n":"SKA","era":"1960-66","d":"Andamento rápido, naipe em uníssono, contratempo e corridas de jazz.","p":[{"n":"Contratempo ska","tag":"2 comp.","d":"Todas as colcheias do contratempo, como o naipe dos anos 60.","len":32,"e":[[2,1,4,"stac"],[6,1,4,"stac"],[10,1,4,"stac"],[14,1,4,"stac"],[18,1,3,"stac"],[22,1,3,"stac"],[26,1,4,"stac"],[30,1,4,"stac"]]},{"n":"Corrida em uníssono","tag":"2 comp.","d":"Colcheias subindo o arpejo e resposta que termina em fall.","len":32,"e":[[0,2,0,"ten"],[2,2,2,"ten"],[4,2,4,"ten"],[6,2,5,"ten"],[8,2,4,"stac"],[10,2,2,"stac"],[12,4,0,"ten"],[16,1,4,"stac"],[18,1,4,"stac"],[20,2,5,"ten"],[22,2,4,"ten"],[24,6,7,"fall"]]},{"n":"Riff de dois tempos","tag":"2 comp.","d":"Frase curta repetida com variação no fim, para dobrar a guitarra.","len":32,"e":[[0,1,0,"stac"],[2,1,2,"stac"],[4,2,4,"ten"],[8,1,4,"stac"],[10,1,2,"stac"],[12,2,0,"ten"],[16,1,0,"stac"],[18,1,2,"stac"],[20,2,5,"ten"],[24,1,4,"stac"],[26,1,2,"stac"],[28,3,0,"fall"]]},{"n":"Toque de clarim","tag":"2 comp.","d":"Repetição na tônica abrindo para a 5ª: chamada para a banda entrar.","len":32,"e":[[0,1,0,"stac"],[1,1,0,"stac"],[2,2,0,"ten"],[4,4,4,"ten"],[12,1,0,"stac"],[13,1,0,"stac"],[14,2,0,"ten"],[16,4,4,"ten"],[20,10,7,"fall"]]},{"n":"Contratempo seco","tag":"2 comp.","d":"Todos os 'e' do primeiro compasso, respondido no segundo.","len":32,"e":[[2,1,0,"stac"],[6,1,2,"stac"],[10,1,0,"stac"],[14,1,2,"stac"],[18,1,4,"stac"],[22,1,4,"stac"],[26,2,2,"ten"]]}]},{"n":"ROCKSTEADY","era":"1966-68","d":"Mais lento e cantado: notas longas, terças e cauda suave.","p":[{"n":"Fanfarra rocksteady","tag":"4 comp.","d":"Abertura em arpejo, segura no topo e resolve na tônica.","len":64,"e":[[0,4,0,"scoop"],[4,4,2,"ten"],[8,4,4,"ten"],[12,4,7,"ten"],[16,12,6,"fall"],[32,2,4,"stac"],[34,2,4,"stac"],[36,4,5,"ten"],[40,8,4,"ten"],[48,2,2,"ten"],[50,2,1,"ten"],[52,12,0,"fall"]]},{"n":"Linha em terças","tag":"2 comp.","d":"Melodia longa para o naipe harmonizado em terças.","len":32,"e":[[0,6,2,"ten"],[6,2,3,"ten"],[8,8,4,"ten"],[16,4,5,"ten"],[20,4,4,"ten"],[24,8,2,"fall"]]},{"n":"Resposta suave","tag":"2 comp.","d":"Silêncio, um pickup e a resposta descendo devagar.","len":32,"e":[[12,1,4,"stac"],[13,1,5,"stac"],[14,2,4,"ten"],[16,6,2,"ten"],[22,2,1,"ten"],[24,8,0,"fall"]]},{"n":"Pontada com cauda","tag":"2 comp.","d":"Notas no 2 e no 4 que seguram um pouco, sem pressa.","len":32,"e":[[4,2,4,"ten"],[12,2,4,"ten"],[20,2,5,"ten"],[28,4,4,"fall"]]},{"n":"Escada","tag":"4 comp.","d":"Colcheias subindo a escala, doit no topo, desce e termina em fall.","len":64,"e":[[0,2,0,"ten"],[2,2,1,"ten"],[4,2,2,"ten"],[6,2,3,"ten"],[8,2,4,"ten"],[10,2,5,"ten"],[12,2,6,"ten"],[14,2,7,"ten"],[16,14,7,"doit"],[32,2,7,"ten"],[34,2,6,"ten"],[36,2,5,"ten"],[38,2,4,"ten"],[40,2,3,"ten"],[42,2,2,"ten"],[44,2,1,"ten"],[46,2,0,"ten"],[48,14,0,"fall"]]}]},{"n":"EARLY REGGAE","era":"1968-72","d":"O reggae saltitante do fim dos 60: riffs curtos e pontadas junto com o órgão.","p":[{"n":"Skank de metais (2 e 4)","tag":"2 comp.","d":"Pontadas secas no 2 e no 4, junto com a guitarra. Base de tudo.","len":32,"e":[[4,1,4,"stac"],[12,1,4,"stac"],[20,1,2,"stac"],[28,1,2,"stac"]]},{"n":"Riff saltitante","tag":"2 comp.","d":"Duas semicolcheias empurrando para o 2, com resposta caindo.","len":32,"e":[[2,1,0,"stac"],[3,1,0,"stac"],[4,2,2,"ten"],[10,1,4,"stac"],[12,2,4,"ten"],[18,1,5,"stac"],[19,1,5,"stac"],[20,2,4,"ten"],[26,1,2,"stac"],[28,3,0,"fall"]]},{"n":"Ataque duplo","tag":"2 comp.","d":"Duas semicolcheias no 'e' do 2, a segunda segura; resposta caindo.","len":32,"e":[[6,1,4,"stac"],[7,2,4,"ten"],[22,1,5,"stac"],[23,3,4,"fall"]]},{"n":"Pergunta curta","tag":"2 comp.","d":"Três notas subindo, resposta descendo com fall.","len":32,"e":[[12,1,2,"stac"],[13,1,3,"stac"],[14,2,4,"ten"],[28,1,4,"stac"],[29,1,3,"stac"],[30,2,2,"fall"]]},{"n":"Chamada de três notas","tag":"2 comp.","d":"Desce da oitava em três notas, duas vezes.","len":32,"e":[[0,2,7,"stac"],[2,2,6,"ten"],[4,4,4,"ten"],[16,2,7,"stac"],[18,2,6,"ten"],[20,6,5,"fall"]]}]},{"n":"ROOTS ONE DROP","era":"1972-78","d":"O tempo 3 é o centro: chamadas menores, pergunta e resposta, hinos.","p":[{"n":"Chamada menor","tag":"4 comp.","d":"Linha descendente melancólica, ótima em menor ou dórico.","len":64,"e":[[0,6,4,"scoop"],[6,2,3,"ten"],[8,4,2,"ten"],[12,4,0,"ten"],[16,14,1,"fall"],[32,2,4,"stac"],[34,2,5,"stac"],[36,2,4,"stac"],[38,2,3,"stac"],[40,8,2,"ten"],[48,3,1,"ten"],[51,3,0,"ten"],[54,10,0,"fall"]]},{"n":"Pickup no 3 (one drop)","tag":"2 comp.","d":"Três semicolcheias levando ao tempo 3, onde cai o bumbo.","len":32,"e":[[5,1,2,"stac"],[6,1,3,"stac"],[7,1,4,"stac"],[8,4,4,"ten"],[21,1,4,"stac"],[22,1,5,"stac"],[23,1,6,"stac"],[24,6,7,"fall"]]},{"n":"Pergunta e resposta","tag":"4 comp.","d":"Dois compassos perguntam subindo, dois respondem descendo.","len":64,"e":[[2,2,0,"ten"],[4,2,2,"ten"],[6,6,4,"ten"],[14,1,4,"stac"],[16,8,5,"fall"],[34,2,4,"ten"],[36,2,2,"ten"],[38,6,1,"ten"],[46,1,1,"stac"],[48,12,0,"fall"]]},{"n":"Lamento no 3","tag":"2 comp.","d":"Uma nota que entra por baixo no 3 e cai no compasso seguinte.","len":32,"e":[[8,6,4,"scoop"],[14,2,3,"ten"],[24,8,2,"fall"]]},{"n":"Hino roots","tag":"4 comp.","d":"Melodia lenta em mínimas, para introdução de música roots.","len":64,"e":[[0,8,0,"scoop"],[8,8,2,"ten"],[16,4,4,"ten"],[20,4,3,"ten"],[24,8,2,"ten"],[32,8,4,"ten"],[40,8,5,"ten"],[48,4,4,"ten"],[52,4,2,"ten"],[56,8,0,"fall"]]},{"n":"Pontada com fall","tag":"2 comp.","d":"Uma nota forte que despenca: o gesto do sax tenor no reggae.","len":32,"e":[[10,3,7,"fall"],[26,3,6,"fall"]]}]},{"n":"ROCKERS","era":"1975-80","d":"Mais duro e militante: pontadas dobradas, empurrões e cortes secos.","p":[{"n":"Dobrada rockers","tag":"2 comp.","d":"Duas pontadas coladas no 2 e no 4, como o naipe de Channel One.","len":32,"e":[[3,1,4,"stac"],[4,1,4,"stac"],[11,1,4,"stac"],[12,1,4,"stac"],[19,1,5,"stac"],[20,1,5,"stac"],[27,1,4,"stac"],[28,2,4,"ten"]]},{"n":"Militante","tag":"2 comp.","d":"Colcheias marcadas na tônica e subida para a oitava.","len":32,"e":[[0,1,0,"stac"],[2,1,0,"stac"],[4,1,0,"stac"],[6,1,0,"stac"],[8,4,2,"ten"],[12,4,4,"ten"],[16,1,0,"stac"],[18,1,0,"stac"],[20,1,0,"stac"],[22,1,0,"stac"],[24,8,7,"fall"]]},{"n":"Empurrão no 'a'","tag":"2 comp.","d":"Notas antecipadas uma semicolcheia antes do tempo, empurrando o groove.","len":32,"e":[[7,3,4,"ten"],[15,3,5,"ten"],[23,3,4,"ten"],[31,1,2,"stac"]]},{"n":"Corte seco","tag":"2 comp.","d":"Pares de pontadas e um fall para fechar.","len":32,"e":[[4,1,4,"stac"],[6,1,4,"stac"],[12,1,2,"stac"],[14,1,2,"stac"],[20,1,4,"stac"],[22,1,5,"stac"],[28,4,4,"fall"]]},{"n":"Scoop + corte","tag":"2 comp.","d":"Nota que entra por baixo (scoop) e um corte seco logo depois.","len":32,"e":[[8,2,4,"scoop"],[11,1,4,"stac"],[24,2,6,"scoop"],[27,1,4,"stac"]]}]},{"n":"DUB","era":"1973-80","d":"Pouca nota e muito espaço: feitas para jogar no Tape Echo e no Dub Throw.","p":[{"n":"Entrada de dub (para o eco)","tag":"4 comp.","d":"Notas isoladas e secas, feitas para jogar no Tape Echo.","len":64,"e":[[0,1,4,"stac"],[8,1,4,"stac"],[24,8,7,"fall"],[40,1,2,"stac"],[44,1,4,"stac"],[48,12,0,"scoop"]]},{"n":"Nota solta no 3","tag":"2 comp.","d":"Uma pontada por compasso. O eco faz o resto.","len":32,"e":[[8,1,4,"stac"],[24,1,2,"stac"]]},{"n":"Throw de duas notas","tag":"2 comp.","d":"Duas notas coladas para disparar o Dub Throw.","len":32,"e":[[2,1,7,"stac"],[3,1,4,"stac"],[18,1,5,"stac"],[19,1,2,"stac"]]},{"n":"Fall longo para a sala","tag":"4 comp.","d":"Notas longas que caem devagar e deixam a sala soar.","len":64,"e":[[0,12,7,"scoop"],[16,14,4,"fall"],[40,1,2,"stac"],[48,14,0,"fall"]]},{"n":"Doit sustentado","tag":"2 comp.","d":"Nota longa que sobe no final. Deixe o eco com intensidade alta.","len":32,"e":[[4,4,4,"doit"],[20,4,5,"doit"]]}]},{"n":"DANCEHALL","era":"1979-85","d":"O começo do dancehall: andamento lento, riffs curtos repetidos e muito espaço para o DJ.","p":[{"n":"Riff repetido","tag":"2 comp.","d":"Uma ideia curta tocada igual nos dois compassos.","len":32,"e":[[0,1,4,"stac"],[2,1,4,"stac"],[3,2,5,"ten"],[6,1,4,"stac"],[8,4,2,"ten"],[16,1,4,"stac"],[18,1,4,"stac"],[19,2,5,"ten"],[22,1,4,"stac"],[24,4,2,"ten"]]},{"n":"Resposta ao DJ","tag":"2 comp.","d":"Silêncio no primeiro compasso e uma resposta no segundo.","len":32,"e":[[20,1,4,"stac"],[22,1,4,"stac"],[24,2,5,"ten"],[26,2,4,"ten"],[28,4,2,"fall"]]},{"n":"Pontada no 1","tag":"2 comp.","d":"Marca a cabeça do compasso e sobe para a 5ª.","len":32,"e":[[0,1,0,"stac"],[16,1,0,"stac"],[18,1,2,"stac"],[20,4,4,"fall"]]},{"n":"Sax de rua","tag":"2 comp.","d":"Frase de sax com semicolcheias, scoop e fall no fim.","len":32,"e":[[0,1,4,"ten"],[1,1,5,"ten"],[2,1,4,"ten"],[3,1,2,"ten"],[4,4,0,"ten"],[12,1,2,"stac"],[14,2,4,"scoop"],[16,6,5,"ten"],[22,2,4,"ten"],[24,8,2,"fall"]]},{"n":"Contracanto lento","tag":"4 comp.","d":"Notas longas descendo por baixo da voz.","len":64,"e":[[0,12,2,"scoop"],[16,12,1,"ten"],[32,12,0,"ten"],[48,14,2,"fall"]]}]},{"n":"DIGITAL & RAGGA","era":"1985-95","d":"Reggae digital: riffs sincopados (3+3+2), pontadas curtas e frases de sax anos 80.","p":[{"n":"Riff 3+3+2","tag":"2 comp.","d":"A divisão sincopada do riddim digital.","len":32,"e":[[0,1,4,"stac"],[3,1,4,"stac"],[6,2,5,"ten"],[16,1,4,"stac"],[19,1,4,"stac"],[22,2,2,"ten"],[28,4,0,"fall"]]},{"n":"Pontadas digitais","tag":"2 comp.","d":"Contratempos curtinhos com um empurrão no fim de cada compasso.","len":32,"e":[[2,1,4,"stac"],[6,1,4,"stac"],[10,1,4,"stac"],[11,1,5,"stac"],[12,2,4,"ten"],[18,1,2,"stac"],[22,1,2,"stac"],[26,1,2,"stac"],[27,1,4,"stac"],[28,2,2,"ten"]]},{"n":"Frase de sax anos 80","tag":"4 comp.","d":"Melodia cantada de sax tenor, com scoop na entrada e fall nas pontas.","len":64,"e":[[0,2,4,"scoop"],[2,2,5,"ten"],[4,4,7,"ten"],[8,2,5,"ten"],[10,2,4,"ten"],[12,4,2,"ten"],[16,10,4,"fall"],[32,2,2,"ten"],[34,2,4,"ten"],[36,4,5,"ten"],[40,2,4,"ten"],[42,2,2,"ten"],[44,4,1,"ten"],[48,12,0,"fall"]]},{"n":"Ragga hit","tag":"2 comp.","d":"Pontadas na oitava a cada tempo forte e descida rápida.","len":32,"e":[[0,1,7,"stac"],[8,1,7,"stac"],[16,1,7,"stac"],[24,1,6,"stac"],[26,1,5,"stac"],[28,3,4,"fall"]]},{"n":"Doit de resposta","tag":"2 comp.","d":"Subida curta que termina em doit, resposta que cai.","len":32,"e":[[12,1,4,"stac"],[13,1,5,"stac"],[14,6,7,"doit"],[28,1,4,"stac"],[29,1,2,"stac"],[30,2,0,"fall"]]}]}];
+let libStyle=3, selPat=null, selRow=-1, recMode=false;
 
 function rootMidi(){ return 60+S.key.root; }
 function degToMidi(g){
@@ -1138,14 +1119,24 @@ function inScale(m){ return SCALES[S.key.scale].iv.includes((((m-S.key.root)%12)
 
 function renderLib(){
   const w=document.getElementById('lib'); w.innerHTML='';
-  LIB[libKind].forEach((p,i)=>{
+  const st=FRASE_ESTILOS[libStyle];
+  document.getElementById('fEra').textContent='ESTILO · '+st.era; document.getElementById('fPos').textContent=String(libStyle+1).padStart(2,'0')+'/'+String(FRASE_ESTILOS.length).padStart(2,'0');
+  document.getElementById('fName').textContent=st.n; document.getElementById('fDesc').textContent=st.d;
+  document.getElementById('fSelect').value=libStyle;
+  st.p.forEach((p,i)=>{
     const c=document.createElement('div'); c.className='card'+(selPat===p?' sel':'');
     c.innerHTML=`<div class="row" style="justify-content:space-between"><span class="t">${p.n}</span><span class="tag">${p.tag}</span></div><div class="d">${p.d}</div>`;
     c.onclick=()=>loadPattern(p);
     w.appendChild(c);
   });
 }
-document.querySelectorAll('[data-lib]').forEach(b=>b.onclick=()=>{libKind=b.dataset.lib; document.querySelectorAll('[data-lib]').forEach(x=>x.classList.toggle('sel',x===b)); renderLib();});
+(function(){ const sel=document.getElementById('fSelect');
+  FRASE_ESTILOS.forEach((st,i)=>sel.appendChild(new Option(st.n+' · '+st.era,i)));
+  sel.onchange=()=>{libStyle=+sel.value; renderLib();};
+  const step=d=>{libStyle=(libStyle+d+FRASE_ESTILOS.length)%FRASE_ESTILOS.length; renderLib();};
+  document.getElementById('fPrev').onclick=()=>step(-1); document.getElementById('fNext').onclick=()=>step(1);
+  document.getElementById('fLcd').onclick=()=>{ sel.focus(); if(sel.showPicker) try{sel.showPicker();}catch(e){} };
+})();
 
 function loadPattern(p){
   selPat=p; const mode=document.getElementById('fillMode').value;
@@ -1209,6 +1200,124 @@ function assignFromKeyboard(m){
   renderEvents(); drawRoll();
   if(selRow<0){ setRec(false); toast('Todas as notas escolhidas ✔'); }
 }
+
+/* ================== TRANSCRIÇÃO (mesmo algoritmo do plugin: Source/Transcriber.h) ================== */
+function transcribe(mono, sr, bpm, fullMix){
+  const res={notes:[],events:[],dropped:0,len:32};
+  if(mono.length<2048) return res;
+  const stepSec=60/Math.max(40,Math.min(200,bpm))/4;
+  const dec=Math.max(1,Math.floor(sr/11025)), fs=sr/dec;
+  const bq=(type,f,q)=>{const w=2*Math.PI*f/sr,c=Math.cos(w),al=Math.sin(w)/(2*q),a0=1+al; let b0,b1,b2;
+    if(type===0){b0=(1-c)/2/a0;b1=(1-c)/a0;b2=b0;} else {b0=(1+c)/2/a0;b1=-(1+c)/a0;b2=b0;}
+    const a1=-2*c/a0,a2=(1-al)/a0; let z1=0,z2=0; return x=>{const y=b0*x+z1; z1=b1*x-a1*y+z2; z2=b2*x-a2*y; return y;};};
+  const fh=fullMix?170:80, fl=Math.min(fullMix?2200:4000,fs*.45);
+  const h1=bq(1,fh,.7),h2=bq(1,fh,.7),l1=bq(0,fl,.7),l2=bq(0,fl,.7);
+  const x=new Float64Array(Math.floor((mono.length-1)/dec)+1); let xi=0;
+  for(let i=0;i<mono.length;i++){ const y=l2(l1(h2(h1(mono[i])))); if(i%dec===0) x[xi++]=y; }
+  const W=512,hop=64,tauMin=Math.floor(fs/1100),tauMax=Math.min(W-2,Math.ceil(fs/70));
+  const nF=x.length>W+tauMax?Math.floor((x.length-W-tauMax)/hop):0; if(nF<8) return res;
+  const f0=new Float64Array(nF),ap=new Float64Array(nF).fill(1),rms=new Float64Array(nF),rmsS=new Float64Array(nF),cm=new Float64Array(tauMax+1);
+  let maxRms=1e-9;
+  for(let fr=0;fr<nF;fr++){
+    const o=fr*hop; let e=0; for(let i=0;i<W;i++) e+=x[o+i]*x[o+i];
+    rms[fr]=Math.sqrt(e/W); if(rms[fr]>maxRms) maxRms=rms[fr];
+    let es=0; for(let i=W/2-64;i<W/2+64;i++) es+=x[o+i]*x[o+i]; rmsS[fr]=Math.sqrt(es/128);
+    for(let tau=1;tau<=tauMax;tau++){ let acc=0; for(let i=0;i<W;i++){const v=x[o+i]-x[o+i+tau]; acc+=v*v;} cm[tau]=acc; }
+    let run=0; for(let tau=1;tau<=tauMax;tau++){ run+=cm[tau]; cm[tau]=run>0?cm[tau]*tau/run:1; }
+    let best=-1;
+    for(let tau=Math.max(2,tauMin);tau<tauMax;tau++) if(cm[tau]<.15){ while(tau+1<tauMax&&cm[tau+1]<cm[tau]) tau++; best=tau; break; }
+    if(best<0){ best=Math.max(2,tauMin); for(let tau=best;tau<tauMax;tau++) if(cm[tau]<cm[best]) best=tau; }
+    for(let k=3;k>=2;k--){ const cand=Math.round(best/k); if(cand-2<Math.max(2,tauMin)) continue; let mn=cand;
+      for(let t=cand-2;t<=cand+2;t++) if(cm[t]<cm[mn]) mn=t; if(cm[mn]<Math.max(.22,cm[best]*1.8)){best=mn;break;} }
+    const a=cm[best-1],b=cm[best],c=cm[best+1],den=a-2*b+c,off=Math.abs(den)>1e-12?.5*(a-c)/den:0;
+    f0[fr]=fs/(best+Math.max(-1,Math.min(1,off))); ap[fr]=b;
+  }
+  const gate=maxRms*Math.pow(10,(fullMix?-26:-34)/20), apMax=fullMix?.22:.3;
+  const mid=new Float64Array(nF).fill(-1);
+  for(let fr=0;fr<nF;fr++) if(rms[fr]>gate&&ap[fr]<apMax&&f0[fr]>60&&f0[fr]<1200) mid[fr]=69+12*Math.log2(f0[fr]/440);
+  const med=v=>{const s2=v.slice().sort((p,q)=>p-q); return s2[Math.floor(s2.length/2)];};
+  const ms=Float64Array.from(mid);
+  for(let fr=2;fr+2<nF;fr++){ const w=[]; for(let k=-2;k<=2;k++) if(mid[fr+k]>0) w.push(mid[fr+k]); if(mid[fr]>0&&w.length>=3) ms[fr]=med(w); }
+  const db=Array.from(rms,v=>20*Math.log10(v+1e-9));
+  const onsetAt=fr=>fr>=3&&db[fr]-db[fr-3]>6&&db[fr]>=db[fr-1];
+  const frameSec=hop/fs, minFrames=Math.max(3,Math.ceil(.045/frameSec));
+  let fr=0;
+  while(fr<nF){
+    if(ms[fr]<0){fr++;continue;}
+    const start=fr, pv=[ms[fr]]; let ref=ms[fr], jump=0; fr++;
+    while(fr<nF&&ms[fr]>0){
+      if(fr-start>minFrames&&onsetAt(fr)) break;
+      if(Math.abs(ms[fr]-ref)>.75){ if(++jump>=3){fr-=2;break;} fr++; continue; }
+      if(jump>0){ for(let k=jump;k>0;k--) pv.push(ms[fr-k]); jump=0; }
+      pv.push(ms[fr]); if(pv.length>4) ref=med(pv.slice(-4)); fr++;
+    }
+    const end=fr; if(end-start<minFrames) continue;
+    const n=pv.length, a0=Math.floor(n/5), a1=Math.max(a0+1,n-Math.floor(n/4));
+    const body=med(pv.slice(a0,a1));
+    let pk=0,pkS=0; for(let k=start;k<end;k++){pk=Math.max(pk,rms[k]); pkS=Math.max(pkS,rmsS[k]);}
+    let lastLoud=start; for(let k=start;k<end;k++) if(rmsS[k]>pkS*.25) lastLoud=k;
+    const nt={t0:start*frameSec+W/fs*.5, midi:Math.round(body), level:pk, a:'ten'};
+    nt.t1=Math.max(nt.t0+frameSec,(lastLoud+1)*frameSec+W/fs*.5);
+    nt.vel=Math.max(.3,Math.min(1,.35+.65*(20*Math.log10(pk/maxRms+1e-9)+30)/30));
+    const edge=Math.max(2,Math.min(Math.floor(n/4),Math.ceil(.08/frameSec)));
+    const head=med(pv.slice(0,Math.min(n,edge))), tail=med(pv.slice(-Math.min(n,edge)));
+    const dur=nt.t1-nt.t0;
+    if(dur<Math.max(.11,.95*stepSec)) nt.a=body-head>1.5?'scoop':'stac';
+    else if(tail-body<-1.3&&n>10) nt.a='fall';
+    else if(tail-body>1.3&&n>10) nt.a='doit';
+    else if(body-head>1) nt.a='scoop';
+    res.notes.push(nt);
+  }
+  let loud=0; res.notes.forEach(n=>loud=Math.max(loud,n.level));
+  const keep=[];
+  for(const nt of res.notes){
+    if(fullMix&&(nt.level<loud*.28||nt.t1-nt.t0<.07)) continue;
+    let echo=false; for(let i=keep.length-1;i>=0&&nt.t0-keep[i].t0<1.6;i--) if(keep[i].midi===nt.midi&&nt.level<keep[i].level*.6){echo=true;break;}
+    if(!echo) keep.push(nt);
+  }
+  res.notes=keep; if(!keep.length) return res;
+  const s16=stepSec, shift=Math.floor(Math.round(keep[0].t0/s16)/16)*16;
+  let lastEnd=0;
+  for(const nt of keep){
+    const s0=Math.round(nt.t0/s16)-shift; let du=Math.max(1,Math.round((nt.t1-nt.t0)/s16+(nt.a==='stac'?0:.25)));
+    if(s0<0||s0>=64||res.events.length>=32){res.dropped++;continue;}
+    const prev=res.events[res.events.length-1];
+    if(prev&&prev.s===s0){res.dropped++;continue;}
+    if(prev) prev.d=Math.max(1,Math.min(prev.d,s0-prev.s));
+    du=Math.min(du,64-s0);
+    res.events.push({s:s0,d:du,g:null,a:nt.a,m:Math.max(36,Math.min(96,nt.midi))});
+    lastEnd=Math.max(lastEnd,s0+du);
+  }
+  res.len=lastEnd>32?64:(lastEnd>16?32:16);
+  return res;
+}
+async function transcribeFile(file){
+  const msg=document.getElementById('trMsg');
+  if(!file) return;
+  msg.textContent='Transcrevendo '+file.name+'...';
+  try{
+    const buf=await file.arrayBuffer();
+    const dc=ctx||new OfflineAudioContext(1,1,44100);
+    const ab=await dc.decodeAudioData(buf);
+    await new Promise(r=>setTimeout(r,30));
+    const n=Math.min(ab.length,Math.floor(ab.sampleRate*60)), mono=new Float32Array(n);
+    for(let c=0;c<ab.numberOfChannels;c++){ const d=ab.getChannelData(c); for(let i=0;i<n;i++) mono[i]+=d[i]/ab.numberOfChannels; }
+    const r=transcribe(mono,ab.sampleRate,S.seq.bpm,document.getElementById('trMode').value==='mix');
+    if(!r.events.length){ msg.textContent='Não encontrei notas de metal nesse áudio. Tente um trecho com o metal na frente.'; return; }
+    selPat=null; S.seq.len=r.len; S.seq.name='Transcrição: '+file.name.replace(/\.[^.]+$/,''); S.seq.events=r.events; selRow=-1;
+    document.getElementById('patName').textContent=S.seq.name; renderLib(); renderEvents(); drawRoll();
+    msg.textContent=`${r.events.length} notas transcritas${r.dropped?` · ${r.dropped} ficaram de fora (máx. 4 compassos / 32 notas)`:''} · confira e corrija nas linhas.`;
+  }catch(e){ msg.textContent='Não consegui abrir esse arquivo de áudio.'; }
+}
+(function(){
+  const inp=document.getElementById('trFile');
+  document.getElementById('trBtn').onclick=()=>inp.click();
+  inp.onchange=()=>{ transcribeFile(inp.files[0]); inp.value=''; };
+  const tab=document.getElementById('tab-frases');
+  ['dragenter','dragover'].forEach(ev=>tab.addEventListener(ev,e=>{e.preventDefault(); tab.classList.add('dropping');}));
+  ['dragleave','drop'].forEach(ev=>tab.addEventListener(ev,e=>{e.preventDefault(); if(ev==='drop'||e.target===tab) tab.classList.remove('dropping');}));
+  tab.addEventListener('drop',e=>{ const f=[...(e.dataTransfer?.files||[])].find(f=>/audio|\.(mp3|wav|aiff?|flac|ogg|m4a)$/i.test(f.type+f.name)); if(f) transcribeFile(f); });
+})();
 
 /* piano roll */
 let playStep=-1;
