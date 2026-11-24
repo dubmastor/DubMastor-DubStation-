@@ -97,7 +97,7 @@ jobs:
           cp -R "build/ReggaeClavinet_artefacts/Release/AU/Mastor Reggae Clavinet MRCL-71.component" ~/Library/Audio/Plug-Ins/Components/
           killall -9 AudioComponentRegistrar 2>/dev/null || true
           sleep 2
-          auval -v aumu Mro6 Dblb
+          auval -v aumu Mcl7 Dblb
 
       - name: Collect + package (Windows)
         if: runner.os == 'Windows'
