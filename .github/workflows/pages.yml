@@ -28,6 +28,8 @@ on:
       - 'Build Mastor Pick Guitar MPG-11'
       - 'Build Mastor Reggae Guitar MRG-68'
       - 'Build Mastor Reggae Clavinet MRCL-71'
+      - 'Build Mastor Intro Fills MIF'
+      - 'Build Mastor Reggae Percussion MRP-77'
       - 'Build Mastor Orch Hit MOH-88'
     types: [completed]
   workflow_dispatch:
