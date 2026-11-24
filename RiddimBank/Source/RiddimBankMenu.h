@@ -3,7 +3,7 @@
 // e MÚSICAS A–Z. Cada item mostra as luzes D B R (bateria, baixo e riddim/harmonia): acesa = a parte veio da gravação original.
 // FILTRO DO INSTRUMENTO: o alvo do CMake define RIDDIMBANK_REQUIRE com as partes que a música precisa ter da gravação
 // (bits de Entry::orig: 1 = R riddim/harmonia, 2 = B baixo, 4 = D bateria). Reggae Drums MRD-12 = 4, Reggae Bass MRB-69 = 2,
-// Reggae Keys MRK-80 = 1; sem o define (MRM-0420, MRO-68 e as machines separadas) o menu mostra todas.
+// Reggae Keys MRK-80 e Reggae Organ MRO-68 = 1; sem o define (MRM-0420 e as machines separadas) o menu mostra todas.
 // Precisa do JUCE (juce_gui_basics) incluído antes.
 #pragma once
 #include "RiddimBank.h"

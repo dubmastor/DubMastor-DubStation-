@@ -56,6 +56,7 @@ target_sources(ReggaeOrgan PRIVATE
 target_include_directories(ReggaeOrgan PRIVATE Source ../ReggaeKeys/Source ../RiddimBank/Source)
 
 target_compile_definitions(ReggaeOrgan PUBLIC
+    RIDDIMBANK_REQUIRE=1   # banco de riddims: só as músicas com o riddim (harmonia) da gravação (luz R)
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -79,7 +80,7 @@ if(RO_SNAPSHOT)
     juce_add_console_app(ReggaeOrganSnapshot PRODUCT_NAME "ReggaeOrganSnapshot")
     target_sources(ReggaeOrganSnapshot PRIVATE tests/snapshot.cpp Source/PluginProcessor.cpp Source/PluginEditor.cpp)
     target_include_directories(ReggaeOrganSnapshot PRIVATE Source ../ReggaeKeys/Source ../RiddimBank/Source)
-    target_compile_definitions(ReggaeOrganSnapshot PRIVATE
+    target_compile_definitions(ReggaeOrganSnapshot PRIVATE RIDDIMBANK_REQUIRE=1
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="Mastor Reggae Organ MRO-68" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1

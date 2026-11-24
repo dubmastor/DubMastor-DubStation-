@@ -1,7 +1,7 @@
 # Mastor Reggae Organ MRO-68 1.1
 
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
-- O MRO-68 continua com o banco inteiro (356 músicas)
+- **Banco de riddims filtrado:** só as 321 músicas com o riddim (a harmonia) da gravação original (luz R acesa); as setas do visor também só passam por elas
 - Versão para celular 1.1
 
 # Mastor Reggae Organ MRO-68 1.0

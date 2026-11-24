@@ -136,7 +136,7 @@ void RiddimVisor::step (int dir)
     for (int k = 0; k < riddimbank::numEntries; ++k)
     {
         i = (i + dir + riddimbank::numEntries) % riddimbank::numEntries;
-        if (riddimbank::usable (i)) { proc.applyBankEntry (i); repaint(); return; }
+        if (riddimbank::allowed (i)) { proc.applyBankEntry (i); repaint(); return; }
     }
 }
 

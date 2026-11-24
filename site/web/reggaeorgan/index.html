@@ -595,7 +595,7 @@ slider('bubbleLvl','bubbleLvl'); slider('chopLvl','chopLvl'); slider('drive','dr
 // BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins e das outras machines)
 if(window.RIDDIM_BANK && window.riddimBankMenu){
   const RB=window.RIDDIM_BANK;
-  riddimBankMenu($('bank'),{ label:`RIDDIM ▾  ${RB.entries.length} músicas · ${RB.families.length} riddims`, current:()=>S.bank, onPick:(e,i)=>applyBank(e,i) });
+  riddimBankMenu($('bank'),{ require:1, label:`RIDDIM ▾  ${RB.entries.filter(e=>e.orig&1).length} músicas com o riddim da gravação`, current:()=>S.bank, onPick:(e,i)=>applyBank(e,i) });
 }
 window.addEventListener('resize',()=>{ if(S.page===1) drawRoll(); });
 renderKeys(); renderDrawbars(); applyMusician(1); setPage(0);
