@@ -1,0 +1,29 @@
+name: Limpar releases antigas (fica só a última de cada plugin)
+
+# Manual: Actions › "Limpar releases antigas" › Run workflow. Sem marcar "apagar", só mostra a lista.
+# Fica a última versão de cada plugin / machine do plugins.json, do MM-2500 e do instalador completo,
+# e qualquer release que o site ou os README ainda linkam. Saem as antigas e as dos nomes antigos, com a tag.
+on:
+  workflow_dispatch:
+    inputs:
+      apagar:
+        description: 'Apagar de verdade (desmarcado = só mostra o que sairia)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: limpar-releases
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  limpar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Limpar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/limpar-releases.py ${{ inputs.apagar && '--apagar' || '' }}
