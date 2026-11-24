@@ -16,9 +16,11 @@ const juce::Rectangle<int> kMus     { 24, 82, 952, 52 };
 const juce::Rectangle<int> kContent { 24, 214, 952, 412 };
 const juce::Rectangle<int> kGridPan { 24, 214, 640, 412 };
 const juce::Rectangle<int> kSide    { 676, 214, 300, 412 };
-const juce::Rectangle<int> kBubCon  { 24, 214, 340, 412 };
-const juce::Rectangle<int> kChopCon { 376, 214, 340, 412 };
-const juce::Rectangle<int> kSound   { 728, 214, 248, 412 };
+const juce::Rectangle<int> kBubCon  { 24, 214, 278, 412 };
+const juce::Rectangle<int> kChopCon { 310, 214, 446, 412 };   // drawbars + a Leslie da mão direita
+const juce::Rectangle<int> kLeslie  { 590, 214, 166, 412 };   // dentro do console da mão direita
+const juce::Rectangle<int> kSound   { 764, 214, 212, 412 };
+constexpr int kDbPitch = 29;
 const juce::Rectangle<int> kKeysBed { 24, 638, 952, 150 };
 
 const juce::Colour lcdBlue   { 0xff0b2236 };
@@ -54,12 +56,79 @@ juce::String yearsOf (const char* who)
 } // namespace
 
 // =====================================================================  Drawbar
+// ---------------------------------------------------------------- Leslie animada
+void LeslieCabinet::paint (juce::Graphics& g)
+{
+    const auto& L = proc.leslieState();
+    const auto& P = mro::lesliePreset (juce::roundToInt (proc.get ("lesPreset")));
+    const bool on = P.on;
+    const float W = (float) getWidth(), H = (float) getHeight();
+    const float aH = L.hornAngle.load(), aD = L.drumAngle.load();
+    const float rH = L.hornRate.load(), rD = L.drumRate.load();
+
+    // gabinete de madeira com veios
+    juce::ColourGradient wood (juce::Colour (0xff5b3519), 0, 0, juce::Colour (0xff4a2a12), W, 0, false);
+    wood.addColour (0.5, juce::Colour (0xff7a4a22));
+    g.setGradientFill (wood);
+    g.fillRoundedRectangle (4, 2, W - 8, H - 4, 8.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.3f));
+    for (float x = 9; x < W - 9; x += 6) g.drawLine (x, 4, x + 2, H - 4, 1.0f);
+
+    const float wx = 16, ww = W - 32, wh = (H - 48) / 2;
+    const float yTop = 10, yBot = 10 + wh + 8;
+    for (float y : { yTop, yBot }) { g.setColour (juce::Colour (0xff120c08)); g.fillRoundedRectangle (wx, y, ww, wh, 6.0f); }
+    const float cx = W * 0.5f, cyH = yTop + wh * 0.5f, cyD = yBot + wh * 0.5f, R = ww * 0.5f;
+    const juce::Colour amber (0xffffc061);
+
+    // tambor (graves): cilindro com as duas aberturas girando
+    g.setColour (juce::Colour (0xff3a2a1c));
+    g.fillEllipse (cx - R * 0.8f, cyD - wh * 0.32f, R * 1.6f, wh * 0.64f);
+    for (int i = 0; i < 2; ++i)
+    {
+        const float a = aD + (float) i * juce::MathConstants<float>::pi, x = std::cos (a), z = std::sin (a);
+        const float ew = 8.0f + 10.0f * std::abs (z), eh = wh * 0.36f;
+        g.setColour (amber.withAlpha (on ? 0.25f + 0.55f * juce::jmax (0.0f, z) : 0.12f));
+        g.fillEllipse (cx + x * R * 0.62f - ew * 0.5f, cyD + z * 6.0f - eh * 0.5f, ew, eh);
+    }
+    g.setColour (juce::Colour (0xff6b4a2a));
+    g.drawEllipse (cx - R * 0.8f, cyD - wh * 0.32f, R * 1.6f, wh * 0.64f, 1.5f);
+
+    // corneta (agudos): a boca de verdade e o contrapeso
+    const float hx = std::cos (aH), hz = std::sin (aH);
+    auto horn = [&] (float sgn, bool real)
+    {
+        const float x = cx + sgn * hx * R * 0.82f, y = cyH + sgn * hz * wh * 0.22f;
+        const bool near = sgn * hz > 0;
+        g.setColour (real ? juce::Colour (0xffc9b48a) : juce::Colour (0xff6f6250));
+        g.drawLine (cx, cyH, x, y, near ? 5.0f : 3.5f);
+        const float bw = real ? (near ? 22.0f : 14.0f) : 10.0f, bh = real ? (near ? 24.0f : 16.0f) : 11.0f;
+        g.setColour (real ? (on ? amber.withAlpha (near ? 1.0f : 0.55f) : juce::Colour (0xff7d6c52)) : juce::Colour (0xff4d4335));
+        g.fillEllipse (x - bw * 0.5f, y - bh * 0.5f, bw, bh);
+    };
+    if (hz > 0) { horn (-1, false); horn (1, true); } else { horn (1, true); horn (-1, false); }
+    g.setColour (juce::Colour (0xff2a2018));
+    g.fillEllipse (cx - 7, cyH - 7, 14, 14);
+
+    // venezianas por cima das janelas
+    g.setColour (juce::Colour (0xff7a4a22).withAlpha (0.55f));
+    for (float y0 : { yTop, yBot })
+        for (float y = y0 + 7; y < y0 + wh - 2; y += 10) g.drawLine (wx + 2, y, wx + ww - 2, y, 2.5f);
+
+    // lâmpada (acende mais com a velocidade) e o nome do preset
+    const float spin = juce::jmin (1.0f, juce::jmax (rH / 6.7f, rD / 5.8f));
+    g.setColour (on ? juce::Colour::fromRGB ((juce::uint8) (120 + 130 * spin), (juce::uint8) (60 + 40 * (1 - spin)), 30) : juce::Colour (0xff444444));
+    g.fillEllipse (W - 26, H - 24, 10, 10);
+    g.setColour (juce::Colour (0xffefe6cf));
+    g.setFont (VintageLookAndFeel::mono (9.5f));
+    g.drawText (juce::String::fromUTF8 (P.name), 14, (int) H - 28, (int) W - 44, 16, juce::Justification::centredLeft);
+}
+
 void OrganDrawbar::paint (juce::Graphics& g)
 {
     const float cx = (float) getWidth() * 0.5f;
     g.setColour (ivoryDark);
-    g.setFont (VintageLookAndFeel::mono (9.5f));
-    g.drawText (name, 0, 0, getWidth(), 14, juce::Justification::centred);
+    g.setFont (VintageLookAndFeel::mono (getWidth() < 34 ? 8.0f : 9.5f));
+    g.drawText (name, -4, 0, getWidth() + 8, 14, juce::Justification::centred);
     const float top = 18.0f;
     g.setColour (juce::Colours::black);
     g.fillRoundedRectangle (cx - 9.0f, top, 18.0f, 8.0f, 2.0f);
@@ -74,7 +143,8 @@ void OrganDrawbar::paint (juce::Graphics& g)
             g.drawText (juce::String (n), juce::Rectangle<float> (cx - 7.0f, top + 4.0f + (float) (n - 1) * step(), 14.0f, step()),
                         juce::Justification::centred);
     }
-    auto tab = juce::Rectangle<float> (cx - 15.0f, top + 4.0f + len, 30.0f, 24.0f);
+    const float tw = juce::jmin (30.0f, (float) getWidth() - 2.0f);
+    auto tab = juce::Rectangle<float> (cx - tw * 0.5f, top + 4.0f + len, tw, 24.0f);
     g.setColour (juce::Colours::black.withAlpha (0.4f));
     g.fillRoundedRectangle (tab.translated (0, 2.0f), 5.0f);
     g.setColour (tabColour);
@@ -651,7 +721,35 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
         addAndMakeVisible (*bubbleDb[i]);
         addAndMakeVisible (*chopDb[i]);
     }
-    setupChips (leslie, "leslie", { "SEM LESLIE", "LENTA", u8 ("R\xc3\x81PIDA") });
+    // Leslie: o preset liga a velocidade e a profundidade dele (como na versão para celular)
+    addAndMakeVisible (cabinet);
+    setupChips (lesPreset, {}, { "SEM LESLIE", u8 ("122 CL\xc3\x81SS."), "ROOTS", "147 GRAVE", "CHORALE", "DUB TREM." });
+    lesPreset.current = [this] { return juce::roundToInt (proc.get ("lesPreset")); };
+    lesPreset.onPick = [this] (int i)
+    {
+        proc.setParam ("lesPreset", (float) i);
+        const auto& P = mro::lesliePreset (i);
+        if (P.on) { proc.setParam ("lesSpeed", (float) P.speed); proc.setParam ("lesDepth", P.depth); proc.setParam ("lesBrake", 0.0f); }
+    };
+    {
+        const char* tips[mro::NumLesliePresets] = { "som direto", "a Leslie 122 do Hammond B3", "lenta, macia no chop",
+                                                    "Leslie 147: tambor mais presente", "meio-termo, coral", "r\xc3\xa1pida e funda" };
+        for (int i = 0; i < mro::NumLesliePresets; ++i)
+            lesPreset.buttons[i]->setTooltip (juce::String::fromUTF8 (mro::lesliePreset (i).name) + ": " + juce::String::fromUTF8 (tips[i]));
+    }
+    setupChips (lesSpeed, {}, { "LENTA", u8 ("R\xc3\x81PIDA") });
+    lesSpeed.current = [this] { return juce::roundToInt (proc.get ("lesSpeed")); };
+    lesSpeed.onPick = [this] (int i) { proc.setParam ("lesSpeed", (float) i); proc.setParam ("lesBrake", 0.0f); };
+    lesBrake.getProperties().set ("style", "chip");
+    lesBrake.setTooltip ("Para os rotores (clique de novo para soltar)");
+    lesBrake.onClick = [this] { proc.setParam ("lesBrake", proc.get ("lesBrake") > 0.5f ? 0.0f : 1.0f); };
+    addAndMakeVisible (lesBrake);
+    setupKnob (lesDepth, "lesDepth", "Profund.");
+    lesDepth.label.setColour (juce::Label::textColourId, ivoryDark);
+    lesRead.setFont (VintageLookAndFeel::mono (8.5f, false));
+    lesRead.setJustificationType (juce::Justification::centred);
+    lesRead.setColour (juce::Label::textColourId, ivoryDark);
+    addAndMakeVisible (lesRead);
     setupChips (instr, "instr", { "B3", "RHODES", "SUITC.", "WURLI", "DX EP" });
     for (auto* b : { &percBtn, &echoBtn, &maxBtn }) { b->getProperties().set ("style", "rocker"); addAndMakeVisible (b); }
     percAtt = std::make_unique<APVTS::ButtonAttachment> (s, "perc", percBtn);
@@ -772,7 +870,12 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
     else
     {
         for (int i = 0; i < 9; ++i) { v.push_back (bubbleDb[i].get()); v.push_back (chopDb[i].get()); }
-        addC (leslie);
+        v.push_back (&cabinet);
+        addC (lesPreset);
+        addC (lesSpeed);
+        v.push_back (&lesBrake);
+        addK (lesDepth);
+        v.push_back (&lesRead);
         addC (instr);
         for (auto* b : { &percBtn, &echoBtn, &maxBtn }) v.push_back (b);
         for (auto* k : { &drive, &click, &echoVol, &echoInt, &echoRate, &reverb, &master }) addK (*k);
@@ -797,8 +900,17 @@ void ReggaeOrganEditor::timerCallback()
         const int newLook = juce::jlimit (0, 4, (int) proc.apvts.getRawParameterValue ("instr")->load());
         if (newLook != look) { look = newLook; repaint(); }
     }
-    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &leslie, &instr, &brush })
+    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &lesPreset, &lesSpeed, &instr, &brush })
         refreshChips (*c);
+    lesBrake.setToggleState (proc.get ("lesBrake") > 0.5f, juce::dontSendNotification);
+    if (page == 2)
+    {
+        cabinet.repaint();
+        const auto& L = proc.leslieState();
+        const bool on = mro::lesliePreset (juce::roundToInt (proc.get ("lesPreset"))).on;
+        lesRead.setText (on ? "CORNETA " + juce::String (L.hornRate.load(), 2) + "  TAMBOR " + juce::String (L.drumRate.load(), 2) + " rot/s"
+                            : juce::String ("SOM DIRETO"), juce::dontSendNotification);
+    }
     const int mus = proc.getCurrentProgram();
     for (int i = 0; i < mro::NumMusicians; ++i) musBtn[i].setToggleState (i == mus, juce::dontSendNotification);
     const int ep = proc.getEpoch();
@@ -1003,9 +1115,17 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
     else
     {
         consolePanel (kBubCon, u8 ("M\xc3\x83O ESQUERDA \xc2\xb7 BUBBLE"), u8 ("SECO E GRAVE: S\xc3\x93 O 8' E UM POUCO DE 4'"));
-        consolePanel (kChopCon, u8 ("M\xc3\x83O DIREITA \xc2\xb7 CHOP + FILLS"), u8 ("CHEIO (888), COM LESLIE, PERC E ECO"));
+        consolePanel (kChopCon, u8 ("M\xc3\x83O DIREITA \xc2\xb7 CHOP + FILLS"), u8 ("CHEIO (888), PERC E ECO  \xc2\xb7  LESLIE \xe2\x86\x92"));
+        g.setColour (ivory);
+        g.setFont (VintageLookAndFeel::mono (11.0f));
+        g.drawText ("LESLIE", kLeslie.getX(), kLeslie.getY() + 8, 150, 14, juce::Justification::centredLeft);
+        g.setColour (ivoryDark.withAlpha (0.7f));
+        g.setFont (VintageLookAndFeel::mono (9.0f, false));
+        g.drawText ("CORNETA + TAMBOR", kLeslie.getX(), kLeslie.getY() + 24, 150, 12, juce::Justification::centredLeft);
+        g.setColour (ivoryDark.withAlpha (0.25f));
+        g.drawVerticalLine (kLeslie.getX() - 8, (float) kLeslie.getY() + 10, (float) kLeslie.getBottom() - 10);
         ivoryPanel (kSound, "SOM", "");
-        smallLabel (u8 ("INSTRUMENTO (DRAWBARS E LESLIE S\xc3\x93 NO B3)"), kSound.getX() + 14, kSound.getY() + 358, 230);
+        smallLabel (u8 ("INSTRUMENTO (DRAWBARS S\xc3\x93 NO B3)"), kSound.getX() + 14, kSound.getY() + 358, 230);
     }
 
     g.setColour (brownInk);
@@ -1100,21 +1220,30 @@ void ReggaeOrganEditor::resized()
     // aba ÓRGÃO
     for (int i = 0; i < 9; ++i)
     {
-        bubbleDb[i]->setBounds (kBubCon.getX() + 10 + i * 36, kBubCon.getY() + 52, 36, 330);
-        chopDb[i]->setBounds (kChopCon.getX() + 10 + i * 36, kChopCon.getY() + 52, 36, 330);
+        bubbleDb[i]->setBounds (kBubCon.getX() + 8 + i * kDbPitch, kBubCon.getY() + 52, kDbPitch, 330);
+        chopDb[i]->setBounds (kChopCon.getX() + 8 + i * kDbPitch, kChopCon.getY() + 52, kDbPitch, 330);
     }
     {
         const int sx = kSound.getX() + 14, sw = kSound.getWidth() - 28;
-        layoutChips (leslie, { sx, kSound.getY() + 34, sw, 24 }, 4);
-        percBtn.setBounds (sx, kSound.getY() + 68, 72, 30);
-        echoBtn.setBounds (sx + 76, kSound.getY() + 68, 76, 30);
-        maxBtn.setBounds (sx + 156, kSound.getY() + 68, 64, 30);
-        vu.setBounds (sx + 20, kSound.getY() + 108, sw - 40, 64);
+        percBtn.setBounds (sx, kSound.getY() + 34, 60, 30);
+        echoBtn.setBounds (sx + 62, kSound.getY() + 34, 64, 30);
+        maxBtn.setBounds (sx + 128, kSound.getY() + 34, 56, 30);
+        vu.setBounds (sx + 12, kSound.getY() + 82, sw - 24, 64);
         Knob* r1[4] = { &drive, &click, &reverb, &master };
-        for (int i = 0; i < 4; ++i) placeKnob (*r1[i], { sx + 26 + i * 56, kSound.getY() + 222 }, 38, 56);
+        for (int i = 0; i < 4; ++i) placeKnob (*r1[i], { sx + 21 + i * 48, kSound.getY() + 196 }, 34, 48);
         Knob* r2[3] = { &echoVol, &echoInt, &echoRate };
-        for (int i = 0; i < 3; ++i) placeKnob (*r2[i], { sx + 54 + i * 56, kSound.getY() + 312 }, 38, 56);
-        layoutChips (instr, { sx, kSound.getY() + 372, sw, 24 }, 3);
+        for (int i = 0; i < 3; ++i) placeKnob (*r2[i], { sx + 45 + i * 48, kSound.getY() + 286 }, 34, 48);
+        layoutChips (instr, { sx, kSound.getY() + 372, sw, 24 }, 2);
+    }
+    {
+        const int lx = kLeslie.getX(), ly = kLeslie.getY(), lw = kLeslie.getWidth() - 10;
+        cabinet.setBounds (lx, ly + 40, lw, 176);
+        for (int i = 0; i < mro::NumLesliePresets; ++i)
+            lesPreset.buttons[i]->setBounds (lx + (i % 2) * (lw / 2 + 2), ly + 222 + (i / 2) * 26, lw / 2 - 2, 23);
+        layoutChips (lesSpeed, { lx, ly + 302, lw, 23 }, 4);
+        lesBrake.setBounds (lx, ly + 340, lw / 2 - 4, 23);
+        placeKnob (lesDepth, { lx + lw * 3 / 4, ly + 348 }, 30, 70);
+        lesRead.setBounds (lx - 4, ly + 388, lw + 8, 14);
     }
 
     keyboard.setBounds (152, 653, 812, 127);

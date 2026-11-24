@@ -1,9 +1,17 @@
-# Mastor Reggae Organ MRO-68 1.1
+# Mastor Reggae Organ MRO-68 1.2
+
+## 1.2
+
+- O gabinete muda com o INSTRUMENTO: madeira no B3, tolex preto com chapa de alumínio e feltro vermelho no Rhodes e no Suitcase, coral no Wurlitzer e preto anos 80 no DX EP; o nome do instrumento aparece ao lado da versão.
+- **Correção:** o DX EP podia travar o plugin em notas muito agudas (mesmo motor do MRK-80, corrigido lá).
 
 ## 1.1
 
-- **INSTRUMENTO** (aba ÓRGÃO, seção SOM): além do **Hammond B3**, o mesmo groove (bubble, chop e fills) pode tocar em 4 pianos elétricos com o motor do Reggae Keys MRK-80: **RHODES** (Rhodes Stage), **SUITC.** (Rhodes Suitcase com tremolo), **WURLI** (Wurlitzer 200A) e **DX EP** (FM EP estilo Yamaha DX7). Drawbars, Leslie e percussão só valem no B3. Projetos antigos abrem no B3.
-- O gabinete muda com o instrumento: madeira no B3, tolex preto com chapa de alumínio e feltro vermelho no Rhodes e no Suitcase, coral no Wurlitzer e preto anos 80 no DX EP.
+- **LESLIE nova, animada** (aba ÓRGÃO, no console da mão direita): dois rotores como numa Leslie de verdade, a **corneta** (agudos) e o **tambor** (graves), separados em 800 Hz, cada um com vibrato, tremolo e giro no estéreo. O gabinete na tela gira na velocidade real de cada rotor.
+  - **Presets:** SEM LESLIE, 122 CLÁSSICA (a do Hammond B3), ROOTS SUAVE, 147 GRAVE, CHORALE e DUB TREMOLO.
+  - **LENTA / RÁPIDA**, **FREIO** (para os rotores) e **PROFUNDIDADE**. A corneta acelera em menos de 1 s e o tambor, pesado, demora 2 a 4 s, como no gabinete de verdade.
+  - Vale para o B3 e para os pianos elétricos. Projetos da 1.0 abrem com a Leslie que tinham (lenta → 122 CLÁSSICA, rápida → DUB TREMOLO).
+- **INSTRUMENTO** (aba ÓRGÃO, seção SOM): além do **Hammond B3**, o mesmo groove (bubble, chop e fills) pode tocar em 4 pianos elétricos com o motor do Reggae Keys MRK-80: **RHODES** (Rhodes Stage), **SUITC.** (Rhodes Suitcase com tremolo), **WURLI** (Wurlitzer 200A) e **DX EP** (FM EP estilo Yamaha DX7). Drawbars e percussão só valem no B3. Projetos antigos abrem no B3.
 
 ## 1.0
 

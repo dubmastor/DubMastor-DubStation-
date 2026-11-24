@@ -47,9 +47,11 @@ def choice_default(pid):
         return 0   # Roots Keys antigo, sem esse parâmetro: só existia o M1
     return int(m.group(1))
 
-def preset(name):
+def preset(name, required=True):
     m = re.search(r'\{\s*"%s"\s*,(.*?)\},?\s*\n' % re.escape(name), rk)
     if not m:
+        if not required:
+            return None
         sys.exit(f'não achei o preset "{name}" no Roots Keys')
     body = m.group(1)
     dbm = re.search(r"\{([^}]*)\}", body)
@@ -76,7 +78,7 @@ def block(struct):
 P = block("RootsKeysPiano")
 O = block("RootsKeysOrgan")
 classic = preset("Piano: M1 Classic")
-roots = preset("Organ: Roots Percussion")
+roots = preset("Organ: Roots Percussion", required=False)   # o MRK-80 3.1 não tem mais órgão (foi para o MRO-68)
 
 expected_piano = {
     "type": choice_default("pianoType"),
@@ -84,7 +86,7 @@ expected_piano = {
     "level": pct("pianoLevel"), "reverb": pct("reverb"), "master": pct("master"),
     "maxOn": bool_default("maxOn"), "maxGainDb": param_default("maxGain"), "maxCeilDb": param_default("maxCeiling"),
 }
-expected_organ = {
+expected_organ = {} if roots is None else {
     "drawbar": roots["drawbar"], "percOn": roots["perc"], "perc3rd": roots["perc3rd"], "percFast": roots["fast"],
     "click": roots["click"], "drive": roots["drive"], "leslieMix": roots["lesMix"], "level": roots["levelO"],
     "leslieFast": roots["lesFast"], "reverb": roots["reverb"],
@@ -113,7 +115,7 @@ for k, pk in (("bright", "bright"), ("decay", "decay"), ("chorus", "chorus"), ("
         print(f"aviso: no Roots Keys, o padrão de {k} ({expected_piano[k]}) difere do preset M1 Classic ({classic[pk]}); vale o padrão")
 
 print("Roots Keys -> piano inicial:", expected_piano)
-print("Roots Keys -> orgao Roots Percussion:", expected_organ)
+print("Roots Keys -> orgao Roots Percussion:", expected_organ or "(o MRK-80 3.1 é só piano: o Hammond do MRCM-1240 fica como está)")
 if errors:
     print("\nO TIMBRE DO MRCM-1240 ESTÁ DESATUALIZADO EM RELAÇÃO AO ROOTS KEYS:")
     for e in errors:

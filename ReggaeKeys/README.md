@@ -1,21 +1,18 @@
-# Mastor Reggae Keys MRK-80 3.1
+# Mastor Reggae Keys MRK-80 3.2
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.2/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.2/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
 
 (Antes se chamava **DubMastor Roots Keys** e **Mastor Roots Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240**, que virou a aba CHORD MACHINE.)
 
-| Modo piano | Modo órgão |
-|---|---|
-| ![Modo piano](docs/interface-piano.png) | ![Modo órgão](docs/interface-organ.png) |
+![Piano](docs/interface-piano.png)
 
 ![Aba CHORD MACHINE](docs/interface-chord-machine.png)
 
-Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cada vez:
+Instrumento VST3 / AU / Standalone de **piano** para reggae e dub: 13 timbres (Korg M1, acústicos, Yamaha, pianos elétricos e digitais), todos por síntese, sem samples.
 
-- **Piano estilo Korg M1** — o piano brilhante do M1 recriado por síntese aditiva (sem samples da Korg): ataque brilhante, presença em 2–4 kHz, decaimento em dois estágios, ruído de martelo e chorus estéreo.
-- **Órgão tonewheel estilo Hammond B3** — 9 drawbars, percussão single-trigger (2º/3º harmônico, rápida/lenta), key click, overdrive valvulado e caixa Leslie com aceleração realista.
+Na 3.1 o **órgão saiu** do MRK-80: o Hammond (drawbars, percussão, Leslie) agora está no **[Mastor Reggae Organ MRO-68](../ReggaeOrgan/)**. Projetos antigos no modo órgão abrem no piano, e o bubble da CHORD MACHINE toca no piano.
 
 Cadeia de saída: **Tape Echo Mastor Tape Echo MTE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
 

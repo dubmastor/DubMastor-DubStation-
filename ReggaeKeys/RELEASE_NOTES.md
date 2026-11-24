@@ -1,12 +1,19 @@
-## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+## Mastor Reggae Keys MRK-80 3.2 🟢🟡⚫
 
+- **GUITAR SKANK:** botão novo ao lado do VOLUME, com o ícone de uma guitarra elétrica, que põe a guitarra do skank para tocar junto com o piano, com o **motor do próprio Mastor Reggae Guitar MRG-68** (as mesmas cordas e o mesmo Fender Twin com mola: Tele 68, captador da ponte; duas guitarras em estéreo, como no MRG-68). A guitarra pega as notas do piano, leva para a região do skank (G3 a E5), palheta para baixo e abafa quando a tecla solta. **Sempre começa desligado.**
+- **O gabinete muda com o timbre:** Rhodes (tolex preto, chapa de alumínio e feltro vermelho), Suitcase (com a luz do tremolo), Wurlitzer (creme), Yamaha CP / C7 / Grand (madeira escura) e Casio (cinza); o M1 e os outros continuam no preto anos 80.
+- **Correção:** o timbre FM EP podia travar o plugin em notas muito agudas (pego pelo pluginval no Windows). Teste novo de automação no estilo do pluginval (`tests/automation_stress.cpp`).
+
+### Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+
+- **Só piano:** o órgão Hammond saiu do Reggae Keys (agora está no **Mastor Reggae Organ MRO-68**). Saíram o botão ORGAN, os drawbars e os presets de órgão. Projetos antigos no modo órgão abrem no piano.
+- **CHORD MACHINE:** o skank e o bubble tocam sempre no piano do instrumento (o SOM INTERNO da machine, com o Hammond, saiu daqui).
+- **Padrão BANG BANG** no skank (janela PADRÃO DO SKANK da aba CHORD MACHINE): além do CONTRATEMPO (o acorde no "&" de cada tempo, com a caixa no 2 e no 4), o **BANG BANG** dobra o bang: no "&" e de novo no "a" de cada tempo, o segundo um pouco mais fraco. As notas continuam de 1/32.
 - **Timbre inicial do piano:** o plugin agora abre no **M1 COMP**, o Piano 16 do Korg M1 comprimido, o piano mais usado no skank digital do reggae e do dancehall (antes abria no M1 sem compressão).
 - **M1 GRAND:** novo timbre com o piano de cauda do Korg M1.
 - **Timbres Yamaha:** novos botões **CP-80** (piano de cauda elétrico Yamaha CP-80, com o meio "honky" do captador) e **C7** (cauda de concerto Yamaha C7, brilhante e com ataque rápido), além do FM EP estilo DX que já existia.
 - **Timbres do skank digital jamaicano** (estudo dos teclados mais usados no reggae e no dancehall): **M1 COMP**, o Piano 16 do Korg M1 comprimido como no dancehall dos anos 90 (cauda alta, quase não muda com o toque); **HONKY**, piano de armário Honky Tonk com as cordas desafinadas entre si, escuro e curto, como os pianos dos estúdios de Kingston; e **CZ-101**, o piano por phase distortion do Casio CZ-101 (mini teclado de Steely & Clevie).
 - **Pianos elétricos:** **RHODES** (Rhodes Stage: tine redondo, sino curto e o "bark" do captador quando se toca forte), **SUITCASE** (Rhodes Suitcase, mais doce, com o tremolo da maleta) e **WURLI** (Wurlitzer 200A, nasal, rosna no toque forte).
-- **GTR SKANK:** botão novo ao lado do VOLUME que põe a guitarra do skank para tocar junto com o piano, com o **motor do próprio Mastor Reggae Guitar MRG-68** (as mesmas cordas e o mesmo Fender Twin com mola: Tele 68, captador da ponte; duas guitarras em estéreo, como no MRG-68). A guitarra pega as notas do piano, leva para a região do skank (G3 a E5), palheta para baixo e abafa quando a tecla solta. **Sempre começa desligado.**
-- **O gabinete muda com o timbre:** Rhodes (tolex preto, chapa de alumínio e feltro vermelho), Suitcase (com a luz do tremolo), Wurlitzer (creme), Yamaha CP / C7 / Grand (madeira escura) e Casio (cinza); o M1 e os outros continuam no preto anos 80.
 - Os 13 timbres ficam em duas linhas abaixo do visor: Korg M1, acústicos e Yamaha em cima; pianos elétricos e digitais embaixo.
 - Os presets de piano M1 e os timbres antigos continuam iguais; projetos salvos abrem com o timbre que tinham.
 

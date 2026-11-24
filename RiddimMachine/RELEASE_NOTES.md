@@ -1,4 +1,8 @@
-## Mastor Riddim Machine MRM-0420 2.5 — DubStation
+## Mastor Riddim Machine MRM-0420 2.6 — DubStation
+
+- Correção no motor de piano compartilhado com o Reggae Keys MRK-80 (fase de timbres em notas muito agudas).
+
+### Mastor Riddim Machine MRM-0420 2.5
 
 - O skank do piano agora toca no **M1 COMP** (o Piano 16 do Korg M1 comprimido), o novo timbre de fábrica do Reggae Keys MRK-80 3.1.
 

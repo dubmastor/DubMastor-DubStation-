@@ -165,10 +165,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 
     // modo (troca o visual)
     for (auto* b : { &modePiano, &modeOrgan })
-    {
-        b->setClickingTogglesState (false);
-        addAndMakeVisible (b);
-    }
+        b->setClickingTogglesState (false);   // 3.1: só piano (o órgão foi para o Mastor Reggae Organ MRO-68): botões fora da tela
     modePiano.onClick = [this] { setModeParam (0); };
     for (auto* t : { &tabInstrument, &tabChords })
     {
@@ -195,7 +192,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
         organPreset[i].setButtonText (kOrganPresetShort[i]);
         organPreset[i].getProperties().set ("style", "reverseKey");
         organPreset[i].onClick = [this, i] { proc.setCurrentProgram (RootsKeysProcessor::getNumPianoPresets() + i); };
-        addChildComponent (organPreset[i]);
+        // (3.1: os presets de órgão não entram na tela)
     }
 
     // piano: timbres
@@ -294,7 +291,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     addAndMakeVisible (keyboard);
 
     setSize (kW, kH);
-    applySkin ((int) s.getRawParameterValue ("mode")->load());
+    applySkin (0);
     startTimerHz (30);
 }
 
@@ -451,7 +448,7 @@ int RootsKeysEditor::lookForTimbre (int t)
 
 void RootsKeysEditor::timerCallback()
 {
-    applySkin ((int) proc.apvts.getRawParameterValue ("mode")->load());
+    applySkin (0);
     {
         const int newLook = lookForTimbre ((int) proc.apvts.getRawParameterValue ("pianoType")->load());
         if (newLook != look) { look = newLook; repaint(); }
@@ -598,8 +595,6 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
         g.drawText (juce::String (F.line) + "  MRK-80  " + versionText(), 30, 58, 360, 12, juce::Justification::centredLeft);
-        g.setFont (VintageLookAndFeel::mono (10.0f, false));
-        g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 
         // caixas de som com tela de tecido e faixa vermelha/dourada
         for (auto sp : { kSpeakerL, kSpeakerR })

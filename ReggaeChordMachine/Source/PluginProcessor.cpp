@@ -59,6 +59,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "organLvl", 1 }, "Orgao Hammond", 0.0f, 1.0f, 0.6f));
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "exportReps", 1 }, "Repeticoes no export",
                                                         StringArray { "1x", "2x", "4x", "8x" }, 1));
+    // padrão do skank (no fim da lista: os parâmetros antigos não mudam de lugar). Só o Reggae Keys MRK-80 mostra
+    // a escolha; no MRCM-1240 e no MRM-0420 fica sempre no contratempo.
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pattern", 1 }, "Padrao do skank",
+                                                        StringArray { "Contratempo", "Bang Bang" }, 0));
     return layout;
 }
 
@@ -129,7 +133,7 @@ std::vector<dub::ChordSlot> DubChordsProcessor::getSlots() const
 dub::Settings DubChordsProcessor::getSettings() const
 {
     dub::Settings s;
-    s.pattern    = dub::SkankOffbeat;   // skank sempre no contratempo
+    s.pattern    = juce::jlimit (0, (int) dub::NumPatterns - 1, (int) param ("pattern"));   // contratempo ou bang bang (MRK-80)
     s.centerNote = (int) param ("center");
     s.velocity   = param ("velocity");
     s.noteSize   = 0;   // todas as notas sempre 1/32 (o parâmetro "noteSize" ficou só para abrir projetos antigos)
