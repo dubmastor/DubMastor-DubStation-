@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monstro Machine MM-2500 1.0</title>
+<title>Monstro Machine MM-2500 1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=VT323&display=swap" rel="stylesheet">
 <style>
@@ -116,7 +116,7 @@ button,select,input{font:inherit}
 </head>
 <body>
 <div class="wrap">
-<nav class="back"><a href="../">← Monstro Machine</a><span>versão para celular / navegador · 1.0</span></nav>
+<nav class="back"><a href="../">← Monstro Machine</a><span>versão para celular / navegador · 1.1</span></nav>
 <div class="mpc">
   <div class="top">
     <div class="brand"><b>MONSTRO MACHINE</b><span>MM-2500 · DubMastor · timbres Monstro.zip</span></div>
@@ -198,7 +198,7 @@ button,select,input{font:inherit}
 <div class="toast" id="toast"></div>
 
 <script>
-const VERSION = '1.0';
+const VERSION = '1.1';
 {
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -263,6 +263,153 @@ function charOf(k){const r=rng(hash(k.name));const s=k.style;return{
   bass:[31,33,34,36,29,28][Math.floor(r()*6)],bDec:s==='drill'?1.6:.7+r()*1.1,bDrive:s==='reggae'?.1:.2+r()*.8,
   sTone:160+r()*120,sNoise:.6+r()*.5,sDec:s==='reggae'?.12+r()*.08:.16+r()*.12,sBand:1500+r()*3000,
   hp:6000+r()*3500,ohDec:.25+r()*.35,perc:[220,280,330,400,180][Math.floor(r()*5)],vox:[330,392,440,494,262][Math.floor(r()*5)],fx:r()}}
+
+
+/* ---------- KITS DO PRODUTOR: cada produtor tem vários kits (KIT 1 = o original) ---------- */
+const kitCountF=k=>{const c=famCounts(k);const sn=(c.SNARE||0)+(c.CLAP||0);return Math.max(3,Math.min(8,Math.min(c.KICK||8,sn||8)))};
+const kitCount=ki=>(state.lib[ki]&&state.lib[ki].length)||kitCountF(KITS[ki]);
+function kitVars(ki,n){const k=KITS[ki],v=Array(16).fill(0);if(!n)return v;const c=famCounts(k);
+  for(const fam of [...new Set(PADFAM)]){const ps=PADFAM.map((f,i)=>f===fam?i:-1).filter(i=>i>=0),cnt=c[fam]||8,r=rng(hash(k.name+'|KIT|'+n+'|'+fam)),base=Math.floor(r()*cnt);ps.forEach((pp,j)=>v[pp]=(base+j)%cnt)}
+  return v}
+
+/* ---------- GROOVE DE CADA PRODUTOR (inspirado no estilo dos artistas com quem trabalha) ----------
+   g: tipo de groove · sw: swing · roll: rolos de hi-hat · slide: 808 deslizando · vox/perc/open: quanto usa · k: densidade do kick */
+const PROF={
+ 'DubMastor':{g:'reggae',sw:56,perc:1,d:'Steppers e rub-a-dub com aro e caixa no 2 e no 4, shaker e 808 andando como baixo (reggae do Cidade Verde Sounds).'},
+ 'Nox':{g:'trap',sw:50,roll:2,slide:1,vox:2,open:1,d:'Trap melódico na linha do Matuê: rolos de hi-hat, 808 deslizando e chops de voz.'},
+ 'Neo Beats':{g:'trapfunk',sw:52,roll:1,perc:1,d:'Trap com o kick do funk carioca (MC Poze do Rodo, Xamã).'},
+ 'Ecologyk':{g:'trap',sw:50,roll:2,slide:1,open:1,d:'Trap clássico (Matuê, Haikaiss, Costa Gold): rolos de hi-hat e open hat.'},
+ 'Pedro Lotto':{g:'trap',sw:50,roll:1,slide:2,vox:1,d:'Trap de SP (Veigh, Vulgo FK) com o 808 deslizando bastante.'},
+ 'Skeeter':{g:'trap',sw:50,roll:1,d:'Trap (sem créditos públicos: groove de trap padrão).'},
+ 'André Nine':{g:'funksp',sw:52,perc:2,d:'Funk de SP (MC Hariel, MC Ryan SP): kick pesado, palma no 2 e no 4 e percussão.'},
+ 'DogDu Beats':{g:'trap',sw:50,roll:2,vox:2,d:'Trap (Sidoka, Zemaru) com efeitos de voz.'},
+ 'DJ Coala':{g:'boombap',sw:61,vox:1,perc:1,d:'Boom bap do rap nacional (RZO, Tribo da Periferia) com swing.'},
+ 'Caio Passos':{g:'funksp',sw:52,perc:2,vox:2,d:'Funk de SP (MC Hariel, MC Daniel, Hyperanhas) cheio de percussão e vox.'},
+ 'Chiocki':{g:'trap',sw:50,roll:3,open:2,vox:1,d:'Trap (Kant, NOG) com chants, open hats e muitos rolos.'},
+ 'Robert Beats':{g:'trap',sw:50,roll:1,d:'Trap (sem créditos públicos: groove de trap padrão).'},
+ 'DJ Caíque':{g:'funkrj',sw:52,perc:1,d:'Funk no tamborzão (sem créditos públicos).'},
+ 'Chris Beats':{g:'trapfunk',sw:51,roll:2,slide:1,perc:1,d:'Trap do Rio que conversa com o funk (Filipe Ret, L7nnon, MC Cabelinho).'},
+ 'Portugal No Beat':{g:'trap',sw:50,roll:1,slide:1,open:1,d:'Trap carioca (Filipe Ret, Jovem Dex).'},
+ 'Kouth':{g:'trap',sw:50,roll:2,slide:1,rim:1,d:'Trap de SP (Derek, UCLÃ) com rimshot.'},
+ 'Jess':{g:'trap',sw:50,roll:1,slide:1,k:0,d:'Trap mais espaçado (Orochi, Bin), com 808 de ambiência.'},
+ 'Deekapz':{g:'funkbr',sw:54,perc:2,vox:1,d:'Funk com percussão brasileira, como nos shows dos festivais.'},
+ 'Blakbone':{g:'drill',sw:50,slide:2,d:'Drill: hi-hat em grupos de 3, caixa no 3 e 808 deslizando.'},
+ 'DJ Coala Vol.3':{g:'boombap',sw:60,vox:1,perc:1,d:'Boom bap do rap nacional com swing.'},
+ 'Dallass':{g:'trap',sw:50,roll:2,d:'Trap (sem créditos públicos: groove de trap padrão).'},
+ 'Celo':{g:'trap',sw:50,roll:1,slide:1,vox:1,d:'Trap (Leozin).'},
+ 'Peunubeat':{g:'trap',sw:50,roll:1,d:'Trap (sem créditos públicos: groove de trap padrão).'},
+ 'Tibery':{g:'trap',sw:50,roll:2,d:'Trap (sem créditos públicos: groove de trap padrão).'},
+ 'Nagalli':{g:'trap',sw:50,roll:2,slide:2,open:1,k:0,d:'Trap do "Magic Show" (L7nnon, Veigh, Kayblack): kick espaçado e 808 forte.'},
+ 'Neckklace':{g:'trap',sw:50,roll:1,slide:1,open:1,d:'Trap melódico (coprodutor de "Serenata").'},
+ 'DJ Oreia':{g:'funkrj',sw:52,perc:2,vox:1,d:'Funk no tamborzão com percussão e vox.'},
+ 'Kotim':{g:'funksp',sw:52,perc:1,vox:1,heavy:1,d:'Funk mandelão: kick e 808 pesados.'},
+ 'DJ Win':{g:'funkrj',sw:52,perc:1,d:'Funk no tamborzão (sem créditos públicos).'},
+ 'Cheek':{g:'drill',sw:50,slide:1,d:'Drill: hi-hat em grupos de 3 e 808 deslizando.'},
+ 'DJ Coala Vol.4':{g:'boombap',sw:62,vox:1,perc:1,d:'Boom bap do rap nacional com swing.'},
+ 'Attlanta':{g:'trap',sw:50,roll:2,open:1,d:'Trap com rolos de hi-hat e open hat.'},
+ 'Fepache':{g:'trap',sw:50,roll:1,slide:2,d:'Trap de SP ("Ballena"), com o 808 deslizando.'}
+};
+const prof=ki=>PROF[KITS[ki].name]||{g:KITS[ki].style,sw:54,roll:1,d:STYLES[KITS[ki].style]};
+const blank=()=>Array.from({length:16},()=>Array(16).fill(0));
+const put=(g,pad,steps,v=1)=>steps.forEach(s=>{if(s>=0&&s<16)g[pad][s]=Math.max(g[pad][s],v)});
+const pick=(r,a)=>a[Math.floor(r()*a.length)];
+const ALL=[...Array(16).keys()],EIGHT=[0,2,4,6,8,10,12,14],TAMB=[0,3,6,8,11,14];
+// pads: 0 KICK 1 KICK2 2 SNARE 3 CLAP 4 RIM 5 HH 6 OH 7 CRASH 8-10 PERC 11 SHAKER 12 808 13 808 SLIDE 14 FX 15 VOX
+const GEN={
+ reggae(r,p,[A,B,C,D]){ // contagem do reggae: caixa/aro só no 2 e no 4 (passos 5 e 13); nunca o drop no 3
+  const off=[2,6,10,14],shk=[1,3,5,7,9,11,13,15];
+  put(A,0,[0,4,8,12]);put(A,4,[4,12],2);put(A,5,off);put(A,11,shk);put(A,12,pick(r,[[0,7,8,14],[0,3,8,11],[0,6,8,15]]));
+  put(B,0,[0,8]);put(B,2,[4,12],2);put(B,5,EIGHT);put(B,6,[14]);put(B,11,shk);put(B,12,pick(r,[[0,3,8,11],[0,7,8,10]]));if(p.perc)put(B,8,[15]);
+  put(C,0,[0,8,pick(r,[6,10,14])]);put(C,2,[4,12],2);put(C,4,[4,12]);put(C,5,off);put(C,8,[3,11]);put(C,12,[0,8]);
+  put(D,0,[0,4,8,12]);put(D,4,[4],2);put(D,2,[12],2);put(D,5,off);put(D,7,[0]);put(D,8,[13]);put(D,9,[14]);put(D,10,[15]);put(D,14,[15]);put(D,12,[0,8])},
+ trap(r,p,[A,B,C,D]){
+  const kick=pick(r,p.k===0?[[0,10],[0,11],[0,7]]:p.k===2?[[0,3,7,10,13],[0,6,7,10,14]]:[[0,10],[0,7,10],[0,3,10],[0,6,10,11],[0,10,13]]);
+  const rolls=[];for(let i=0;i<(p.roll||0);i++)rolls.push(...pick(r,[[6,7],[14,15],[10,11],[3],[12,13,14,15]]));
+  for(const g of [A,B,D]){put(g,0,kick);put(g,3,[8],2);put(g,5,EIGHT);put(g,5,rolls)}
+  if(r()<.5)put(A,2,[8]);if(p.rim)put(A,4,[pick(r,[7,13,15])]);
+  const last=kick[kick.length-1];
+  for(const g of [A,B])kick.forEach(s=>put(g,(p.slide&&s===last&&(p.slide>1||r()<.6))?13:12,[s]));
+  if(p.open)put(A,6,[pick(r,[6,14])]);if(p.perc)put(A,8,[pick(r,[7,11,15])]);if(p.vox)put(A,15,[pick(r,[15,6,14])]);
+  const ex=pick(r,[3,13,14,6]);put(B,0,[ex]);put(B,12,[ex]);put(B,5,[1,5,9,11,13].filter(()=>r()<.45));if(p.open)put(B,6,[14]);if(p.vox>1)put(B,15,[6,15]);
+  put(C,0,[0]);put(C,3,[8],2);put(C,5,[0,4,8,12]);put(C,12,[0]);if(p.slide)put(C,13,[10]);if(p.vox)put(C,15,[4,12]);put(C,6,[14]);if(p.perc)put(C,8,[3,11]);
+  put(D,5,ALL);put(D,3,[12,13,14]);put(D,3,[15],2);put(D,7,[0]);put(D,14,[0]);put(D,12,kick)},
+ trapfunk(r,p,[A,B,C,D]){
+  const kick=pick(r,[[0,3,6,10],[0,3,8,11],[0,3,6,10,13]]),rolls=[];for(let i=0;i<(p.roll||0);i++)rolls.push(...pick(r,[[6,7],[14,15],[10,11]]));
+  for(const g of [A,B,D]){put(g,0,kick);put(g,3,[4,12],2);put(g,5,EIGHT);put(g,5,rolls)}
+  for(const g of [A,B])kick.forEach((s,i)=>put(g,p.slide&&i===kick.length-1?13:12,[s]));
+  put(A,9,[pick(r,[7,15])]);put(B,8,TAMB);put(B,6,[14]);
+  put(C,0,[0,8]);put(C,3,[12],2);put(C,8,TAMB);put(C,5,[0,4,8,12]);put(C,12,[0]);
+  put(D,5,ALL);put(D,3,[13,14],1);put(D,3,[15],2);put(D,7,[0]);put(D,14,[0])},
+ funkrj(r,p,[A,B,C,D]){ // tamborzão: x..x..x.x..x..x.
+  const k=pick(r,[[0,8],[0,3,8,11],[0,8,11]]);
+  put(A,0,k);put(A,8,TAMB);put(A,3,[4,12],2);put(A,5,[2,6,10,14]);put(A,12,[0,8]);if(p.vox)put(A,15,[15]);if(p.perc>1)put(A,9,[2,10]);
+  put(B,0,TAMB);put(B,8,TAMB);put(B,3,[4,12],2);put(B,5,EIGHT);put(B,12,[0,6,8]);put(B,10,[pick(r,[7,15])]);
+  put(C,8,TAMB);put(C,3,[12],2);put(C,0,[0]);if(p.vox)put(C,15,[6,14]);
+  put(D,0,TAMB);put(D,3,[4,12,13,14]);put(D,3,[15],2);put(D,7,[0]);put(D,14,[15]);put(D,8,TAMB)},
+ funksp(r,p,[A,B,C,D]){ // beat de SP / mandelão
+  const k=pick(r,[[0,3,6,10,13],[0,6,8,14],[0,3,7,10]]),tuim=pick(r,[[7,15],[2,10],[6,14]]);
+  for(const g of [A,B,D]){put(g,0,k);put(g,3,[4,12],2)}
+  put(A,5,EIGHT);put(A,9,tuim);if(p.perc>1)put(A,8,[pick(r,[3,11])]);
+  for(const g of [A,B])(p.heavy?k:[0,8]).forEach((s,i,a)=>put(g,p.heavy&&i===a.length-1?13:12,[s]));
+  if(p.vox)put(A,15,[15]);if(p.vox>1)put(B,15,[6,14]);
+  put(B,5,ALL.filter(s=>s%4!==3));put(B,9,tuim);put(B,8,[3,11]);put(B,6,[14]);
+  put(C,0,[0]);put(C,3,[12],2);put(C,9,tuim);put(C,12,[0]);if(p.vox)put(C,15,[4,10]);
+  put(D,5,ALL);put(D,3,[13,14]);put(D,3,[15],2);put(D,7,[0]);put(D,14,[0])},
+ funkbr(r,p,[A,B,C,D]){ // funk com percussão brasileira
+  const k=pick(r,[[0,3,8,11],[0,6,8,14]]);
+  for(const g of [A,B,D]){put(g,0,k);put(g,3,[4,12],2);put(g,11,ALL)}
+  put(A,8,[2,5,10,13]);put(A,10,TAMB);put(A,12,[0,8]);if(p.vox)put(A,15,[15]);
+  put(B,8,[2,5,7,10,13,15]);put(B,10,TAMB);put(B,9,[pick(r,[6,14])]);put(B,12,[0,6,8]);put(B,5,[2,6,10,14]);
+  put(C,10,TAMB);put(C,8,[2,10]);put(C,3,[12],2);put(C,0,[0]);put(C,11,EIGHT);
+  put(D,8,[12,13,14,15]);put(D,7,[0]);put(D,14,[15])},
+ boombap(r,p,[A,B,C,D]){
+  const k1=pick(r,[[0,7,10],[0,3,10],[0,7,9],[0,10,11],[0,6,10]]),k2=pick(r,[[0,3,10,15],[0,7,9,10],[0,6,7,10]]);
+  put(A,0,k1);put(A,2,[4,12],2);put(A,5,EIGHT);put(A,5,[pick(r,[3,7,11,15])]);if(r()<.5)put(A,6,[14]);put(A,12,[0]);if(p.vox)put(A,15,[15]);if(p.perc)put(A,8,[7]);
+  put(B,0,k2);put(B,2,[4,12],2);put(B,2,[pick(r,[7,15])]);put(B,5,EIGHT);put(B,6,[14]);put(B,12,[0,10]);
+  put(C,0,[0]);put(C,2,[4,12],2);put(C,5,[0,4,8,12]);if(p.vox)put(C,15,[6,14]);
+  put(D,0,k1);put(D,2,[4,12],2);put(D,4,[13,14,15]);put(D,7,[0]);put(D,5,EIGHT)},
+ drill(r,p,[A,B,C,D]){ // hi-hat em grupos de 3, caixa no 3 do half-time (passo 9)
+  const k=pick(r,[[0,11],[0,7,11],[0,3,11]]),ghost=pick(r,[13,14,6]);
+  for(const g of [A,B,D]){put(g,0,k);put(g,2,[8],2);put(g,5,TAMB)}
+  put(A,2,[ghost]);put(A,5,[pick(r,[1,9,15])]);put(A,13,k);put(A,12,[0]);
+  put(B,0,[14]);put(B,2,[ghost,15]);put(B,13,[0,7,11,14]);put(B,5,[1,9,12,13]);put(B,4,[10]);
+  put(C,2,[8],2);put(C,5,TAMB);put(C,13,[0]);
+  put(D,2,[12,13,14]);put(D,2,[15],2);put(D,7,[0]);put(D,14,[0])}
+};
+function groove(ki){const p=prof(ki),r=rng(hash(KITS[ki].name+'|GROOVE')),s=[blank(),blank(),blank(),blank()];(GEN[p.g]||GEN.trap)(r,p,s);return s}
+
+/* ---------- PASTA DO USUÁRIO: separa por produtor e por kit ---------- */
+const FAMFILE=[['VOX',/vox|vocal|chant|voz/i],['OPEN HAT',/open|\boh\b/i],['KICK',/kick|bumbo|\bbd\b/i],['SNARE',/snare|caixa|\bsd\b/i],['CLAP',/clap|palma|snap/i],['RIM',/rim/i],['HI-HAT',/hat|\bhh\b|hihat/i],['CYMBAL',/crash|cym|ride/i],['808',/808|bass|baixo/i],['SHAKER',/shak/i],['PERC',/perc|conga|bongo|tom|fill/i],['FX',/fx|efeito|riser|impact/i]];
+const famOf=nm=>{const f=FAMFILE.find(([,re])=>re.test(nm));return f?f[0]:null};
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const PNAMES=KITS.map((k,ki)=>[norm(k.name.replace(/\s*vol\.?\s*\d+/i,'')),ki]);
+function producerOf(segs){const path=norm(segs.join('/'));
+  for(let i=0;i<segs.length-1;i++){const w=segs[i].split(/[\s_\-.()\[\]]+/).map(norm).filter(Boolean);if(!w.length)continue;
+    const joins=new Set();for(let a=0;a<w.length;a++){let s='';for(let b=a;b<w.length;b++){s+=w[b];joins.add(s)}}
+    const c=PNAMES.filter(([n])=>n.length>=3&&joins.has(n));
+    if(c.length){const byVol=c.find(([,ki])=>path.includes('vol'+KITS[ki].vol));return {ki:(byVol||c[0])[1],at:i}}}
+  return null}
+const SKIP=/loop|melod|midi|preset|stem|bonus.*loop/i,GENERIC=/^(drums?|one ?shots?|samples?|sounds?|wav|audio|kit|drum ?kit|monstro.*|vol.*)$/i;
+function buildLib(files,curKit){const by={};
+  for(const f of files){const rel=f.webkitRelativePath||f.name;if(SKIP.test(rel))continue;const segs=rel.split('/'),fam=famOf(segs.slice(-2).join('/'));if(!fam)continue;
+    const pr=producerOf(segs);const ki=pr?pr.ki:curKit,dirs=segs.slice(pr?pr.at+1:1,-1).filter(d=>!famOf(d)&&!GENERIC.test(d.trim()));
+    const key=dirs[0]||'';((by[ki]=by[ki]||{})[key]=by[ki][key]||[]).push([fam,f])}
+  const lib={};
+  for(const ki in by){const groups=Object.entries(by[ki]),kits=[];
+    const pack=list=>{const files={};list.sort((a,b)=>a[1].name.localeCompare(b[1].name)).forEach(([fam,f])=>(files[fam]=files[fam]||[]).push(f));return files};
+    if(groups.length===1){const files=pack(groups[0][1]),kk=(files.KICK||[]).length,ss=(files.SNARE||[]).length+(files.CLAP||[]).length;
+      const n=Math.max(1,Math.min(8,Math.min(kk?Math.ceil(kk/2):8,ss||8)));
+      for(let j=0;j<n;j++){const part={};for(const fam in files){const L=files[fam].filter((_,i)=>i%n===j);part[fam]=L.length?L:files[fam]}kits.push({name:groups[0][0]?groups[0][0]+(n>1?' '+(j+1):''):'PASTA '+(j+1),files:part})}}
+    else groups.sort((a,b)=>a[0].localeCompare(b[0])).forEach(([key,list])=>kits.push({name:key||'SOLTOS',files:pack(list)}));
+    lib[ki]=kits}
+  return lib}
+async function loadUserKit(){const kit=state.lib[state.kit][state.pk];state.files=kit.files;state.userKit=true;
+  for(let p=0;p<16;p++){const fam=PADFAM[p],L=kit.files[fam];state.samples[p]=null;state.var[p]=0;if(!L||!L.length)continue;
+    const j=PADFAM.slice(0,p).filter(f=>f===fam).length%L.length;state.var[p]=j;try{state.samples[p]={buf:await decode(L[j]),name:L[j].name.replace(/\.[^.]+$/,'')}}catch(e){}}
+  updAll();renderInfo()}
+function selectPk(n){const c=kitCount(state.kit);state.pk=((n%c)+c)%c;state.samples=Array(16).fill(null);state.files={};state.userKit=false;
+  if(state.lib[state.kit])return loadUserKit();
+  state.var=kitVars(state.kit,state.pk);updAll();renderInfo()}
 
 /* ---------- ÁUDIO ---------- */
 let ac,master,dry,satNode,satIn,echoIn,delay,fb,wet,noiseBuf;
@@ -340,17 +487,19 @@ const PATTERNS={
 };
 
 /* ---------- ESTADO ---------- */
-const state={kit:store.get('kit',0),bpm:140,swing:54,pat:0,pad:0,seqs:null,ch:null,tune:Array(16).fill(0),dec:Array(16).fill(100),samples:Array(16).fill(null),userKit:false,playing:false,rec:false,step:-1,vol:.8,var:Array(16).fill(0),screen:'main',kvol:1,files:{}};
+const state={kit:store.get('kit11',8),bpm:140,swing:54,pat:0,pad:0,seqs:null,ch:null,tune:Array(16).fill(0),dec:Array(16).fill(100),samples:Array(16).fill(null),userKit:false,playing:false,rec:false,step:-1,vol:.8,var:Array(16).fill(0),screen:'main',kvol:1,files:{},pk:0,lib:{}};
 let history=[];
 const clone=x=>JSON.parse(JSON.stringify(x));
-function loadKit(i,keepSeq){state.kit=(i+KITS.length)%KITS.length;store.set('kit',state.kit);const k=KITS[state.kit];
-  state.ch=charOf(k);state.bpm=k.bpm;$('#bpm').value=k.bpm;state.samples=Array(16).fill(null);state.userKit=false;state.files={};state.var=Array(16).fill(0);state.kvol=k.vol;
-  if(!keepSeq){state.seqs=clone(PATTERNS[k.style]);state.pat=0;setPatBtns()}
-  updAll();renderInfo()}
+function loadKit(i,keepSeq){state.kit=(i+KITS.length)%KITS.length;store.set('kit11',state.kit);const k=KITS[state.kit];
+  state.ch=charOf(k);state.bpm=k.bpm;$('#bpm').value=k.bpm;state.samples=Array(16).fill(null);state.userKit=false;state.files={};state.var=Array(16).fill(0);state.kvol=k.vol;state.forceStyle=null;
+  if(!keepSeq){state.seqs=groove(state.kit);state.pat=0;setPatBtns();state.swing=prof(state.kit).sw||54;$('#swing').value=state.swing}
+  selectPk(0)}
 function renderInfo(){const k=KITS[state.kit];
   const cr=k.credits.length?`<p><b>Trabalhou com:</b> ${k.credits.map(esc).join(', ')}</p>`:'<p class="note">Créditos não divulgados nas páginas públicas do pack.</p>';
   const ct=k.contents.length?`<b>Conteúdo do kit</b><ul>${k.contents.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`:'<p class="note">A lista de conteúdo deste kit não está publicada.</p>';
-  $('#info').innerHTML=`<div><span class="tag">Monstro.zip Vol. ${k.vol}</span><span class="tag">${STYLES[k.style]} · ${k.bpm} BPM</span><h2>${esc(k.name)}</h2><p>${esc(k.bio)}</p>${cr}</div><div>${ct}<p class="note">Padrão de fábrica: groove ${STYLES[k.style]}${k.style==='reggae'?' na contagem de reggae, caixa/aro no 2 e no 4':''}. Saturador e Tape Echo começam em bypass.</p></div>`}
+  const n=kitCount(state.kit),lib=state.lib[state.kit];
+  const kl=`<p><b>Kits (${n}):</b> ${Array.from({length:n},(_,j)=>`<span class="tag" style="${j===state.pk?'background:#e0402f':''}">KIT ${j+1}${lib?' · '+esc(lib[j].name):''}</span>`).join('')}</p><p class="note">${lib?'Kits da pasta carregada.':'Kits sintetizados com timbres diferentes do mesmo produtor. Carregue a pasta do Monstro.zip para tocar os samples reais.'}</p>`;
+  $('#info').innerHTML=`<div><span class="tag">Monstro.zip Vol. ${k.vol}</span><span class="tag">${STYLES[k.style]} · ${k.bpm} BPM</span><h2>${esc(k.name)}</h2><p>${esc(k.bio)}</p>${cr}<p><b>Groove de fábrica:</b> ${esc(prof(state.kit).d)}</p></div><div>${kl}${ct}<p class="note">Saturador e Tape Echo começam em bypass.${k.style==='reggae'?' Reggae na contagem, caixa/aro no 2 e no 4.':''}</p></div>`}
 
 /* ---------- UI ---------- */
 $('#pads').innerHTML=[12,13,14,15,8,9,10,11,4,5,6,7,0,1,2,3].map(i=>`<button class="pad" data-i="${i}"><span>${i+1}</span><small id="pl${i}">${PADS[i]}</small></button>`).join('');
@@ -400,13 +549,11 @@ const RULES=[[0,/kick|bumbo|bd/i],[2,/snare|caixa|sd/i],[3,/clap|palma|snap/i],[
 async function decode(f){initAudio();const ab=await f.arrayBuffer();return await ac.decodeAudioData(ab)}
 $('#loadKit').onclick=()=>$('#dirIn').click();
 $('#dirIn').onchange=async e=>{const files=[...e.target.files].filter(f=>/\.(wav|mp3|aif|aiff|ogg|flac)$/i.test(f.name));if(!files.length)return toast('Nenhum áudio na pasta');
-  const used=new Set();let n=0;
-  for(const [pad,re] of RULES){const list=files.filter(f=>re.test(f.webkitRelativePath||f.name)&&!used.has(f));
-    const targets=pad===0?[0,1]:pad===12?[12,13]:pad===8?[8,9,10]:[pad];
-    for(const tp of targets){const f=list.shift();if(!f)break;used.add(f);try{state.samples[tp]={buf:await decode(f),name:f.name.replace(/\.[^.]+$/,'')};$('#pl'+tp).textContent=state.samples[tp].name;n++}catch(err){}}}
-  state.files={};files.forEach(f=>{const nm=f.webkitRelativePath||f.name;const fam=[['KICK',/kick|bumbo|bd/i],['SNARE',/snare|caixa|sd/i],['CLAP',/clap|palma|snap/i],['RIM',/rim/i],['OPEN HAT',/open|oh/i],['HI-HAT',/hat|hh|hihat/i],['CYMBAL',/crash|cym|ride/i],['808',/808|bass|baixo/i],['SHAKER',/shak/i],['PERC',/perc|conga|bongo|tom/i],['FX',/fx|efeito|riser|impact/i],['VOX',/vox|vocal|chant|voz/i]].find(([,re])=>re.test(nm));if(fam)(state.files[fam[0]]=state.files[fam[0]]||[]).push(f)});
-  for(let p=0;p<16;p++){const L=state.files[PADFAM[p]];if(L&&state.samples[p]){const k=L.findIndex(f=>f.name.replace(/\.[^.]+$/,'')===state.samples[p].name);state.var[p]=Math.max(0,k)}}
-  state.userKit=true;toast(n+' samples carregados nos pads');updAll()};
+  const lib=buildLib(files,state.kit),ks=Object.keys(lib).map(Number);if(!ks.length)return toast('Nenhum timbre reconhecido na pasta');
+  Object.assign(state.lib,lib);const nk=ks.reduce((a,ki)=>a+lib[ki].length,0);
+  toast(ks.length>1?`${ks.length} produtores · ${nk} kits carregados`:`${KITS[ks[0]].name}: ${nk} kit${nk>1?'s':''} carregado${nk>1?'s':''}`);
+  if(ks.includes(state.kit)){state.pk=0;return loadUserKit()}return loadKit(ks[0]);
+};
 $('#loadPad').onclick=()=>$('#padIn').click();
 $('#padIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{state.samples[state.pad]={buf:await decode(f),name:f.name.replace(/\.[^.]+$/,'')};$('#pl'+state.pad).textContent=state.samples[state.pad].name;toast('Sample no pad '+(state.pad+1));updAll()}catch(err){toast('Formato não suportado')}};
 
@@ -429,16 +576,18 @@ const famPads=fam=>PADFAM.map((f,i)=>f===fam?i:-1).filter(i=>i>=0);
 const mbar=v=>`<span class="bar" style="width:${Math.round(v*60)}px"></span>`;
 const SCR={
  main(){const k=KITS[state.kit];return{h:`<div class="hd"><span class="inv">${state.playing?(state.rec?'REC':'PLAY'):'STOP'}</span><span>SEQ:${'ABCD'[state.pat]} BEAT ${state.step<0?1:Math.floor(state.step/4)+1}</span></div>
-  <div class="fam"><button class="arrow" data-a="kit-1" aria-label="Kit anterior">◀</button><button class="big" data-a="go:kit">${esc(state.userKit?'USER: ':'')}${esc(k.name.toUpperCase())}</button><button class="arrow" data-a="kit+1" aria-label="Próximo kit">▶</button></div>
+  <div class="fam"><button class="arrow" data-a="kit-1" aria-label="Produtor anterior">◀</button><button class="big" data-a="go:kit">${esc(state.userKit?'USER: ':'')}${esc(k.name.toUpperCase())}</button><button class="arrow" data-a="kit+1" aria-label="Próximo produtor">▶</button></div>
+  <div class="fam"><button class="arrow" data-a="pk-1" aria-label="Kit anterior do produtor">◀</button><button class="big" data-a="go:kit" style="font-size:22px">KIT ${state.pk+1}/${kitCount(state.kit)}${state.lib[state.kit]?' '+esc(state.lib[state.kit][state.pk].name.toUpperCase().slice(0,12)):''}</button><button class="arrow" data-a="pk+1" aria-label="Próximo kit do produtor">▶</button></div>
   <div class="row"><span>VOL.${k.vol} ${STYLES[k.style].toUpperCase()}</span><span>${state.bpm} BPM SW${state.swing}%</span></div>
   <div class="fam"><button class="arrow" data-a="var-1" aria-label="Timbre anterior">◀</button><button class="big" data-a="go:timbre" style="font-size:24px">PAD${String(state.pad+1).padStart(2,'0')} ${esc(state.samples[state.pad]?state.samples[state.pad].name.slice(0,14):vname(state.pad))} <small>/${varCount(state.pad)}</small></button><button class="arrow" data-a="var+1" aria-label="Próximo timbre">▶</button></div>
   <div class="row"><span>MST ${'█'.repeat(Math.round(state.vol*10))}${'░'.repeat(10-Math.round(state.vol*10))}</span><span>SAT:${fx.sat?'ON':'BYP'} ECHO:${fx.echo?'ON':'BYP'}</span></div>
   <div class="mini">${state.seqs[state.pat][state.pad].map((v,s)=>`<i class="${v?'on':''} ${s===state.step?'now':''}"></i>`).join('')}</div>`,
-  f:[['KIT ◀','kit-1'],['KIT ▶','kit+1'],['TIMB ◀','var-1'],['TIMB ▶','var+1'],['VOL −','mst-'],['VOL +','mst+']]}},
- kit(){const list=KITS.map((k,i)=>[k,i]).filter(([k])=>k.vol===state.kvol);return{h:`<div class="hd"><span class="inv">PROGRAM</span><span>${list.length} KITS</span></div>
+  f:[['PROD ◀','kit-1'],['PROD ▶','kit+1'],['KIT ◀','pk-1'],['KIT ▶','pk+1'],['TIMB ◀','var-1'],['TIMB ▶','var+1']]}},
+ kit(){const list=KITS.map((k,i)=>[k,i]).filter(([k])=>k.vol===state.kvol);return{h:`<div class="hd"><span class="inv">PROGRAM</span><span>${list.length} PRODUTORES · ★ PASTA</span></div>
   <div class="tabs">${[1,2,3,4].map(v=>`<button class="${v===state.kvol?'inv':''}" data-a="kvol:${v}">VOL.${v}</button>`).join('')}</div>
-  <div class="list">${list.map(([k,i])=>`<button class="${i===state.kit?'inv':''}" data-a="load:${i}"><span>${esc(k.name.toUpperCase())}</span><span>${STYLES[k.style].split(' ')[0].toUpperCase()}</span></button>`).join('')}</div>`,
-  f:[['VOL.1','kvol:1'],['VOL.2','kvol:2'],['VOL.3','kvol:3'],['VOL.4','kvol:4'],['KIT ◀','kit-1'],['KIT ▶','kit+1']]}},
+  <div class="list">${list.map(([k,i])=>`<button class="${i===state.kit?'inv':''}" data-a="load:${i}"><span>${esc(k.name.toUpperCase())}${state.lib[i]?' ★':''}</span><span>${kitCount(i)} KITS</span></button>`).join('')}</div>
+  <div class="tabs" style="margin-top:6px">${Array.from({length:kitCount(state.kit)},(_,j)=>`<button class="${j===state.pk?'inv':''}" data-a="setpk:${j}">KIT ${j+1}</button>`).join('')}</div>`,
+  f:[['VOL.1','kvol:1'],['VOL.2','kvol:2'],['KIT ◀','pk-1'],['KIT ▶','pk+1'],['PROD ◀','kit-1'],['PROD ▶','kit+1']]}},
  timbre(){const pad=state.pad,fam=PADFAM[pad],n=varCount(pad),L=state.files[fam],k=KITS[state.kit];
   const fams=[...new Set(PADFAM)];
   return{h:`<div class="hd"><span class="inv">TIMBRE</span><span>${esc(k.name.toUpperCase())} · ${L&&L.length?'ARQUIVOS DO KIT':'MESMO PRODUTOR'}</span></div>
@@ -449,7 +598,7 @@ const SCR={
   f:[['TIMB ◀','var-1'],['TIMB ▶','var+1'],['PAD ◀','pad-1'],['PAD ▶','pad+1'],['SORTEAR','rndv'],['ORIGINAL','setv:0']]}},
  mixer(){return{h:`<div class="hd"><span class="inv">MIXER</span><span>TOQUE NO PAD PARA EDITAR</span></div>
   <div class="list">${Array.from({length:16},(_,i)=>`<button class="${i===state.pad?'inv':''}" data-a="pad:${i}"><span>${String(i+1).padStart(2,'0')} ${esc((state.samples[i]?state.samples[i].name:vname(i)).slice(0,12))}</span><span>D${state.dec[i]} T${state.tune[i]>0?'+':''}${state.tune[i]}</span></button>`).join('')}</div>`,
-  f:[['TUNE −','tune-'],['TUNE +','tune+'],['DEC −','dec-'],['DEC +','dec+'],['PAD ◀','pad-1'],['PAD ▶','pad+1']]}},
+  f:[['TUNE −','tune-'],['TUNE +','tune+'],['DEC −','dec-'],['DEC +','dec+'],['VOL −','mst-'],['VOL +','mst+']]}},
  fx(){return{h:`<div class="hd"><span class="inv">EFFECTS</span><span>MASTER</span></div>
   <div class="list" style="grid-template-columns:minmax(0,1fr)">
    <button data-a="sat"><span>SATURADOR</span><span class="${fx.sat?'inv':''}">${fx.sat?'ON':'BYPASS'}</span></button>
@@ -460,13 +609,15 @@ const SCR={
   f:[['SAT','sat'],['ECHO','echo'],['TEMPO −','et-'],['TEMPO +','et+'],['FB −','fb-'],['FB +','fb+']]}},
  seq(){const k=KITS[state.kit],st=state.forceStyle||k.style;return{h:`<div class="hd"><span class="inv">SEQUENCE</span><span>${state.bpm} BPM · SW${state.swing}%</span></div>
   <div class="list">${[0,1,2,3].map(p=>`<button class="${p===state.pat?'inv':''}" data-a="pat:${p}"><span>SEQ ${'ABCD'[p]}</span><span>${state.seqs[p].reduce((a,r)=>a+r.filter(Boolean).length,0)} NOTAS</span></button>`).join('')}</div>
-  <div class="tabs" style="margin-top:6px">${Object.keys(STYLES).map(s=>`<button class="${s===st?'inv':''}" data-a="style:${s}">${STYLES[s].toUpperCase()}</button>`).join('')}</div>`,
+  <div class="tabs" style="margin-top:6px"><button class="${state.forceStyle?'':'inv'}" data-a="prodgroove">${esc(k.name.toUpperCase())}</button>${Object.keys(STYLES).map(s=>`<button class="${s===state.forceStyle?'inv':''}" data-a="style:${s}">${STYLES[s].toUpperCase()}</button>`).join('')}</div>`,
   f:[['BPM −','bpm-'],['BPM +','bpm+'],['SWING −','sw-'],['SWING +','sw+'],['UNDO','undo'],['LIMPAR','clear']]}}
 };
 function updLcd(){const sc=SCR[state.screen]();$('#lcd').innerHTML=sc.h;$('#fkeys').innerHTML=sc.f.map(([l,a],i)=>`<button class="btn" data-a="${a}"><small style="opacity:.6">F${i+1}</small><br>${l}</button>`).join('');
   document.querySelectorAll('.mode').forEach(b=>{const on=b.dataset.scr===state.screen;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)})}
 function act(a){const [c,v]=a.split(':'),k=KITS[state.kit];
   if(a==='kit-1')return loadKit(state.kit-1);if(a==='kit+1')return loadKit(state.kit+1);
+  if(a==='pk-1')return selectPk(state.pk-1);if(a==='pk+1')return selectPk(state.pk+1);
+  if(a==='prodgroove'){pushHist();state.forceStyle=null;state.seqs=groove(state.kit);state.swing=prof(state.kit).sw||54;$('#swing').value=state.swing;toast('Groove do '+k.name);return updAll()}
   if(a==='var-1')return setVar(state.pad,state.var[state.pad]-1);if(a==='var+1')return setVar(state.pad,state.var[state.pad]+1);
   if(a==='rndv')return setVar(state.pad,Math.floor(Math.random()*varCount(state.pad)));
   if(a==='pad-1'||a==='pad+1'){state.pad=(state.pad+(a==='pad+1'?1:15))%16;play(state.pad,0,.85);flash(state.pad);return updAll()}
@@ -481,7 +632,8 @@ function act(a){const [c,v]=a.split(':'),k=KITS[state.kit];
   if(a==='clear'){pushHist();state.seqs[state.pat]=Array.from({length:16},()=>Array(16).fill(0));updAll();return toast('SEQ '+'ABCD'[state.pat]+' limpa')}
   if(c==='go'){state.screen=v;return updLcd()}
   if(c==='kvol'){state.kvol=+v;state.screen='kit';return updLcd()}
-  if(c==='load'){loadKit(+v,true);return toast(KITS[+v].name+' carregado')}
+  if(c==='load'){loadKit(+v);return toast(KITS[+v].name+' carregado')}
+  if(c==='setpk')return selectPk(+v);
   if(c==='setv')return setVar(state.pad,+v);
   if(c==='fam'){const ps=famPads(v);const nx=ps.find(p=>p>state.pad)??ps[0];state.pad=ps.includes(state.pad)&&ps.length===1?state.pad:nx;play(state.pad,0,.85);flash(state.pad);return updAll()}
   if(c==='pad'){state.pad=+v;play(state.pad,0,.85);flash(state.pad);return updAll()}

@@ -79,6 +79,8 @@ public:
     void filesDropped (const juce::StringArray&, int x, int y) override;
 
     void act (const juce::String& action);
+
+    juce::String folderToast (int kits) const;
     void padPressed (int pad);
     void stepClicked (int step, bool accent);
     void buildScreen();

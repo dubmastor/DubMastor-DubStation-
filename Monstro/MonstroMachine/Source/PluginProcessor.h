@@ -4,6 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <atomic>
 #include <memory>
+#include <map>
 #include "MonstroEngine.h"
 
 class MonstroProcessor : public juce::AudioProcessor
@@ -38,10 +39,19 @@ public:
     void setParam (const juce::String& id, float plainValue);
     static juce::String pid (const char* base, int pad) { return juce::String (base) + juce::String (pad); }
 
-    // ---- kit (PROGRAM): carrega o BPM e os grooves do estilo do kit
+    // ---- produtor (PROGRAM): carrega o BPM, o swing e o groove do produtor; cada produtor tem vários kits
     int kit() const { return juce::jlimit (0, mm::numKits() - 1, (int) get ("kit")); }
     void selectKit (int index, bool keepSeqs = false);
     void loadStyle (const juce::String& styleKey);          // troca os 4 SEQs pelo groove de outro estilo
+    void loadProducerGroove();                               // volta para o groove do produtor
+    int pk() const { return juce::jlimit (0, juce::jmax (0, kitCount() - 1), (int) get ("pkit")); }
+    int kitCount() const { return kitCountOf (kit()); }      // KIT 1…N do produtor (da pasta ou de fábrica)
+    int kitCountOf (int producer) const;
+    void selectPk (int n);
+    juce::String kitLabel (int producer, int n) const;      // nome do kit da pasta (vazio nos kits de fábrica)
+    bool hasLib (int producer) const { return lib.count (producer) > 0; }
+    int lastLoadProducers = 0;
+    bool styleIsProducer() const { return styleOverride.isEmpty(); }
     juce::String style() const { return styleOverride.isNotEmpty() ? styleOverride : juce::String (mm::kits()[(size_t) kit()].style); }
 
     // ---- sequências: 4 SEQs × 16 pads × 16 passos (0 vazio, 1 nota, 2 acento)
@@ -63,9 +73,10 @@ public:
     // ---- amostras do usuário
     bool loadSample (int pad, const juce::File&);
     void clearSample (int pad);
-    int loadFolder (const juce::File& dir);                  // devolve quantos pads receberam som
-    void clearUserKit();
-    juce::String userKitName() const { return userFolder.getFileName(); }
+    int loadFolder (const juce::File& dir);                  // separa por produtor e por kit; devolve quantos kits achou
+    void clearUserKit();                                     // tira os sons do pad (a pasta continua carregada)
+    void forgetFolders();                                    // volta tudo para os kits de fábrica
+    juce::String userKitName() const { return hasLib (kit()) ? kitLabel (kit(), pk()) : juce::String(); }
     bool hasSample (int pad) const { return std::atomic_load (&samples[(size_t) pad]) != nullptr; }
 
     // ---- toque na tela / MIDI que chega
@@ -104,8 +115,12 @@ private:
 
     std::array<std::shared_ptr<const mm::SampleData>, mm::numPads> samples;
     std::array<juce::File, mm::numPads> sampleFile;
-    juce::File userFolder;
-    std::array<juce::Array<juce::File>, mm::numFams> famFiles;   // arquivos da pasta por família
+    std::array<juce::Array<juce::File>, mm::numFams> famFiles;   // arquivos do kit atual por família
+    struct UserKit { juce::String name; std::array<juce::Array<juce::File>, mm::numFams> files; };
+    std::map<int, std::vector<UserKit>> lib;                      // kits da pasta, por produtor
+    juce::StringArray folders;                                    // pastas carregadas (salvas no projeto)
+    std::map<int, std::vector<UserKit>> buildLib (const juce::File& dir) const;
+    void applyUserKit();
 
     juce::AbstractFifo uiFifo { 64 };
     std::array<std::pair<int, float>, 64> uiQueue {};

@@ -297,7 +297,7 @@ void MonstroEditor::buildScreen()
     if (scr == "kit")
     {
         int n = 0; for (auto& x : mm::kits()) n += x.vol == proc.uiKitVol ? 1 : 0;
-        header ("PROGRAM", String (n) + " KITS NO VOL." + String (proc.uiKitVol));
+        header ("PROGRAM", String (n) + u8 (" PRODUTORES NO VOL.") + String (proc.uiKitVol) + u8 (" · \xe2\x98\x85 PASTA"));
         const float tw = (W - 2 * pad - 18) / 4;
         for (int v = 1; v <= 4; ++v) add ({ pad + (v - 1) * (tw + 6), y, tw, 24 }, "VOL." + String (v), "kvol:" + String (v), v == proc.uiKitVol, 18, Justification::centred, true);
         y += 30;
@@ -308,10 +308,15 @@ void MonstroEditor::buildScreen()
             const auto& x = mm::kits()[(size_t) ki];
             if (x.vol != proc.uiKitVol) continue;
             const float cx = pad + (i % 2) * (cw + 8), cy = y + (i / 2) * 24.0f;
-            add ({ cx, cy, cw, 23 }, u8 (x.name).toUpperCase() + "  " + styleUpper (x.style).upToFirstOccurrenceOf (" ", false, false), "load:" + String (ki), ki == proc.kit(), 16);
+            add ({ cx, cy, cw, 23 }, u8 (x.name).toUpperCase() + (proc.hasLib (ki) ? u8 (" \xe2\x98\x85") : String()) + "  " + String (proc.kitCountOf (ki)) + " KITS", "load:" + String (ki), ki == proc.kit(), 16);
             ++i;
         }
-        fk ({ { "VOL.1", "kvol:1" }, { "VOL.2", "kvol:2" }, { "VOL.3", "kvol:3" }, { "VOL.4", "kvol:4" }, { "KIT \xe2\x97\x80", "kit-1" }, { "KIT \xe2\x96\xb6", "kit+1" } });
+        y += ((i + 1) / 2) * 24.0f + 6;
+        const int nk = proc.kitCount();
+        const float kw = (W - 2 * pad - 7 * 4) / 8;
+        for (int j = 0; j < nk; ++j)
+            add ({ pad + j * (kw + 4), y, kw, 26 }, "KIT " + String (j + 1), "setpk:" + String (j), j == proc.pk(), 15, Justification::centred, true);
+        fk ({ { "VOL.1", "kvol:1" }, { "VOL.2", "kvol:2" }, { "KIT \xe2\x97\x80", "pk-1" }, { "KIT \xe2\x96\xb6", "pk+1" }, { "PROD \xe2\x97\x80", "kit-1" }, { "PROD \xe2\x96\xb6", "kit+1" } });
     }
     else if (scr == "timbre")
     {
@@ -365,7 +370,9 @@ void MonstroEditor::buildScreen()
         row ("MIX " + bar (proc.get ("echoMix")) + "  " + String (roundToInt (proc.get ("echoMix") * 100)) + "%", {});
         add ({ W - pad - 80, y - 26, 38, 24 }, u8 ("\xe2\x88\x92"), "mix-", false, 18, Justification::centred, true);
         add ({ W - pad - 38, y - 26, 38, 24 }, "+", "mix+", false, 18, Justification::centred, true);
-        row ("MASTER " + bar (proc.get ("master")), String (roundToInt (proc.get ("master") * 100)) + "%");
+        row ("MASTER " + bar (proc.get ("master")) + "  " + String (roundToInt (proc.get ("master") * 100)) + "%", {});
+        add ({ W - pad - 80, y - 26, 38, 24 }, u8 ("\xe2\x88\x92"), "mst-", false, 18, Justification::centred, true);
+        add ({ W - pad - 38, y - 26, 38, 24 }, "+", "mst+", false, 18, Justification::centred, true);
         row (u8 ("Padrão de fábrica: saturador e eco em bypass"), {});
         fk ({ { "SAT", "sat" }, { "ECHO", "echo" }, { "TEMPO \xe2\x88\x92", "et-" }, { "TEMPO +", "et+" }, { "FB \xe2\x88\x92", "fb-" }, { "FB +", "fb+" } });
     }
@@ -377,21 +384,23 @@ void MonstroEditor::buildScreen()
             add ({ pad + (s % 2) * (cw + 8), y + (s / 2) * 30.0f, cw, 28 }, "SEQ " + String::charToString ((juce_wchar) ('A' + s)) + "   " + String (proc.notesIn (s)) + " NOTAS",
                  "pat:" + String (s), s == proc.seq(), 18);
         y += 66;
-        const float tw = (W - 2 * pad - 4 * 4) / 5;
+        const float tw = (W - 2 * pad - 5 * 4) / 6;
+        add ({ pad, y, tw, 26 }, u8 (k.name).toUpperCase().substring (0, 10), "prodgroove", proc.styleIsProducer(), 13, Justification::centred, true);
         for (int i = 0; i < 5; ++i)
         {
             const String key (mm::styleKeys()[(size_t) i]);
-            add ({ pad + i * (tw + 4), y, tw, 26 }, styleUpper (key), "style:" + key, key == proc.style(), 14, Justification::centred, true);
+            add ({ pad + (i + 1) * (tw + 4), y, tw, 26 }, styleUpper (key).upToFirstOccurrenceOf (" ", false, false), "style:" + key, ! proc.styleIsProducer() && key == proc.style(), 13, Justification::centred, true);
         }
         y += 34;
-        row (proc.style() == "reggae" ? u8 ("Reggae: caixa/aro no 2 e no 4") : u8 ("Escolha um estilo para trocar os 4 SEQs"), {});
+        row (proc.styleIsProducer() ? u8 (mm::prof (proc.kit()).d).substring (0, 52) : (proc.style() == "reggae" ? u8 ("Reggae: caixa/aro no 2 e no 4") : u8 ("Groove de outro estilo")), {});
         row ("TOCA COM A DAW", proc.get ("machineOn") > 0.5f ? "SIM" : u8 ("NÃO"), "daw", "daw");
         fk ({ { "BPM \xe2\x88\x92", "bpm-" }, { "BPM +", "bpm+" }, { "SWING \xe2\x88\x92", "sw-" }, { "SWING +", "sw+" }, { "UNDO", "undo" }, { "LIMPAR", "clear" } });
     }
     else
     {
         header (proc.recording ? "REC" : playing ? "PLAY" : "STOP", "SEQ:" + seqName + " BEAT " + String (playing ? proc.playStep.load() / 4 + 1 : 1));
-        fam ((proc.userKitName().isNotEmpty() ? "USER: " + proc.userKitName() : u8 (k.name)).toUpperCase(), "kit-1", "go:kit", "kit+1", 28);
+        fam ((proc.hasLib (proc.kit()) ? "USER: " : "") + u8 (k.name).toUpperCase(), "kit-1", "go:kit", "kit+1", 28);
+        fam ("KIT " + String (proc.pk() + 1) + "/" + String (proc.kitCount()) + (proc.userKitName().isNotEmpty() ? " " + proc.userKitName().toUpperCase().substring (0, 14) : String()), "pk-1", "go:kit", "pk+1", 20);
         row ("VOL." + String (k.vol) + " " + styleUpper (proc.style()), String ((int) proc.get ("bpm")) + " BPM SW" + String ((int) proc.get ("swing")) + "%");
         fam ("PAD" + two (cur + 1) + " " + proc.timbreName (cur).substring (0, 16) + " /" + String (proc.varCount (cur)), "var-1", "go:timbre", "var+1", 22);
         row ("MST " + bar (proc.get ("master")), String ("SAT:") + (proc.get ("satOn") > 0.5f ? "ON" : "BYP") + " ECHO:" + (proc.get ("echoOn") > 0.5f ? "ON" : "BYP"), {}, "go:fx");
@@ -402,7 +411,7 @@ void MonstroEditor::buildScreen()
             const int v = proc.getStep (proc.seq(), cur, s);
             add ({ pad + s * (mw + 3), y + 4, mw, 18 }, v == 2 ? ">" : "", {}, v != 0, 12, Justification::centred, s == ps || s % 4 == 0);
         }
-        fk ({ { "KIT \xe2\x97\x80", "kit-1" }, { "KIT \xe2\x96\xb6", "kit+1" }, { "TIMB \xe2\x97\x80", "var-1" }, { "TIMB \xe2\x96\xb6", "var+1" }, { "VOL \xe2\x88\x92", "mst-" }, { "VOL +", "mst+" } });
+        fk ({ { "PROD \xe2\x97\x80", "kit-1" }, { "PROD \xe2\x96\xb6", "kit+1" }, { "KIT \xe2\x97\x80", "pk-1" }, { "KIT \xe2\x96\xb6", "pk+1" }, { "TIMB \xe2\x97\x80", "var-1" }, { "TIMB \xe2\x96\xb6", "var+1" } });
     }
     for (int i = 0; i < modes.size(); ++i)
     {
@@ -415,6 +424,13 @@ void MonstroEditor::buildScreen()
 }
 
 // ---------------------------------------------------------------- ações (as mesmas da versão web)
+String MonstroEditor::folderToast (int kits) const
+{
+    if (kits <= 0) return "Nenhum som reconhecido na pasta";
+    if (proc.lastLoadProducers > 1) return String (proc.lastLoadProducers) + u8 (" produtores · ") + String (kits) + " kits carregados";
+    return u8 (mm::kits()[(size_t) proc.kit()].name) + ": " + String (kits) + (kits > 1 ? " kits carregados" : " kit carregado");
+}
+
 void MonstroEditor::nudge (const String& id, float d, float lo, float hi) { proc.setParam (id, jlimit (lo, hi, proc.get (id) + d)); }
 
 void MonstroEditor::act (const String& a)
@@ -425,6 +441,8 @@ void MonstroEditor::act (const String& a)
     auto tap = [&] (int pad) { p.uiPad = pad; p.playPad (pad, 0.85f); };
 
     if (a == "kit-1" || a == "kit+1") { p.selectKit (p.kit() + (a == "kit+1" ? 1 : -1)); toast (u8 (mm::kits()[(size_t) p.kit()].name)); }
+    else if (a == "pk-1" || a == "pk+1") { p.selectPk (p.pk() + (a == "pk+1" ? 1 : -1)); toast ("KIT " + String (p.pk() + 1) + (p.userKitName().isNotEmpty() ? u8 (" \xc2\xb7 ") + p.userKitName() : String())); }
+    else if (a == "prodgroove") { p.pushUndo(); p.loadProducerGroove(); toast ("Groove do " + u8 (mm::kits()[(size_t) p.kit()].name)); }
     else if (a == "var-1" || a == "var+1") p.setVariation (cur, p.variation (cur) + (a == "var+1" ? 1 : -1));
     else if (a == "vpage-" || a == "vpage+") p.setVariation (cur, p.variation (cur) + (a == "vpage+" ? 24 : -24));
     else if (a == "rndv") p.setVariation (cur, Random::getSystemRandom().nextInt (jmax (1, p.varCount (cur))));
@@ -461,7 +479,7 @@ void MonstroEditor::act (const String& a)
     else if (a == "stop") { p.setParam ("preview", 0.0f); p.recording = false; }
     else if (a == "rec") { p.recording = ! p.recording.load(); if (p.recording) p.setParam ("preview", 1.0f); }
     else if (a == "daw") p.setParam ("machineOn", p.get ("machineOn") > 0.5f ? 0.0f : 1.0f);
-    else if (a == "factory") { p.clearUserKit(); for (int i = 0; i < mm::numPads; ++i) p.setParam (MonstroProcessor::pid ("var", i), 0); toast (u8 ("Kit de fábrica: ") + u8 (mm::kits()[(size_t) p.kit()].name)); }
+    else if (a == "factory") { p.forgetFolders(); toast (u8 ("Kits de fábrica: ") + u8 (mm::kits()[(size_t) p.kit()].name)); }
     else if (a == "folder")
     {
         chooser = std::make_unique<FileChooser> ("Pasta do kit (o Monstro.zip descompactado ou outra pasta de samples)", File(), "*");
@@ -470,7 +488,7 @@ void MonstroEditor::act (const String& a)
             const auto f = fc.getResult();
             if (! f.isDirectory()) return;
             const int n = proc.loadFolder (f);
-            toast (n > 0 ? String (n) + " pads com os sons de " + f.getFileName() : "Nenhum som reconhecido na pasta");
+            toast (folderToast (n));
             buildScreen(); refresh();
         });
         return;
@@ -488,7 +506,8 @@ void MonstroEditor::act (const String& a)
     }
     else if (c == "go") { p.uiScreen = v; if (v == "kit") p.uiKitVol = mm::kits()[(size_t) p.kit()].vol; }
     else if (c == "kvol") { p.uiKitVol = v.getIntValue(); p.uiScreen = "kit"; }
-    else if (c == "load") { p.selectKit (v.getIntValue(), true); toast (u8 (mm::kits()[(size_t) p.kit()].name) + " carregado"); }
+    else if (c == "load") { p.selectKit (v.getIntValue()); toast (u8 (mm::kits()[(size_t) p.kit()].name) + " carregado"); }
+    else if (c == "setpk") p.selectPk (v.getIntValue());
     else if (c == "setv") p.setVariation (cur, v.getIntValue());
     else if (c == "fam")
     {
@@ -533,7 +552,7 @@ void MonstroEditor::stepClicked (int s, bool accent)
 void MonstroEditor::filesDropped (const StringArray& files, int x, int y)
 {
     const File f (files[0]);
-    if (f.isDirectory()) { const int n = proc.loadFolder (f); toast (n > 0 ? String (n) + " pads com os sons de " + f.getFileName() : "Nenhum som reconhecido na pasta"); }
+    if (f.isDirectory()) { const int n = proc.loadFolder (f); toast (folderToast (n)); }
     else
     {
         int target = proc.uiPad;
@@ -586,7 +605,7 @@ void MonstroEditor::timerCallback()
     }
     // a tela só é refeita quando algo visível muda (passo, parâmetros, kit)
     String key;
-    key << proc.playStep.load() << "|" << proc.kit() << "|" << proc.seq() << "|" << proc.uiPad << "|" << (int) proc.recording.load();
+    key << proc.playStep.load() << "|" << proc.kit() << "|" << proc.pk() << "|" << proc.seq() << "|" << proc.uiPad << "|" << (int) proc.recording.load();
     for (auto* prm : proc.getParameters()) key << "," << roundToInt (prm->getValue() * 1000);
     if (key != lastKey || any) { lastKey = key; buildScreen(); refresh(); }
     if (toastL.isVisible() && Time::getMillisecondCounter() > toastUntil) toastL.setVisible (false);

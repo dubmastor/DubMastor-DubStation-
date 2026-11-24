@@ -116,7 +116,47 @@ int main (int argc, char** argv)
         if (argc > 1) writeWav (argv[1], OL, OR, sr);
     }
 
+    // ---- 1.1: vários kits por produtor e o groove de cada produtor (iguais aos da web)
+    auto grooveHash = [] (int k)
+    {
+        uint32_t h = 2166136261u;
+        for (auto& s : mm::groove (k)) for (auto& p : s) for (auto v : p) h = (h ^ (uint32_t) ('0' + v)) * 16777619u;
+        return h;
+    };
+    CHECK (std::string (mm::kits()[(size_t) mm::defaultKit()].name) == "DJ Coala", "preset inicial tem que ser o DJ Coala");
+    CHECK (grooveHash (0) == 1595767603u, "groove do DubMastor diferente da web (%u)", grooveHash (0));
+    CHECK (grooveHash (1) == 2340979147u, "groove do Nox diferente da web (%u)", grooveHash (1));
+    for (int k = 0; k < mm::numKits(); ++k)
+    {
+        const auto& x = mm::kits()[(size_t) k];
+        bool hasProf = false;
+        for (auto& p : mm::profs()) hasProf |= std::string (p.name) == x.name;
+        CHECK (hasProf, "%s sem perfil de groove", x.name);
+        const auto g = mm::groove (k);
+        for (int q = 0; q < mm::numSeqs; ++q)
+        {
+            int notes = 0;
+            for (auto& p : g[(size_t) q]) for (auto v : p) notes += v ? 1 : 0;
+            CHECK (notes >= 4, "%s SEQ %c quase vazio", x.name, 'A' + q);
+            if (std::string (x.style) == "reggae")   // caixa/aro só no 2 e no 4 (passos 5 e 13): nunca o drop no 3
+                for (int pad : { 2, 4 })
+                    for (int st = 0; st < mm::numSteps; ++st)
+                        if (g[(size_t) q][(size_t) pad][(size_t) st]) CHECK (st == 4 || st == 12, "%s: caixa/aro fora do 2 e do 4 (passo %d)", x.name, st + 1);
+        }
+        const int nk = mm::kitCountF (k);
+        CHECK (nk >= 3 && nk <= 8, "%s: %d kits", x.name, nk);
+        const auto k1 = mm::kitVars (k, 0);
+        for (int v : k1) CHECK (v == 0, "%s: o KIT 1 tem que ser o original", x.name);
+        for (int a = 0; a < nk; ++a)
+            for (int b = a + 1; b < nk; ++b) CHECK (mm::kitVars (k, a) != mm::kitVars (k, b), "%s: KIT %d igual ao KIT %d", x.name, a + 1, b + 1);
+        for (int n = 0; n < nk; ++n)
+        {
+            const auto v = mm::kitVars (k, n);
+            for (int p = 0; p < mm::numPads; ++p) CHECK (v[(size_t) p] >= 0 && v[(size_t) p] < mm::famCount (k, mm::padFam()[(size_t) p]), "%s: timbre fora da família", x.name);
+        }
+    }
+
     if (fails) { std::printf ("%d falha(s)\n", fails); return 1; }
-    std::printf ("OK: %d kits, 16 pads, timbres por família, grooves e efeitos\n", mm::numKits());
+    std::printf ("OK: %d produtores, kits por produtor, 16 pads, timbres por família, grooves de cada produtor e efeitos\n", mm::numKits());
     return 0;
 }
