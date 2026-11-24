@@ -24,6 +24,11 @@ on:
       - 'Build Mastor Half Dub MHD-050'
       - 'Build Mastor Tune MT-0420'
       - 'Build Mastor Key Scout MKS-0420'
+      - 'Build Mastor Reggae Organ MRO-68'
+      - 'Build Mastor Pick Guitar MPG-11'
+      - 'Build Mastor Reggae Guitar MRG-68'
+      - 'Build Mastor Reggae Clavinet MRCL-71'
+      - 'Build Mastor Orch Hit MOH-88'
     types: [completed]
   workflow_dispatch:
 

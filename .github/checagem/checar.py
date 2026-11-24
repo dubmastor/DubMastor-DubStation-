@@ -66,8 +66,14 @@ for p in reg:
             err(sig, f"o site não mostra '{nome}' na versão {v}")
         continue
 
-    if not (RAIZ / f".github/workflows/build-{pasta.lower()}.yml").exists():
+    wf = RAIZ / f".github/workflows/build-{pasta.lower()}.yml"
+    if not wf.exists():
         err(sig, f"falta o workflow .github/workflows/build-{pasta.lower()}.yml")
+    else:
+        # o site se atualiza sozinho depois do build (pages.yml → workflow_run): o nome do workflow tem que estar lá
+        mw = re.search(r"^name:\s*(.+)$", wf.read_text(), re.M)
+        if mw and f"'{mw.group(1).strip()}'" not in (RAIZ / ".github/workflows/pages.yml").read_text():
+            err(sig, f"o workflow '{mw.group(1).strip()}' não está no workflow_run do pages.yml (o site não se atualiza depois da release)")
 
     # site: card com nome + versão e links da versão atual ("oculto": true = fora do site por enquanto)
     if p.get("oculto"):
