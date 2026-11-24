@@ -144,6 +144,7 @@ nav.tabs button.muted{color:#8a7a62}
 .live .mc:not(.off) .eqz i:nth-child(2){animation-delay:-.2s}.live .mc:not(.off) .eqz i:nth-child(3){animation-delay:-.35s}.live .mc:not(.off) .eqz i:nth-child(4){animation-delay:-.1s}
 @keyframes eqz{to{height:18px}}
 .mc.hit{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 0 #000,0 0 22px var(--c)}
+.sirecho{margin-top:12px;background:linear-gradient(180deg,#5d6b4f,#46523b);border:2px solid #000;border-radius:10px;padding:10px 12px;color:#f0ead8}.sirecho.bypassed{filter:grayscale(.7) brightness(.75)}.sirecho .knob .kl{color:#e4ddc6}.sirecho .knob .arc{stroke:#f6efd9}
 .dub{background:radial-gradient(500px 220px at 20% 0%,#5a2416,transparent),linear-gradient(180deg,#2a120c,#120806);border:2px solid #000;border-radius:12px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
 .dubt{font-family:var(--disp);font-size:44px;letter-spacing:6px;line-height:1;background:linear-gradient(180deg,#ff6a4a,#e6b83a 50%,#4f9a5a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .siren{width:132px;height:132px;border-radius:50%;border:3px solid #000;cursor:pointer;font-family:var(--disp);font-size:18px;letter-spacing:2px;color:#fff;background:radial-gradient(circle at 40% 35%,#ff8a6a,#c8402f 55%,#5a140c);box-shadow:0 6px 0 #000,0 0 18px rgba(255,80,50,.35);touch-action:none;user-select:none;-webkit-user-select:none;flex:none}
@@ -664,7 +665,7 @@ let userStopped=false;
 $('play').onclick=e=>{if(!H.ready&&!playing){openSetup(true);return}if(!ctx)initAudio();ctx.resume();playing=!playing;if(!playing&&e&&e.isTrusted)userStopped=true;const b=$('play');
  if(playing){cur=0;bar=0;arrI=0;arrB=0;arrJump=-1;arrEndAt=0;nextT=ctx.currentTime+.05;timer=setInterval(tick,25);b.textContent='■ STOP';b.className='btn big red'}
  else{clearInterval(timer);uiQ.length=0;b.textContent='▶ PLAY';b.className='btn big green';showStep(-1,0)}document.body.classList.toggle('live',playing);const b2=$('play2');b2.textContent=playing?'■ STOP':'▶ PLAY';b2.className='btn big '+(playing?'red':'green');};
-const setBpm=v=>{H.bpm=Math.max(40,Math.min(180,Math.round(v)));$('bpmv').textContent=H.bpm;applyFX();if(typeof renderTl==='function'&&$('tl'))renderTl()};
+const setBpm=v=>{H.bpm=Math.max(40,Math.min(180,Math.round(v)));$('bpmv').textContent=H.bpm;applyFX();if(typeof renderTl==='function'&&$('tl'))renderTl();if(typeof seApply==='function')seApply()};
 $('bm').onclick=()=>setBpm(H.bpm-1);$('bp').onclick=()=>setBpm(H.bpm+1);
 
 /* ---------- knob ---------- */
@@ -743,8 +744,9 @@ const mp=mk(`<section class="panel" id="p-main" style="${thVars(MN)}">${cab(MN,'
 <div class="show" id="showbox"><h3 style="margin:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span class="dubt" style="font-size:22px">SHOW</span><span class="cnt">10 riddims salvos para tocar ao vivo · ficam neste navegador</span><span style="flex:1"></span><button class="btn" id="shexp">Exportar show</button><label class="btn" style="cursor:pointer">Importar show<input type="file" id="shimp" accept=".json,application/json" hidden></label></h3><div class="sgrid" id="sgrid"></div></div>
 <div class="console" id="mixmain"><h3 style="margin:0 0 2px;display:flex;align-items:center;gap:8px"><span class="dubt" style="font-size:22px">MIXAGEM</span><span class="cnt">volume, pan, mute e solo de cada machine · os mesmos controles das abas</span></h3><div class="chs" data-console></div></div>
 <div class="group" style="margin-top:12px"><h3>Machines <span class="row"><button class="btn" id="allon">Ligar todas</button><button class="btn" id="alloff">Desligar todas</button></span></h3><div class="mgrid" id="mgrid"></div></div>
-<div class="dub" style="margin-top:12px"><div><div class="dubt">DUB</div><p class="hint" style="margin:6px 0 10px">Segure a sirene para tocar. Ela passa pelo Tape Echo do master.</p>
-<div class="row" style="gap:16px;align-items:center"><button class="siren" id="siren" aria-label="Sirene (segure)">SIRENE</button><div><select id="smode" aria-label="Tipo de sirene"><option>Clássica</option><option>Laser</option><option>Whoop</option><option>Alarme</option></select><div class="knobs" id="sirk"></div></div></div></div>
+<div class="dub" style="margin-top:12px"><div><div class="dubt">DUB</div><p class="hint" style="margin:6px 0 10px">Segure a sirene para tocar. Ela tem um Tape Echo só dela, ligado, no tempo do riddim.</p>
+<div class="row" style="gap:16px;align-items:center"><button class="siren" id="siren" aria-label="Sirene (segure)">SIRENE</button><div><select id="smode" aria-label="Tipo de sirene"><option>Clássica</option><option>Laser</option><option>Whoop</option><option>Alarme</option></select><div class="knobs" id="sirk"></div></div></div>
+<div class="sirecho" id="sirecho"><div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><span class="brand" style="font-size:15px">TAPE ECHO<small>da sirene</small></span><button class="btn on" id="seby">Ligado</button><select id="setime" aria-label="Tempo do eco da sirene"></select></div><div class="knobs" id="sek"></div></div></div>
 <div class="bigbox"><div class="bkt">MASTOR BIG KNOB</div><div id="bigk2"></div></div></div>
 
 </div></section>`);
@@ -1086,10 +1088,24 @@ $('allon').onclick=()=>{M.forEach(i=>{i.mute=false;i.solo=false});renderToggles(
 $('alloff').onclick=()=>{M.forEach(i=>i.mute=true);renderToggles()};
 $('play2').onclick=()=>$('play').click();
 /* sirene */
-const SR={tone:.45,rate:.35,echo:.6,vol:.6};let sirOut,sirSend,sv=null;
+const SR={tone:.45,rate:.35,vol:.6};let sirOut,sv=null;
+/* Tape Echo da sirene: começa LIGADO em 1/2 tercina (longa), no tempo do riddim */
+const SE={on:true,time:'1/2 tercina',fb:.55,tone:.4,mix:.5,wow:.35};
+const SET={'1/8 tercina':1/3,'1/4 tercina':2/3,'1/2 tercina':4/3,'1/8 pontuada':.75,'1/4':1,'1/4 pontuada':1.5};
+let seIn,seDl,seFb,seLp,seOut,seWow,seWowG;
+const seSec=()=>Math.min(3.8,SET[SE.time]*60/H.bpm);
+function seUi(){$('sirecho').classList.toggle('bypassed',!SE.on);$('seby').textContent=SE.on?'Ligado':'Desligado';$('seby').classList.toggle('on',SE.on)}
+function seApply(){seUi();if(!seIn)return;const t=ctx.currentTime;seDl.delayTime.setTargetAtTime(seSec(),t,.05);seFb.gain.value=SE.fb;seLp.frequency.value=700*7**SE.tone;seOut.gain.value=SE.on?SE.mix:0;seIn.gain.value=SE.on?1:0;seWowG.gain.value=.0025*SE.wow}
+function seBuild(){sirOut=ctx.createGain();sirOut.connect(bus);seIn=ctx.createGain();seDl=ctx.createDelay(4);seFb=ctx.createGain();seLp=ctx.createBiquadFilter();seLp.type='lowpass';
+ const hp2=ctx.createBiquadFilter();hp2.type='highpass';hp2.frequency.value=180;const sat=ctx.createWaveShaper();sat.curve=curve(0,.25);seOut=ctx.createGain();
+ seWow=ctx.createOscillator();seWow.frequency.value=.6;seWowG=ctx.createGain();seWow.connect(seWowG);seWowG.connect(seDl.delayTime);seWow.start();
+ sirOut.connect(seIn);seIn.connect(seDl);seDl.connect(seLp);seLp.connect(hp2);hp2.connect(sat);sat.connect(seFb);seFb.connect(seDl);sat.connect(seOut);seOut.connect(bus);seApply()}
 const SMODES={'Clássica':['square','triangle',.5],'Laser':['sawtooth','sawtooth',.8],'Whoop':['sine','sine',.6],'Alarme':['square','square',.35]};
-$('sirk').append(knob('Tom',0,1,SR.tone,pct,v=>SR.tone=v),knob('Velocidade',0,1,SR.rate,pct,v=>SR.rate=v),knob('Eco',0,1,SR.echo,pct,v=>{SR.echo=v;if(sirSend)sirSend.gain.value=v}),knob('Volume',0,1,SR.vol,pct,v=>SR.vol=v));
-function sirenOn(){if(!ctx)initAudio();ctx.resume();if(!sirOut){sirOut=ctx.createGain();sirSend=ctx.createGain();sirOut.connect(bus);sirOut.connect(sirSend);sirSend.connect(eIn)}sirSend.gain.value=SR.echo;if(sv)sirenOff(true);
+$('setime').innerHTML=Object.keys(SET).map(k=>`<option ${k===SE.time?'selected':''}>${k}</option>`).join('');$('setime').onchange=e=>{SE.time=e.target.value;seApply()};
+$('seby').onclick=()=>{SE.on=!SE.on;seApply()};
+$('sek').append(knob('Feedback',0,.9,SE.fb,pct,v=>{SE.fb=v;seApply()}),knob('Tom',0,1,SE.tone,pct,v=>{SE.tone=v;seApply()}),knob('Mix',0,1,SE.mix,pct,v=>{SE.mix=v;seApply()}),knob('Wow',0,1,SE.wow,pct,v=>{SE.wow=v;seApply()}));
+$('sirk').append(knob('Tom',0,1,SR.tone,pct,v=>SR.tone=v),knob('Velocidade',0,1,SR.rate,pct,v=>SR.rate=v),knob('Volume',0,1,SR.vol,pct,v=>SR.vol=v));
+function sirenOn(){if(!ctx)initAudio();ctx.resume();if(!sirOut)seBuild();if(sv)sirenOff(true);
  const[w,lw,dp]=SMODES[$('smode').value],t=ctx.currentTime,f=200*6**SR.tone,o=ctx.createOscillator(),l=ctx.createOscillator(),lg=ctx.createGain(),g=ctx.createGain(),fl=ctx.createBiquadFilter();
  o.type=w;o.frequency.value=f;l.type=lw;l.frequency.value=.5*24**SR.rate;lg.gain.value=f*dp;fl.type='lowpass';fl.frequency.value=4000;l.connect(lg);lg.connect(o.frequency);o.connect(fl);fl.connect(g);g.connect(sirOut);
  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25*SR.vol+.0002,t+.03);o.start(t);l.start(t);sv={o,l,g};$('siren').classList.add('on')}
