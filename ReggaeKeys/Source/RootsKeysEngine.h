@@ -32,9 +32,10 @@ struct SineTable
     static constexpr int N = 4096;
     float t[N + 1];
     SineTable() { for (int i = 0; i <= N; ++i) t[i] = std::sin (kTwoPi * (float) i / (float) N); }
-    inline float operator() (float ph) const   // ph em [0,1)
+    inline float operator() (float ph) const   // ph em ciclos (qualquer valor: a fase é dobrada para [0,1))
     {
-        const float x = ph * (float) N;
+        ph -= std::floor (ph);                     // notas muito agudas (ex.: o "tine" 14x do FM EP) passam de 1 por amostra
+        const float x = std::min (ph * (float) N, (float) N - 0.001f);
         const int i = (int) x;
         const float f = x - (float) i;
         return t[i] + f * (t[i + 1] - t[i]);
@@ -546,8 +547,8 @@ struct PianoVoice
             {
                 const float m = S (mPh[i]) * idx[i] * 0.159155f;   // índice em radianos -> ciclos
                 s += S (wrap1 (cPh[i] + m)) * cAmp[i];
-                cPh[i] += cInc[i] * fm; if (cPh[i] >= 1.0f) cPh[i] -= 1.0f;
-                mPh[i] += mInc[i] * fm; if (mPh[i] >= 1.0f) mPh[i] -= 1.0f;
+                cPh[i] = wrap1 (cPh[i] + cInc[i] * fm);
+                mPh[i] = wrap1 (mPh[i] + mInc[i] * fm);
                 idx[i] *= idxCoef[i];
             }
             att = std::min (1.0f, att + attInc);
