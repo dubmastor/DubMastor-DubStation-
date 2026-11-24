@@ -1,4 +1,15 @@
-## Mastor Dub Horns MDH-70 1.3 🟢🟡⚫
+## Mastor Dub Horns MDH-70 1.4 🟢🟡⚫
+
+**Frases por década e estilo, e transcrição de áudio para MIDI.**
+
+- **Biblioteca de frases no padrão da Riddim Machine:** visor azul, ESTILO ◀ ▶ e LISTA na aba Frases MIDI. São 41 frases **originais** em 8 estilos, com o ritmo e a articulação de cada época:
+  Ska (1960-66), Rocksteady (1966-68), Early Reggae (1968-72), Roots One Drop (1972-78), Rockers (1975-80), Dub (1973-80), Dancehall (1979-85) e Digital & Ragga (1985-95). As notas continuam sendo suas (ou sugeridas no tom).
+- **Transcrição de áudio:** arraste um MP3, WAV, AIFF ou FLAC na aba Frases (ou toque em *Transcrever áudio*) e os metais viram uma frase MIDI de até 4 compassos, no BPM do projeto, com staccato, scoop, fall e doit reconhecidos. Dá para tocar, corrigir as notas, arrastar para a DAW ou exportar o `.mid`.
+  - *metal sozinho*: para gravações em que o metal está sozinho ou bem na frente (nos testes, 144 de 146 notas certas).
+  - *música inteira*: foca na região dos metais e ignora o que está muito mais baixo e as repetições do eco; podem sobrar algumas notas para apagar.
+  - Para estudo e para as suas gravações. Melodias de discos de terceiros continuam sendo dos autores.
+
+### O que veio na 1.3
 
 **Timbre de sessão jamaicana dos anos 70 e 80, visor de presets sempre à vista e o plugin abrindo no dub.**
 
