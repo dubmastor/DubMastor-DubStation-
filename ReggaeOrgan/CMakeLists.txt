@@ -44,7 +44,7 @@ juce_add_plugin(ReggaeOrgan
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     VST3_CATEGORIES Instrument Synth)
 
-# o órgão, o visual e as fontes são os mesmos do Mastor Reggae Keys MRK-80 (pasta ReggaePiano/)
+# o órgão, o visual e as fontes são os mesmos do Mastor Reggae Piano MRP-80 (pasta ReggaePiano/)
 juce_add_binary_data(ReggaeOrganFonts SOURCES
     ../ReggaePiano/Resources/ArchivoBlack-Regular.ttf
     ../ReggaePiano/Resources/RootsKeysDisplay-BoldItalic.ttf)

@@ -49,7 +49,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
 
     // ---- ajustes do groove
     l.add (choice ("beat", "Batida", { "One Drop", "Rockers", "Steppers" }, m.beat));
-    l.add (choice ("nota", "Duracao da nota", { "1/32", "1/16", "1/8" }, 0));
+    l.add (choice ("nota", "Duracao da nota", { "1/32", "1/64" }, 0));
     l.add (pct ("swing", "Swing", m.swing));
     l.add (pct ("human", "Humanizar", m.human));
     l.add (pct ("ghost", "Ghost (nota fantasma)", m.ghost));

@@ -1480,7 +1480,7 @@ MainPage::MainPage (MrmProcessor& p)
         addAndMakeVisible (*c);
     muteDrums  = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Drums)),  "DRUMS",  "MRD-12",    juce::Colour (0xff2fbf55));
     muteBass   = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Bass)),   "BASS",   "MRB-69",    col::jamGold);
-    muteRiddim = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Chords)), "RIDDIM", "MRK-80",    juce::Colour (0xffe8432c));
+    muteRiddim = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (MrmProcessor::Chords)), "RIDDIM", "MRP-80",    juce::Colour (0xffe8432c));
     for (auto* m : { muteDrums.get(), muteBass.get(), muteRiddim.get() }) addAndMakeVisible (*m);
     fxPower = std::make_unique<PowerSwitch> (*proc.apvts.getParameter ("fxOn"), "CONTROL ROOM", "CONTROL ROOM");
     echoPower = std::make_unique<PowerSwitch> (*proc.getKnob().apvts.getParameter ("echoOn"), "TAPE ECHO", "TAPE ECHO");
@@ -1729,7 +1729,7 @@ void MainPage::renderBackground()
 
     // plaquetas de cada máquina
     const char* names[]  = { "BATERIA", "HARMONIA", "BAIXO" };
-    const juce::String models[] = { juce::String ("MRD-12 ") + MRM_DRUMS_VER, juce::String ("MRK-80 ") + MRM_CHORDS_VER,
+    const juce::String models[] = { juce::String ("MRD-12 ") + MRM_DRUMS_VER, juce::String ("MRP-80 ") + MRM_CHORDS_VER,
                                     juce::String ("MRB-69 ") + MRM_BASS_VER };
     const char* players[] = { "ESTILO DE REGGAE  \xc2\xb7  BATERISTA", "PADR\xc3\x83O DO SKANK", "TIMBRE  \xc2\xb7  BAIXISTA" };
     for (int m = 0; m < MrmProcessor::NumMachines; ++m)

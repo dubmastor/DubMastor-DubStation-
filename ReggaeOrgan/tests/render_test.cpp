@@ -72,9 +72,9 @@ int main()
         for (auto& e : barEvents (0, bc.data(), s)) if (e.layer == LayerChop && std::abs (e.start - 0.5) < 1e-9) notes.push_back (e.note % 12);
         std::sort (notes.begin(), notes.end());
         CHECK ((notes == std::vector<int> { 0, 4, 9 }), "acorde de L\xc3\xa1 menor = A C E");
-        // nota maior: NOTA 1/16
+        // nota menor: NOTA 1/64
         s.noteSize = 1;
-        for (auto& e : barEvents (0, bc.data(), s)) CHECK (std::abs (e.length - 0.25) < 1e-9, "NOTA 1/16");
+        for (auto& e : barEvents (0, bc.data(), s)) CHECK (std::abs (e.length - 0.0625) < 1e-9, "NOTA 1/64");
         s.noteSize = 0;
         // grade editada: célula na cabeça do 1 também funciona
         s.grid = Grid(); s.grid.rh[0] = Accent; s.grid.lh[7] = Ghost;

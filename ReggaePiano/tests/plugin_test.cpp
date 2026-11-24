@@ -1,4 +1,4 @@
-// Teste do Mastor Reggae Keys MRK-80 com a aba CHORD MACHINE (MRCM-1240 embutido).
+// Teste do Mastor Reggae Piano MRP-80 com a aba CHORD MACHINE (MRCM-1240 embutido).
 // cmake -B build -DJUCE_DIR=... -DROOTSKEYS_TESTS=ON && cmake --build build --target RootsKeysTest
 // ./RootsKeysTest [pasta-das-imagens]   -> falha (exit 1) se algum item não passar
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -85,19 +85,31 @@ int main (int argc, char** argv)
         setP (p.apvts, "machineOn", 1.0f);
         bool fin = true;
         const double rms = render (p, 6.0, fin);
-        check (fin && rms > 1.0e-3, "CHORD MACHINE toca no piano do MRK-80 (rms " + juce::String (rms, 5) + ")");
-        setP (p.apvts, "mode", 1.0f);
-        const double rmsOrgan = render (p, 6.0, fin);
-        check (fin && rmsOrgan > 1.0e-3, "CHORD MACHINE toca no orgao do MRK-80 (rms " + juce::String (rmsOrgan, 5) + ")");
+        check (fin && rms > 1.0e-3, "CHORD MACHINE toca no piano do MRP-80 (rms " + juce::String (rms, 5) + ")");
+        check (getP (p.getMachine().apvts, "bubble") < 0.5f, "so piano: BUBBLE da machine desligado");
     }
-    {   // 3) SOM INTERNO ligado: o som da propria machine (piano M1 + Hammond) na saida
+    {   // 2b) PIANISTAS, FILLS, nota de 1/64 e os timbres novos tocam pela CHORD MACHINE
+        for (int pn = 1; pn < 8; ++pn)
+        {
+            RootsKeysProcessor p;
+            setP (p.apvts, "machineOn", 1.0f);
+            setP (p.apvts, "pianoType", (float) (pn % 7));   // um timbre diferente por pianista (0..6)
+            setP (p.getMachine().apvts, "pianist", (float) pn);
+            setP (p.getMachine().apvts, "pianoFill", (float) (8 - pn));   // FILL separado do pianista
+            setP (p.getMachine().apvts, "nota64", pn % 2 == 0 ? 1.0f : 0.0f);
+            bool fin = true;
+            const double rms = render (p, 5.0, fin);
+            check (fin && rms > 5.0e-4, "pianista " + juce::String (pn) + " + fill " + juce::String (8 - pn) + " + timbre " + juce::String (pn % 7)
+                                        + " tocam (rms " + juce::String (rms, 5) + ")");
+        }
+    }
+    {   // 3) SOM INTERNO ligado: o som da propria machine (piano M1) na saida
         RootsKeysProcessor p;
         setP (p.apvts, "machineOn", 1.0f);
         setP (p.getMachine().apvts, "sound", 1.0f);
-        setP (p.getMachine().apvts, "bubble", 1.0f);
         bool fin = true;
         const double rms = render (p, 6.0, fin);
-        check (fin && rms > 1.0e-3, "SOM INTERNO da machine (skank + bubble) na saida (rms " + juce::String (rms, 5) + ")");
+        check (fin && rms > 1.0e-3, "SOM INTERNO da machine (piano M1 no skank) na saida (rms " + juce::String (rms, 5) + ")");
     }
     {   // 4) projeto salvo: a machine volta igual
         RootsKeysProcessor a, b;
@@ -133,15 +145,13 @@ int main (int argc, char** argv)
                  && juce::roundToInt (getP (mb, "dur0")) == 1 && juce::roundToInt (getP (mb, "root1")) == 9
                  && juce::roundToInt (getP (mb, "qual1")) == 0 && getP (mb, "on1") > 0.5f && getP (mb, "on2") < 0.5f,
                "projeto antigo: acordes da DUB CHORDS (m7 -> menor, maj7 -> maior)");
-        check (getP (mb, "bubble") > 0.5f && juce::roundToInt (getP (mb, "center")) == 55
+        check (getP (mb, "bubble") < 0.5f && juce::roundToInt (getP (mb, "center")) == 55
                  && juce::roundToInt (getP (mb, "bpm")) == 82 && getP (mb, "sound") < 0.5f,
-               "projeto antigo: padrao Auto no orgao vira bubble, registro e BPM mantidos");
-        check (getP (p.apvts, "machineOn") > 0.5f && juce::roundToInt (getP (p.apvts, "mode")) == 1,
-               "projeto antigo: 'tocar com a DAW' vira CHORD MACHINE ligada, modo orgao mantido");
+               "projeto antigo: sem bubble (o orgao e do MRO-68), registro e BPM mantidos");
+        check (getP (p.apvts, "machineOn") > 0.5f, "projeto antigo: 'tocar com a DAW' vira CHORD MACHINE ligada");
     }
     {   // 6) capturas da interface
         RootsKeysProcessor p;
-        setP (p.getMachine().apvts, "bubble", 1.0f);
         std::unique_ptr<juce::AudioProcessorEditor> ed (p.createEditor());
         auto* rk = dynamic_cast<RootsKeysEditor*> (ed.get());
         for (int f = 0; f < 6; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
@@ -158,10 +168,6 @@ int main (int argc, char** argv)
         save ("interface-piano.png");
         rk->setPage (1);
         save ("interface-chord-machine.png");
-        setP (p.apvts, "mode", 1.0f);
-        for (int f = 0; f < 12; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
-        rk->setPage (0);
-        save ("interface-organ.png");
     }
 
     std::printf ("\n%s\n", failures == 0 ? "TUDO OK" : "HA FALHAS");

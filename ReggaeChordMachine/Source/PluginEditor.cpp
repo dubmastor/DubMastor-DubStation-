@@ -702,6 +702,12 @@ void DubChordsPanel::exportMidi()
 void DubChordsPanel::timerCallback()
 {
     voicings = proc.getVoicings();
+    {   // PIANISTA / 1/64 mudaram (pelo clique, por um projeto aberto ou pela automação): redesenha as janelas
+        const int key = ((int) proc.apvts.getRawParameterValue ("pianist")->load() * 2
+                      + (proc.apvts.getRawParameterValue ("nota64")->load() > 0.5f ? 1 : 0)) * 16
+                      + (int) proc.apvts.getRawParameterValue ("pianoFill")->load();
+        if (key != lastPianistKey) { lastPianistKey = key; repaint (patternArea.getUnion (noteSizeArea()).getUnion (fillArea())); }
+    }
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);
@@ -897,7 +903,7 @@ void DubChordsPanel::renderBackground()
     juce::String ver (JucePlugin_VersionString);
     if (ver.containsChar ('.') && ver.fromFirstOccurrenceOf (".", false, false).containsChar ('.'))
         ver = ver.upToLastOccurrenceOf (".", false, false);
-   #ifdef MCM_PANEL_TITLE   // dentro do Mastor Reggae Keys MRK-80 (aba CHORD MACHINE)
+   #ifdef MCM_PANEL_TITLE   // dentro do Mastor Reggae Piano MRP-80 (aba CHORD MACHINE)
     const juce::String title (MCM_PANEL_TITLE + ver);
    #else
     const juce::String title ("MASTOR REGGAE CHORD MACHINE " + ver);
@@ -1014,11 +1020,14 @@ void DubChordsPanel::renderBackground()
         }
     }
     for (auto* k : { &center, &velocity, &swing, &bpm, &pianoLvl, &organLvl })
+       #ifdef MCM_NO_BUBBLE   // dentro do Mastor Reggae Piano MRP-80: sem órgão (o bubble é do Mastor Reggae Organ MRO-68)
+        if (k != &organLvl)
+       #endif
         drawKnobScale (g, k->slider, 11);
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
-    g.drawText (juce::String::fromUTF8 ("PADR\xc3\x83O DO SKANK"), patternArea.translated (0, -15).withHeight (12), juce::Justification::centred);
-    {   // skank sempre no contratempo: janela fixa no lugar do antigo seletor
+    g.drawText (juce::String::fromUTF8 ("PIANISTA  \xe2\x96\xbe"), patternArea.translated (0, -15).withHeight (12), juce::Justification::centred);
+    {   // PIANISTA: janela que abre a lista dos chops (o nome é desenhado no paint)
         auto b = patternArea.toFloat();
         g.setColour (juce::Colours::black.withAlpha (0.35f));
         g.fillRoundedRectangle (b.translated (0, 2.0f), 5.0f);
@@ -1034,24 +1043,74 @@ void DubChordsPanel::renderBackground()
         drum.addColour (0.85, juce::Colour (0xffcbbd98));
         g.setGradientFill (drum);
         g.fillRoundedRectangle (win, 2.0f);
-        g.setColour (colours::ink);
-        g.setFont (stencil (17.0f, 0.06f));
-        g.drawText ("CONTRATEMPO", win, juce::Justification::centred);
     }
-    {   // notas sempre 1/32: plaqueta gravada no lugar do antigo seletor
-        auto r = patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44).toFloat();
+    // FILL (lista) e duração das notas: 1/32 (padrão) ou 1/64, clicando nas plaquetas (os valores são desenhados no paint)
+    for (auto [area, label] : { std::pair { fillArea(), "FILL  \xe2\x96\xbe" }, std::pair { noteSizeArea(), "NOTAS  \xe2\x96\xb8" } })
+    {
+        auto r = area.toFloat();
         g.setColour (juce::Colours::white.withAlpha (0.45f));
         g.drawRoundedRectangle (r.translated (1, 1), 4.0f, 1.0f);
         g.setColour (colours::ink.withAlpha (0.55f));
         g.drawRoundedRectangle (r, 4.0f, 1.2f);
         g.setColour (colours::inkSoft);
         g.setFont (stencil (9.0f, 0.3f));
-        g.drawText (juce::String::fromUTF8 ("DURA\xc3\x87\xc3\x83O DAS NOTAS"), r.withHeight (r.getHeight() * 0.45f).translated (0, 4), juce::Justification::centred);
-        g.setColour (colours::ink);
-        g.setFont (stencil (14.0f, 0.12f));
-        g.drawText ("1/32  FUSA", r.withTrimmedTop (r.getHeight() * 0.42f), juce::Justification::centred);
+        g.drawText (juce::String::fromUTF8 (label), r.withHeight (r.getHeight() * 0.45f).translated (0, 4), juce::Justification::centred);
     }
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" });
+}
+
+juce::Rectangle<int> DubChordsPanel::noteSizeArea() const
+{
+    return patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44).withTrimmedLeft (patternArea.getWidth() / 2 + 3);
+}
+
+juce::Rectangle<int> DubChordsPanel::fillArea() const
+{
+    return patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44).withWidth (patternArea.getWidth() / 2 - 3);
+}
+
+void DubChordsPanel::mouseDown (const juce::MouseEvent& e)
+{
+    if (patternArea.contains (e.getPosition()))
+    {
+        juce::PopupMenu m;
+        const int cur = (int) proc.apvts.getRawParameterValue ("pianist")->load();
+        m.addSectionHeader (juce::String::fromUTF8 ("PIANISTAS  \xc2\xb7  SKANK NO ESTILO DOS TECLADISTAS JAMAICANOS"));
+        for (int p = 0; p < dub::NumPianists; ++p)
+            m.addItem (p + 1, juce::String (dub::pianistName (p)) + "    " + juce::String::fromUTF8 (dub::pianistWho (p)), true, p == cur);
+        juce::Component::SafePointer<DubChordsPanel> safe (this);
+        m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withTargetScreenArea (localAreaToGlobal (patternArea)),
+                         [safe] (int r)
+                         {
+                             if (safe == nullptr || r <= 0) return;
+                             if (auto* prm = safe->proc.apvts.getParameter ("pianist"))
+                                 prm->setValueNotifyingHost (prm->convertTo0to1 ((float) (r - 1)));
+                             safe->repaint();
+                         });
+    }
+    else if (fillArea().contains (e.getPosition()))
+    {
+        juce::PopupMenu m;
+        const int cur = (int) proc.apvts.getRawParameterValue ("pianoFill")->load();
+        m.addSectionHeader (juce::String::fromUTF8 ("FILLS  \xc2\xb7  NO FIM DE CADA FRASE DE 4 COMPASSOS (TEMPOS 3 E 4)"));
+        for (int f = 0; f < dub::NumFills; ++f)
+            m.addItem (f + 1, juce::String (dub::fillName (f)) + "    " + juce::String::fromUTF8 (dub::fillWho (f)), true, f == cur);
+        juce::Component::SafePointer<DubChordsPanel> safe (this);
+        m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withTargetScreenArea (localAreaToGlobal (fillArea())),
+                         [safe] (int r)
+                         {
+                             if (safe == nullptr || r <= 0) return;
+                             if (auto* prm = safe->proc.apvts.getParameter ("pianoFill"))
+                                 prm->setValueNotifyingHost (prm->convertTo0to1 ((float) (r - 1)));
+                             safe->repaint();
+                         });
+    }
+    else if (noteSizeArea().contains (e.getPosition()))
+    {
+        if (auto* prm = proc.apvts.getParameter ("nota64"))
+            prm->setValueNotifyingHost (prm->getValue() > 0.5f ? 0.0f : 1.0f);
+        repaint();
+    }
 }
 
 void DubChordsPanel::paint (juce::Graphics& g)
@@ -1059,6 +1118,22 @@ void DubChordsPanel::paint (juce::Graphics& g)
     g.fillAll (colours::woodDark);
     if (background.isValid())
         g.drawImage (background, getLocalBounds().toFloat());
+
+    {   // PIANISTA e DURAÇÃO DAS NOTAS (mudam com o clique)
+        const int pn = juce::jlimit (0, dub::NumPianists - 1, (int) proc.apvts.getRawParameterValue ("pianist")->load());
+        auto win = patternArea.toFloat().reduced (14.0f, 7.0f);
+        g.setColour (colours::ink);
+        g.setFont (stencil (pn == 0 ? 15.0f : 17.0f, 0.06f));
+        g.drawText (pn == 0 ? juce::String ("CONTRATEMPO") : juce::String (dub::pianistName (pn)), win, juce::Justification::centred);
+        const bool n64 = proc.apvts.getRawParameterValue ("nota64")->load() > 0.5f;
+        auto r = noteSizeArea().toFloat();
+        g.setFont (stencil (14.0f, 0.12f));
+        g.drawText (n64 ? juce::String ("1/64") : juce::String ("1/32"), r.withTrimmedTop (r.getHeight() * 0.42f), juce::Justification::centred);
+        const int fl = juce::jlimit (0, dub::NumFills - 1, (int) proc.apvts.getRawParameterValue ("pianoFill")->load());
+        auto fr = fillArea().toFloat();
+        g.setFont (stencil (fl == 0 ? 11.0f : 12.5f, 0.08f));
+        g.drawText (fl == 0 ? juce::String ("SEM") : juce::String (dub::fillName (fl)), fr.withTrimmedTop (fr.getHeight() * 0.42f), juce::Justification::centred);
+    }
 
     const auto slots = proc.getSlots();
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
@@ -1192,6 +1267,11 @@ void DubChordsPanel::resized()
         const int kw = a.getWidth() / 3;
         for (auto* k : { &bpm, &pianoLvl, &organLvl })
             placeKnob (*k, a.removeFromLeft (kw).withTrimmedBottom (24).withTrimmedTop (14));
+       #ifdef MCM_NO_BUBBLE   // dentro do Mastor Reggae Piano MRP-80: só o skank de piano
+        bubble.button.setVisible (false);
+        organLvl.slider.setVisible (false);
+        organLvl.label.setVisible (false);
+       #endif
     }
     {   // MIDI
         auto a = midiPanel.reduced (14, 0);

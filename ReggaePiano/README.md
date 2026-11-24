@@ -1,27 +1,24 @@
-# Mastor Reggae Keys MRK-80 3.0
+# Mastor Reggae Piano MRP-80 3.1
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.0/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRP-80-3.1/MRP-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRP-80-3.1/MRP-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/piano/)**
 
-(Antes se chamava **DubMastor Roots Keys** e **Mastor Roots Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240**, que virou a aba CHORD MACHINE.)
+(Antes se chamava **DubMastor Roots Keys**, **Mastor Roots Keys MRK-80** e **Mastor Reggae Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240** (aba CHORD MACHINE); na 3.1 o órgão saiu e virou o **Mastor Reggae Organ MRO-68**.)
 
-| Modo piano | Modo órgão |
-|---|---|
-| ![Modo piano](docs/interface-piano.png) | ![Modo órgão](docs/interface-organ.png) |
+![Modo piano](docs/interface-piano.png)
 
 ![Aba CHORD MACHINE](docs/interface-chord-machine.png)
 
-Instrumento VST3 / AU / Standalone com dois timbres para reggae e dub, um de cada vez:
+Instrumento VST3 / AU / Standalone de piano para reggae e dub:
 
 - **Piano estilo Korg M1** — o piano brilhante do M1 recriado por síntese aditiva (sem samples da Korg): ataque brilhante, presença em 2–4 kHz, decaimento em dois estágios, ruído de martelo e chorus estéreo.
-- **Órgão tonewheel estilo Hammond B3** — 9 drawbars, percussão single-trigger (2º/3º harmônico, rápida/lenta), key click, overdrive valvulado e caixa Leslie com aceleração realista.
 
 Cadeia de saída: **Tape Echo Mastor Tape Echo MTE-12** (o mesmo eco do Dub Station 2.1) → reverb → **Flanger dub** (o "avião a jato" no estilo dos dubs do Mad Professor, na mistura inteira) → **Maximizer** → **VUs analógicos L/R**. O teclado de 61 teclas acende com as notas MIDI tocadas (e toca com o mouse).
 
 ## Timbres de piano
 
-Quatro botões logo abaixo do visor do modo piano (o visor mostra o timbre escolhido):
+Sete botões logo abaixo do visor (o visor mostra o timbre escolhido):
 
 | Timbre | Som |
 |---|---|
@@ -29,6 +26,9 @@ Quatro botões logo abaixo do visor do modo piano (o visor mostra o timbre escol
 | **GRAND** | piano de cauda: mais harmônicos, cordas mais "duras", ataque de martelo grave, sustentação longa e o leve batimento entre as cordas de cada nota |
 | **MT-40** | teclado digital de brinquedo estilo Casio MT-40: onda de pulso, sem sensibilidade ao toque, ~6 bits a 16 kHz, bem lo-fi |
 | **FM EP** | piano elétrico FM estilo Yamaha DX: corpo 1:1 + "tine" metálico 1:14 que some rápido; o toque mais forte abre o brilho |
+| **RHODES** | piano elétrico de palheta: corpo redondo, sino curto (1:7) e "bark" (saturação) que cresce com a força do toque |
+| **UPRIGHT** | piano de armário de estúdio (ska / Studio One): cordas menos afinadas entre si, mais curto e mais batido |
+| **CZ** | Casio CZ-101 da era digital (Steely & Clevie): phase distortion, abre brilhante como serra e fecha em senoide |
 
 BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
 
@@ -36,50 +36,37 @@ BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
 
 As duas rodas do lado do teclado funcionam com o mouse e com o MIDI:
 
-- **PITCH**: arraste para cima/baixo — ±2 semitons em todos os timbres e no órgão; ao soltar, volta ao centro como a roda de verdade.
-- **MOD**: arraste para definir — no piano faz **vibrato**; no órgão, acima da metade, liga a **Leslie rápida**. Duplo clique zera.
+- **PITCH**: arraste para cima/baixo — ±2 semitons em todos os timbres; ao soltar, volta ao centro como a roda de verdade.
+- **MOD**: arraste para definir — faz **vibrato**. Duplo clique zera.
 
 ## Aba CHORD MACHINE — o MRCM-1240 dentro do teclado
 
 Clique em **CHORD MACHINE** no cabeçalho: é o **Mastor Reggae Chord Machine MRCM-1240** inteiro (o código vem direto de `ReggaeChordMachine/`, nada copiado), só com acordes **maior e menor**:
 
-- **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano no contratempo com as duas mãos e, com **BUBBLE**, o bubble de Hammond.
+- **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano no contratempo com as duas mãos (o bubble de órgão é do Mastor Reggae Organ MRO-68).
 - **PRESETS**: o banco único de riddims (356 músicas, 155 riddims; ESTILOS, RIDDIMS A–Z, MÚSICAS A–Z, luzes D B R) e as 180 harmonias clássicas.
-- **Som**: com o **SOM INTERNO** desligado (o padrão), os acordes tocam no piano ou no órgão do instrumento, passando pelo eco, flanger, reverb e maximizer. Ligado, toca o som próprio da machine: piano M1 no skank e Hammond no bubble ao mesmo tempo (PIANO M1 e HAMMOND ajustam os níveis).
+- **Som**: com o **SOM INTERNO** desligado (o padrão), os acordes tocam no piano do instrumento, passando pelo eco, flanger, reverb e maximizer. Ligado, toca o som próprio da machine (piano M1).
 - **Tocar**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCA COM A DAW** (no cabeçalho) segue o play, o BPM e o loop da DAW.
 - **MIDI**: EXPORTAR ou ARRASTAR para a timeline, com repetição 1x a 8x.
 
 Projetos salvos com a antiga aba DUB CHORDS abrem na CHORD MACHINE com os mesmos acordes (7, maj7, sus2 e sus4 viram maior; m7, m6, dim e m9 viram menor).
 
-## Dois visuais
+## Visual
 
-O visual muda com o instrumento — escolher um preset de piano ou de órgão (ou a chave PIANO / ORGAN) troca a tela:
-
-- **Piano:** teclado preto anos 80 em plástico liso e fosco, caixas de som com tela de tecido e faixa vermelha e dourada, visor de cristal líquido verde com o preset, botões P01–P04 com LED, faders, rodas de pitch/mod e teclas que acendem em verde.
-- **Órgão:** gabinete de madeira com detalhes em marfim, drawbars que se puxam **para baixo** (como no B3; duplo clique zera/abre), chave meia-lua da Leslie, tabs de percussão, teclas de preset invertidas e teclas que acendem em laranja.
-
-As texturas são geradas por código (sem imagens). O emblema dourado **Dub Station** fica no centro do cabeçalho nos dois visuais. Títulos em Michroma (piano) e RootsKeys Display, derivada da Playfair Display (órgão).
+Teclado preto anos 80 em plástico liso e fosco, caixas de som com tela de tecido e faixa vermelha e dourada, visor de cristal líquido verde com o preset, botões P01–P04 com LED, faders, rodas de pitch/mod e teclas que acendem em verde. As texturas são geradas por código (sem imagens); o emblema dourado **Dub Station** fica no centro do cabeçalho. Título em Michroma.
 
 ## Controles
 
 | Seção | Controles |
 |---|---|
 | Piano | Brilho, Decay, Chorus, Volume · pedal de sustain (CC64) |
-| Órgão | 9 drawbars (16' 5⅓' 8' 4' 2⅔' 2' 1⅗' 1⅓' 1'), tabs de percussão ON / 3RD / SLOW, chave Leslie SLOW/FAST, Leslie Mix, Drive, Click, Organ Vol · mod wheel (CC1) = Leslie rápido |
 | Tape Echo (Mastor Tape Echo MTE-12) | Echo on/off, Mode 1–12 (1–4 só eco, 5–11 eco + mola, 12 só mola), Rate, Intensity (acima de ~0.85 auto-oscila), Echo Vol, Spring, Wow, Tape Age. Ao desligar, a cauda continua tocando. |
 | Flanger | Flanger on/off, Rate (0,02–4 Hz), Depth, Manual (posição do "pente"), Feedback (−0,95 a +0,95; negativo dá o timbre oco), Mix. Fica depois do eco e do reverb, então os ecos também "voam". |
 | Maximizer / VU | Max on/off, Gain (0 a +18 dB), Ceiling, Reverb, Master, leitura de GR e VUs L/R (0 VU = −18 dBFS RMS) |
 
-## Presets (separados por instrumento)
+## Presets
 
-| Piano | Órgão |
-|---|---|
-| M1 Classic | Reggae Bubble |
-| M1 Dub Skank | Roots Percussion |
-| M1 Bright House | Dub Dark |
-| M1 Soft Ballad | Gospel Leslie Fast |
-
-Um preset de piano nunca altera o órgão, e vice-versa.
+M1 Classic · M1 Dub Skank · M1 Bright House · M1 Soft Ballad (P01–P04, timbre M1).
 
 ## Compilar
 
@@ -96,7 +83,7 @@ Teste offline do DSP (sem JUCE): `g++ -std=c++17 -O2 tests/render_demo.cpp -o re
 Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, capturas da interface): `cmake -B build -DROOTSKEYS_TESTS=ON && cmake --build build --target RootsKeysTest && ./build/RootsKeysTest_artefacts/Release/RootsKeysTest docs`
 
 ## Arquivos
-- `Source/RootsKeysEngine.h` — piano, órgão, Leslie, reverb e maximizer (sem dependências)
+- `Source/RootsKeysEngine.h` — piano, reverb e maximizer (sem dependências); o órgão e a Leslie continuam aqui porque o MRO-68, o MRCM-1240 e o MRM-0420 usam
 - `Source/TapeEchoDSP.h` — Mastor Tape Echo MTE-12 (cópia do Dub Station 2.1)
 - `Source/PluginProcessor.*` — parâmetros, presets, MIDI, medidores
 - `Source/PluginEditor.*` — interface com os dois visuais, abas e a placa Dub Station

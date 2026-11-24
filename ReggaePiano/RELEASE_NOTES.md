@@ -1,5 +1,12 @@
-## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+## Mastor Reggae Piano MRP-80 3.1 🟢🟡⚫
 
+- **Nome novo: Mastor Reggae Piano MRP-80** (antes Mastor Reggae Keys MRK-80). Agora é **só piano**: o órgão saiu e é o **Mastor Reggae Organ MRO-68**. Um plugin por músico: o MIDI do skank arrastado para a DAW toca neste piano, e o do órgão toca no MRO-68. Projetos antigos abrem igual (no piano); o instalador apaga a cópia com o nome antigo
+- **PIANISTA** na CHORD MACHINE (clique em PIANISTA): o estilo do skank inspirado nos tecladistas jamaicanos, na contagem com a caixa no 2 e no 4 — CLÁSSICO (o skank de sempre), BECKFORD (shuffle do ska), GLADDY (curto), STERLING (seco, com espaço), DOWNIE (respostas sincopadas), LYN (lovers rock, mais longo), STEELY (digital, grade presa) e LENKY (stabs dos anos 2000). São inspirados no estilo de cada um, não transcrições
+- **FILL** (seletor separado, ao lado de NOTAS): no fim de cada frase de 4 compassos, nos tempos 3 e 4 — SEM FILL, BECKFORD (corrida do ska), GLADDY (fragmentos graves), STERLING (acorde segurado), DOWNIE (respostas sincopadas), LYN (arpejo), STEELY (semicolcheias digitais) e LENKY (stabs nos "e" e "a"). Combine qualquer pianista com qualquer fill
+- **Nota de 1/64**: a duração das notas agora é 1/32 (padrão) ou 1/64, clicando na plaqueta
+- **3 timbres novos**: RHODES (piano elétrico de palheta, com "bark" no toque forte), UPRIGHT (piano de armário do ska e da Studio One) e CZ (Casio CZ-101 da era digital, phase distortion)
+- A CHORD MACHINE toca só o **skank de piano** (o botão BUBBLE e o nível do Hammond saíram; o bubble é do organista no MRO-68)
+- Continuam os 4 timbres (M1, GRAND, MT-40 e FM EP), os 4 presets de piano, o eco de fita, o flanger, o maximizer e os VUs
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
 - **Banco de riddims filtrado:** a CHORD MACHINE mostra só as 321 músicas com o riddim (a harmonia) da gravação original (luz R acesa)
 - Versão para celular 3.1

@@ -189,7 +189,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 </header>
 
 <section class="mod"><div class="tag">HARMONIA</div>
-  <div class="lbl" style="margin-top:0">VALE PARA O SKANK (MRK-80) E PARA O BAIXO (MRB-69)</div>
+  <div class="lbl" style="margin-top:0">VALE PARA O SKANK (MRP-80) E PARA O BAIXO (MRB-69)</div>
   <div class="chords" id="chords"></div>
 </section>
 
@@ -213,7 +213,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
   <div class="mutes">
     <button class="mute" id="mute0" style="--c:var(--m-drums)">DRUMS<small>MRD-12</small></button>
     <button class="mute" id="mute2" style="--c:var(--m-bass)">BASS<small>MRB-69</small></button>
-    <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRK-80</small></button>
+    <button class="mute" id="mute1" style="--c:var(--m-riddim)">RIDDIM<small>MRP-80</small></button>
   </div>
 </section>
 
@@ -562,7 +562,7 @@ function drawChords() {
 const MACHINES = [
   { id: DRUMS, name: 'BATERIA', model: 'MRD-12', who: 'BATERISTA', key: 'drummer', cols: 'c3', extra: { who: 'ESTILO DE REGGAE', key: 'style', names: ['ROCKERS', 'ONE DROP', 'BOOM BAP', 'DEMBOW'] },
     names: ['STYLE SCOTT', 'SANTA DAVIS', 'CARLTON BARRETT', 'SLY DUNBAR', 'DIGIKAL'] },
-  { id: CHORDS, name: 'HARMONIA', model: 'MRK-80', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
+  { id: CHORDS, name: 'HARMONIA', model: 'MRP-80', who: 'PADRÃO DO SKANK', key: 'pattern', cols: '',
     names: ['CONTRATEMPO'] },
   { id: BASS, name: 'BAIXO', model: 'MRB-69', who: 'BAIXISTA', key: 'bassist', cols: 'c3', names: B.styleNames },
 ];
@@ -726,7 +726,7 @@ function midiFile(which, reps, riddim) {
     tracks.push(track(name, evs));
   };
   if (which.includes(DRUMS) && st.on[DRUMS]) add('MRM-0420 Bateria (MRD-12)', drums, 10, (e) => e.beat, (e) => 1 + (e.bar % 4));
-  if (which.includes(CHORDS) && st.on[CHORDS]) add('MRM-0420 Skank (MRK-80)', chords, 1, (e) => e.start, (e) => 1 + e.slot);
+  if (which.includes(CHORDS) && st.on[CHORDS]) add('MRM-0420 Skank (MRP-80)', chords, 1, (e) => e.start, (e) => 1 + e.slot);
   if (which.includes(BASS) && st.on[BASS]) add('MRM-0420 Baixo (MRB-69)', bass, 1, (e) => e.start, (e) => 1 + (e.slot || 0));
   return new Uint8Array([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length, tpq >> 8, tpq & 255, ...tracks.flat()]);
 }

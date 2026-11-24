@@ -528,7 +528,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
 {
     plateFace = juce::Typeface::createSystemTypefaceFor (BinaryData::ArchivoBlackRegular_ttf, (size_t) BinaryData::ArchivoBlackRegular_ttfSize);
     titleFace = juce::Typeface::createSystemTypefaceFor (BinaryData::RootsKeysDisplayBoldItalic_ttf, (size_t) BinaryData::RootsKeysDisplayBoldItalic_ttfSize);
-    lnf.setSkin (1);   // visual do órgão do MRK-80: madeira + marfim
+    lnf.setSkin (1);   // visual do órgão do MRP-80: madeira + marfim
     setLookAndFeel (&lnf);
     auto& s = proc.apvts;
 
@@ -579,7 +579,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
     density.onPick = [this] (int i) { quickDensity = i; proc.applyFeel (quickFeel, quickDensity); };
     density.current = [this] { return quickDensity; };
     setupChips (beat, "beat", { "ONE DROP", "ROCKERS", "STEPPERS" });
-    setupChips (nota, "nota", { "1/32", "1/16", "1/8" });
+    setupChips (nota, "nota", { "1/32", "1/64" });
     setupKnob (swing, "swing", "Swing");
     setupKnob (human, "human", "Human");
     setupKnob (ghost, "ghost", "Ghost");
@@ -862,7 +862,7 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
     g.setFont (VintageLookAndFeel::mono (9.5f, false));
     g.drawText ("MRO-68", 26 + tw + 10, 24, 80, 14, juce::Justification::centredLeft);
 
-    // placa DUB STATION (latão dourado, igual à do MRK-80)
+    // placa DUB STATION (latão dourado, igual à do MRP-80)
     {
         auto r = kPlate.toFloat();
         g.setColour (juce::Colours::black.withAlpha (0.45f));

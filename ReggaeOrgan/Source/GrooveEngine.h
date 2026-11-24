@@ -9,7 +9,7 @@
 //   FILLS   no fim das frases (tempos 3 e 4 do compasso de fill): licks curtos (Mittoo), melodia em oitavas
 //           (Winston Wright), acordes sincopados (Tyrone Downie) ou fragmentos graves e lentos (Gladstone Anderson)
 // Bubble e chop saem de uma GRADE de 16 semicolcheias (Grid), que cada MÚSICO traz pronta e que pode ser editada.
-// Notas de 1/32 por padrão, como o skank e o bubble do MRCM-1240 (NOTA: 1/32, 1/16 ou 1/8).
+// Notas de 1/32 por padrão, como o skank e o bubble do MRCM-1240 (NOTA: 1/32 ou 1/64).
 //
 // Ajustes:
 //   grade     vazio / fantasma / acento em cada semicolcheia, para a mão direita e a esquerda
@@ -42,8 +42,8 @@ inline const char* rootName (int r)    { static const char* n[] = { "C", "C#", "
 
 // duração das notas (figura), em tempos
 constexpr int numNoteSizes = 3;
-inline const char* noteSizeName (int n) { static const char* s[] = { "1/32", "1/16", "1/8" }; return s[std::clamp (n, 0, 2)]; }
-inline double noteSizeBeats (int n)     { static const double b[] = { 0.125, 0.25, 0.5 }; return b[std::clamp (n, 0, 2)]; }
+inline const char* noteSizeName (int n) { static const char* s[] = { "1/32", "1/64" }; return s[std::clamp (n, 0, 1)]; }
+inline double noteSizeBeats (int n)     { static const double b[] = { 0.125, 0.0625 }; return b[std::clamp (n, 0, 1)]; }
 
 // duração dos acordes: 1/2, 1, 2, 3, 4 e 8 compassos (os mesmos índices do MRCM-1240 e do banco de riddims)
 constexpr int numChordDurations = 6;
@@ -79,7 +79,7 @@ inline Grid gridFrom (const char* rh, const char* lh)
 struct Chord
 {
     int  root  = 9;      // 0 = C ... 11 = B
-    bool minor = true;   // o MRO-68 usa só acordes maiores e menores, como o MRK-80
+    bool minor = true;   // o MRO-68 usa só acordes maiores e menores, como o MRP-80
     int  beats = 4;      // duração em tempos (2 = meio compasso)
 };
 

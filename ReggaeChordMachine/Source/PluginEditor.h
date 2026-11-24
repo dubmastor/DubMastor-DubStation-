@@ -159,6 +159,10 @@ private:
     };
 
     void timerCallback() override;
+    void mouseDown (const juce::MouseEvent&) override;   // PIANISTA (lista), FILL (lista) e DURAÇÃO DAS NOTAS (1/32 ou 1/64)
+    juce::Rectangle<int> noteSizeArea() const;
+    juce::Rectangle<int> fillArea() const;               // FILL (lista), à esquerda da DURAÇÃO DAS NOTAS
+    int lastPianistKey = -1;
     void setupKnob (Knob&, const juce::String& paramId, const juce::String& name);
     void setupToggle (Toggle&, const juce::String& paramId, const juce::String& text);
     void placeKnob (Knob&, juce::Rectangle<int>);

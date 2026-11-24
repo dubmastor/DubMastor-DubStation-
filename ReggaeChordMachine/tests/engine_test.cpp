@@ -156,6 +156,27 @@ int main()
                 CHECK (ons - offs == stillOn && stillOn <= 12, "notas presas (%d)", stillOn);
             }
 
+    // PIANISTAS: cada um toca, nenhuma nota passa do loop, a mesma nota não se sobrepõe a ela mesma
+    for (int p = 0; p < NumPianists; ++p)
+      for (int fl = 0; fl < NumFills; ++fl)
+        for (int ns : { 0, NoteSize64 })
+        {
+            Settings st; st.pianist = p; st.fill = fl; st.noteSize = ns; st.swing = 0.4f; st.bubble = false;
+            std::vector<ChordSlot> sl { { 9, Min, 4, -1 }, { 2, Min, 4, -1 }, { 4, Min, 4, -1 }, { 7, Maj, 4, -1 } };
+            double lb = 0;
+            const auto ev = buildLoop (sl, st, lb);
+            bool overlap = false, outside = false;
+            for (size_t i = 0; i < ev.size(); ++i)
+            {
+                outside |= ev[i].start < 0 || ev[i].start + ev[i].length > lb + 1e-9;
+                for (size_t j = i + 1; j < ev.size(); ++j)
+                    if (ev[j].note == ev[i].note && ev[j].start < ev[i].start + ev[i].length - 1e-9 && ev[j].start >= ev[i].start)
+                        overlap = true;
+            }
+            if (fl == 0 || p == 0) std::printf ("pianista %-9s fill %-9s nota=%-4s notas=%zu\n", pianistName (p), fillName (fl), noteSizeName (ns), ev.size());
+            CHECK (! ev.empty() && ! overlap && ! outside, "pianista %s + fill %s: vazio, sobreposto ou fora do loop", pianistName (p), fillName (fl));
+        }
+
     std::printf (failures == 0 ? "\nTODOS OS TESTES PASSARAM\n" : "\n%d FALHA(S)\n", failures);
     return failures == 0 ? 0 : 1;
 }

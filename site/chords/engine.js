@@ -26,7 +26,81 @@
   const NOTE_SIZES = [ // tamanho da nota do skank
     { name: '1/32', sub: 'FUSA', beats: 0.125 }, { name: '1/16', sub: 'SEMICOLCHEIA', beats: 0.25 },
     { name: '1/8', sub: 'COLCHEIA', beats: 0.5 }, { name: '1/4', sub: 'SEMÍNIMA', beats: 1.0 },
-    { name: '1/2', sub: 'MÍNIMA', beats: 2.0 }];
+    { name: '1/2', sub: 'MÍNIMA', beats: 2.0 }, { name: '1/64', sub: 'SEMIFUSA', beats: 0.0625 }];   // 1/64 no fim: o índice 0 continua 1/32
+  const NOTE_SIZE_64 = 5;
+
+  // PIANISTAS (cópia do ReggaeChordMachine/Source/DubEngine.h: o mesmo MIDI no plugin e no navegador)
+  // part: 0 = as duas mãos, 1 = só a mão direita, 2 = só a mão esquerda. Caixa no 2 e no 4, skank no "&".
+  const PIANISTS = [
+    { name: 'CLASSICO', who: 'SKANK NO CONTRATEMPO' },
+    { name: 'BECKFORD', who: 'THEOPHILUS BECKFORD · SHUFFLE DO SKA' },
+    { name: 'GLADDY', who: 'GLADSTONE ANDERSON · FRAGMENTOS GRAVES' },
+    { name: 'STERLING', who: 'KEITH STERLING · SECO, COM ESPAÇO' },
+    { name: 'DOWNIE', who: 'TYRONE DOWNIE · RESPOSTAS SINCOPADAS' },
+    { name: 'LYN', who: 'ROBBIE LYN · LOVERS ROCK' },
+    { name: 'STEELY', who: 'STEELY · DIGITAL, GRADE PRESA' },
+    { name: 'LENKY', who: 'LENKY · STABS DOS ANOS 2000' }];
+  // FILLS: seletor separado do pianista (mesma ordem do PianoFill do DubEngine.h)
+  const FILLS = [
+    { name: 'SEM FILL', who: 'SÓ O SKANK' },
+    { name: 'BECKFORD', who: 'CORRIDA DO SKA · COLCHEIAS CRESCENDO' },
+    { name: 'GLADDY', who: 'FRAGMENTOS GRAVES DESCENDO' },
+    { name: 'STERLING', who: 'UM ACORDE SEGURADO E UMA NOTA NO ALTO' },
+    { name: 'DOWNIE', who: 'RESPOSTAS SINCOPADAS' },
+    { name: 'LYN', who: 'ARPEJO SUBINDO (LOVERS ROCK)' },
+    { name: 'STEELY', who: 'SEMICOLCHEIAS DIGITAIS NO 4' },
+    { name: 'LENKY', who: 'STABS NOS "E" E NOS "A"' }];
+  const FILL_NONE = 0, FILL_BECKFORD = 1, FILL_GLADDY = 2, FILL_STERLING = 3, FILL_DOWNIE = 4, FILL_LYN = 5, FILL_STEELY = 6, FILL_LENKY = 7;
+  const fillNoSwing = (f) => f === FILL_STEELY || f === FILL_LENKY;
+  function pianistRecipe(p) {
+    const H = (step, vel, part, lenMul) => ({ step, vel: f32(vel), part, lenMul: f32(lenMul) });
+    const skank = (v, len) => [H(2, v, 0, len), H(6, v, 0, len), H(10, v, 0, len), H(14, v, 0, len)];
+    const r = { barA: null, barB: null, noSwing: false, layBack: 0.0 };
+    switch (clamp(p | 0, 0, PIANISTS.length - 1)) {
+      case 1: r.barA = [H(0, 0.45, 2, 1), H(2, 1, 1, 1), H(4, 0.5, 2, 1), H(6, 1, 1, 1), H(8, 0.45, 2, 1), H(10, 1, 1, 1), H(12, 0.5, 2, 1), H(14, 1, 1, 1)];
+        r.barB = r.barA; break;
+      case 2: r.barA = skank(0.9, 0.8); r.barB = r.barA; break;
+      case 3: r.barA = [H(2, 0.55, 1, 0.8), H(6, 1, 0, 0.8), H(10, 0.55, 1, 0.8), H(14, 1, 0, 0.8)];
+        r.barB = [H(6, 1, 0, 0.8), H(10, 0.5, 1, 0.8), H(14, 1, 0, 0.8)]; break;
+      case 4: r.barA = skank(0.95, 1);
+        r.barB = [H(2, 0.95, 0, 1), H(6, 0.95, 0, 1), H(10, 0.95, 0, 1), H(11, 0.7, 1, 1), H(14, 0.95, 0, 1), H(15, 0.65, 1, 1)];
+        r.layBack = 0.015; break;
+      case 5: r.barA = skank(0.8, 2); r.barB = r.barA; break;
+      case 6: r.barA = [H(2, 1, 0, 0.75), H(6, 1, 0, 0.75), H(10, 1, 0, 0.75), H(14, 1, 0, 0.75), H(15, 0.8, 1, 0.75)];
+        r.barB = r.barA; r.noSwing = true; break;
+      case 7: r.barA = [H(2, 0.9, 0, 0.75), H(6, 1, 0, 0.75), H(9, 0.85, 1, 0.75), H(14, 1, 0, 0.75)];
+        r.barB = [H(2, 0.9, 0, 0.75), H(6, 1, 0, 0.75), H(11, 0.85, 1, 0.75), H(14, 1, 0, 0.75)]; r.noSwing = true; break;
+      default: r.barA = skank(1, 1); r.barB = r.barA;
+    }
+    return r;
+  }
+  function pianoFill(fill, left, stepInBar, start, slot, velocity, events) {
+    if (!left.length) return;
+    const barEnd = start - (start - Math.floor(start / 4) * 4) + 4;   // nenhuma nota passa do compasso
+    const add = (note, len, v) => events.push({ start, length: Math.max(0.03, Math.min(len, barEnd - start - 0.02)), note: clamp(note, 0, 127),
+      velocity: clamp(lround(f32(f32(v * velocity) * 127)), 1, 127), channel: ChSkank, slot });
+    const n = left.length;
+    if (fill === FILL_BECKFORD) {
+      if (stepInBar % 2 === 0) for (const x of left) add(x + 12, 0.2, f32(f32(0.7) + f32(f32(0.1) * ((stepInBar - 8) / 2))));
+    } else if (fill === FILL_STERLING) {
+      if (stepInBar === 10) for (const x of left) add(x + 12, 1.4, f32(0.85));
+      if (stepInBar === 14) add(left[n - 1] + 24, 0.4, f32(0.6));
+    } else if (fill === FILL_STEELY) {
+      if (stepInBar >= 12) for (const x of left) add(x + 12, 0.1, f32(stepInBar % 2 === 0 ? 1.0 : 0.75));
+    } else if (fill === FILL_LENKY) {
+      if (stepInBar === 9 || stepInBar === 11 || stepInBar === 13) for (const x of left) add(x + 12, 0.15, f32(0.85));
+      if (stepInBar === 15) add(left[n - 1] + 24, 0.2, f32(0.8));
+    } else if (fill === FILL_GLADDY) {
+      const steps = [8, 10, 12, 14];
+      for (let k = 0; k < 4; k++)
+        if (stepInBar === steps[k]) add(left[((n - 1 - k % n) + n) % n] - 12 - (k >= n ? 12 : 0), 0.45, f32(f32(0.78) - f32(f32(0.04) * k)));
+    } else if (fill === FILL_DOWNIE) {
+      if (stepInBar === 10 || stepInBar === 11 || stepInBar === 14)
+        for (const x of left) add(x + 12, 0.2, f32(stepInBar === 11 ? 0.7 : 0.9));
+    } else if (fill === FILL_LYN) {
+      if (stepInBar >= 12) { const k = stepInBar - 12; add(k < n ? left[k] + 12 : left[0] + 24, 0.22, f32(0.68)); }
+    }
+  }
   const PATTERNS = ['CONTRATEMPO'];
   const INVERSIONS = ['FUND', '1ª INV', '2ª INV'];
 
@@ -129,6 +203,13 @@
     const velocity = f32(s.velocity), swing = f32(s.swing);
     const voicings = voiceProgression(slots, s.centerNote);
     let pos = 0;
+    let totalBeats = 0;
+    for (const sl of slots) if (sl.beats > 0) totalBeats += sl.beats;
+    const loopBars = Math.max(1, lround(Math.ceil(totalBeats / 4)));
+    const fillEvery = Math.min(4, loopBars);
+    const pianist = clamp((s.pianist || 0) | 0, 0, PIANISTS.length - 1);
+    const rec = pianistRecipe(pianist);
+    const fill = clamp((s.fill || 0) | 0, 0, FILLS.length - 1);
     for (let si = 0; si < slots.length; si++) {
       const slot = slots[si];
       if (slot.beats <= 0) continue;
@@ -136,10 +217,32 @@
       const skank = left.concat(left.map((n) => n + 12));
       const organRight = left, organLeft = left.map((n) => n - 12);
       const firstStep = lround(pos * 4), numSteps = lround(slot.beats * 4);
+      const rightHand = left.map((n) => n + 12), leftHand = left;
       for (let st = firstStep; st < firstStep + numSteps; st++) {
         const stepInBar = st % 16;
         const swingOffset = stepInBar % 2 === 1 ? swing * 0.125 : 0.0;
-        for (let h = 0; h < hits.length; h++) {
+        const fillBar = fill !== FILL_NONE && stepInBar >= 8 && Math.floor(st / 16) % fillEvery === fillEvery - 1;
+        if (fillBar) {
+          const fo = (!fillNoSwing(fill) && stepInBar % 2 === 1) ? swing * 0.125 : 0.0;
+          pianoFill(fill, left, stepInBar, st * 0.25 + fo, si, velocity, events);
+        } else if (pianist !== 0) {
+          const bar = Math.floor(st / 16);
+          const so = (!rec.noSwing && stepInBar % 2 === 1) ? swing * 0.125 : 0.0;
+          {
+            const bh = bar % 2 === 0 ? rec.barA : rec.barB;
+            for (const h of bh) {
+              if (h.step !== stepInBar) continue;
+              let gap = 16;
+              for (const o of bh) { let d = o.step - h.step; if (d <= 0) d += 16; gap = Math.min(gap, d); }
+              const maxLen = gap * 0.25 - so - 0.02;
+              const len = Math.max(0.03, Math.min(noteBeats * h.lenMul, maxLen));
+              const vel = clamp(lround(f32(f32(h.vel * velocity) * 127)), 1, 127);
+              const notes = h.part === 1 ? rightHand : (h.part === 2 ? leftHand : skank);
+              for (const note of notes) events.push({ start: st * 0.25 + so + rec.layBack, length: len, note: clamp(note, 0, 127), velocity: vel, channel: ChSkank, slot: si });
+            }
+          }
+        }
+        for (let h = 0; !fillBar && pianist === 0 && h < hits.length; h++) {
           if (hits[h].step !== stepInBar) continue;
           const start = st * 0.25 + swingOffset;
           const len = hitLength(hits, h, noteBeats, swingOffset);
@@ -165,7 +268,7 @@
     return { events: idx.map((x) => x[0]), loopBeats: pos, voicings };
   }
 
-  root.MRCM = { Maj, Min, ChSkank, ChBubble, ROOTS, DURATIONS, NOTE_SIZES, PATTERNS, INVERSIONS,
+  root.MRCM = { Maj, Min, ChSkank, ChBubble, ROOTS, DURATIONS, NOTE_SIZES, NOTE_SIZE_64, PATTERNS, INVERSIONS, PIANISTS, FILLS,
     rootName, qualityName, chordLabel, voiceChord, inversionOf, voiceProgression, buildLoop, bubbleHits, patternHits };
   if (typeof module !== 'undefined') module.exports = root.MRCM;
 })(typeof window !== 'undefined' ? window : globalThis);

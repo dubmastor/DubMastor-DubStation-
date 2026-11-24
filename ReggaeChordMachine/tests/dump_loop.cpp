@@ -1,5 +1,5 @@
 // Gera os eventos do motor C++ para cenários lidos da entrada padrão (usado pelo web_engine_test.js).
-// Cada linha: pattern center velocity noteSize swing bubble | root qual beats inv ; root qual beats inv ; ...
+// Cada linha: pattern center velocity noteSize swing bubble [pianist] [fill] | root qual beats inv ; root qual beats inv ; ...
 // Saída por cenário: "L <loopBeats>" e uma linha por evento: start length note vel channel slot, depois "END".
 #include "../Source/DubEngine.h"
 #include <cstdio>
@@ -18,6 +18,10 @@ int main()
         std::istringstream head (line.substr (0, bar));
         Settings s; int bubble = 0;
         head >> s.pattern >> s.centerNote >> s.velocity >> s.noteSize >> s.swing >> bubble;
+        int pianist = 0;
+        if (head >> pianist) s.pianist = pianist;   // PIANISTAS (opcional no fim da linha)
+        int fill = 0;
+        if (head >> fill) s.fill = fill;            // FILLS (opcional)
         s.bubble = bubble != 0;
         std::vector<ChordSlot> slots;
         std::istringstream rest (line.substr (bar + 1));

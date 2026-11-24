@@ -103,7 +103,9 @@ struct Params
     int   mode = 0;            // 0 = Piano, 1 = Órgão
     // Piano
     float pianoLevel  = 0.8f;
-    int   pianoType = 0;       // 0 = M1, 1 = Grand Piano, 2 = MT-40 (Casio), 3 = FM EP (Yamaha DX)
+    int   pianoType = 0;       // 0 = M1, 1 = Grand Piano, 2 = MT-40 (Casio), 3 = FM EP (Yamaha DX),
+                               // 4 = Rhodes, 5 = Upright (piano de armário), 6 = CZ (Casio CZ-101),
+                               // 7 = Clavinet (fora do MRP-80: guardado para o futuro Mastor Reggae Clavinet)
     float pianoBright = 0.6f;
     float pianoDecay  = 0.5f;
     float pianoChorus = 0.5f;
@@ -249,6 +251,8 @@ struct PianoVoice
     // MT-40 (Casio) e FM EP (Yamaha DX)
     float oPh = 0, oInc = 0, oEnv = 0, oCoef = 0, oLp = 0, oLpCoef = 0, oHold = 0, oHoldCnt = 0, oHoldLen = 1;
     float cPh[2] {}, mPh[2] {}, cInc[2] {}, mInc[2] {}, idx[2] {}, idxCoef[2] {}, cAmp[2] {}, cE1 = 0, cE2 = 0, cC1 = 0, cC2 = 0;
+    float drive = 0;                       // Rhodes: "bark" (saturação que cresce com a força do toque)
+    float pd = 0.5f, pdCoef = 1, pdTarget = 0.5f;   // CZ: phase distortion (0,03 = brilhante tipo serra, 0,5 = senoide)
 
     void start (int n, float vel, float sr, const Params& p, uint64_t stamp)
     {
@@ -258,6 +262,10 @@ struct PianoVoice
         if (type == 1) { startGrand (n, vel, sr, p); return; }
         if (type == 2) { startCasio (n, sr, p); return; }
         if (type == 3) { startFm (n, vel, sr, p); return; }
+        if (type == 4) { startRhodes (n, vel, sr, p); return; }
+        if (type == 7) { startClav (n, vel, sr, p); return; }
+        if (type == 5) { startUpright (n, vel, sr, p); return; }
+        if (type == 6) { startCz (n, vel, sr, p); return; }
 
         const float f    = midiToHz ((float) n);
         const float v    = clampf (vel, 0.0f, 1.0f);
@@ -300,7 +308,93 @@ struct PianoVoice
         nzFilt.set (std::min (6.0f * f, 7000.0f), 0.9f, sr);
     }
 
-    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 3 ? 3 : t); }
+    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 7 ? 7 : t); }
+
+    // ---- RHODES: piano elétrico de palheta (tine) — corpo redondo, sino curto no ataque e "bark" no toque forte
+    void startRhodes (int n, float vel, float sr, const Params& p)
+    {
+        const float f = midiToHz ((float) n);
+        const float v = clampf (vel, 0.0f, 1.0f);
+        const float ks = std::pow (2.0f, -((float) n - 60.0f) / 18.0f);
+        cInc[0] = f / sr;          mInc[0] = f / sr;              // corpo: 1:1
+        cInc[1] = (f + 0.4f) / sr; mInc[1] = 7.0f * f / sr;       // tine: 1:7, mais grave que o DX
+        idx[0] = (0.2f + 1.9f * v * v) * (0.5f + 0.7f * p.pianoBright);
+        idx[1] = (0.3f + 1.3f * v) * (0.4f + 0.8f * p.pianoBright);
+        idxCoef[0] = std::exp (-1.0f / ((0.35f + 0.6f * p.pianoDecay) * sr));
+        idxCoef[1] = std::exp (-1.0f / (0.03f * sr));
+        cAmp[0] = 0.85f; cAmp[1] = 0.12f + 0.2f * v;
+        const float tBody = clampf ((1.8f + 7.0f * p.pianoDecay) * ks, 0.4f, 14.0f);
+        const float gain = 0.14f * (0.2f + 0.8f * v);
+        cE1 = gain * 0.25f; cE2 = gain * 0.75f;
+        cC1 = std::exp (-1.0f / (0.2f * sr)); cC2 = std::exp (-1.0f / (tBody * sr));
+        drive = 0.6f + 3.2f * v * v;
+        for (int i = 0; i < 2; ++i) { cPh[i] = 0; mPh[i] = rng.uni(); }
+        np = 0; nzEnv = 0; nzLvl = 0;
+        att = 0; attInc = 1.0f / (0.0015f * sr);
+        rel = 1; relCoef = 1;
+    }
+
+    // ---- CLAVINET: corda curta palhetada com captador perto da ponte — muito brilho, ataque seco, morre rápido
+    void startClav (int n, float vel, float sr, const Params& p)
+    {
+        const float f = midiToHz ((float) n);
+        const float v = clampf (vel, 0.0f, 1.0f);
+        const float pw = clampf (1.15f - 0.5f * p.pianoBright - 0.3f * v, 0.45f, 1.4f);
+        const float tBase = clampf ((0.35f + 1.6f * p.pianoDecay) * std::pow (2.0f, -((float) n - 60.0f) / 20.0f), 0.12f, 3.0f);
+        const float gain = 0.21f * (0.3f + 0.7f * v);
+        np = 0;
+        for (int k = 1; k <= MaxP; ++k)
+        {
+            const float fk = (float) k * f * (1.0f + 0.0004f * (float) k);
+            if (fk > std::min (0.42f * sr, 12000.0f)) break;
+            float a = std::pow ((float) k, -pw);
+            a *= 0.2f + 0.8f * std::fabs (std::sin (3.14159265f * (float) k * 0.11f));   // captador (filtro em pente)
+            a *= 0.3f + 0.7f * std::fabs (std::sin (3.14159265f * (float) k * 0.31f));   // ponto onde o martelo bate
+            const float t2 = tBase / (1.0f + 0.15f * (float) (k - 1));
+            ph[np] = 0.0f; inc[np] = fk / sr;
+            e1[np] = gain * a * 0.5f; e2[np] = gain * a * 0.5f;
+            c1[np] = std::exp (-1.0f / (0.02f * sr)); c2[np] = std::exp (-1.0f / (t2 * sr));
+            ++np;
+        }
+        att = 0; attInc = 1.0f / (0.0004f * sr);
+        rel = 1; relCoef = 1;
+        nzEnv = 1; nzCoef = std::exp (-1.0f / (0.004f * sr));
+        nzLvl = 0.12f * v;
+        nzFilt.reset();
+        nzFilt.set (std::min (8.0f * f, 8000.0f), 1.2f, sr);
+    }
+
+    // ---- UPRIGHT: piano de armário de estúdio (ska / Studio One) — cordas mais desafinadas entre si, mais curto e "batido"
+    void startUpright (int n, float vel, float sr, const Params& p)
+    {
+        startGrand (n, vel, sr, p);
+        const float tScale = 0.55f;
+        for (int i = 0; i < np; ++i)
+        {
+            c2[i] = std::pow (c2[i], 1.0f / tScale);         // decai mais rápido
+            binc[i] = (1.2f + 2.6f * rng.uni()) / sr;        // batimento mais rápido (cordas menos afinadas)
+            bdep[i] = i < 10 ? 0.34f : 0.14f;
+            e1[i] *= 1.15f;                                  // ataque mais duro
+        }
+        nzLvl *= 2.2f;                                       // mais barulho de martelo
+        nzFilt.set (std::min (2.2f * midiToHz ((float) n), 1800.0f), 0.7f, sr);
+    }
+
+    // ---- CZ: Casio CZ-101 (era digital de Steely & Clevie) — phase distortion: brilho de serra que fecha em senoide
+    void startCz (int n, float vel, float sr, const Params& p)
+    {
+        const float f = midiToHz ((float) n);
+        const float v = clampf (vel, 0.0f, 1.0f);
+        oPh = 0; oInc = f / sr;
+        oEnv = 0.13f * (0.35f + 0.65f * v);
+        oCoef = std::exp (-1.0f / ((0.5f + 2.5f * p.pianoDecay) * sr));
+        pd = clampf (0.06f - 0.04f * p.pianoBright, 0.015f, 0.1f);     // começa brilhante
+        pdTarget = 0.5f;
+        pdCoef = std::exp (-1.0f / ((0.08f + 0.4f * p.pianoDecay) * sr));
+        np = 0; nzEnv = 0; nzLvl = 0;
+        att = 0; attInc = 1.0f / (0.001f * sr);
+        rel = 1; relCoef = 1;
+    }
 
     // ---- GRAND PIANO: mais parciais e inarmonicidade, decaimento longo, cordas que batem
     void startGrand (int n, float vel, float sr, const Params& p)
@@ -381,7 +475,10 @@ struct PianoVoice
         float t = note > 88 ? 1.2f : 0.11f;   // notas agudas sem abafador
         if (type == 1) t = note > 88 ? 1.8f : 0.16f;
         if (type == 2) t = 0.06f;
-        if (type == 3) t = 0.22f;
+        if (type == 3 || type == 4) t = 0.22f;
+        if (type == 7) t = 0.03f;                    // clavinet: a lã abafa na hora
+        if (type == 5) t = note > 88 ? 1.0f : 0.12f;
+        if (type == 6) t = 0.08f;
         relCoef = std::exp (-1.0f / (t * sr));
     }
 
@@ -404,7 +501,20 @@ struct PianoVoice
             if (rel < 1.0e-4f || oEnv < 1.0e-4f) active = false;
             return out;
         }
-        if (type == 3)
+        if (type == 6)
+        {
+            // phase distortion: a fase anda depressa até "pd" e devagar depois -> cos vira uma serra que fecha em senoide
+            const float q = oPh < pd ? oPh * 0.5f / pd : 0.5f + (oPh - pd) * 0.5f / (1.0f - pd);
+            oPh += oInc * fm; if (oPh >= 1.0f) oPh -= 1.0f;
+            pd = pdTarget + (pd - pdTarget) * pdCoef;
+            att = std::min (1.0f, att + attInc);
+            const float out = -S (wrap1 (q + 0.25f)) * oEnv * att * rel;
+            oEnv *= oCoef;
+            if (releasing) rel *= relCoef;
+            if (rel < 1.0e-4f || oEnv < 1.0e-5f) active = false;
+            return out;
+        }
+        if (type == 3 || type == 4)
         {
             float s = 0;
             for (int i = 0; i < 2; ++i)
@@ -418,6 +528,7 @@ struct PianoVoice
             att = std::min (1.0f, att + attInc);
             const float env = cE1 + cE2;
             cE1 *= cC1; cE2 *= cC2;
+            if (type == 4) s = std::tanh (s * drive) / std::tanh (drive);   // bark do Rhodes
             const float out = s * env * att * rel;
             if (releasing) rel *= relCoef;
             if (rel < 1.0e-4f || cE2 < 1.0e-6f) active = false;
@@ -425,7 +536,7 @@ struct PianoVoice
         }
 
         float s = 0;
-        if (type == 1)
+        if (type == 1 || type == 5)
         {
             for (int i = 0; i < np; ++i)
             {

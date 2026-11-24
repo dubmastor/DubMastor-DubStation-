@@ -4,30 +4,18 @@
 
 namespace
 {
-// Presets de fábrica — drawbars na ordem 16' 5⅓' 8' 4' 2⅔' 2' 1⅗' 1⅓' 1'
+// Presets de fábrica do piano (timbre M1)
 const Preset kPresets[] = {
-    // ---------------- PIANO (só mexe nos parâmetros do piano)
-    //  nome                         modo  brilho decay chorus nívelP   (campos do órgão ignorados)                                                 reverb
-    { "Piano: M1 Classic",              0, 0.65f, 0.55f, 0.50f, 0.80f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.20f },
-    { "Piano: M1 Dub Skank",            0, 0.85f, 0.20f, 0.65f, 0.85f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.35f },
-    { "Piano: M1 Bright House",         0, 1.00f, 0.45f, 0.55f, 0.80f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.25f },
-    { "Piano: M1 Soft Ballad",          0, 0.35f, 0.80f, 0.40f, 0.85f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.30f },
-    // ---------------- ORGAN (só mexe nos parâmetros do órgão)
-    //  nome                         modo  (campos do piano ignorados)   drawbars                     perc  3ª    fast  click  drive  lesMix nívelO lesFast reverb
-    { "Organ: Reggae Bubble",           1, 0, 0, 0, 0,                  { 8,8,8,0,0,0,0,0,0 }, false, true, true, 0.40f, 0.25f, 0.85f, 0.75f, false, 0.18f },
-    { "Organ: Roots Percussion",        1, 0, 0, 0, 0,                  { 8,8,8,0,0,0,0,0,0 }, true,  true, true, 0.50f, 0.30f, 0.80f, 0.75f, false, 0.18f },
-    { "Organ: Dub Dark",                1, 0, 0, 0, 0,                  { 8,0,8,0,0,0,0,0,0 }, false, true, true, 0.25f, 0.15f, 0.90f, 0.80f, false, 0.40f },
-    { "Organ: Gospel Leslie Fast",      1, 0, 0, 0, 0,                  { 8,8,8,8,0,0,0,0,8 }, false, true, true, 0.45f, 0.40f, 0.90f, 0.65f, true,  0.25f },
+    //  nome                         brilho decay chorus nível  reverb
+    { "Piano: M1 Classic",           0.65f, 0.55f, 0.50f, 0.80f, 0.20f },
+    { "Piano: M1 Dub Skank",         0.85f, 0.20f, 0.65f, 0.85f, 0.35f },
+    { "Piano: M1 Bright House",      1.00f, 0.45f, 0.55f, 0.80f, 0.25f },
+    { "Piano: M1 Soft Ballad",       0.35f, 0.80f, 0.40f, 0.85f, 0.30f },
 };
 constexpr int kNumPianoPresets = 4;
 constexpr int kNumPresets = (int) (sizeof (kPresets) / sizeof (kPresets[0]));
 } // namespace
 
-const juce::StringArray& RootsKeysProcessor::drawbarNames()
-{
-    static const juce::StringArray names { "16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1 1/3'", "1'" };
-    return names;
-}
 
 juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLayout()
 {
@@ -36,28 +24,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
     auto pct = [] (const char* id, const char* name, float def)
     { return std::make_unique<AudioParameterFloat> (ParameterID { id, 1 }, name, NormalisableRange<float> (0.0f, 1.0f), def); };
 
-    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "mode", 1 }, "Mode", StringArray { "Piano", "Organ" }, 0));
 
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoType", 1 }, "Piano Timbre",
-                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP" }, 0));
+                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP", "Rhodes", "Upright", "CZ" }, 0));   // novos no fim
     l.add (pct ("pianoBright", "Piano Brightness", 0.65f));
     l.add (pct ("pianoDecay",  "Piano Decay",      0.55f));
     l.add (pct ("pianoChorus", "Piano Chorus",     0.50f));
     l.add (pct ("pianoLevel",  "Piano Level",      0.80f));
-
-    const int defDb[9] = { 8, 8, 8, 0, 0, 0, 0, 0, 0 };
-    for (int i = 0; i < 9; ++i)
-        l.add (std::make_unique<AudioParameterInt> (ParameterID { "db" + String (i + 1), 1 },
-                                                    "Drawbar " + drawbarNames()[i], 0, 8, defDb[i]));
-
-    l.add (std::make_unique<AudioParameterBool>   (ParameterID { "percOn", 1 },   "Percussion", false));
-    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "percHarm", 1 }, "Perc Harmonic", StringArray { "2nd", "3rd" }, 1));
-    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "percDecay", 1 },"Perc Decay", StringArray { "Fast", "Slow" }, 0));
-    l.add (pct ("click",      "Key Click",    0.35f));
-    l.add (pct ("drive",      "Overdrive",    0.20f));
-    l.add (std::make_unique<AudioParameterBool>   (ParameterID { "leslieFast", 1 }, "Leslie Fast", false));
-    l.add (pct ("leslieMix",  "Leslie Mix",   0.85f));
-    l.add (pct ("organLevel", "Organ Level",  0.70f));
 
     // Tape Echo — FitaEco TE-12 (mesmo DSP do Dub Station 2.1)
     l.add (std::make_unique<AudioParameterBool>   (ParameterID { "echoOn", 1 }, "Echo On", false));
@@ -107,10 +80,9 @@ RootsKeysProcessor::RootsKeysProcessor()
       apvts (*this, nullptr, "PARAMS", createLayout()),
       machine (std::make_unique<DubChordsProcessor>())
 {
-    for (int i = 0; i < 9; ++i)
-        dbParam[i] = apvts.getRawParameterValue ("db" + juce::String (i + 1));
     // instância nova: os acordes da machine tocam no som deste instrumento (SOM INTERNO da machine desligado)
     if (auto* prm = machine->apvts.getParameter ("sound")) prm->setValueNotifyingHost (0.0f);
+    if (auto* prm = machine->apvts.getParameter ("bubble")) prm->setValueNotifyingHost (0.0f);   // só piano
 }
 
 RootsKeysProcessor::~RootsKeysProcessor() = default;
@@ -148,22 +120,12 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
     // parâmetros -> motor
     rk::Params& p = engine.params;
-    p.mode        = (int) get ("mode");
+    p.mode        = 0;   // só piano (o órgão está no Mastor Reggae Organ MRO-68)
     p.pianoType   = (int) get ("pianoType");
     p.pianoBright = get ("pianoBright");
     p.pianoDecay  = get ("pianoDecay");
     p.pianoChorus = get ("pianoChorus");
     p.pianoLevel  = get ("pianoLevel");
-    for (int i = 0; i < 9; ++i)
-        p.drawbar[i] = dbParam[i]->load();
-    p.percOn     = get ("percOn") > 0.5f;
-    p.perc3rd    = get ("percHarm") > 0.5f;
-    p.percFast   = get ("percDecay") < 0.5f;
-    p.click      = get ("click");
-    p.drive      = get ("drive");
-    p.leslieFast = get ("leslieFast") > 0.5f;
-    p.leslieMix  = get ("leslieMix");
-    p.organLevel = get ("organLevel");
     p.reverb     = get ("reverb");
     p.master     = get ("master");
     p.echoOn        = get ("echoOn") > 0.5f;
@@ -301,7 +263,8 @@ void RootsKeysProcessor::migrateOldDubChords (const juce::ValueTree& old)
     set ("exportReps", value ("dcReps", 1));
     // padrão: 0 = Auto (segue o instrumento: órgão = bubble), 4 = Bubble (órgão)
     const int pattern = (int) value ("dcPattern", 0);
-    set ("bubble", (pattern == 4 || (pattern == 0 && value ("mode", 0) > 0.5)) ? 1 : 0);
+    juce::ignoreUnused (pattern);
+    set ("bubble", 0);   // sem órgão no plugin: o bubble é do organista (Mastor Reggae Organ MRO-68)
     set ("preview", 0);
     set ("sound", 0);
     apvts.getParameter ("machineOn")->setValueNotifyingHost (value ("dcOn", 0) > 0.5 ? 1.0f : 0.0f);
@@ -331,28 +294,11 @@ void RootsKeysProcessor::setCurrentProgram (int index)
     if (! juce::isPositiveAndBelow (index, kNumPresets)) return;
     currentProgram = index;
     const Preset& pr = kPresets[index];
-    setParam ("mode", (float) pr.mode);
-
-    if (pr.mode == 0)   // preset de piano: não toca nos parâmetros do órgão
-    {
-        setParam ("pianoType", 0.0f);   // os presets de piano são do timbre M1
-        setParam ("pianoBright", pr.pianoBright);
-        setParam ("pianoDecay", pr.pianoDecay);
-        setParam ("pianoChorus", pr.pianoChorus);
-        setParam ("pianoLevel", pr.pianoLevel);
-    }
-    else                // preset de órgão: não toca nos parâmetros do piano
-    {
-        for (int i = 0; i < 9; ++i) setParam ("db" + juce::String (i + 1), (float) pr.drawbars[i]);
-        setParam ("percOn", pr.percOn ? 1.0f : 0.0f);
-        setParam ("percHarm", pr.perc3rd ? 1.0f : 0.0f);
-        setParam ("percDecay", pr.percFast ? 0.0f : 1.0f);
-        setParam ("click", pr.click);
-        setParam ("drive", pr.drive);
-        setParam ("leslieMix", pr.leslieMix);
-        setParam ("organLevel", pr.organLevel);
-        setParam ("leslieFast", pr.leslieFast ? 1.0f : 0.0f);
-    }
+    setParam ("pianoType", 0.0f);   // os presets são do timbre M1
+    setParam ("pianoBright", pr.pianoBright);
+    setParam ("pianoDecay", pr.pianoDecay);
+    setParam ("pianoChorus", pr.pianoChorus);
+    setParam ("pianoLevel", pr.pianoLevel);
     setParam ("reverb", pr.reverb);
 }
 
@@ -392,6 +338,8 @@ void RootsKeysProcessor::setStateInformation (const void* data, int sizeInBytes)
             currentProgram = (int) tree.getProperty ("program", 0);
             apvts.replaceState (tree);
             if (! hadMachine) migrateOldDubChords (tree);
+            // só piano: projeto do MRK-80 3.0 com o BUBBLE ligado abre sem ele (o bubble é do Mastor Reggae Organ MRO-68)
+            if (auto* prm = machine->apvts.getParameter ("bubble")) prm->setValueNotifyingHost (0.0f);
         }
 }
 

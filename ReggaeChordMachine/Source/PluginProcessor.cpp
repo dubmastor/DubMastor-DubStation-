@@ -59,6 +59,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "organLvl", 1 }, "Orgao Hammond", 0.0f, 1.0f, 0.6f));
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "exportReps", 1 }, "Repeticoes no export",
                                                         StringArray { "1x", "2x", "4x", "8x" }, 1));
+    // PIANISTAS (chops inspirados nos tecladistas jamaicanos) e a nota de 1/64. No fim da lista: os antigos não mudam de lugar.
+    {
+        StringArray pn;
+        for (int p = 0; p < dub::NumPianists; ++p) pn.add (dub::pianistName (p));
+        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianist", 1 }, "Pianista", pn, dub::PnClassico));
+    }
+    layout.add (std::make_unique<AudioParameterBool> (ParameterID { "nota64", 1 }, "Nota 1/64", false));
+    {   // FILLS (seletor separado do pianista): no fim de cada frase de 4 compassos
+        StringArray fl;
+        for (int f = 0; f < dub::NumFills; ++f) fl.add (dub::fillName (f));
+        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoFill", 1 }, "Fill", fl, dub::FillNone));
+    }
     return layout;
 }
 
@@ -132,7 +144,9 @@ dub::Settings DubChordsProcessor::getSettings() const
     s.pattern    = dub::SkankOffbeat;   // skank sempre no contratempo
     s.centerNote = (int) param ("center");
     s.velocity   = param ("velocity");
-    s.noteSize   = 0;   // todas as notas sempre 1/32 (o parâmetro "noteSize" ficou só para abrir projetos antigos)
+    s.noteSize   = param ("nota64") > 0.5f ? dub::NoteSize64 : 0;   // 1/32 (padrão) ou 1/64 ("noteSize" ficou só para projetos antigos)
+    s.pianist    = juce::jlimit (0, dub::NumPianists - 1, (int) param ("pianist"));
+    s.fill       = juce::jlimit (0, dub::NumFills - 1, (int) param ("pianoFill"));
     s.bubble     = param ("bubble") > 0.5f;
     s.swing      = param ("swing");
     return s;
@@ -453,7 +467,8 @@ juce::String DubChordsProcessor::settingsKey() const
           << (int) param (invId (i)) << ',' << (i == 0 ? 1 : (param (onId (i)) > 0.5f ? 1 : 0)) << ';';
     }
     k << 0 << ',' << (int) param ("center") << ',' << juce::roundToInt (param ("velocity") * 1000.0f) << ','
-      << (param ("bubble") > 0.5f ? 1 : 0) << ',' << juce::roundToInt (param ("swing") * 1000.0f);
+      << (param ("bubble") > 0.5f ? 1 : 0) << ',' << juce::roundToInt (param ("swing") * 1000.0f)
+      << ',' << (int) param ("pianist") << ',' << (param ("nota64") > 0.5f ? 1 : 0) << ',' << (int) param ("pianoFill");
     return k;
 }
 

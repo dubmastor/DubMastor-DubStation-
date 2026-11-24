@@ -33,7 +33,7 @@ juce_add_plugin(RootsKeys
     PLUGIN_MANUFACTURER_CODE Dblb
     PLUGIN_CODE Rtky
     FORMATS VST3 AU Standalone ${DM_AAX}
-    PRODUCT_NAME "Mastor Reggae Keys MRK-80"
+    PRODUCT_NAME "Mastor Reggae Piano MRP-80"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE
@@ -88,7 +88,7 @@ if(ROOTSKEYS_TESTS)
     target_compile_definitions(RootsKeysTest PRIVATE RIDDIMBANK_REQUIRE=1
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
-        JucePlugin_Name="Mastor Reggae Keys MRK-80" JucePlugin_VersionString="${PROJECT_VERSION}"
+        JucePlugin_Name="Mastor Reggae Piano MRP-80" JucePlugin_VersionString="${PROJECT_VERSION}"
         JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0)
     target_link_libraries(RootsKeysTest PRIVATE RootsKeysFonts juce::juce_audio_utils
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)

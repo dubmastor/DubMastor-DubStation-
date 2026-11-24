@@ -207,7 +207,7 @@ document.getElementById('verTxt').textContent = VERSION;
 // ====================================================================== motor de grooves (igual ao GrooveEngine.h)
 const ROOTS = ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
 const DURS = [[2,'1/2 COMP.'],[4,'1 COMP.'],[8,'2 COMP.'],[12,'3 COMP.'],[16,'4 COMP.'],[32,'8 COMP.']];
-const NOTE_SIZES = [0.125, 0.25, 0.5];
+const NOTE_SIZES = [0.125, 0.0625];
 const MUS = [
   {name:'BECKFORD',who:'THEOPHILUS BECKFORD · SKA 1959-65',rh:'..X...X...X...X.',lh:'.x.x.x.x.x.x.x.x',beat:0,swing:.04,human:.22,ghost:.40,fillStyle:0,fillEvery:4,bpm:96,bdb:[0,0,8,4,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],leslie:0,drive:.15},
   {name:'MITTOO',who:'JACKIE MITTOO · STUDIO ONE 1966-72',rh:'..X...X...X...X.',lh:'.X.x.X.x.X.x.X.x',beat:0,swing:.12,human:.30,ghost:.50,fillStyle:0,fillEvery:4,bpm:80,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],leslie:0,drive:.20},
@@ -247,7 +247,7 @@ function makeGrid(feel,density){ const g={rh:new Array(16).fill(0),lh:new Array(
   for(let b=0;b<4;b++){ g.rh[b*4+2]=feel===1?1:2; const e=feel===0?1:2, a=feel===2?1:(feel===0?1:2); if(density!==1) g.lh[b*4+1]=e; if(density!==0) g.lh[b*4+3]=a; } return g; }
 
 function barEvents(bar, ch, s){
-  const out=[], s16=.25, L=NOTE_SIZES[clamp(s.noteSize,0,2)], hum=clamp(s.human,0,1);
+  const out=[], s16=.25, L=NOTE_SIZES[clamp(s.noteSize,0,1)], hum=clamp(s.human,0,1);
   const push=(start,len,note,v01,layer,accent,r)=>{
     const st=clamp(start+r.tri()*hum*.011,0,3.999);
     const ln=Math.max(.03,len*(1+r.bi()*hum*.08));
@@ -583,7 +583,7 @@ chips('tabs',['GROOVE','MIDI','ÓRGÃO'],()=>S.page,i=>setPage(i));
 chips('feel',['SKA','ROCKSTEADY','REGGAE'],()=>S.quickFeel,i=>{ S.quickFeel=i; S.grid=makeGrid(S.quickFeel,S.quickDen); S.edits=null; });
 chips('density',['SÓ e','SÓ a','e + a'],()=>S.quickDen,i=>{ S.quickDen=i; S.grid=makeGrid(S.quickFeel,S.quickDen); S.edits=null; });
 chips('beat',['ONE DROP','ROCKERS','STEPPERS'],()=>S.beat,i=>{ S.beat=i; S.edits=null; });
-chips('nota',['1/32','1/16','1/8'],()=>S.nota,i=>{ S.nota=i; S.edits=null; });
+chips('nota',['1/32','1/64'],()=>S.nota,i=>{ S.nota=i; S.edits=null; });
 chips('fillStyle',['MITTOO','WRIGHT','DOWNIE','GLADDY'],()=>S.fillStyle,i=>{ S.fillStyle=i; S.edits=null; });
 chips('fillEvery',['2','4','8'],()=>[2,4,8].indexOf(S.fillEvery),i=>{ S.fillEvery=[2,4,8][i]; S.edits=null; });
 chips('chordSrc',['DO PLUGIN','DO TECLADO'],()=>S.chordSrc,i=>{ S.chordSrc=i; });

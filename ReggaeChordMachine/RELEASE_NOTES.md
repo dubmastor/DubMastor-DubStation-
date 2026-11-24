@@ -1,6 +1,6 @@
 # Mastor Reggae Chord Machine MRCM-1240 — 2.4 · legado
 
-- O MRCM-1240 virou a aba CHORD MACHINE do Mastor Reggae Keys MRK-80; as novidades da harmonia (banco único de riddims, luzes H B D, harmonias conferidas) saem lá e no MRM-0420
+- O MRCM-1240 virou a aba CHORD MACHINE do Mastor Reggae Piano MRP-80 (antes Reggae Keys MRK-80); as novidades da harmonia (banco único de riddims, luzes H B D, harmonias conferidas) saem lá e no MRM-0420
 
 ## Mastor Reggae Chord Machine MRCM-1240 2.4 🟢🟡⚫
 

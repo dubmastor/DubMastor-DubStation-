@@ -195,10 +195,11 @@ int main()
         chord (ev, 4.0, 3.5, { 55, 59, 62 }, 0.8f);
         render (fb > 0 ? "demo_flanger_dub.wav" : "demo_flanger_dub_neg.wav", p, ev, 10.0);
     }
-    // 7) Timbres novos do piano: Grand, MT-40 (Casio) e FM EP (Yamaha DX)
+    // 7) Timbres do piano: Grand, MT-40 (Casio), FM EP (Yamaha DX), Rhodes, Upright, CZ (Casio CZ-101) e o clavinet (só no motor, para o futuro Mastor Reggae Clavinet)
     {
-        const char* names[4] = { "demo_piano_m1_ref.wav", "demo_piano_grand.wav", "demo_piano_mt40.wav", "demo_piano_fm_ep.wav" };
-        for (int t = 1; t <= 3; ++t)
+        const char* names[8] = { "demo_piano_m1_ref.wav", "demo_piano_grand.wav", "demo_piano_mt40.wav", "demo_piano_fm_ep.wav",
+                                 "demo_piano_rhodes.wav", "demo_piano_upright.wav", "demo_piano_cz.wav", "demo_piano_clavinet.wav" };
+        for (int t = 1; t <= 7; ++t)
         {
             rk::Params p; p.mode = 0; p.pianoType = t; p.reverb = 0.22f;
             std::vector<Ev> ev;
@@ -210,11 +211,12 @@ int main()
         }
     }
     // 8) Pitch bend: +1 = +2 semitons (razão 1,1225) em todos os timbres e no órgão
-    for (int t = 0; t <= 4; ++t)
+    static const char* tn[9] = { "M1", "Grand", "MT-40", "FM EP", "Rhodes", "Clav", "Upright", "CZ", "orgao" };
+    for (int t = 0; t <= 8; ++t)
     {
         auto pitchOf = [&] (float bend)
         {
-            rk::Params p; p.mode = t == 4 ? 1 : 0; p.pianoType = t == 4 ? 0 : t; p.reverb = 0; p.maxOn = false;
+            rk::Params p; p.mode = t == 8 ? 1 : 0; p.pianoType = t == 8 ? 0 : t; p.reverb = 0; p.maxOn = false;
             float db[9] = { 0, 0, 8, 0, 0, 0, 0, 0, 0 }; std::memcpy (p.drawbar, db, sizeof db); p.leslieMix = 0; p.drive = 0;
             rk::Engine e; e.params = p; e.prepare (48000);
             e.setPitchBend (bend);
@@ -234,7 +236,7 @@ int main()
         const double ratio = f0 > 0 ? f1 / f0 : 0;
         const bool ok = std::abs (ratio - 1.1225) < 0.02;
         std::printf ("pitch bend %-6s %.1f Hz -> %.1f Hz (razao %.3f) %s\n",
-                     t == 4 ? "orgao" : (t == 0 ? "M1" : t == 1 ? "Grand" : t == 2 ? "MT-40" : "FM EP"), f0, f1, ratio, ok ? "ok" : "FALHOU");
+                     tn[t], f0, f1, ratio, ok ? "ok" : "FALHOU");
         if (! ok) g_ok = false;
     }
     std::printf (g_ok ? "OK: todos os testes passaram\n" : "ERRO: algum teste falhou\n");

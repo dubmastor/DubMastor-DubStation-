@@ -11,17 +11,6 @@ namespace
 {
 constexpr int kW = 1000, kH = 800;
 
-// cores das drawbars no padrão Hammond: marrom (sub), marfim (oitavas), preta (quintas/terças)
-juce::Colour drawbarColour (int i)
-{
-    switch (i)
-    {
-        case 0: case 1: return juce::Colour (0xff6b3418);
-        case 4: case 6: case 7: return juce::Colour (0xff141414);
-        default: return ivory;
-    }
-}
-
 juce::String versionText()
 {
     auto parts = juce::StringArray::fromTokens (JucePlugin_VersionString, ".", "");
@@ -29,7 +18,6 @@ juce::String versionText()
 }
 
 const char* kPianoPresetShort[4] = { "M1 CLASSIC", "DUB SKANK", "BRIGHT HOUSE", "SOFT BALLAD" };
-const char* kOrganPresetShort[4] = { "BUBBLE", "PERC", "DUB DARK", "GOSPEL" };
 
 // ----- layout fixo (1000 x 724)
 const juce::Rectangle<int> kPlate      { 415, 16, 170, 40 };   // centralizada no cabeçalho
@@ -47,59 +35,6 @@ const juce::Rectangle<int> kConsole    { 210, 94, 580, 258 };
 const juce::Rectangle<int> kLeslie     { 40, 100, 150, 110 };
 const juce::Rectangle<int> kPerc       { 810, 100, 150, 132 };
 } // namespace
-
-// =====================================================================  Drawbar
-void DrawbarComponent::paint (juce::Graphics& g)
-{
-    const float cx = (float) getWidth() * 0.5f;
-    g.setColour (ivoryDark);
-    g.setFont (VintageLookAndFeel::mono (11.0f));
-    g.drawText (name, 0, 0, getWidth(), 14, juce::Justification::centred);
-
-    const float top = 18.0f;
-    g.setColour (juce::Colours::black);
-    g.fillRoundedRectangle (cx - 9.0f, top, 18.0f, 8.0f, 2.0f);
-
-    const float len = (float) value * step();
-    if (value > 0)
-    {
-        g.setColour (ivoryDark);
-        g.fillRect (cx - 7.0f, top + 4.0f, 14.0f, len);
-        g.setColour (brownInk);
-        g.setFont (VintageLookAndFeel::mono (10.0f));
-        for (int n = 1; n <= value; ++n)
-            g.drawText (juce::String (n), juce::Rectangle<float> (cx - 7.0f, top + 4.0f + (float) (n - 1) * step(), 14.0f, step()),
-                        juce::Justification::centred);
-    }
-    auto tab = juce::Rectangle<float> (cx - 18.0f, top + 4.0f + len, 36.0f, 26.0f);
-    g.setColour (juce::Colours::black.withAlpha (0.4f));
-    g.fillRoundedRectangle (tab.translated (0, 2.0f), 5.0f);
-    g.setColour (tabColour);
-    g.fillRoundedRectangle (tab, 5.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.18f));
-    g.fillRoundedRectangle (tab.reduced (4.0f, 0).withHeight (3.0f).translated (0, 3.0f), 1.5f);
-    g.setColour (juce::Colours::black.withAlpha (0.5f));
-    g.drawRoundedRectangle (tab, 5.0f, 1.0f);
-}
-
-void DrawbarComponent::mouseDown (const juce::MouseEvent&)
-{
-    dragStart = value;
-    attachment.beginGesture();
-}
-
-void DrawbarComponent::mouseDrag (const juce::MouseEvent& e)
-{
-    const int v = juce::jlimit (0, 8, dragStart + juce::roundToInt ((float) e.getDistanceFromDragStartY() / step()));
-    if (v != value) attachment.setValueAsPartOfGesture ((float) v);
-}
-
-void DrawbarComponent::mouseUp (const juce::MouseEvent&) { attachment.endGesture(); }
-
-void DrawbarComponent::mouseDoubleClick (const juce::MouseEvent&)
-{
-    attachment.setValueAsCompleteGesture (value == 0 ? 8.0f : 0.0f);
-}
 
 // =====================================================================  LCD
 void LcdDisplay::paint (juce::Graphics& g)
@@ -163,13 +98,6 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     setLookAndFeel (&lnf);
     auto& s = proc.apvts;
 
-    // modo (troca o visual)
-    for (auto* b : { &modePiano, &modeOrgan })
-    {
-        b->setClickingTogglesState (false);
-        addAndMakeVisible (b);
-    }
-    modePiano.onClick = [this] { setModeParam (0); };
     for (auto* t : { &tabInstrument, &tabChords })
     {
         t->setClickingTogglesState (false);
@@ -182,26 +110,20 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     addChildComponent (*machinePanel);
     addChildComponent (machineOnBtn);
     machineOnAtt = std::make_unique<APVTS::ButtonAttachment> (s, "machineOn", machineOnBtn);
-    modeOrgan.onClick = [this] { setModeParam (1); };
 
-    // presets: 4 de piano (botões com LED) e 4 de órgão (teclas invertidas)
+    // presets: 4 de piano (botões com LED)
     for (int i = 0; i < 4; ++i)
     {
         pianoPreset[i].setButtonText ("P0" + juce::String (i + 1));
         pianoPreset[i].getProperties().set ("style", "membrane");
         pianoPreset[i].onClick = [this, i] { proc.setCurrentProgram (i); };
         addChildComponent (pianoPreset[i]);
-
-        organPreset[i].setButtonText (kOrganPresetShort[i]);
-        organPreset[i].getProperties().set ("style", "reverseKey");
-        organPreset[i].onClick = [this, i] { proc.setCurrentProgram (RootsKeysProcessor::getNumPianoPresets() + i); };
-        addChildComponent (organPreset[i]);
     }
 
     // piano: timbres
     {
-        const char* names[4] = { "M1", "GRAND", "MT-40", "FM EP" };
-        for (int i = 0; i < 4; ++i)
+        const char* names[7] = { "M1", "GRAND", "MT-40", "FM EP", "RHODES", "UPRIGHT", "CZ" };
+        for (int i = 0; i < 7; ++i)
         {
             pianoTimbre[i].setButtonText (names[i]);
             pianoTimbre[i].getProperties().set ("style", "chip");
@@ -223,26 +145,6 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     setupKnob (faderChorus, "pianoChorus", "Chorus", true);
     setupKnob (faderLevel,  "pianoLevel",  "Volume", true);
     addChildComponent (wheels);
-
-    // órgão
-    for (int i = 0; i < 9; ++i)
-    {
-        auto* prm = s.getParameter ("db" + juce::String (i + 1));
-        drawbars[i] = std::make_unique<DrawbarComponent> (*prm, RootsKeysProcessor::drawbarNames()[i],
-                                                          drawbarColour (i));
-        addChildComponent (*drawbars[i]);
-    }
-    leslieSwitch.getProperties().set ("style", "halfmoon");
-    for (auto* t : { &percOn, &perc3rd, &percSlow }) t->getProperties().set ("style", "tab");
-    for (auto* b : { &leslieSwitch, &percOn, &perc3rd, &percSlow }) addChildComponent (b);
-    leslieAtt   = std::make_unique<APVTS::ButtonAttachment> (s, "leslieFast", leslieSwitch);
-    percOnAtt   = std::make_unique<APVTS::ButtonAttachment> (s, "percOn", percOn);
-    perc3rdAtt  = std::make_unique<APVTS::ButtonAttachment> (s, "percHarm", perc3rd);    // ligado = 3º harmônico
-    percSlowAtt = std::make_unique<APVTS::ButtonAttachment> (s, "percDecay", percSlow);  // ligado = decaimento lento
-    setupKnob (oLeslieMix, "leslieMix",  "Leslie Mix");
-    setupKnob (oDrive,     "drive",      "Drive");
-    setupKnob (oClick,     "click",      "Click");
-    setupKnob (oLevel,     "organLevel", "Organ Vol");
 
     // eco de fita FitaEco TE-12
     addAndMakeVisible (echoButton);
@@ -288,7 +190,7 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     addAndMakeVisible (keyboard);
 
     setSize (kW, kH);
-    applySkin ((int) s.getRawParameterValue ("mode")->load());
+    applySkin (0);   // só o visual do piano (o órgão está no Mastor Reggae Organ MRO-68)
     startTimerHz (30);
 }
 
@@ -318,13 +220,6 @@ void RootsKeysEditor::placeKnob (Knob& k, juce::Point<int> c, int size, int labe
     k.label.setBounds (juce::Rectangle<int> (labelW, 14).withCentre ({ c.x, c.y + size / 2 + 9 }));
 }
 
-void RootsKeysEditor::setModeParam (int m)
-{
-    if (auto* prm = proc.apvts.getParameter ("mode"))
-        prm->setValueNotifyingHost (prm->convertTo0to1 ((float) m));
-    applySkin (m);
-}
-
 void RootsKeysEditor::applySkin (int newSkin)
 {
     newSkin = juce::jlimit (0, 1, newSkin);
@@ -333,9 +228,6 @@ void RootsKeysEditor::applySkin (int newSkin)
     const bool piano = (skin == 0);
     lnf.setSkin (skin);
 
-    modePiano.setToggleState (piano, juce::dontSendNotification);
-    modeOrgan.setToggleState (! piano, juce::dontSendNotification);
-    for (auto* b : { &modePiano, &modeOrgan }) b->getProperties().set ("style", piano ? "membrane" : "pill");
 
     // cores que dependem do visual
     const auto tickOnPanel  = piano ? plasticMuted : brownInk;   // knobs sobre painel (marfim no órgão)
@@ -346,11 +238,6 @@ void RootsKeysEditor::applySkin (int newSkin)
     {
         k->slider.setColour (juce::Slider::rotarySliderOutlineColourId, tickOnPanel);
         k->label.setColour (juce::Label::textColourId, labelOnPanel);
-    }
-    for (auto* k : { &oLeslieMix, &oDrive, &oClick, &oLevel })
-    {
-        k->slider.setColour (juce::Slider::rotarySliderOutlineColourId, tickOnWood);
-        k->label.setColour (juce::Label::textColourId, ivory);
     }
     for (auto* k : { &faderBright, &faderDecay, &faderChorus, &faderLevel })
         k->label.setColour (juce::Label::textColourId, plasticText);
@@ -400,7 +287,6 @@ void RootsKeysEditor::updateVisibility()
     // área do teclado (a CHORD MACHINE tem o próprio teclado de acordes e usa a janela inteira)
     keyboard.setVisible (inst);
     wheels.setVisible (inst && piano);
-    for (auto& b : organPreset) b.setVisible (inst && ! piano);
 
     // instrumento
     lcd.setVisible (inst && piano);
@@ -408,10 +294,6 @@ void RootsKeysEditor::updateVisibility()
     for (auto& b : pianoTimbre) b.setVisible (inst && piano);
     for (auto* k : { &faderBright, &faderDecay, &faderChorus, &faderLevel })
     { k->slider.setVisible (inst && piano); k->label.setVisible (inst && piano); }
-    for (auto& d : drawbars) d->setVisible (inst && ! piano);
-    for (auto* b : { &leslieSwitch, &percOn, &perc3rd, &percSlow }) b->setVisible (inst && ! piano);
-    for (auto* k : { &oLeslieMix, &oDrive, &oClick, &oLevel })
-    { k->slider.setVisible (inst && ! piano); k->label.setVisible (inst && ! piano); }
     for (auto* k : { &eRate, &eIntensity, &eVol, &eSpring, &eWow, &eAge, &fRate, &fDepth, &fManual, &fFeedback, &fMix,
                       &mxGain, &mxCeil, &mMaster, &mReverb })
     { k->slider.setVisible (inst); k->label.setVisible (inst); }
@@ -425,8 +307,8 @@ void RootsKeysEditor::updateLcd()
     auto pct = [this] (const char* id) { return juce::String (juce::roundToInt (proc.apvts.getRawParameterValue (id)->load() * 100.0f)).paddedLeft (' ', 2); };
     const int prog = proc.getCurrentProgram();
     const int type = (int) proc.apvts.getRawParameterValue ("pianoType")->load();
-    static const char* typeNames[4] = { "M1", "GRAND PIANO", "MT-40", "FM EP" };
-    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 3, type)]
+    static const char* typeNames[7] = { "M1", "GRAND PIANO", "MT-40", "FM EP", "RHODES", "UPRIGHT", "CZ-101" };
+    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 7, type)]
                           : prog < RootsKeysProcessor::getNumPianoPresets()
                               ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
                               : juce::String ("P--  Piano: Edit");
@@ -436,18 +318,20 @@ void RootsKeysEditor::updateLcd()
 
 void RootsKeysEditor::timerCallback()
 {
-    applySkin ((int) proc.apvts.getRawParameterValue ("mode")->load());
+    applySkin (0);
 
     vuL.update (proc.meterL.load(), 1.0f / 30.0f);
     vuR.update (proc.meterR.load(), 1.0f / 30.0f);
     grLabel.setText ("GR " + juce::String (proc.gainReduction.load(), 1), juce::dontSendNotification);
 
-    const int prog = proc.getCurrentProgram(), np = RootsKeysProcessor::getNumPianoPresets();
+    const int prog = proc.getCurrentProgram();
     for (int i = 0; i < 4; ++i)
     {
         pianoPreset[i].setToggleState (prog == i && (int) proc.apvts.getRawParameterValue ("pianoType")->load() == 0, juce::dontSendNotification);
+    }
+    for (int i = 0; i < 7; ++i)
+    {
         pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
-        organPreset[i].setToggleState (prog == np + i, juce::dontSendNotification);
     }
     if (skin == 0)
     {
@@ -515,12 +399,11 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.drawText ("DubMastor", 28, 8, 200, 18, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xfff2f2f2));
         g.setFont (juce::FontOptions (pianoTitleFace).withHeight (23.0f).withKerningFactor (0.06f));
-        g.drawText ("REGGAE KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
+        g.drawText ("REGGAE PIANO", 26, 26, 340, 30, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
-        g.drawText ("DIGITAL PIANO SYNTHESIS  MRK-80  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
+        g.drawText ("DIGITAL PIANO SYNTHESIS  MRP-80  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
         g.setFont (VintageLookAndFeel::mono (10.0f, false));
-        g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 
         // caixas de som com tela de tecido e faixa vermelha/dourada
         for (auto sp : { kSpeakerL, kSpeakerR })
@@ -608,7 +491,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.drawText (versionText(), 112, 12, 60, 16, juce::Justification::centredLeft);
         g.setColour (ivory);
         g.setFont (juce::FontOptions (organTitleFace).withHeight (36.0f));
-        g.drawText ("Reggae Keys", 28, 24, 320, 44, juce::Justification::centredLeft);
+        g.drawText ("Reggae Piano", 28, 24, 320, 44, juce::Justification::centredLeft);
 
         // trilho escuro da chave de modo
         g.setColour (brownInk);
@@ -696,16 +579,12 @@ void RootsKeysEditor::resized()
         machinePanel->setTransform (juce::AffineTransform::scale (sc).translated (x, y));
     }
 
-    // cabeçalho
-    modePiano.setBounds (piano ? juce::Rectangle<int> (764, 28, 96, 26) : juce::Rectangle<int> (766, 27, 95, 26));
-    modeOrgan.setBounds (piano ? juce::Rectangle<int> (866, 28, 96, 26) : juce::Rectangle<int> (863, 27, 95, 26));
-
     // piano
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
         pianoPreset[i].setBounds (290 + i * 106, 198, 84, 26);
-    for (int i = 0; i < 4; ++i)
-        pianoTimbre[i].setBounds (290 + i * 106, 166, 84, 24);
+    for (int i = 0; i < 7; ++i)
+        pianoTimbre[i].setBounds (285 + i * 66, 166, 62, 24);
     {
         Knob* fs[4] = { &faderBright, &faderDecay, &faderChorus, &faderLevel };
         for (int i = 0; i < 4; ++i)
@@ -716,20 +595,6 @@ void RootsKeysEditor::resized()
         }
     }
     wheels.setBounds (40, 652, 74, 128);
-
-    // órgão
-    for (int i = 0; i < 9; ++i)
-        drawbars[i]->setBounds (258 + i * 60 - 24, 102, 48, 232);
-    leslieSwitch.setBounds (kLeslie.getX() + 25, kLeslie.getY() + 30, 100, 74);
-    percOn.setBounds   (kPerc.getX() + 12,  kPerc.getY() + 28, 38, 96);
-    perc3rd.setBounds  (kPerc.getX() + 56,  kPerc.getY() + 28, 38, 96);
-    percSlow.setBounds (kPerc.getX() + 100, kPerc.getY() + 28, 38, 96);
-    placeKnob (oLeslieMix, { 80, 266 }, 52);
-    placeKnob (oDrive,     { 152, 266 }, 52);
-    placeKnob (oClick,     { 848, 280 }, 52);
-    placeKnob (oLevel,     { 920, 280 }, 52);
-    for (int i = 0; i < 4; ++i)
-        organPreset[i].setBounds (40, 652 + i * 32, 100, 28);
 
     // eco (igual nos dois visuais)
     echoButton.setBounds (kEcho.getX() + 14, kEcho.getY() + 36, piano ? 76 : 80, piano ? 26 : 34);

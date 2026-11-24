@@ -6,15 +6,11 @@
 
 class DubChordsProcessor;   // MRCM-1240 inteiro na aba CHORD MACHINE (Source/MachineProcessorUnit.cpp)
 
+// preset de fábrica do piano (o órgão saiu do plugin na 3.1: ele está no Mastor Reggae Organ MRO-68)
 struct Preset
 {
     const char* name;
-    int mode;
     float pianoBright, pianoDecay, pianoChorus, pianoLevel;
-    int drawbars[9];
-    bool percOn, perc3rd, percFast;
-    float click, drive, leslieMix, organLevel;
-    bool leslieFast;
     float reverb;
 };
 
@@ -49,7 +45,6 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
-    static const juce::StringArray& drawbarNames();
 
     juce::AudioProcessorValueTreeState apvts;
 
@@ -77,7 +72,6 @@ public:
 private:
     rk::Engine engine;
     int currentProgram = 0;
-    std::atomic<float>* dbParam[9] {};
 
     std::unique_ptr<DubChordsProcessor> machine;
     juce::AudioBuffer<float> machineBuf;

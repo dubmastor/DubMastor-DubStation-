@@ -2,6 +2,8 @@
 
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
 - O MRM-0420 continua com o banco inteiro (356 músicas)
+- A HARMONIA mostra o **Mastor Reggae Piano MRP-80** (o antigo Reggae Keys MRK-80, agora só piano)
+- Aba CHORDS (MRCM-1240): **PIANISTA** (estilo do skank: Beckford, Gladdy, Sterling, Downie, Lyn, Steely, Lenky), **FILL** separado no fim de cada frase de 4 compassos e notas de 1/32 ou 1/64
 - Versão para celular 2.5
 
 ## Mastor Riddim Machine MRM-0420 2.4 — DubStation
@@ -9,7 +11,7 @@
 - **BANCO ÚNICO DE RIDDIMS nos PRESETS da aba RIDDIM:** 356 músicas em 10 estilos e 155 riddims de A a Z, o mesmo banco do MRCM-1240, do MRDM-12 e do MRBM-69 (`RiddimBank/`). A música vai inteira para as três máquinas: harmonia conferida, BPM, kit, baterista e baixista mais próximos de quem gravou
 - Visor azul com o estilo e os anos, a música, os acordes, o BPM (ORIGINAL quando medido), o kit, os músicos e as **luzes H B D** (harmonia, baixo e bateria da gravação original). ◀ ▶ passam por estilo e por música; LISTA e PRESETS abrem **ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z** e a opção **Só completos**
 - **TIMBRE do baixo na aba RIDDIM:** ROOTS, **SUPER TONE** (o baixo digital Casio da era Sleng Teng) ou 808, direto na linha do BAIXO, acima dos baixistas. Cada música do banco já escolhe o timbre da época: SUPER TONE no digital e no ragga, 808 no dancehall, ROOTS no resto (dá para trocar na hora)
-- **Bateria do Mastor Reggae Drums MRD-12:** a aba e a plaqueta da BATERIA passam a mostrar o MRD-12 (o MRDM-12 virou a aba DUB DRUMS dele); o BAIXO mostra o Mastor Reggae Bass MRB-69 (o MRBM-69 virou a aba BASS MACHINE dele) e a HARMONIA mostra o Mastor Reggae Keys MRK-80 (o MRCM-1240 virou a aba CHORD MACHINE dele); balanço humano calibrado pela medição de bateria de reggae (Wright & Berdahl, Stanford 2005)
+- **Bateria do Mastor Reggae Drums MRD-12:** a aba e a plaqueta da BATERIA passam a mostrar o MRD-12 (o MRDM-12 virou a aba DUB DRUMS dele); o BAIXO mostra o Mastor Reggae Bass MRB-69 (o MRBM-69 virou a aba BASS MACHINE dele) e a HARMONIA mostra o Mastor Reggae Keys MRK-80, hoje Mastor Reggae Piano MRP-80 (o MRCM-1240 virou a aba CHORD MACHINE dele); balanço humano calibrado pela medição de bateria de reggae (Wright & Berdahl, Stanford 2005)
 - **Créditos no visor:** a linha de baixo do visor azul alterna a cada 4 s entre os músicos e os créditos da gravação (produção, estúdio, baixo e bateria)
 - **ALAVANCA** sorteia uma música do banco (só ROCKERS e ONE DROP: caixa no 2 e no 4)
 - Projetos antigos abrem igual: o preset antigo aparece como a música certa do banco
