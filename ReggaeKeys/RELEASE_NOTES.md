@@ -1,3 +1,9 @@
+## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+
+- **Timbre inicial do piano:** o plugin agora abre no **M1 Grand Piano**, o piano de cauda do Korg M1 (antes abria no piano M1 da house).
+- **Timbres Yamaha:** novos botões **CP-80** (piano de cauda elétrico Yamaha CP-80, com o meio "honky" do captador) e **C7** (cauda de concerto Yamaha C7, brilhante e com ataque rápido), além do FM EP estilo DX que já existia.
+- Os presets de piano M1 e os timbres antigos continuam iguais; projetos salvos abrem com o timbre que tinham.
+
 ## Mastor Reggae Keys MRK-80 3.0 🟢🟡⚫
 
 - **Nome novo:** o Mastor Roots Keys MRK-80 passa a se chamar **Mastor Reggae Keys MRK-80** e absorve o Mastor Reggae Chord Machine MRCM-1240, que deixa de ser um plugin separado (o MRCM-1240 2.4 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo

@@ -132,7 +132,7 @@ private:
     // piano anos 80
     LcdDisplay lcd;
     juce::TextButton pianoPreset[4];
-    juce::TextButton pianoTimbre[4];   // M1 / GRAND / MT-40 / FM EP
+    juce::TextButton pianoTimbre[7];   // M1 / GRAND / MT-40 / FM EP / CP-80 / C7 / M1 GRAND
     Knob faderBright, faderDecay, faderChorus, faderLevel;   // faders verticais
     WheelsComponent wheels;
 

@@ -39,7 +39,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "mode", 1 }, "Mode", StringArray { "Piano", "Organ" }, 0));
 
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoType", 1 }, "Piano Timbre",
-                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP" }, 0));
+                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP", "Yamaha CP-80", "Yamaha C7", "M1 Grand Piano" }, 6));   // de fábrica: o Grand Piano do Korg M1 (novos timbres sempre no fim da lista: projetos antigos guardam o índice)
     l.add (pct ("pianoBright", "Piano Brightness", 0.65f));
     l.add (pct ("pianoDecay",  "Piano Decay",      0.55f));
     l.add (pct ("pianoChorus", "Piano Chorus",     0.50f));

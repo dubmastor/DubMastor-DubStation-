@@ -200,8 +200,8 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 
     // piano: timbres
     {
-        const char* names[4] = { "M1", "GRAND", "MT-40", "FM EP" };
-        for (int i = 0; i < 4; ++i)
+        const char* names[7] = { "M1", "GRAND", "MT-40", "FM EP", "CP-80", "C7", "M1 GR" };
+        for (int i = 0; i < 7; ++i)
         {
             pianoTimbre[i].setButtonText (names[i]);
             pianoTimbre[i].getProperties().set ("style", "chip");
@@ -425,8 +425,8 @@ void RootsKeysEditor::updateLcd()
     auto pct = [this] (const char* id) { return juce::String (juce::roundToInt (proc.apvts.getRawParameterValue (id)->load() * 100.0f)).paddedLeft (' ', 2); };
     const int prog = proc.getCurrentProgram();
     const int type = (int) proc.apvts.getRawParameterValue ("pianoType")->load();
-    static const char* typeNames[4] = { "M1", "GRAND PIANO", "MT-40", "FM EP" };
-    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 3, type)]
+    static const char* typeNames[7] = { "M1", "GRAND PIANO", "MT-40", "FM EP", "YAMAHA CP-80", "YAMAHA C7", "M1 GRAND PIANO" };
+    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 6, type)]
                           : prog < RootsKeysProcessor::getNumPianoPresets()
                               ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
                               : juce::String ("P--  Piano: Edit");
@@ -446,9 +446,10 @@ void RootsKeysEditor::timerCallback()
     for (int i = 0; i < 4; ++i)
     {
         pianoPreset[i].setToggleState (prog == i && (int) proc.apvts.getRawParameterValue ("pianoType")->load() == 0, juce::dontSendNotification);
-        pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
         organPreset[i].setToggleState (prog == np + i, juce::dontSendNotification);
     }
+    for (int i = 0; i < 7; ++i)
+        pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
     if (skin == 0)
     {
         updateLcd();
@@ -704,8 +705,8 @@ void RootsKeysEditor::resized()
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
         pianoPreset[i].setBounds (290 + i * 106, 198, 84, 26);
-    for (int i = 0; i < 4; ++i)
-        pianoTimbre[i].setBounds (290 + i * 106, 166, 84, 24);
+    for (int i = 0; i < 7; ++i)
+        pianoTimbre[i].setBounds (290 + i * 57, 166, 54, 24);
     {
         Knob* fs[4] = { &faderBright, &faderDecay, &faderChorus, &faderLevel };
         for (int i = 0; i < 4; ++i)
