@@ -48,6 +48,26 @@ int main (int argc, char** argv)
         ok = ok && w;
         std::printf ("%s %s (%dx%d)\n", w ? "PNG" : "FALHOU", f.getFullPathName().toRawUTF8(), img.getWidth(), img.getHeight());
     }
+    {   // o gabinete muda com o INSTRUMENTO (aba GROOVE e aba ÓRGÃO de cada um)
+        const char* nomes[5] = { "", "-rhodes", "-suitcase", "-wurlitzer", "-dxep" };
+        for (int ins = 1; ins < 5; ++ins)
+            for (int page : { 0, 2 })
+            {
+                proc.setParam ("instr", (float) ins);
+                re->setPage (page);
+                re->refreshForSnapshot();
+                auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
+                juce::File f = base.getSiblingFile (base.getFileNameWithoutExtension() + suffix[page] + nomes[ins] + base.getFileExtension());
+                f.deleteFile();
+                juce::FileOutputStream os (f);
+                juce::PNGImageFormat png;
+                const bool w = png.writeImageToStream (img, os);
+                ok = ok && w;
+                std::printf ("%s %s\n", w ? "PNG" : "FALHOU", f.getFullPathName().toRawUTF8());
+            }
+        proc.setParam ("instr", 0.0f);
+        re->refreshForSnapshot();
+    }
     re->setPage (0);
 
     // estado: salva e restaura

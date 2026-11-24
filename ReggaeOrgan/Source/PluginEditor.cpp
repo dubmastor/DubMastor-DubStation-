@@ -793,6 +793,10 @@ void ReggaeOrganEditor::setPage (int p)
 
 void ReggaeOrganEditor::timerCallback()
 {
+    {
+        const int newLook = juce::jlimit (0, 4, (int) proc.apvts.getRawParameterValue ("instr")->load());
+        if (newLook != look) { look = newLook; repaint(); }
+    }
     for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &leslie, &instr, &brush })
         refreshChips (*c);
     const int mus = proc.getCurrentProgram();
@@ -843,10 +847,36 @@ void ReggaeOrganEditor::timerCallback()
 // ---------------------------------------------------------------------  fundo
 void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
 {
-    static const juce::Image wood = skin::makeWood (kW, kH);
-    g.drawImageAt (wood, 0, 0);
-    g.setColour (juce::Colours::black.withAlpha (0.12f));
+    // gabinete conforme o INSTRUMENTO: madeira do Hammond, tolex preto do Rhodes, coral do Wurlitzer, preto anos 80 do DX
+    if (look == 0)
+    {
+        static const juce::Image wood = skin::makeWood (kW, kH);
+        g.drawImageAt (wood, 0, 0);
+    }
+    else
+    {
+        static const juce::Colour bodies[5] = { juce::Colour (0xff5b3519), juce::Colour (0xff1b1a19), juce::Colour (0xff1b1a19),
+                                                juce::Colour (0xffa4472f), juce::Colour (0xff232022) };
+        g.fillAll (bodies[juce::jlimit (0, 4, look)]);
+        g.setColour (juce::Colours::white.withAlpha (0.025f));
+        for (int y = 0; y < kH; y += 3) g.drawHorizontalLine (y, 0.0f, (float) kW);
+        g.setColour (juce::Colours::black.withAlpha (look == 3 ? 0.08f : 0.18f));
+        for (int x = 0; x < kW; x += 4) g.drawVerticalLine (x, 0.0f, (float) kH);
+    }
+    g.setColour (juce::Colours::black.withAlpha (look == 0 ? 0.12f : 0.3f));
     g.fillRect (0, 0, kW, 74);
+    if (look == 1 || look == 2)
+    {   // chapa de alumínio e feltro vermelho do Rhodes
+        g.setColour (juce::Colour (0xffbfbfbb));
+        g.fillRect (0, 75, kW, 2);
+        g.setColour (juce::Colour (0xff8e2a20));
+        g.fillRect (0, 77, kW, 3);
+    }
+    else if (look == 4)
+    {   // friso bordô do teclado FM anos 80
+        g.setColour (juce::Colour (0xff7a2234));
+        g.fillRect (0, 75, kW, 3);
+    }
     g.setColour (brownInk);
     g.fillRect (0, 73, kW, 2);
 
@@ -863,6 +893,12 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
     g.setColour (ivory.withAlpha (0.7f));
     g.setFont (VintageLookAndFeel::mono (9.5f, false));
     g.drawText ("MRO-68", 26 + tw + 10, 24, 80, 14, juce::Justification::centredLeft);
+    {
+        static const char* badges[5] = { "B3", "STAGE 73", "SUITCASE 73", "200A", "FM EP" };
+        g.setColour (ivory.withAlpha (0.85f));
+        g.setFont (VintageLookAndFeel::mono (10.0f));
+        g.drawText (badges[juce::jlimit (0, 4, look)], 26 + tw + 70, 38, 120, 18, juce::Justification::centredLeft);
+    }
 
     // placa DUB STATION (latão dourado, igual à do MRK-80)
     {
@@ -985,12 +1021,13 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
 
 void ReggaeOrganEditor::paint (juce::Graphics& g)
 {
-    if (background.isNull() || backgroundPage != page)
+    if (background.isNull() || backgroundPage != page || backgroundLook != look)
     {
         background = juce::Image (juce::Image::RGB, kW, kH, true);
         juce::Graphics bg (background);
         renderBackground (bg);
         backgroundPage = page;
+        backgroundLook = look;
     }
     g.drawImageAt (background, 0, 0);
 }

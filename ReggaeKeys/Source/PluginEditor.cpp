@@ -436,9 +436,19 @@ void RootsKeysEditor::updateLcd()
                     + "  CHO " + pct ("pianoChorus") + "  VOL " + pct ("pianoLevel"));
 }
 
+int RootsKeysEditor::lookForTimbre (int t)
+{
+    static const int m[13] = { 0, 4, 5, 0, 4, 4, 0, 0, 0, 5, 1, 2, 3 };
+    return m[juce::jlimit (0, 12, t)];
+}
+
 void RootsKeysEditor::timerCallback()
 {
     applySkin ((int) proc.apvts.getRawParameterValue ("mode")->load());
+    {
+        const int newLook = lookForTimbre ((int) proc.apvts.getRawParameterValue ("pianoType")->load());
+        if (newLook != look) { look = newLook; repaint(); }
+    }
 
     vuL.update (proc.meterL.load(), 1.0f / 30.0f);
     vuR.update (proc.meterR.load(), 1.0f / 30.0f);
@@ -504,14 +514,73 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 
     if (piano)
     {
-        // ---------------- teclado anos 80: plástico preto liso e fosco
-        static const juce::Image plastic = skin::makeSatin (kW, kH);
-        g.drawImageAt (plastic, 0, 0);
-        g.setColour (juce::Colour (0xff18181a));
+        // ---------------- gabinete conforme o timbre (look): o anos 80 preto é o de sempre
+        struct Finish
+        {
+            juce::Colour body, header, trimHi, trimLo, cloth, clothA, clothB, band1, band2, plate, panelFill;
+            const char* line; const char* badge; bool lightBody;
+        };
+        static const Finish finishes[6] = {
+            // 0 teclado preto anos 80 (M1)
+            { juce::Colour (0xff151517), juce::Colour (0xff18181a), juce::Colour (0xff9a9da2), juce::Colour (0xff5a5d62),
+              juce::Colour (0xff1d1d20), juce::Colour (0xff151517), juce::Colour (0xff27272b), ledRed, juce::Colour (0xffe2b956),
+              juce::Colour (0xff9a9a9e), juce::Colour (0x00000000), "DIGITAL PIANO SYNTHESIS", "ROOTS", false },
+            // 1 Rhodes Stage: tolex preto, chapa de alumínio, feltro vermelho
+            { juce::Colour (0xff1b1a19), juce::Colour (0xff101010), juce::Colour (0xffd9d9d6), juce::Colour (0xff8f8f8c),
+              juce::Colour (0xff222120), juce::Colour (0xff1a1918), juce::Colour (0xff2c2b29), juce::Colour (0xff8e2a20), juce::Colour (0xffbfbfbb),
+              juce::Colour (0xffd9d9d6), juce::Colour (0x00000000), "STAGE 73  ELECTRIC PIANO", "STAGE 73", false },
+            // 2 Rhodes Suitcase: tolex preto e o gabinete de alto-falante com a luz do tremolo
+            { juce::Colour (0xff1b1a19), juce::Colour (0xff101010), juce::Colour (0xffd9d9d6), juce::Colour (0xff8f8f8c),
+              juce::Colour (0xff2a2927), juce::Colour (0xff262523), juce::Colour (0xff3a3936), juce::Colour (0xffe2483d), juce::Colour (0xffbfbfbb),
+              juce::Colour (0xffd9d9d6), juce::Colour (0x00000000), "SUITCASE 73  TREMOLO", "SUITCASE", false },
+            // 3 Wurlitzer 200A: plástico creme anos 60, faixa de controles marrom
+            { juce::Colour (0xffe9dcc3), juce::Colour (0xff3c3226), juce::Colour (0xfff3e6c8), juce::Colour (0xffb9a888),
+              juce::Colour (0xffd8c9ab), juce::Colour (0xffcdbd9e), juce::Colour (0xffe3d5b8), juce::Colour (0xff8a5a2b), juce::Colour (0xff5b4a35),
+              juce::Colour (0xff5b4a35), juce::Colour (0xff2e261d), "200A  ELECTRIC PIANO", "200A", true },
+            // 4 Yamaha CP / C7 / Grand: madeira escura com plaqueta dourada
+            { juce::Colour (0xff2a1c14), juce::Colour (0xff1a110b), juce::Colour (0xffd6b36a), juce::Colour (0xff7a5f2c),
+              juce::Colour (0xff1e1510), juce::Colour (0xff17100c), juce::Colour (0xff2a1d15), juce::Colour (0xffd6b36a), juce::Colour (0xff6b5a48),
+              juce::Colour (0xffd6b36a), juce::Colour (0x00000000), "ELECTRIC GRAND  CP / C7", "GRAND", false },
+            // 5 Casio CZ-101 / MT-40: plástico cinza, faixa escura, teclas azuis e vermelhas
+            { juce::Colour (0xffb9bbbd), juce::Colour (0xff2b2d31), juce::Colour (0xffe4e5e6), juce::Colour (0xff8d8f92),
+              juce::Colour (0xffa9abad), juce::Colour (0xff9fa1a3), juce::Colour (0xffb3b5b7), juce::Colour (0xff2b5fa8), juce::Colour (0xffc43a32),
+              juce::Colour (0xff2b2d31), juce::Colour (0xff2b2d31), "PHASE DISTORTION  CZ / MT", "CZ / MT", true },
+        };
+        const Finish& F = finishes[juce::jlimit (0, 5, look)];
+
+        if (look == 0)
+        {
+            static const juce::Image plastic = skin::makeSatin (kW, kH);
+            g.drawImageAt (plastic, 0, 0);
+        }
+        else if (look == 4)
+        {
+            static const juce::Image wood = skin::makeWood (kW, kH);
+            g.drawImageAt (wood, 0, 0);
+            g.setColour (juce::Colours::black.withAlpha (0.55f));   // madeira escura, verniz de piano
+            g.fillRect (0, 0, kW, kH);
+        }
+        else
+        {
+            g.fillAll (F.body);
+            if (! F.lightBody)
+            {   // tolex: trama fina
+                g.setColour (juce::Colours::white.withAlpha (0.025f));
+                for (int y = 0; y < kH; y += 3) g.drawHorizontalLine (y, 0.0f, (float) kW);
+                g.setColour (juce::Colours::black.withAlpha (0.18f));
+                for (int x = 0; x < kW; x += 4) g.drawVerticalLine (x, 0.0f, (float) kH);
+            }
+        }
+        g.setColour (F.header);
         g.fillRect (0, 0, kW, 74);
-        // friso de alumínio sob o cabeçalho
-        g.setGradientFill (juce::ColourGradient::vertical (juce::Colour (0xff9a9da2), 74.0f, juce::Colour (0xff5a5d62), 77.0f));
+        // friso sob o cabeçalho
+        g.setGradientFill (juce::ColourGradient::vertical (F.trimHi, 74.0f, F.trimLo, 77.0f));
         g.fillRect (0, 74, kW, 3);
+        if (look == 1 || look == 2)
+        {   // feltro vermelho do Rhodes logo abaixo da chapa
+            g.setColour (juce::Colour (0xff8e2a20));
+            g.fillRect (0, 77, kW, 3);
+        }
 
         g.setColour (plasticMuted);
         g.setFont (juce::FontOptions (13.0f, juce::Font::italic));
@@ -521,7 +590,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
         g.drawText ("REGGAE KEYS", 26, 26, 340, 30, juce::Justification::centredLeft);
         g.setColour (juce::Colour (0xff75757a));
         g.setFont (VintageLookAndFeel::mono (9.0f, false));
-        g.drawText ("DIGITAL PIANO SYNTHESIS  MRK-80  " + versionText(), 30, 58, 300, 12, juce::Justification::centredLeft);
+        g.drawText (juce::String (F.line) + "  MRK-80  " + versionText(), 30, 58, 360, 12, juce::Justification::centredLeft);
         g.setFont (VintageLookAndFeel::mono (10.0f, false));
         g.drawText ("MODE", 764, 12, 60, 12, juce::Justification::centredLeft);
 
@@ -530,18 +599,18 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             if (page == 0)
         {
             auto box = sp.toFloat();
-            g.setColour (juce::Colour (0xff0a0a0b));
+            g.setColour (F.lightBody ? F.header : juce::Colour (0xff0a0a0b));
             g.fillRoundedRectangle (box, 8.0f);
             auto cloth = box.reduced (8.0f);
-            g.setColour (juce::Colour (0xff1d1d20));
+            g.setColour (F.cloth);
             g.fillRoundedRectangle (cloth, 4.0f);
             {
                 juce::Graphics::ScopedSaveState ss (g);
                 g.reduceClipRegion (cloth.toNearestInt());
-                g.setColour (juce::Colour (0xff151517));
-                for (float y = cloth.getY(); y < cloth.getBottom(); y += 2.0f)
+                g.setColour (F.clothA);
+                for (float y = cloth.getY(); y < cloth.getBottom(); y += (look == 2 ? 5.0f : 2.0f))   // Suitcase: grade larga do gabinete
                     g.drawHorizontalLine ((int) y, cloth.getX(), cloth.getRight());
-                g.setColour (juce::Colour (0xff27272b));
+                g.setColour (F.clothB);
                 for (float x = cloth.getX(); x < cloth.getRight(); x += 2.0f)
                     g.drawVerticalLine ((int) x, cloth.getY(), cloth.getBottom());
                 // leve volume do cone por trás do tecido
@@ -550,17 +619,27 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
                 g.fillRect (cloth);
             }
             const float sy = cloth.getBottom() - 44.0f;
-            g.setColour (ledRed);
+            g.setColour (F.band1);
             g.fillRect (cloth.getX(), sy, cloth.getWidth(), 4.0f);
-            g.setColour (juce::Colour (0xffe2b956));
+            g.setColour (F.band2);
             g.fillRect (cloth.getX(), sy + 6.0f, cloth.getWidth(), 2.0f);
-            g.setColour (juce::Colour (0xff9a9a9e));
+            g.setColour (F.plate);
             g.setFont (juce::FontOptions (pianoTitleFace).withHeight (10.0f).withKerningFactor (0.2f));
-            g.drawText ("ROOTS", cloth.withTop (sy + 12.0f).withHeight (24.0f), juce::Justification::centred);
+            g.drawText (F.badge, cloth.withTop (sy + 12.0f).withHeight (24.0f), juce::Justification::centred);
+            if (look == 2)
+            {   // luz do tremolo da maleta
+                g.setColour (juce::Colour (0xffe2483d));
+                g.fillEllipse (cloth.getRight() - 18.0f, cloth.getY() + 8.0f, 9.0f, 9.0f);
+            }
         }
 
         auto panel = [&] (juce::Rectangle<int> r)
         {
+            if (F.lightBody)
+            {   // gabinete claro: a faixa de controles é escura, para os knobs e textos continuarem legíveis
+                g.setColour (F.panelFill);
+                g.fillRoundedRectangle (r.toFloat(), 4.0f);
+            }
             g.setColour (juce::Colours::white.withAlpha (0.025f));
             g.fillRoundedRectangle (r.toFloat(), 4.0f);
             g.setColour (juce::Colour (0xff3a3a3e));
@@ -666,13 +745,14 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
 
 void RootsKeysEditor::paint (juce::Graphics& g)
 {
-    if (backgroundSkin != skin || backgroundPage != page || background.isNull())
+    if (backgroundSkin != skin || backgroundPage != page || backgroundLook != look || background.isNull())
     {
         background = juce::Image (juce::Image::RGB, kW, kH, true);
         juce::Graphics bg (background);
         renderBackground (bg, skin);
         backgroundSkin = skin;
         backgroundPage = page;
+        backgroundLook = look;
     }
     g.drawImageAt (background, 0, 0);
     if (page == 1)

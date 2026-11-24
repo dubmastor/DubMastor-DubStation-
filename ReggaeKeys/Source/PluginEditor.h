@@ -120,7 +120,12 @@ private:
     juce::Typeface::Ptr plateFace, pianoTitleFace, organTitleFace;
     int skin = -1, page = 0;
     juce::Image background;
-    int backgroundSkin = -1, backgroundPage = -1;
+    int backgroundSkin = -1, backgroundPage = -1, backgroundLook = -1;
+    // acabamento do gabinete no modo piano, conforme o timbre:
+    // 0 teclado preto anos 80 (M1, M1 COMP, M1 GRAND, Honky, FM EP) · 1 Rhodes Stage · 2 Rhodes Suitcase
+    // 3 Wurlitzer 200A · 4 Yamaha CP / C7 / Grand · 5 Casio CZ-101 / MT-40
+    int look = 0;
+    static int lookForTimbre (int pianoType);
 
     // cabeçalho
     juce::TextButton modePiano { "PIANO" }, modeOrgan { "ORGAN" };
