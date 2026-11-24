@@ -162,6 +162,10 @@ int main (int argc, char** argv)
                                      "interface-piano-yamaha.png", "interface-piano-casio.png" };
             for (int i = 0; i < 5; ++i) { setP (p.apvts, "pianoType", (float) types[i]); save (names[i]); }
             setP (p.apvts, "pianoType", 7.0f);
+            check (getP (p.apvts, "gtrOn") < 0.5f, "GTR SKANK começa desligado");
+            setP (p.apvts, "gtrOn", 1.0f);
+            save ("interface-piano-gtr.png");
+            setP (p.apvts, "gtrOn", 0.0f);
         }
         rk->setPage (1);
         save ("interface-chord-machine.png");

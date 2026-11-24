@@ -152,6 +152,8 @@ private:
     // eco de fita FitaEco TE-12
     juce::ToggleButton echoButton { "ECHO" };
     std::unique_ptr<APVTS::ButtonAttachment> echoAtt;
+    juce::ToggleButton gtrButton { "GTR" };   // GTR SKANK (guitarra do skank junto com o piano)
+    std::unique_ptr<APVTS::ButtonAttachment> gtrAtt;
     juce::ComboBox echoModeBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> echoModeAtt;
     Knob eRate, eIntensity, eVol, eSpring, eWow, eAge;

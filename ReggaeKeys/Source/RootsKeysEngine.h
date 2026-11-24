@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "TapeEchoDSP.h"
+#include "GuitarSkank.h"
 
 namespace rk
 {
@@ -134,6 +135,9 @@ struct Params
     float flDepth    = 0.8f;    // amplitude da varredura
     float flManual   = 0.3f;    // atraso base (posição do "pente")
     float flFeedback = 0.65f;   // -0.95..0.95 (regeneração; negativo = timbre oco)
+    // GTR SKANK: a guitarra do skank (timbre do MRG-68) tocando junto com o piano — sempre começa desligada
+    bool  gtrOn    = false;
+    float gtrLevel = 0.6f;
     float flMix      = 0.5f;
     // Master / Maximizer
     float reverb = 0.18f;
@@ -814,6 +818,7 @@ public:
         flanger.prepare (sr);
         echoIdle = true;
         maxi.prepare (sr);
+        gtr.prepare (sr);
         for (auto& v : piano) v.active = false;
         for (auto& v : organ) v.active = false;
         for (float& g : dbSmooth) g = 0;
@@ -830,6 +835,7 @@ public:
         {
             PianoVoice& v = allocPiano (note);
             v.start (note, vel, sr, params, stamp);
+            if (params.gtrOn) gtr.noteOn (note, vel);
         }
         if (mode == 1)
         {
@@ -845,6 +851,7 @@ public:
 
     void noteOff (int note)
     {
+        gtr.noteOff (note);
         for (auto& v : piano)
             if (v.active && v.held && v.note == note)
             {
@@ -872,6 +879,7 @@ public:
 
     void allNotesOff()
     {
+        gtr.allNotesOff();
         for (auto& v : piano) if (v.active) { v.held = false; v.release (sr); }
         for (auto& v : organ) if (v.active) v.release (0.0f);
         sustain = false; heldKeys = 0;
@@ -889,6 +897,7 @@ public:
 
     void renderChunk (float* outL, float* outR, int n)
     {
+        gtr.flush();   // palhetada com as notas do piano que chegaram juntas
         const Params& p = params;
         float dbTarget[9];
         for (int i = 0; i < 9; ++i)
@@ -937,8 +946,10 @@ public:
             float ol = (od * (1 - m) + ll * m) * p.organLevel;
             float orr = (od * (1 - m) + lr * m) * p.organLevel;
 
-            bufL[s] = pl + ol;
-            bufR[s] = pr + orr;
+            // guitarra do skank: um pouco para a direita, entra no eco e no reverb como o piano
+            const float gt = gtr.tick() * p.gtrLevel;
+            bufL[s] = pl + ol + gt * 0.75f;
+            bufR[s] = pr + orr + gt;
         }
 
         // eco de fita FitaEco TE-12 (antes do reverb, como num rack de dub).
@@ -999,6 +1010,7 @@ private:
     StereoChorus chorus;
     Leslie leslie;
     Reverb reverb;
+    GuitarSkank gtr;
     fitaeco::TapeEcho echo;
     Flanger flanger;
     static constexpr int kChunk = 256;

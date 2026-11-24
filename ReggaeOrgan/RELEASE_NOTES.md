@@ -3,6 +3,7 @@
 ## 1.1
 
 - **INSTRUMENTO** (aba ÓRGÃO, seção SOM): além do **Hammond B3**, o mesmo groove (bubble, chop e fills) pode tocar em 4 pianos elétricos com o motor do Reggae Keys MRK-80: **RHODES** (Rhodes Stage), **SUITC.** (Rhodes Suitcase com tremolo), **WURLI** (Wurlitzer 200A) e **DX EP** (FM EP estilo Yamaha DX7). Drawbars, Leslie e percussão só valem no B3. Projetos antigos abrem no B3.
+- O gabinete muda com o instrumento: madeira no B3, tolex preto com chapa de alumínio e feltro vermelho no Rhodes e no Suitcase, coral no Wurlitzer e preto anos 80 no DX EP.
 
 ## 1.0
 
