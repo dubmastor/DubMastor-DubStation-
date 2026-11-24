@@ -263,21 +263,22 @@ const STYLES = [['SKANK DUPLO', '"&" e "a" · acorde curto, abafado'], ['CONTRAP
 const FILLS = [['SEM', 'só a linha'], ['PUXADA', 'o próximo acorde adiantado no "a" do 4'], ['RAJADA', 'semicolcheias no 4, crescendo'], ['SUBIDA', 'pentatônica subindo no 3 e no 4']];
 // timbres = ajustes do instrumento (o eco nunca liga sozinho: Tape Echo começa sempre desligado)
 const TIMBRES = [
-  { name: 'D6', lcd: 'D6 Funky Reggae', f: [1, 0, 1, 0], p: [1, 0], bright: 0.7, decay: 0.45, mute: 0.15, wah: 0, ph: 0 },
-  { name: 'MUTE', lcd: 'D6 Muted Chop', f: [0, 1, 1, 0], p: [1, 0], bright: 0.55, decay: 0.3, mute: 0.7, wah: 0, ph: 0 },
-  { name: 'WAH', lcd: 'Wah Skank', f: [1, 1, 0, 0], p: [0, 1], bright: 0.75, decay: 0.4, mute: 0.3, wah: 1, ph: 0 },
+  { name: 'D6', lcd: 'D6 Funky Reggae', f: [1, 0, 1, 0], p: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08, wah: 0, ph: 0 },
+  { name: 'MUTE', lcd: 'D6 Muted Chop', f: [0, 1, 1, 0], p: [0, 1], bright: 0.75, decay: 0.4, mute: 0.55, wah: 0, ph: 0 },
+  { name: 'WAH', lcd: 'Wah Skank', f: [1, 1, 0, 0], p: [0, 1], bright: 0.9, decay: 0.45, mute: 0.2, wah: 1, ph: 0 },
   { name: 'PHASER', lcd: 'Phase Riff', f: [0, 1, 1, 0], p: [1, 1], bright: 0.6, decay: 0.55, mute: 0.1, wah: 0, ph: 1 },
   { name: 'DUB', lcd: 'Dark Dub Clav', f: [0, 0, 1, 1], p: [1, 0], bright: 0.4, decay: 0.6, mute: 0.2, wah: 0, ph: 1 }];
 
 // ------------------------------------------------------------------ estado
-const DEF = { page: 1, bpm: 76, base: true, timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.7, decay: 0.45, mute: 0.15, vol: 0.8,
+const DEF = { page: 1, bpm: 76, base: true, timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08, vol: 0.8,
   wahOn: false, wahSens: 0.6, wahRange: 0.7, phOn: false, phRate: 0.4, phDepth: 0.55, echoOn: false, echoTime: 1, echoFb: 0.4, echoMix: 0.45,
   maxOn: true, rev: 0.2, master: 0.8, src: 0,
   slots: [{ root: 9, minor: true, dur: 1, on: true }, { root: 2, minor: true, dur: 1, on: true }, { root: 7, minor: false, dur: 1, on: true }, { root: 4, minor: true, dur: 1, on: true }],
-  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 53, reg: 4, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
+  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 53, reg: 5, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
 let S = JSON.parse(JSON.stringify(DEF));
 try { const sv = JSON.parse(localStorage.getItem('mrcl71') || 'null'); if (sv && typeof sv === 'object') S = Object.assign(S, sv); } catch (e) {}
 if ((S.reg | 0) < 4) { S.center = 53; S.reg = 4; S.edits = null; }   // oitava 2 do Cubase (C2 = MIDI 48), pedido de 23/nov
+if ((S.reg | 0) < 5) { Object.assign(S, { timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08, reg: 5 }); }   // timbre novo (modelo físico)
 const save = () => { try { localStorage.setItem('mrcl71', JSON.stringify(S)); } catch (e) {} };
 
 // ------------------------------------------------------------------ gerador das linhas (na contagem com a caixa no 2 e no 4)
@@ -363,19 +364,43 @@ function current() { return S.edits ? { events: S.edits, bars: SUG[S.use].bars }
 
 // ------------------------------------------------------------------ áudio
 let ac = null, bus, wahF, wahDry, wahWet, ph, phLfo, phDepthG, phWet, phDry, echo, echoFb, echoLp, echoWet, comp, makeup, master, revWet, inst, toneNodes = [], baseBus;
+// ---- corda do clavinet por modelo físico (Karplus-Strong): a tangente bate na corda e a prende, a corda curta vibra
+//      até a ponte, os dois captadores perto da ponte filtram em pente (o som anasalado) e a lã abafa ao soltar a tecla
 const waveCache = new Map();
-function clavWave(bright) {
-  const pk = S.pickups, key = pk.join('') + Math.round(bright * 10);
+const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+function clavBuf(m, vb) {
+  const key = [m, vb, S.pickups.join(''), Math.round(S.bright * 20), Math.round(S.decay * 20), Math.round(S.mute * 20)].join('|');
   if (waveCache.has(key)) return waveCache.get(key);
-  const N = 48, re = new Float32Array(N), im = new Float32Array(N);
-  const pw = 1.25 - 0.6 * bright;
-  for (let k = 1; k < N; k++) {
-    let a = Math.pow(k, -pw), comb = 0, cnt = 0;
-    if (pk[0]) { comb += (0.2 + 0.8 * Math.abs(Math.sin(Math.PI * k * 0.11))) * (0.3 + 0.7 * Math.abs(Math.sin(Math.PI * k * 0.31))); cnt++; }   // C/D: captador do meio
-    if (pk[1]) { comb += (0.15 + 0.85 * Math.abs(Math.sin(Math.PI * k * 0.05))) * (0.4 + 0.6 * Math.abs(Math.sin(Math.PI * k * 0.19))); cnt++; }  // A/B: perto da ponte, mais fino
-    im[k] = a * (cnt ? comb / cnt : 0.5);
+  const sr = ac.sampleRate, f = mtof(m), vel = [0.55, 0.8, 1][vb];
+  // sustentação (60 dB): corda de aço curta, longa no grave; a alavanca da lã (MUTE) encurta muito
+  const T = clamp((0.8 + 3.0 * S.decay) * Math.pow(2, -(m - 48) / 20), 0.3, 5) * (1 - 0.86 * S.mute);
+  // passa-baixas de um polo dentro do loop: perto de 1 = brilho que dura (clavinet), menor = mais abafado
+  const g = clamp(0.8 + 0.2 * clamp((m - 48) / 24, -0.5, 1.2) - 0.25 * (1 - S.bright) - 0.3 * S.mute - 0.08 * (1 - vel), 0.3, 0.97);   // agudo: menos perda por volta (o clavinet é brilhante em toda a extensão)
+  const P = sr / f - (1 - g) / g, Ni = Math.max(2, Math.floor(P)), fr = P - Ni;   // atraso do loop = período (descontado o atraso do filtro)
+  const loss = Math.pow(0.001, 1 / (f * T));
+  const len = Math.floor(sr * Math.min(4.5, T * 1.15 + 0.05)), y = new Float32Array(len), exc = new Float32Array(Ni + 1);
+  // excitação: a tangente de metal bate seca na corda (pulso bem curto e brilhante, mais forte = mais agudo)
+  const a = clamp(0.18 + 0.4 * vel * (0.5 + 0.5 * S.bright), 0.15, 0.6);
+  let lp = 0, mean = 0;
+  for (let i = 0; i <= Ni; i++) { const x = (i < Math.max(2, Ni * 0.04) ? 1 : 0) * 0.8 + (Math.random() * 2 - 1) * 0.35; lp += a * (x - lp); exc[i] = lp; mean += lp; }
+  mean /= Ni + 1; for (let i = 0; i <= Ni; i++) exc[i] -= mean;
+  let z = 0;
+  for (let n = 0; n < len; n++) {
+    const a1 = n >= Ni ? y[n - Ni] : 0, a2 = n > Ni ? y[n - Ni - 1] : 0;
+    z += g * (a1 * (1 - fr) + a2 * fr - z);
+    y[n] = (n <= Ni ? exc[n] : 0) + z * loss;
   }
-  const w = ac.createPeriodicWave(re, im); waveCache.set(key, w); return w;
+  // captadores perto da ponte = filtro em pente: A/B mais perto (fino, "quack"), C/D um pouco mais longe (mais cheio)
+  const out = new Float32Array(len), pos = [];
+  if (S.pickups[1]) pos.push(0.07);
+  if (S.pickups[0]) pos.push(0.15);
+  if (!pos.length) pos.push(0.15);
+  for (const pp of pos) { const d = Math.max(1, Math.round(P * pp)); for (let i = 0; i < len; i++) out[i] += y[i] - (i >= d ? y[i - d] : 0); }
+  let pk = 0; for (let i = 0; i < len; i++) pk = Math.max(pk, Math.abs(out[i]));
+  const sc = vel / (pk || 1); for (let i = 0; i < len; i++) out[i] *= sc;
+  const b = ac.createBuffer(1, len, sr); b.getChannelData(0).set(out);
+  if (waveCache.size > 300) waveCache.clear();
+  waveCache.set(key, b); return b;
 }
 function impulse(sec) {
   const len = Math.floor(ac.sampleRate * sec), b = ac.createBuffer(2, len, ac.sampleRate);
@@ -390,8 +415,12 @@ function setupAudio() {
   const rv = ac.createConvolver(); rv.buffer = impulse(1.6); revWet = ac.createGain(); rv.connect(revWet); revWet.connect(master);
   // instrumento: voz -> filtro dos botões -> wah -> phaser -> eco -> master
   inst = ac.createGain();
-  let node = inst;
-  const shapes = [['highshelf', 2800, 0, 7], ['peaking', 1900, 1.2, 5], ['peaking', 700, 1.0, 4], ['lowpass', 1600, 0.7, 0]];
+  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 85; hp.Q.value = 0.7;
+  const nasal = ac.createBiquadFilter(); nasal.type = 'peaking'; nasal.frequency.value = 1500; nasal.Q.value = 1.1; nasal.gain.value = 4;
+  const amp = ac.createWaveShaper(); const cv = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; cv[i] = Math.tanh(1.6 * x) / Math.tanh(1.6); } amp.curve = cv;
+  inst.connect(hp); hp.connect(nasal); nasal.connect(amp);
+  let node = amp;
+  const shapes = [['highshelf', 3200, 0, 6], ['peaking', 2200, 1.0, 4], ['peaking', 650, 0.9, 4], ['lowpass', 1400, 0.7, 0]];
   toneNodes = shapes.map(([t, f, q, g]) => { const b = ac.createBiquadFilter(); b.type = t; b.frequency.value = f; b.Q.value = q; b.gain.value = 0; node.connect(b); node = b; return { b, t, g }; });
   bus = ac.createGain(); node.connect(bus);
   wahF = ac.createBiquadFilter(); wahF.type = 'lowpass'; wahF.Q.value = 6; wahF.frequency.value = 600;
@@ -427,35 +456,26 @@ function applySound() {
   comp.threshold.value = S.maxOn ? -18 : 0; comp.ratio.value = S.maxOn ? 6 : 1; comp.attack.value = 0.003; comp.release.value = 0.12;
   makeup.gain.setTargetAtTime((S.maxOn ? 1.3 : 1) * S.master, t, 0.02);
 }
-// uma nota de clavinet: corda curta palhetada, brilho que fecha rápido, a lã abafa ao soltar
+// uma nota de clavinet: a corda (modelo físico) e, ao soltar, a lã abafa na hora com o "toc" da tangente voltando
+let thunkBuf = null;
 function clavNote(t, midi, velocity, len) {
-  const f = 440 * Math.pow(2, (midi - 69) / 12), v = clamp(velocity, 0, 1);
-  const osc = ac.createOscillator(); osc.setPeriodicWave(clavWave(S.bright)); osc.frequency.value = f;
-  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.8;
-  const g = ac.createGain();
-  const tBase = clamp((0.35 + 1.6 * S.decay) * Math.pow(2, -(midi - 60) / 20), 0.12, 3) * (1 - 0.82 * S.mute);
-  const top = Math.min(14000, f * (3 + 18 * S.bright * (0.4 + 0.6 * v)));
-  lp.frequency.setValueAtTime(top, t); lp.frequency.exponentialRampToValueAtTime(Math.max(f * 1.5, 200), t + Math.max(0.05, tBase * 0.6));
-  const amp = 0.12 * (0.3 + 0.7 * v);
-  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(amp, t + 0.0015);
-  g.gain.setTargetAtTime(0, t + 0.002, tBase / 3);
+  const v = clamp(velocity, 0, 1), vb = v < 0.5 ? 0 : (v < 0.8 ? 1 : 2);
+  const src = ac.createBufferSource(); src.buffer = clavBuf(midi, vb);
+  const g = ac.createGain(); g.gain.value = 0.3 * (0.35 + 0.65 * v) / [0.55, 0.8, 1][vb];
+  src.connect(g); g.connect(inst); src.start(t);
   const off = t + Math.max(0.02, len);
-  g.gain.cancelAndHoldAtTime ? g.gain.cancelAndHoldAtTime(off) : null;
-  g.gain.setTargetAtTime(0, off, 0.012);   // a lã abafa na hora
-  osc.connect(lp); lp.connect(g); g.connect(inst);
-  osc.start(t); osc.stop(off + 0.15);
-  // estalo da palheta
-  const nb = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.012), ac.sampleRate), d = nb.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
-  const ns = ac.createBufferSource(); ns.buffer = nb; const nf = ac.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = Math.min(8 * f, 8000); nf.Q.value = 1.2;
-  const ng = ac.createGain(); ng.gain.value = 0.12 * v; ns.connect(nf); nf.connect(ng); ng.connect(inst); ns.start(t);
+  g.gain.setValueAtTime(g.gain.value, off); g.gain.setTargetAtTime(0, off, 0.009);
+  src.stop(off + 0.12);
+  if (!thunkBuf) { thunkBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.02), ac.sampleRate); const d = thunkBuf.getChannelData(0); let l = 0;
+    for (let i = 0; i < d.length; i++) { l += 0.15 * ((Math.random() * 2 - 1) - l); d[i] = l * Math.pow(1 - i / d.length, 3) * 3; } }
+  const th = ac.createBufferSource(); th.buffer = thunkBuf; const tg = ac.createGain(); tg.gain.value = 0.05 * v; th.connect(tg); tg.connect(inst); th.start(off);
   // auto-wah: o filtro abre com o ataque e fecha
   if (S.wahOn) {
     const lo = 350, hi = lo + 2600 * S.wahRange * (0.4 + 0.6 * S.wahSens * v);
     wahF.frequency.cancelScheduledValues(t); wahF.frequency.setValueAtTime(lo, t);
     wahF.frequency.linearRampToValueAtTime(hi, t + 0.025); wahF.frequency.setTargetAtTime(lo, t + 0.03, 0.09);
   }
-  return { stop: (tt) => { g.gain.cancelScheduledValues(tt); g.gain.setTargetAtTime(0, tt, 0.012); } };
+  return { stop: (tt) => { g.gain.cancelScheduledValues(tt); g.gain.setTargetAtTime(0, tt, 0.009); const h = ac.createBufferSource(); h.buffer = thunkBuf; const hg = ac.createGain(); hg.gain.value = 0.05 * v; h.connect(hg); hg.connect(inst); h.start(tt); } };
 }
 // BASE de referência (o que o MRP-80 e o MRM-0420 tocariam): skank de piano no "&" e caixa no 2 e no 4
 function baseHit(t, kind, notes) {
@@ -706,7 +726,7 @@ TIMBRES.forEach((T, i) => { const b = document.createElement('button'); b.classN
 for (const k of ['wahOn', 'phOn', 'echoOn', 'maxOn']) $(k).onclick = () => { S[k] = !S[k]; applySound(); save(); refresh(); };
 $('baseBtn').onclick = () => { S.base = !S.base; save(); refresh(); };
 slider('bpm', (v) => v, () => applySound());
-slider('bright', pct, () => waveCache.clear()); slider('decay', pct); slider('mute', pct); slider('vol', pct);
+slider('bright', pct, () => waveCache.clear()); slider('decay', pct, () => waveCache.clear()); slider('mute', pct, () => waveCache.clear()); slider('vol', pct);
 slider('wahSens', pct); slider('wahRange', pct); slider('phRate', (v) => v.toFixed(2) + ' Hz'); slider('phDepth', pct);
 slider('echoTime', (v) => ['1/8', '3/16', '1/4', '3/8'][v]); slider('echoFb', pct); slider('echoMix', pct); slider('rev', pct); slider('master', pct);
 slider('center', (v) => noteName(v), () => changed());
