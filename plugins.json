@@ -13,7 +13,7 @@
     {"sigla": "MRCM-1240", "pasta": "ReggaeChordMachine", "nome": "Mastor Reggae Chord Machine MRCM-1240", "tipo": "instrumento", "web": "chords", "categoria": "machines", "legado": "Mastor Reggae Keys MRK-80"},
     {"sigla": "MRDM-12", "pasta": "ReggaeDrumMachine", "nome": "Mastor Reggae Drum Machine MRDM-12", "tipo": "instrumento", "web": "drums", "categoria": "machines", "legado": "Mastor Reggae Drums MRD-12"},
     {"sigla": "MRBM-69", "pasta": "ReggaeBassMachine", "nome": "Mastor Reggae Bass Machine MRBM-69", "tipo": "instrumento", "web": "bassmachine", "categoria": "machines", "legado": "Mastor Reggae Bass MRB-69"},
-    {"sigla": "MRO-68", "pasta": "ReggaeOrgan", "nome": "Mastor Reggae Organ MRO-68", "tipo": "instrumento", "web": "web/reggaeorgan", "categoria": "machines"},
+    {"sigla": "MRO-68", "pasta": "ReggaeOrgan", "nome": "Mastor Reggae Organ MRO-68", "tipo": "instrumento", "web": "web/reggaeorgan", "categoria": "machines", "so_celular": true},
     {"sigla": "MRM-0420", "pasta": "RiddimMachine", "nome": "Mastor Riddim Machine MRM-0420", "tipo": "instrumento", "web": "riddim", "categoria": "machines"},
     {"sigla": "MT-0420", "pasta": "Tune", "nome": "Mastor Tune MT-0420", "tipo": "efeito", "web": "web/tune", "categoria": "efeitos"},
     {"sigla": "MKS-0420", "pasta": "KeyScout", "nome": "Mastor Key Scout MKS-0420", "tipo": "efeito", "web": "web/keyscout", "categoria": "efeitos"}
