@@ -1,5 +1,8 @@
 ## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
 
+- **Só piano:** o órgão Hammond saiu do Reggae Keys (agora está no **Mastor Reggae Organ MRO-68**). Saíram o botão ORGAN, os drawbars e os presets de órgão. Projetos antigos no modo órgão abrem no piano.
+- **CHORD MACHINE:** o skank e o bubble tocam sempre no piano do instrumento (o SOM INTERNO da machine, com o Hammond, saiu daqui).
+- **Padrão BANG BANG** no skank (janela PADRÃO DO SKANK da aba CHORD MACHINE): além do CONTRATEMPO (o acorde no "&" de cada tempo, com a caixa no 2 e no 4), o **BANG BANG** dobra o bang: no "&" e de novo no "a" de cada tempo, o segundo um pouco mais fraco. As notas continuam de 1/32.
 - **Timbre inicial do piano:** o plugin agora abre no **M1 COMP**, o Piano 16 do Korg M1 comprimido, o piano mais usado no skank digital do reggae e do dancehall (antes abria no M1 sem compressão).
 - **M1 GRAND:** novo timbre com o piano de cauda do Korg M1.
 - **Timbres Yamaha:** novos botões **CP-80** (piano de cauda elétrico Yamaha CP-80, com o meio "honky" do captador) e **C7** (cauda de concerto Yamaha C7, brilhante e com ataque rápido), além do FM EP estilo DX que já existia.

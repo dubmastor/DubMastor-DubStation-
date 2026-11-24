@@ -624,6 +624,18 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
         k->slider.updateText();
     }
 
+   #ifdef MCM_PANEL_TITLE
+    // Reggae Keys MRK-80 3.1: só piano. Os acordes (skank e bubble) tocam sempre no piano do instrumento:
+    // sem SOM INTERNO e sem os níveis do piano M1 / Hammond da machine. E o skank escolhe CONTRATEMPO ou BANG BANG.
+    patternWin = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("pattern"), [] (int p) -> std::pair<juce::String, juce::String>
+    {
+        return std::make_pair (juce::String (p == dub::SkankBangBang ? "BANG BANG" : "CONTRATEMPO"), juce::String());
+    });
+    addAndMakeVisible (*patternWin);
+    for (juce::Component* c : { (juce::Component*) &sound.button, (juce::Component*) &pianoLvl.slider, (juce::Component*) &pianoLvl.label,
+                                (juce::Component*) &organLvl.slider, (juce::Component*) &organLvl.label })
+        c->setVisible (false);
+   #endif
     setupKnob (reps, "exportReps", "REPETIR");
     reps.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     exportBtn.onClick = [this] { exportMidi(); };
@@ -1014,10 +1026,11 @@ void DubChordsPanel::renderBackground()
         }
     }
     for (auto* k : { &center, &velocity, &swing, &bpm, &pianoLvl, &organLvl })
-        drawKnobScale (g, k->slider, 11);
+        if (k->slider.isVisible()) drawKnobScale (g, k->slider, 11);
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
     g.drawText (juce::String::fromUTF8 ("PADR\xc3\x83O DO SKANK"), patternArea.translated (0, -15).withHeight (12), juce::Justification::centred);
+    if (patternWin == nullptr)
     {   // skank sempre no contratempo: janela fixa no lugar do antigo seletor
         auto b = patternArea.toFloat();
         g.setColour (juce::Colours::black.withAlpha (0.35f));
@@ -1172,6 +1185,7 @@ void DubChordsPanel::resized()
         a.removeFromTop (34);
         auto left = a.removeFromLeft (190);
         patternArea = left.removeFromTop (52);
+        if (patternWin != nullptr) patternWin->setBounds (patternArea);
         a.removeFromLeft (8);
         const int kw = a.getWidth() / 3;
         for (auto* k : { &center, &velocity, &swing })

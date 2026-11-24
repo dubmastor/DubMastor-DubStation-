@@ -12,12 +12,7 @@ const Preset kPresets[] = {
     { "Piano: M1 Dub Skank",            0, 0.85f, 0.20f, 0.65f, 0.85f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.35f },
     { "Piano: M1 Bright House",         0, 1.00f, 0.45f, 0.55f, 0.80f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.25f },
     { "Piano: M1 Soft Ballad",          0, 0.35f, 0.80f, 0.40f, 0.85f, { 0,0,0,0,0,0,0,0,0 }, false, true, true, 0, 0, 0, 0, false, 0.30f },
-    // ---------------- ORGAN (só mexe nos parâmetros do órgão)
-    //  nome                         modo  (campos do piano ignorados)   drawbars                     perc  3ª    fast  click  drive  lesMix nívelO lesFast reverb
-    { "Organ: Reggae Bubble",           1, 0, 0, 0, 0,                  { 8,8,8,0,0,0,0,0,0 }, false, true, true, 0.40f, 0.25f, 0.85f, 0.75f, false, 0.18f },
-    { "Organ: Roots Percussion",        1, 0, 0, 0, 0,                  { 8,8,8,0,0,0,0,0,0 }, true,  true, true, 0.50f, 0.30f, 0.80f, 0.75f, false, 0.18f },
-    { "Organ: Dub Dark",                1, 0, 0, 0, 0,                  { 8,0,8,0,0,0,0,0,0 }, false, true, true, 0.25f, 0.15f, 0.90f, 0.80f, false, 0.40f },
-    { "Organ: Gospel Leslie Fast",      1, 0, 0, 0, 0,                  { 8,8,8,8,0,0,0,0,8 }, false, true, true, 0.45f, 0.40f, 0.90f, 0.65f, true,  0.25f },
+    // (3.1: o órgão saiu do MRK-80 — foi para o Mastor Reggae Organ MRO-68 — e os presets de órgão com ele)
 };
 constexpr int kNumPianoPresets = 4;
 constexpr int kNumPresets = (int) (sizeof (kPresets) / sizeof (kPresets[0]));
@@ -150,7 +145,7 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
     // parâmetros -> motor
     rk::Params& p = engine.params;
-    p.mode        = (int) get ("mode");
+    p.mode        = 0;   // 3.1: só piano (o parâmetro "mode" fica só para abrir projetos antigos, que abrem no piano)
     p.pianoType   = (int) get ("pianoType");
     p.pianoBright = get ("pianoBright");
     p.pianoDecay  = get ("pianoDecay");
@@ -224,9 +219,6 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     }
     if (pos < n) engine.render (L + pos, R + pos, n - pos);
 
-    // SOM INTERNO da machine ligado: o piano M1 + Hammond dela somados à saída
-    for (int ch = 0; ch < 2; ++ch)
-        buffer.addFrom (ch, 0, machineBuf, ch, 0, n);
 
     // medidores (média quadrática do bloco) para o VU
     float sl = 0, sr = 0;
@@ -246,11 +238,10 @@ void RootsKeysProcessor::runMachine (juce::MidiBuffer& midi, int numSamples)
     machine->processBlock (machineBuf, machineMidi);   // limpa o buffer e escreve o som interno (se ligado)
 
     const bool heard = get ("machineOn") > 0.5f || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
-    const bool ownSound = machine->apvts.getRawParameterValue ("sound")->load() > 0.5f;
-    if (! heard) { machineBuf.clear(); return; }
-    if (ownSound) return;   // as notas já tocaram no som da machine (machineBuf vai para a saída)
+    machineBuf.clear();   // 3.1: o SOM INTERNO da machine (piano M1 + Hammond) não toca mais aqui
+    if (! heard) return;
 
-    // SOM INTERNO desligado: as notas (skank no canal 1, bubble no 3) tocam no piano/órgão deste instrumento
+    // as notas (skank no canal 1, bubble no 3) tocam sempre no piano deste instrumento
     for (const auto meta : machineMidi)
     {
         auto m = meta.getMessage();
@@ -301,7 +292,7 @@ void RootsKeysProcessor::migrateOldDubChords (const juce::ValueTree& old)
     set ("swing",    value ("dcSwing", 0.0));
     set ("bpm",      value ("dcBpm", 75.0));
     set ("exportReps", value ("dcReps", 1));
-    // padrão: 0 = Auto (segue o instrumento: órgão = bubble), 4 = Bubble (órgão)
+    // padrão: 0 = Auto (segue o instrumento: órgão = bubble), 4 = Bubble (o bubble agora toca no piano)
     const int pattern = (int) value ("dcPattern", 0);
     set ("bubble", (pattern == 4 || (pattern == 0 && value ("mode", 0) > 0.5)) ? 1 : 0);
     set ("preview", 0);
@@ -333,27 +324,13 @@ void RootsKeysProcessor::setCurrentProgram (int index)
     if (! juce::isPositiveAndBelow (index, kNumPresets)) return;
     currentProgram = index;
     const Preset& pr = kPresets[index];
-    setParam ("mode", (float) pr.mode);
-
-    if (pr.mode == 0)   // preset de piano: não toca nos parâmetros do órgão
+    setParam ("mode", 0.0f);
     {
         setParam ("pianoType", 0.0f);   // os presets de piano são do timbre M1
         setParam ("pianoBright", pr.pianoBright);
         setParam ("pianoDecay", pr.pianoDecay);
         setParam ("pianoChorus", pr.pianoChorus);
         setParam ("pianoLevel", pr.pianoLevel);
-    }
-    else                // preset de órgão: não toca nos parâmetros do piano
-    {
-        for (int i = 0; i < 9; ++i) setParam ("db" + juce::String (i + 1), (float) pr.drawbars[i]);
-        setParam ("percOn", pr.percOn ? 1.0f : 0.0f);
-        setParam ("percHarm", pr.perc3rd ? 1.0f : 0.0f);
-        setParam ("percDecay", pr.percFast ? 0.0f : 1.0f);
-        setParam ("click", pr.click);
-        setParam ("drive", pr.drive);
-        setParam ("leslieMix", pr.leslieMix);
-        setParam ("organLevel", pr.organLevel);
-        setParam ("leslieFast", pr.leslieFast ? 1.0f : 0.0f);
     }
     setParam ("reverb", pr.reverb);
 }
@@ -392,6 +369,7 @@ void RootsKeysProcessor::setStateInformation (const void* data, int sizeInBytes)
             }
             auto tree = juce::ValueTree::fromXml (*xml);
             currentProgram = (int) tree.getProperty ("program", 0);
+            if (! juce::isPositiveAndBelow (currentProgram, kNumPresets)) currentProgram = 0;   // presets de órgão antigos -> P01
             apvts.replaceState (tree);
             if (! hadMachine) migrateOldDubChords (tree);
         }

@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Keys MRK-80 3.0 — Dub Station</title>
-<meta name="description" content="Mastor Reggae Keys MRK-80 no celular: toque o piano M1 e o órgão Hammond na tela, monte o riddim na CHORD MACHINE e baixe o MIDI para a sua DAW.">
+<title>Mastor Reggae Keys MRK-80 3.1 — Dub Station</title>
+<meta name="description" content="Mastor Reggae Keys MRK-80 no celular: toque o piano M1 na tela, monte o riddim na CHORD MACHINE e baixe o MIDI para a sua DAW.">
 <style>
 :root{
   --plate:#e4d8bc; --plate2:#c9b994; --ink:#2b241d; --ink2:#5c5144; --label:#1a1714; --cream:#efe5cc;
@@ -113,18 +113,19 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
   <div><a class="back" href="../" title="Voltar ao site do Dub Station">← Dub Station</a></div>
-  <div><h1>MASTOR REGGAE KEYS MRK-80 <span id="ver">3.1</span></h1><div class="sub">PIANO M1 · HAMMOND · CHORD MACHINE · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE KEYS MRK-80 <span id="ver">3.1</span></h1><div class="sub">PIANO M1 · RHODES · WURLITZER · CHORD MACHINE · NO NAVEGADOR</div></div>
   <div class="plaque">MRK-80</div><div class="flag"></div>
 </header>
 
 <section class="mod" id="kbMod" style="margin-bottom:16px"><div class="tag">INSTRUMENTO</div>
   <button class="unlock" id="unlock">🔊 TOQUE AQUI PARA LIBERAR O ÁUDIO</button>
   <div class="kb-top">
-    <div class="btns c2" style="flex:2;min-width:200px"><button class="b" id="mPiano">PIANO M1</button><button class="b" id="mOrgan">ÓRGÃO HAMMOND</button></div>
+    <div class="btns c2" style="flex:2;min-width:220px" id="timbre"><button class="b" data-t="0">PIANO M1</button><button class="b" data-t="1">RHODES STAGE</button><button class="b" data-t="2">RHODES SUITCASE</button><button class="b" data-t="3">WURLITZER 200A</button></div>
     <div class="oct"><button id="octDn">◀</button><span id="octVal"></span><button id="octUp">▶</button></div>
   </div>
   <div class="piano" id="piano"></div>
-  <div class="hint">Toque com vários dedos ao mesmo tempo. No plugin, a aba CHORD MACHINE (abaixo) toca neste piano ou órgão, com eco, flanger e maximizer.</div>
+  <div class="hint" id="timbreHint" style="margin-top:8px"></div>
+  <div class="hint">Toque com vários dedos ao mesmo tempo. No plugin, a aba CHORD MACHINE (abaixo) toca neste piano, com eco, flanger e maximizer. O órgão Hammond agora fica no Mastor Reggae Organ MRO-68.</div>
 </section>
 
 <h2 style="margin:6px 2px 12px;font-size:13px;letter-spacing:.3em;color:var(--ink)">CHORD MACHINE</h2>
@@ -134,7 +135,8 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <div class="grid-mods" style="margin-top:16px">
   <section class="mod"><div class="tag">RITMO</div>
     <div class="lbl" style="margin-top:2px">PADRÃO DO SKANK</div>
-    <div class="stepper"><div class="val"><b style="font-size:15px">CONTRATEMPO</b></div></div>
+    <div class="btns c2" id="pattern"><button class="b" data-p="0">CONTRATEMPO</button><button class="b" data-p="1">BANG BANG</button></div>
+    <div class="hint" id="patternHint" style="margin-top:4px"></div>
     <div class="lbl">DURAÇÃO DAS NOTAS</div>
     <div class="stepper"><div class="val"><b>1/32</b><small>FUSA · SEMPRE</small></div></div>
     <div style="margin-top:12px">
@@ -146,11 +148,10 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 
   <section class="mod"><div class="tag">SOM</div>
     <button class="preview" id="preview"><span class="lamp"></span><span class="txt">▶ PREVIEW</span></button>
-    <div class="row" style="display:flex;gap:8px;margin:12px 0 6px"><div class="toggle" id="bubble"><i></i>BUBBLE (HAMMOND)</div></div>
+    <div class="row" style="display:flex;gap:8px;margin:12px 0 6px"><div class="toggle" id="bubble"><i></i>BUBBLE (PIANO)</div></div>
     <div class="slider"><span>BPM</span><input type="range" min="50" max="180" step="1" id="bpm"><output id="o_bpm"></output></div>
-    <div class="slider"><span>PIANO M1</span><input type="range" min="0" max="100" step="1" id="pianoLvl"><output id="o_pianoLvl"></output></div>
-    <div class="slider"><span>HAMMOND</span><input type="range" min="0" max="100" step="1" id="organLvl"><output id="o_organLvl"></output></div>
-    <div class="hint">No navegador: skank no piano M1 e bubble no Hammond. No plugin, com SOM INTERNO desligado, os acordes tocam no piano ou órgão do instrumento.</div>
+    <div class="slider"><span>VOLUME</span><input type="range" min="0" max="100" step="1" id="pianoLvl"><output id="o_pianoLvl"></output></div>
+    <div class="hint">Skank e bubble no timbre escolhido lá em cima (piano M1, Rhodes ou Wurlitzer). No plugin, com SOM INTERNO desligado, os acordes tocam no piano do instrumento.</div>
   </section>
 
   <section class="mod"><div class="tag">MIDI</div>
@@ -178,10 +179,10 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
   <button class="green" id="export2">⬇ MIDI</button></div>
 
 <script src="../chords/engine.js"></script>
-<script src="../chords/presets.js"></script>
-<script src="../chords/presetmenu.js"></script>
-<script src="../riddimbank.js"></script>
-<script src="../riddimbankmenu.js"></script>
+<script src="../../chords/presets.js"></script>
+<script src="../../chords/presetmenu.js"></script>
+<script src="../../riddimbank.js"></script>
+<script src="../../riddimbankmenu.js"></script>
 <script>
 'use strict';
 const M = window.MRCM;
@@ -194,7 +195,7 @@ const DEFAULTS = {
   slots: [ { root: 9, quality: 1, dur: 0, inv: -1, on: true }, { root: 2, quality: 1, dur: 0, inv: -1, on: true },
            { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false } ],
   pattern: 0, noteSize: 0, center: 60, velocity: 80, swing: 0, bubble: false,
-  bpm: 75, pianoLvl: 80, organLvl: 60, reps: 1, mode: 0, octave: 4,
+  bpm: 75, pianoLvl: 80, organLvl: 60, reps: 1, mode: 0, octave: 4, timbre: 0,
 };
 function load() {
   try {
@@ -204,7 +205,8 @@ function load() {
   return structuredClone(DEFAULTS);
 }
 const st = load();
-st.slots[0].on = true; st.pattern = 0;   // skank sempre no contratempo
+st.timbre = [0, 1, 2, 3].includes(st.timbre) ? st.timbre : 0;
+st.slots[0].on = true; st.pattern = st.pattern === 1 ? 1 : 0;   // 0 contratempo, 1 bang bang
 function save() { try { localStorage.setItem('mrk80', JSON.stringify(st)); } catch (e) {} }
 
 function slotsForEngine() {
@@ -280,6 +282,58 @@ const audio = (() => {
   }
   const hz = (n) => 440 * Math.pow(2, (n - 69) / 12);
 
+  // ---- PIANOS ELÉTRICOS (mesmo modelo do plugin, RootsKeysEngine.h tipos 10, 11 e 12)
+  //  Rhodes: tine batida por martelo — fundamental redonda, "sino" inarmônico curto (7,1×) e o "bark" do captador
+  //          magnético (assimetria x + b·x², que cresce com a força do toque). Suitcase: mais sino, mais doce, com o
+  //          tremolo do amplificador da maleta. Wurlitzer 200A: palheta de aço, mais curta e nasal, satura (tanh) no toque forte.
+  let epBus = null, tremBus = null; const curves = new Map();
+  function epCurve(kind, bark) {
+    const key = kind + ':' + bark.toFixed(2);
+    if (curves.has(key)) return curves.get(key);
+    const c = new Float32Array(1025);
+    for (let i = 0; i < 1025; i++) {
+      const x = i / 512 - 1;
+      c[i] = kind === 3 ? Math.tanh(bark * x) / Math.tanh(bark) : (x + bark * 0.55 * x * x) / (1 + bark * 0.55);
+    }
+    curves.set(key, c); return c;
+  }
+  function epBuses() {
+    if (epBus) return;
+    epBus = ctx.createGain(); epBus.gain.value = 1;
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 20;   // tira o DC da assimetria
+    epBus.connect(hp).connect(pianoGain);
+    tremBus = ctx.createGain(); tremBus.gain.value = 0.825;                               // tremolo da maleta: 4,8 Hz, 35%
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 4.8; const dep = ctx.createGain(); dep.gain.value = 0.175;
+    lfo.connect(dep).connect(tremBus.gain); lfo.start(); tremBus.connect(epBus);
+  }
+  function ep(t, note, vel, len, kind) {
+    epBuses();
+    const f = hz(note), v = Math.min(1, vel / 127), br = 0.6, decay = 0.5;
+    const wurli = kind === 3, suit = kind === 2, ks = Math.pow(2, -(note - 60) / 18);
+    const tBody = Math.min(14, Math.max(0.3, (wurli ? 1 + 3.5 * decay : 2.2 + 8 * decay) * ks));
+    const ratio = [1, 2, wurli ? 5.4 : 7.1];
+    const amp = [1, wurli ? 0.1 : 0.1 + 0.22 * v,
+                 (wurli ? 0.1 + 0.25 * v : (0.22 + 0.5 * v) * (suit ? 1.6 : 1)) * (0.6 + 0.8 * br)];
+    const tau = [tBody, tBody * 0.4, wurli ? 0.025 : (suit ? 0.11 : 0.06)];
+    const bark = wurli ? 1 + 3.5 * v * v * (0.6 + 0.8 * br) : (0.15 + 1.1 * v * v) * (0.5 + br) * (suit ? 0.7 : 1);
+    const off = t + Math.max(len, 0.02), rel = wurli ? 0.04 : 0.065, end = off + rel * 7;
+    const sum = ctx.createGain(); sum.gain.value = 1 / (amp[0] + amp[1] + amp[2]);
+    ratio.forEach((r, i) => {
+      if (f * r > 0.45 * ctx.sampleRate) return;
+      const o = ctx.createOscillator(); o.frequency.value = f * r;
+      const a = ctx.createGain(); a.gain.setValueAtTime(amp[i], t); a.gain.setTargetAtTime(0, t, tau[i]);
+      o.connect(a).connect(sum); o.start(t); o.stop(end);
+    });
+    const sh = ctx.createWaveShaper(); sh.curve = epCurve(kind, bark); sh.oversample = '2x';
+    const g = ctx.createGain(), lvl = [0, 0.215, 0.245, 0.068][kind] * (0.25 + 0.75 * Math.pow(v, 1.2));
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(lvl, t + 0.0015);
+    g.gain.setTargetAtTime(0.0001, off, rel);
+    sum.connect(sh).connect(g).connect(suit ? tremBus : epBus);
+    voices.push({ g, end });
+    return g;
+  }
+  const play = (t, note, vel, len) => (st.timbre ? ep(t, note, vel, len, st.timbre) : piano(t, note, vel, len));
+
   function piano(t, note, vel, len) {
     const f = hz(note), v = Math.pow(vel / 127, 1.4) * 0.5;
     const o = ctx.createOscillator(); o.setPeriodicWave(wave.piano); o.frequency.value = f;
@@ -332,7 +386,7 @@ const audio = (() => {
       for (let t = e.start + k * L; t < to; t += L) {
         if (t < from) continue;
         const when = beatTime + (t - beatPos) * spb, len = e.length * spb;
-        if (e.channel === M.ChBubble) organ(when, e.note, e.velocity, len); else piano(when, e.note, e.velocity, len);
+        play(when, e.note, e.velocity, len);
       }
     }
   }
@@ -363,7 +417,7 @@ const audio = (() => {
   function liveOn(note, mode) {
     ensure(); if (ctx.state === 'suspended') ctx.resume();
     const t = ctx.currentTime + 0.005;
-    return mode ? organ(t, note, 100, 30) : piano(t, note, 100, 30);
+    return play(t, note, 100, 30);
   }
   function liveOff(g) {
     if (!ctx || !g) return;
@@ -406,7 +460,7 @@ function midiFile() {
     let pos = 0;
     slots.forEach((s, i) => { if (s.beats <= 0) return; meta.push(text(Math.round((pos + r * L) * ppq), 6, M.chordLabel(s))); pos += s.beats; });
   }
-  const skank = [text(0, 3, 'MRK-80 - Skank (piano)')], bubble = [text(0, 3, 'MRK-80 - Bubble (orgao)')];
+  const skank = [text(0, 3, 'MRK-80 - Skank (piano)')], bubble = [text(0, 3, 'MRK-80 - Bubble (piano)')];
   for (let r = 0; r < reps; r++)
     for (const e of loop.events) {
       const seq = e.channel === M.ChBubble ? bubble : skank, ch = Math.min(15, e.slot);
@@ -513,8 +567,22 @@ slider('center', noteName);
 slider('velocity', (v) => v + '%');
 slider('swing', (v) => v + '%');
 slider('bpm', (v) => v, () => { save(); render(); });
+const TIMBRE_HINT = [
+  'PIANO M1: o piano do Korg M1, com o chorus do M1 — o skank digital dos anos 80 e 90.',
+  'RHODES STAGE: o Fender Rhodes de palco — redondo, com o "bark" do captador quando se toca forte. Skank macio, de estúdio.',
+  'RHODES SUITCASE: o Rhodes de maleta — mais sino e o tremolo do amplificador, balançando o skank.',
+  'WURLITZER 200A: palheta de aço — mais curto e nasal, rosna no toque forte. Corta a mistura no contratempo.',
+];
+function refreshTimbre() {
+  document.querySelectorAll('#timbre .b').forEach((b) => b.classList.toggle('on', +b.dataset.t === st.timbre));
+  $('timbreHint').textContent = TIMBRE_HINT[st.timbre];
+}
+document.querySelectorAll('#timbre .b').forEach((b) => b.addEventListener('click', () => {
+  st.timbre = +b.dataset.t; refreshTimbre(); save();
+  audio.unlock(); const g = audio.liveOn(60); setTimeout(() => audio.liveOff(g), 350);   // ouve na hora
+}));
+refreshTimbre();
 slider('pianoLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
-slider('organLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
 for (const id of ['preview', 'preview2']) $(id).onclick = () => setPreview(!audio.isPlaying());
 for (const id of ['export', 'export2']) $(id).onclick = download;
 // PRESETS: harmonias clássicas do reggae por estilo (o mesmo banco do plugin)
@@ -557,10 +625,21 @@ for (const id of ['export', 'export2']) $(id).onclick = download;
 render();
 
 // ---------------------------------------------------------------- teclado do instrumento (toque e mouse)
+(function patternButtons() {
+  const hint = ['O acorde no contratempo "&" de cada tempo (caixa no 2 e no 4).',
+                'Bang dobrado: o acorde no "&" e de novo no "a" de cada tempo, o segundo mais fraco.'];
+  function show() {
+    for (const b of $('pattern').children) b.classList.toggle('on', +b.dataset.p === st.pattern);
+    $('patternHint').textContent = hint[st.pattern];
+  }
+  for (const b of $('pattern').children) b.onclick = () => { st.pattern = +b.dataset.p; show(); changed(); };
+  show();
+})();
+
 (function keyboard() {
   const el = $('piano'), WHITE = [0, 2, 4, 5, 7, 9, 11], NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const OCTS = 2, held = new Map();   // pointerId -> { key, g }
-  st.octave = Math.min(6, Math.max(2, st.octave || 4)); st.mode = st.mode ? 1 : 0;
+  st.octave = Math.min(6, Math.max(2, st.octave || 4)); st.mode = 0;   // 3.1: só piano
   function build() {
     el.innerHTML = '';
     const nw = WHITE.length * OCTS + 1, ww = 100 / nw;
@@ -574,8 +653,6 @@ render();
       el.appendChild(b);
     }
     $('octVal').textContent = 'C' + st.octave;
-    $('mPiano').classList.toggle('on', st.mode === 0); $('mOrgan').classList.toggle('on', st.mode === 1);
-    $('kbMod').classList.toggle('organ', st.mode === 1);
   }
   function press(id, key) {
     if (!key || !key.dataset.note) return;
@@ -593,8 +670,6 @@ render();
   el.addEventListener('pointerdown', (e) => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (err) {} press(e.pointerId, keyAt(e.clientX, e.clientY)); });
   el.addEventListener('pointermove', (e) => { if (!held.has(e.pointerId)) return; const k = keyAt(e.clientX, e.clientY); if (k && k !== held.get(e.pointerId).key) press(e.pointerId, k); });
   for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) el.addEventListener(ev, (e) => release(e.pointerId));
-  $('mPiano').onclick = () => { st.mode = 0; save(); build(); };
-  $('mOrgan').onclick = () => { st.mode = 1; save(); build(); };
   $('octDn').onclick = () => { st.octave = Math.max(2, st.octave - 1); save(); build(); };
   $('octUp').onclick = () => { st.octave = Math.min(6, st.octave + 1); save(); build(); };
   $('unlock').onclick = () => { const c = audio.unlock(); $('unlock').classList.add('ok'); $('unlock').textContent = '🔊 ÁUDIO LIBERADO'; return c; };

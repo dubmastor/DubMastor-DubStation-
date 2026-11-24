@@ -61,16 +61,26 @@ inline double noteSizeBeats (int n)
 
 //==============================================================================
 // Padrões do skank (grade de 16 semicolcheias por compasso)
-// Só o contratempo (o skank clássico nos "e" de cada tempo); os outros padrões saíram na 1.7.
-enum Pattern { SkankOffbeat, NumPatterns };
+// Contagem da Dub Station: caixa no 2 e no 4.
+//   CONTRATEMPO: o acorde (o "bang" da mão direita) no "&" de cada tempo
+//   BANG BANG:   o bang dobrado, no "&" e de novo no "a" de cada tempo, o segundo um pouco mais fraco
+//                (Reggae Keys MRK-80 3.1; o MRCM-1240 e o MRM-0420 continuam só no contratempo)
+// Mesmo padrão da versão para celular (site/chords/engine.js).
+enum Pattern { SkankOffbeat, SkankBangBang, NumPatterns };
 
-inline const char* patternName (int) { return "Contratempo"; }
+inline const char* patternName (int p) { return p == SkankBangBang ? "Bang Bang" : "Contratempo"; }
 
 struct Hit { int step; float vel; };
 
-inline std::vector<Hit> patternHits (int)
+inline std::vector<Hit> patternHits (int p)
 {
-    return { { 2, 1.0f }, { 6, 1.0f }, { 10, 1.0f }, { 14, 1.0f } };
+    std::vector<Hit> h;
+    for (int beat = 0; beat < 4; ++beat)
+    {
+        h.push_back ({ beat * 4 + 2, 1.0f });
+        if (p == SkankBangBang) h.push_back ({ beat * 4 + 3, 0.8f });
+    }
+    return h;
 }
 
 // Bubble de órgão com as duas mãos (o "bubble" clássico do reggae), em cada tempo:
