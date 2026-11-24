@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Keys MRK-80 3.2 — Dub Station</title>
+<title>Mastor Reggae Keys MRK-80 3.3 — Dub Station</title>
 <meta name="description" content="Mastor Reggae Keys MRK-80 no celular: toque o piano M1 na tela, monte o riddim na CHORD MACHINE e baixe o MIDI para a sua DAW.">
 <style>
 :root{
@@ -67,6 +67,44 @@ h1{margin:0;font-size:clamp(14px,3.4vw,25px);letter-spacing:.16em;font-weight:80
 input[type=range]{width:100%;accent-color:var(--amber);height:28px}
 .slider{display:grid;grid-template-columns:86px 1fr 50px;gap:8px;align-items:center;font-size:11px;font-weight:800;letter-spacing:.1em;margin:4px 0}
 .slider output{text-align:right;color:var(--ink2)}
+
+.mega{background:#1a1714;border-radius:8px;padding:10px;margin:0 0 12px;color:#efe5cc}
+.mega .mhead{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.16em;color:var(--gold);padding:2px 4px 8px}
+.mega .mhead span{font-size:11px;letter-spacing:.04em;color:#b9a684}
+.mega .mtabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:8px}
+.mega .mtabs button,.mega .nav button,.mega .lets button{border:0;border-radius:4px;background:#0f0d0b;color:#efe5cc;font-family:inherit;font-weight:800;cursor:pointer}
+.mega .mtabs button{flex:1 0 auto;padding:11px 10px;font-size:11px;letter-spacing:.1em}
+.mega .mtabs button.on,.mega .nav button.on,.mega .lets button.on{background:#3a2f1c;color:#ffc061;box-shadow:inset 0 -2px 0 #ffc061}
+.mega input[type=search]{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:5px;border:1px solid #3a2f1c;background:#0f0d0b;color:#efe5cc;font:inherit;font-size:14px;margin-bottom:8px}
+.mega{min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}
+.mega .mbody{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px;min-width:0}
+.mega #mnav,.mega #mlist{min-width:0}
+.mega .nav{display:flex;flex-direction:column;gap:3px}
+.mega .nav button{padding:10px;font-size:11px;letter-spacing:.08em;text-align:left;display:flex;justify-content:space-between;gap:6px}
+.mega .nav button small{opacity:.6}
+.mega .lets{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+.mega .lets button{padding:9px 0;font-size:12px}.mega .lets button:disabled{opacity:.25;cursor:default}
+.mega #mlist{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.mega .grp{font-size:10px;letter-spacing:.14em;color:#c9a45c;padding:8px 4px 2px}
+.mega .rw{display:grid;grid-template-columns:12px minmax(0,1fr) auto;min-width:0;gap:8px;align-items:center;text-align:left;border:0;border-radius:4px;background:#0f0d0b;color:#efe5cc;padding:9px 10px;font-family:inherit;cursor:pointer;min-height:44px}
+.mega .rw:hover{background:#2c2925}.mega .rw.on{background:#3a2f1c;color:#ffc061}
+.mega .rw b{font-size:13px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mega .rw .a{font-size:11px;opacity:.7;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mega .rw .m{font-size:11px;text-align:right;white-space:nowrap;font-weight:700;opacity:.85}
+.mega i.g,.mega i.y{width:9px;height:9px;border-radius:50%;display:inline-block}
+.mega i.g{background:#4fdc6a;box-shadow:0 0 6px #4fdc6a}.mega i.y{background:#f2c23a;box-shadow:0 0 6px #f2c23a}
+.mega #mdet{margin-top:8px}
+.mega .det{background:#0f0d0b;border-radius:6px;padding:12px;display:grid;gap:8px}
+.mega .det h4{margin:0;font-size:15px;color:#ffc061;letter-spacing:.04em}
+.mega .det .sub{font-size:11px;color:#b9a684;letter-spacing:.06em}
+.mega .det .ch{font-size:18px;font-weight:900;letter-spacing:.06em}
+.mega .det .acts{display:flex;gap:6px;flex-wrap:wrap}
+.mega .det .acts button{flex:1 1 140px;border:0;border-radius:5px;padding:12px;font-family:inherit;font-weight:900;font-size:12px;letter-spacing:.12em;cursor:pointer;background:#3a2f1c;color:#ffc061}
+.mega .det .acts button.go{background:linear-gradient(180deg,#5fbf5a,#2f7a2c);color:#fff}
+.mega .det .acts button.go.on{background:linear-gradient(180deg,#f0c93a,#9c7414);color:#2e2108}
+.mega .mleg{display:flex;flex-wrap:wrap;gap:12px;font-size:10.5px;opacity:.75;padding:8px 4px 0}.mega .mleg span{display:inline-flex;gap:5px;align-items:center}
+@media (max-width:640px){.mega .mbody{grid-template-columns:minmax(0,1fr)}.mega .nav{flex-direction:row;overflow-x:auto}.mega .nav button{flex:none}.mega .lets{grid-template-columns:repeat(9,1fr)}.mega #mlist{max-height:55vh}}
+.inst-ctl{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(0,0,0,.25)}
+.inst-ctl .preview{padding:14px;font-size:17px;margin-bottom:8px}
 .preview{width:100%;padding:18px;border:0;border-radius:8px;cursor:pointer;color:var(--gold);font-weight:800;font-size:20px;letter-spacing:.18em;
   background:linear-gradient(180deg,#1e9c4c,#0b5a26);box-shadow:0 0 0 4px var(--label);display:flex;align-items:center;justify-content:center;gap:14px}
 .preview .lamp{width:16px;height:16px;border-radius:50%;background:#3a2d18;box-shadow:0 0 0 1px #000}
@@ -113,7 +151,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <div class="rack"><div class="wood"></div><div class="unit">
 <header>
   <div><a class="back" href="../" title="Voltar ao site do Dub Station">← Dub Station</a></div>
-  <div><h1>MASTOR REGGAE KEYS MRK-80 <span id="ver">3.2</span></h1><div class="sub">PIANO M1 · RHODES · WURLITZER · CHORD MACHINE · NO NAVEGADOR</div></div>
+  <div><h1>MASTOR REGGAE KEYS MRK-80 <span id="ver">3.3</span></h1><div class="sub">PIANO M1 · RHODES · WURLITZER · CHORD MACHINE · NO NAVEGADOR</div></div>
   <div class="plaque">MRK-80</div><div class="flag"></div>
 </header>
 
@@ -125,6 +163,13 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
   </div>
   <div class="piano" id="piano"></div>
   <div class="hint" id="timbreHint" style="margin-top:8px"></div>
+  <div class="inst-ctl">
+    <button class="preview" id="preview3"><span class="lamp"></span><span class="txt">▶ PREVIEW</span></button>
+    <div class="slider"><span>PAN PIANO</span><input type="range" min="-100" max="100" step="1" id="pianoPan"><output id="o_pianoPan"></output></div>
+    <div class="row" style="display:flex;gap:8px;margin:10px 0 4px;align-items:center"><div class="toggle" id="gtr"><i></i>GUITAR SKANK</div><span class="hint" style="margin:0">a guitarra do Mastor Reggae Guitar MRG-68 junto com o piano</span></div>
+    <div class="slider"><span>PAN GUITAR</span><input type="range" min="-100" max="100" step="1" id="gtrPan"><output id="o_gtrPan"></output></div>
+    <div class="slider"><span>VOL GUITAR</span><input type="range" min="0" max="100" step="1" id="gtrLvl"><output id="o_gtrLvl"></output></div>
+  </div>
   <div class="hint">Toque com vários dedos ao mesmo tempo. No plugin, a aba CHORD MACHINE (abaixo) toca neste piano, com eco, flanger e maximizer. O órgão Hammond agora fica no Mastor Reggae Organ MRO-68.</div>
 </section>
 
@@ -165,8 +210,14 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 </div>
 
 <section class="mod" style="margin-top:16px"><div class="tag">LOOP</div>
-  <div id="bank"></div>
-  <div id="presets"></div>
+  <div class="mega" id="mega">
+    <div class="mhead"><b>PRESETS · MEGA BANCO</b><span id="mcount"></span></div>
+    <div class="mtabs"><button data-mv="est" class="on">ESTILOS</button><button data-mv="az">RIDDIMS A–Z</button><button data-mv="mus">MÚSICAS</button><button data-mv="fav">★ FAVORITOS</button></div>
+    <input type="search" id="mq" placeholder="Buscar música, artista ou riddim" aria-label="Buscar">
+    <div class="mbody"><div id="mnav"></div><div id="mlist"></div></div>
+    <div id="mdet"></div>
+    <div class="mleg"><span><i class="g"></i>harmonia conferida</span><span><i class="y"></i>harmonia aproximada</span><span>só entram riddims com a harmonia levantada</span></div>
+  </div>
   <div class="loop" id="loop"><div class="head" id="head"></div></div>
   <div class="hint" id="loopInfo"></div>
 </section>
@@ -179,15 +230,12 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
   <button class="green" id="export2">⬇ MIDI</button></div>
 
 <script src="../chords/engine.js"></script>
-<script src="../../chords/presets.js"></script>
-<script src="../../chords/presetmenu.js"></script>
-<script src="../../riddimbank.js"></script>
-<script src="../../riddimbankmenu.js"></script>
+<script src="../riddimbank.js"></script>
 <script>
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '3.2';
+const VERSION = '3.3';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)
@@ -196,6 +244,7 @@ const DEFAULTS = {
            { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false } ],
   pattern: 0, noteSize: 0, center: 60, velocity: 80, swing: 0, bubble: false,
   bpm: 75, pianoLvl: 80, organLvl: 60, reps: 1, mode: 0, octave: 4, timbre: 0,
+  pianoPan: 0, gtr: false, gtrPan: 35, gtrLvl: 70,   // 3.3: PAN do piano e GUITAR SKANK (começa desligado) com PAN
 };
 function load() {
   try {
@@ -206,6 +255,7 @@ function load() {
 }
 const st = load();
 st.timbre = [0, 1, 2, 3].includes(st.timbre) ? st.timbre : 0;
+st.gtr = false;   // o GUITAR SKANK sempre começa desligado
 st.slots[0].on = true; st.pattern = st.pattern === 1 ? 1 : 0;   // 0 contratempo, 1 bang bang
 function save() { try { localStorage.setItem('mrk80', JSON.stringify(st)); } catch (e) {} }
 
@@ -218,9 +268,65 @@ function settings() {
 }
 let loop = M.buildLoop(slotsForEngine(), settings());
 
+// ---------------------------------------------------------------- GUITAR SKANK: cordas do Mastor Reggae Guitar MRG-68 (cópia de site/web/reggaeguitar, DSP)
+const GTR = (() => {
+ function rnd(seed){let s=(seed*2654435761)>>>0||7;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296*2-1}}
+ function onepole(x,fc,SR){const a=Math.exp(-2*Math.PI*fc/SR);let y=0;for(let i=0;i<x.length;i++){y=(1-a)*x[i]+a*y;x[i]=y}}
+ function string(SR,midi,vel,hold,seed,o){
+  const pickPos=o.pickPos||0.13,ring=o.ring||0.9965,muteG=o.muteG||0.8,dark=o.dark||0;
+  const L=Math.floor(SR*(hold+0.12)),m=Math.floor(hold*SR);
+  [[-0.7,0.62],[0.7,0.38]].forEach(([dc,w],pol)=>{
+   const f=440*Math.pow(2,(midi-69+dc/100)/12),P=SR/f,s0=0.5,N=Math.floor(P-s0-0.1),d=P-s0-N,c=(1-d)/(1+d);
+   const r=rnd(seed*31+pol*7+midi),n=N,k=Math.max(2,Math.floor(pickPos*n));
+   const x=new Float32Array(n);let a=0.55-0.35*vel+dark*0.3,lp=0,mean=0;
+   for(let i=0;i<n;i++){const tri=i<k?i/k:1-(i-k)/(n-k);lp=(1-a)*r()+a*lp;x[i]=0.55*tri+0.45*lp;mean+=x[i]}
+   mean/=n;for(let i=0;i<n;i++)x[i]-=mean;
+   const xc=Float32Array.from(x);for(let i=k;i<n;i++)x[i]=xc[i]-0.9*xc[i-k];
+   const fc=(1800+2600*vel)*(1-dark*0.5);onepole(x,fc,SR);onepole(x,fc,SR);
+   const bright=Math.min(0.62,midi<60?0.5:0.5+0.004*(midi-60));
+   const dl=new Float32Array(N+2);let wi=0,wPrev=0,lPrev=0,aPrev=0;
+   for(let i=0;i<L;i++){
+    const g=i<m?ring:muteG,s=i<m?bright:0.5;
+    const w=dl[(wi+dl.length-N)%dl.length];
+    const l=(1-s)*w+s*wPrev;wPrev=w;
+    const ap=c*l+lPrev-c*aPrev;lPrev=l;aPrev=ap;
+    const y=(i<n?x[i]*vel:0)+g*ap;
+    dl[wi]=y;wi=(wi+1)%dl.length;
+    if(pol===0)tmp0[i]=y;else tmp1[i]=y;
+   }
+  });
+ }
+ let tmp0=new Float32Array(1),tmp1=new Float32Array(1);
+ function stringMix(SR,midi,vel,hold,seed,o){
+  const L=Math.floor(SR*(hold+0.12));
+  if(tmp0.length<L){tmp0=new Float32Array(L);tmp1=new Float32Array(L)}
+  tmp0.fill(0,0,L);tmp1.fill(0,0,L);
+  string(SR,midi,vel,hold,seed,o);
+  const y=new Float32Array(L);for(let i=0;i<L;i++)y[i]=0.62*tmp0[i]+0.38*tmp1[i];
+  const P=SR/(440*Math.pow(2,(midi-69)/12)),q=Math.max(1,Math.floor((o.pickupPos||0.1)*P));
+  const yc=Float32Array.from(y);for(let i=q;i<L;i++)y[i]=yc[i]-0.7*yc[i-q];
+  return y;
+ }
+ function noiseBurst(SR,dur,seed,lo,hi,decay){const n=Math.floor(dur*SR),r=rnd(seed),x=new Float32Array(n);for(let i=0;i<n;i++)x[i]=r()*Math.exp(-decay*i/n);onepole(x,hi,SR);let p=0;const a=Math.exp(-2*Math.PI*lo/SR);for(let i=0;i<n;i++){const v=x[i];x[i]=v-p;p=a*p+(1-a)*v}return x}
+ function strum(SR,chord,vel,hold,seed,o){
+  const up=o.up!==false,notes=chord.slice().sort((a,b)=>up?b-a:a-b),spread=(o.spread||0.0042)*(1.2-0.4*vel);
+  const L=Math.floor(SR*(hold+0.13+spread*notes.length)),out=new Float32Array(L);
+  notes.forEach((p,i)=>{
+   const v=vel*(1-0.09*i)*(0.92+0.08*Math.abs(rnd(seed+i)()));
+   const y=stringMix(SR,p,v,Math.max(0.008,hold-i*spread*0.5),seed*17+i,o);
+   const st=Math.floor(i*spread*SR);for(let j=0;j<y.length&&st+j<L;j++)out[st+j]+=y[j];
+  });
+  const pn=noiseBurst(SR,0.003,seed+5,3000,9000,7);for(let j=0;j<pn.length;j++)out[j]+=0.05*vel*pn[j];
+  const rn=noiseBurst(SR,0.012,seed+9,700,3500,5),rs=Math.floor(hold*SR);for(let j=0;j<rn.length&&rs+j<L;j++)out[rs+j]+=0.02*vel*rn[j];
+  return out;
+ }
+ return { strum };
+})();
+
 // ---------------------------------------------------------------- som (WebAudio): piano estilo M1 e Hammond
 const audio = (() => {
-  let ctx = null, pianoBus, organBus, master, wave = {}, pianoGain, organGain;
+  let ctx = null, pianoBus, organBus, master, wave = {}, pianoGain, organGain, pianoPan, gtrGain, gtrPanN, gtrBus;
+  const gtrCache = new Map();
   let playing = false, timer = null, beatPos = 0, beatTime = 0, active = null, pending = null;
   let voices = [], organHeldUntil = 0;
   const LOOKAHEAD = 0.12;
@@ -250,7 +356,16 @@ const audio = (() => {
       const dry = ctx.createGain(); dry.gain.value = 0.75; const wet = ctx.createGain(); wet.gain.value = 0.45;
       pianoBus.connect(dry).connect(merger, 0, ch); pianoBus.connect(d).connect(wet).connect(merger, 0, ch);
     });
-    merger.connect(pianoGain); pianoGain.connect(master); pianoGain.connect(verb);
+    pianoPan = ctx.createStereoPanner(); pianoPan.pan.value = st.pianoPan / 100;
+    merger.connect(pianoGain); pianoGain.connect(pianoPan); pianoPan.connect(master); pianoPan.connect(verb);
+    // GUITAR SKANK: corda do MRG-68 (mesmo modelo), corpo/amp simples e PAN próprio
+    gtrGain = ctx.createGain(); gtrGain.gain.value = st.gtrLvl / 100 * 0.9;
+    gtrPanN = ctx.createStereoPanner(); gtrPanN.pan.value = st.gtrPan / 100;
+    const ghp = ctx.createBiquadFilter(); ghp.type = 'highpass'; ghp.frequency.value = 180;
+    const gpk = ctx.createBiquadFilter(); gpk.type = 'peaking'; gpk.frequency.value = 1800; gpk.Q.value = 0.8; gpk.gain.value = 4;
+    const glp = ctx.createBiquadFilter(); glp.type = 'lowpass'; glp.frequency.value = 5200;
+    gtrBus = ctx.createGain(); gtrBus.connect(ghp).connect(gpk).connect(glp).connect(gtrGain).connect(gtrPanN);
+    gtrPanN.connect(master); const gv = ctx.createGain(); gv.gain.value = 0.5; gtrPanN.connect(gv).connect(verb);
 
     // órgão: drive valvulado + Leslie lento (tremolo/vibrato estéreo)
     organGain = ctx.createGain(); organGain.gain.value = st.organLvl / 100;
@@ -377,6 +492,19 @@ const audio = (() => {
     return g;
   }
 
+  // guitarra do skank: os acordes do skank viram uma palhetada pra cima, abafada, na região aguda (G4 a A5)
+  function gtrStrum(t, notes, vel) {
+    const pcs = [...new Set(notes.map((n) => n % 12))], chord = pcs.map((pc) => 67 + ((pc - 67) % 12 + 12) % 12).sort((a, b) => a - b);
+    const v = Math.min(1, vel / 127), key = chord.join(',') + ':' + Math.round(v * 8);
+    let buf = gtrCache.get(key);
+    if (!buf) {
+      const y = GTR.strum(ctx.sampleRate, chord, 0.45 + 0.5 * v, 0.085, chord[0] * 7 + 3, { up: true, ring: 0.996, muteG: 0.55, pickPos: 0.12 });
+      buf = ctx.createBuffer(1, y.length, ctx.sampleRate); buf.copyToChannel(y, 0); gtrCache.set(key, buf);
+      if (gtrCache.size > 64) gtrCache.delete(gtrCache.keys().next().value);
+    }
+    const src = ctx.createBufferSource(); src.buffer = buf; const g = ctx.createGain(); g.gain.value = 0.9;
+    src.connect(g).connect(gtrBus); src.start(t); voices.push({ g, end: t + buf.duration });
+  }
   const secPerBeat = () => 60 / st.bpm;
   function schedule(from, to) {
     const L = active.loopBeats; if (L <= 0) return;
@@ -389,6 +517,17 @@ const audio = (() => {
         play(when, e.note, e.velocity, len);
       }
     }
+    if (st.gtr) for (const gr of skankGroups(active)) {
+      const k = Math.max(0, Math.ceil((from - gr.start) / L));
+      for (let t = gr.start + k * L; t < to; t += L) if (t >= from) gtrStrum(beatTime + (t - beatPos) * spb, gr.notes, gr.vel);
+    }
+  }
+  // acordes do skank agrupados por tempo (cada grupo = uma palhetada)
+  function skankGroups(l) {
+    if (l._gtr) return l._gtr;
+    const m = new Map();
+    for (const e of l.events) if (e.channel === M.ChSkank) { const k = e.start.toFixed(4); const g = m.get(k) || { start: e.start, notes: [], vel: 0 }; g.notes.push(e.note); g.vel = Math.max(g.vel, e.velocity); m.set(k, g); }
+    return (l._gtr = [...m.values()]);
   }
   function tick() {
     const horizon = ctx.currentTime + LOOKAHEAD, spb = secPerBeat();
@@ -429,7 +568,8 @@ const audio = (() => {
     start, stop, isPlaying: () => playing, liveOn, liveOff,
     unlock() { ensure(); if (ctx.state === 'suspended') ctx.resume(); return ctx; },
     setLoop(l) { if (playing) pending = l; else active = l; },
-    setLevels() { if (!ctx) return; pianoGain.gain.setTargetAtTime(st.pianoLvl / 100, ctx.currentTime, 0.03); organGain.gain.setTargetAtTime(st.organLvl / 100, ctx.currentTime, 0.03); },
+    setLevels() { if (!ctx) return; const t = ctx.currentTime; pianoGain.gain.setTargetAtTime(st.pianoLvl / 100, t, 0.03); organGain.gain.setTargetAtTime(st.organLvl / 100, t, 0.03);
+      pianoPan.pan.setTargetAtTime(st.pianoPan / 100, t, 0.03); gtrPanN.pan.setTargetAtTime(st.gtrPan / 100, t, 0.03); gtrGain.gain.setTargetAtTime(st.gtrLvl / 100 * 0.9, t, 0.03); },
     playhead() {
       if (!playing || !ctx || !active || active.loopBeats <= 0) return -1;
       const b = beatPos - (beatTime - ctx.currentTime) / secPerBeat();
@@ -554,10 +694,11 @@ function changed() {
 
 function setPreview(on) {
   if (on) audio.start(); else audio.stop();
-  for (const id of ['preview', 'preview2']) {
+  for (const id of ['preview', 'preview2', 'preview3']) {
     $(id).classList.toggle('on', on);
     $(id).querySelector('.txt').textContent = on ? '■ PARAR' : '▶ PREVIEW';
   }
+  if (window.megaRender) window.megaRender();
 }
 
 buildChords();
@@ -583,44 +724,79 @@ document.querySelectorAll('#timbre .b').forEach((b) => b.addEventListener('click
 }));
 refreshTimbre();
 slider('pianoLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
-for (const id of ['preview', 'preview2']) $(id).onclick = () => setPreview(!audio.isPlaying());
+for (const id of ['preview', 'preview2', 'preview3']) $(id).onclick = () => setPreview(!audio.isPlaying());
+const panTxt = (v) => (v === 0 ? 'C' : (v < 0 ? 'L' : 'R') + Math.abs(v));
+slider('pianoPan', panTxt, () => { audio.setLevels(); save(); });
+slider('gtrPan', panTxt, () => { audio.setLevels(); save(); });
+slider('gtrLvl', (v) => v + '%', () => { audio.setLevels(); save(); });
+function refreshGtr() { $('gtr').classList.toggle('on', st.gtr); }
+$('gtr').onclick = () => { st.gtr = !st.gtr; refreshGtr(); };
+refreshGtr();
 for (const id of ['export', 'export2']) $(id).onclick = download;
-// PRESETS: harmonias clássicas do reggae por estilo (o mesmo banco do plugin)
-(function presets() {   // pasta > letras > música (passe o mouse ou toque)
-  let last = -1;
-  presetMenu($('presets'), {
-    label: 'HARMONIAS CLÁSSICAS ▾  banco antigo do MRCM (180)',
-    itemText: (p) => `${p.era} · ${p.chords.map((c) => M.ROOTS[c.root] + (c.quality ? 'm' : '')).join(' - ')}`,
-    current: () => last,
-    onPick: (p, i) => {
-      last = i;
-      st.slots.forEach((s, k) => {
-        const c = p.chords[k];
-        if (c) Object.assign(s, { root: c.root, quality: c.quality, dur: c.dur, inv: -1, on: true });
-        else s.on = false;
-      });
-      changed();
-    },
+// PRESETS · MEGA BANCO: o mesmo padrão da Riddim Machine MRM-0420 (estilos, riddims A–Z, músicas e favoritos),
+// com o banco único de riddims da Dub Station; só entram os riddims que têm a harmonia levantada (conferida ou aproximada)
+(function megaBank() {
+  const RB = window.RIDDIM_BANK, NOTES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+  const CAT = RB.entries.map((e, id) => ({ ...e, id })).filter((e) => e.harmony < 2 && e.chords.length);
+  const STY = RB.styles.filter((x, i) => CAT.some((e) => e.style === i));
+  const gk = (e) => (e.riddim || e.name).toUpperCase().trim();
+  const G = {}; CAT.forEach((e) => (G[gk(e)] = G[gk(e)] || []).push(e));
+  Object.values(G).forEach((g) => g.sort((a, b) => (a.year || 9999) - (b.year || 9999)));
+  const sel = { v: 'est', st: RB.styles[2] || STY[0], L: 'A', g: null, c: null, q: '' };
+  let FAV = []; try { FAV = JSON.parse(localStorage.getItem('mrk80-fav') || '[]'); } catch (e) {}
+  const esc = (x) => String(x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const DL = ['½', '', '×2', '×3', '×4', '×8'];
+  const chordTxt = (e) => e.chords.map((c) => NOTES[c[0]] + (c[1] ? 'm' : '') + DL[c[2]]).join(' – ');
+  const light = (e) => `<i class="${e.harmony === 0 ? 'g' : 'y'}"></i>`;
+  const filt = (l) => { const q = sel.q.toLowerCase(); return l.filter((e) => !q || (e.name + ' ' + e.artist + ' ' + e.riddim + ' ' + RB.styles[e.style]).toLowerCase().includes(q)); };
+  const row = (e) => `<button class="rw ${sel.c && sel.c.id === e.id ? 'on' : ''}" data-c="${e.id}">${light(e)}<span><b>${esc(e.name)}${FAV.includes(e.id) ? ' ★' : ''}</b><span class="a">${esc(e.artist)}${e.year ? ' · ' + e.year : ''}${gk(e) !== e.name.toUpperCase() ? ' · riddim ' + esc(e.riddim) : ''}</span></span><span class="m">${esc(chordTxt(e))}<br>${e.bpm} BPM</span></button>`;
+  $('mcount').textContent = `${CAT.length} músicas · ${Object.keys(G).length} riddims`;
+  function render() {
+    document.querySelectorAll('#mega .mtabs button').forEach((b) => b.classList.toggle('on', b.dataset.mv === sel.v));
+    const nav = $('mnav'), list = $('mlist');
+    if (sel.v === 'est') {
+      nav.innerHTML = `<div class="nav">${STY.map((x) => `<button data-st="${x}" class="${x === sel.st ? 'on' : ''}">${x}<small>${filt(CAT.filter((e) => RB.styles[e.style] === x)).length}</small></button>`).join('')}</div>`;
+      const items = filt(CAT.filter((e) => RB.styles[e.style] === sel.st)), by = {};
+      items.forEach((e) => (by[gk(e)] = by[gk(e)] || []).push(e));
+      list.innerHTML = items.length ? Object.keys(by).sort().map((k) => `<div class="grp">${esc(k)} · ${by[k].length}</div>` + by[k].map(row).join('')).join('') : '<p class="hint">Nada com essa busca.</p>';
+    } else if (sel.v === 'az') {
+      const keys = Object.keys(G).filter((k) => filt(G[k]).length).sort(), L = (k) => (/[A-Z]/.test(k[0]) ? k[0] : '#'), have = new Set(keys.map(L));
+      if (!have.has(sel.L)) sel.L = [...have].sort()[0] || 'A';
+      nav.innerHTML = `<div class="lets">${'#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((l) => `<button data-l="${l}" class="${l === sel.L ? 'on' : ''}" ${have.has(l) ? '' : 'disabled'}>${l}</button>`).join('')}</div>`;
+      list.innerHTML = keys.filter((k) => L(k) === sel.L).map((k) => `<div class="grp">${esc(k)} · ${filt(G[k]).length}</div>` + filt(G[k]).map(row).join('')).join('');
+    } else {
+      nav.innerHTML = '';
+      const src = sel.v === 'fav' ? CAT.filter((e) => FAV.includes(e.id)) : CAT, items = filt(src).sort((a, b) => a.name.localeCompare(b.name));
+      list.innerHTML = items.length ? items.map(row).join('') : `<p class="hint">${sel.v === 'fav' ? 'Nenhum favorito ainda: toque em ☆ FAVORITAR numa música.' : 'Nada com essa busca.'}</p>`;
+    }
+    det();
+  }
+  function det() {
+    const c = sel.c;
+    $('mdet').innerHTML = c ? `<div class="det"><h4>${esc(c.name)} <span class="sub">${esc(c.artist)}${c.year ? ' · ' + c.year : ''}</span></h4>
+      <div class="sub">${RB.styles[c.style]} · riddim ${esc(c.riddim)} · harmonia ${c.harmony === 0 ? 'conferida' : 'aproximada'} · ${c.bpm} BPM</div>
+      <div class="ch">${esc(chordTxt(c))}</div>
+      <div class="acts"><button class="go ${audio.isPlaying() ? 'on' : ''}" data-play>${audio.isPlaying() ? '■ PARAR' : '▶ PREVIEW'}</button><button data-fav>${FAV.includes(c.id) ? '★ FAVORITO' : '☆ FAVORITAR'}</button></div></div>` : '';
+  }
+  function pick(e) {
+    sel.c = e;
+    st.slots.forEach((x, k) => { const c = e.chords[k]; if (c) Object.assign(x, { root: c[0], quality: c[1], dur: c[2], inv: -1, on: true }); else x.on = false; });
+    st.bpm = e.bpm; $('bpm').value = st.bpm; $('o_bpm').textContent = st.bpm;
+    changed(); render();
+    const on = document.querySelector('#mlist .rw.on'); if (on) on.scrollIntoView({ block: 'nearest' });
+  }
+  $('mega').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button'); if (!b) return;
+    if (b.dataset.mv) { sel.v = b.dataset.mv; render(); }
+    else if (b.dataset.st) { sel.st = b.dataset.st; render(); }
+    else if (b.dataset.l) { sel.L = b.dataset.l; render(); }
+    else if (b.dataset.c) pick(CAT.find((e) => e.id === +b.dataset.c));
+    else if (b.hasAttribute('data-play')) setPreview(!audio.isPlaying());
+    else if (b.hasAttribute('data-fav') && sel.c) { const id = sel.c.id; FAV = FAV.includes(id) ? FAV.filter((x) => x !== id) : [...FAV, id]; try { localStorage.setItem('mrk80-fav', JSON.stringify(FAV)); } catch (e) {} render(); }
   });
-})();
-// BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins e das outras machines): harmonia conferida e BPM da música
-(function bank() {
-  const RB = window.RIDDIM_BANK;
-  let last = -1;
-  riddimBankMenu($('bank'), {
-    label: `BANCO DE RIDDIMS ▾  ${RB.entries.length} músicas · ${RB.families.length} riddims`,
-    current: () => last,
-    onPick: (e, i) => {
-      last = i;
-      st.slots.forEach((s, k) => {
-        const c = e.chords[k];
-        if (c) Object.assign(s, { root: c[0], quality: c[1], dur: c[2], inv: -1, on: true });
-        else s.on = false;
-      });
-      st.bpm = e.bpm; $('bpm').value = st.bpm; $('o_bpm').textContent = st.bpm;
-      changed();
-    },
-  });
+  $('mq').oninput = (ev) => { sel.q = ev.target.value; render(); };
+  window.megaRender = det;
+  render();
 })();
 render();
 
