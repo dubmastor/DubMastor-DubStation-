@@ -172,7 +172,7 @@ def gerar_iss(dist, versao, saida):
     a('Name: "escolher"; Description: "Escolher os plugins"; Flags: iscustom')
     a("")
     a("[Components]")
-    for grupo, titulo in (("efeito", "Efeitos"), ("instrumento", "Instrumentos e machines")):
+    for grupo, titulo in (("efeito", "Efeitos"), ("instrumento", "Instrumentos e Riddim Machine")):
         a(f'Name: "{grupo}"; Description: "{titulo}"; Types: tudo escolher')
         for p, d, v in itens:
             if tipo_txt(p) == grupo:
