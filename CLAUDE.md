@@ -131,3 +131,11 @@ ao mudar um, mude o outro. Tudo na contagem com a caixa no 2 e no 4 (1 passo = 1
 faixa 36–51 do MRD-12** (o teste falha se alguma cair lá); vão de 54 a 100. Saturador e Tape Echo começam desligados. MIDI no padrão da linha:
 arrastar o groove, uma peça ou um compasso (na cor dele), MIDI colorido (compasso N = canal N) e BAIXAR MIDI.
 Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
+
+## Monstro Machine MM-2500 (Monstro/MonstroMachine/) — produto à parte
+Drum machine no estilo MPC2500 com os kits do Monstro.zip (Academia de Beats). **Não faz parte do Dub Station**: fica fora do
+`plugins.json`, das páginas do Dub Station e do instalador completo. Site próprio em `site/monstro/` (versão para celular em
+`site/monstro/app/`), instaladores próprios em `Monstro/MonstroMachine/installer/`, workflow `build-monstromachine.yml`, release `MM-2500-x.y`.
+O motor (`Source/MonstroEngine.h`) tem uma cópia em JavaScript na versão para celular (`play`, `charOf`, `vpar`, `PATTERNS`): ao mudar um, mude o outro.
+Toda alteração sobe a versão no `CMakeLists.txt`, no README, no `RELEASE_NOTES.md`, nos links de `site/monstro/index.html` e no `VERSION` do app.
+Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
