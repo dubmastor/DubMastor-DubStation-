@@ -89,6 +89,8 @@ O workflow `.github/workflows/build-riddimmachine.yml` não roda mais sozinho qu
 - **Mastor Reggae Drums MRD-12** (`ReggaeDrums/`, antigo Dub Battery Reggae DBR) tem o MRDM-12 inteiro na aba DUB DRUMS.
 - **Mastor Reggae Bass MRB-69** (`ReggaeBass/`, antigo Dub Bass MRDBI-07) tem o MRBM-69 inteiro na aba BASS MACHINE
   (`Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`; nomes repetidos trocados em `MachineNames.h`).
+  Desde a 2.1: no banco de riddims da BASS MACHINE só ficam ativos os com baixo original (`riddimbank::addMenus (..., needBass = true)`)
+  e a bateria de acompanhamento tem o chimbal 1/8 ou 1/16 (parâmetro `hat16`, começa em 1/8; `buildDrums (..., hat16)` igual em `site/bassmachine/engine.js`).
 - **Mastor Reggae Keys MRK-80** (`ReggaeKeys/`, antigo Roots Keys) tem o MRCM-1240 inteiro na aba CHORD MACHINE (só maior e menor;
   `Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`). Projetos da antiga aba DUB CHORDS migram em `migrateOldDubChords`.
   Versão para celular em `site/keys/` (usa `site/chords/engine.js`, que continua sendo o motor web da machine).

@@ -1006,6 +1006,8 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
         keysKeys = std::make_unique<InterlockKeys> (*proc.apvts.getParameter ("keysMode"), kmodes, false);
         addAndMakeVisible (*drumKeys);
         addAndMakeVisible (*keysKeys);
+        hatKeys = std::make_unique<InterlockKeys> (*proc.apvts.getParameter ("hat16"), juce::StringArray { "HH 1/8", "HH 1/16" }, false);
+        addAndMakeVisible (*hatKeys);
     }
     setupKnob (density,   "density",   "DENSIDADE");
     setupKnob (variation, "variation", "VARIACAO");
@@ -1493,8 +1495,6 @@ void BassMachinePanel::renderBackground()
         drawKnobScale (g, k->slider, 11);
     g.setColour (colours::inkSoft);
     g.setFont (stencil (8.5f, 0.12f));
-    g.drawFittedText (juce::String::fromUTF8 ("SÓ NO PREVIEW: O MIDI ARRASTADO É SÓ O BAIXO"),
-                      drumsPanel.withTrimmedLeft (14).withWidth (150).withTrimmedTop (64).withHeight (30), juce::Justification::centredLeft, 2);
     g.drawFittedText (juce::String::fromUTF8 ("SKANK DO PIANO M1 E BUBBLE DO HAMMOND SEGUINDO A HARMONIA"),
                       keysPanel.withTrimmedLeft (14).withWidth (150).withTrimmedTop (64).withHeight (30), juce::Justification::centredLeft, 2);
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" }, 22.0f);
@@ -1676,7 +1676,13 @@ void BassMachinePanel::resized()
         a.removeFromTop (18);
         a.removeFromBottom (10);
         auto left = a.removeFromLeft (150);
-        onBtn->button.setBounds (left.removeFromTop (36));
+        if (onBtn == &drumsOn)
+        {   // BATERIA em cima e o chimbal (HH 1/8 · HH 1/16) logo abaixo
+            onBtn->button.setBounds (left.removeFromTop (30));
+            left.removeFromTop (5);
+            hatKeys->setBounds (left.removeFromTop (28));
+        }
+        else onBtn->button.setBounds (left.removeFromTop (36));
         placeKnob (*vol, a.removeFromRight (84));
         a.removeFromRight (10);
         sel->setBounds (a.withSizeKeepingCentre (a.getWidth(), 56));
@@ -1782,7 +1788,7 @@ void RiddimBox::mouseDown (const juce::MouseEvent& e)
     {   // setas no BANCO: próxima / anterior música com harmonia
         const int dir = e.x < 26 ? -1 : 1;
         int n = b;
-        do n = (n + dir + riddimbank::numEntries) % riddimbank::numEntries; while (! riddimbank::usable (n) && n != b);
+        do n = (n + dir + riddimbank::numEntries) % riddimbank::numEntries; while (! riddimbank::active (n, true) && n != b);
         loadBank (n);
         return;
     }
@@ -1838,7 +1844,7 @@ void RiddimBox::showMenu()
         }
     }
     juce::PopupMenu m;
-    riddimbank::addMenus (m, proc.currentBank());   // BANCO ÚNICO (o mesmo do MRCM-1240, MRDM-12 e MRM-0420)
+    riddimbank::addMenus (m, proc.currentBank(), true);   // BANCO ÚNICO: na Bass Machine só os riddims com baixo original ficam ativos
     m.addSeparator();
     m.addSectionHeader (juce::String::fromUTF8 ("160 RIDDIMS DO MRBM-69  ·  ✓ = harmonia conferida"));
     m.addSubMenu ("POR ESTILO DE REGGAE", byStyle);
@@ -1852,7 +1858,7 @@ void RiddimBox::showMenu()
                      {
                          if (safe == nullptr || res == 0) return;
                          if (res == riddimbank::toggleCompleteId) { riddimbank::onlyComplete() = ! riddimbank::onlyComplete(); safe->showMenu(); return; }
-                         if (const int e = riddimbank::entryFromMenuResult (res); e >= 0) safe->loadBank (e);
+                         if (const int e = riddimbank::entryFromMenuResult (res); e >= 0 && riddimbank::active (e, true)) safe->loadBank (e);
                          else if (res > 0 && res <= mbmriddims::numRiddims) safe->load (res - 1);
                      });
 }

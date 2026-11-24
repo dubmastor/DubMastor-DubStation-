@@ -9,6 +9,8 @@
 #include "../Source/PluginEditor.h"
 #include "../../ReggaeBassMachine/Source/PluginProcessor.h"   // aba BASS MACHINE (MRBM-69)
 #include "../../ReggaeBassMachine/Source/RiddimPresets.h"
+#include "../../ReggaeBassMachine/Source/AccompEngine.h"
+#include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 static int failures = 0;
 static void check (bool ok, const juce::String& what)
@@ -210,6 +212,17 @@ int main (int argc, char** argv)
         p.apvts.state.setProperty ("tab", 0, nullptr);
     }
 
+    {   // 2.1: chimbal 1/8 ou 1/16 e banco só com baixo original
+        BassMachineProcessor m;
+        check (m.apvts.getRawParameterValue ("hat16")->load() < 0.5f, "BASS MACHINE: chimbal começa em 1/8, como antes");
+        int h8 = 0, h16 = 0;
+        for (const auto& e : mbm::buildDrums (8.0, mbm::DrumOneDrop, 0.2f, false)) h8 += e.note == mbm::drum::ClosedHat;
+        for (const auto& e : mbm::buildDrums (8.0, mbm::DrumOneDrop, 0.2f, true))  h16 += e.note == mbm::drum::ClosedHat;
+        check (h16 > h8 && h16 == 28, "HH 1/16: semicolcheias no chimbal (" + juce::String (h8) + " -> " + juce::String (h16) + ")");
+        int on = 0;
+        for (int i = 0; i < riddimbank::numEntries; ++i) on += riddimbank::active (i, true);
+        check (on == 160, "banco: só os " + juce::String (on) + " riddims com baixo original ficam ativos");
+    }
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");
     return failures == 0 ? 0 : 1;
 }

@@ -45,9 +45,10 @@ int main (int argc, char** argv)
         for (double L : { 2.0, 4.0, 8.0, 18.0, 34.0 })
             for (int ds = 0; ds < NumDrumStyles; ++ds)
                 for (float sw : { 0.0f, 0.35f, 1.0f })
+                for (int hh = 0; hh < 2; ++hh)   // chimbal 1/8 e 1/16
                 {
-                    const auto d = buildDrums (L, ds, sw);
-                    std::printf ("%s\n{\"L\":%.17g,\"style\":%d,\"swing\":%.9g,\"ev\":[", first ? "" : ",", L, ds, (double) sw);
+                    const auto d = buildDrums (L, ds, sw, hh == 1);
+                    std::printf ("%s\n{\"L\":%.17g,\"style\":%d,\"swing\":%.9g,\"hat16\":%d,\"ev\":[", first ? "" : ",", L, ds, (double) sw, hh);
                     first = false;
                     for (size_t i = 0; i < d.size(); ++i)
                         std::printf ("%s[%.17g,%d,%d,%d]", i ? "," : "", d[i].start, d[i].note, d[i].velocity, d[i].target);
