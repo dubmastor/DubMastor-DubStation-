@@ -1,30 +1,21 @@
 name: Build Mastor Reggae Drum Machine MRDM-12
 
 on:
+  # legado: não compila mais em push nem PR (o instrumento e o MRM-0420 compilam este código); release só por tag manual
   push:
-    branches: [main]
-    paths:
-      - 'ReggaeDrumMachine/**'
-      - 'RiddimBank/Source/**'
-      - 'site/drums/generator.js'
-      - '.github/workflows/build-reggaedrummachine.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRDM-12-*'
-  pull_request:
-    paths:
-      - 'ReggaeDrumMachine/**'
-      - 'RiddimBank/Source/**'
-      - '.github/workflows/build-reggaedrummachine.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+
+# só o build mais novo de cada branch / PR roda: um push novo cancela o anterior (economiza as máquinas Mac)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

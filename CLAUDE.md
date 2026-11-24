@@ -75,6 +75,9 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
   instalador completo e a checagem exige que não haja link. Para liberar: tirar `pausado`, devolver o bloco `completo` em
   `site/index.html` e os links no README.
 - **Sempre que a versão de um plugin subir**, atualize `plugins.json` → `pacote` → `plugins` com a nova versão, suba `pacote` → `versao` e troque `DubStation-x.y` nos links do site e do README. A checagem falha se esquecer.
+- **Fila das máquinas Mac (otimização de nov/2026):** todo workflow de build tem `concurrency` com `cancel-in-progress` (um push novo
+  cancela o build anterior da mesma branch/PR); o instalador completo não roda em PR (só na `main`, por tag ou manual); as machines legado
+  (MRDM-12, MRBM-69, MRCM-1240) só compilam por tag ou manual. Releases: fica só a última de cada plugin (as antigas e as dos nomes antigos foram apagadas).
 - Pro Tools (AAX): todo CMakeLists inclui `.github/cmake/aax.cmake` e põe `${DM_AAX}` no fim de `FORMATS`. Plugin novo também. O AAX é compilado sempre (SDK do JUCE 8) e só entra no instalador público quando assinado pela PACE (passo a passo em `PROTOOLS.md`).
 
 
