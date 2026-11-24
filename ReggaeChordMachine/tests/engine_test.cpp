@@ -162,6 +162,7 @@ int main()
         for (int ns : { 0, NoteSize64 })
         {
             Settings st; st.pianist = p; st.fill = fl; st.noteSize = ns; st.swing = 0.4f; st.bubble = false;
+            st.fillEvery = (p + fl) % 2 == 0 ? 4 : 8;
             std::vector<ChordSlot> sl { { 9, Min, 4, -1 }, { 2, Min, 4, -1 }, { 4, Min, 4, -1 }, { 7, Maj, 4, -1 } };
             double lb = 0;
             const auto ev = buildLoop (sl, st, lb);
@@ -176,6 +177,22 @@ int main()
             if (fl == 0 || p == 0) std::printf ("pianista %-9s fill %-9s nota=%-4s notas=%zu\n", pianistName (p), fillName (fl), noteSizeName (ns), ev.size());
             CHECK (! ev.empty() && ! overlap && ! outside, "pianista %s + fill %s: vazio, sobreposto ou fora do loop", pianistName (p), fillName (fl));
         }
+
+    // frase de 8: um loop de 2 compassos com fill vira 8 compassos e o fill cai só no 8º
+    {
+        Settings st; st.fill = FillPuxada; st.fillEvery = 8; st.bubble = false;
+        std::vector<ChordSlot> sl { { 9, Min, 4, -1 }, { 2, Min, 4, -1 }, { 4, Min, 0, -1 }, { 7, Maj, 0, -1 } };
+        double lb = 0;
+        const auto ev = buildLoop (sl, st, lb);
+        int pushes = 0;
+        for (const auto& e : ev) if (std::fmod (e.start, 4.0) > 3.74) ++pushes;   // o "a" do 4 só aparece no fill
+        CHECK (std::abs (lb - 32.0) < 1e-9 && pushes > 0, "frase de 8: loop de 32 tempos (%.1f) com a puxada no fim", lb);
+        bool onlyLast = true;
+        for (const auto& e : ev) if (std::fmod (e.start, 4.0) > 3.74 && e.start < 28.0) onlyLast = false;
+        CHECK (onlyLast, "puxada s\xc3\xb3 no 8\xc2\xba compasso");
+        st.fill = FillNone; buildLoop (sl, st, lb);
+        CHECK (std::abs (lb - 8.0) < 1e-9, "sem fill o loop continua com 2 compassos");
+    }
 
     std::printf (failures == 0 ? "\nTODOS OS TESTES PASSARAM\n" : "\n%d FALHA(S)\n", failures);
     return failures == 0 ? 0 : 1;

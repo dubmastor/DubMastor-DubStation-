@@ -69,11 +69,14 @@ inline double noteSizeBeats (int n)
 // compasso de cada frase de 4 compassos (ou do loop, se ele for mais curto).
 enum Pianist { PnClassico, PnBeckford, PnGladdy, PnSterling, PnDownie, PnLyn, PnSteely, PnLenky, NumPianists };
 // FILLS: seletor separado do pianista. O fill toma o lugar do skank nos tempos 3 e 4 do último compasso da frase.
-enum PianoFill { FillNone, FillBeckford, FillGladdy, FillSterling, FillDownie, FillLyn, FillSteely, FillLenky, NumFills };
+enum PianoFill { FillNone, FillBeckford, FillGladdy, FillSterling, FillDownie, FillLyn, FillSteely, FillLenky,
+                 // fills só de acordes (a "firula" do pianista na base, no fim da frase)
+                 FillPuxada, FillDobrado, FillRajada, FillInversoes, FillTercina, FillArrastado, NumFills };
 
 inline const char* fillName (int f)
 {
-    static const char* n[NumFills] = { "SEM FILL", "BECKFORD", "GLADDY", "STERLING", "DOWNIE", "LYN", "STEELY", "LENKY" };
+    static const char* n[NumFills] = { "SEM FILL", "BECKFORD", "GLADDY", "STERLING", "DOWNIE", "LYN", "STEELY", "LENKY",
+                                       "PUXADA", "DOBRADO", "RAJADA", "INVERSOES", "TERCINA", "ARRASTADO" };
     return n[std::clamp (f, 0, NumFills - 1)];
 }
 inline const char* fillWho (int f)
@@ -86,10 +89,16 @@ inline const char* fillWho (int f)
         "RESPOSTAS SINCOPADAS",
         "ARPEJO SUBINDO (LOVERS ROCK)",
         "SEMICOLCHEIAS DIGITAIS NO 4",
-        "STABS NOS \"E\" E NOS \"A\"" };
+        "STABS NOS \"E\" E NOS \"A\"",
+        "O PR\xc3\x93XIMO ACORDE ADIANTADO NO \"A\" DO 4",
+        "SKANK DOBRADO NO \"&\" E NO \"A\" DO 3 E DO 4",
+        "4 ACORDES EM SEMICOLCHEIA NO 4, CRESCENDO",
+        "O ACORDE SUBINDO EM INVERS\xc3\x95" "ES NO 3 E NO 4",
+        "TERCINA DE ACORDES NO 4",
+        "ACORDE ARRASTADO (ROLADO) NO \"&\" DO 4" };
     return n[std::clamp (f, 0, NumFills - 1)];
 }
-inline bool fillNoSwing (int f) { return f == FillSteely || f == FillLenky; }
+inline bool fillNoSwing (int f) { return f == FillSteely || f == FillLenky || f == FillTercina; }
 
 inline const char* pianistName (int p)
 {
@@ -222,7 +231,8 @@ struct Settings
     float swing = 0.0f;      // 0..1 (atrasa as semicolcheias pares)
     bool bubble = true;      // órgão uma oitava abaixo do skank
     int pianist = PnClassico;   // PIANISTAS: 0 = o skank clássico (igual às versões antigas)
-    int fill = FillNone;        // FILLS (seletor separado): no fim de cada frase de 4 compassos
+    int fill = FillNone;        // FILLS (seletor separado): no fim de cada frase
+    int fillEvery = 4;          // frase de 4 ou 8 compassos (o loop curto se repete até a frase)
 };
 
 //==============================================================================
@@ -349,8 +359,8 @@ inline double hitLength (const std::vector<HitT>& hits, size_t index, double not
 }
 
 // Fill do pianista num passo dos tempos 3 e 4 (passos 8..15 do compasso)
-inline void pianoFill (int fill, const std::vector<int>& left, int stepInBar, double start, int slot, const Settings& s,
-                       std::vector<NoteEvent>& events)
+inline void pianoFill (int fill, const std::vector<int>& left, const std::vector<int>& nextLeft, int stepInBar, double start, int slot,
+                       const Settings& s, std::vector<NoteEvent>& events)
 {
     if (left.empty()) return;
     const double barEnd = start - (start - std::floor (start / 4.0) * 4.0) + 4.0;   // nenhuma nota passa do compasso
@@ -363,6 +373,64 @@ inline void pianoFill (int fill, const std::vector<int>& left, int stepInBar, do
     const int n = (int) left.size();
     switch (fill)
     {
+        case FillPuxada:   // skank no "&" do 3 e do 4 e o PRÓXIMO acorde adiantado no "a" do 4
+            if (stepInBar == 10 || stepInBar == 14)
+                for (int x : left) { add (x, noteSizeBeats (s.noteSize), 1.0f); add (x + 12, noteSizeBeats (s.noteSize), 1.0f); }
+            if (stepInBar == 15)
+                for (int x : (nextLeft.empty() ? left : nextLeft)) { add (x, 0.3, 0.95f); add (x + 12, 0.3, 0.95f); }
+            break;
+        case FillDobrado:  // skank dobrado: "&" e "a" do 3 e do 4
+            if (stepInBar == 10 || stepInBar == 11 || stepInBar == 14 || stepInBar == 15)
+                for (int x : left) { const float v = stepInBar % 2 == 0 ? 0.95f : 0.7f; add (x, 0.12, v); add (x + 12, 0.12, v); }
+            break;
+        case FillRajada:   // skank no "&" do 3 e quatro acordes em semicolcheia no 4, crescendo
+            if (stepInBar == 10)
+                for (int x : left) { add (x, noteSizeBeats (s.noteSize), 1.0f); add (x + 12, noteSizeBeats (s.noteSize), 1.0f); }
+            if (stepInBar >= 12)
+                for (int x : left) { const float v = 0.6f + 0.13f * (float) (stepInBar - 12); add (x, 0.1, v); add (x + 12, 0.1, v); }
+            break;
+        case FillInversoes: // o mesmo acorde subindo de inversão em colcheias (mão direita): fund., 1ª, 2ª, oitava
+            if (stepInBar % 2 == 0)
+            {
+                const int k = (stepInBar - 8) / 2;
+                std::vector<int> v = left;
+                std::sort (v.begin(), v.end());
+                for (int i = 0; i < k && ! v.empty(); ++i) { v.push_back (v.front() + 12); v.erase (v.begin()); }
+                for (int x : v) add (x + 12, 0.2, 0.75f + 0.07f * (float) k);
+            }
+            break;
+        case FillTercina:  // skank no "&" do 3 e tercina de acordes no 4 (grade presa)
+            if (stepInBar == 10)
+                for (int x : left) { add (x, noteSizeBeats (s.noteSize), 1.0f); add (x + 12, noteSizeBeats (s.noteSize), 1.0f); }
+            if (stepInBar == 12)
+            {
+                const double base = start;
+                for (int t = 0; t < 3; ++t)
+                    for (int x : left)
+                    {
+                        const int vel = std::clamp ((int) std::lround ((0.8f + 0.1f * (float) t) * s.velocity * 127.0f), 1, 127);
+                        const double st = base + t / 3.0;
+                        const double len = std::max (0.03, std::min (0.22, barEnd - st - 0.02));
+                        events.push_back ({ st, len, std::clamp (x + 12, 0, 127), vel, ChSkank, slot });
+                    }
+            }
+            break;
+        case FillArrastado: // skank no "&" do 3 e, no "&" do 4, o acorde rolado de baixo para cima, segurado até o 1
+            if (stepInBar == 10)
+                for (int x : left) { add (x, noteSizeBeats (s.noteSize), 1.0f); add (x + 12, noteSizeBeats (s.noteSize), 1.0f); }
+            if (stepInBar == 14)
+            {
+                std::vector<int> v;
+                for (int x : left) { v.push_back (x); v.push_back (x + 12); }
+                std::sort (v.begin(), v.end());
+                for (size_t i = 0; i < v.size(); ++i)
+                {
+                    const double st = start + 0.03 * (double) i;
+                    const int vel = std::clamp ((int) std::lround (0.85f * s.velocity * 127.0f), 1, 127);
+                    events.push_back ({ st, std::max (0.03, barEnd - st - 0.02), std::clamp (v[i], 0, 127), vel, ChSkank, slot });
+                }
+            }
+            break;
         case FillBeckford: // corrida do ska: acorde da mão direita em todas as colcheias do 3 e do 4, crescendo
             if (stepInBar % 2 == 0)
                 for (int x : left) add (x + 12, 0.2, 0.7f + 0.1f * (float) ((stepInBar - 8) / 2));
@@ -418,8 +486,22 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
     double totalBeats = 0;
     for (const auto& sl : slots) if (sl.beats > 0) totalBeats += sl.beats;
     const int loopBars = std::max (1, (int) std::lround (std::ceil (totalBeats / 4.0)));
-    const int fillEvery = std::min (4, loopBars);
+    // frase de 4 ou 8 compassos: o loop curto (1, 2 ou 4 compassos) se repete até a frase, para o fill cair no fim dela
+    const int phrase = s.fillEvery == 8 ? 8 : 4;
+    const bool wholeBars = std::abs (std::fmod (totalBeats, 4.0)) < 1.0e-9;
+    const int reps = (s.fill != FillNone && wholeBars && loopBars < phrase && phrase % loopBars == 0) ? phrase / loopBars : 1;
+    const int fillEvery = std::min (phrase, loopBars * reps);
+    auto nextVoicing = [&] (int si) -> const std::vector<int>&
+    {
+        for (int k = 1; k <= (int) slots.size(); ++k)
+        {
+            const int j = (si + k) % (int) slots.size();
+            if (slots[(size_t) j].beats > 0) return voicings.notes[(size_t) j];
+        }
+        return voicings.notes[(size_t) si];
+    };
 
+    for (int rep = 0; rep < reps; ++rep)
     for (int si = 0; si < (int) slots.size(); ++si)
     {
         const auto& slot = slots[(size_t) si];
@@ -474,7 +556,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
                 if (s.fill != FillNone && stepInBar >= 8 && (st / 16) % fillEvery == fillEvery - 1)
                 {
                     const double so = (! fillNoSwing (s.fill) && stepInBar % 2 == 1) ? s.swing * 0.125 : 0.0;
-                    pianoFill (s.fill, left, stepInBar, st * 0.25 + so, si, s, events);
+                    pianoFill (s.fill, left, nextVoicing (si), stepInBar, st * 0.25 + so, si, s, events);
                 }
                 else
                     emit (hits, skank, ChSkank, 1.0f, st);
@@ -494,7 +576,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
                 if (fillBar)
                 {
                     const double so = (! fillNoSwing (s.fill) && stepInBar % 2 == 1) ? s.swing * 0.125 : 0.0;
-                    pianoFill (s.fill, left, stepInBar, st * 0.25 + so, si, s, events);
+                    pianoFill (s.fill, left, nextVoicing (si), stepInBar, st * 0.25 + so, si, s, events);
                 }
                 else
                 {

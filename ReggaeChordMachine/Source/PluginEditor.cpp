@@ -1092,7 +1092,8 @@ void DubChordsPanel::timerCallback()
     {   // PIANISTA / 1/64 mudaram (pelo clique, por um projeto aberto ou pela automação): redesenha as janelas
         const int key = ((int) proc.apvts.getRawParameterValue ("pianist")->load() * 2
                       + (proc.apvts.getRawParameterValue ("nota64")->load() > 0.5f ? 1 : 0)) * 16
-                      + (int) proc.apvts.getRawParameterValue ("pianoFill")->load();
+                      + (int) proc.apvts.getRawParameterValue ("pianoFill")->load()
+                      + (proc.apvts.getRawParameterValue ("pianoFillEvery")->load() > 0.5f ? 100000 : 0);
         if (key != lastPianistKey) { lastPianistKey = key; repaint (patternArea.getUnion (noteSizeArea()).getUnion (fillArea())); }
     }
     if (midiView) roll.update();
@@ -1482,13 +1483,25 @@ void DubChordsPanel::mouseDown (const juce::MouseEvent& e)
         const int cur = (int) proc.apvts.getRawParameterValue ("pianoFill")->load();
         m.addSectionHeader (juce::String::fromUTF8 ("FILLS  \xc2\xb7  NO FIM DE CADA FRASE DE 4 COMPASSOS (TEMPOS 3 E 4)"));
         for (int f = 0; f < dub::NumFills; ++f)
+        {
+            if (f == dub::FillPuxada) m.addSectionHeader (juce::String::fromUTF8 ("S\xc3\x93 COM OS ACORDES (A FIRULA NA BASE)"));
             m.addItem (f + 1, juce::String (dub::fillName (f)) + "    " + juce::String::fromUTF8 (dub::fillWho (f)), true, f == cur);
+        }
+        m.addSeparator();
+        const bool every8 = proc.apvts.getRawParameterValue ("pianoFillEvery")->load() > 0.5f;
+        m.addItem (1001, "A CADA 4 COMPASSOS", true, ! every8);
+        m.addItem (1002, "A CADA 8 COMPASSOS", true, every8);
         juce::Component::SafePointer<DubChordsPanel> safe (this);
         m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withTargetScreenArea (localAreaToGlobal (fillArea())),
                          [safe] (int r)
                          {
                              if (safe == nullptr || r <= 0) return;
-                             if (auto* prm = safe->proc.apvts.getParameter ("pianoFill"))
+                             if (r >= 1001)
+                             {
+                                 if (auto* prm = safe->proc.apvts.getParameter ("pianoFillEvery"))
+                                     prm->setValueNotifyingHost (r == 1002 ? 1.0f : 0.0f);
+                             }
+                             else if (auto* prm = safe->proc.apvts.getParameter ("pianoFill"))
                                  prm->setValueNotifyingHost (prm->convertTo0to1 ((float) (r - 1)));
                              safe->repaint();
                          });
@@ -1519,8 +1532,16 @@ void DubChordsPanel::paint (juce::Graphics& g)
         g.drawText (n64 ? juce::String ("1/64") : juce::String ("1/32"), r.withTrimmedTop (r.getHeight() * 0.42f), juce::Justification::centred);
         const int fl = juce::jlimit (0, dub::NumFills - 1, (int) proc.apvts.getRawParameterValue ("pianoFill")->load());
         auto fr = fillArea().toFloat();
-        g.setFont (stencil (fl == 0 ? 11.0f : 12.5f, 0.08f));
-        g.drawText (fl == 0 ? juce::String ("SEM") : juce::String (dub::fillName (fl)), fr.withTrimmedTop (fr.getHeight() * 0.42f), juce::Justification::centred);
+        const juce::String fname = fl == 0 ? juce::String ("SEM") : juce::String (dub::fillName (fl));
+        g.setFont (stencil (fname.length() > 7 ? 10.5f : 12.5f, 0.06f));
+        g.drawText (fname, fr.withTrimmedTop (fr.getHeight() * 0.42f), juce::Justification::centred);
+        if (fl != 0)
+        {
+            g.setColour (colours::inkSoft);
+            g.setFont (stencil (8.0f, 0.1f));
+            g.drawText (proc.apvts.getRawParameterValue ("pianoFillEvery")->load() > 0.5f ? "/8" : "/4",
+                        fr.reduced (6.0f, 4.0f), juce::Justification::topRight);
+        }
     }
 
     const auto slots = proc.getSlots();

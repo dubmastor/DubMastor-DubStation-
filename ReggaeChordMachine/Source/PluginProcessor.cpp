@@ -73,6 +73,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
         StringArray fl;
         for (int f = 0; f < dub::NumFills; ++f) fl.add (dub::fillName (f));
         layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoFill", 1 }, "Fill", fl, dub::FillNone));
+        layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoFillEvery", 1 }, "Fill a cada", StringArray { "4 compassos", "8 compassos" }, 0));
     }
     return layout;
 }
@@ -150,6 +151,7 @@ dub::Settings DubChordsProcessor::getSettings() const
     s.noteSize   = param ("nota64") > 0.5f ? dub::NoteSize64 : 0;   // 1/32 (padrão) ou 1/64 ("noteSize" ficou só para projetos antigos)
     s.pianist    = juce::jlimit (0, dub::NumPianists - 1, (int) param ("pianist"));
     s.fill       = juce::jlimit (0, dub::NumFills - 1, (int) param ("pianoFill"));
+    s.fillEvery  = param ("pianoFillEvery") > 0.5f ? 8 : 4;
     s.bubble     = param ("bubble") > 0.5f;
     s.swing      = param ("swing");
     return s;
@@ -471,7 +473,7 @@ juce::String DubChordsProcessor::settingsKey() const
     }
     k << 0 << ',' << (int) param ("center") << ',' << juce::roundToInt (param ("velocity") * 1000.0f) << ','
       << (param ("bubble") > 0.5f ? 1 : 0) << ',' << juce::roundToInt (param ("swing") * 1000.0f)
-      << ',' << (int) param ("pianist") << ',' << (param ("nota64") > 0.5f ? 1 : 0) << ',' << (int) param ("pianoFill");
+      << ',' << (int) param ("pianist") << ',' << (param ("nota64") > 0.5f ? 1 : 0) << ',' << (int) param ("pianoFill") << ',' << (int) param ("pianoFillEvery");
     return k;
 }
 

@@ -95,11 +95,12 @@ int main (int argc, char** argv)
             setP (p.apvts, "machineOn", 1.0f);
             setP (p.apvts, "pianoType", (float) (pn % 7));   // um timbre diferente por pianista (0..6)
             setP (p.getMachine().apvts, "pianist", (float) pn);
-            setP (p.getMachine().apvts, "pianoFill", (float) (8 - pn));   // FILL separado do pianista
+            setP (p.getMachine().apvts, "pianoFill", (float) (6 + pn));   // FILL separado do pianista (7..13: os de acordes)
+            setP (p.getMachine().apvts, "pianoFillEvery", pn % 2 == 0 ? 1.0f : 0.0f);
             setP (p.getMachine().apvts, "nota64", pn % 2 == 0 ? 1.0f : 0.0f);
             bool fin = true;
             const double rms = render (p, 5.0, fin);
-            check (fin && rms > 5.0e-4, "pianista " + juce::String (pn) + " + fill " + juce::String (8 - pn) + " + timbre " + juce::String (pn % 7)
+            check (fin && rms > 5.0e-4, "pianista " + juce::String (pn) + " + fill " + juce::String (6 + pn) + " + timbre " + juce::String (pn % 7)
                                         + " tocam (rms " + juce::String (rms, 5) + ")");
         }
     }

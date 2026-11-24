@@ -137,6 +137,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
     <div class="stepper"><button id="pnDn">◀</button><div class="val" id="pnVal"></div><button id="pnUp">▶</button></div>
     <div class="lbl" style="margin-top:6px">FILL <small>(fim de cada frase de 4 compassos)</small></div>
     <div class="stepper"><button id="flDn">◀</button><div class="val" id="flVal"></div><button id="flUp">▶</button></div>
+    <div class="btns c2"><button class="b" id="fe4">A CADA 4</button><button class="b" id="fe8">A CADA 8</button></div>
     <div class="lbl">DURAÇÃO DAS NOTAS</div>
     <div class="btns c2" id="nsz"><button class="b" id="ns32">1/32 FUSA</button><button class="b" id="ns64">1/64 SEMIFUSA</button></div>
     <div style="margin-top:12px">
@@ -193,7 +194,7 @@ const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 const DEFAULTS = {
   slots: [ { root: 9, quality: 1, dur: 0, inv: -1, on: true }, { root: 2, quality: 1, dur: 0, inv: -1, on: true },
            { root: 4, quality: 1, dur: 0, inv: -1, on: false }, { root: 7, quality: 0, dur: 0, inv: -1, on: false } ],
-  pattern: 0, noteSize: 5, pianist: 0, fill: 0, center: 60, velocity: 80, swing: 0, bubble: false,
+  pattern: 0, noteSize: 5, pianist: 0, fill: 0, fillEvery: 4, center: 60, velocity: 80, swing: 0, bubble: false,
   bpm: 75, pianoLvl: 80, organLvl: 60, reps: 1, mode: 0, octave: 4,
 };
 function load() {
@@ -213,7 +214,7 @@ function slotsForEngine() {
 }
 function settings() {
   return { pattern: st.pattern, centerNote: st.center, velocity: Math.fround(st.velocity / 100),
-           noteSize: st.noteSize === M.NOTE_SIZE_64 ? M.NOTE_SIZE_64 : 0, pianist: st.pianist | 0, fill: st.fill | 0,
+           noteSize: st.noteSize === M.NOTE_SIZE_64 ? M.NOTE_SIZE_64 : 0, pianist: st.pianist | 0, fill: st.fill | 0, fillEvery: st.fillEvery === 8 ? 8 : 4,
            swing: Math.fround(st.swing / 100), bubble: st.bubble };
 }
 let loop = M.buildLoop(slotsForEngine(), settings());
@@ -562,13 +563,16 @@ for (const id of ['export', 'export2']) $(id).onclick = download;
     const p = M.PIANISTS[st.pianist];
     $('pnVal').innerHTML = `<b style="font-size:15px">${st.pianist === 0 ? 'CONTRATEMPO' : p.name}</b><small>${st.pianist === 0 ? '' : p.who.split(' · ')[1]}</small>`;
     const f = M.FILLS[st.fill];
-    $('flVal').innerHTML = `<b style="font-size:15px">${f.name}</b><small>${st.fill === 0 ? '' : f.who}</small>`;
+    $('flVal').innerHTML = `<b style="font-size:15px">${f.name}</b><small>${st.fill === 0 ? '' : (f.chords ? 'SÓ ACORDES · ' : '') + f.who}</small>`;
+    $('fe4').classList.toggle('on', st.fillEvery !== 8); $('fe8').classList.toggle('on', st.fillEvery === 8);
     $('ns32').classList.toggle('on', st.noteSize !== M.NOTE_SIZE_64); $('ns64').classList.toggle('on', st.noteSize === M.NOTE_SIZE_64);
   };
   $('pnDn').onclick = () => { st.pianist = (st.pianist + M.PIANISTS.length - 1) % M.PIANISTS.length; show(); changed(); };
   $('pnUp').onclick = () => { st.pianist = (st.pianist + 1) % M.PIANISTS.length; show(); changed(); };
   $('flDn').onclick = () => { st.fill = (st.fill + M.FILLS.length - 1) % M.FILLS.length; show(); changed(); };
   $('flUp').onclick = () => { st.fill = (st.fill + 1) % M.FILLS.length; show(); changed(); };
+  $('fe4').onclick = () => { st.fillEvery = 4; show(); changed(); };
+  $('fe8').onclick = () => { st.fillEvery = 8; show(); changed(); };
   $('ns32').onclick = () => { st.noteSize = 0; show(); changed(); };
   $('ns64').onclick = () => { st.noteSize = M.NOTE_SIZE_64; show(); changed(); };
   show();

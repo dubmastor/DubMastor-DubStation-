@@ -28,11 +28,11 @@ for (let k = 0; k < 600; k++) {
   }
   scenarios.push({ s: { pattern: 0, centerNote: 48 + Math.floor(rnd() * 25),
     velocity: f32(Math.round(rnd() * 90 + 10) / 100), noteSize: Math.floor(rnd() * 6),
-    swing: f32(Math.round(rnd() * 100) / 100), bubble: rnd() < 0.6 ? 1 : 0, pianist: Math.floor(rnd() * 8), fill: Math.floor(rnd() * 8) }, slots });
+    swing: f32(Math.round(rnd() * 100) / 100), bubble: rnd() < 0.6 ? 1 : 0, pianist: Math.floor(rnd() * 8), fill: Math.floor(rnd() * 14), fillEvery: rnd() < 0.5 ? 4 : 8 }, slots });
 }
 
 const input = scenarios.map(({ s, slots }) =>
-  `${s.pattern} ${s.centerNote} ${s.velocity.toPrecision(9)} ${s.noteSize} ${s.swing.toPrecision(9)} ${s.bubble} ${s.pianist || 0} ${s.fill || 0} | ` +
+  `${s.pattern} ${s.centerNote} ${s.velocity.toPrecision(9)} ${s.noteSize} ${s.swing.toPrecision(9)} ${s.bubble} ${s.pianist || 0} ${s.fill || 0} ${s.fillEvery || 4} | ` +
   slots.map((x) => x.join(' ')).join(' ; ')).join('\n') + '\n';
 const out = execFileSync(dumper, { input, maxBuffer: 1 << 28 }).toString().split('\n');
 

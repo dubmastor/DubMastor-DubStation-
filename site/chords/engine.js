@@ -49,9 +49,16 @@
     { name: 'DOWNIE', who: 'RESPOSTAS SINCOPADAS' },
     { name: 'LYN', who: 'ARPEJO SUBINDO (LOVERS ROCK)' },
     { name: 'STEELY', who: 'SEMICOLCHEIAS DIGITAIS NO 4' },
-    { name: 'LENKY', who: 'STABS NOS "E" E NOS "A"' }];
-  const FILL_NONE = 0, FILL_BECKFORD = 1, FILL_GLADDY = 2, FILL_STERLING = 3, FILL_DOWNIE = 4, FILL_LYN = 5, FILL_STEELY = 6, FILL_LENKY = 7;
-  const fillNoSwing = (f) => f === FILL_STEELY || f === FILL_LENKY;
+    { name: 'LENKY', who: 'STABS NOS "E" E NOS "A"' },
+    { name: 'PUXADA', who: 'O PRÓXIMO ACORDE ADIANTADO NO "A" DO 4', chords: true },
+    { name: 'DOBRADO', who: 'SKANK DOBRADO NO "&" E NO "A" DO 3 E DO 4', chords: true },
+    { name: 'RAJADA', who: '4 ACORDES EM SEMICOLCHEIA NO 4, CRESCENDO', chords: true },
+    { name: 'INVERSOES', who: 'O ACORDE SUBINDO EM INVERSÕES NO 3 E NO 4', chords: true },
+    { name: 'TERCINA', who: 'TERCINA DE ACORDES NO 4', chords: true },
+    { name: 'ARRASTADO', who: 'ACORDE ARRASTADO (ROLADO) NO "&" DO 4', chords: true }];
+  const FILL_NONE = 0, FILL_BECKFORD = 1, FILL_GLADDY = 2, FILL_STERLING = 3, FILL_DOWNIE = 4, FILL_LYN = 5, FILL_STEELY = 6, FILL_LENKY = 7,
+    FILL_PUXADA = 8, FILL_DOBRADO = 9, FILL_RAJADA = 10, FILL_INVERSOES = 11, FILL_TERCINA = 12, FILL_ARRASTADO = 13;
+  const fillNoSwing = (f) => f === FILL_STEELY || f === FILL_LENKY || f === FILL_TERCINA;
   function pianistRecipe(p) {
     const H = (step, vel, part, lenMul) => ({ step, vel: f32(vel), part, lenMul: f32(lenMul) });
     const skank = (v, len) => [H(2, v, 0, len), H(6, v, 0, len), H(10, v, 0, len), H(14, v, 0, len)];
@@ -74,13 +81,50 @@
     }
     return r;
   }
-  function pianoFill(fill, left, stepInBar, start, slot, velocity, events) {
+  function pianoFill(fill, left, nextLeft, stepInBar, start, slot, velocity, noteBeats, events) {
     if (!left.length) return;
     const barEnd = start - (start - Math.floor(start / 4) * 4) + 4;   // nenhuma nota passa do compasso
     const add = (note, len, v) => events.push({ start, length: Math.max(0.03, Math.min(len, barEnd - start - 0.02)), note: clamp(note, 0, 127),
       velocity: clamp(lround(f32(f32(v * velocity) * 127)), 1, 127), channel: ChSkank, slot });
     const n = left.length;
-    if (fill === FILL_BECKFORD) {
+    const vel = (v) => clamp(lround(f32(f32(v * velocity) * 127)), 1, 127);
+    const both = (len, v) => { for (const x of left) { add(x, len, v); add(x + 12, len, v); } };
+    if (fill === FILL_PUXADA) {
+      if (stepInBar === 10 || stepInBar === 14) both(noteBeats, f32(1.0));
+      if (stepInBar === 15) for (const x of (nextLeft.length ? nextLeft : left)) { add(x, 0.3, f32(0.95)); add(x + 12, 0.3, f32(0.95)); }
+    } else if (fill === FILL_DOBRADO) {
+      if (stepInBar === 10 || stepInBar === 11 || stepInBar === 14 || stepInBar === 15) both(0.12, f32(stepInBar % 2 === 0 ? 0.95 : 0.7));
+    } else if (fill === FILL_RAJADA) {
+      if (stepInBar === 10) both(noteBeats, f32(1.0));
+      if (stepInBar >= 12) both(0.1, f32(f32(0.6) + f32(f32(0.13) * (stepInBar - 12))));
+    } else if (fill === FILL_INVERSOES) {
+      if (stepInBar % 2 === 0) {
+        const k = (stepInBar - 8) / 2;
+        const v = left.slice().sort((a, b) => a - b);
+        for (let i = 0; i < k && v.length; i++) { v.push(v[0] + 12); v.shift(); }
+        for (const x of v) add(x + 12, 0.2, f32(f32(0.75) + f32(f32(0.07) * k)));
+      }
+    } else if (fill === FILL_TERCINA) {
+      if (stepInBar === 10) both(noteBeats, f32(1.0));
+      if (stepInBar === 12)
+        for (let t = 0; t < 3; t++)
+          for (const x of left) {
+            const st = start + t / 3.0;
+            events.push({ start: st, length: Math.max(0.03, Math.min(0.22, barEnd - st - 0.02)), note: clamp(x + 12, 0, 127),
+              velocity: clamp(lround(f32(f32(f32(f32(0.8) + f32(f32(0.1) * t)) * velocity) * 127)), 1, 127), channel: ChSkank, slot });
+          }
+    } else if (fill === FILL_ARRASTADO) {
+      if (stepInBar === 10) both(noteBeats, f32(1.0));
+      if (stepInBar === 14) {
+        const v = [];
+        for (const x of left) { v.push(x); v.push(x + 12); }
+        v.sort((a, b) => a - b);
+        for (let i = 0; i < v.length; i++) {
+          const st = start + 0.03 * i;
+          events.push({ start: st, length: Math.max(0.03, barEnd - st - 0.02), note: clamp(v[i], 0, 127), velocity: vel(f32(0.85)), channel: ChSkank, slot });
+        }
+      }
+    } else if (fill === FILL_BECKFORD) {
       if (stepInBar % 2 === 0) for (const x of left) add(x + 12, 0.2, f32(f32(0.7) + f32(f32(0.1) * ((stepInBar - 8) / 2))));
     } else if (fill === FILL_STERLING) {
       if (stepInBar === 10) for (const x of left) add(x + 12, 1.4, f32(0.85));
@@ -206,10 +250,16 @@
     let totalBeats = 0;
     for (const sl of slots) if (sl.beats > 0) totalBeats += sl.beats;
     const loopBars = Math.max(1, lround(Math.ceil(totalBeats / 4)));
-    const fillEvery = Math.min(4, loopBars);
     const pianist = clamp((s.pianist || 0) | 0, 0, PIANISTS.length - 1);
     const rec = pianistRecipe(pianist);
     const fill = clamp((s.fill || 0) | 0, 0, FILLS.length - 1);
+    // frase de 4 ou 8 compassos: o loop curto se repete até a frase (igual ao DubEngine.h)
+    const phrase = s.fillEvery === 8 ? 8 : 4;
+    const wholeBars = Math.abs(totalBeats % 4) < 1e-9;
+    const reps = (fill !== FILL_NONE && wholeBars && loopBars < phrase && phrase % loopBars === 0) ? phrase / loopBars : 1;
+    const fillEvery = Math.min(phrase, loopBars * reps);
+    const nextVoicing = (si) => { for (let k = 1; k <= slots.length; k++) { const j = (si + k) % slots.length; if (slots[j].beats > 0) return voicings.notes[j]; } return voicings.notes[si]; };
+    for (let rep = 0; rep < reps; rep++)
     for (let si = 0; si < slots.length; si++) {
       const slot = slots[si];
       if (slot.beats <= 0) continue;
@@ -224,7 +274,7 @@
         const fillBar = fill !== FILL_NONE && stepInBar >= 8 && Math.floor(st / 16) % fillEvery === fillEvery - 1;
         if (fillBar) {
           const fo = (!fillNoSwing(fill) && stepInBar % 2 === 1) ? swing * 0.125 : 0.0;
-          pianoFill(fill, left, stepInBar, st * 0.25 + fo, si, velocity, events);
+          pianoFill(fill, left, nextVoicing(si), stepInBar, st * 0.25 + fo, si, velocity, noteBeats, events);
         } else if (pianist !== 0) {
           const bar = Math.floor(st / 16);
           const so = (!rec.noSwing && stepInBar % 2 === 1) ? swing * 0.125 : 0.0;
