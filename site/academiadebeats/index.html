@@ -16,6 +16,7 @@ p{max-width:65ch}
 .card h2{margin:0 0 6px;font-size:24px}
 .card small{opacity:.7}
 .btn{display:inline-block;background:#2f9e44;color:#fff;text-decoration:none;border-radius:8px;padding:12px 18px;margin-top:10px;font-weight:700}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.dl a{background:#1b1b1b;color:#fff;text-decoration:none;border-radius:8px;padding:10px 14px;font-size:14px}.small{font-size:13px;opacity:.75}
 .back{color:var(--ink);text-decoration:none;font-size:14px}
 </style>
 </head>
@@ -25,9 +26,17 @@ p{max-width:65ch}
 <h1>Projetos Academia de Beats</h1>
 <p>Ferramentas do DubMastor feitas para a linha da Academia de Beats. É um projeto separado da coleção Dub Station.</p>
 <div class="card">
-  <h2>Monstro Machine MM-2500 <small>0.1 · em teste</small></h2>
+  <h2>Monstro Machine MM-2500 <small>1.0</small></h2>
   <p>Drum machine no estilo MPC2500 com os kits dos produtores do Monstro.zip (Vol. 1 a 4): 16 pads, 4 sequências de 16 passos, grooves por estilo, ficha de cada produtor e carregamento dos samples reais do kit.</p>
+  <p>Plugin VST3 (Windows e Mac), AU (Logic, GarageBand) e standalone. Funciona no Cubase, FL Studio, Ableton Live, Studio One, Reaper, Logic, Bitwig e nas outras DAWs que abrem VST3 ou AU. Pads nas notas 36–51; segue o andamento e o play da DAW.</p>
   <a class="btn" href="monstromachine/">▶ Tocar no celular / navegador</a>
+  <div class="dl">
+    <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MM-2500-1.0/MM-2500-Windows-Instalador.exe">⬇ Windows (instalador)</a>
+    <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MM-2500-1.0/MM-2500-macOS-Instalador.pkg">⬇ macOS (instalador)</a>
+    <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MM-2500-1.0/MM-2500-Windows.zip">Windows .zip</a>
+    <a href="https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MM-2500-1.0/MM-2500-macOS.zip">macOS .zip</a>
+  </div>
+  <p class="small">Windows: o instalador coloca o plugin em C:\Program Files\Common Files\VST3. Mac: o .pkg instala em /Library/Audio/Plug-Ins (VST3 e Components). Depois, peça para a DAW procurar plugins de novo.</p>
 </div>
 </div>
 </body>

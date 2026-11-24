@@ -213,3 +213,9 @@ O **instalador completo** (todos os plugins) é feito pelo `build-pacote.yml`; o
 Todos em C++ / JUCE 8. Os códigos internos (`PLUGIN_CODE`, fabricante `Dblb` e `BUNDLE_ID`) não mudaram com os nomes novos, então projetos antigos do Cubase continuam abrindo os plugins.
 
 Cada plugin é compilado e validado sozinho quando a pasta dele muda. A validação usa o **pluginval** (carrega o plugin, processa áudio, testa estado e interface) e, no Mac, o **auval** da Apple. A cada push na `main` que mexa num plugin, o build dele publica (ou atualiza) a release `SIGLA-versão`, sem virar a "latest".
+
+## Outros projetos — Academia de Beats
+
+Projetos separados da Dub Station, na pasta [`AcademiaDeBeats/`](AcademiaDeBeats/) e no site em [/academiadebeats/](https://dubmastor.github.io/DubMastor-DubStation-/academiadebeats/):
+
+- **Monstro Machine MM-2500 1.0** — drum machine estilo MPC2500 com os kits do Monstro.zip · [Detalhes](AcademiaDeBeats/MonstroMachine/)
