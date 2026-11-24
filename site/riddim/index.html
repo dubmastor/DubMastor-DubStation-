@@ -1097,7 +1097,7 @@ const seSec=()=>Math.min(3.8,SET[SE.time]*60/H.bpm);
 function seUi(){$('sirecho').classList.toggle('bypassed',!SE.on);$('seby').textContent=SE.on?'Ligado':'Desligado';$('seby').classList.toggle('on',SE.on)}
 function seApply(){seUi();if(!seIn)return;const t=ctx.currentTime;seDl.delayTime.setTargetAtTime(seSec(),t,.05);seFb.gain.value=SE.fb;seLp.frequency.value=700*7**SE.tone;seOut.gain.value=SE.on?SE.mix:0;seIn.gain.value=SE.on?1:0;seWowG.gain.value=.0025*SE.wow}
 function seBuild(){sirOut=ctx.createGain();sirOut.connect(bus);seIn=ctx.createGain();seDl=ctx.createDelay(4);seFb=ctx.createGain();seLp=ctx.createBiquadFilter();seLp.type='lowpass';
- const hp2=ctx.createBiquadFilter();hp2.type='highpass';hp2.frequency.value=180;const sat=ctx.createWaveShaper();sat.curve=curve(0,.25);seOut=ctx.createGain();
+ const hp2=ctx.createBiquadFilter();hp2.type='highpass';hp2.frequency.value=180;const sat=ctx.createWaveShaper();{const n=1024,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=Math.tanh(1.3*x)/1.3}sat.curve=c}/* saturação de fita sem ganho: o eco vai sumindo */seOut=ctx.createGain();
  seWow=ctx.createOscillator();seWow.frequency.value=.6;seWowG=ctx.createGain();seWow.connect(seWowG);seWowG.connect(seDl.delayTime);seWow.start();
  sirOut.connect(seIn);seIn.connect(seDl);seDl.connect(seLp);seLp.connect(hp2);hp2.connect(sat);sat.connect(seFb);seFb.connect(seDl);sat.connect(seOut);seOut.connect(bus);seApply()}
 const SMODES={'Clássica':['square','triangle',.5],'Laser':['sawtooth','sawtooth',.8],'Whoop':['sine','sine',.6],'Alarme':['square','square',.35]};
