@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monstro Machine MM-2500 v0.1 (teste) — Academia de Beats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* VOICE: hardware de estúdio, sério e pesado, gíria de beatmaker na tela
+   IDEA: um sampler de pads anos 2000 (estilo MPC2500) carregado com o Monstro.zip
+   PICTURE: o próprio aparelho — LCD retroiluminado, 16 pads de borracha, transporte
+   COLOUR: chassi grafite, LCD verde-água, pads cinza, acento vermelho de REC
+   TYPE: Chakra Petch (serigrafia) + VT323 (LCD) */
+:root{color-scheme:light dark;--bg:light-dark(#d9d6cf,#141414);--body:#3a3b3d;--body2:#2c2d2f;--edge:#55575a;--silk:#e8e6e0;--lcd:#9fd8c6;--lcd2:#7cc2ad;--lcdink:#0e2a24;--pad:#6b6d70;--padhi:#8a8c90;--red:#e0402f;--amber:#ffb020;--ink:light-dark(#1b1b1b,#eee)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Chakra Petch",system-ui,sans-serif;overflow-x:clip}
+button,select,input{font:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:16px max(2vw,10px) 40px}
+.mpc{background:linear-gradient(180deg,#46484b,var(--body) 30%,var(--body2));border-radius:18px;border:1px solid #000;box-shadow:0 2px 0 #6a6c70 inset,0 20px 40px #0008;padding:16px;color:var(--silk)}
+.top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #0006;padding-bottom:10px;margin-bottom:12px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand b{font-size:clamp(20px,3vw,28px);letter-spacing:.02em}
+.brand span{color:#b8b6b0;font-size:13px}
+.logos{display:flex;gap:8px;align-items:center}
+.logo{height:46px;min-width:90px;max-width:170px;border:1px dashed #777;border-radius:8px;display:grid;place-items:center;font-size:11px;color:#aaa;cursor:pointer;padding:4px 8px;text-align:center;background:#0002}
+.logo img{max-height:38px;max-width:150px;display:block}
+.logo.has{border:0;background:none}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px}
+@media(max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.lcdbox{background:#111;border-radius:10px;padding:10px;box-shadow:0 0 0 2px #000 inset}
+.lcd{background:radial-gradient(ellipse at 40% 30%,var(--lcd),var(--lcd2));color:var(--lcdink);font-family:VT323,monospace;font-size:20px;line-height:1.1;border-radius:4px;padding:8px 10px;min-height:190px;box-shadow:0 0 18px #9fd8c655 inset}
+.lcd .row{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;overflow:hidden}
+.lcd .inv{background:var(--lcdink);color:var(--lcd);padding:0 4px}
+.lcd .big{font-size:30px}
+.mini{display:grid;grid-template-columns:repeat(16,1fr);gap:2px;margin-top:6px}
+.mini i{height:6px;background:#0e2a2422;display:block}
+.mini i.on{background:var(--lcdink)}
+.mini i.now{outline:1px solid var(--lcdink)}
+.fkeys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:8px}
+.btn{background:linear-gradient(#5d5f62,#46484b);color:var(--silk);border:1px solid #111;border-radius:6px;min-height:40px;padding:4px 6px;font-size:12px;cursor:pointer;box-shadow:0 2px 0 #111}
+.btn:active{transform:translateY(1px);box-shadow:0 1px 0 #111}
+.btn.on{background:linear-gradient(#7a5,#584);color:#fff}
+.btn.rec.on{background:linear-gradient(#f55,#c22)}
+.btn:focus-visible,.pad:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.sel{background:#1c1d1f;color:var(--silk);border:1px solid #000;border-radius:6px;min-height:40px;padding:4px 8px;font-size:15px;width:100%}
+.label{font-size:11px;color:#b8b6b0;margin:10px 0 4px}
+.transport{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px}
+.transport .btn{min-height:46px;font-size:13px}
+.knobs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.knob{background:#0003;border-radius:8px;padding:6px;text-align:center;font-size:11px}
+.knob input{width:100%;accent-color:var(--amber)}
+.knob output{display:block;font-family:VT323,monospace;font-size:18px;color:var(--amber)}
+.fx{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.fxu{background:#0003;border-radius:8px;padding:8px}
+.fxu header{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12px}
+.fxu .btn{min-height:32px}
+.fxu label{display:block;font-size:11px;color:#bbb;margin-top:4px}
+.fxu input{width:100%;accent-color:var(--amber)}
+.pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:#1f2022;padding:12px;border-radius:12px;box-shadow:0 0 0 1px #000 inset}
+.pad{aspect-ratio:1;border-radius:9px;border:1px solid #111;background:radial-gradient(circle at 50% 35%,var(--padhi),var(--pad));box-shadow:0 4px 0 #111,0 0 0 3px #2a2b2d;color:#1a1a1a;font-size:11px;font-weight:700;display:flex;flex-direction:column;justify-content:space-between;padding:6px;cursor:pointer;touch-action:manipulation;user-select:none;text-align:left}
+.pad small{font-weight:500;color:#2b2b2b;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pad.hit{background:radial-gradient(circle at 50% 35%,#ffd27a,var(--amber));transform:translateY(2px);box-shadow:0 2px 0 #111,0 0 18px var(--amber)}
+.pad.cur{box-shadow:0 4px 0 #111,0 0 0 3px var(--red)}
+.pad.user{background:radial-gradient(circle at 50% 35%,#9bb,#688)}
+.banks{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.steps{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:4px;margin-top:12px}
+.st{height:34px;border-radius:4px;border:1px solid #000;background:#4b4d50;cursor:pointer;padding:0}
+.st:nth-child(4n+1){background:#5a5c60}
+.st.on{background:var(--amber)}.st.acc{background:#ff7a1a}
+.st.now{box-shadow:0 0 0 2px #fff inset}
+@media(max-width:600px){.steps{grid-template-columns:repeat(8,minmax(0,1fr))}.st{height:38px}.fkeys{grid-template-columns:repeat(3,minmax(0,1fr))}.knobs{grid-template-columns:repeat(2,minmax(0,1fr))}.fx{grid-template-columns:minmax(0,1fr)}}
+.stephead{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:12px;color:#ccc}
+.info{background:var(--silk);color:#1b1b1b;border-radius:14px;margin-top:16px;padding:18px clamp(14px,3vw,28px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px}
+@media(max-width:820px){.info{grid-template-columns:minmax(0,1fr)}}
+.info h2{font-size:clamp(26px,4vw,40px);line-height:1.05;margin:0 0 6px;text-wrap:balance}
+.info .tag{display:inline-block;background:#1b1b1b;color:var(--silk);border-radius:4px;padding:2px 8px;font-size:12px;margin:0 6px 6px 0}
+.info p{margin:8px 0;max-width:68ch}
+.info ul{margin:6px 0;padding-left:18px;columns:2;font-size:14px}
+.info .note{font-size:13px;color:#555}
+.about{margin-top:16px;color:var(--ink);font-size:14px}
+.about details{background:light-dark(#fff8,#fff1);border-radius:10px;padding:10px 14px;margin-top:8px}
+.about summary{cursor:pointer;font-weight:700}
+.hidden{display:none}
+.back{display:inline-block;color:var(--ink);text-decoration:none;font-size:14px;margin:0 0 10px;padding:8px 0}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){.pad.hit{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← Projetos Academia de Beats</a>
+<div class="mpc">
+  <div class="top">
+    <div class="brand"><b>MONSTRO MACHINE</b><span>MM-2500 · DubMastor · timbres Monstro.zip</span></div>
+    <div class="logos">
+      <div class="logo" id="logoA" title="Toque para carregar o logo da Academia de Beats">Logo<br>Academia de Beats</div>
+      <div class="logo" id="logoM" title="Toque para carregar o logo do Monstro.zip">Logo<br>Monstro.zip</div>
+      <input type="file" id="logoFile" accept="image/*" class="hidden">
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="lcdbox">
+        <div class="lcd" id="lcd"></div>
+        <div class="fkeys">
+          <button class="btn" id="f1">VOL −</button>
+          <button class="btn" id="f2">VOL +</button>
+          <button class="btn" id="f3">KIT ◀</button>
+          <button class="btn" id="f4">KIT ▶</button>
+          <button class="btn" id="f5">ESTILO</button>
+          <button class="btn" id="f6">LIMPAR</button>
+        </div>
+      </div>
+
+      <div class="label">Kit do Monstro (produtor)</div>
+      <select class="sel" id="kitSel"></select>
+
+      <div class="transport">
+        <button class="btn rec" id="rec">● REC</button>
+        <button class="btn" id="play">▶ PLAY</button>
+        <button class="btn" id="stop">■ STOP</button>
+        <button class="btn" id="tap">TAP</button>
+        <button class="btn" id="undo">UNDO</button>
+      </div>
+
+      <div class="knobs">
+        <div class="knob">BPM<input type="range" id="bpm" min="60" max="180" value="140"><output id="bpmO"></output></div>
+        <div class="knob">SWING<input type="range" id="swing" min="50" max="75" value="54"><output id="swO"></output></div>
+        <div class="knob">PAD TUNE<input type="range" id="tune" min="-12" max="12" value="0"><output id="tuO"></output></div>
+        <div class="knob">PAD DECAY<input type="range" id="dec" min="25" max="200" value="100"><output id="deO"></output></div>
+      </div>
+
+      <div class="fx">
+        <div class="fxu">
+          <header><span>SATURADOR</span><button class="btn" id="satB">BYPASS</button></header>
+          <label>Drive <input type="range" id="satD" min="0" max="100" value="35"></label>
+        </div>
+        <div class="fxu">
+          <header><span>TAPE ECHO</span><button class="btn" id="echoB">BYPASS</button></header>
+          <label>Tempo (passos) <input type="range" id="echoT" min="1" max="8" value="3"></label>
+          <label>Feedback <input type="range" id="echoF" min="0" max="85" value="45"></label>
+          <label>Mix <input type="range" id="echoM" min="0" max="100" value="30"></label>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="banks">
+        <button class="btn on" data-pat="0">SEQ A</button>
+        <button class="btn" data-pat="1">SEQ B</button>
+        <button class="btn" data-pat="2">SEQ C</button>
+        <button class="btn" data-pat="3">SEQ D</button>
+        <button class="btn" id="loadKit">CARREGAR PASTA</button>
+        <button class="btn" id="loadPad">SAMPLE NO PAD</button>
+        <input type="file" id="dirIn" webkitdirectory multiple class="hidden">
+        <input type="file" id="padIn" accept="audio/*" class="hidden">
+      </div>
+      <div class="pads" id="pads"></div>
+      <div class="stephead"><span id="stepLbl"></span><span>toque segura = acento</span></div>
+      <div class="steps" id="steps"></div>
+      <div class="banks" style="margin-top:10px">
+        <button class="btn" id="midi" draggable="true">⇩ ARRASTAR MIDI</button>
+        <button class="btn" id="copyMidi">COPIAR PADRÃO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="info" id="info"></section>
+
+<div class="about">
+  <details open><summary>Sobre o Monstro.zip e a Academia de Beats</summary>
+    <p>O <b>Monstro.zip</b> é a série de packs da Academia de Beats com drum kits e sample packs de beatmakers da cena brasileira, lançados em volumes com licenças limitadas. O Vol. 3 reuniu 18 produtores e 11 drum kits inéditos, com mais de 1000 timbres e harmonias royalty free; o Vol. 4 trouxe 9 drum kits inéditos, mais de 1000 timbres e um bônus de melodias (Monstro Secret Melodies), lançado com a Batalha do Monstro, uma batalha de beats feita com um free pack.</p>
+    <p>A <b>Academia de Beats</b> é uma escola online de produção musical (trilhas de Produção, Mixagem e Masterização e Business e Carreira, com masterclasses e dezenas de professores, como Caio Passos, Deekapz, Blakbone, Chiocki, Nagalli, DJ Oreia e Attlanta). A Beatmaker Store é um projeto dela.</p>
+    <p class="note">Os sons tocados aqui são sintetizados no estilo de cada kit. Para tocar os timbres reais, use <b>CARREGAR PASTA</b> e escolha a pasta descompactada do kit: os arquivos são distribuídos nos pads pelo nome (kick, snare, clap, 808, hat, perc, rim, crash, fx, vox).</p>
+  </details>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const VERSION = '0.1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1800)};
+const store={get(k,d){try{const v=localStorage.getItem('mm2500_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('mm2500_'+k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- KITS (pesquisa: páginas da Academia de Beats / Beatmaker Store) ---------- */
+const K=(vol,name,style,bpm,credits,bio,contents)=>({vol,name,style,bpm,credits,bio,contents});
+const KITS=[
+K(1,'DubMastor','reggae',80,['Adonai','Cidade Verde Sounds','Costa Gold','DJ Cia','Cacife Clandestino'],'Apresentado pela Academia como o monstro do reggae e mestre do DJ Coala. O kit mistura timbres modernos com os sons das próprias produções de reggae dele.',['57 drum fills','31 tons','5 cymbals','78 hihats','81 kicks','45 percs','3 shakers','338 snares','40 efeitos']),
+K(1,'Nox','trap',140,['Matuê (DJ)','Predella','Tati Zaqui','Welisson','Kant','Bivolt','Costa Gold'],'Produtor e DJ do Matuê. O kit vem com bônus de loops de bateria e melodias.',['34 808s','6 claps','19 cymbals','11 hihats','10 kicks','12 percs','11 vocal chops','8 snares','19 efeitos']),
+K(1,'Neo Beats','trap',138,['MC Poze do Rodo','Xamã','Haikaiss','Borges','Agnes Nunes','Sidoka','Krawk'],'Kit com timbres usados nas próprias produções dele.',['8 808s','10 claps','11 cymbals','10 hihats','10 kicks','10 snares','20 efeitos']),
+K(1,'Ecologyk','trap',140,['Matuê','Haikaiss','Costa Gold','Konai','Diego Thug','MC Guime','Negra Li','Jade Baraldo'],'Paulo Henrique Castro, DJ e produtor na cena brasileira desde 2009, com milhões de streams no Spotify.',[]),
+K(1,'Pedro Lotto','trap',142,['Veigh','Vulgo FK','MC PH','Orochi'],'Produtor de trap com créditos em faixas como "Ballena" (Vulgo FK, MC PH, Veigh) e "Mesma História" (Orochi).',[]),
+K(1,'Skeeter','trap',140,[],'Kit listado na coleção Monstro da Beatmaker Store.',[]),
+K(2,'André Nine','funk',130,['MC Hariel','Kawe','Costa Gold','MC Ryan SP'],'Seleção de timbres usados nas produções dele, com bônus misterioso.',['13 808s','12 claps','7 cymbals','26 hihats','12 kicks','16 percs','15 snares']),
+K(2,'DogDu Beats','trap',140,['Sidoka','Zemaru','Chris MC'],'Timbres das produções dele, com efeitos de vox exclusivos de bônus.',['7 808s','7 claps','4 cymbals','7 hihats','8 kicks','8 percs','7 snares','FX de vox']),
+K(2,'DJ Coala','boombap',90,['Sidoka','RZO','Qualy','Tribo da Periferia'],'Produtor da escola rap/boom bap, aluno do DubMastor. Kit com bônus de efeitos de voz e FX.',['12 808s + 5 basses','11 claps','7 cymbals','10 hihats','10 kicks','15 percs','12 snares']),
+K(2,'Caio Passos','funk',130,['MC Hariel','Yunk Vino','Hyperanhas','MC Daniel','MC Pedrinho','Felp 22'],'Professor da Academia de Beats. O kit tem baterias de funk, vox e loops exclusivos.',['9 808s','4 claps','6 cymbals','6 hihats','6 kicks','21 percs','2 rimshots','19 efeitos de voz','4 snares']),
+K(2,'Chiocki','trap',145,['Kant','NOG','Spinard'],'Professor da Academia de Beats. São 145 timbres selecionados, incluindo chants, drum fills, open hats, shakers e snaps.',['11 808s','11 chants','10 claps','10 cymbals','10 drum fills','10 FX','10 hihats','10 kicks','10 open hats']),
+K(2,'Robert Beats','trap',140,[],'Kit do Vol. 2. Há pouca informação pública sobre os créditos dele.',[]),
+K(2,'DJ Caíque','funk',130,[],'Kit do Vol. 2. Há pouca informação pública sobre os créditos dele.',[]),
+K(3,'Chris Beats','trap',140,['Filipe Ret','L7nnon','MC Cabelinho','MC Maneirinho','Hyperanhas','Tz da Coronel'],'Bônus com os timbres usados em "Corte Americano" (Filipe Ret e L7nnon).',['12 808s','3 basses','11 claps','2 cymbals','7 hihats','4 kicks','6 one shots','6 percs']),
+K(3,'Portugal No Beat','trap',142,['Filipe Ret','Jovem Dex','Greg Ferreira','Gaab'],'Pack de timbres das produções dele.',['8 808s','8 claps','8 cymbals','8 hihats','6 kicks','8 percs','4 rimshots','10 snares']),
+K(3,'Kouth','trap',140,['Derek','UCLÃ','Lil Ivy','Denov','MC Igu','VK Mac','Kweller'],'Beatmaker com kit de 8 timbres por categoria.',['8 808s','8 claps','8 cymbals','8 hihats','8 kicks','8 percs','8 rimshots','8 snares','8 efeitos']),
+K(3,'Jess','trap',140,['Orochi','Bin','PL Quest','Borges'],'Pack compacto com basses de ambiência.',['4 808s','4 basses','5 claps','2 cymbals','5 hihats','5 kicks','5 rimshots','5 snares']),
+K(3,'Deekapz','funk',130,['festivais: Primavera Sound, Lollapalooza, The Town'],'Dupla de produtores (Matheus Henrique e Paulo Vitor) que mistura funk, trap e música brasileira. Criaram a festa gratuita Deekapz 0800 e dão aula na Academia.',[]),
+K(3,'Blakbone','drill',142,[],'Professor da Academia de Beats. Há pouca informação pública sobre os créditos dele.',[]),
+K(3,'DJ Coala Vol.3','boombap',92,['Sidoka','RZO','Qualy','Tribo da Periferia'],'Segundo kit do DJ Coala na série.',[]),
+K(3,'Dallass','trap',140,[],'Kit do Vol. 3. Há pouca informação pública sobre os créditos dele.',[]),
+K(3,'Celo','trap',140,['Leozin'],'Kit do Vol. 3. Aparece como Celo1st em faixas do Leozin.',[]),
+K(3,'Peunubeat','trap',140,[],'Kit do Vol. 3. Há pouca informação pública sobre os créditos dele.',[]),
+K(3,'Tibery','trap',140,[],'Kit do Vol. 3. Há pouca informação pública sobre os créditos dele.',[]),
+K(4,'Nagalli','trap',140,['L7nnon','Veigh','MC Cabelinho','Kayblack','Vulgo FK'],'André Nagalli de Oliveira, de Piracicaba (SP). Sócio-fundador e diretor musical da Supernova Entertainment. Lançou o álbum "Magic Show" em 2024 e é apontado como o produtor de rap mais ouvido do Brasil. Também dá aula na Academia.',[]),
+K(4,'Neckklace','trap',140,['Nagalli (Magic Show)','G.A','MC Luanna','Niink'],'Coprodutor de "Serenata", do álbum "Magic Show" do Nagalli.',[]),
+K(4,'DJ Oreia','funk',130,[],'DJ e produtor, professor da Academia de Beats.',[]),
+K(4,'Kotim','funk',130,['Mc Don Juan'],'Artista e produtor de "Quem vai patrocinar?", com participação em "Sereia me perdoa" (Mc Don Juan).',[]),
+K(4,'DJ Win','funk',130,[],'Kit do Vol. 4. Há pouca informação pública sobre os créditos dele.',[]),
+K(4,'Cheek','drill',142,[],'Kit do Vol. 4. Há pouca informação pública sobre os créditos dele.',[]),
+K(4,'DJ Coala Vol.4','boombap',90,['Sidoka','RZO','Qualy'],'Terceiro kit do DJ Coala na série.',[]),
+K(4,'Attlanta','trap',140,[],'Produtora e professora da Academia de Beats. Foi destaque na série "O Beat Delas" da Rolling Stone Brasil, sobre mulheres produtoras.',[]),
+K(4,'Fepache','trap',140,['Vulgo FK','MC PH','Veigh'],'Produtor com crédito em "Ballena".',[])
+];
+const STYLES={reggae:'Reggae Steppers',trap:'Trap',boombap:'Boom Bap',funk:'Funk',drill:'Drill'};
+
+/* ---------- PADS ---------- */
+const PADS=['KICK','KICK 2','SNARE','CLAP','RIM','HH FECH','HH ABER','CRASH','PERC 1','PERC 2','PERC 3','SHAKER','808','808 SLIDE','FX','VOX'];
+const MIDI_NOTES=[36,35,38,39,37,42,46,49,63,64,62,70,34,33,55,54];
+
+/* ---------- caráter do kit (semente pelo nome) ---------- */
+const hash=s=>{let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0};
+const rng=seed=>()=>((seed=Math.imul(seed^seed>>>15,seed|1)+0x6D2B79F5|0,((seed^seed>>>7)>>>0)%10000)/10000);
+function charOf(k){const r=rng(hash(k.name));const s=k.style;return{
+  kStart:s==='reggae'?120+r()*40:150+r()*90,kEnd:s==='boombap'?48+r()*10:38+r()*14,kDec:s==='reggae'?.35+r()*.2:s==='boombap'?.28+r()*.15:.45+r()*.3,kClick:.2+r()*.6,
+  bass:[31,33,34,36,29,28][Math.floor(r()*6)],bDec:s==='drill'?1.6:.7+r()*1.1,bDrive:s==='reggae'?.1:.2+r()*.8,
+  sTone:160+r()*120,sNoise:.6+r()*.5,sDec:s==='reggae'?.12+r()*.08:.16+r()*.12,sBand:1500+r()*3000,
+  hp:6000+r()*3500,ohDec:.25+r()*.35,perc:[220,280,330,400,180][Math.floor(r()*5)],vox:[330,392,440,494,262][Math.floor(r()*5)],fx:r()}}
+
+/* ---------- ÁUDIO ---------- */
+let ac,master,dry,satNode,satIn,echoIn,delay,fb,wet,noiseBuf;
+const fx={sat:false,echo:false};
+function curve(a){const n=1024,c=new Float32Array(n),k=a*40+1;for(let i=0;i<n;i++){const x=i/n*2-1;c[i]=Math.tanh(k*x)/Math.tanh(k)}return c}
+function initAudio(){if(ac)return;ac=new (window.AudioContext||window.webkitAudioContext)();
+  master=ac.createGain();master.gain.value=.8;
+  const comp=ac.createDynamicsCompressor();comp.threshold.value=-10;comp.ratio.value=4;
+  satIn=ac.createGain();satNode=ac.createWaveShaper();satNode.curve=curve(.35);satNode.oversample='2x';
+  dry=ac.createGain();echoIn=ac.createGain();delay=ac.createDelay(3);fb=ac.createGain();wet=ac.createGain();
+  const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;
+  master.connect(satIn);routeSat();
+  dry.connect(comp);dry.connect(echoIn);echoIn.connect(delay);delay.connect(lp);lp.connect(fb);fb.connect(delay);lp.connect(wet);wet.connect(comp);
+  comp.connect(ac.destination);
+  noiseBuf=ac.createBuffer(1,ac.sampleRate,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  updFx()}
+function routeSat(){satIn.disconnect();satNode.disconnect();if(fx.sat){satIn.connect(satNode);satNode.connect(dry)}else satIn.connect(dry)}
+function updFx(){if(!ac)return;satNode.curve=curve($('#satD').value/100);routeSat();
+  const stepDur=60/state.bpm/4;delay.delayTime.setTargetAtTime(Math.min(2.9,stepDur*$('#echoT').value),ac.currentTime,.05);
+  fb.gain.value=$('#echoF').value/100;wet.gain.value=fx.echo?$('#echoM').value/100:0;echoIn.gain.value=fx.echo?1:0}
+
+const env=(g,t,a,peak,dec)=>{g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+dec)};
+function noise(t,dur,type,freq,q,peak,dec,out){const s=ac.createBufferSource();s.buffer=noiseBuf;const f=ac.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q||.7;const g=ac.createGain();env(g,t,.001,peak,dec);s.connect(f);f.connect(g);g.connect(out);s.start(t);s.stop(t+dur)}
+function tone(t,type,f0,f1,sweep,peak,dec,out){const o=ac.createOscillator();o.type=type;o.frequency.setValueAtTime(f0,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+sweep);const g=ac.createGain();env(g,t,.002,peak,dec);o.connect(g);g.connect(out);o.start(t);o.stop(t+dec+.05);return o}
+const mtof=m=>440*2**((m-69)/12);
+
+function play(i,t,vel){initAudio();t=t||ac.currentTime;vel=vel||.8;
+  const p=state.ch,tune=2**(state.tune[i]/12),dk=state.dec[i]/100;
+  const out=ac.createGain();out.gain.value=vel;out.connect(master);
+  if(state.samples[i]){const s=ac.createBufferSource();s.buffer=state.samples[i].buf;s.playbackRate.value=tune;const g=ac.createGain();g.gain.setValueAtTime(1,t);g.gain.setTargetAtTime(0,t+s.buffer.duration*dk*.9,.03);s.connect(g);g.connect(out);s.start(t);return}
+  switch(i){
+  case 0:tone(t,'sine',p.kStart*tune,p.kEnd*tune,.07,1,p.kDec*dk,out);noise(t,.02,'highpass',3000,.7,p.kClick*.5,.015,out);break;
+  case 1:tone(t,'sine',p.kStart*1.2*tune,p.kEnd*1.3*tune,.04,.9,p.kDec*.6*dk,out);tone(t,'triangle',900,120,.02,.4,.03,out);break;
+  case 2:tone(t,'triangle',p.sTone*tune,p.sTone*.8*tune,.05,.6,.1*dk,out);noise(t,.5,'bandpass',p.sBand,.8,p.sNoise,p.sDec*dk,out);break;
+  case 3:[0,.011,.022].forEach(d=>noise(t+d,.05,'bandpass',1200*tune,1.2,.9,.03,out));noise(t+.03,.4,'bandpass',1100*tune,1,.7,.16*dk,out);break;
+  case 4:tone(t,'square',1650*tune,null,0,.3,.035*dk,out);tone(t,'triangle',470*tune,null,0,.4,.05*dk,out);break;
+  case 5:noise(t,.1,'highpass',p.hp*tune,.7,.45,.035*dk,out);break;
+  case 6:noise(t,1,'highpass',p.hp*.9*tune,.7,.4,p.ohDec*dk,out);break;
+  case 7:noise(t,2,'highpass',4500*tune,.5,.45,1.2*dk,out);[1,1.48,1.93].forEach(m=>tone(t,'square',540*m*tune,null,0,.04,1*dk,out));break;
+  case 8:tone(t,'sine',p.perc*tune,p.perc*.85*tune,.05,.7,.18*dk,out);break;
+  case 9:tone(t,'sine',p.perc*1.5*tune,p.perc*1.3*tune,.04,.6,.12*dk,out);noise(t,.02,'bandpass',2500,1,.2,.01,out);break;
+  case 10:tone(t,'triangle',p.perc*3*tune,null,0,.5,.05*dk,out);break;
+  case 11:{const s=ac.createBufferSource();s.buffer=noiseBuf;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=7000*tune;f.Q.value=1.5;const g=ac.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(.35,t+.02);g.gain.exponentialRampToValueAtTime(0.0001,t+.09*dk);s.connect(f);f.connect(g);g.connect(out);s.start(t);s.stop(t+.2);break}
+  case 12:case 13:{const f=mtof(p.bass)*tune,sh=ac.createWaveShaper();sh.curve=curve(p.bDrive);const g=ac.createGain();sh.connect(g);g.connect(out);
+    const o=ac.createOscillator();o.type='sine';if(i===13){o.frequency.setValueAtTime(f*2,t);o.frequency.exponentialRampToValueAtTime(f,t+.12)}else{o.frequency.setValueAtTime(f*1.5,t);o.frequency.exponentialRampToValueAtTime(f,t+.02)}
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.9,t+.005);g.gain.exponentialRampToValueAtTime(0.0001,t+p.bDec*dk);o.connect(sh);o.start(t);o.stop(t+p.bDec*dk+.05);break}
+  case 14:if(p.fx<.5){const o=tone(t,'sawtooth',2400*tune,80,.6,.25,.6*dk,out)}else noise(t,1,'bandpass',800*tune,4,.5,.7*dk,out);break;
+  case 15:{const o=ac.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(p.vox*tune,t);o.frequency.linearRampToValueAtTime(p.vox*.94*tune,t+.2);const g=ac.createGain();env(g,t,.01,.5,.22*dk);
+    [700,1150,2600].forEach((ff,j)=>{const b=ac.createBiquadFilter();b.type='bandpass';b.frequency.value=ff;b.Q.value=8;o.connect(b);b.connect(g)});g.connect(out);o.start(t);o.stop(t+.4*dk);break}
+  }}
+
+/* ---------- PADRÕES por estilo (16 passos = 1 compasso 4/4; tempos 1-2-3-4 nos passos 1,5,9,13) ---------- */
+const P=(o)=>{const g=Array.from({length:16},()=>Array(16).fill(0));for(const k in o)o[k].forEach(s=>g[k][Math.abs(s)]=s<0||Object.is(s,-0)?2:1);return g};
+const PATTERNS={
+ reggae:[P({0:[0,4,8,12],4:[-4,-12],5:[2,6,10,14],11:[1,3,5,7,9,11,13,15],12:[0,7,8,14]}),
+         P({0:[0,8],2:[4,-12],5:[2,6,10,14],6:[14],11:[1,3,5,7,9,11,13,15],12:[0,3,8,11]}),
+         P({0:[0,4,8,12],2:[-12],4:[4],5:[0,2,4,6,8,10,12,14],8:[7,15],12:[0,6,8]}),
+         P({0:[0,8],4:[4,12],5:[2,6,10,14],7:[0],14:[15],12:[0,10]})],
+ trap:[P({0:[0,10],3:[-8],5:[0,2,4,6,8,10,11,12,14,15],6:[6],12:[0,10],15:[15]}),
+       P({0:[0,3,10],3:[-8],5:[0,2,4,5,6,8,10,12,13,14,15],8:[7],13:[0],12:[10]}),
+       P({0:[0,6,10],2:[8],3:[-8],5:[0,1,2,4,6,8,9,10,12,14],12:[0,6,10],14:[15]}),
+       P({0:[0],3:[-8],7:[0],5:[0,4,8,12],12:[0],14:[0]})],
+ boombap:[P({0:[0,7,10],2:[-4,-12],5:[0,2,4,6,8,10,12,14],6:[14],12:[0,10]}),
+          P({0:[0,3,10],2:[4,12],5:[0,2,4,6,8,10,12,14],4:[15],12:[0,3,10]}),
+          P({0:[0,7,9],2:[-4,-12],5:[0,2,4,6,8,10,12,14],15:[6],12:[0]}),
+          P({0:[0,10],2:[4,12],5:[2,6,10,14],7:[0],12:[0]})],
+ funk:[P({0:[0,3,8,11],3:[-4,-12],8:[0,3,6,8,11,14],5:[2,6,10,14],12:[0,8],15:[6]}),
+       P({0:[0,3,6,8,11,14],3:[4,12],9:[2,10],5:[0,2,4,6,8,10,12,14],12:[0,6]}),
+       P({0:[0,6,8,14],3:[-4,-12],8:[3,11],10:[2,5,10,13],15:[12],12:[0,8]}),
+       P({0:[0,8],3:[4,12],8:[3,6,11,14],14:[15]})],
+ drill:[P({0:[0,11],2:[-6],3:[14],5:[0,3,4,7,8,10,12,15],13:[0,11],4:[3]}),
+        P({0:[0,7,11],2:[6,14],5:[0,2,3,4,6,8,10,11,12,14],13:[0],12:[7,11]}),
+        P({0:[0,11],2:[6],3:[14],5:[0,3,6,8,11,14],9:[9],13:[0,11]}),
+        P({0:[0],2:[6,14],7:[0],13:[0]})]
+};
+
+/* ---------- ESTADO ---------- */
+const state={kit:store.get('kit',0),bpm:140,swing:54,pat:0,pad:0,seqs:null,ch:null,tune:Array(16).fill(0),dec:Array(16).fill(100),samples:Array(16).fill(null),userKit:false,playing:false,rec:false,step:-1,vol:.8};
+let history=[];
+const clone=x=>JSON.parse(JSON.stringify(x));
+function loadKit(i,keepSeq){state.kit=(i+KITS.length)%KITS.length;store.set('kit',state.kit);const k=KITS[state.kit];
+  state.ch=charOf(k);state.bpm=k.bpm;$('#bpm').value=k.bpm;state.samples=Array(16).fill(null);state.userKit=false;
+  if(!keepSeq){state.seqs=clone(PATTERNS[k.style]);state.pat=0;setPatBtns()}
+  $('#kitSel').value=state.kit;updAll();renderInfo()}
+function renderInfo(){const k=KITS[state.kit];
+  const cr=k.credits.length?`<p><b>Trabalhou com:</b> ${k.credits.map(esc).join(', ')}</p>`:'<p class="note">Créditos não divulgados nas páginas públicas do pack.</p>';
+  const ct=k.contents.length?`<b>Conteúdo do kit</b><ul>${k.contents.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`:'<p class="note">A lista de conteúdo deste kit não está publicada.</p>';
+  $('#info').innerHTML=`<div><span class="tag">Monstro.zip Vol. ${k.vol}</span><span class="tag">${STYLES[k.style]} · ${k.bpm} BPM</span><h2>${esc(k.name)}</h2><p>${esc(k.bio)}</p>${cr}</div><div>${ct}<p class="note">Padrão de fábrica: groove ${STYLES[k.style]}${k.style==='reggae'?' na contagem de reggae, caixa/aro no 2 e no 4':''}. Saturador e Tape Echo começam em bypass.</p></div>`}
+
+/* ---------- UI ---------- */
+$('#kitSel').innerHTML=[1,2,3,4].map(v=>`<optgroup label="Monstro.zip Vol. ${v}">${KITS.map((k,i)=>k.vol===v?`<option value="${i}">${esc(k.name)}</option>`:'').join('')}</optgroup>`).join('');
+$('#pads').innerHTML=[12,13,14,15,8,9,10,11,4,5,6,7,0,1,2,3].map(i=>`<button class="pad" data-i="${i}"><span>${i+1}</span><small id="pl${i}">${PADS[i]}</small></button>`).join('');
+$('#steps').innerHTML=Array.from({length:16},(_,s)=>`<button class="st" data-s="${s}" aria-label="passo ${s+1}"></button>`).join('');
+function setPatBtns(){document.querySelectorAll('[data-pat]').forEach(b=>b.classList.toggle('on',+b.dataset.pat===state.pat))}
+function updSteps(){const row=state.seqs[state.pat][state.pad];document.querySelectorAll('.st').forEach((b,s)=>{b.classList.toggle('on',row[s]===1);b.classList.toggle('acc',row[s]===2);b.classList.toggle('now',s===state.step)});
+  $('#stepLbl').textContent=`PAD ${state.pad+1} · ${state.samples[state.pad]?state.samples[state.pad].name:PADS[state.pad]} · SEQ ${'ABCD'[state.pat]}`;
+  document.querySelectorAll('.pad').forEach(b=>{const i=+b.dataset.i;b.classList.toggle('cur',i===state.pad);b.classList.toggle('user',!!state.samples[i])})}
+function updLcd(){const k=KITS[state.kit],seq=state.seqs[state.pat],row=seq[state.pad];
+  $('#lcd').innerHTML=`<div class="row"><span class="inv">${state.playing?(state.rec?'REC':'PLAY'):'STOP'}</span><span>SEQ:${'ABCD'[state.pat]} BAR 1 BEAT ${state.step<0?1:Math.floor(state.step/4)+1}</span></div>
+  <div class="row big"><span>${esc(state.userKit?'USER: ':'')}${esc(k.name.toUpperCase())}</span></div>
+  <div class="row"><span>VOL.${k.vol} ${STYLES[k.style].toUpperCase()}</span><span>${state.bpm} BPM SW${state.swing}%</span></div>
+  <div class="row"><span>PAD${String(state.pad+1).padStart(2,'0')} ${esc((state.samples[state.pad]?state.samples[state.pad].name:PADS[state.pad]).slice(0,16))}</span><span>T${state.tune[state.pad]>0?'+':''}${state.tune[state.pad]} D${state.dec[state.pad]}%</span></div>
+  <div class="row"><span>MST ${'█'.repeat(Math.round(state.vol*10))}${'░'.repeat(10-Math.round(state.vol*10))}</span><span>SAT:${fx.sat?'ON':'BYP'} ECHO:${fx.echo?'ON':'BYP'}</span></div>
+  <div class="mini">${row.map((v,s)=>`<i class="${v?'on':''} ${s===state.step?'now':''}"></i>`).join('')}</div>`}
+function updAll(){$('#bpmO').textContent=state.bpm;$('#swO').textContent=state.swing+'%';$('#tune').value=state.tune[state.pad];$('#tuO').textContent=state.tune[state.pad];$('#dec').value=state.dec[state.pad];$('#deO').textContent=state.dec[state.pad]+'%';updSteps();updLcd();updFx()}
+
+const flash=i=>{const b=document.querySelector(`.pad[data-i="${i}"]`);if(!b)return;b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),110)};
+let tapT=[];
+document.querySelectorAll('.pad').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();const i=+b.dataset.i;state.pad=i;play(i,0,.9);flash(i);
+  if(state.rec&&state.playing){const t=ac.currentTime,stepDur=60/state.bpm/4;let s=Math.round((t-lastStepTime)/stepDur+Math.max(0,state.step));pushHist();state.seqs[state.pat][i][(s+16)%16]=1}
+  updAll()}));
+let pressT;
+document.querySelectorAll('.st').forEach(b=>{
+  b.addEventListener('pointerdown',()=>{pressT=setTimeout(()=>{pressT=null;pushHist();state.seqs[state.pat][state.pad][+b.dataset.s]=2;updAll()},420)});
+  b.addEventListener('pointerup',()=>{if(pressT){clearTimeout(pressT);pressT=null;pushHist();const r=state.seqs[state.pat][state.pad],s=+b.dataset.s;r[s]=r[s]?0:1;updAll();if(r[s]&&!state.playing)play(state.pad,0,.8)}});
+  b.addEventListener('pointerleave',()=>{if(pressT){clearTimeout(pressT);pressT=null}})});
+function pushHist(){history.push(clone(state.seqs));if(history.length>50)history.shift()}
+$('#undo').onclick=()=>{if(history.length){state.seqs=history.pop();updAll();toast('Desfeito')}};
+document.querySelectorAll('[data-pat]').forEach(b=>b.onclick=()=>{state.pat=+b.dataset.pat;setPatBtns();updAll()});
+$('#kitSel').onchange=e=>loadKit(+e.target.value);
+$('#f3').onclick=()=>loadKit(state.kit-1);$('#f4').onclick=()=>loadKit(state.kit+1);
+$('#f1').onclick=()=>{state.vol=Math.max(0,state.vol-.1);if(master)master.gain.value=state.vol;updLcd()};
+$('#f2').onclick=()=>{state.vol=Math.min(1,state.vol+.1);if(master)master.gain.value=state.vol;updLcd()};
+const styleKeys=Object.keys(STYLES);
+$('#f5').onclick=()=>{const k=KITS[state.kit];const cur=styleKeys.indexOf(state.forceStyle||k.style);state.forceStyle=styleKeys[(cur+1)%styleKeys.length];pushHist();state.seqs=clone(PATTERNS[state.forceStyle]);toast('Groove: '+STYLES[state.forceStyle]);updAll()};
+$('#f6').onclick=()=>{pushHist();state.seqs[state.pat]=Array.from({length:16},()=>Array(16).fill(0));updAll();toast('SEQ '+'ABCD'[state.pat]+' limpa')};
+$('#bpm').oninput=e=>{state.bpm=+e.target.value;updAll()};
+$('#swing').oninput=e=>{state.swing=+e.target.value;updAll()};
+$('#tune').oninput=e=>{state.tune[state.pad]=+e.target.value;updAll()};
+$('#dec').oninput=e=>{state.dec[state.pad]=+e.target.value;updAll()};
+$('#tap').onclick=()=>{const n=performance.now();tapT=tapT.filter(t=>n-t<2500);tapT.push(n);if(tapT.length>1){const d=(tapT[tapT.length-1]-tapT[0])/(tapT.length-1);state.bpm=Math.max(60,Math.min(180,Math.round(60000/d)));$('#bpm').value=state.bpm;updAll()}};
+const fxBtn=(id,key)=>{$(id).onclick=()=>{initAudio();fx[key]=!fx[key];$(id).textContent=fx[key]?'ON':'BYPASS';$(id).classList.toggle('on',fx[key]);updFx();updLcd()}};
+fxBtn('#satB','sat');fxBtn('#echoB','echo');
+['#satD','#echoT','#echoF','#echoM'].forEach(s=>$(s).oninput=updFx);
+
+/* ---------- SEQUENCER ---------- */
+let curStep=0,nextTime=0,lastStepTime=0,timer;
+function schedule(){const stepDur=60/state.bpm/4;
+  while(nextTime<ac.currentTime+.1){const sw=curStep%2?(state.swing-50)/50*stepDur*2*.5:0;const t=nextTime+sw;
+    const seq=state.seqs[state.pat];for(let i=0;i<16;i++){const v=seq[i][curStep];if(v)play(i,t,v===2?1:.75)}
+    const s=curStep,d=(t-ac.currentTime)*1000;setTimeout(()=>{state.step=s;lastStepTime=ac.currentTime;for(let i=0;i<16;i++)if(state.seqs[state.pat][i][s])flash(i);updSteps();updLcd()},Math.max(0,d));
+    nextTime+=stepDur;curStep=(curStep+1)%16}}
+$('#play').onclick=()=>{initAudio();ac.resume();if(state.playing)return;state.playing=true;curStep=0;nextTime=ac.currentTime+.05;timer=setInterval(schedule,25);$('#play').classList.add('on');updLcd()};
+$('#stop').onclick=()=>{state.playing=false;clearInterval(timer);state.step=-1;$('#play').classList.remove('on');updAll()};
+$('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('on',state.rec);if(state.rec&&!state.playing)$('#play').onclick();updLcd()};
+
+/* ---------- SAMPLES DO USUÁRIO ---------- */
+const RULES=[[0,/kick|bumbo|bd/i],[2,/snare|caixa|sd/i],[3,/clap|palma|snap/i],[4,/rim/i],[6,/open|oh/i],[5,/hat|hh|hihat/i],[7,/crash|cym|ride/i],[12,/808|bass|baixo/i],[11,/shak/i],[8,/perc|conga|bongo|tom/i],[14,/fx|efeito|riser|impact/i],[15,/vox|vocal|chant|voz/i]];
+async function decode(f){initAudio();const ab=await f.arrayBuffer();return await ac.decodeAudioData(ab)}
+$('#loadKit').onclick=()=>$('#dirIn').click();
+$('#dirIn').onchange=async e=>{const files=[...e.target.files].filter(f=>/\.(wav|mp3|aif|aiff|ogg|flac)$/i.test(f.name));if(!files.length)return toast('Nenhum áudio na pasta');
+  const used=new Set();let n=0;
+  for(const [pad,re] of RULES){const list=files.filter(f=>re.test(f.webkitRelativePath||f.name)&&!used.has(f));
+    const targets=pad===0?[0,1]:pad===12?[12,13]:pad===8?[8,9,10]:[pad];
+    for(const tp of targets){const f=list.shift();if(!f)break;used.add(f);try{state.samples[tp]={buf:await decode(f),name:f.name.replace(/\.[^.]+$/,'')};$('#pl'+tp).textContent=state.samples[tp].name;n++}catch(err){}}}
+  state.userKit=true;toast(n+' samples carregados nos pads');updAll()};
+$('#loadPad').onclick=()=>$('#padIn').click();
+$('#padIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{state.samples[state.pad]={buf:await decode(f),name:f.name.replace(/\.[^.]+$/,'')};$('#pl'+state.pad).textContent=state.samples[state.pad].name;toast('Sample no pad '+(state.pad+1));updAll()}catch(err){toast('Formato não suportado')}};
+
+/* ---------- LOGOS (enviados pelo usuário) ---------- */
+let logoTarget;
+function showLogo(id){const src=store.get(id,null),el=$('#'+id);if(src){el.innerHTML='';const im=new Image();im.src=src;im.alt=id==='logoA'?'Academia de Beats':'Monstro.zip';el.appendChild(im);el.classList.add('has')}}
+['logoA','logoM'].forEach(id=>{showLogo(id);$('#'+id).onclick=()=>{logoTarget=id;$('#logoFile').click()}});
+$('#logoFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{store.set(logoTarget,r.result);showLogo(logoTarget);toast('Logo salvo neste navegador')};r.readAsDataURL(f)};
+
+/* ---------- MIDI ---------- */
+function midiBytes(){const seq=state.seqs[state.pat],tpq=96,st=tpq/4,ev=[];
+  for(let i=0;i<16;i++)for(let s=0;s<16;s++){const v=seq[i][s];if(!v)continue;let len=st;if(i===12||i===13){let n=s+1;while(n<16&&!seq[12][n]&&!seq[13][n])n++;len=(n-s)*st}ev.push([s*st,0x99,MIDI_NOTES[i],v===2?120:96],[s*st+len-1,0x89,MIDI_NOTES[i],0])}
+  ev.sort((a,b)=>a[0]-b[0]||(a[1]===0x89?-1:1));const vl=n=>{const b=[n&127];while(n>>=7)b.unshift((n&127)|128);return b};
+  const us=Math.round(60e6/state.bpm);let tr=[0,0xFF,0x51,3,us>>16&255,us>>8&255,us&255],last=0;
+  for(const e of ev){tr.push(...vl(e[0]-last),e[1],e[2],e[3]);last=e[0]}tr.push(...vl(16*st-last),0xFF,0x2F,0);
+  const L=tr.length;return new Uint8Array([77,84,104,100,0,0,0,6,0,0,0,1,0,tpq,77,84,114,107,L>>24&255,L>>16&255,L>>8&255,L&255,...tr])}
+$('#midi').addEventListener('dragstart',e=>{const url=URL.createObjectURL(new Blob([midiBytes()],{type:'audio/midi'}));const nm=`Monstro_${KITS[state.kit].name.replace(/\W+/g,'')}_SEQ${'ABCD'[state.pat]}_${state.bpm}bpm.mid`;e.dataTransfer.setData('DownloadURL',`audio/midi:${nm}:${url}`);e.dataTransfer.setData('text/uri-list',url)});
+$('#midi').onclick=()=>toast('Arraste este botão para a DAW (computador)');
+$('#copyMidi').onclick=async()=>{const seq=state.seqs[state.pat];const txt=`${KITS[state.kit].name} SEQ ${'ABCD'[state.pat]} ${state.bpm} BPM\n`+seq.map((r,i)=>r.some(v=>v)?PADS[i].padEnd(10)+' |'+r.map((v,s)=>(v===2?'X':v?'x':'.')+(s%4===3?'|':'')).join(''):'').filter(Boolean).join('\n');try{await navigator.clipboard.writeText(txt);toast('Padrão copiado')}catch(e){toast('Cópia bloqueada')}};
+
+loadKit(state.kit);
+}
+</script>
+</body>
+</html>
