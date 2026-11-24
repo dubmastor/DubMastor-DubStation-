@@ -4,7 +4,7 @@
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**Em teste:** por enquanto só a versão para celular — 📱 [Tocar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/). O download para Windows e Mac sai quando for aprovado.
+**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.0/MRO-68-Windows-Instalador.exe) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.0/MRO-68-macOS-Instalador.pkg) · 📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/)
 
 Instrumento que toca **o órgão de reggae pronto** — bubble, chop e fills — no andamento da DAW, com o mesmo Hammond do
 **Mastor Reggae Keys MRK-80**. Formatos: **VST3** (Windows/macOS), **AU** (macOS), **AAX** (Pro Tools, depois da assinatura PACE) e **Standalone**.
