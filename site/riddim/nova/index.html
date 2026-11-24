@@ -688,7 +688,7 @@ const mp=mk(`<section class="panel" id="p-main" style="${thVars(MN)}">${cab(MN,'
 <div id="scb" hidden><p class="hint" style="margin:10px 0 6px">Acordes (dá para ajustar):</p><div id="sch"></div><button class="btn" id="saddch">+ acorde</button></div></div>
 <div class="sstep"><h3><i>3</i> BPM</h3><div class="row"><input type="number" id="sbpm" min="40" max="180" placeholder="ex.: 74" inputmode="numeric" aria-label="BPM"><span class="cnt">vem com a média das músicas da harmonia escolhida</span></div></div>
 <div class="sstep"><h3><i>4</i> MÚSICOS <span class="cnt">★ = mais parecido com o estilo e a harmonia</span></h3><div id="smus"></div>
-<div class="row" style="margin-top:10px"><button class="btn" id="ssug">Usar os sugeridos ★</button><button class="btn big green" id="sgoB" disabled>GERAR RIDDIM</button><button class="btn" id="sgoA" disabled>Só BPM e harmonia (gero cada linha depois)</button></div><p class="sterr" id="serrB"></p></div>
+<div class="row" style="margin-top:10px"><button class="btn" id="ssug">Usar os sugeridos ★</button><button class="btn big green" id="sgoB" disabled>GERAR RIDDIM</button><button class="btn" id="sgoA" disabled>Só BPM e harmonia no skank do piano (gero cada linha depois)</button></div><p class="sterr" id="serrB"></p></div>
 </div>
 <div class="menu" id="menu"><div class="mhead"><span class="t">PRESETS · MEGA BANCO</span><span class="cnt" id="ccount"></span><span class="grow" style="flex:1"></span><button class="btn" id="newrub">+ Novo riddim</button><button class="btn" id="crand">Alavanca</button></div>
 <div class="mtabs" role="tablist"><button data-mv="est" class="on">ESTILOS</button><button data-mv="az">RIDDIMS A–Z</button><button data-mv="mus">MÚSICAS</button><button data-mv="fav">★ FAVORITOS</button></div>
@@ -707,7 +707,7 @@ const RD=byId.harm;
 const rp=mk(`<section class="panel" id="p-harm" style="${thVars(RD)}">${cab(RD,'Riddim','Harmonia · BPM · acordes',midiBtn('riddim completo · todas as machines'))}
 <div class="pbody">
 <p class="loaded"></p>
-<div class="group" style="margin-bottom:12px"><h3>Teclado do riddim · timbres do Mastor Keys</h3><div class="row"><select data-tbsync="piano" id="rkeys" aria-label="Timbre do teclado do riddim"></select><span class="cnt">mesmo timbre da aba Piano (MRK-80) · no MRM 2.6 o RIDDIM toca o skank do MRK-80</span></div></div>
+<div class="group" style="margin-bottom:12px"><h3>Teclado do riddim · timbres do Mastor Keys</h3><div class="row"><select data-tbsync="piano" id="rkeys" aria-label="Timbre do teclado do riddim"></select><span class="cnt">mesmo timbre da aba Piano (MRK-80) · o riddim toca o skank do piano com este timbre</span></div></div>
 <div class="group"><h3>Harmonia <span class="row"><span class="pill">→ Mastor Tune MT-0420</span><span class="midi" id="hmidi" draggable="true" role="button" tabindex="0" style="min-height:40px;font-size:13px"><span class="ic" style="width:28px;height:28px;font-size:16px">⇣</span>MIDI DOS ACORDES</span></span></h3>
 <div class="chords" id="chords"></div><button class="btn" id="addch">+ acorde</button></div>
 <p class="hint">Escolha o riddim do mega banco na aba Principal. Aqui você edita os acordes e a duração de cada um.</p>
@@ -834,11 +834,19 @@ function genRubADub(first){const pool=CAT.filter(c=>c.st==='RUB A DUB'&&c.hs!=='
  M.forEach(I=>{if(I.id==='horns'||I.id==='orch'){I.mute=true;I.need=false;return}
   const sg=suggest(I,H.ctx),pick=rnd(sg.slice(0,2));gen(I,pick.mi,pick.s);I.mute=false});
  sel.c=null;renderChords();renderToggles();M.forEach(I=>I.renderGen&&I.renderGen());if(!first)renderMenu()}
-/* carregar um riddim do mega banco: só o que é original toca */
+/* o riddim toca o skank do piano com o timbre do Mastor Keys escolhido em "Teclado do riddim" (como no MRM 2.6) */
+function rodaSkankPiano(sc){const I=byId.piano,tb=I.t;const sg=sc?suggest(I,sc):[];
+ if(sg&&sg.length)gen(I,sg[0].mi,sg[0].s);else{setPreset(I,'Padrão do skank');I.need=false;I.musician=null;renderGrid(I)}
+ setTimbre(I,tb);I.mute=false}
+/* carregar um riddim do mega banco: bateria e baixo originais quando existem; o que não existe é gerado (o riddim sempre toca) */
 function loadRiddim(c){H.ready=true;$('setup').hidden=true;H.cur=c;H.ctx=null;const ch=parseHarm(c.h);if(ch){H.chords=ch;buildSeq()}setBpm(c.bpm);
  M.forEach(I=>{I.musician=null;I.orig=false;I.need=true;I.mute=true;I.solo=false});
  const dm=MUS.drums.findIndex(m=>m.c===c.dr);if(c.ds==='o'&&dm>=0){gen(byId.drums,dm,kitStyle('drums',c));byId.drums.orig=true;byId.drums.mute=false}
  const bm=MUS.bass.findIndex(m=>m.c===c.bass);if(c.bs==='o'&&bm>=0){gen(byId.bass,bm,kitStyle('bass',c));byId.bass.orig=true;byId.bass.mute=false}
+ // bateria e baixo sempre tocam: a parte que não existe na gravação é gerada pelo músico sugerido para o riddim
+ const sc={st:c.st,y:c.y||0,kit:c.kit||'R',dr:c.dr,bass:c.bass};
+ ['drums','bass'].forEach(id=>{const I=byId[id];if(I.orig)return;const sg=suggest(I,sc);if(sg&&sg.length){gen(I,sg[0].mi,sg[0].s);I.mute=false}});
+ rodaSkankPiano(sc);
  byId.horns.need=false;byId.orch.need=false;
  renderChords();renderToggles();M.forEach(I=>I.renderGen&&I.renderGen());renderMenu();if(!playing)$('play').click()}
 /* ---------- menu de presets ---------- */
@@ -878,10 +886,10 @@ function renderDet(){const d=$('mdet');let c=sel.c;if(!c&&sel.g)c=filt(GROUPS[se
  ${g.length>1?`<div class="vers">${g.map(v=>`<button data-c="${v.id}" class="${v.id===c.id?'on':''}">${lights(v)}<span>${esc(v.s)}<br><small>${esc(v.a)}${v.y?' · '+v.y:''}</small></span></button>`).join('')}</div>`:`<p class="hint" style="margin:0 0 10px">${esc(c.s)} — ${esc(c.a)}${c.y?' · '+c.y:''}</p>`}
  <div class="pcards">
  <div class="pc" style="--k:${c.hs==='c'?'#4fdc6a':c.hs==='a'?'#f2c23a':'#e2483a'}"><div class="k">RIDDIM <span class="lt"><i class="${LC[c.hs]}">R</i></span></div><div class="v">${esc(chordTxt(c.h))}</div><div class="s">${c.bpm} BPM · harmonia ${c.hs==='c'?'conferida':c.hs==='a'?'aproximada':'pendente'}</div></div>
- <div class="pc" style="--k:${c.ds==='o'?'#4fdc6a':'#f2c23a'}"><div class="k">DRUM <span class="lt"><i class="${LC[c.ds]}">D</i></span></div><div class="v">${dn}</div><div class="s">${KIT[c.kit]} · ${c.ds==='o'?'groove original da gravação':'não existe na gravação — gerar'}</div></div>
- <div class="pc" style="--k:${c.bs==='o'?'#4fdc6a':'#f2c23a'}"><div class="k">BASS <span class="lt"><i class="${LC[c.bs]}">B</i></span></div><div class="v">${bn}</div><div class="s">${c.bs==='o'?'linha original (MRBM-69)':'não existe na gravação — gerar'}</div></div></div>
+ <div class="pc" style="--k:${c.ds==='o'?'#4fdc6a':'#f2c23a'}"><div class="k">DRUM <span class="lt"><i class="${LC[c.ds]}">D</i></span></div><div class="v">${dn}</div><div class="s">${KIT[c.kit]} · ${c.ds==='o'?'groove original da gravação':'não existe na gravação — a MRM gera'}</div></div>
+ <div class="pc" style="--k:${c.bs==='o'?'#4fdc6a':'#f2c23a'}"><div class="k">BASS <span class="lt"><i class="${LC[c.bs]}">B</i></span></div><div class="v">${bn}</div><div class="s">${c.bs==='o'?'linha original (MRBM-69)':'não existe na gravação — a MRM gera'}</div></div></div>
  <div class="dact"><button class="btn big green" data-load="${c.id}">CARREGAR E TOCAR</button><button class="btn" data-fav="${c.id}">${FAV.includes(c.id)?'★ Favorito':'☆ Favoritar'}</button></div>
- <p class="need-note">Toca só o original: ${[c.ds==='o'?'bateria':null,c.bs==='o'?'baixo':null].filter(Boolean).join(' e ')||'nenhuma parte gravada'}${c.hs!=='p'?' sobre a harmonia':''}. ${miss.length?miss.join(' e ')+' e as outras machines':'As outras machines'} ficam com a aba acesa para gerar.</p></div>`}
+ <p class="need-note">Toca bateria, baixo e o skank do piano (timbre do Keys)${c.hs!=='p'?' na harmonia':''}: ${[c.ds==='o'?'bateria original':'bateria gerada',c.bs==='o'?'baixo original':'baixo gerado'].join(' e ')}. As outras machines ficam com a aba acesa para gerar.</p></div>`}
 $('menu').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
  if(t.dataset.mv){sel.v=t.dataset.mv;renderMenu()}else if(t.dataset.st){sel.st=t.dataset.st;renderMenu()}else if(t.dataset.l||t.getAttribute('data-L')){sel.L=t.getAttribute('data-L');renderMenu()}
  else if(t.dataset.g){sel.g=t.dataset.g;sel.c=null;renderMenu();if(innerWidth<900)$('mdet').scrollIntoView({behavior:'smooth',block:'start'})}
@@ -942,7 +950,7 @@ function finishSetup(){H.ready=true;$('setup').hidden=true;renderChords();render
 const stName=s=>s[0]+s.slice(1).toLowerCase();
 function setHarm(){H.chords=SU.ch.map(c=>({r:c.r,q:c.q,len:c.len}));buildSeq();setBpm(+$('sbpm').value)}
 $('sgoA').onclick=()=>{setHarm();H.cur={gen:true,s:`${stName(SU.st)} montado`,a:SU.hg?`harmonia de ${SU.hg.list[0].s}`:'harmonia escolhida por você',st:SU.st,y:0,r:'',h:''};H.ctx={...SU.ctx};
- M.forEach(I=>{I.pat=I.lanes.map(()=>P(E));I.musician=null;I.orig=false;I.mute=true;I.need=!(I.id==='horns'||I.id==='orch');if(I.id==='pick')I.follow=false;renderGrid(I)});finishSetup()};
+ M.forEach(I=>{I.pat=I.lanes.map(()=>P(E));I.musician=null;I.orig=false;I.mute=true;I.need=!(I.id==='horns'||I.id==='orch');if(I.id==='pick')I.follow=false;renderGrid(I)});rodaSkankPiano(null);finishSetup()};
 $('sgoB').onclick=()=>{setHarm();H.ctx={...SU.ctx};
  H.cur={gen:true,s:`${stName(SU.st)} gerado`,a:SU.hg?`harmonia de ${SU.hg.list[0].s} · músicos escolhidos`:'harmonia e músicos escolhidos por você',st:SU.st,y:0,r:'',h:''};
  M.forEach(I=>{let v=SU.mus[I.id];I.orig=false;if(I.id==='pick'){if(v===''||v==='off'||v==null)v=suggest(I,H.ctx)[0].mi;gen(I,v,'Pica-pau no baixo');I.mute=false;return}
