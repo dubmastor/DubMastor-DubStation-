@@ -22,6 +22,9 @@ Toda mudança num plugin segue esta lista, na mesma pull request:
    No card do site, o botão verde "▶ Tocar no celular / navegador". Plugin novo sem versão web não passa na checagem.
    Os plugins antigos marcados como `"web": "pendente"` no `plugins.json` devem ganhar a sua quando forem atualizados.
    Plugin com `"oculto": true` no `plugins.json` fica fora do site por enquanto (sem card); a checagem só avisa e falha se o card continuar lá.
+   Plugin com `"so_celular": true` está **em teste**: o card fica no site só com o botão da versão para celular, sem download
+   (a checagem falha se houver link de release no card) e o README não leva link de download. Regra do dono: todo VST novo
+   começa assim; só depois de aprovado ganha os downloads (tirar `so_celular` e devolver os links).
 4. **Registro.** Plugin novo entra no `plugins.json` (sigla, pasta, nome, tipo, web) e ganha um workflow
    `build-<pasta em minúsculas>.yml` copiado de um existente (com instaladores, pluginval e auval).
 5. **Checagem.** Rodar `python3 .github/checagem/checar.py` antes de enviar. O workflow `checagem.yml`
@@ -97,3 +100,10 @@ e as fontes de `ReggaePiano/`, e o banco de riddims de `RiddimBank/Source`. Mudo
 Rode também o teste do MRO-68 (`ReggaeOrgan/tests/render_test.cpp`). Tudo nele é na contagem com a caixa no 2 e no 4.
 O motor de grooves (`ReggaeOrgan/Source/GrooveEngine.h`) tem uma cópia em JavaScript na versão para celular (`site/web/reggaeorgan/`):
 ao mudar um, mude o outro (mesmo gerador aleatório: o mesmo compasso tem que sair igual).
+
+## Mastor Reggae Clavinet MRCL-71 (ReggaeClavinet/)
+O som (`Source/ClavEngine.h`, corda por modelo físico) e o gerador das linhas (`Source/LineEngine.h`) têm uma cópia em JavaScript
+na versão para celular (`site/web/reggaeclavinet/`, funções `clavBuf` e `generate`): ao mudar um, mude o outro.
+Tudo na contagem com a caixa no 2 e no 4; nomes das notas como no Cubase (C3 = dó central). Timbre inicial: M1. Tape Echo começa desligado.
+A machine não escuta outros plugins: segue os acordes do plugin (banco de riddims) ou o MIDI que chega na trilha (o do MRP-80 ou do MRM-0420).
+Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).

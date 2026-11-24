@@ -81,9 +81,15 @@ for p in reg:
         c = card.group(0)
         if card.group(1) != v:
             err(sig, f"site mostra a versão {card.group(1)}, o código está na {v}")
-        for f in (f"{sig}-Windows-Instalador.exe", f"{sig}-macOS-Instalador.pkg", f"{sig}-Windows.zip", f"{sig}-macOS.zip"):
-            if f"{REL}/{sig}-{v}/{f}" not in c:
-                err(sig, f"site sem o link {sig}-{v}/{f}")
+        if p.get("so_celular"):
+            # em teste: só a versão para celular até ser aprovado (sem download no site)
+            warn(sig, "so_celular: em teste, o site mostra só a versão para celular")
+            if f"{REL}/{sig}-" in c or "/downloads/" in c:
+                err(sig, "está marcado como so_celular, mas o card ainda tem link de download")
+        else:
+            for f in (f"{sig}-Windows-Instalador.exe", f"{sig}-macOS-Instalador.pkg", f"{sig}-Windows.zip", f"{sig}-macOS.zip"):
+                if f"{REL}/{sig}-{v}/{f}" not in c:
+                    err(sig, f"site sem o link {sig}-{v}/{f}")
         web = p.get("web")
         if web and web != "pendente":
             if f'href="{web}/"' not in c:
