@@ -165,7 +165,7 @@ void EqCurve::paint (juce::Graphics& g)
     for (int i = 0; i <= (int) r.getWidth(); i += 2)
     {
         const float x = r.getX() + (float) i;
-        const float y = juce::jlimit (r.getY(), r.getBottom(), yOf (mro::OrganEQ::responseDb (ep, fOf (x))));
+        const float y = juce::jlimit (r.getY(), r.getBottom(), yOf (mro::OrganEQ::responseDb (ep, fOf (x)) - ep.out));   // a SAÍDA vai escrita no canto
         if (i == 0) { curve.startNewSubPath (x, y); fill.startNewSubPath (x, yOf (0)); }
         curve.lineTo (x, y);
         fill.lineTo (x, y);
@@ -188,6 +188,13 @@ void EqCurve::paint (juce::Graphics& g)
         g.drawEllipse (juce::Rectangle<float> (12.0f, 12.0f).withCentre (p), 1.5f);
         g.setColour (lcdCyan.withAlpha (0.8f));
         g.drawText (juce::String::fromUTF8 (names[k]), (int) p.x - 30, (int) p.y - 22, 60, 11, juce::Justification::centred);
+    }
+    if (ep.on && std::abs (ep.out) > 0.05f)
+    {
+        g.setColour (lcdCyan.withAlpha (0.8f));
+        g.setFont (VintageLookAndFeel::mono (9.5f));
+        g.drawText (u8 ("SA\xc3\x8d" "DA ") + (ep.out > 0 ? "+" : "") + juce::String (ep.out, 1) + " dB",
+                    r.toNearestInt().reduced (4), juce::Justification::topRight);
     }
     if (! ep.on)
     {
@@ -911,6 +918,8 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
     eqOnBtn.getProperties().set ("style", "rocker");
     addAndMakeVisible (eqOnBtn);
     eqOnAtt = std::make_unique<APVTS::ButtonAttachment> (s, "eqOn", eqOnBtn);
+    setupKnob (eqOut,   "eqOut",   "Ganho");
+    eqOut.slider.setDoubleClickReturnValue (true, 0.0);
     setupKnob (eqHpf,   "eqHpf",   "Corte");
     setupKnob (eqLowG,  "eqLowG",  "Ganho");
     setupKnob (eqLowF,  "eqLowF",  "Freq.");
@@ -938,7 +947,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
                              "Os discos Unpolished e Ras Mek Peace foram gravados ao vivo, direto em fita de dois canais, "
                              "sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.\n\n"
                              "O timbre: bubble oco (8' + 4' + 2 2/3'), chop cheio sem percuss\xc3\xa3o, Leslie lenta e discreta, "
-                             "key click aparente, sem reverb e sem eco; o EQ corta o grave do caminho do baixo e real\xc3\xa7" "a o m\xc3\xa9" "dio.\n\n"
+                             "key click aparente, sem reverb e sem eco; o EQ corta o grave do caminho do baixo, tira um pouco de m\xc3\xa9" "dio e compensa o volume na SA\xc3\x8d" "DA.\n\n"
                              "Nenhuma fonte diz qual \xc3\xb3rg\xc3\xa3o ele usava: os registros s\xc3\xa3o uma aproxima\xc3\xa7\xc3\xa3o de ouvido."),
                          juce::dontSendNotification);
     midniteInfo.setFont (VintageLookAndFeel::mono (9.5f, false));
@@ -1053,7 +1062,7 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
     {
         v.push_back (&eqCurve);
         v.push_back (&eqOnBtn);
-        for (auto* k : { &eqHpf, &eqLowG, &eqLowF, &eqMidG, &eqMidF, &eqMidQ, &eqHighG, &eqHighF }) addK (*k);
+        for (auto* k : { &eqOut, &eqHpf, &eqLowG, &eqLowF, &eqMidG, &eqMidF, &eqMidQ, &eqHighG, &eqHighF }) addK (*k);
         addC (eqPresets);
         v.push_back (&midniteBtn);
         v.push_back (&midniteInfo);
@@ -1310,6 +1319,7 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
         ivoryPanel (kGridPan, "EQUALIZADOR", u8 ("SA\xc3\x8d" "DA DO \xc3\x93RG\xc3\x83O \xc2\xb7 ARRASTE OS PONTOS \xc2\xb7 RODA = Q DO M\xc3\x89" "DIO"));
         const int x = kGridPan.getX() + 14, y = kGridPan.getY() + 252;
         smallLabel ("CORTE", x + 70, y);
+        smallLabel (u8 ("SA\xc3\x8d" "DA"), x + 12, y + 34);
         smallLabel ("GRAVES", x + 168, y);
         smallLabel (u8 ("M\xc3\x89" "DIOS"), x + 318, y);
         smallLabel ("AGUDOS", x + 498, y);
@@ -1456,7 +1466,8 @@ void ReggaeOrganEditor::resized()
     {
         const int x = kGridPan.getX() + 14, w = kGridPan.getWidth() - 28, y = kGridPan.getY() + 252;
         eqCurve.setBounds (x, kGridPan.getY() + 32, w, 212);
-        eqOnBtn.setBounds (x, y + 22, 56, 30);
+        eqOnBtn.setBounds (x, y + 2, 56, 30);
+        placeKnob (eqOut, { x + 28, y + 62 }, 34, 56);
         placeKnob (eqHpf,  { x + 96, y + 44 }, 38, 60);
         placeKnob (eqLowG, { x + 186, y + 44 }, 38, 60);
         placeKnob (eqLowF, { x + 252, y + 44 }, 38, 60);

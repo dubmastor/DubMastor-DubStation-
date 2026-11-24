@@ -237,6 +237,7 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
         <div class="sl"><label>Q</label><input type="range" id="eqMidQ" min="0.3" max="4" step="0.01"><output></output></div></div>
       <div><div class="lbl">AGUDOS</div><div class="sl"><label>GANHO</label><input type="range" id="eqHighG" min="-15" max="15" step="0.1"><output></output></div>
         <div class="sl"><label>FREQ.</label><input type="range" id="eqHighF" min="0" max="1" step="0.001"><output></output></div></div>
+      <div><div class="lbl">SAÍDA</div><div class="sl"><label>GANHO</label><input type="range" id="eqOut" min="-12" max="12" step="0.1"><output></output></div></div>
     </div>
     <div class="lbl">PRESETS DO EQ</div><div class="row" id="eqPresets"></div>
   </div>
@@ -244,7 +245,7 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
     <h2>TIMBRE MIDNITE <small>Ron Benjamin</small></h2>
     <button class="chip" id="midnite">CARREGAR O TIMBRE MIDNITE</button>
     <p>Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens, 1989-2015). Os discos <i>Unpolished</i> e <i>Ras Mek Peace</i> foram gravados ao vivo, direto em fita de dois canais, sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.</p>
-    <p>O timbre: bubble oco (8' + 4' + 2⅔'), chop cheio sem percussão, Leslie lenta e discreta, sem eco; o EQ corta o grave do caminho do baixo e realça o médio. O groove continua o do músico escolhido.</p>
+    <p>O timbre: bubble oco (8' + 4' + 2⅔'), chop cheio sem percussão, Leslie lenta e discreta, sem eco; o EQ corta o grave do caminho do baixo, tira um pouco de médio e compensa o volume na SAÍDA. O groove continua o do músico escolhido.</p>
     <p style="opacity:.7">Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.</p>
   </div>
  </div>
@@ -290,15 +291,15 @@ const LES = [
 ].map(p=>({on:true,...p}));
 const lesFromMusician=v=>v===2?5:(v===1?1:0);
 // EQUALIZADOR (1.3): igual ao OrganEQ.h do plugin (mesmos presets e o mesmo timbre Midnite)
-const EQ_FLAT={eqOn:true,eqHpf:20,eqLowG:0,eqLowF:120,eqMidG:0,eqMidF:1000,eqMidQ:.8,eqHighG:0,eqHighF:5000};
+const EQ_FLAT={eqOn:true,eqHpf:20,eqLowG:0,eqLowF:120,eqMidG:0,eqMidF:1000,eqMidQ:.8,eqHighG:0,eqHighF:5000,eqOut:0};
 const EQ_PRESETS=[
-  ['PLANO','sem EQ',[20,0,120,0,1000,.8,0,5000]],
-  ['ROOTS QUENTE','graves cheios, agudo macio',[40,3,150,1,700,.7,-3,6000]],
-  ['DUB ESCURO','sem agudo, para o eco',[60,2,120,-2,2000,.8,-9,3500]],
-  ['DIGITAL 80','fino e brilhante',[150,-3,200,2,2500,.9,4,7000]],
-  ['ABRE O BAIXO','corta o grave para o baixo',[180,-4,250,1.5,1200,.8,0,5000]]];
-const EQ_KEYS=['eqHpf','eqLowG','eqLowF','eqMidG','eqMidF','eqMidQ','eqHighG','eqHighF'];
-const MIDNITE={bdb:[0,0,8,6,4,0,0,0,0],cdb:[8,6,8,6,0,0,0,0,0],drive:.12,lesPreset:2,lesSpeed:0,lesDepth:.45,eq:[110,-2,220,2.5,1100,.9,-1.5,6500]};
+  ['PLANO','sem EQ',[20,0,120,0,1000,.8,0,5000,0]],
+  ['ROOTS QUENTE','graves cheios, agudo macio',[40,3,150,1,700,.7,-3,6000,0]],
+  ['DUB ESCURO','sem agudo, para o eco',[60,2,120,-2,2000,.8,-9,3500,0]],
+  ['DIGITAL 80','fino e brilhante',[150,-3,200,2,2500,.9,4,7000,0]],
+  ['ABRE O BAIXO','corta o grave para o baixo',[180,-4,250,1.5,1200,.8,0,5000,0]]];
+const EQ_KEYS=['eqHpf','eqLowG','eqLowF','eqMidG','eqMidF','eqMidQ','eqHighG','eqHighF','eqOut'];
+const MIDNITE={bdb:[0,0,8,6,4,0,0,0,0],cdb:[8,6,8,6,0,0,0,0,0],drive:.12,lesPreset:2,lesSpeed:0,lesDepth:.45,eq:[110,-2,220,-2.5,1100,.9,-1.5,6500,5.5]};
 const EPOCHS = [ // musician, beat, feel(-1 = grade do músico), bpm
   ['ROCKSTEADY','1966-68',1,0,1,80],['EARLY REGGAE','1968-72',2,0,-1,84],['ROOTS','1972-79',3,0,-1,74],['ROCKERS','1975-80',5,1,-1,76],
   ['LOVERS ROCK','1969-94',4,0,-1,72],['RUB A DUB','1979-84',6,0,-1,78],['DIGITAL','1985-89',7,1,-1,92],['RAGGA','1990-95',7,2,-1,94],
@@ -409,7 +410,8 @@ function initAudio(){
   const out=ctx.createGain(), comp=ctx.createDynamicsCompressor();
   comp.threshold.value=-6; comp.ratio.value=8; comp.attack.value=.002; comp.release.value=.12;
   const eqF=['highpass','lowshelf','peaking','highshelf'].map(t=>{ const f=ctx.createBiquadFilter(); f.type=t; return f; });
-  out.connect(eqF[0]).connect(eqF[1]).connect(eqF[2]).connect(eqF[3]).connect(comp).connect(ctx.destination);
+  const eqG=ctx.createGain();   // SAÍDA do EQ (compensação de volume)
+  out.connect(eqF[0]).connect(eqF[1]).connect(eqF[2]).connect(eqF[3]).connect(eqG).connect(comp).connect(ctx.destination);
   const accent=ctx.createGain(), ghost=ctx.createGain(), chop=ctx.createGain();
   accent.connect(out); ghost.connect(out);
   const shaper=ctx.createWaveShaper(); shaper.curve=makeDrive(S.drive);
@@ -430,7 +432,7 @@ function initAudio(){
   for(const [k,b] of [['accent',accent],['ghost',ghost],['chop',chop]]){
     const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=20; epIn[k]=ctx.createGain(); epIn[k].connect(hp).connect(b);
     epTrem[k]=ctx.createGain(); epTrem[k].gain.value=.825; td.connect(epTrem[k].gain); epTrem[k].connect(epIn[k]); }
-  buses={eqF,out,accent,ghost,chop,shaper,trem,dry,wet,horn,drum,echoIn,dl,fb,epIn,epTrem};
+  buses={eqF,eqG,out,accent,ghost,chop,shaper,trem,dry,wet,horn,drum,echoIn,dl,fb,epIn,epTrem};
   buildWaves(); applySound();
 }
 function applySound(){
@@ -451,7 +453,7 @@ function applySound(){
   }
   B.echoIn.gain.setTargetAtTime(S.echoOn?S.echoVol:0,t,.03);
   B.dl.delayTime.setTargetAtTime(60/S.bpm*.75,t,.05); B.fb.gain.setTargetAtTime(S.echoInt,t,.03);
-  setEqNodes(B.eqF,t); drawEq();
+  setEqNodes(B.eqF,t); B.eqG.gain.setTargetAtTime(S.eqOn?Math.pow(10,S.eqOut/20):1,t,.03); drawEq();
 }
 function setEqNodes(F,t){
   const on=S.eqOn, set=(p,v)=>t==null?(p.value=v):p.setTargetAtTime(v,t,.02);
@@ -812,13 +814,14 @@ function drawEq(){
   for(const db of [-12,-6,0,6,12]){ const y=eqY(g,db); c.strokeStyle=`rgba(143,227,255,${db?0.12:0.3})`; c.beginPath(); c.moveTo(g.x0,y); c.lineTo(g.x1,y); c.stroke(); c.fillStyle='rgba(143,227,255,.5)'; c.fillText((db>0?'+':'')+db,g.x0-4,y+3); }
   const N=Math.max(64,Math.floor(g.x1-g.x0)), fr=new Float32Array(N), mag=new Float32Array(N), ph=new Float32Array(N), tot=new Float32Array(N);
   for(let i=0;i<N;i++) fr[i]=eqF(g,g.x0+(g.x1-g.x0)*i/(N-1));
-  if(S.eqOn) for(const F of eqFilters()){ F.getFrequencyResponse(fr,mag,ph); for(let i=0;i<N;i++) tot[i]+=20*Math.log10(mag[i]+1e-12); }
+  if(S.eqOn){ for(const F of eqFilters()){ F.getFrequencyResponse(fr,mag,ph); for(let i=0;i<N;i++) tot[i]+=20*Math.log10(mag[i]+1e-12); } }
   const col=S.eqOn?'#ffb347':'rgba(143,227,255,.4)';
   c.beginPath(); c.moveTo(g.x0,eqY(g,0)); for(let i=0;i<N;i++) c.lineTo(g.x0+(g.x1-g.x0)*i/(N-1),Math.max(g.y0,Math.min(g.y1,eqY(g,tot[i])))); c.lineTo(g.x1,eqY(g,0)); c.closePath();
   c.fillStyle=S.eqOn?'rgba(255,179,71,.15)':'rgba(143,227,255,.08)'; c.fill();
   c.beginPath(); for(let i=0;i<N;i++){ const x=g.x0+(g.x1-g.x0)*i/(N-1), y=Math.max(g.y0,Math.min(g.y1,eqY(g,tot[i]))); i?c.lineTo(x,y):c.moveTo(x,y); } c.strokeStyle=col; c.lineWidth=2; c.stroke();
   c.textAlign='center';
   EQ_NODES.forEach((n,k)=>{ const [x,y]=eqNode(g,k); c.fillStyle=k===eqDrag?'#fff':col; c.beginPath(); c.arc(x,y,7,0,7); c.fill(); c.strokeStyle='#0b2236'; c.lineWidth=1.5; c.stroke(); c.fillStyle='rgba(143,227,255,.85)'; c.fillText(n[2],x,y-12); });
+  if(S.eqOn&&Math.abs(S.eqOut)>.05){ c.fillStyle='rgba(143,227,255,.8)'; c.textAlign='right'; c.fillText('SAÍDA '+(S.eqOut>0?'+':'')+S.eqOut.toFixed(1)+' dB',g.x1-4,g.y0+12); c.textAlign='center'; }
   if(!S.eqOn){ c.fillStyle='rgba(143,227,255,.7)'; c.font='bold 12px monospace'; c.fillText('EQ DESLIGADO',g.W/2,g.y0+16); }
 }
 (function eqTouch(){

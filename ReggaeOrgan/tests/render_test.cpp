@@ -246,6 +246,9 @@ int main()
         float pk = 0; double ms = 0;
         for (int i = 0; i < N; ++i) { pk = std::max (pk, std::fabs (keys[(size_t) i])); ms += keys[(size_t) i] * keys[(size_t) i]; }
         const double rmsDb = 10 * std::log10 (ms / N + 1e-12);
+        static double mittooRms = 0;
+        if (m == (int) MusMittoo) mittooRms = rmsDb;
+        if (midnite) CHECK (std::fabs (rmsDb - mittooRms) < 0.7, "MIDNITE: volume compensado (mesmo RMS do timbre do Mittoo)");
         std::printf ("%-9s %5.1f BPM  notas %4d  pico %.2f  RMS %5.1f dB\n", midnite ? "MIDNITE" : mu.name, bpm, notesOn, pk, rmsDb);
         CHECK (pk > 0.05f && pk <= 1.0f, "\xc3\xb3rg\xc3\xa3o soa e n\xc3\xa3o passa do teto");
         CHECK (rmsDb > -40.0 && std::isfinite (rmsDb), "n\xc3\xadvel do \xc3\xb3rg\xc3\xa3o razo\xc3\xa1vel, sem NaN");
@@ -336,7 +339,9 @@ int main()
             CHECK (std::fabs (got - OrganEQ::responseDb (t, f, sr)) < 0.15, msg);
         }
         const EqParams& t = midniteTimbre().eq;
-        CHECK (OrganEQ::responseDb (t, 60.0) < -6.0 && OrganEQ::responseDb (t, 1100.0) > 1.5, "MIDNITE: grave fora do caminho do baixo, m\xc3\xa9" "dio na frente");
+        CHECK (OrganEQ::responseDb (t, 60.0) - t.out < -6.0 && OrganEQ::responseDb (t, 1100.0) - t.out < -1.5, "MIDNITE: grave fora do caminho do baixo e um pouco menos de m\xc3\xa9" "dio");
+        e = EqParams(); e.out = 4.0f;
+        CHECK (std::fabs (OrganEQ::responseDb (e, 300.0) - 4.0) < 0.01, "SA\xc3\x8d" "DA +4 dB");
         CHECK (midniteTimbre().reverb == 0.0f && ! midniteTimbre().perc, "MIDNITE: seco (sem reverb) e sem percuss\xc3\xa3o");
     }
     std::printf (fails ? "\n%d FALHA(S)\n" : "\nTudo certo.\n", fails);

@@ -270,7 +270,7 @@ private:
     EqCurve eqCurve { proc };
     juce::ToggleButton eqOnBtn { "EQ" };
     std::unique_ptr<APVTS::ButtonAttachment> eqOnAtt;
-    Knob eqHpf, eqLowG, eqLowF, eqMidG, eqMidF, eqMidQ, eqHighG, eqHighF;
+    Knob eqOut, eqHpf, eqLowG, eqLowF, eqMidG, eqMidF, eqMidQ, eqHighG, eqHighF;
     Chips eqPresets;
     juce::TextButton midniteBtn;
     juce::Label midniteInfo;

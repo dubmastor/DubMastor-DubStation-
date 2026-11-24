@@ -69,12 +69,12 @@ separados. Leslie de dois rotores (corneta e tambor, com presets, LENTA/RÁPIDA,
 ![Aba EQ com o timbre Midnite](docs/interface-eq.png)
 
 - **EQUALIZADOR** de 4 faixas na saída do órgão: **CORTE** de graves (passa-altas; 20 Hz = desligado), **GRAVES** (shelf),
-  **MÉDIOS** (sino com Q) e **AGUDOS** (shelf), de −15 a +15 dB. Arraste os pontos na curva; roda do mouse no MÉDIOS = Q;
+  **MÉDIOS** (sino com Q) e **AGUDOS** (shelf), de −15 a +15 dB, e **SAÍDA** (−12 a +12 dB) para compensar o volume. Arraste os pontos na curva; roda do mouse no MÉDIOS = Q;
   duplo clique zera. Presets: PLANO, ROOTS QUENTE, DUB ESCURO, DIGITAL 80 e ABRE O BAIXO. Começa plano.
 - **TIMBRE MIDNITE**: o órgão cru e seco do Ron Benjamin (Midnite, St. Croix). Os discos *Unpolished* e *Ras Mek Peace*
   foram gravados ao vivo direto em fita de dois canais, sem reverb, sem eco e sem EQ. O botão carrega bubble oco (8' + 4' + 2⅔'),
   chop cheio sem percussão, Leslie lenta e discreta, key click aparente, sem reverb e sem eco, e o EQ que tira o grave do caminho
-  do baixo e realça o médio. Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
+  do baixo e um pouco de médio, com o volume compensado na SAÍDA. Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
 
 ## Código
 - `Source/GrooveEngine.h` — o motor (C++ puro): grade, músicos, épocas e fills. A versão para celular (`site/web/reggaeorgan/`) usa a mesma lógica e o mesmo gerador aleatório: o mesmo compasso sai igual nos dois.

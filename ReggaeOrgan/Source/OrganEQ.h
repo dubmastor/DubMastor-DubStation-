@@ -17,10 +17,11 @@ struct EqParams
     float lowG = 0.0f,  lowF = 120.0f;     // dB, Hz
     float midG = 0.0f,  midF = 1000.0f, midQ = 0.8f;
     float highG = 0.0f, highF = 5000.0f;
+    float out = 0.0f;                      // ganho de saída (dB), para compensar o volume
     bool operator== (const EqParams& o) const
     {
         return on == o.on && hpf == o.hpf && lowG == o.lowG && lowF == o.lowF && midG == o.midG && midF == o.midF
-            && midQ == o.midQ && highG == o.highG && highF == o.highF;
+            && midQ == o.midQ && highG == o.highG && highF == o.highF && out == o.out;
     }
 };
 
@@ -42,7 +43,7 @@ inline const EqPreset& eqPreset (int i)
 // TIMBRE MIDNITE (Ron Benjamin, Midnite · St. Croix, 1997-2015): órgão cru e seco, como nos discos gravados
 // ao vivo direto em fita de dois canais (Unpolished, Ras Mek Peace), sem reverb e sem eco; bubble oco
 // (8' + 4' + 2⅔'), chop cheio sem percussão, Leslie lenta e discreta, key click aparente; o EQ tira o grave
-// do caminho do baixo pesado e dá um pouco de médio. Registros e EQ são uma aproximação de ouvido.
+// do caminho do baixo pesado, tira um pouco de médio e compensa o volume na SAÍDA. Registros e EQ são uma aproximação de ouvido.
 struct OrganTimbre
 {
     const char* name;
@@ -53,6 +54,7 @@ struct OrganTimbre
     float lesDepth;
     EqParams eq;
 };
+constexpr float kMidniteOutDb = 5.5f;   // compensação de volume (medida no teste: mesmo RMS do timbre do Mittoo)
 inline const OrganTimbre& midniteTimbre()
 {
     static const OrganTimbre t {
@@ -60,7 +62,7 @@ inline const OrganTimbre& midniteTimbre()
         { 0, 0, 8, 6, 4, 0, 0, 0, 0 }, { 8, 6, 8, 6, 0, 0, 0, 0, 0 },
         false, 0.12f, 0.55f, 0.0f,
         2, 0, 0.45f,
-        { true, 110.0f, -2.0f, 220.0f, 2.5f, 1100.0f, 0.9f, -1.5f, 6500.0f }
+        { true, 110.0f, -2.0f, 220.0f, -2.5f, 1100.0f, 0.9f, -1.5f, 6500.0f, kMidniteOutDb }
     };
     return t;
 }
@@ -124,7 +126,7 @@ struct Biquad
 class OrganEQ
 {
 public:
-    void prepare (double sampleRate) { sr = sampleRate; for (auto& b : bq) b.reset(); dirty = true; }
+    void prepare (double sampleRate) { sr = sampleRate; for (auto& b : bq) b.reset(); design(); gain = target; }
     void set (const EqParams& p) { if (! (p == cur)) { cur = p; dirty = true; } }
     const EqParams& params() const { return cur; }
 
@@ -137,7 +139,8 @@ public:
             float l = L[s], r = R[s];
             for (int k = 0; k < 4; ++k)
                 if (active[k]) { l = bq[k].process (l, 0); r = bq[k].process (r, 1); }
-            L[s] = l; R[s] = r;
+            gain += (target - gain) * 0.0015f;   // ganho de saída sem estalo
+            L[s] = l * gain; R[s] = r * gain;
         }
     }
 
@@ -146,7 +149,7 @@ public:
     {
         if (! p.on) return 0.0;
         OrganEQ e; e.sr = sampleRate; e.cur = p; e.design();
-        double db = 0;
+        double db = p.out;
         for (int k = 0; k < 4; ++k) if (e.active[k]) db += e.bq[k].magnitudeDb (f, sampleRate);
         return db;
     }
@@ -155,6 +158,7 @@ private:
     void design()
     {
         dirty = false;
+        target = (float) std::pow (10.0, cur.out / 20.0);
         bq[0].design (0, sr, cur.hpf, 0, 0.7071);
         bq[1].design (1, sr, cur.lowF, cur.lowG, 0.7071);
         bq[2].design (2, sr, cur.midF, cur.midG, std::fmax (0.2f, cur.midQ));
@@ -171,5 +175,6 @@ private:
     Biquad bq[4];
     bool active[4] = {};
     bool dirty = true;
+    float gain = 1.0f, target = 1.0f;
 };
 } // namespace mro

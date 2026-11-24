@@ -130,6 +130,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
         l.add (std::make_unique<AudioParameterFloat> (ParameterID { "eqMidQ", 1 }, "EQ medios Q", NormalisableRange<float> (0.3f, 4.0f, 0.01f, 0.5f), 0.8f));
         l.add (db ("eqHighG", "EQ agudos"));
         l.add (hz ("eqHighF", "EQ agudos frequencia", 1500.0f, 12000.0f, 5000.0f));
+        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "eqOut", 1 }, "EQ saida", NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f,
+                                                      AudioParameterFloatAttributes().withLabel ("dB")));
     }
     return l;
 }
@@ -208,6 +210,7 @@ void ReggaeOrganProcessor::setEq (const EqParams& e)
     setParam ("eqLowG", e.lowG);   setParam ("eqLowF", e.lowF);
     setParam ("eqMidG", e.midG);   setParam ("eqMidF", e.midF);   setParam ("eqMidQ", e.midQ);
     setParam ("eqHighG", e.highG); setParam ("eqHighF", e.highF);
+    setParam ("eqOut", e.out);
 }
 
 EqParams ReggaeOrganProcessor::getEq() const
@@ -218,6 +221,7 @@ EqParams ReggaeOrganProcessor::getEq() const
     e.lowG = get ("eqLowG");   e.lowF = get ("eqLowF");
     e.midG = get ("eqMidG");   e.midF = get ("eqMidF");   e.midQ = get ("eqMidQ");
     e.highG = get ("eqHighG"); e.highF = get ("eqHighF");
+    e.out = get ("eqOut");
     return e;
 }
 
@@ -235,7 +239,7 @@ int ReggaeOrganProcessor::getEqPreset() const
     {
         const EqParams& p = eqPreset (i).p;
         if (e.on && near (e.hpf, p.hpf) && near (e.lowG, p.lowG) && near (e.lowF, p.lowF) && near (e.midG, p.midG)
-            && near (e.midF, p.midF) && near (e.midQ, p.midQ) && near (e.highG, p.highG) && near (e.highF, p.highF))
+            && near (e.midF, p.midF) && near (e.midQ, p.midQ) && near (e.highG, p.highG) && near (e.highF, p.highF) && near (e.out, p.out))
             return i;
     }
     return -1;
