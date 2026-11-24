@@ -597,6 +597,11 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
         addAndMakeVisible (*m.dur);
         if (i > 0) setupToggle (m.on, "on" + n, "ON");
     }
+    // padrão do skank: contratempo ou bang-bang (o double chop do Mastor Reggae Guitar MRG-68)
+    patternWin = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("skankStyle"), [] (int p) -> std::pair<juce::String, juce::String>
+                 { return p == dub::SkankBangBang ? std::pair<juce::String, juce::String> { "BANG-BANG", "+1/16" }
+                                                  : std::pair<juce::String, juce::String> { "CONTRATEMPO", "" }; });
+    addAndMakeVisible (*patternWin);
 
 
 
@@ -1018,26 +1023,6 @@ void DubChordsPanel::renderBackground()
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
     g.drawText (juce::String::fromUTF8 ("PADR\xc3\x83O DO SKANK"), patternArea.translated (0, -15).withHeight (12), juce::Justification::centred);
-    {   // skank sempre no contratempo: janela fixa no lugar do antigo seletor
-        auto b = patternArea.toFloat();
-        g.setColour (juce::Colours::black.withAlpha (0.35f));
-        g.fillRoundedRectangle (b.translated (0, 2.0f), 5.0f);
-        juce::ColourGradient frame (juce::Colour (0xff3a3632), b.getX(), b.getY(), juce::Colour (0xff141210), b.getX(), b.getBottom(), false);
-        g.setGradientFill (frame);
-        g.fillRoundedRectangle (b, 5.0f);
-        auto win = b.reduced (14.0f, 7.0f);
-        g.setColour (juce::Colour (0xff0c0907));
-        g.fillRoundedRectangle (win.expanded (2.0f), 3.0f);
-        juce::ColourGradient drum (juce::Colour (0xff8f8264), win.getX(), win.getY(), juce::Colour (0xff8f8264), win.getX(), win.getBottom(), false);
-        drum.addColour (0.25, juce::Colour (0xffefe5cc));
-        drum.addColour (0.55, juce::Colour (0xfff6ecd6));
-        drum.addColour (0.85, juce::Colour (0xffcbbd98));
-        g.setGradientFill (drum);
-        g.fillRoundedRectangle (win, 2.0f);
-        g.setColour (colours::ink);
-        g.setFont (stencil (17.0f, 0.06f));
-        g.drawText ("CONTRATEMPO", win, juce::Justification::centred);
-    }
     {   // notas sempre 1/32: plaqueta gravada no lugar do antigo seletor
         auto r = patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44).toFloat();
         g.setColour (juce::Colours::white.withAlpha (0.45f));
@@ -1172,6 +1157,7 @@ void DubChordsPanel::resized()
         a.removeFromTop (34);
         auto left = a.removeFromLeft (190);
         patternArea = left.removeFromTop (52);
+        if (patternWin != nullptr) patternWin->setBounds (patternArea);
         a.removeFromLeft (8);
         const int kw = a.getWidth() / 3;
         for (auto* k : { &center, &velocity, &swing })

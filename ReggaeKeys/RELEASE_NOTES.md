@@ -1,3 +1,13 @@
+## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+
+- **Groove BANG-BANG na CHORD MACHINE:** o PADRÃO DO SKANK agora troca entre **CONTRATEMPO** (o skank nos "e") e **BANG-BANG**, o double chop do Mastor Reggae Guitar MRG-68 no piano: o acorde acentuado no "e" e só a mão direita (a oitava de cima), mais fraca, na semicolcheia seguinte (1/16 depois). Contagem com a caixa no 2 e no 4; vale no som interno, no piano e no órgão deste instrumento, no MIDI exportado e no arraste
+- Projetos antigos abrem no CONTRATEMPO, como antes
+- Versão para celular 3.1 com o mesmo seletor (e o mesmo motor: o teste confere que o navegador gera o mesmo MIDI do plugin)
+
+É um instrumento: no Cubase, carregue numa *Instrument Track*.
+
+---
+
 ## Mastor Reggae Keys MRK-80 3.0 🟢🟡⚫
 
 - **Nome novo:** o Mastor Roots Keys MRK-80 passa a se chamar **Mastor Reggae Keys MRK-80** e absorve o Mastor Reggae Chord Machine MRCM-1240, que deixa de ser um plugin separado (o MRCM-1240 2.4 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo

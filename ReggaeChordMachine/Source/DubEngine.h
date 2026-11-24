@@ -60,16 +60,21 @@ inline double noteSizeBeats (int n)
 }
 
 //==============================================================================
-// Padrões do skank (grade de 16 semicolcheias por compasso)
-// Só o contratempo (o skank clássico nos "e" de cada tempo); os outros padrões saíram na 1.7.
-enum Pattern { SkankOffbeat, NumPatterns };
+// Padrões do skank (grade de 16 semicolcheias por compasso, contagem com a caixa no 2 e no 4)
+//   Contratempo: o skank clássico nos "e" de cada tempo
+//   Bang-bang (double chop, o mesmo do Mastor Reggae Guitar MRG-68): o acorde acentuado no "e" +
+//   só a mão direita (a oitava de cima), mais fraca, na semicolcheia seguinte (1/16 depois)
+enum Pattern { SkankOffbeat, SkankBangBang, NumPatterns };
 
-inline const char* patternName (int) { return "Contratempo"; }
+inline const char* patternName (int p) { return p == SkankBangBang ? "Bang-bang" : "Contratempo"; }
 
-struct Hit { int step; float vel; };
+struct Hit { int step; float vel; bool upper = false; };   // upper: só a mão direita do skank
 
-inline std::vector<Hit> patternHits (int)
+inline std::vector<Hit> patternHits (int p)
 {
+    if (p == SkankBangBang)
+        return { { 2, 1.0f }, { 3, 0.62f, true }, { 6, 1.0f }, { 7, 0.62f, true },
+                 { 10, 1.0f }, { 11, 0.62f, true }, { 14, 1.0f }, { 15, 0.62f, true } };
     return { { 2, 1.0f }, { 6, 1.0f }, { 10, 1.0f }, { 14, 1.0f } };
 }
 
@@ -269,8 +274,8 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
 
         // mão esquerda (voicing) + mão direita uma oitava acima
         const auto& left = voicings.notes[(size_t) si];
-        std::vector<int> skank = left;
-        for (int n : left) skank.push_back (n + 12);
+        std::vector<int> skank = left, skankUpper;
+        for (int n : left) { skank.push_back (n + 12); skankUpper.push_back (n + 12); }
         const std::vector<int>& organRight = left;              // bubble: mão direita = mão esquerda do skank
         std::vector<int> organLeft;                              //         mão esquerda uma oitava abaixo
         for (int n : left) organLeft.push_back (n - 12);
@@ -288,7 +293,7 @@ inline std::vector<NoteEvent> buildLoop (const std::vector<ChordSlot>& slots, co
                 const double start = st * 0.25 + swingOffset;
                 const double len = hitLength (hs, h, noteBeats, swingOffset);
                 const int vel = std::clamp ((int) std::lround (hs[h].vel * s.velocity * velScale * 127.0f), 1, 127);
-                for (int note : notes)
+                for (int note : (hs[h].upper && channel == ChSkank ? skankUpper : notes))
                     events.push_back ({ start, len, std::clamp (note, 0, 127), vel, channel, si });
             }
         };

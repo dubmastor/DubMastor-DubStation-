@@ -17,6 +17,7 @@ const fixed = [
   { s: { pattern: 0, centerNote: 60, velocity: 0.8, noteSize: 0, swing: 0, bubble: 0 }, slots: [[9, 1, 2, -1], [2, 1, 2, -1]] },
   { s: { pattern: 0, centerNote: 60, velocity: 0.8, noteSize: 1, swing: 0.6, bubble: 1 }, slots: [[9, 1, 8, -1], [2, 1, 4, -1], [4, 1, 2, -1], [7, 0, 2, -1]] },
   { s: { pattern: 0, centerNote: 55, velocity: 1.0, noteSize: 4, swing: 0.3, bubble: 1 }, slots: [[0, 0, 4, 2], [5, 0, 4, 1], [7, 0, 4, 0], [9, 1, 4, -1]] },
+  { s: { pattern: 1, centerNote: 60, velocity: 0.8, noteSize: 0, swing: 0.2, bubble: 1 }, slots: [[9, 1, 8, -1], [2, 1, 4, -1], [4, 1, 4, -1]] },   // bang-bang
 ];
 for (const f of fixed) scenarios.push(f);
 for (let k = 0; k < 300; k++) {
@@ -26,7 +27,7 @@ for (let k = 0; k < 300; k++) {
     const on = i < n || rnd() < 0.3;
     slots.push([Math.floor(rnd() * 12), rnd() < 0.5 ? 0 : 1, on ? M.DURATIONS[Math.floor(rnd() * 6)].beats : 0, Math.floor(rnd() * 4) - 1]);
   }
-  scenarios.push({ s: { pattern: 0, centerNote: 48 + Math.floor(rnd() * 25),
+  scenarios.push({ s: { pattern: rnd() < 0.5 ? 1 : 0, centerNote: 48 + Math.floor(rnd() * 25),
     velocity: f32(Math.round(rnd() * 90 + 10) / 100), noteSize: Math.floor(rnd() * 5),
     swing: f32(Math.round(rnd() * 100) / 100), bubble: rnd() < 0.6 ? 1 : 0 }, slots });
 }

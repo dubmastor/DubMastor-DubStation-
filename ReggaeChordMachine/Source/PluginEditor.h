@@ -174,7 +174,8 @@ private:
     std::array<ChordModule, DubChordsProcessor::numSlots> mods;
     Knob center, velocity, swing;
     Knob bpm, pianoLvl, organLvl, reps;
-    juce::Rectangle<int> patternArea;   // skank sempre no contratempo (janela fixa)
+    juce::Rectangle<int> patternArea;   // padrão do skank: contratempo ou bang-bang
+    std::unique_ptr<ChoiceWindow> patternWin;
     Toggle bubble, sound;
     PreviewButton previewBtn;
     std::unique_ptr<ButtonAttach> previewAtt;

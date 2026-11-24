@@ -1,3 +1,11 @@
+## Mastor Riddim Machine MRM-0420 2.5 — DubStation
+
+- **Groove BANG-BANG na HARMONIA:** o PADRÃO DO SKANK da machine de harmonia (a do Mastor Reggae Keys MRK-80 3.1) troca entre **CONTRATEMPO** e **BANG-BANG**: o acorde acentuado no "e" e só a mão direita, mais fraca, na semicolcheia seguinte (1/16 depois), o mesmo double chop do Mastor Reggae Guitar MRG-68. Contagem com a caixa no 2 e no 4
+- Projetos antigos abrem no CONTRATEMPO, como antes
+- Versão para celular 2.5 com o mesmo motor de harmonia
+
+---
+
 ## Mastor Riddim Machine MRM-0420 2.4 — DubStation
 
 - **BANCO ÚNICO DE RIDDIMS nos PRESETS da aba RIDDIM:** 356 músicas em 10 estilos e 155 riddims de A a Z, o mesmo banco do MRCM-1240, do MRDM-12 e do MRBM-69 (`RiddimBank/`). A música vai inteira para as três máquinas: harmonia conferida, BPM, kit, baterista e baixista mais próximos de quem gravou

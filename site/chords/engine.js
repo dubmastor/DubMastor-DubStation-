@@ -27,11 +27,14 @@
     { name: '1/32', sub: 'FUSA', beats: 0.125 }, { name: '1/16', sub: 'SEMICOLCHEIA', beats: 0.25 },
     { name: '1/8', sub: 'COLCHEIA', beats: 0.5 }, { name: '1/4', sub: 'SEMÍNIMA', beats: 1.0 },
     { name: '1/2', sub: 'MÍNIMA', beats: 2.0 }];
-  const PATTERNS = ['CONTRATEMPO'];
+  const PATTERNS = ['CONTRATEMPO', 'BANG-BANG'];
   const INVERSIONS = ['FUND', '1ª INV', '2ª INV'];
 
-  // só o contratempo (os outros padrões saíram na 1.7)
-  function patternHits() {
+  // contratempo (skank nos "e") ou bang-bang: o acorde no "e" + só a mão direita 1/16 depois, mais fraca
+  // (igual ao DubEngine.h do plugin; o mesmo double chop do Mastor Reggae Guitar MRG-68)
+  function patternHits(p) {
+    if (p === 1) return [{ step: 2, vel: 1.0 }, { step: 3, vel: 0.62, upper: true }, { step: 6, vel: 1.0 }, { step: 7, vel: 0.62, upper: true },
+      { step: 10, vel: 1.0 }, { step: 11, vel: 0.62, upper: true }, { step: 14, vel: 1.0 }, { step: 15, vel: 0.62, upper: true }];
     return [{ step: 2, vel: 1.0 }, { step: 6, vel: 1.0 }, { step: 10, vel: 1.0 }, { step: 14, vel: 1.0 }];
   }
 
@@ -133,7 +136,7 @@
       const slot = slots[si];
       if (slot.beats <= 0) continue;
       const left = voicings.notes[si];
-      const skank = left.concat(left.map((n) => n + 12));
+      const skank = left.concat(left.map((n) => n + 12)), skankUpper = left.map((n) => n + 12);
       const organRight = left, organLeft = left.map((n) => n - 12);
       const firstStep = lround(pos * 4), numSteps = lround(slot.beats * 4);
       for (let st = firstStep; st < firstStep + numSteps; st++) {
@@ -144,7 +147,7 @@
           const start = st * 0.25 + swingOffset;
           const len = hitLength(hits, h, noteBeats, swingOffset);
           const vel = clamp(lround(f32(f32(f32(f32(hits[h].vel) * velocity) * 1.0) * 127)), 1, 127);
-          for (const note of skank) events.push({ start, length: len, note: clamp(note, 0, 127), velocity: vel, channel: ChSkank, slot: si });
+          for (const note of (hits[h].upper ? skankUpper : skank)) events.push({ start, length: len, note: clamp(note, 0, 127), velocity: vel, channel: ChSkank, slot: si });
         }
         if (s.bubble) {
           for (let h = 0; h < bub.length; h++) {

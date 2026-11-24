@@ -50,6 +50,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
         layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "noteSize", 1 }, "Tamanho da nota", sizes, 0));   // 1/32
     }
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "bubble", 1 }, "Bubble (orgao)", false));
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "skankStyle", 1 }, "Padrao do skank",
+                                                        StringArray { "Contratempo", "Bang-bang" }, 0));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "swing", 1 }, "Swing", 0.0f, 1.0f, 0.0f));
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "preview", 1 }, "Preview (clock interno)", false));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "bpm", 1 }, "BPM interno", NormalisableRange<float> (50.0f, 180.0f, 1.0f), 75.0f));
@@ -129,7 +131,7 @@ std::vector<dub::ChordSlot> DubChordsProcessor::getSlots() const
 dub::Settings DubChordsProcessor::getSettings() const
 {
     dub::Settings s;
-    s.pattern    = dub::SkankOffbeat;   // skank sempre no contratempo
+    s.pattern    = juce::jlimit (0, dub::NumPatterns - 1, (int) param ("skankStyle"));   // contratempo ou bang-bang
     s.centerNote = (int) param ("center");
     s.velocity   = param ("velocity");
     s.noteSize   = 0;   // todas as notas sempre 1/32 (o parâmetro "noteSize" ficou só para abrir projetos antigos)
