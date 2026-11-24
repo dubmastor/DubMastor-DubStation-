@@ -136,6 +136,8 @@ Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteir
 Drum machine no estilo MPC2500 com os kits do Monstro.zip (Academia de Beats). **Não faz parte do Dub Station**: fica fora do
 `plugins.json`, das páginas do Dub Station e do instalador completo. Site próprio em `site/monstro/` (versão para celular em
 `site/monstro/app/`), instaladores próprios em `Monstro/MonstroMachine/installer/`, workflow `build-monstromachine.yml`, release `MM-2500-x.y`.
-O motor (`Source/MonstroEngine.h`) tem uma cópia em JavaScript na versão para celular (`play`, `charOf`, `vpar`, `PATTERNS`): ao mudar um, mude o outro.
+O motor (`Source/MonstroEngine.h`) tem uma cópia em JavaScript na versão para celular (`play`, `charOf`, `vpar`, `PATTERNS`, e desde a 1.1
+`kitCountF`, `kitVars`, `PROF` e `GEN`/`groove`; a pasta do usuário em `buildLib`): ao mudar um, mude o outro (o mesmo produtor tem que sair com o mesmo groove e os mesmos kits;
+o teste confere o hash do groove do DubMastor e do Nox). Cada produtor tem vários kits (parâmetro `pkit`) e um groove próprio, inspirado no estilo dele.
 Toda alteração sobe a versão no `CMakeLists.txt`, no README, no `RELEASE_NOTES.md`, nos links de `site/monstro/index.html` e no `VERSION` do app.
 Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).

@@ -104,8 +104,8 @@ inline int famOfContent (const std::string& raw)
     if (has (s, "efeito") || has (s, "fx")) return FX;
     return -1;
 }
-// quantos timbres de cada família o kit traz (8 quando o kit não publica a lista)
-inline int famCount (int kit, int fam)
+// quantos timbres de cada família o kit publica (0 quando não publica)
+inline int famRaw (int kit, int fam)
 {
     const std::string c = kits()[(size_t) kit].contents;
     int n = 0; size_t p = 0;
@@ -117,8 +117,10 @@ inline int famCount (int kit, int fam)
         if (q == std::string::npos) break;
         p = q + 1;
     }
-    return n > 0 ? n : 8;
+    return n;
 }
+// quantos timbres de cada família o kit traz (8 quando o kit não publica a lista)
+inline int famCount (int kit, int fam) { const int n = famRaw (kit, fam); return n > 0 ? n : 8; }
 
 // ---------------------------------------------------------------- aleatório igual ao da web
 // FNV-1a sobre as unidades UTF-16 (como o hash da web); continua de h para juntar pedaços sem alocar
@@ -225,6 +227,209 @@ inline const std::array<Seq, numSeqs>& patterns (const std::string& style)
     if (style == "boombap") return boombap;
     if (style == "funk") return funk;
     return drill;
+}
+
+
+// ---------------------------------------------------------------- kits do produtor (KIT 1 = o original)
+// mesmo cálculo da web (kitCountF e kitVars): cada kit escolhe outros timbres da mesma família, do mesmo produtor
+inline int kitCountF (int kit)
+{
+    const int kk = famRaw (kit, KICK), sn = famRaw (kit, SNARE) + famRaw (kit, CLAP);
+    return std::max (3, std::min (8, std::min (kk ? kk : 8, sn ? sn : 8)));
+}
+inline std::array<int, numPads> kitVars (int kit, int n)
+{
+    std::array<int, numPads> v {};
+    if (n <= 0) return v;
+    char num[16]; std::snprintf (num, sizeof num, "%d", n);
+    for (int fam = 0; fam < numFams; ++fam)
+    {
+        std::vector<int> ps;
+        for (int p = 0; p < numPads; ++p) if (padFam()[(size_t) p] == fam) ps.push_back (p);
+        if (ps.empty()) continue;
+        const int cnt = famCount (kit, fam);
+        uint32_t h = hashCont (2166136261u, kits()[(size_t) kit].name);
+        h = hashCont (hashCont (hashCont (hashCont (h, "|KIT|"), num), "|"), famNames()[(size_t) fam]);
+        Rng r (h);
+        const int base = (int) std::floor (r() * cnt);
+        for (size_t j = 0; j < ps.size(); ++j) v[(size_t) ps[j]] = (base + (int) j) % cnt;
+    }
+    return v;
+}
+
+// ---------------------------------------------------------------- groove de cada produtor (mesmo gerador da web: PROF e GEN)
+// inspirado no estilo dos artistas com quem cada produtor trabalha; 4 SEQs: A principal, B variação, C break, D virada
+struct Prof { const char* name; const char* g; int sw, roll, slide, vox, perc, open, rim, k, heavy; const char* d; };
+inline const std::vector<Prof>& profs()
+{
+    //  nome                 groove      sw rl sl vx pc op rm  k hv
+    static const std::vector<Prof> p {
+    { "DubMastor",        "reggae",   56, 0, 0, 0, 1, 0, 0, -1, 0, "Steppers e rub-a-dub com aro e caixa no 2 e no 4, shaker e 808 andando como baixo (reggae do Cidade Verde Sounds)." },
+    { "Nox",              "trap",     50, 2, 1, 2, 0, 1, 0, -1, 0, "Trap melódico na linha do Matuê: rolos de hi-hat, 808 deslizando e chops de voz." },
+    { "Neo Beats",        "trapfunk", 52, 1, 0, 0, 1, 0, 0, -1, 0, "Trap com o kick do funk carioca (MC Poze do Rodo, Xamã)." },
+    { "Ecologyk",         "trap",     50, 2, 1, 0, 0, 1, 0, -1, 0, "Trap clássico (Matuê, Haikaiss, Costa Gold): rolos de hi-hat e open hat." },
+    { "Pedro Lotto",      "trap",     50, 1, 2, 1, 0, 0, 0, -1, 0, "Trap de SP (Veigh, Vulgo FK) com o 808 deslizando bastante." },
+    { "Skeeter",          "trap",     50, 1, 0, 0, 0, 0, 0, -1, 0, "Trap (sem créditos públicos: groove de trap padrão)." },
+    { "André Nine",       "funksp",   52, 0, 0, 0, 2, 0, 0, -1, 0, "Funk de SP (MC Hariel, MC Ryan SP): kick pesado, palma no 2 e no 4 e percussão." },
+    { "DogDu Beats",      "trap",     50, 2, 0, 2, 0, 0, 0, -1, 0, "Trap (Sidoka, Zemaru) com efeitos de voz." },
+    { "DJ Coala",         "boombap",  61, 0, 0, 1, 1, 0, 0, -1, 0, "Boom bap do rap nacional (RZO, Tribo da Periferia) com swing." },
+    { "Caio Passos",      "funksp",   52, 0, 0, 2, 2, 0, 0, -1, 0, "Funk de SP (MC Hariel, MC Daniel, Hyperanhas) cheio de percussão e vox." },
+    { "Chiocki",          "trap",     50, 3, 0, 1, 0, 2, 0, -1, 0, "Trap (Kant, NOG) com chants, open hats e muitos rolos." },
+    { "Robert Beats",     "trap",     50, 1, 0, 0, 0, 0, 0, -1, 0, "Trap (sem créditos públicos: groove de trap padrão)." },
+    { "DJ Caíque",        "funkrj",   52, 0, 0, 0, 1, 0, 0, -1, 0, "Funk no tamborzão (sem créditos públicos)." },
+    { "Chris Beats",      "trapfunk", 51, 2, 1, 0, 1, 0, 0, -1, 0, "Trap do Rio que conversa com o funk (Filipe Ret, L7nnon, MC Cabelinho)." },
+    { "Portugal No Beat", "trap",     50, 1, 1, 0, 0, 1, 0, -1, 0, "Trap carioca (Filipe Ret, Jovem Dex)." },
+    { "Kouth",            "trap",     50, 2, 1, 0, 0, 0, 1, -1, 0, "Trap de SP (Derek, UCLÃ) com rimshot." },
+    { "Jess",             "trap",     50, 1, 1, 0, 0, 0, 0,  0, 0, "Trap mais espaçado (Orochi, Bin), com 808 de ambiência." },
+    { "Deekapz",          "funkbr",   54, 0, 0, 1, 2, 0, 0, -1, 0, "Funk com percussão brasileira, como nos shows dos festivais." },
+    { "Blakbone",         "drill",    50, 0, 2, 0, 0, 0, 0, -1, 0, "Drill: hi-hat em grupos de 3, caixa no 3 e 808 deslizando." },
+    { "DJ Coala Vol.3",   "boombap",  60, 0, 0, 1, 1, 0, 0, -1, 0, "Boom bap do rap nacional com swing." },
+    { "Dallass",          "trap",     50, 2, 0, 0, 0, 0, 0, -1, 0, "Trap (sem créditos públicos: groove de trap padrão)." },
+    { "Celo",             "trap",     50, 1, 1, 1, 0, 0, 0, -1, 0, "Trap (Leozin)." },
+    { "Peunubeat",        "trap",     50, 1, 0, 0, 0, 0, 0, -1, 0, "Trap (sem créditos públicos: groove de trap padrão)." },
+    { "Tibery",           "trap",     50, 2, 0, 0, 0, 0, 0, -1, 0, "Trap (sem créditos públicos: groove de trap padrão)." },
+    { "Nagalli",          "trap",     50, 2, 2, 0, 0, 1, 0,  0, 0, "Trap do \"Magic Show\" (L7nnon, Veigh, Kayblack): kick espaçado e 808 forte." },
+    { "Neckklace",        "trap",     50, 1, 1, 0, 0, 1, 0, -1, 0, "Trap melódico (coprodutor de \"Serenata\")." },
+    { "DJ Oreia",         "funkrj",   52, 0, 0, 1, 2, 0, 0, -1, 0, "Funk no tamborzão com percussão e vox." },
+    { "Kotim",            "funksp",   52, 0, 0, 1, 1, 0, 0, -1, 1, "Funk mandelão: kick e 808 pesados." },
+    { "DJ Win",           "funkrj",   52, 0, 0, 0, 1, 0, 0, -1, 0, "Funk no tamborzão (sem créditos públicos)." },
+    { "Cheek",            "drill",    50, 0, 1, 0, 0, 0, 0, -1, 0, "Drill: hi-hat em grupos de 3 e 808 deslizando." },
+    { "DJ Coala Vol.4",   "boombap",  62, 0, 0, 1, 1, 0, 0, -1, 0, "Boom bap do rap nacional com swing." },
+    { "Attlanta",         "trap",     50, 2, 0, 0, 0, 1, 0, -1, 0, "Trap com rolos de hi-hat e open hat." },
+    { "Fepache",          "trap",     50, 1, 2, 0, 0, 0, 0, -1, 0, "Trap de SP (\"Ballena\"), com o 808 deslizando." },
+    };
+    return p;
+}
+inline Prof prof (int kit)
+{
+    const std::string n = kits()[(size_t) kit].name;
+    for (auto& x : profs()) if (n == x.name) return x;
+    return { kits()[(size_t) kit].name, kits()[(size_t) kit].style, 54, 1, 0, 0, 0, 0, 0, -1, 0, styleName (kits()[(size_t) kit].style) };
+}
+
+namespace gen
+{
+    using L = std::vector<int>;
+    inline void put (Seq& g, int pad, const L& steps, int v = 1)
+    { for (int s : steps) if (s >= 0 && s < numSteps) g[(size_t) pad][(size_t) s] = (uint8_t) std::max ((int) g[(size_t) pad][(size_t) s], v); }
+    inline int pick (Rng& r, const L& a) { return a[(size_t) std::floor (r() * (double) a.size())]; }
+    inline const L& pick (Rng& r, const std::vector<L>& a) { return a[(size_t) std::floor (r() * (double) a.size())]; }
+    inline L all() { L a; for (int i = 0; i < 16; ++i) a.push_back (i); return a; }
+    static const L EIGHT { 0, 2, 4, 6, 8, 10, 12, 14 }, TAMB { 0, 3, 6, 8, 11, 14 };
+
+    // pads: 0 KICK 1 KICK2 2 SNARE 3 CLAP 4 RIM 5 HH 6 OH 7 CRASH 8-10 PERC 11 SHAKER 12 808 13 808 SLIDE 14 FX 15 VOX
+    inline void reggae (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {   // contagem do reggae: caixa/aro só no 2 e no 4 (passos 5 e 13); nunca o drop no 3
+        const L off { 2, 6, 10, 14 }, shk { 1, 3, 5, 7, 9, 11, 13, 15 };
+        put (A, 0, { 0, 4, 8, 12 }); put (A, 4, { 4, 12 }, 2); put (A, 5, off); put (A, 11, shk); put (A, 12, pick (r, std::vector<L> { { 0, 7, 8, 14 }, { 0, 3, 8, 11 }, { 0, 6, 8, 15 } }));
+        put (B, 0, { 0, 8 }); put (B, 2, { 4, 12 }, 2); put (B, 5, EIGHT); put (B, 6, { 14 }); put (B, 11, shk); put (B, 12, pick (r, std::vector<L> { { 0, 3, 8, 11 }, { 0, 7, 8, 10 } })); if (p.perc) put (B, 8, { 15 });
+        put (C, 0, { 0, 8, pick (r, L { 6, 10, 14 }) }); put (C, 2, { 4, 12 }, 2); put (C, 4, { 4, 12 }); put (C, 5, off); put (C, 8, { 3, 11 }); put (C, 12, { 0, 8 });
+        put (D, 0, { 0, 4, 8, 12 }); put (D, 4, { 4 }, 2); put (D, 2, { 12 }, 2); put (D, 5, off); put (D, 7, { 0 }); put (D, 8, { 13 }); put (D, 9, { 14 }); put (D, 10, { 15 }); put (D, 14, { 15 }); put (D, 12, { 0, 8 });
+    }
+    inline void trap (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {
+        const L kick = pick (r, p.k == 0 ? std::vector<L> { { 0, 10 }, { 0, 11 }, { 0, 7 } }
+                              : p.k == 2 ? std::vector<L> { { 0, 3, 7, 10, 13 }, { 0, 6, 7, 10, 14 } }
+                                         : std::vector<L> { { 0, 10 }, { 0, 7, 10 }, { 0, 3, 10 }, { 0, 6, 10, 11 }, { 0, 10, 13 } });
+        L rolls;
+        for (int i = 0; i < p.roll; ++i) { const L x = pick (r, std::vector<L> { { 6, 7 }, { 14, 15 }, { 10, 11 }, { 3 }, { 12, 13, 14, 15 } }); rolls.insert (rolls.end(), x.begin(), x.end()); }
+        for (Seq* g : { &A, &B, &D }) { put (*g, 0, kick); put (*g, 3, { 8 }, 2); put (*g, 5, EIGHT); put (*g, 5, rolls); }
+        if (r() < .5) put (A, 2, { 8 });
+        if (p.rim) put (A, 4, { pick (r, L { 7, 13, 15 }) });
+        const int last = kick.back();
+        for (Seq* g : { &A, &B })
+            for (int s : kick) put (*g, (p.slide && s == last && (p.slide > 1 || r() < .6)) ? 13 : 12, { s });
+        if (p.open) put (A, 6, { pick (r, L { 6, 14 }) });
+        if (p.perc) put (A, 8, { pick (r, L { 7, 11, 15 }) });
+        if (p.vox) put (A, 15, { pick (r, L { 15, 6, 14 }) });
+        const int ex = pick (r, L { 3, 13, 14, 6 }); put (B, 0, { ex }); put (B, 12, { ex });
+        { L f; for (int s : { 1, 5, 9, 11, 13 }) if (r() < .45) f.push_back (s); put (B, 5, f); }
+        if (p.open) put (B, 6, { 14 });
+        if (p.vox > 1) put (B, 15, { 6, 15 });
+        put (C, 0, { 0 }); put (C, 3, { 8 }, 2); put (C, 5, { 0, 4, 8, 12 }); put (C, 12, { 0 }); if (p.slide) put (C, 13, { 10 }); if (p.vox) put (C, 15, { 4, 12 }); put (C, 6, { 14 }); if (p.perc) put (C, 8, { 3, 11 });
+        put (D, 5, all()); put (D, 3, { 12, 13, 14 }); put (D, 3, { 15 }, 2); put (D, 7, { 0 }); put (D, 14, { 0 }); put (D, 12, kick);
+    }
+    inline void trapfunk (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {
+        const L kick = pick (r, std::vector<L> { { 0, 3, 6, 10 }, { 0, 3, 8, 11 }, { 0, 3, 6, 10, 13 } });
+        L rolls;
+        for (int i = 0; i < p.roll; ++i) { const L x = pick (r, std::vector<L> { { 6, 7 }, { 14, 15 }, { 10, 11 } }); rolls.insert (rolls.end(), x.begin(), x.end()); }
+        for (Seq* g : { &A, &B, &D }) { put (*g, 0, kick); put (*g, 3, { 4, 12 }, 2); put (*g, 5, EIGHT); put (*g, 5, rolls); }
+        for (Seq* g : { &A, &B }) for (size_t i = 0; i < kick.size(); ++i) put (*g, p.slide && i == kick.size() - 1 ? 13 : 12, { kick[i] });
+        put (A, 9, { pick (r, L { 7, 15 }) }); put (B, 8, TAMB); put (B, 6, { 14 });
+        put (C, 0, { 0, 8 }); put (C, 3, { 12 }, 2); put (C, 8, TAMB); put (C, 5, { 0, 4, 8, 12 }); put (C, 12, { 0 });
+        put (D, 5, all()); put (D, 3, { 13, 14 }, 1); put (D, 3, { 15 }, 2); put (D, 7, { 0 }); put (D, 14, { 0 });
+    }
+    inline void funkrj (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {   // tamborzão: x..x..x.x..x..x.
+        const L k = pick (r, std::vector<L> { { 0, 8 }, { 0, 3, 8, 11 }, { 0, 8, 11 } });
+        put (A, 0, k); put (A, 8, TAMB); put (A, 3, { 4, 12 }, 2); put (A, 5, { 2, 6, 10, 14 }); put (A, 12, { 0, 8 }); if (p.vox) put (A, 15, { 15 }); if (p.perc > 1) put (A, 9, { 2, 10 });
+        put (B, 0, TAMB); put (B, 8, TAMB); put (B, 3, { 4, 12 }, 2); put (B, 5, EIGHT); put (B, 12, { 0, 6, 8 }); put (B, 10, { pick (r, L { 7, 15 }) });
+        put (C, 8, TAMB); put (C, 3, { 12 }, 2); put (C, 0, { 0 }); if (p.vox) put (C, 15, { 6, 14 });
+        put (D, 0, TAMB); put (D, 3, { 4, 12, 13, 14 }); put (D, 3, { 15 }, 2); put (D, 7, { 0 }); put (D, 14, { 15 }); put (D, 8, TAMB);
+    }
+    inline void funksp (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {   // beat de SP / mandelão
+        const L k = pick (r, std::vector<L> { { 0, 3, 6, 10, 13 }, { 0, 6, 8, 14 }, { 0, 3, 7, 10 } });
+        const L tuim = pick (r, std::vector<L> { { 7, 15 }, { 2, 10 }, { 6, 14 } });
+        for (Seq* g : { &A, &B, &D }) { put (*g, 0, k); put (*g, 3, { 4, 12 }, 2); }
+        put (A, 5, EIGHT); put (A, 9, tuim); if (p.perc > 1) put (A, 8, { pick (r, L { 3, 11 }) });
+        const L bass = p.heavy ? k : L { 0, 8 };
+        for (Seq* g : { &A, &B }) for (size_t i = 0; i < bass.size(); ++i) put (*g, p.heavy && i == bass.size() - 1 ? 13 : 12, { bass[i] });
+        if (p.vox) put (A, 15, { 15 });
+        if (p.vox > 1) put (B, 15, { 6, 14 });
+        { L h; for (int s = 0; s < 16; ++s) if (s % 4 != 3) h.push_back (s); put (B, 5, h); }
+        put (B, 9, tuim); put (B, 8, { 3, 11 }); put (B, 6, { 14 });
+        put (C, 0, { 0 }); put (C, 3, { 12 }, 2); put (C, 9, tuim); put (C, 12, { 0 }); if (p.vox) put (C, 15, { 4, 10 });
+        put (D, 5, all()); put (D, 3, { 13, 14 }); put (D, 3, { 15 }, 2); put (D, 7, { 0 }); put (D, 14, { 0 });
+    }
+    inline void funkbr (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {   // funk com percussão brasileira
+        const L k = pick (r, std::vector<L> { { 0, 3, 8, 11 }, { 0, 6, 8, 14 } });
+        for (Seq* g : { &A, &B, &D }) { put (*g, 0, k); put (*g, 3, { 4, 12 }, 2); put (*g, 11, all()); }
+        put (A, 8, { 2, 5, 10, 13 }); put (A, 10, TAMB); put (A, 12, { 0, 8 }); if (p.vox) put (A, 15, { 15 });
+        put (B, 8, { 2, 5, 7, 10, 13, 15 }); put (B, 10, TAMB); put (B, 9, { pick (r, L { 6, 14 }) }); put (B, 12, { 0, 6, 8 }); put (B, 5, { 2, 6, 10, 14 });
+        put (C, 10, TAMB); put (C, 8, { 2, 10 }); put (C, 3, { 12 }, 2); put (C, 0, { 0 }); put (C, 11, EIGHT);
+        put (D, 8, { 12, 13, 14, 15 }); put (D, 7, { 0 }); put (D, 14, { 15 });
+    }
+    inline void boombap (Rng& r, const Prof& p, Seq& A, Seq& B, Seq& C, Seq& D)
+    {
+        const L k1 = pick (r, std::vector<L> { { 0, 7, 10 }, { 0, 3, 10 }, { 0, 7, 9 }, { 0, 10, 11 }, { 0, 6, 10 } });
+        const L k2 = pick (r, std::vector<L> { { 0, 3, 10, 15 }, { 0, 7, 9, 10 }, { 0, 6, 7, 10 } });
+        put (A, 0, k1); put (A, 2, { 4, 12 }, 2); put (A, 5, EIGHT); put (A, 5, { pick (r, L { 3, 7, 11, 15 }) });
+        if (r() < .5) put (A, 6, { 14 });
+        put (A, 12, { 0 }); if (p.vox) put (A, 15, { 15 }); if (p.perc) put (A, 8, { 7 });
+        put (B, 0, k2); put (B, 2, { 4, 12 }, 2); put (B, 2, { pick (r, L { 7, 15 }) }); put (B, 5, EIGHT); put (B, 6, { 14 }); put (B, 12, { 0, 10 });
+        put (C, 0, { 0 }); put (C, 2, { 4, 12 }, 2); put (C, 5, { 0, 4, 8, 12 }); if (p.vox) put (C, 15, { 6, 14 });
+        put (D, 0, k1); put (D, 2, { 4, 12 }, 2); put (D, 4, { 13, 14, 15 }); put (D, 7, { 0 }); put (D, 5, EIGHT);
+    }
+    inline void drill (Rng& r, const Prof&, Seq& A, Seq& B, Seq& C, Seq& D)
+    {   // hi-hat em grupos de 3, caixa no 3 do half-time (passo 9)
+        const L k = pick (r, std::vector<L> { { 0, 11 }, { 0, 7, 11 }, { 0, 3, 11 } });
+        const int ghost = pick (r, L { 13, 14, 6 });
+        for (Seq* g : { &A, &B, &D }) { put (*g, 0, k); put (*g, 2, { 8 }, 2); put (*g, 5, TAMB); }
+        put (A, 2, { ghost }); put (A, 5, { pick (r, L { 1, 9, 15 }) }); put (A, 13, k); put (A, 12, { 0 });
+        put (B, 0, { 14 }); put (B, 2, { ghost, 15 }); put (B, 13, { 0, 7, 11, 14 }); put (B, 5, { 1, 9, 12, 13 }); put (B, 4, { 10 });
+        put (C, 2, { 8 }, 2); put (C, 5, TAMB); put (C, 13, { 0 });
+        put (D, 2, { 12, 13, 14 }); put (D, 2, { 15 }, 2); put (D, 7, { 0 }); put (D, 14, { 0 });
+    }
+}
+
+inline std::array<Seq, numSeqs> groove (int kit)
+{
+    const Prof p = prof (kit);
+    Rng r (hashCont (hashCont (2166136261u, kits()[(size_t) kit].name), "|GROOVE"));
+    std::array<Seq, numSeqs> s {};
+    const std::string g = p.g;
+    if (g == "reggae") gen::reggae (r, p, s[0], s[1], s[2], s[3]);
+    else if (g == "trapfunk") gen::trapfunk (r, p, s[0], s[1], s[2], s[3]);
+    else if (g == "funkrj") gen::funkrj (r, p, s[0], s[1], s[2], s[3]);
+    else if (g == "funksp") gen::funksp (r, p, s[0], s[1], s[2], s[3]);
+    else if (g == "funkbr") gen::funkbr (r, p, s[0], s[1], s[2], s[3]);
+    else if (g == "boombap") gen::boombap (r, p, s[0], s[1], s[2], s[3]);
+    else if (g == "drill") gen::drill (r, p, s[0], s[1], s[2], s[3]);
+    else gen::trap (r, p, s[0], s[1], s[2], s[3]);
+    return s;
 }
 
 // ---------------------------------------------------------------- DSP

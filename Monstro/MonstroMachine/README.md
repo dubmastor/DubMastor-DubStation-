@@ -1,11 +1,11 @@
-# Monstro Machine MM-2500 1.0
+# Monstro Machine MM-2500 1.1
 
 Drum machine no estilo da MPC2500 com os kits do **Monstro.zip**, o pack da **Academia de Beats**.
 É um produto **à parte**: não faz parte do Dub Station (fica fora do `plugins.json`, das páginas do Dub Station e do instalador completo).
 
 - Site: https://dubmastor.github.io/DubMastor-DubStation-/monstro/ (pasta `site/monstro/`)
 - Versão para celular / navegador: https://dubmastor.github.io/DubMastor-DubStation-/monstro/app/ (pasta `site/monstro/app/`)
-- Release: `MM-2500-1.0` (`MM-2500-Windows-Instalador.exe`, `MM-2500-macOS-Instalador.pkg`, `MM-2500-Windows.zip`, `MM-2500-macOS.zip`)
+- Release: `MM-2500-1.1` (`MM-2500-Windows-Instalador.exe`, `MM-2500-macOS-Instalador.pkg`, `MM-2500-Windows.zip`, `MM-2500-macOS.zip`)
 
 ![Interface](docs/interface.png)
 
@@ -15,7 +15,7 @@ Drum machine no estilo da MPC2500 com os kits do **Monstro.zip**, o pack da **Ac
 
 ## Código
 - `Source/MonstroEngine.h` — motor sem JUCE: kits, famílias, caráter de cada kit, variações dos timbres, grooves, síntese dos 16 pads, saturador e eco.
-  A versão para celular (`site/monstro/app/index.html`) tem a mesma síntese em JavaScript (`play`, `charOf`, `vpar`, `PATTERNS`):
+  A versão para celular (`site/monstro/app/index.html`) tem a mesma síntese em JavaScript (`play`, `charOf`, `vpar`, `PATTERNS`, `kitVars`, `PROF`, `groove`, `buildLib`):
   **ao mudar um, mude o outro** (mesmo hash e mesmo aleatório: o mesmo kit e o mesmo timbre soam iguais).
 - `Source/PluginProcessor.*` — parâmetros, 4 SEQs, transporte da DAW, MIDI que chega, samples do usuário, MIDI para a DAW.
 - `Source/PluginEditor.*` — interface da MPC (tela clicável, soft keys, modos, pads, passos).

@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <regex>
 
 using namespace juce;
 
@@ -12,6 +13,7 @@ AudioProcessorValueTreeState::ParameterLayout MonstroProcessor::createLayout()
     StringArray kitNames;
     for (auto& k : mm::kits()) kitNames.add ("Vol." + String (k.vol) + " " + String::fromUTF8 (k.name));
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "kit", 1 }, "Kit", kitNames, 0));
+    l.add (std::make_unique<AudioParameterInt> (ParameterID { "pkit", 1 }, "Kit do produtor", 0, 7, 0));
 
     // ---- sequenciador
     l.add (onOff ("machineOn", "Toca com a DAW", true));
@@ -78,9 +80,63 @@ void MonstroProcessor::selectKit (int index, bool keepSeqs)
     const auto& k = mm::kits()[(size_t) index];
     setParam ("kit", (float) index);
     setParam ("bpm", (float) k.bpm);
-    clearUserKit();
-    for (int p = 0; p < mm::numPads; ++p) setParam (pid ("var", p), 0.0f);
-    if (! keepSeqs) { styleOverride = {}; loadStyle (k.style); setParam ("seq", 0.0f); styleOverride = {}; }
+    if (! keepSeqs) { loadProducerGroove(); setParam ("seq", 0.0f); }
+    selectPk (0);
+}
+
+void MonstroProcessor::loadProducerGroove()
+{
+    const auto g = mm::groove (kit());
+    for (int s = 0; s < mm::numSeqs; ++s)
+        for (int p = 0; p < mm::numPads; ++p)
+            for (int st = 0; st < mm::numSteps; ++st) setStep (s, p, st, g[(size_t) s][(size_t) p][(size_t) st]);
+    setParam ("swing", (float) mm::prof (kit()).sw);
+    styleOverride = {};
+}
+
+int MonstroProcessor::kitCountOf (int producer) const
+{
+    const auto it = lib.find (producer);
+    return it != lib.end() && ! it->second.empty() ? jmin (8, (int) it->second.size()) : mm::kitCountF (producer);
+}
+
+String MonstroProcessor::kitLabel (int producer, int n) const
+{
+    const auto it = lib.find (producer);
+    if (it == lib.end() || n < 0 || n >= (int) it->second.size()) return {};
+    return it->second[(size_t) n].name;
+}
+
+void MonstroProcessor::selectPk (int n)
+{
+    const int c = jmax (1, kitCount());
+    n = ((n % c) + c) % c;
+    setParam ("pkit", (float) n);
+    for (auto& f : famFiles) f.clear();
+    for (int p = 0; p < mm::numPads; ++p) clearSample (p);
+    if (hasLib (kit())) { applyUserKit(); return; }
+    const auto v = mm::kitVars (kit(), n);
+    for (int p = 0; p < mm::numPads; ++p) setParam (pid ("var", p), (float) v[(size_t) p]);
+}
+
+// o kit da pasta vai para os pads: KICK 2, PERC 2… pegam o próximo arquivo da família
+void MonstroProcessor::applyUserKit()
+{
+    const auto it = lib.find (kit());
+    if (it == lib.end() || it->second.empty()) return;
+    const auto& uk = it->second[(size_t) jmin (pk(), (int) it->second.size() - 1)];
+    famFiles = uk.files;
+    std::array<int, mm::numFams> used {};
+    for (int p = 0; p < mm::numPads; ++p)
+    {
+        const int fam = mm::padFam()[(size_t) p];
+        const auto& L = famFiles[(size_t) fam];
+        const int j = used[(size_t) fam]++;
+        clearSample (p);
+        if (L.isEmpty()) { setParam (pid ("var", p), 0.0f); continue; }
+        setParam (pid ("var", p), (float) (j % L.size()));
+        loadSample (p, L[j % L.size()]);
+    }
 }
 
 void MonstroProcessor::loadStyle (const String& styleKey)
@@ -89,7 +145,7 @@ void MonstroProcessor::loadStyle (const String& styleKey)
     for (int s = 0; s < mm::numSeqs; ++s)
         for (int p = 0; p < mm::numPads; ++p)
             for (int st = 0; st < mm::numSteps; ++st) setStep (s, p, st, pats[(size_t) s][(size_t) p][(size_t) st]);
-    styleOverride = styleKey == String (mm::kits()[(size_t) kit()].style) ? String() : styleKey;
+    styleOverride = styleKey;   // groove de um estilo (o do produtor volta com loadProducerGroove)
 }
 
 int MonstroProcessor::notesIn (int s) const
@@ -171,43 +227,150 @@ void MonstroProcessor::clearSample (int pad)
 
 void MonstroProcessor::clearUserKit()
 {
-    userFolder = File();
     for (auto& f : famFiles) f.clear();
     for (int p = 0; p < mm::numPads; ++p) clearSample (p);
+}
+
+void MonstroProcessor::forgetFolders()
+{
+    lib.clear(); folders.clear();
+    selectPk (0);
+}
+
+// ---------------------------------------------------------------- pasta do usuário (mesma regra da web: buildLib)
+namespace
+{
+    // família pelo nome (arquivo e pasta de cima), na mesma ordem da web (FAMFILE)
+    int famOfFile (const std::string& s)
+    {
+        static const std::vector<std::pair<int, std::regex>> rules {
+            { mm::VOX, std::regex ("vox|vocal|chant|voz", std::regex::icase) },
+            { mm::OPENHAT, std::regex ("open|\\boh\\b", std::regex::icase) },
+            { mm::KICK, std::regex ("kick|bumbo|\\bbd\\b", std::regex::icase) },
+            { mm::SNARE, std::regex ("snare|caixa|\\bsd\\b", std::regex::icase) },
+            { mm::CLAP, std::regex ("clap|palma|snap", std::regex::icase) },
+            { mm::RIM, std::regex ("rim", std::regex::icase) },
+            { mm::HIHAT, std::regex ("hat|\\bhh\\b|hihat", std::regex::icase) },
+            { mm::CYMBAL, std::regex ("crash|cym|ride", std::regex::icase) },
+            { mm::B808, std::regex ("808|bass|baixo", std::regex::icase) },
+            { mm::SHAKER, std::regex ("shak", std::regex::icase) },
+            { mm::PERC, std::regex ("perc|conga|bongo|tom|fill", std::regex::icase) },
+            { mm::FX, std::regex ("fx|efeito|riser|impact", std::regex::icase) } };
+        for (auto& [f, re] : rules) if (std::regex_search (s, re)) return f;
+        return -1;
+    }
+    // minúsculas, sem acento e só letras e números (como o norm da web)
+    std::string norm (const String& s)
+    {
+        static const char* latin = "aaaaaaaceeeeiiiidnooooo/ouuuuytsaaaaaaaceeeeiiiidnooooo/ouuuuyty";
+        std::string out;
+        for (auto c : s.toLowerCase())
+        {
+            juce_wchar ch = c;
+            if (ch >= 0xC0 && ch <= 0xFF) ch = (juce_wchar) latin[ch - 0xC0];
+            if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) out += (char) ch;
+        }
+        return out;
+    }
+    struct Who { int ki = -1, at = -1; };
+    Who producerOf (const StringArray& segs)
+    {
+        static std::vector<std::pair<std::string, int>> names;
+        if (names.empty())
+            for (int ki = 0; ki < mm::numKits(); ++ki)
+                names.push_back ({ norm (String (std::regex_replace (std::string (mm::kits()[(size_t) ki].name), std::regex ("\\s*vol\\.?\\s*\\d+", std::regex::icase), "")).trim()), ki });
+        const std::string path = norm (segs.joinIntoString ("/"));
+        for (int i = 0; i < segs.size() - 1; ++i)
+        {
+            std::vector<std::string> w;
+            for (auto& t : StringArray::fromTokens (segs[i], " _-.()[]\t", "")) { const auto n = norm (t); if (! n.empty()) w.push_back (n); }
+            if (w.empty()) continue;
+            std::vector<std::string> joins;
+            for (size_t a = 0; a < w.size(); ++a) { std::string s; for (size_t b = a; b < w.size(); ++b) { s += w[b]; joins.push_back (s); } }
+            std::vector<int> c;
+            for (auto& [n, ki] : names) if (n.size() >= 3 && std::find (joins.begin(), joins.end(), n) != joins.end()) c.push_back (ki);
+            if (c.empty()) continue;
+            for (int ki : c) if (path.find ("vol" + std::to_string (mm::kits()[(size_t) ki].vol)) != std::string::npos) return { ki, i };
+            return { c[0], i };
+        }
+        return {};
+    }
+}
+
+std::map<int, std::vector<MonstroProcessor::UserKit>> MonstroProcessor::buildLib (const File& dir) const
+{
+    static const std::regex skip ("loop|melod|midi|preset|stem", std::regex::icase);
+    static const std::regex generic ("^(drums?|one ?shots?|samples?|sounds?|wav|audio|kit|drum ?kit|monstro.*|vol.*)$", std::regex::icase);
+    auto files = dir.findChildFiles (File::findFiles, true, "*.wav;*.aif;*.aiff;*.flac;*.mp3;*.ogg");
+    std::map<int, std::map<String, std::vector<std::pair<int, File>>>> by;
+    for (auto& f : files)
+    {
+        // caminho como o da web: a pasta escolhida + o caminho dentro dela
+        const String rel = dir.getFileName() + "/" + f.getRelativePathFrom (dir).replaceCharacter ('\\', '/');
+        if (std::regex_search (rel.toStdString(), skip)) continue;
+        StringArray segs; segs.addTokens (rel, "/", "");
+        const int fam = famOfFile ((segs.size() > 1 ? segs[segs.size() - 2] + "/" : String()).toStdString() + segs[segs.size() - 1].toStdString());
+        if (fam < 0) continue;
+        const auto who = producerOf (segs);
+        const int ki = who.ki >= 0 ? who.ki : kit();
+        String key;
+        for (int i = who.ki >= 0 ? who.at + 1 : 1; i < segs.size() - 1; ++i)
+        {
+            const String d = segs[i].trim();
+            if (famOfFile (d.toStdString()) >= 0 || std::regex_match (d.toStdString(), generic)) continue;
+            key = d; break;
+        }
+        by[ki][key].push_back ({ fam, f });
+    }
+    std::map<int, std::vector<UserKit>> out;
+    for (auto& [ki, groups] : by)
+    {
+        auto pack = [] (std::vector<std::pair<int, File>> list)
+        {
+            std::sort (list.begin(), list.end(), [] (auto& a, auto& b) { return a.second.getFileName().compareIgnoreCase (b.second.getFileName()) < 0; });
+            std::array<Array<File>, mm::numFams> byFam;
+            for (auto& [fam, f] : list) byFam[(size_t) fam].add (f);
+            return byFam;
+        };
+        std::vector<UserKit> kits;
+        if (groups.size() == 1)
+        {
+            const auto& [key, list] = *groups.begin();
+            const auto packed = pack (list);
+            const int kk = packed[mm::KICK].size(), ss = packed[mm::SNARE].size() + packed[mm::CLAP].size();
+            const int n = jmax (1, jmin (8, jmin (kk ? (kk + 1) / 2 : 8, ss ? ss : 8)));
+            for (int j = 0; j < n; ++j)
+            {
+                UserKit u;
+                u.name = key.isNotEmpty() ? key + (n > 1 ? " " + String (j + 1) : String()) : "PASTA " + String (j + 1);
+                for (int f = 0; f < mm::numFams; ++f)
+                {
+                    for (int i = j; i < packed[(size_t) f].size(); i += n) u.files[(size_t) f].add (packed[(size_t) f][i]);
+                    if (u.files[(size_t) f].isEmpty()) u.files[(size_t) f] = packed[(size_t) f];
+                }
+                kits.push_back (u);
+            }
+        }
+        else
+            for (auto& [key, list] : groups) { UserKit u; u.name = key.isNotEmpty() ? key : "SOLTOS"; u.files = pack (list); kits.push_back (u); }
+        if (kits.size() > 8) kits.resize (8);
+        out[ki] = kits;
+    }
+    return out;
 }
 
 int MonstroProcessor::loadFolder (const File& dir)
 {
     if (! dir.isDirectory()) return 0;
-    auto files = dir.findChildFiles (File::findFiles, true, "*.wav;*.aif;*.aiff;*.flac;*.mp3;*.ogg");
-    files.sort();
-    std::array<Array<File>, mm::numFams> byFam;
-    for (auto& f : files)
-    {
-        // a família vem do nome do arquivo e, se não der, da pasta (Kicks/, Snares/…)
-        int fam = mm::famOfContent (" " + f.getFileNameWithoutExtension().toStdString());
-        if (fam < 0) fam = mm::famOfContent (" " + f.getParentDirectory().getFileName().toStdString());
-        if (fam < 0 && f.getFileName().containsIgnoreCase ("hh")) fam = mm::HIHAT;
-        if (fam >= 0) byFam[(size_t) fam].add (f);
-    }
-    int found = 0;
-    for (auto& a : byFam) found += a.size();
-    if (found == 0) return 0;
-    for (int p = 0; p < mm::numPads; ++p) clearSample (p);
-    famFiles = byFam;
-    userFolder = dir;
-    int loaded = 0;
-    std::array<int, mm::numFams> used {};
-    for (int p = 0; p < mm::numPads; ++p)
-    {
-        const int fam = mm::padFam()[(size_t) p];
-        const auto& L = famFiles[(size_t) fam];
-        if (L.isEmpty()) { setParam (pid ("var", p), 0.0f); continue; }
-        const int v = used[(size_t) fam]++ % L.size();   // KICK 2, PERC 2… pegam o próximo arquivo da família
-        setParam (pid ("var", p), (float) v);
-        if (loadSample (p, L[v])) ++loaded;
-    }
-    return loaded;
+    auto found = buildLib (dir);
+    if (found.empty()) { lastLoadProducers = 0; return 0; }
+    int kits = 0;
+    for (auto& [ki, v] : found) { lib[ki] = v; kits += (int) v.size(); }
+    lastLoadProducers = (int) found.size();
+    folders.addIfNotAlreadyThere (dir.getFullPathName());
+    if (found.count (kit())) selectPk (0);
+    else selectKit (found.begin()->first);
+    return kits;
 }
 
 void MonstroProcessor::playPad (int pad, float vel)
@@ -394,7 +557,7 @@ void MonstroProcessor::getStateInformation (MemoryBlock& dest)
         g.setProperty ("seq" + String (s), t, nullptr);
     }
     for (int p = 0; p < mm::numPads; ++p) g.setProperty (pid ("sample", p), sampleFile[(size_t) p].getFullPathName(), nullptr);
-    g.setProperty ("folder", userFolder.getFullPathName(), nullptr);
+    g.setProperty ("folders", folders.joinIntoString ("\n"), nullptr);
     g.setProperty ("style", styleOverride, nullptr);
     state.addChild (g, -1, nullptr);
     if (auto xml = state.createXml()) copyXmlToBinary (*xml, dest);
@@ -420,16 +583,19 @@ void MonstroProcessor::setStateInformation (const void* data, int size)
             }
     }
     styleOverride = g.getProperty ("style").toString();
-    // a pasta do usuário (para o ◀ ▶) e o som de cada pad, sem mexer nos timbres escolhidos
-    userFolder = File(); for (auto& f : famFiles) f.clear();
-    const File folder (g.getProperty ("folder").toString());
-    if (g.getProperty ("folder").toString().isNotEmpty() && folder.isDirectory())
+    // as pastas do usuário (kits por produtor, para o ◀ ▶) e o som de cada pad, sem mexer nos timbres escolhidos
+    lib.clear(); folders.clear(); for (auto& f : famFiles) f.clear();
+    StringArray saved; saved.addLines (g.getProperty ("folders").toString());
+    if (g.getProperty ("folder").toString().isNotEmpty()) saved.add (g.getProperty ("folder").toString());   // projetos da 1.0
+    for (auto& path : saved)
     {
-        Array<float> keep;
-        for (int p = 0; p < mm::numPads; ++p) keep.add (get (pid ("var", p)));
-        loadFolder (folder);
-        for (int p = 0; p < mm::numPads; ++p) setParam (pid ("var", p), keep[p]);
+        const File folder (path);
+        if (path.isEmpty() || ! folder.isDirectory()) continue;
+        for (auto& [ki, v] : buildLib (folder)) lib[ki] = v;
+        folders.addIfNotAlreadyThere (path);
     }
+    if (const auto it = lib.find (kit()); it != lib.end() && ! it->second.empty())
+        famFiles = it->second[(size_t) jmin (pk(), (int) it->second.size() - 1)].files;
     for (int p = 0; p < mm::numPads; ++p)
     {
         const String path = g.getProperty (pid ("sample", p)).toString();
