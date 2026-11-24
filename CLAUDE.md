@@ -115,3 +115,11 @@ na versão para celular (`site/web/reggaeclavinet/`, funções `clavBuf` e `gene
 Tudo na contagem com a caixa no 2 e no 4; nomes das notas como no Cubase (C3 = dó central). Timbre inicial: M1. Tape Echo começa desligado.
 A machine não escuta outros plugins: segue os acordes do plugin (banco de riddims) ou o MIDI que chega na trilha (o do MRP-80 ou do MRM-0420).
 Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
+
+## Mastor Intro Fills MIF (IntroFills/)
+As viradas, os grooves e o feel (`Source/FillEngine.h`) e a dinâmica do kit (`Source/FillSampler.h`) têm uma cópia em JavaScript
+na versão para celular (`site/web/introfills/`, funções `buildSequence`, `perform` e `hit`): ao mudar um, mude o outro
+(mesmo gerador aleatório Park-Miller: a mesma virada tem que sair igual). Tudo na contagem com a caixa no 2 e no 4; o passo 16
+da virada é o 1 do groove (a chegada). MIDI nas notas do MRD-12, canal 10. Tape Echo e saturador começam desligados.
+Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
+
