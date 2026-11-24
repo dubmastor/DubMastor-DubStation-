@@ -5,6 +5,7 @@
 // v1.2: o fall/doit some junto com a queda de afinação (nada de sirene) e o vibrato para ao soltar.
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 #include <vector>
 #include "../Source/HornEngine.h"
 #include "../Source/PhraseStyles.h"
@@ -164,7 +165,7 @@ int main (int argc, char** argv)
     {
         Engine e;
         e.prepare (sr, 512);
-        Params p;
+        Params p; p.echoOn = true;                           // o teste do Tape Echo liga o eco (de fábrica ele começa desligado)
         for (auto& i : p.inst) i.on = true;                    // naipe cheio
         p.inst[2].harm = 5;
         e.setParams (p);
@@ -212,6 +213,54 @@ int main (int argc, char** argv)
         e.allNotesOff();
         auto ext2 = run (e, S * 2, 480);
         CHECK (ext.finite && ext2.finite && ext.peak <= 1.0f && ext2.peak <= 1.0f, "%.0f Hz: parametros extremos estaveis (pico %.3f)", sr, ext.peak);
+    }
+
+    {   // v1.5: padrão de fábrica do kit — Tape Echo e saturação de fita começam desligados
+        const Params d;
+        CHECK (! d.echoOn && d.drive == 0.0f, "fabrica: Tape Echo e saturacao de fita desligados");
+    }
+    // v1.5: espectro dinâmico — em cada instrumento o brilho (centróide) cresce com a força, sem salto,
+    // e o ataque começa mais escuro que a sustentação (os agudos chegam depois)
+    {
+        const float sr = 48000.0f;
+        const int notes[kNumInst] = { 67, 67, 64, 58, 53, 46 };
+        for (int ins = 0; ins < kNumInst; ++ins)
+        {
+            Params P; Rng r; r.s = 777;
+            auto centroid = [&] (float vel, float t0, float t1)
+            {
+                Voice v; v.start (ins, notes[ins], vel, Ten, 0, -1, P, sr, 1, r, 0.0f);
+                const int N = (int) (sr * t1) + 16;
+                std::vector<float> L ((size_t) N), R ((size_t) N);
+                v.render (L.data(), R.data(), N);
+                const double f0 = 440.0 * std::pow (2.0, (notes[ins] - 69) / 12.0);
+                const int a = (int) (t0 * sr), b = (int) (t1 * sr);
+                double num = 0, den = 0;
+                for (int k = 1; k <= 24; ++k)
+                {
+                    double re = 0, im = 0;
+                    for (int i = a; i < b; ++i)
+                    {
+                        const double w = 0.5 - 0.5 * std::cos (2.0 * M_PI * (i - a) / (b - a));
+                        re += L[(size_t) i] * w * std::cos (2.0 * M_PI * k * f0 * i / sr);
+                        im += L[(size_t) i] * w * std::sin (2.0 * M_PI * k * f0 * i / sr);
+                    }
+                    const double e = re * re + im * im; num += k * f0 * e; den += e;
+                }
+                return num / std::max (1.0e-12, den);
+            };
+            double prev = 0; bool mono = true, smooth = true; double c[5];
+            for (int i = 0; i < 5; ++i)
+            {
+                c[i] = centroid (0.2f + 0.2f * (float) i, 0.3f, 0.6f);
+                if (i > 0 && c[i] <= prev) mono = false;
+                if (i > 0 && c[i] > prev * 1.6) smooth = false;
+                prev = c[i];
+            }
+            const double atk = centroid (0.9f, 0.0f, 0.03f), sus = centroid (0.9f, 0.3f, 0.6f);
+            CHECK (mono && smooth && atk < sus, "%s: brilho cresce com a forca sem salto (%.0f %.0f %.0f %.0f %.0f Hz), ataque mais escuro (%.0f < %.0f)",
+                   instruments()[(size_t) ins].name, c[0], c[1], c[2], c[3], c[4], atk, sus);
+        }
     }
 
     std::printf (failures ? "\n%d FALHA(S)\n" : "\nTUDO OK\n", failures);

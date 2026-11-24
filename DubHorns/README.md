@@ -1,6 +1,6 @@
 # Mastor Dub Horns 🎺 — Dub Station
 
-**Mastor Dub Horns MDH-70 1.4.** Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU** (Mac) e app standalone. Também toca no navegador: <https://dubmastor.github.io/DubMastor-DubStation-/web/dubhorns/>
+**Mastor Dub Horns MDH-70 1.5.** Naipe de metais anos 70 para sessão de dub, em **VST3** (Windows e Mac), **AU** (Mac) e app standalone. Também toca no navegador: <https://dubmastor.github.io/DubMastor-DubStation-/web/dubhorns/>
 
 ![Naipe](docs/interface-naipe.png)
 

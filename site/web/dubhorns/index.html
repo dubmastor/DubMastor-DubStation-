@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1f1610">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Mastor Dub Horns MDH-70: naipe de metais anos 70 para tocar no celular ou no navegador, sem instalar nada.">
-<title>Mastor Dub Horns MDH-70 v1.4 — Dub Station</title>
+<title>Mastor Dub Horns MDH-70 v1.5 — Dub Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Righteous&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -268,7 +268,8 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
   <section class="panel active" id="tab-naipe">
     <h2>Monte o seu naipe</h2>
     <p class="hint">Ligue os instrumentos que vão tocar. Cada um pode dobrar a nota em uníssono, oitava ou harmonizar em 3ª/5ª/6ª — sempre dentro do <b>tom e escala</b> escolhidos lá em cima. Uma nota no teclado vira um acorde de metais.</p>
-    <div class="row" style="margin-bottom:12px" id="sectionPresets"></div>
+    <div class="row" style="margin-bottom:6px" id="sectionPresets"></div>
+    <div class="row" style="margin-bottom:12px;align-items:center;gap:10px"><select id="voicingSel" style="max-width:100%"></select><span class="hint" id="voicingInfo" style="margin:0">Escolha como o naipe abre as vozes: uníssono, oitavas, 3ªs, 6ªs ou acorde.</span></div>
     <div class="insts" id="insts"></div>
   </section>
 
@@ -305,7 +306,7 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
         <div class="knobs" id="kEcho"></div>
       </div>
       <div class="row" style="margin-top:14px">
-        <button class="btn on" id="echoOn">ECHO LIGADO</button>
+        <button class="btn" id="echoOn">ECHO DESLIGADO</button>
         <button class="btn red throw" id="throwBtn">SEGURE: DUB THROW</button>
         <button class="btn throw" id="selfOsc">SEGURE: AUTO-OSCILAR</button>
         <span class="hint" style="color:#e4ddc6;margin:0">Throw manda tudo pro eco enquanto segura (tecla <b>Espaço</b>). Auto-oscilar sobe a intensidade além de 100%.</span>
@@ -413,7 +414,7 @@ textarea.copybox{width:100%;height:120px;font-family:var(--mono);font-size:11px;
 <script>
 "use strict";
 /* ================== VERSÃO ================== */
-const VERSION = '1.4';
+const VERSION = '1.5';
 const CHANGELOG = [
   {v:'1.4', date:'23/11/2026', items:[
     'Frases MIDI por década e estilo, no padrão da Riddim Machine (visor azul, ESTILO ◀ ▶, LISTA): 41 frases originais em 8 estilos — Ska, Rocksteady, Early Reggae, Roots One Drop, Rockers, Dub, Dancehall e Digital & Ragga.',
@@ -484,6 +485,40 @@ const INST = {
     cut:500,env:1800,q:2,f1:650,g1:7,f2:1600,g2:3,atk:.05,br:.8,brF:1800,vib:1,scoop:90,gain:1,fall:6,stair:.45,growl:.9,drift:6,vibRate:4.9,f3:380,g3:3,bell:55,buzz:.6,nl:.8}
 };
 const INST_TUNE = {}; for(const k in INST) INST_TUNE[k]=(Math.random()*2-1)*7;   // cada músico afina um pouco diferente
+// v1.5: ESPECTRO DINÂMICO (cópia de DubHorns/Source/Music.h, spectra() e harmonicDb()): o brilho cresce com a força do sopro.
+// [tiltPP, tiltFF, gamma, radFc, lpFc, lpSlope, formantes [f, dB, largura em oitavas], dB a mais nos pares]
+const SPEC = {
+  trumpet: [13,1.5,1.25, 900,4500,14, [[1350,4,1],[2600,2,.8]], 0],
+  flugel:  [16,5,1.10,   600,2400,16, [[850,3,1.2]], 0],
+  alto:    [9,1,.90,     180,3400,12, [[750,5,.8],[2500,6,.7],[1450,-4,.5]], 0],
+  tenor:   [9,1.5,.90,   120,2700,12, [[520,6,.9],[1800,6,.7],[1050,-4,.5]], 0],
+  trombone:[15,3,1.10,   450,3000,14, [[600,4,1.2],[1300,2,.8]], 0],
+  bari:    [9,2,.95,      70,1900,12, [[380,6,.9],[1300,5,.7],[750,-4,.5]], 0]
+};
+function harmonicDb(sp,k,fk,L){
+  L=Math.min(1,Math.max(0,L));
+  const tilt=sp[0]+(sp[1]-sp[0])*Math.pow(L,sp[2]);
+  let db=-tilt*Math.log2(k);
+  db+=10*Math.log10(1/(1+(sp[3]/fk)*(sp[3]/fk)));
+  if(fk>sp[4]) db-=sp[5]*Math.log2(fk/sp[4]);
+  for(const [f,g,bw] of sp[6]){ const d=Math.log2(fk/f)/Math.max(.05,bw); db+=g*Math.exp(-d*d*2); }
+  if(k%2===0) db+=sp[7];
+  return db;
+}
+// três ondas por nota (pp, mf, ff), normalizadas como no plugin; a mistura segue a força do sopro
+const waveCache=new Map();
+function specWaves(key, midi){
+  const id=key+':'+midi; if(waveCache.has(id)) return waveCache.get(id);
+  const f0=mtof(midi), nh=Math.max(1,Math.min(48,Math.floor(Math.min(.42*ctx.sampleRate,15000)/(f0*1.19))));
+  const w=[0,.5,1].map(L=>{
+    const re=new Float32Array(nh+1), im=new Float32Array(nh+1); let e=0;
+    for(let k=1;k<=nh;k++){ const a=Math.pow(10,harmonicDb(SPEC[key],k,f0*k,L)/20); im[k]=a; e+=a*a; }
+    const n=1/Math.sqrt(Math.max(1e-12,e)); for(let k=1;k<=nh;k++) im[k]*=n;
+    return ctx.createPeriodicWave(re,im,{disableNormalization:true});
+  });
+  waveCache.set(id,w); return w;
+}
+const specMix=L=>{ L=Math.min(1,Math.max(0,L)); return L<=.5?[1-2*L,2*L,0]:[0,2-2*L,2*L-1]; };
 const HARM = [
   {v:'uni',n:'Uníssono',deg:0,semi:0},
   {v:'3+',n:'3ª acima',deg:2,semi:4},
@@ -505,8 +540,8 @@ const S = {
     trombone:{on:true, level:.7, pan:.35, oct:0, harm:'3-'},
     bari:{on:false, level:.65, pan:0, oct:-1, harm:'5-'}
   },
-  t:{bright:.55, breath:.4, vib:.3, attack:1, release:.3, scoop:.4, drive:.35, band:9000, lowcut:80, hiss:.15, human:.5, width:.7, growl:.3, room:.25},
-  echo:{on:true, sync:'8d', time:375, fb:.45, send:.3, ret:.75, tone:3200, bass:220, wow:.3, sat:.5, heads:[true,false,false]},
+  t:{bright:.55, breath:.4, vib:.3, attack:1, release:.3, scoop:.4, drive:0, band:9000, lowcut:80, hiss:.15, human:.5, width:.7, growl:.3, room:.25},
+  echo:{on:false, sync:'8d', time:375, fb:.45, send:.3, ret:.75, tone:3200, bass:220, wow:.3, sat:.5, heads:[true,false,false]},
   eq:[0,0,0,0,0,0,0,0,0,0], tubby:20, tubbyQ:1,
   seq:{bpm:74, loop:true, click:true, swing:.1, len:32, events:[], name:''}
 };
@@ -678,29 +713,21 @@ function voice(key, midi, vel, t0, artic, dl, tune){
   const lvl=ctx.createGain(); lvl.gain.value=st.level*I.gain;
   const pan=ctx.createStereoPanner(); pan.pan.value=Math.max(-1,Math.min(1,st.pan*(.3+T.width)));
   const pre=ctx.createGain(); pre.gain.value=1;
-  const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.Q.value=I.q;
-  const f1=ctx.createBiquadFilter(); f1.type='peaking'; f1.frequency.value=I.f1; f1.Q.value=1.4; f1.gain.value=I.g1;
-  const f2=ctx.createBiquadFilter(); f2.type='peaking'; f2.frequency.value=I.f2; f2.Q.value=2; f2.gain.value=I.g2;
+  const tone=ctx.createGain(); tone.gain.value=.62;   // v1.5: o timbre vem do espectro dinâmico (sem filtro)
   const srcs=[];
   // rouco: aspereza da palheta (modulação por ruído grave + um pouco de distorção assimétrica)
   const gA=T.growl*I.growl;
   if(gA>.01){
     const sh=ctx.createWaveShaper(); const n=1024, c=new Float32Array(n);
     for(let i=0;i<n;i++){const x=i/(n-1)*2-1; c[i]=x+gA*.22*(x*Math.abs(x)-.3*x);} sh.curve=c;
-    pre.connect(sh); sh.connect(lp);
+    pre.connect(sh); sh.connect(tone);
     const gn=ctx.createBufferSource(); gn.buffer=noiseBuf; gn.loop=true;
     const gl1=ctx.createBiquadFilter(); gl1.type='lowpass'; gl1.frequency.value=55+25*R(); gl1.Q.value=.5;
     const gl2=ctx.createBiquadFilter(); gl2.type='lowpass'; gl2.frequency.value=gl1.frequency.value; gl2.Q.value=.5;
     const gg=ctx.createGain(); gg.gain.value=gA*.7*16;
     gn.connect(gl1); gl1.connect(gl2); gl2.connect(gg); gg.connect(pre.gain); srcs.push([gn,R()*1.5]);
-  } else pre.connect(lp);
-  // v1.3: o metal real escurece no pp e rasga no ff; 3º formante e campana
-  const f3=ctx.createBiquadFilter(); f3.type='peaking'; f3.frequency.value=I.f3; f3.Q.value=1.6; f3.gain.value=I.g3;
-  const bell=ctx.createBiquadFilter(); bell.type='highpass'; bell.frequency.value=I.bell; bell.Q.value=.6;
-  const nlG=1+I.nl*2.6*.8*v*.95*(.4+.8*T.bright);
-  const nls=ctx.createWaveShaper(); { const n=1024,c=new Float32Array(n); for(let i=0;i<n;i++){const x=(i/(n-1)*2-1)*1.5; c[i]=Math.tanh(nlG*x)/nlG*(1+.35*(nlG-1));} nls.curve=c; }
-  const nlIn=ctx.createGain(); nlIn.gain.value=1/1.5;
-  lp.connect(nlIn); nlIn.connect(nls); nls.connect(f1); f1.connect(f2); f2.connect(f3); f3.connect(bell); bell.connect(out); out.connect(endG); endG.connect(lvl); lvl.connect(pan); pan.connect(nodes.bus);
+  } else pre.connect(tone);
+  tone.connect(out); out.connect(endG); endG.connect(lvl); lvl.connect(pan); pan.connect(nodes.bus);
 
   const atk=I.atk*(.4+T.attack*.9);
   // afinação em cents, uma só para os osciladores: scoop, assentar, fall/doit
@@ -710,9 +737,12 @@ function voice(key, midi, vel, t0, artic, dl, tune){
   const settle=(R()*2-1)*9*(.3+T.human);
   pitch.offset.setValueAtTime(-scoopC+settle, t0);
   pitch.offset.setTargetAtTime(0, t0, scoopT/3);
-  const oscs=I.osc.map(o=>{
-    const osc=ctx.createOscillator(); if(o.t==='pulse') osc.setPeriodicWave(nodes.pulse); else osc.type=o.t; osc.frequency.value=f; osc.detune.value=det+(o.d||0);
-    const g=ctx.createGain(); g.gain.value=o.g; osc.connect(g); g.connect(pre);
+  // espectro dinâmico: pp / mf / ff misturados pela força (no ataque os agudos chegam depois dos graves)
+  const SW=specWaves(key,midi), bS=.75+.7*T.bright;
+  const mixG=[];
+  const oscs=SW.map(w=>{
+    const osc=ctx.createOscillator(); osc.setPeriodicWave(w); osc.frequency.value=f; osc.detune.value=det;
+    const g=ctx.createGain(); g.gain.value=0; osc.connect(g); g.connect(pre); mixG.push(g);
     pitch.connect(osc.detune);
     return osc;
   });
@@ -735,15 +765,10 @@ function voice(key, midi, vel, t0, artic, dl, tune){
   const ampSus=v*(.68+.08*R());
   const tg=ctx.createGain(); tg.gain.setValueAtTime(0,t0); tg.gain.setValueAtTime(0,vibStart); tg.gain.linearRampToValueAtTime(ampSus*.45*vibC/100,vibStart+.45);
   lfo.connect(tg); tg.connect(out.gain);
-  // filtro: o "blat" do metal abre com a força
-  const kt=Math.pow(f/440,.45);
-  const base=I.cut*kt*(.55+T.bright*.9)*(.45+.75*v);   // pp fecha, ff abre
-  const peak=Math.min(16000, base + I.env*kt*T.bright*(.08+v*v*1.37));
-  const bgn=ctx.createGain(); bgn.gain.setValueAtTime(0,t0); bgn.gain.setValueAtTime(0,vibStart); bgn.gain.linearRampToValueAtTime(base*.6*vibC/100,vibStart+.45);
-  lfo.connect(bgn); bgn.connect(lp.frequency);
-  lp.frequency.setValueAtTime(base*.5,t0);
-  lp.frequency.linearRampToValueAtTime(peak,t0+atk*1.3);
-  lp.frequency.setTargetAtTime(base+(peak-base)*.5,t0+atk*1.3,.18);
+  // brilho: a mistura pp/mf/ff segue o volume do sopro (pico do ataque e depois a sustentação)
+  const Lpk=Math.min(1,v*bS), Lsus=Math.min(1,ampSus/.95*bS);
+  const m0=specMix(0), mPk=specMix(Lpk), mSus=specMix(Lsus);
+  mixG.forEach((g,i)=>{ g.gain.setValueAtTime(m0[i],t0); g.gain.linearRampToValueAtTime(mPk[i],t0+atk*1.25); g.gain.setTargetAtTime(mSus[i],t0+atk*1.25,.12); });
   // amplitude
   out.gain.setValueAtTime(0,t0);
   out.gain.linearRampToValueAtTime(v*.95,t0+atk);
@@ -770,7 +795,7 @@ function voice(key, midi, vel, t0, artic, dl, tune){
       if(stopped) return; stopped=true;
       t=Math.max(t,minEnd);
       const rel=.05+T.release*.45; let end;
-      [lg,tg,bgn].forEach(g=>{g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0,t,.03);});   // o músico para o vibrato
+      [lg,tg].forEach(g=>{g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(0,t,.03);});   // o músico para o vibrato
       if(artic==='fall'||artic==='doit'){
         const fall=artic==='fall', vr=.8+.4*R(), hold=.035+.05*R();
         const depth=fall? -I.fall*vr : (I.fall*.45+.8)*vr;
@@ -786,13 +811,13 @@ function voice(key, midi, vel, t0, artic, dl, tune){
         pitch.offset.cancelScheduledValues(t); pitch.offset.setTargetAtTime(0,t,.01);
         pitch.offset.setValueCurveAtTime(pc,t+hold,len);
         endG.gain.setValueAtTime(1,t+hold); endG.gain.setValueCurveAtTime(gc,t+hold+.001,len);
-        lp.frequency.setTargetAtTime(base*.4,t+hold,len/2.5);
+        mixG.forEach((g,i)=>{ g.gain.cancelScheduledValues(t+hold); g.gain.setTargetAtTime(m0[i],t+hold,len/2.5); });   // escurece ao cair
         ng.gain.setTargetAtTime(bAmt*(fall?.55:.4),t+hold,.03); ng.gain.setTargetAtTime(0,t+hold+len*.4,len/4);
         end=t+hold+len+.06;
       } else {
         const sag=-(6+10*R())*(.4+.8*I.drift/6);
         pitch.offset.setTargetAtTime(sag,t,rel/2.5);
-        out.gain.setTargetAtTime(0,t,rel/3.5); lp.frequency.setTargetAtTime(base*.45,t,rel/3);
+        out.gain.setTargetAtTime(0,t,rel/3.5); mixG.forEach((g,i)=>{ g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(m0[i],t,rel/3); });
         ng.gain.setTargetAtTime(0,t,rel/4); end=t+rel*2.5+.1;
       }
       oscs.forEach(o=>o.stop(end)); dr.forEach(o=>o.stop(end)); lfo.stop(end); jit.stop(end); pitch.stop(end); ns.stop(end);
@@ -923,11 +948,29 @@ const SECTION_PRESETS=[
   {n:'Naipe cheio (6)', s:{trumpet:[1,0,'uni'],flugel:[1,0,'3-'],alto:[1,0,'5-'],tenor:[1,-1,'uni'],trombone:[1,0,'6-'],bari:[1,-1,'uni']}},
   {n:'Trombone solo', s:{trombone:[1,0,'uni']}}
 ];
+// v1.5: VOZES DO NAIPE JAMAICANO (cópia da tabela do plugin, PluginEditor.cpp > NaipePage::voicings)
+const VOICINGS=[
+  {n:'Ska · uníssono (TPT · ALT · TEN, TBN 8ª abaixo)', d:'A frente dos Skatalites: todo mundo na melodia, o trombone embaixo', s:{trumpet:[1,0,'uni'],alto:[1,0,'uni'],tenor:[1,0,'uni'],trombone:[1,-1,'uni']}},
+  {n:'Uníssono jamaicano (TPT · TEN · TBN)', d:'A melodia junto, sem acorde: o som mais comum dos naipes de estúdio', s:{trumpet:[1,0,'uni'],tenor:[1,0,'uni'],trombone:[1,0,'uni']}},
+  {n:'Oitavas (TPT em cima · TEN e TBN embaixo)', d:'Tenor e trombone juntos, o trompete uma oitava acima: peso e clareza', s:{trumpet:[1,0,'uni'],tenor:[1,-1,'uni'],trombone:[1,-1,'uni']}},
+  {n:'Trompete + tenor em oitava', d:'Dois sopros: o trompete no meio da extensão e o tenor uma oitava abaixo', s:{trumpet:[1,0,'uni'],tenor:[1,-1,'uni']}},
+  {n:'3ªs (TEN 3ª abaixo · TBN 8ª abaixo)', d:'Frases rápidas e alegres (ska, rocksteady): o tenor em 3ªs embaixo do trompete', s:{trumpet:[1,0,'uni'],tenor:[1,0,'3-'],trombone:[1,-1,'uni']}},
+  {n:'6ªs (TEN 6ª abaixo · TBN 8ª abaixo)', d:'Mais largo e doce, para o roots lento (como a introdução de "Natural Mystic")', s:{trumpet:[1,0,'uni'],tenor:[1,0,'6-'],trombone:[1,-1,'uni']}},
+  {n:'Tríade fechada (TPT · TEN 3ª · TBN 5ª abaixo)', d:'Acorde de três notas juntinhas, o trombone na voz de baixo', s:{trumpet:[1,0,'uni'],tenor:[1,0,'3-'],trombone:[1,0,'5-']}},
+  {n:'Tríade aberta (TEN 5ª · TBN 10ª abaixo)', d:'O mesmo acorde aberto: o trombone desce uma oitava e o naipe fica largo', s:{trumpet:[1,0,'uni'],tenor:[1,0,'5-'],trombone:[1,-1,'3-']}},
+  {n:'Pad de saxes + trombone', d:'Notas longas embaixo do groove (alto em cima, tenor 3ª, trombone 5ª, barítono 8ª abaixo)', s:{alto:[1,0,'uni'],tenor:[1,0,'3-'],trombone:[1,0,'5-'],bari:[1,-1,'uni']}}
+];
 (function(){const w=document.getElementById('sectionPresets');
   SECTION_PRESETS.forEach(p=>{const b=document.createElement('button'); b.className='btn'; b.textContent=p.n;
     b.onclick=()=>{ for(const k in INST){const x=p.s[k]; S.inst[k].on=!!x; if(x){S.inst[k].oct=x[1]; S.inst[k].harm=x[2];}} renderInsts();
       w.querySelectorAll('.btn').forEach(z=>z.classList.toggle('sel',z===b)); if(ctx) audition(); };
     w.appendChild(b);});
+})();
+(function(){const sel=document.getElementById('voicingSel'), info=document.getElementById('voicingInfo');
+  sel.innerHTML='<option value="-1">VOZES DO NAIPE JAMAICANO ▾</option>'+VOICINGS.map((v,i)=>`<option value="${i}">${v.n}</option>`).join('');
+  sel.onchange=()=>{ const v=VOICINGS[+sel.value]; if(!v) return;
+    for(const k in INST){const x=v.s[k]; S.inst[k].on=!!x; if(x){S.inst[k].oct=x[1]; S.inst[k].harm=x[2];}} renderInsts();
+    document.querySelectorAll('#sectionPresets .btn').forEach(z=>z.classList.remove('sel')); info.textContent=v.d; if(ctx) audition(); };
 })();
 renderInsts();
 
@@ -1445,7 +1488,9 @@ document.getElementById('octDn').onclick=()=>{S.oct=Math.max(1,S.oct-1); buildKe
 document.getElementById('octUp').onclick=()=>{S.oct=Math.min(6,S.oct+1); buildKeyboard();};
 document.getElementById('vel').oninput=e=>{S.vel=+e.target.value; document.getElementById('velLbl').textContent=S.vel;};
 buildKeyboard();
-applyMusico(MUSICO_INICIAL);   // abre no "Tubby · naipe no eco": o delay já na frente
+applyMusico(MUSICO_INICIAL);   // abre no som do "Tubby · naipe no eco"...
+S.echo.on=false; echoOn.classList.remove('on'); echoOn.textContent='ECHO DESLIGADO'; applyEcho();   // ...com o Tape Echo desligado
+S.t.drive=0; tk.forEach(k=>k.refresh()); applyTimbre();   // e a saturação de fita desligada (padrão de fábrica do kit)
 
 /* MIDI */
 let midiInit=false;

@@ -1,3 +1,14 @@
+## Mastor Dub Horns MDH-70 1.5 🟢🟡⚫
+
+**Timbre novo de metal e as vozes do naipe jamaicano.**
+
+- **Espectro dinâmico:** cada instrumento agora é feito harmônico por harmônico, e o brilho cresce junto com a força do sopro, sem salto — fraco é redondo, forte "rasga", como no metal de verdade. Antes o som ficava abafado e abria de uma vez só no máximo.
+- **Ataque de metal:** a nota começa mais escura e os agudos chegam logo depois dos graves.
+- **Formantes revistos:** trompete com a campana brilhante, flugel redondo, trombone gordo que abre no forte, sax tenor com corpo e o "honk" das pontadas, alto nasal e barítono grave. Cada harmônico oscila um pouco, devagar, para o som não ficar parado.
+- **VOZES DO NAIPE JAMAICANO** (aba NAIPE): uníssono estilo Skatalites, uníssono de estúdio (trompete, tenor e trombone), oitavas (tenor e trombone juntos, trompete uma oitava acima), trompete + tenor em oitava, 3ªs (ska e rocksteady), 6ªs (roots lento, como a introdução de "Natural Mystic"), tríade fechada, tríade aberta e pad de saxes + trombone. A melodia fica no trompete e o trombone é a voz de baixo. Também na versão para celular.
+- **Padrão de fábrica:** o plugin abre com o **Tape Echo e a saturação de fita desligados**. Os presets de MÚSICOS continuam ligando o eco quando fazem parte do som.
+- Versão para celular 1.5
+
 ## Mastor Dub Horns MDH-70 1.4 🟢🟡⚫
 
 **Frases por década e estilo, e transcrição de áudio para MIDI.**

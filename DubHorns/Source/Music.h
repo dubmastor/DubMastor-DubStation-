@@ -166,6 +166,59 @@ inline const std::array<InstDef, kNumInst>& instruments()
     return d;
 }
 
+// ------------------------------------------------------------------ v1.5: espectro dinâmico
+// Cada harmônico tem um nível (dB) que depende da FORÇA do sopro naquele instante (L = 0 pp .. 1 ff):
+//   inclinação: pp cai muito por oitava (escuro), ff quase não cai (o metal "rasga") — Risset: a largura
+//   do espectro do metal cresce junto com o volume;
+//   radiação: a campana do metal irradia mal o grave (passa-altas suave em radFc);
+//   corte do tubo: acima de lpFc os harmônicos caem mais rápido (no sax, os furos das chaves);
+//   formantes: ressonâncias fixas em Hz de cada instrumento (ganho em dB, largura em oitavas; negativo = vale).
+struct Formant { float f, gDb, bwOct; };
+struct SpecDef
+{
+    float tiltPP, tiltFF, gamma;      // dB por oitava em pp e em ff; curva entre os dois
+    float radFc;                      // passa-altas da radiação (Hz)
+    float lpFc, lpSlope;              // corte do tubo (Hz) e queda extra (dB por oitava)
+    Formant fm[3];
+    float even;                       // dB a mais nos harmônicos pares (negativo = mais "oco")
+};
+inline const std::array<SpecDef, kNumInst>& spectra()
+{
+    static const std::array<SpecDef, kNumInst> s {{
+        // trompete: pp redondo, ff brilhante e cortante (formante da campana ~1,2–1,5 kHz)
+        { 13.0f, 1.5f, 1.25f,  900, 4500, 14, { { 1350, 4.0f, 1.0f }, { 2600, 2.0f, 0.8f }, { 0, 0, 1 } }, 0.0f },
+        // flugelhorn: cônico e largo, quase sem agudo mesmo no forte
+        { 16.0f, 5.0f, 1.10f,  600, 2400, 16, { {  850, 3.0f, 1.2f }, { 0, 0, 1 }, { 0, 0, 1 } }, 0.0f },
+        // sax alto: nasal, formante alto, cortante
+        {  9.0f, 1.0f, 0.90f,  180, 3400, 12, { {  750, 5.0f, 0.8f }, { 2500, 6.0f, 0.7f }, { 1450, -4.0f, 0.5f } }, 0.0f },
+        // sax tenor: corpo em ~500 Hz, vale em ~1 kHz, brilho em ~1,8 kHz (o "honk" das pontadas)
+        {  9.0f, 1.5f, 0.90f,  120, 2700, 12, { {  520, 6.0f, 0.9f }, { 1800, 6.0f, 0.7f }, { 1050, -4.0f, 0.5f } }, 0.0f },
+        // trombone: gordo; no ff a campana "abre" muito (o blare)
+        { 15.0f, 3.0f, 1.10f,  450, 3000, 14, { {  600, 4.0f, 1.2f }, { 1300, 2.0f, 0.8f }, { 0, 0, 1 } }, 0.0f },
+        // sax barítono: grave encorpado, formante baixo
+        {  9.0f, 2.0f, 0.95f,   70, 1900, 12, { {  380, 6.0f, 0.9f }, { 1300, 5.0f, 0.7f }, {  750, -4.0f, 0.5f } }, 0.0f },
+    }};
+    return s;
+}
+
+// nível (dB, relativo) do harmônico k (frequência fk) na força L
+inline float harmonicDb (const SpecDef& s, int k, float fk, float L)
+{
+    L = std::clamp (L, 0.0f, 1.0f);
+    const float tilt = s.tiltPP + (s.tiltFF - s.tiltPP) * std::pow (L, s.gamma);
+    float db = -tilt * std::log2 ((float) k);
+    db += 10.0f * std::log10 (1.0f / (1.0f + (s.radFc / fk) * (s.radFc / fk)));
+    if (fk > s.lpFc) db -= s.lpSlope * std::log2 (fk / s.lpFc);
+    for (const auto& f : s.fm)
+        if (f.f > 0.0f)
+        {
+            const float d = std::log2 (fk / f.f) / std::max (0.05f, f.bwOct);
+            db += f.gDb * std::exp (-d * d * 2.0f);
+        }
+    if ((k & 1) == 0) db += s.even;
+    return db;
+}
+
 // Nota que um instrumento toca quando o usuário toca "midi"
 inline int sectionNote (int midi, int harm, int octave, int inst, int key, int scale)
 {

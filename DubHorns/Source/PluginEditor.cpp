@@ -330,25 +330,54 @@ public:
             { "Naipe cheio (6)",                 { 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, -1, 0, -1 }, { 0, 2, 3, 0, 5, 0 } },
             { "Trombone solo",                   { 0, 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0 },  { 0, 0, 0, 0, 0, 0 } },
         };
+        // v1.5: VOZES DO NAIPE — como os naipes jamaicanos abrem as vozes (estudo das gravações e dos manuais de arranjo):
+        // a melodia fica em cima (trompete), o trombone é a voz de baixo, e o mais comum é tocar junto (uníssono / oitavas);
+        // a harmonia vem em 3ªs nas frases rápidas, em 6ªs nas lentas (o naipe do "Natural Mystic") e em acordes nos pads.
+        // ordem: trompete, flugel, alto, tenor, trombone, barítono  (harm: 0 uníss. 2 3ª abaixo 3 5ª abaixo 5 6ª abaixo)
+        voicings = {
+            { "SKA · UNÍSSONO (TPT · ALT · TEN, TBN 8ª ABAIXO)", "A frente dos Skatalites: todo mundo na melodia, o trombone embaixo",
+              { 1, 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, -1, 0 }, { 0, 0, 0, 0, 0, 0 } },
+            { "UNÍSSONO JAMAICANO (TPT · TEN · TBN)", "A melodia junto, sem acorde: o som mais comum dos naipes de estúdio",
+              { 1, 0, 0, 1, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } },
+            { "OITAVAS (TPT EM CIMA · TEN E TBN EMBAIXO)", "Tenor e trombone juntos, o trompete uma oitava acima: peso e clareza",
+              { 1, 0, 0, 1, 1, 0 }, { 0, 0, 0, -1, -1, 0 }, { 0, 0, 0, 0, 0, 0 } },
+            { "TROMPETE + TENOR EM OITAVA", "Dois sopros: o trompete no meio da extensão e o tenor uma oitava abaixo",
+              { 1, 0, 0, 1, 0, 0 }, { 0, 0, 0, -1, 0, 0 }, { 0, 0, 0, 0, 0, 0 } },
+            { "3ªS (TEN 3ª ABAIXO · TBN 8ª ABAIXO)", "Frases rápidas e alegres (ska, rocksteady): o tenor em 3ªs embaixo do trompete",
+              { 1, 0, 0, 1, 1, 0 }, { 0, 0, 0, 0, -1, 0 }, { 0, 0, 0, 2, 0, 0 } },
+            { "6ªS (TEN 6ª ABAIXO · TBN 8ª ABAIXO)", "Mais largo e doce, para o roots lento (como a introdução de \"Natural Mystic\")",
+              { 1, 0, 0, 1, 1, 0 }, { 0, 0, 0, 0, -1, 0 }, { 0, 0, 0, 5, 0, 0 } },
+            { "TRÍADE FECHADA (TPT · TEN 3ª · TBN 5ª ABAIXO)", "Acorde de três notas juntinhas, o trombone na voz de baixo",
+              { 1, 0, 0, 1, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 2, 3, 0 } },
+            { "TRÍADE ABERTA (TEN 5ª · TBN 10ª ABAIXO)", "O mesmo acorde aberto: o trombone desce uma oitava e o naipe fica largo",
+              { 1, 0, 0, 1, 1, 0 }, { 0, 0, 0, 0, -1, 0 }, { 0, 0, 0, 3, 2, 0 } },
+            { "PAD DE SAXES + TROMBONE", "Notas longas embaixo do groove (alto em cima, tenor 3ª, trombone 5ª, barítono 8ª abaixo)",
+              { 0, 0, 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, -1 }, { 0, 0, 0, 2, 3, 0 } },
+        };
+        voiceBox.setTextWhenNothingSelected (HU ("VOZES DO NAIPE JAMAICANO  ▾"));
+        for (size_t k = 0; k < voicings.size(); ++k) voiceBox.addItem (HU (voicings[k].name), (int) k + 1);
+        voiceBox.onChange = [this]
+        {
+            const int k = voiceBox.getSelectedItemIndex();
+            if (k < 0) return;
+            applyCombo (voicings[(size_t) k].on, voicings[(size_t) k].oct, voicings[(size_t) k].harm);
+            voiceInfo.setText (HU (voicings[(size_t) k].desc), dontSendNotification);
+            for (auto& b : buttons) b->setToggleState (false, dontSendNotification);
+        };
+        addAndMakeVisible (voiceBox);
+        voiceInfo.setFont (uiFont (12.0f));
+        voiceInfo.setColour (Label::textColourId, hc::muted);
+        voiceInfo.setText (HU ("Escolha como o naipe abre as vozes: uníssono, oitavas, 3ªs, 6ªs ou acorde."), dontSendNotification);
+        addAndMakeVisible (voiceInfo);
         for (size_t k = 0; k < presets.size(); ++k)
         {
             auto& b = *buttons.emplace_back (std::make_unique<TextButton> (HU (presets[k].name)));
             addAndMakeVisible (b);
             b.onClick = [this, k]
             {
-                const auto ids = HornsProcessor::instIds();
-                for (int i = 0; i < horns::kNumInst; ++i)
-                {
-                    setParamValue (proc.apvts, ids[i] + "_on", (float) presets[k].on[(size_t) i]);
-                    if (presets[k].on[(size_t) i])
-                    {
-                        setParamValue (proc.apvts, ids[i] + "_oct", (float) (presets[k].oct[(size_t) i] + 2));
-                        setParamValue (proc.apvts, ids[i] + "_harm", (float) presets[k].harm[(size_t) i]);
-                    }
-                }
+                applyCombo (presets[k].on, presets[k].oct, presets[k].harm);
                 for (size_t j = 0; j < buttons.size(); ++j) buttons[j]->setToggleState (j == k, dontSendNotification);
-                for (auto& m : mods) m->repaint();
-                proc.previewNote (60 + (int) proc.apvts.getRawParameterValue ("key")->load(), horns::Ten);
+                voiceBox.setSelectedItemIndex (-1, dontSendNotification);
             };
         }
     }
@@ -362,16 +391,38 @@ public:
     }
     void resized() override
     {
-        auto row = Rectangle<int> (20, 56, getWidth() - 40, 30);
-        const int bw = (row.getWidth() - 5 * 8) / 6;
-        for (auto& b : buttons) { b->setBounds (row.removeFromLeft (bw)); row.removeFromLeft (8); }
+        // linha 1: as 6 combinações de instrumentos; linha 2: VOZES DO NAIPE JAMAICANO + a explicação
+        const int perRow = (int) buttons.size(), bw = (getWidth() - 40 - (perRow - 1) * 8) / perRow;
+        for (int k = 0; k < perRow; ++k)
+            buttons[(size_t) k]->setBounds (20 + k * (bw + 8), 52, bw, 21);
+        voiceBox.setBounds (20, 77, 420, 22);
+        voiceInfo.setBounds (450, 77, getWidth() - 470, 22);
         const int cw = (getWidth() - 40 - 2 * 14) / 3, ch = 154;
         for (int i = 0; i < (int) mods.size(); ++i)
-            mods[(size_t) i]->setBounds (20 + (i % 3) * (cw + 14), 100 + (i / 3) * (ch + 12), cw, ch);
+            mods[(size_t) i]->setBounds (20 + (i % 3) * (cw + 14), 104 + (i / 3) * (ch + 12), cw, ch);
     }
 private:
+    void applyCombo (const std::array<int, 6>& on, const std::array<int, 6>& oct, const std::array<int, 6>& harm)
+    {
+        const auto ids = HornsProcessor::instIds();
+        for (int i = 0; i < horns::kNumInst; ++i)
+        {
+            setParamValue (proc.apvts, ids[i] + "_on", (float) on[(size_t) i]);
+            if (on[(size_t) i])
+            {
+                setParamValue (proc.apvts, ids[i] + "_oct", (float) (oct[(size_t) i] + 2));
+                setParamValue (proc.apvts, ids[i] + "_harm", (float) harm[(size_t) i]);
+            }
+        }
+        for (auto& m : mods) m->repaint();
+        proc.previewNote (60 + (int) proc.apvts.getRawParameterValue ("key")->load(), horns::Ten);
+    }
     struct Preset { const char* name; std::array<int, 6> on, oct, harm; };
+    struct Voicing { const char* name; const char* desc; std::array<int, 6> on, oct, harm; };
     std::vector<Preset> presets;
+    std::vector<Voicing> voicings;
+    ComboBox voiceBox;
+    Label voiceInfo;
     std::vector<std::unique_ptr<InstModule>> mods;
     std::vector<std::unique_ptr<TextButton>> buttons;
 };
@@ -437,9 +488,10 @@ public:
     }
     void resized() override
     {
-        auto row = Rectangle<int> (20, 56, getWidth() - 40, 30);
-        const int bw = (row.getWidth() - 5 * 8) / 6;
-        for (auto& b : buttons) { b->setBounds (row.removeFromLeft (bw)); row.removeFromLeft (8); }
+        // duas linhas de 4 combinações
+        const int perRow = 4, bw = (getWidth() - 40 - (perRow - 1) * 8) / perRow;
+        for (int k = 0; k < (int) buttons.size(); ++k)
+            buttons[(size_t) k]->setBounds (20 + (k % perRow) * (bw + 8), 52 + (k / perRow) * 24, bw, 21);
         const int top = 110, kh = 104, kw = 84;
         gTone  = { 20, top, 4 * kw + 30, 2 * kh + 46 };
         gTape  = { gTone.getRight() + 16, top, 3 * kw + 30, 2 * kh + 46 };
