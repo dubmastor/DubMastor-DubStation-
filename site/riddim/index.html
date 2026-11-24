@@ -531,6 +531,13 @@ const INST=[
  p:{vol:.68,pan:0,tone:.4,echo:0,dur:3},
  notes:(l,c)=>[deg(c,l,33)]},
 {id:'harm',name:'Riddim',color:'#e6b83a',th:['#3b2a1c','#1c130c','#ffd27a','#f2a541','#efe2c4'],riddim:true},
+{id:'piano',name:'Riddim · Keys',tab:'Keys',full:'Reggae Keys',code:'MRK-80',color:'#efe2c4',th:['#efe4c8','#c9b68c','#3a2412','#1b130d','#2a1d14'],kind:'mel',
+ hint:'Timbres do Mastor Reggae Keys MRK-80: PIANO M1 (o primeiro, como no site), RHODES STAGE, RHODES SUITCASE e WURLITZER 200A, mais os da versão 3.1 (Grand Piano, M1 Piano 16 comprimido, Yamaha CP-80 e C7, Honky Tonk e Casio CZ-101). Chord machine com PADRÃO DO SKANK e CONTRATEMPO BANG BANG, notas de 1/32.',
+ lanes:['Skank','Grave','Acorde longo'],
+ presets:{'Padrão do skank':['..X...X...X...X.',E,E],'Contratempo BANG BANG':['..Xx..Xx..Xx..Xx',E,E],'Skank + grave':['..X...X...X...X.','x.......x.......',E]},
+ TB:{'PIANO M1':{o:[['triangle',1,.15],['square',2,.025],['sine',4,.02]],lo:2000,hi:9000,s:.25,r:.18},'RHODES STAGE':{o:[['sine',1,.22],['sine',2,.04],['triangle',4,.012]],lo:1200,hi:4200,a:.003,s:.5,r:.3},'RHODES SUITCASE':{o:[['sine',1,.2],['sine',2,.05]],lo:1000,hi:3600,a:.003,s:.55,r:.35,les:4.5},'WURLITZER 200A':{o:[['triangle',1,.16],['square',1,.03]],lo:1000,hi:3500,s:.45,r:.2},'Grand Piano':{o:[['triangle',1,.16],['sine',2,.05],['sine',3,.02]],lo:1500,hi:9000,s:.35,r:.25},'M1 Piano 16 comprimido':{o:[['triangle',1,.17],['square',2,.035],['sine',4,.025]],lo:2400,hi:9000,a:.001,s:.6,r:.12},'Yamaha CP-80':{o:[['triangle',1,.14],['sawtooth',2,.03]],lo:1800,hi:8000,s:.3,r:.2},'Yamaha C7':{o:[['triangle',1,.15],['sine',2,.06],['sine',3,.03],['sine',5,.01]],lo:1800,hi:10000,s:.35,r:.3},'Honky Tonk':{o:[['triangle',1,.12,-12],['triangle',1,.12,12]],lo:1800,hi:7000,s:.3,r:.2},'Casio CZ-101':{o:[['sawtooth',1,.08],['square',2,.04]],lo:1200,hi:6000,q:2,s:.3,r:.15}},
+ p:{vol:.4,pan:.15,tone:.6,echo:0,dur:1},
+ notes:(l,c)=>l===0?voic(c.slice(0,3),60):l===1?[near(c[0],43),near(c[0],43)+12]:voic(c,55)},
 {id:'organ',name:'Órgão',full:'Mastor Reggae Organ',code:'MRO-68',color:'#4f9a5a',th:['#1f4a2a','#0b1d10','#d8f5c8','#7cc47f','#e4f2dc'],kind:'mel',
  hint:'Como no MRO-68 1.2: camadas Bubble (mão esquerda no "e" e no "a"), Chop (mão direita no contratempo) e Fills, notas de 1/32, com o Leslie só na mão direita (chop e fills).',
  lanes:['Bubble (mão esq.)','Chop (mão dir.)','Fills'],
@@ -572,13 +579,6 @@ const INST=[
  syncLanes(){this.lanes=this.snd.map(si=>SND[si].l+' '+SND[si].s);if(typeof renderPieces==='function')renderPieces(this)},
  p:{vol:.5,pan:0,tone:.5,echo:0},
  play(t,l,v,p,o){const tr=this.tr[l];mrpHit(t,this.snd[l],v,{lvl:tr.lvl,pan:tr.pan,dec:tr.dec*(.5+p.tone)},o,stepDur())}},
-{id:'piano',name:'Piano',full:'Reggae Keys',code:'MRK-80',color:'#efe2c4',th:['#efe4c8','#c9b68c','#3a2412','#1b130d','#2a1d14'],kind:'mel',
- hint:'Timbres do Mastor Reggae Keys MRK-80: PIANO M1 (o primeiro, como no site), RHODES STAGE, RHODES SUITCASE e WURLITZER 200A, mais os da versão 3.1 (Grand Piano, M1 Piano 16 comprimido, Yamaha CP-80 e C7, Honky Tonk e Casio CZ-101). Chord machine com PADRÃO DO SKANK e CONTRATEMPO BANG BANG, notas de 1/32.',
- lanes:['Skank','Grave','Acorde longo'],
- presets:{'Padrão do skank':['..X...X...X...X.',E,E],'Contratempo BANG BANG':['..Xx..Xx..Xx..Xx',E,E],'Skank + grave':['..X...X...X...X.','x.......x.......',E]},
- TB:{'PIANO M1':{o:[['triangle',1,.15],['square',2,.025],['sine',4,.02]],lo:2000,hi:9000,s:.25,r:.18},'RHODES STAGE':{o:[['sine',1,.22],['sine',2,.04],['triangle',4,.012]],lo:1200,hi:4200,a:.003,s:.5,r:.3},'RHODES SUITCASE':{o:[['sine',1,.2],['sine',2,.05]],lo:1000,hi:3600,a:.003,s:.55,r:.35,les:4.5},'WURLITZER 200A':{o:[['triangle',1,.16],['square',1,.03]],lo:1000,hi:3500,s:.45,r:.2},'Grand Piano':{o:[['triangle',1,.16],['sine',2,.05],['sine',3,.02]],lo:1500,hi:9000,s:.35,r:.25},'M1 Piano 16 comprimido':{o:[['triangle',1,.17],['square',2,.035],['sine',4,.025]],lo:2400,hi:9000,a:.001,s:.6,r:.12},'Yamaha CP-80':{o:[['triangle',1,.14],['sawtooth',2,.03]],lo:1800,hi:8000,s:.3,r:.2},'Yamaha C7':{o:[['triangle',1,.15],['sine',2,.06],['sine',3,.03],['sine',5,.01]],lo:1800,hi:10000,s:.35,r:.3},'Honky Tonk':{o:[['triangle',1,.12,-12],['triangle',1,.12,12]],lo:1800,hi:7000,s:.3,r:.2},'Casio CZ-101':{o:[['sawtooth',1,.08],['square',2,.04]],lo:1200,hi:6000,q:2,s:.3,r:.15}},
- p:{vol:.4,pan:.15,tone:.6,echo:0,dur:1},
- notes:(l,c)=>l===0?voic(c.slice(0,3),60):l===1?[near(c[0],43),near(c[0],43)+12]:voic(c,55)},
 {id:'mif',name:'Viradas',full:'Mastor Intro Fills',code:'MIF',color:'#d0622c',th:['#5a2412','#260e06','#ffc49a','#d0622c','#f6dccb'],kind:'drum',fill:true,
  hint:'Mesmos samples do MIF: caixa DM-SNARES6 e toms do MRD-12. A virada entra no último compasso do riddim e corta a bateria a partir do ponto em que começa.',
  lanes:['Caixa','Tom agudo','Tom médio','Tom grave'],midi:[38,50,47,43],TB:DT,
@@ -691,7 +691,7 @@ const midiBtn=(sub)=>`<span class="midi" draggable="true" role="button" tabindex
 
 /* ---------- abas ---------- */
 const tabs=$('tabs'),panels=$('panels');
-tabs.innerHTML=TABS.map(t=>`<button role="tab" data-t="${t.id}" style="--c:${t.color};--th1:${t.th[0]};--th2:${t.th[1]};--tl:${t.th[4]}">${'mute' in t?`<span class="tmute" data-tmute="${t.id}" title="Mutar / desmutar ${t.name}" aria-label="Mutar ou desmutar ${t.name}"><span class="dot" data-dot="${t.id}"></span></span>`:`<span class="dot" data-dot="${t.id}"></span>`}${t.name}${t.code?` <small>${t.code}</small>`:''}</button>`).join('');
+tabs.innerHTML=TABS.map(t=>`<button role="tab" data-t="${t.id}" style="--c:${t.color};--th1:${t.th[0]};--th2:${t.th[1]};--tl:${t.th[4]}">${'mute' in t?`<span class="tmute" data-tmute="${t.id}" title="Mutar / desmutar ${t.name}" aria-label="Mutar ou desmutar ${t.name}"><span class="dot" data-dot="${t.id}"></span></span>`:`<span class="dot" data-dot="${t.id}"></span>`}${t.tab||t.name}${t.code?` <small>${t.code}</small>`:''}</button>`).join('');
 function show(id){const T=byId[id];if(T.kind&&T.renderGen)T.renderGen();tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.t===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on)});panels.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='p-'+id));
  const u=$('unit').style;u.setProperty('--h1',T.th[0]);u.setProperty('--h2',T.th[1]);u.setProperty('--l1',T.th[2]);u.setProperty('--l2',T.th[3]);u.setProperty('--l3',T.th[3]);u.setProperty('--htx',T.th[4]);
  $('hsub').textContent=T.code?`${T.full} · ${T.code}`:T.main?'Principal · controla todas as machines':T.riddim?'Riddim · harmonia':'Dub Station · DubMastor';
@@ -734,7 +734,7 @@ const RD=byId.harm;
 const rp=mk(`<section class="panel" id="p-harm" style="${thVars(RD)}">${cab(RD,'Riddim','Harmonia · BPM · acordes',midiBtn('riddim completo · todas as machines'))}
 <div class="pbody">
 <p class="loaded"></p>
-<div class="group" style="margin-bottom:12px"><h3>Teclado do riddim · timbres do Mastor Keys</h3><div class="row"><select data-tbsync="piano" id="rkeys" aria-label="Timbre do teclado do riddim"></select><span class="cnt">mesmo timbre da aba Piano (MRK-80) · o riddim toca o skank do piano com este timbre</span></div></div>
+<div class="group" style="margin-bottom:12px"><h3>Teclado do riddim · timbres do Mastor Keys</h3><div class="row"><select data-tbsync="piano" id="rkeys" aria-label="Timbre do teclado do riddim"></select><span class="cnt">mesmo timbre da aba Keys (MRK-80) · o riddim toca o skank do piano com este timbre</span></div></div>
 <div class="group"><h3>Harmonia <span class="row"><span class="pill">→ Mastor Tune MT-0420</span><span class="midi" id="hmidi" draggable="true" role="button" tabindex="0" style="min-height:40px;font-size:13px"><span class="ic" style="width:28px;height:28px;font-size:16px">⇣</span>MIDI DOS ACORDES</span></span></h3>
 <div class="chords" id="chords"></div><button class="btn" id="addch">+ acorde</button></div>
 <p class="hint">Escolha o riddim do mega banco na aba Principal. Aqui você edita os acordes e a duração de cada um.</p>
