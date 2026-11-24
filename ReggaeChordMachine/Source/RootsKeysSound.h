@@ -19,7 +19,7 @@ namespace rkdefaults
     // Piano inicial do Roots Keys (padrões dos parâmetros = preset "Piano: M1 Classic")
     struct RootsKeysPiano
     {
-        static constexpr int   type   = 0;      // pianoType: 0 = M1 (o timbre inicial do Roots Keys)
+        static constexpr int   type   = 6;      // pianoType: 6 = M1 Grand Piano (o timbre inicial do Reggae Keys MRK-80 desde a 3.1)
         static constexpr float bright = 0.65f;
         static constexpr float decay  = 0.55f;
         static constexpr float chorus = 0.50f;

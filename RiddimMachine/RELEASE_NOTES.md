@@ -1,4 +1,8 @@
-## Mastor Riddim Machine MRM-0420 2.4 — DubStation
+## Mastor Riddim Machine MRM-0420 2.5 — DubStation
+
+- O skank do piano agora toca no **M1 Grand Piano** (o Grand Piano do Korg M1), o novo timbre de fábrica do Reggae Keys MRK-80 3.1.
+
+### Mastor Riddim Machine MRM-0420 2.4
 
 - **BANCO ÚNICO DE RIDDIMS nos PRESETS da aba RIDDIM:** 356 músicas em 10 estilos e 155 riddims de A a Z, o mesmo banco do MRCM-1240, do MRDM-12 e do MRBM-69 (`RiddimBank/`). A música vai inteira para as três máquinas: harmonia conferida, BPM, kit, baterista e baixista mais próximos de quem gravou
 - Visor azul com o estilo e os anos, a música, os acordes, o BPM (ORIGINAL quando medido), o kit, os músicos e as **luzes H B D** (harmonia, baixo e bateria da gravação original). ◀ ▶ passam por estilo e por música; LISTA e PRESETS abrem **ESTILOS · RIDDIMS A–Z · MÚSICAS A–Z** e a opção **Só completos**
