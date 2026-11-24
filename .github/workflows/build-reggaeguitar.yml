@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'ReggaeGuitar/**'
-      - 'ReggaeKeys/Source/**'
+      - 'ReggaePiano/Source/**'
       - '.github/workflows/build-reggaeguitar.yml'
       - '.github/scripts/**'
       - '.github/installer/**'
@@ -14,7 +14,7 @@ on:
   pull_request:
     paths:
       - 'ReggaeGuitar/**'
-      - 'ReggaeKeys/Source/**'
+      - 'ReggaePiano/Source/**'
       - '.github/workflows/build-reggaeguitar.yml'
       - '.github/scripts/**'
       - '.github/installer/**'

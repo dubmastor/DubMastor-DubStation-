@@ -6,8 +6,8 @@ on:
     paths:
       - 'PickGuitar/**'
       - 'HalfDub/Source/TapeEcho.h'
-      - 'ReggaeKeys/Source/VUMeter.h'
-      - 'ReggaeKeys/Source/SkinTextures.h'
+      - 'ReggaePiano/Source/VUMeter.h'
+      - 'ReggaePiano/Source/SkinTextures.h'
       - '.github/workflows/build-pickguitar.yml'
       - '.github/scripts/**'
       - '.github/installer/**'
@@ -17,8 +17,8 @@ on:
     paths:
       - 'PickGuitar/**'
       - 'HalfDub/Source/TapeEcho.h'
-      - 'ReggaeKeys/Source/VUMeter.h'
-      - 'ReggaeKeys/Source/SkinTextures.h'
+      - 'ReggaePiano/Source/VUMeter.h'
+      - 'ReggaePiano/Source/SkinTextures.h'
       - '.github/workflows/build-pickguitar.yml'
       - '.github/scripts/**'
       - '.github/installer/**'
