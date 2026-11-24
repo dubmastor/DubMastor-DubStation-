@@ -12,13 +12,13 @@ AudioProcessorValueTreeState::ParameterLayout MonstroProcessor::createLayout()
 
     StringArray kitNames;
     for (auto& k : mm::kits()) kitNames.add ("Vol." + String (k.vol) + " " + String::fromUTF8 (k.name));
-    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "kit", 1 }, "Kit", kitNames, 0));
+    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "kit", 1 }, "Kit", kitNames, mm::defaultKit()));
     l.add (std::make_unique<AudioParameterInt> (ParameterID { "pkit", 1 }, "Kit do produtor", 0, 7, 0));
 
     // ---- sequenciador
     l.add (onOff ("machineOn", "Toca com a DAW", true));
     l.add (onOff ("preview", "Play do plugin", false));
-    l.add (std::make_unique<AudioParameterInt> (ParameterID { "bpm", 1 }, "BPM", 60, 180, mm::kits()[0].bpm));
+    l.add (std::make_unique<AudioParameterInt> (ParameterID { "bpm", 1 }, "BPM", 60, 180, mm::kits()[(size_t) mm::defaultKit()].bpm));
     l.add (std::make_unique<AudioParameterInt> (ParameterID { "swing", 1 }, "Swing", 50, 75, 54));
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "seq", 1 }, "SEQ", StringArray { "A", "B", "C", "D" }, 0));
 
@@ -51,7 +51,7 @@ MonstroProcessor::MonstroProcessor()
     for (auto& s : seqs) for (auto& p : s) for (auto& x : p) x.store (0);
     for (auto& h : padHits) h.store (0);
     cachedVar.fill (-1);
-    selectKit (0);
+    selectKit (mm::defaultKit());   // preset inicial: DJ Coala
 }
 
 bool MonstroProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const

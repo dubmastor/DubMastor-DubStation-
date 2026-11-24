@@ -34,7 +34,7 @@ int main (int argc, char** argv)
     MonstroProcessor proc;
     proc.prepareToPlay (48000.0, 512);
     check (proc.get ("satOn") < 0.5f && proc.get ("echoOn") < 0.5f, "padr\xc3\xa3o de f\xc3\xa1" "brica: saturador e Tape Echo em bypass");
-    check (proc.kit() == 0 && (int) proc.get ("bpm") == mm::kits()[0].bpm, "kit inicial DubMastor no BPM do kit");
+    check (proc.kit() == mm::defaultKit() && (int) proc.get ("bpm") == mm::kits()[(size_t) mm::defaultKit()].bpm, "kit inicial DJ Coala no BPM do kit");
     check (proc.getStep (0, 4, 4) == 2 && proc.getStep (0, 4, 12) == 2, "groove reggae: aro com acento no 2 e no 4");
 
     proc.setParam ("preview", 1.0f);

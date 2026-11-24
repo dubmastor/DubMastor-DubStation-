@@ -61,6 +61,8 @@ inline const std::vector<Kit>& kits()
     return k;
 }
 inline int numKits() { return (int) kits().size(); }
+// preset inicial: o kit do DJ Coala (Vol. 2)
+inline int defaultKit() { for (int i = 0; i < numKits(); ++i) if (std::string (kits()[(size_t) i].name) == "DJ Coala") return i; return 0; }
 
 inline const char* styleName (const std::string& s)
 {

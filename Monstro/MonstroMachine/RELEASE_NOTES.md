@@ -5,6 +5,7 @@ Vários kits por produtor e o groove de cada produtor.
 - Cada produtor tem até 8 kits (KIT 1 é o original; os outros usam outros timbres da mesma família, do mesmo produtor). KIT ◀ ▶ na tela principal e a fileira KIT 1…8 no PROGRAM.
 - Groove de fábrica próprio para cada um dos 33 produtores, inspirado no estilo dos artistas com quem ele trabalha (steppers e rub-a-dub do DubMastor com caixa/aro no 2 e no 4, trap com rolos e 808 deslizando, trap com kick de funk, funk de SP e mandelão, tamborzão, funk com percussão brasileira, boom bap com swing e drill). O swing também muda por produtor. Na SEQUENCE, o botão com o nome do produtor volta para o groove dele.
 - CARREGAR PASTA reconhece cada produtor pelo nome da pasta do Monstro.zip, faz um kit de cada subpasta (ou divide os arquivos em vários kits) e ignora loops e melodias. As pastas ficam salvas no projeto.
+- Preset inicial: o kit do DJ Coala (boom bap, 90 BPM).
 - MASTER com − + na tela EFFECTS.
 
 ---

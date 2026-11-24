@@ -487,10 +487,10 @@ const PATTERNS={
 };
 
 /* ---------- ESTADO ---------- */
-const state={kit:store.get('kit',0),bpm:140,swing:54,pat:0,pad:0,seqs:null,ch:null,tune:Array(16).fill(0),dec:Array(16).fill(100),samples:Array(16).fill(null),userKit:false,playing:false,rec:false,step:-1,vol:.8,var:Array(16).fill(0),screen:'main',kvol:1,files:{},pk:0,lib:{}};
+const state={kit:store.get('kit11',8),bpm:140,swing:54,pat:0,pad:0,seqs:null,ch:null,tune:Array(16).fill(0),dec:Array(16).fill(100),samples:Array(16).fill(null),userKit:false,playing:false,rec:false,step:-1,vol:.8,var:Array(16).fill(0),screen:'main',kvol:1,files:{},pk:0,lib:{}};
 let history=[];
 const clone=x=>JSON.parse(JSON.stringify(x));
-function loadKit(i,keepSeq){state.kit=(i+KITS.length)%KITS.length;store.set('kit',state.kit);const k=KITS[state.kit];
+function loadKit(i,keepSeq){state.kit=(i+KITS.length)%KITS.length;store.set('kit11',state.kit);const k=KITS[state.kit];
   state.ch=charOf(k);state.bpm=k.bpm;$('#bpm').value=k.bpm;state.samples=Array(16).fill(null);state.userKit=false;state.files={};state.var=Array(16).fill(0);state.kvol=k.vol;state.forceStyle=null;
   if(!keepSeq){state.seqs=groove(state.kit);state.pat=0;setPatBtns();state.swing=prof(state.kit).sw||54;$('#swing').value=state.swing}
   selectPk(0)}

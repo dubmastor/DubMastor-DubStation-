@@ -123,6 +123,7 @@ int main (int argc, char** argv)
         for (auto& s : mm::groove (k)) for (auto& p : s) for (auto v : p) h = (h ^ (uint32_t) ('0' + v)) * 16777619u;
         return h;
     };
+    CHECK (std::string (mm::kits()[(size_t) mm::defaultKit()].name) == "DJ Coala", "preset inicial tem que ser o DJ Coala");
     CHECK (grooveHash (0) == 1595767603u, "groove do DubMastor diferente da web (%u)", grooveHash (0));
     CHECK (grooveHash (1) == 2340979147u, "groove do Nox diferente da web (%u)", grooveHash (1));
     for (int k = 0; k < mm::numKits(); ++k)
