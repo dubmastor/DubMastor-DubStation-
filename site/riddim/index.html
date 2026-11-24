@@ -304,7 +304,7 @@ const DRUMS = 0, CHORDS = 1, BASS = 2;
 
 // ---------------------------------------------------------------- as três máquinas (motores das versões do navegador)
 const chordSlots = () => st.slots.map((s, i) => ({ root: s.root, quality: s.quality, beats: (i === 0 || s.on) ? C.DURATIONS[s.dur].beats : 0, inversion: s.inv }));
-const chordSettings = () => ({ pattern: st.pattern, centerNote: 60, velocity: Math.fround(0.8), noteSize: 0, swing: 0, bubble: false });
+const chordSettings = () => ({ pattern: st.pattern, centerNote: 60, velocity: Math.fround(0.8), noteSize: 5, swing: 0, bubble: false });   // 5 = 1/64 (padrão do MRM-0420)
 const bassSlots = () => st.slots.map((s, i) => ({ root: s.root, quality: s.quality, beats: (i === 0 || s.on) ? B.DURATIONS[s.dur] : 0 }));
 const lineSeed = (m) => (st.lineSeed && st.lineSeed[m]) || st.seed;   // NOVA LINHA: semente só desta máquina
 const bassSettings = () => ({ style: st.bassist, seed: lineSeed(BASS), density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7, strict: true });   // reggae de livro, como no plugin
