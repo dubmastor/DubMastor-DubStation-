@@ -63,6 +63,9 @@ public:
     float get (const juce::String& id) const { return apvts.getRawParameterValue (id)->load(); }
     void setParam (const juce::String& id, float value);
     std::vector<mro::Chord> getChords() const;
+    std::vector<int> getChordSlots() const;           // ACORDE 1..4 (0..3) de cada acorde de getChords()
+    int chordSlotForBeat (double beat) const;         // -1 = sem acorde do plugin (acordes do teclado)
+    bool colourByChord() const;                       // CORES: por acorde (canal 1..4) ou por camada (canal 1..3)
     mro::Settings getSettings() const;
     double exportBpm() const;
 

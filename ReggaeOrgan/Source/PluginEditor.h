@@ -209,6 +209,7 @@ private:
     std::unique_ptr<APVTS::ButtonAttachment> slotOnAtt[ReggaeOrganProcessor::numSlots];
     OrganRoll roll;
     Chips brush;
+    Chips colorBy;   // CORES: por acorde ou por camada (visor e canais do MIDI)
     std::unique_ptr<MidiDragChip> dragAll, dragLayer[3];
     juce::ComboBox repsBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> repsAtt;

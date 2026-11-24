@@ -348,6 +348,22 @@ inline int totalBeats (const std::vector<Chord>& chords)
     return n;
 }
 
+// posição (0, 1, 2...) do acorde que soa no tempo "beat" (a lista repete se o loop for maior)
+inline int chordIndexForBeat (const std::vector<Chord>& chords, double beat)
+{
+    int tb = 0;
+    for (auto& c : chords) tb += std::max (1, c.beats);
+    if (tb <= 0) return -1;
+    double b = std::fmod (beat, (double) tb);
+    if (b < 0) b += tb;
+    for (int i = 0; i < (int) chords.size(); ++i)
+    {
+        if (b < std::max (1, chords[(size_t) i].beats) - 1.0e-9) return i;
+        b -= std::max (1, chords[(size_t) i].beats);
+    }
+    return (int) chords.size() - 1;
+}
+
 inline const Chord& chordForBeat (const std::vector<Chord>& chords, int beat)
 {
     static const Chord fallback;

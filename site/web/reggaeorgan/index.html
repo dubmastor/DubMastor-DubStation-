@@ -165,8 +165,9 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
     <h2>ACORDES E MIDI <small>toque numa nota para apagar · toque no vazio para pôr (pincel)</small></h2>
     <div class="slots" id="slots"></div>
     <canvas id="roll"></canvas>
+    <div class="lbl">CORES DO VISOR E CANAIS DO MIDI</div><div class="row" id="colorBy"></div>
     <div class="lbl">PINCEL (NOTA NOVA)</div><div class="row" id="brush"></div>
-    <div class="lbl">BAIXAR O MIDI (canal 1 bubble, 2 chop, 3 fills)</div>
+    <div class="lbl" id="dlLbl">BAIXAR O MIDI</div>
     <div class="row dl"><button class="chip" data-l="-1">⇣ TUDO (3 TRILHAS)</button><button class="chip c0" data-l="0">⇣ BUBBLE</button><button class="chip c1" data-l="1">⇣ CHOP</button><button class="chip c2" data-l="2">⇣ FILLS</button>
       <select id="reps" class="chip" style="flex:0 0 70px"><option value="1">x1</option><option value="2" selected>x2</option><option value="4">x4</option></select>
       <button class="chip" id="backBtn">VOLTAR AO GROOVE</button></div>
@@ -310,9 +311,14 @@ function detectChord(held){
 const S = {mus:1,epoch:-1,bank:-1,grid:gridFrom(MUS[1].rh,MUS[1].lh),beat:0,nota:1,swing:.12,human:.3,ghost:.5,seed:1,
   bubbleOn:true,chopOn:true,fillsOn:true,bubbleLvl:.85,chopLvl:.75,fillStyle:0,fillEvery:4,chordSrc:0,bpm:80,
   leslie:0,drive:.2,echoOn:false,echoVol:.45,echoInt:.4,master:.8,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],
-  quickFeel:2,quickDen:2,page:0,brush:1,edits:null,
+  quickFeel:2,quickDen:2,page:0,brush:1,colorBy:0,edits:null,
   slots:[{root:9,minor:true,dur:1,on:true},{root:2,minor:true,dur:1,on:true},{root:9,minor:true,dur:1,on:true},{root:4,minor:true,dur:1,on:true}]};
 const chords=()=>S.slots.filter((s,i)=>i===0||s.on).map(s=>({root:s.root,minor:s.minor,beats:DURS[s.dur][0]}));
+// CORES por acorde (acorde 1..4 = canal 1..4, igual ao MRP-80) ou por camada (1 bubble, 2 chop, 3 fills)
+const CHORD_COL=['#ffa928','#ff6f4f','#6fd16f','#5fb8ff'];
+const byChord=()=>(S.colorBy|0)===0&&S.chordSrc===0;
+function slotForBeat(beat){ const on=S.slots.map((s,i)=>i).filter(i=>i===0||S.slots[i].on), cs=chords(), tb=totalBeats(cs); if(tb<=0) return -1;
+  let b=((beat%tb)+tb)%tb; for(let k=0;k<cs.length;k++){ const d=Math.max(1,cs[k].beats); if(b<d-1e-9) return on[k]; b-=d; } return on[on.length-1]; }
 function settings(){ return {grid:S.grid,beat:S.beat,noteSize:S.nota,swing:S.swing,human:S.human,ghost:S.ghost,seed:S.seed,bubbleOn:S.bubbleOn,chopOn:S.chopOn,fillsOn:S.fillsOn,
   bubbleVel:.85,chopVel:.9,fillVel:.8,fillStyle:S.fillStyle,fillEvery:S.fillEvery}; }
 function currentLoop(){ return S.edits || buildLoop(chords(),settings()); }
@@ -420,7 +426,8 @@ function midiFile(layer){
   const lp=currentLoop(), reps=+document.getElementById('reps').value, tpq=960, tracks=[[],[],[]];
   for(let r=0;r<reps;r++) for(const e of lp.events){ if(layer>=0&&e.layer!==layer) continue;
     const t0=Math.round((e.start+4*lp.bars*r)*tpq), t1=Math.round((e.start+e.length+4*lp.bars*r)*tpq);
-    tracks[e.layer].push([t0,0x90|e.layer,e.note,e.velocity],[t1,0x80|e.layer,e.note,0]); }
+    const sl=byChord()?slotForBeat(e.start):-1, ch=sl>=0?sl:e.layer;
+    tracks[e.layer].push([t0,0x90|ch,e.note,e.velocity],[t1,0x80|ch,e.note,0]); }
   const chunk=(id,data)=>[...id].map(c=>c.charCodeAt(0)).concat([(data.length>>>24)&255,(data.length>>>16)&255,(data.length>>>8)&255,data.length&255],data);
   const us=Math.round(60000000/S.bpm), meta=[0,0xff,0x51,3,(us>>16)&255,(us>>8)&255,us&255,0,0xff,0x58,4,4,2,24,8,0,0xff,0x2f,0];
   const names=['Reggae Organ - Bubble (mao esquerda)','Reggae Organ - Chop (mao direita)','Reggae Organ - Fills'];
@@ -517,8 +524,10 @@ function drawRoll(){
   g.fillStyle='rgba(229,72,77,.7)'; for(let b=1;b<beats;b+=2) g.fillRect(xOf(b)-1.5,y0+h-4,3,4);
   if(S.chordSrc===0){ const cs=chords(); let prev=null; g.font='bold 10px monospace';
     for(let b=0;b<beats;b++){ const c=chordForBeat(cs,b), k=c.root+(c.minor?'m':''); if(k!==prev){ g.fillStyle='rgba(143,227,255,.35)'; g.fillRect(xOf(b),2,1,H-4); g.fillStyle='#8fe3ff'; g.fillText(ROOTS[c.root]+(c.minor?'m':''),xOf(b)+4,13); prev=k; } } }
-  for(const e of lp.events){ const now=curPos>=0&&curPos>=e.start&&curPos<e.start+e.length; g.globalAlpha=now?1:.45+.55*e.velocity/127; g.fillStyle=LAYER_COL[e.layer];
-    g.fillRect(xOf(e.start),yOf(e.note),Math.max(3,xOf(e.start+e.length)-xOf(e.start)),Math.max(2,rh-.5)); }
+  for(const e of lp.events){ const now=curPos>=0&&curPos>=e.start&&curPos<e.start+e.length; g.globalAlpha=now?1:.45+.55*e.velocity/127; const sl=byChord()?slotForBeat(e.start):-1; g.fillStyle=sl>=0?CHORD_COL[sl]:LAYER_COL[e.layer];
+    const rx=xOf(e.start), ry=yOf(e.note), rw=Math.max(3,xOf(e.start+e.length)-xOf(e.start)), rhh=Math.max(2,rh-.5);
+    g.fillRect(rx,ry,rw,rhh);
+    if(sl>=0&&e.layer!==1){ g.strokeStyle=e.layer===2?'rgba(255,255,255,.85)':'rgba(0,0,0,.6)'; g.lineWidth=1; g.strokeRect(rx+.5,ry+.5,rw-1,rhh-1); } }
   g.globalAlpha=1;
   if(curPos>=0){ g.fillStyle='#8fe3ff'; g.fillRect(xOf(curPos),y0,1,h); }
   if(S.edits){ g.fillStyle='#ffc061'; g.font='bold 10px monospace'; g.fillText('MIDI EDITADO',x0+4,y0+h-8); }
@@ -544,7 +553,8 @@ function setPage(p){ S.page=p; [0,1,2].forEach(k=>$('p'+k).hidden=k!==p); refres
 function refresh(){
   [...$('mus').children].forEach((b,i)=>b.classList.toggle('on',i===S.mus));
   $('epoch').value=String(S.epoch);
-  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','leslie','brush'].forEach(refreshChips);
+  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','leslie','brush','colorBy'].forEach(refreshChips);
+  $('dlLbl').textContent=byChord()?'BAIXAR O MIDI (acorde 1..4 = canal 1..4)':'BAIXAR O MIDI (canal 1 bubble, 2 chop, 3 fills)';
   for(const k of ['bubbleOn','chopOn','fillsOn','echoOn']) $(k).classList.toggle('on',S[k]);
   $('backBtn').disabled=!S.edits; $('backBtn').classList.toggle('on',!!S.edits);
   sliders.forEach(f=>f()); renderSlots(); drawGrid(); if(S.page===1) drawRoll();
@@ -589,6 +599,7 @@ chips('fillEvery',['2','4','8'],()=>[2,4,8].indexOf(S.fillEvery),i=>{ S.fillEver
 chips('chordSrc',['DO PLUGIN','DO TECLADO'],()=>S.chordSrc,i=>{ S.chordSrc=i; });
 chips('leslie',['SEM LESLIE','LENTA','RÁPIDA'],()=>S.leslie,i=>{ S.leslie=i; });
 chips('brush',['BUBBLE','CHOP','FILLS'],()=>S.brush,i=>{ S.brush=i; });
+chips('colorBy',['COR POR ACORDE','COR POR CAMADA'],()=>S.colorBy|0,i=>{ S.colorBy=i; });
 const clearEd=()=>{ S.edits=null; };
 slider('bpm','bpm',v=>v); slider('swing','swing',undefined,clearEd); slider('human','human',undefined,clearEd); slider('ghost','ghost'); slider('seed','seed',v=>v,clearEd);
 slider('bubbleLvl','bubbleLvl'); slider('chopLvl','chopLvl'); slider('drive','drive'); slider('echoVol','echoVol'); slider('echoInt','echoInt'); slider('master','master');

@@ -100,6 +100,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
     l.add (pct ("reverb", "Reverb", 0.15f));
     l.add (pct ("master", "Master", 0.80f));
     l.add (onOff ("maxOn", "Maximizer", true));
+    // CORES do visor e canais do MIDI: por acorde (igual ao MRP-80: acorde 1..4 = canal 1..4) ou por camada (1 bubble, 2 chop, 3 fills)
+    l.add (choice ("colorBy", "Cores do MIDI", { "Por acorde", "Por camada" }, 0));
     return l;
 }
 
@@ -262,6 +264,28 @@ std::vector<Chord> ReggaeOrganProcessor::getChords() const
         v.push_back (c);
     }
     return v;
+}
+
+std::vector<int> ReggaeOrganProcessor::getChordSlots() const
+{
+    std::vector<int> v;
+    for (int i = 0; i < numSlots; ++i)
+        if (i == 0 || get ("on" + juce::String (i + 1)) > 0.5f) v.push_back (i);
+    return v;
+}
+
+int ReggaeOrganProcessor::chordSlotForBeat (double beat) const
+{
+    if (get ("chordSrc") > 0.5f) return -1;
+    const auto chords = getChords();
+    const auto slots = getChordSlots();
+    const int k = chordIndexForBeat (chords, beat);
+    return k >= 0 && k < (int) slots.size() ? slots[(size_t) k] : -1;
+}
+
+bool ReggaeOrganProcessor::colourByChord() const
+{
+    return get ("colorBy") < 0.5f && get ("chordSrc") < 0.5f;
 }
 
 Settings ReggaeOrganProcessor::getSettings() const
@@ -487,14 +511,19 @@ bool ReggaeOrganProcessor::writeMidiFile (const juce::File& file, int layer) con
     const char* names[NumLayers] = { "Reggae Organ - Bubble (mao esquerda)", "Reggae Organ - Chop (mao direita)", "Reggae Organ - Fills" };
     for (int k = 0; k < NumLayers; ++k) tr[k].addEvent (juce::MidiMessage::textMetaEvent (3, names[k]), 0.0);
 
-    // cada camada no seu canal MIDI (1 bubble, 2 chop, 3 fills): na DAW cada uma aparece numa cor
+    // uma trilha por camada; o canal MIDI dá a cor na DAW:
+    //   CORES POR ACORDE  -> acorde 1..4 = canal 1..4 (igual ao MRP-80 e às outras machines)
+    //   CORES POR CAMADA  -> 1 bubble, 2 chop, 3 fills
+    const bool byChord = colourByChord();
     for (int r = 0; r < reps; ++r)
         for (const auto& e : loop.events)
         {
             if (layer >= 0 && e.layer != layer) continue;
             const double t0 = (e.start + 4.0 * loop.bars * r) * tpq;
-            tr[e.layer].addEvent (juce::MidiMessage::noteOn (e.layer + 1, e.note, (juce::uint8) e.velocity), t0);
-            tr[e.layer].addEvent (juce::MidiMessage::noteOff (e.layer + 1, e.note), t0 + e.length * tpq);
+            const int slot = byChord ? chordSlotForBeat (e.start) : -1;
+            const int ch = slot >= 0 ? slot + 1 : e.layer + 1;
+            tr[e.layer].addEvent (juce::MidiMessage::noteOn (ch, e.note, (juce::uint8) e.velocity), t0);
+            tr[e.layer].addEvent (juce::MidiMessage::noteOff (ch, e.note), t0 + e.length * tpq);
         }
 
     juce::MidiFile mf;
@@ -562,7 +591,11 @@ void ReggaeOrganProcessor::setStateInformation (const void* data, int sizeInByte
                 if (! ev.empty()) setEdits (ev, (int) t.getProperty ("bars", 1));
                 tree.removeChild (t, nullptr);
             }
+            bool hadColorBy = false;
+            for (const auto& c : tree) hadColorBy |= c.getProperty ("id").toString() == "colorBy";
             apvts.replaceState (tree);
+            if (! hadColorBy)   // projeto da 1.0: continua com as cores/canais por camada
+                if (auto* prm = apvts.getParameter ("colorBy")) prm->setValueNotifyingHost (1.0f);
         }
 }
 

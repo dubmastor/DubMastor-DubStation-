@@ -2,6 +2,7 @@
 
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
 - O órgão agora mora só aqui: o antigo Reggae Keys virou o **Mastor Reggae Piano MRP-80** (só piano). Toque o skank no MRP-80 e o órgão no MRO-68, cada MIDI na trilha do seu plugin
+- **CORES no visor MIDI**: COR POR ACORDE (igual ao MRP-80: cada acorde numa cor e, no MIDI, acorde 1..4 = canal 1..4; a camada fica no contorno da nota) ou COR POR CAMADA (como na 1.0: canal 1 bubble, 2 chop, 3 fills). Projetos da 1.0 abrem por camada. Também na versão para celular
 - **Duração da nota: 1/64 (padrão) ou 1/32** — saíram o 1/16 e o 1/8, para o órgão ficar sempre curto e no contratempo (projeto antigo em 1/16 ou 1/8 abre em 1/64)
 - **Banco de riddims filtrado:** só as 321 músicas com o riddim (a harmonia) da gravação original (luz R acesa); as setas do visor também só passam por elas
 - Versão para celular 1.1

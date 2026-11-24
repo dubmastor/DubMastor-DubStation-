@@ -28,6 +28,12 @@ const juce::Colour colChop   { 0xffd9752e };   // mão direita
 const juce::Colour colFill   { 0xfff3e6c4 };   // fills
 
 juce::Colour layerColour (int l) { return l == mro::LayerBubble ? colBubble : (l == mro::LayerChop ? colChop : colFill); }
+// cores dos acordes 1..4: as mesmas do visor do MRP-80 (e o canal MIDI 1..4)
+juce::Colour chordColour (int slot)
+{
+    static const juce::Colour c[4] = { juce::Colour (0xffffa928), juce::Colour (0xffff6f4f), juce::Colour (0xff6fd16f), juce::Colour (0xff5fb8ff) };
+    return c[(size_t) juce::jlimit (0, 3, slot)];
+}
 
 juce::Colour drawbarColour (int i)
 {
@@ -446,14 +452,22 @@ void OrganRoll::paint (juce::Graphics& g)
     for (double b = 1.0; b < loopBeats; b += 2.0) g.fillRect (xOf (b) - 1.5f, area.getBottom() - 4.0f, 3.0f, 4.0f);
 
     const double pos = proc.playPos.load();
+    const bool byChord = proc.colourByChord();
     for (int i = 0; i < (int) events.size(); ++i)
     {
         const auto& e = events[(size_t) i];
         auto nr = noteRect (e).reduced (0.0f, rowH > 5.0f ? 0.5f : 0.0f);
         const bool now = pos >= 0.0 && pos >= e.start && pos < e.start + e.length;
         const float a = 0.45f + 0.55f * (float) e.velocity / 127.0f;
-        g.setColour (layerColour (e.layer).withAlpha (now ? 1.0f : a));
+        const int cs = byChord ? proc.chordSlotForBeat (e.start) : -1;
+        const auto col = cs >= 0 ? chordColour (cs) : layerColour (e.layer);
+        g.setColour (col.withAlpha (now ? 1.0f : a));
         g.fillRect (nr);
+        if (cs >= 0 && e.layer != mro::LayerChop)   // por acorde: a camada fica no contorno (bubble tracejado, fill claro)
+        {
+            g.setColour (e.layer == mro::LayerFill ? juce::Colours::white.withAlpha (0.85f) : juce::Colours::black.withAlpha (0.6f));
+            g.drawRect (nr, 1.0f);
+        }
         if (now || (i == dragIndex && drag != Drag::None)) { g.setColour (juce::Colours::white); g.drawRect (nr, 1.0f); }
     }
     if (pos >= 0.0)
@@ -464,13 +478,30 @@ void OrganRoll::paint (juce::Graphics& g)
     // legenda
     g.setFont (VintageLookAndFeel::mono (9.5f));
     auto leg = juce::Rectangle<float> (area.getRight() - 300.0f, header.getY(), 300.0f, header.getHeight());
-    const char* names[3] = { "BUBBLE", "CHOP", "FILLS" };
-    for (int k = 2; k >= 0; --k)
+    if (byChord)
     {
-        auto it = leg.removeFromRight (90.0f);
-        g.setColour (layerColour (k));
-        g.fillRect (it.removeFromLeft (10.0f).withSizeKeepingCentre (10.0f, 6.0f));
-        g.drawText (names[k], it.withTrimmedLeft (4.0f), juce::Justification::centredLeft);
+        const auto slotsOn = proc.getChordSlots();
+        const auto ch = proc.getChords();
+        leg = juce::Rectangle<float> (area.getRight() - 80.0f * (float) slotsOn.size(), header.getY(), 80.0f * (float) slotsOn.size(), header.getHeight());
+        for (int k = 0; k < (int) slotsOn.size() && k < (int) ch.size(); ++k)
+        {
+            auto it = leg.removeFromLeft (80.0f);
+            g.setColour (chordColour (slotsOn[(size_t) k]));
+            g.fillRect (it.removeFromLeft (10.0f).withSizeKeepingCentre (10.0f, 6.0f));
+            g.drawText ("AC" + juce::String (slotsOn[(size_t) k] + 1) + " " + mro::rootName (ch[(size_t) k].root) + (ch[(size_t) k].minor ? "m" : ""),
+                        it.withTrimmedLeft (4.0f), juce::Justification::centredLeft);
+        }
+    }
+    else
+    {
+        const char* names[3] = { "BUBBLE", "CHOP", "FILLS" };
+        for (int k = 2; k >= 0; --k)
+        {
+            auto it = leg.removeFromRight (90.0f);
+            g.setColour (layerColour (k));
+            g.fillRect (it.removeFromLeft (10.0f).withSizeKeepingCentre (10.0f, 6.0f));
+            g.drawText (names[k], it.withTrimmedLeft (4.0f), juce::Justification::centredLeft);
+        }
     }
     if (proc.hasEdits())
     {
@@ -623,6 +654,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
     }
     addAndMakeVisible (roll);
     setupChips (brush, {}, { "BUBBLE", "CHOP", "FILLS" });
+    setupChips (colorBy, "colorBy", { "COR POR ACORDE", "COR POR CAMADA" });
     brush.onPick = [this] (int i) { roll.brush = i; };
     brush.current = [this] { return roll.brush; };
     dragAll = std::make_unique<MidiDragChip> (proc, -1, "TUDO (3 TRILHAS)");
@@ -764,6 +796,7 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
                 v.push_back (c);
         v.push_back (&roll);
         addC (brush);
+        addC (colorBy);
         for (auto* d : { dragAll.get(), dragLayer[0].get(), dragLayer[1].get(), dragLayer[2].get() }) v.push_back (d);
         v.push_back (&repsBox);
         v.push_back (&backToGroove);
@@ -791,7 +824,7 @@ void ReggaeOrganEditor::setPage (int p)
 
 void ReggaeOrganEditor::timerCallback()
 {
-    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &leslie, &brush })
+    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &leslie, &brush, &colorBy })
         refreshChips (*c);
     const int mus = proc.getCurrentProgram();
     for (int i = 0; i < mro::NumMusicians; ++i) musBtn[i].setToggleState (i == mus, juce::dontSendNotification);
@@ -958,7 +991,7 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
     }
     else if (page == 1)
     {
-        ivoryPanel (kContent, "ACORDES E MIDI", u8 ("EDITE NO VISOR \xc2\xb7 ARRASTE PARA A DAW (CANAL 1 BUBBLE, 2 CHOP, 3 FILLS)"));
+        ivoryPanel (kContent, "ACORDES E MIDI", proc.colourByChord() ? u8 ("MIDI: ACORDE 1..4 = CANAL 1..4") : u8 ("MIDI: CANAL 1 BUBBLE, 2 CHOP, 3 FILLS"));
         smallLabel ("PINCEL (NOTA NOVA)", kContent.getX() + 14, 572);
         smallLabel ("ARRASTE PARA A DAW", kContent.getX() + 300, 572);
     }
@@ -1048,6 +1081,7 @@ void ReggaeOrganEditor::resized()
             durBox[i].setBounds (cx + 108, y + 28, colW - 108, 22);
         }
         roll.setBounds (x, kContent.getY() + 88, w, 268);
+        layoutChips (colorBy, { x + 300, kContent.getY() + 3, 300, 20 }, 4);
         layoutChips (brush, { x, 586, 270, 26 }, 4);
         dragAll->setBounds (x + 286, 586, 160, 26);
         dragLayer[0]->setBounds (x + 452, 586, 90, 26);
