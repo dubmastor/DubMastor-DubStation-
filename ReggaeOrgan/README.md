@@ -1,10 +1,10 @@
-# Mastor Reggae Organ MRO-68 1.1 — o órgão de reggae dos organistas jamaicanos 🎹
+# Mastor Reggae Organ MRO-68 1.2 — o órgão de reggae dos organistas jamaicanos 🎹
 
 *Linha Dub Station*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.1/MRO-68-Windows-Instalador.exe) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.1/MRO-68-macOS-Instalador.pkg) · 📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/)
+**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.2/MRO-68-Windows-Instalador.exe) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.2/MRO-68-macOS-Instalador.pkg) · 📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/)
 
 Instrumento que toca **o órgão de reggae pronto** — bubble, chop e fills — no andamento da DAW, com o mesmo Hammond do
 **Mastor Reggae Keys MRK-80**. Formatos: **VST3** (Windows/macOS), **AU** (macOS), **AAX** (Pro Tools, depois da assinatura PACE) e **Standalone**.

@@ -86,6 +86,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
 
     // Maximizer
     l.add (std::make_unique<AudioParameterBool>  (ParameterID { "maxOn", 1 }, "Maximizer On", true));
+    l.add (std::make_unique<AudioParameterBool>  (ParameterID { "gtrOn", 1 }, "Guitar Skank On", false));   // sempre começa desligado
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "maxGain", 1 }, "Maximizer Gain",
                                                   NormalisableRange<float> (0.0f, 18.0f, 0.1f), 3.0f,
                                                   AudioParameterFloatAttributes().withLabel ("dB")));
@@ -123,6 +124,7 @@ void RootsKeysProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     machine->prepareToPlay (sampleRate, samplesPerBlock);
     machineBuf.setSize (2, juce::jmax (1, samplesPerBlock));
     machineMidi.ensureSize (2048);
+    engine.enableGuitar();   // GTR SKANK: só o MRK-80 aloca as cordas do MRG-68
     engine.prepare (sampleRate);
     setLatencySamples (engine.latencySamples());   // lookahead do maximizer
     keyboardState.reset();
@@ -164,6 +166,7 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.reverb     = get ("reverb");
     p.master     = get ("master");
     p.echoOn        = get ("echoOn") > 0.5f;
+    p.gtrOn         = get ("gtrOn") > 0.5f;
     p.echoMode      = (int) get ("echoMode") + 1;
     p.echoRate      = get ("echoRate");
     p.echoIntensity = get ("echoIntensity");

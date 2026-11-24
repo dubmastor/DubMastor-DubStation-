@@ -91,6 +91,95 @@ private:
     }
 };
 
+// botão GTR SKANK: o LED do teclado e, no lugar do texto, uma guitarra elétrica de dois cortes (estilo Strat)
+// em sunburst, com escudo branco, três captadores, ponte cromada, braço de maple e mão com as tarraxas de um lado
+class GuitarIconToggle : public juce::ToggleButton
+{
+public:
+    GuitarIconToggle() : juce::ToggleButton ("") {}
+
+    // coordenadas 0..1, guitarra em pé (mão em cima)
+    static juce::Path body()
+    {
+        juce::Path p;
+        p.startNewSubPath (0.445f, 0.50f);
+        p.quadraticTo (0.36f, 0.50f, 0.33f, 0.42f);       // corte do lado grave
+        p.quadraticTo (0.30f, 0.36f, 0.26f, 0.42f);       // chifre grave
+        p.quadraticTo (0.20f, 0.52f, 0.21f, 0.62f);
+        p.quadraticTo (0.24f, 0.69f, 0.20f, 0.76f);       // cintura
+        p.quadraticTo (0.15f, 0.90f, 0.32f, 0.96f);
+        p.quadraticTo (0.50f, 1.00f, 0.68f, 0.96f);       // fundo
+        p.quadraticTo (0.85f, 0.90f, 0.80f, 0.76f);
+        p.quadraticTo (0.76f, 0.69f, 0.79f, 0.60f);
+        p.quadraticTo (0.81f, 0.50f, 0.74f, 0.45f);       // chifre agudo (mais curto)
+        p.quadraticTo (0.69f, 0.42f, 0.66f, 0.47f);
+        p.quadraticTo (0.63f, 0.52f, 0.555f, 0.50f);      // corte do lado agudo
+        p.closeSubPath();
+        return p;
+    }
+    static juce::Path neck()
+    {
+        juce::Path p;
+        p.addRectangle (0.462f, 0.10f, 0.076f, 0.44f);
+        p.startNewSubPath (0.462f, 0.115f);               // mão com as 6 tarraxas de um lado
+        p.quadraticTo (0.43f, 0.06f, 0.45f, 0.02f);
+        p.quadraticTo (0.47f, -0.005f, 0.52f, 0.005f);
+        p.quadraticTo (0.58f, 0.02f, 0.575f, 0.05f);
+        p.quadraticTo (0.56f, 0.09f, 0.538f, 0.115f);
+        p.closeSubPath();
+        p.setUsingNonZeroWinding (true);
+        return p;
+    }
+    static juce::Path pickguard()
+    {
+        juce::Path p;
+        p.startNewSubPath (0.44f, 0.52f);
+        p.quadraticTo (0.33f, 0.52f, 0.29f, 0.60f);
+        p.quadraticTo (0.27f, 0.70f, 0.33f, 0.80f);
+        p.quadraticTo (0.40f, 0.88f, 0.48f, 0.86f);
+        p.lineTo (0.60f, 0.80f);
+        p.quadraticTo (0.66f, 0.70f, 0.62f, 0.58f);
+        p.quadraticTo (0.60f, 0.52f, 0.56f, 0.52f);
+        p.closeSubPath();
+        return p;
+    }
+
+    void paintButton (juce::Graphics& g, bool highlighted, bool down) override
+    {
+        getLookAndFeel().drawToggleButton (g, *this, highlighted, down);
+        auto box = getLocalBounds().toFloat().reduced (1.0f).withTrimmedLeft (14.0f);
+        const float sz = juce::jmin (box.getHeight(), box.getWidth()) * 1.02f;
+        const auto area = juce::Rectangle<float> (sz, sz).withCentre (box.getCentre());
+        const auto tf = juce::AffineTransform::rotation (juce::degreesToRadians (35.0f), 0.5f, 0.5f)
+                            .scaled (sz, sz).translated (area.getX(), area.getY());
+        const bool on = getToggleState();
+        const juce::Colour edge   = on ? juce::Colour (0xff3a1a0c) : juce::Colour (0xff4a4a4e);   // sunburst: borda escura
+        const juce::Colour centre = on ? juce::Colour (0xffe0a23a) : juce::Colour (0xffa2a2a7);   //           e centro âmbar
+        const juce::Colour guard  = on ? juce::Colour (0xfff6f1e6) : juce::Colour (0xffd2d2d6);
+        const juce::Colour maple  = on ? juce::Colour (0xfff3dfab) : juce::Colour (0xffb9b9be);
+        const juce::Colour metal  = juce::Colour (0xff1e1e21);
+
+        auto b = body();
+        g.setColour (edge);   g.fillPath (b, tf);
+        g.setColour (centre); g.fillPath (b, juce::AffineTransform::scale (0.72f, 0.80f, 0.5f, 0.74f).followedBy (tf));
+        g.setColour (guard);  g.fillPath (pickguard(), tf);
+        g.setColour (maple);  g.fillPath (neck(), tf);
+        g.setColour (metal);
+        for (float y : { 0.585f, 0.665f, 0.75f })                    // três captadores
+        {
+            juce::Path pu; pu.addRoundedRectangle (0.445f, y, 0.11f, 0.032f, 0.012f);
+            g.fillPath (pu, tf);
+        }
+        g.setColour (on ? juce::Colour (0xffe4e6e9) : juce::Colour (0xffc4c5c8));
+        {
+            juce::Path bridge; bridge.addRoundedRectangle (0.44f, 0.82f, 0.12f, 0.04f, 0.01f);
+            g.fillPath (bridge, tf);
+        }
+        g.setColour (juce::Colours::black.withAlpha (0.6f));
+        g.strokePath (b, juce::PathStrokeType (0.012f), tf);
+    }
+};
+
 class RootsKeysEditor : public juce::AudioProcessorEditor,
                         private juce::Timer
 {
@@ -120,7 +209,12 @@ private:
     juce::Typeface::Ptr plateFace, pianoTitleFace, organTitleFace;
     int skin = -1, page = 0;
     juce::Image background;
-    int backgroundSkin = -1, backgroundPage = -1;
+    int backgroundSkin = -1, backgroundPage = -1, backgroundLook = -1;
+    // acabamento do gabinete no modo piano, conforme o timbre:
+    // 0 teclado preto anos 80 (M1, M1 COMP, M1 GRAND, Honky, FM EP) · 1 Rhodes Stage · 2 Rhodes Suitcase
+    // 3 Wurlitzer 200A · 4 Yamaha CP / C7 / Grand · 5 Casio CZ-101 / MT-40
+    int look = 0;
+    static int lookForTimbre (int pianoType);
 
     // cabeçalho
     juce::TextButton modePiano { "PIANO" }, modeOrgan { "ORGAN" };
@@ -147,6 +241,8 @@ private:
     // eco de fita FitaEco TE-12
     juce::ToggleButton echoButton { "ECHO" };
     std::unique_ptr<APVTS::ButtonAttachment> echoAtt;
+    GuitarIconToggle gtrButton;   // GTR SKANK (LED + ícone de guitarra elétrica) (guitarra do skank junto com o piano)
+    std::unique_ptr<APVTS::ButtonAttachment> gtrAtt;
     juce::ComboBox echoModeBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> echoModeAtt;
     Knob eRate, eIntensity, eVol, eSpring, eWow, eAge;

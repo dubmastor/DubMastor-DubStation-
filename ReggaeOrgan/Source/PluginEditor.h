@@ -187,6 +187,7 @@ private:
     juce::Typeface::Ptr plateFace, titleFace;
     juce::Image background;
     int page = 0, backgroundPage = -1;
+    int look = 0, backgroundLook = -1;   // gabinete conforme o INSTRUMENTO: 0 madeira (B3), 1 Rhodes, 2 Suitcase, 3 Wurlitzer, 4 DX EP
 
     // cabeçalho
     juce::ToggleButton grooveBtn { "GROOVE" }, playBtn { "PLAY" };

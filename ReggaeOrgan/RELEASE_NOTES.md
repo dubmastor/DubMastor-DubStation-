@@ -1,4 +1,9 @@
-# Mastor Reggae Organ MRO-68 1.1
+# Mastor Reggae Organ MRO-68 1.2
+
+## 1.2
+
+- O gabinete muda com o INSTRUMENTO: madeira no B3, tolex preto com chapa de alumínio e feltro vermelho no Rhodes e no Suitcase, coral no Wurlitzer e preto anos 80 no DX EP; o nome do instrumento aparece ao lado da versão.
+- **Correção:** o DX EP podia travar o plugin em notas muito agudas (mesmo motor do MRK-80, corrigido lá).
 
 ## 1.1
 

@@ -6,7 +6,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-project(RootsKeys VERSION 3.1.0)
+project(RootsKeys VERSION 3.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -90,5 +90,21 @@ if(ROOTSKEYS_TESTS)
         JucePlugin_Name="Mastor Reggae Keys MRK-80" JucePlugin_VersionString="${PROJECT_VERSION}"
         JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0)
     target_link_libraries(RootsKeysTest PRIVATE RootsKeysFonts juce::juce_audio_utils
+        juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+
+    # teste de automação no estilo do pluginval (parâmetros aleatórios a cada 32 amostras + MIDI aleatório)
+    juce_add_console_app(RootsKeysStress PRODUCT_NAME "RootsKeysStress")
+    target_sources(RootsKeysStress PRIVATE
+        tests/automation_stress.cpp
+        Source/PluginProcessor.cpp
+        Source/PluginEditor.cpp
+        ${MRK_MACHINE_SOURCES})
+    target_include_directories(RootsKeysStress PRIVATE Source)
+    target_compile_definitions(RootsKeysStress PRIVATE
+        JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
+        JucePlugin_Name="Mastor Reggae Keys MRK-80" JucePlugin_VersionString="${PROJECT_VERSION}"
+        JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0)
+    target_link_libraries(RootsKeysStress PRIVATE RootsKeysFonts juce::juce_audio_utils
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 endif()

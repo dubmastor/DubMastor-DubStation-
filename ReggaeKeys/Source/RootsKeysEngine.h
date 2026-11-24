@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "TapeEchoDSP.h"
+#include "GuitarSkank.h"
 
 namespace rk
 {
@@ -31,9 +32,10 @@ struct SineTable
     static constexpr int N = 4096;
     float t[N + 1];
     SineTable() { for (int i = 0; i <= N; ++i) t[i] = std::sin (kTwoPi * (float) i / (float) N); }
-    inline float operator() (float ph) const   // ph em [0,1)
+    inline float operator() (float ph) const   // ph em ciclos (qualquer valor: a fase é dobrada para [0,1))
     {
-        const float x = ph * (float) N;
+        ph -= std::floor (ph);                     // notas muito agudas (ex.: o "tine" 14x do FM EP) passam de 1 por amostra
+        const float x = std::min (ph * (float) N, (float) N - 0.001f);
         const int i = (int) x;
         const float f = x - (float) i;
         return t[i] + f * (t[i + 1] - t[i]);
@@ -134,6 +136,9 @@ struct Params
     float flDepth    = 0.8f;    // amplitude da varredura
     float flManual   = 0.3f;    // atraso base (posição do "pente")
     float flFeedback = 0.65f;   // -0.95..0.95 (regeneração; negativo = timbre oco)
+    // GTR SKANK: a guitarra do skank (motor do MRG-68) tocando junto com o piano — sempre começa desligada
+    bool  gtrOn    = false;
+    float gtrLevel = 1.0f;
     float flMix      = 0.5f;
     // Master / Maximizer
     float reverb = 0.18f;
@@ -542,8 +547,8 @@ struct PianoVoice
             {
                 const float m = S (mPh[i]) * idx[i] * 0.159155f;   // índice em radianos -> ciclos
                 s += S (wrap1 (cPh[i] + m)) * cAmp[i];
-                cPh[i] += cInc[i] * fm; if (cPh[i] >= 1.0f) cPh[i] -= 1.0f;
-                mPh[i] += mInc[i] * fm; if (mPh[i] >= 1.0f) mPh[i] -= 1.0f;
+                cPh[i] = wrap1 (cPh[i] + cInc[i] * fm);
+                mPh[i] = wrap1 (mPh[i] + mInc[i] * fm);
                 idx[i] *= idxCoef[i];
             }
             att = std::min (1.0f, att + attInc);
@@ -814,6 +819,7 @@ public:
         flanger.prepare (sr);
         echoIdle = true;
         maxi.prepare (sr);
+        gtr.prepare (sr);
         for (auto& v : piano) v.active = false;
         for (auto& v : organ) v.active = false;
         for (float& g : dbSmooth) g = 0;
@@ -821,6 +827,8 @@ public:
         percWindow = 0;
         heldKeys = 0;
     }
+
+    void enableGuitar() { gtr.enable(); }
 
     void noteOn (int note, float vel)
     {
@@ -830,6 +838,7 @@ public:
         {
             PianoVoice& v = allocPiano (note);
             v.start (note, vel, sr, params, stamp);
+            if (params.gtrOn) gtr.noteOn (note, vel);
         }
         if (mode == 1)
         {
@@ -845,6 +854,7 @@ public:
 
     void noteOff (int note)
     {
+        gtr.noteOff (note);
         for (auto& v : piano)
             if (v.active && v.held && v.note == note)
             {
@@ -872,6 +882,7 @@ public:
 
     void allNotesOff()
     {
+        gtr.allNotesOff();
         for (auto& v : piano) if (v.active) { v.held = false; v.release (sr); }
         for (auto& v : organ) if (v.active) v.release (0.0f);
         sustain = false; heldKeys = 0;
@@ -941,6 +952,20 @@ public:
             bufR[s] = pr + orr;
         }
 
+        // guitarra do skank (motor do MRG-68, com o próprio Twin e mola): entra antes do eco e do reverb, como o piano
+        if (gtr.isEnabled() && (p.gtrOn || gtrTail))
+        {
+            float gl[kChunk] = {}, gr[kChunk] = {};
+            gtr.render (gl, gr, n);
+            float pk = 0;
+            for (int s = 0; s < n; ++s)
+            {
+                bufL[s] += gl[s] * p.gtrLevel; bufR[s] += gr[s] * p.gtrLevel;
+                pk = std::max (pk, std::fabs (gl[s]) + std::fabs (gr[s]));
+            }
+            gtrTail = pk > 1.0e-5f;   // desligou o botão: a cauda termina de tocar
+        }
+
         // eco de fita FitaEco TE-12 (antes do reverb, como num rack de dub).
         // Só o sinal molhado volta daqui; desligar o ECHO corta a entrada mas deixa a cauda tocar.
         fitaeco::Params fp;
@@ -999,6 +1024,8 @@ private:
     StereoChorus chorus;
     Leslie leslie;
     Reverb reverb;
+    GuitarSkank gtr;
+    bool gtrTail = false;
     fitaeco::TapeEcho echo;
     Flanger flanger;
     static constexpr int kChunk = 256;

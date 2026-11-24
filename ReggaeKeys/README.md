@@ -1,8 +1,8 @@
-# Mastor Reggae Keys MRK-80 3.1
+# Mastor Reggae Keys MRK-80 3.2
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.1/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.1/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.2/MRK-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRK-80-3.2/MRK-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/keys/)**
 
 (Antes se chamava **DubMastor Roots Keys** e **Mastor Roots Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240**, que virou a aba CHORD MACHINE.)
 

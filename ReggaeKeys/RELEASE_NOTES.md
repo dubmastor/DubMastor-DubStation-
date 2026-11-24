@@ -1,4 +1,10 @@
-## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+## Mastor Reggae Keys MRK-80 3.2 🟢🟡⚫
+
+- **GUITAR SKANK:** botão novo ao lado do VOLUME, com o ícone de uma guitarra elétrica, que põe a guitarra do skank para tocar junto com o piano, com o **motor do próprio Mastor Reggae Guitar MRG-68** (as mesmas cordas e o mesmo Fender Twin com mola: Tele 68, captador da ponte; duas guitarras em estéreo, como no MRG-68). A guitarra pega as notas do piano, leva para a região do skank (G3 a E5), palheta para baixo e abafa quando a tecla solta. **Sempre começa desligado.**
+- **O gabinete muda com o timbre:** Rhodes (tolex preto, chapa de alumínio e feltro vermelho), Suitcase (com a luz do tremolo), Wurlitzer (creme), Yamaha CP / C7 / Grand (madeira escura) e Casio (cinza); o M1 e os outros continuam no preto anos 80.
+- **Correção:** o timbre FM EP podia travar o plugin em notas muito agudas (pego pelo pluginval no Windows). Teste novo de automação no estilo do pluginval (`tests/automation_stress.cpp`).
+
+### Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
 
 - **Só piano:** o órgão Hammond saiu do Reggae Keys (agora está no **Mastor Reggae Organ MRO-68**). Saíram o botão ORGAN, os drawbars e os presets de órgão. Projetos antigos no modo órgão abrem no piano.
 - **CHORD MACHINE:** o skank e o bubble tocam sempre no piano do instrumento (o SOM INTERNO da machine, com o Hammond, saiu daqui).
