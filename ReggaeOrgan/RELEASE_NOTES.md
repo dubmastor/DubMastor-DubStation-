@@ -10,7 +10,7 @@
 - **TIMBRE MIDNITE** (na aba EQ): o órgão do Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens).
   Os discos *Unpolished* e *Ras Mek Peace* foram gravados ao vivo, direto em fita de dois canais, sem reverb, sem eco e sem EQ.
   O botão carrega um som cru e seco: bubble oco (8' + 4' + 2⅔'), chop cheio sem percussão, Leslie ROOTS SUAVE discreta,
-  sem key click, sem reverb e sem eco, e o EQ tirando o grave do caminho do baixo e um pouco de médio, com o volume compensado na SAÍDA (soa tão alto quanto os outros timbres). O groove continua o do músico.
+  sem key click, sem reverb e sem eco, e o EQ tirando o grave profundo do caminho do baixo, encorpando o médio-grave (150–350 Hz) e tirando médio (−5 dB em 1,2 kHz), com o volume compensado na SAÍDA (soa tão alto quanto os outros timbres). O groove continua o do músico.
   Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
 - Versão para celular 1.3 com a mesma aba EQ (curva no toque) e o mesmo timbre.
 
