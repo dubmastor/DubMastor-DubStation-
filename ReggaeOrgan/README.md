@@ -63,7 +63,7 @@ Arraste para a timeline **TUDO** (3 trilhas: bubble no canal 1, chop no 2, fills
 ![Aba ÓRGÃO](docs/interface-orgao.png)
 
 Dois organistas: **mão esquerda** (bubble, seco e grave) e **mão direita** (chop e fills, cheio) com registros de drawbar
-separados. Leslie, percussão e eco de fita só na mão direita.
+separados. Leslie de dois rotores (corneta e tambor, com presets, LENTA/RÁPIDA, FREIO e o gabinete animado), percussão e eco de fita só na mão direita.
 
 ## Código
 - `Source/GrooveEngine.h` — o motor (C++ puro): grade, músicos, épocas e fills. A versão para celular (`site/web/reggaeorgan/`) usa a mesma lógica e o mesmo gerador aleatório: o mesmo compasso sai igual nos dois.

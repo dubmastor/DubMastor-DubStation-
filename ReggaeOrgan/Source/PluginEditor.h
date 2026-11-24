@@ -144,6 +144,17 @@ private:
     juce::File makeFile (const juce::File& dir) const;
 };
 
+// A Leslie animada: gabinete de madeira com a corneta (agudos, em cima) e o tambor (graves, embaixo)
+// girando na velocidade de verdade de cada rotor (a mesma do som).
+class LeslieCabinet : public juce::Component
+{
+public:
+    explicit LeslieCabinet (ReggaeOrganProcessor& p) : proc (p) {}
+    void paint (juce::Graphics&) override;
+private:
+    ReggaeOrganProcessor& proc;
+};
+
 class ReggaeOrganEditor : public juce::AudioProcessorEditor, private juce::Timer
 {
 public:
@@ -217,7 +228,11 @@ private:
 
     // aba ÓRGÃO
     std::unique_ptr<OrganDrawbar> bubbleDb[9], chopDb[9];
-    Chips leslie;
+    LeslieCabinet cabinet { proc };
+    Chips lesPreset, lesSpeed;
+    juce::TextButton lesBrake { "FREIO" };
+    Knob lesDepth;
+    juce::Label lesRead;
     Chips instr;   // Hammond B3 ou um dos 4 pianos elétricos (Rhodes Stage, Suitcase, Wurlitzer, DX EP)
     juce::ToggleButton percBtn { "PERC" }, echoBtn { "ECHO" }, maxBtn { "MAX" };
     std::unique_ptr<APVTS::ButtonAttachment> percAtt, echoAtt, maxAtt;
