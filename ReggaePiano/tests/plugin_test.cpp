@@ -172,6 +172,17 @@ int main (int argc, char** argv)
             check (os.openedOk() && fmt.writeImageToStream (img, os), "imagem " + name);
         };
         save ("interface-piano.png");
+        {   // o gabinete muda com o timbre: Rhodes, Suitcase, Wurlitzer, Yamaha (Grand/CP/C7) e Casio
+            const int types[5] = { 10, 11, 12, 4, 9 };
+            const char* names[5] = { "interface-piano-rhodes.png", "interface-piano-suitcase.png", "interface-piano-wurlitzer.png",
+                                     "interface-piano-yamaha.png", "interface-piano-casio.png" };
+            for (int i = 0; i < 5; ++i) { setP (p.apvts, "pianoType", (float) types[i]); save (names[i]); }
+            setP (p.apvts, "pianoType", 7.0f);
+            check (getP (p.apvts, "gtrOn") < 0.5f, "GTR SKANK começa desligado");
+            setP (p.apvts, "gtrOn", 1.0f);
+            save ("interface-piano-gtr.png");
+            setP (p.apvts, "gtrOn", 0.0f);
+        }
         rk->setPage (1);
         save ("interface-chord-machine.png");
         // aba MIDI da CHORD MACHINE: o visor editável (clica no botão "MIDI")

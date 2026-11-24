@@ -26,7 +26,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
 
 
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianoType", 1 }, "Piano Timbre",
-                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP", "Rhodes", "Upright", "CZ" }, 0));   // novos no fim
+                                                   StringArray { "M1", "Grand Piano", "MT-40", "FM EP", "Yamaha CP-80", "Yamaha C7", "M1 Grand Piano",
+                                                                 "M1 Piano 16 Comp", "Honky Tonk", "Casio CZ-101",
+                                                                 "Rhodes Stage", "Rhodes Suitcase", "Wurlitzer 200A" }, 7));   // de fábrica: o Piano 16 do Korg M1 comprimido (novos timbres sempre no fim da lista: projetos antigos guardam o índice)
     l.add (pct ("pianoBright", "Piano Brightness", 0.65f));
     l.add (pct ("pianoDecay",  "Piano Decay",      0.55f));
     l.add (pct ("pianoChorus", "Piano Chorus",     0.50f));
@@ -62,6 +64,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
 
     // Maximizer
     l.add (std::make_unique<AudioParameterBool>  (ParameterID { "maxOn", 1 }, "Maximizer On", true));
+    l.add (std::make_unique<AudioParameterBool>  (ParameterID { "gtrOn", 1 }, "Guitar Skank On", false));   // sempre começa desligado
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "maxGain", 1 }, "Maximizer Gain",
                                                   NormalisableRange<float> (0.0f, 18.0f, 0.1f), 3.0f,
                                                   AudioParameterFloatAttributes().withLabel ("dB")));
@@ -129,6 +132,7 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.reverb     = get ("reverb");
     p.master     = get ("master");
     p.echoOn        = get ("echoOn") > 0.5f;
+    p.gtrOn         = get ("gtrOn") > 0.5f;
     p.echoMode      = (int) get ("echoMode") + 1;
     p.echoRate      = get ("echoRate");
     p.echoIntensity = get ("echoIntensity");

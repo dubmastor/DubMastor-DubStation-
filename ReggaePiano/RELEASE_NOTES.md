@@ -6,9 +6,10 @@
 - **FILLS só de acordes** (a firula do pianista na base): PUXADA (o próximo acorde adiantado no "a" do 4), DOBRADO, RAJADA, INVERSÕES, TERCINA e ARRASTADO, e o fill **a cada 4 ou 8 compassos** (no menu do FILL; o loop curto se repete até a frase)
 - **Visor MIDI editável** na CHORD MACHINE (botão MIDI ✎ na linha do LOOP): o loop inteiro em rolo de piano, cada acorde numa cor (as mesmas cores/canais do MIDI exportado). Clique põe o acorde que soa ali, arraste move, a borda estica, duplo clique apaga, roda do mouse muda a força; ARRASTE O MIDI leva o loop editado direto para a DAW e DESFAZER volta ao groove
 - **Nota de 1/64**: a duração das notas agora é 1/64 (padrão) ou 1/32, clicando na plaqueta NOTAS (projetos antigos continuam em 1/32)
-- **3 timbres novos**: RHODES (piano elétrico de palheta, com "bark" no toque forte), UPRIGHT (piano de armário do ska e da Studio One) e CZ (Casio CZ-101 da era digital, phase distortion)
+- **13 timbres de piano** em duas linhas: **M1 COMP** (o Piano 16 do Korg M1 comprimido, o skank digital do dancehall dos anos 90 — agora o timbre inicial), M1, **M1 GRAND**, GRAND, **HONKY** (piano de armário de Kingston), **CP-80** e **C7** (Yamaha), **RHODES**, **SUITCASE** (com tremolo), **WURLI** (Wurlitzer 200A), FM EP, **CZ-101** e MT-40. O gabinete muda com o timbre (Rhodes, Suitcase, Wurlitzer, Yamaha e Casio). Projetos salvos abrem com o timbre que tinham
+- **GUITAR SKANK**: botão novo ao lado do VOLUME que põe a guitarra do skank (timbre do Mastor Reggae Guitar MRG-68) tocando junto com o piano. Sempre começa desligado
 - A CHORD MACHINE toca só o **skank de piano** (o botão BUBBLE e o nível do Hammond saíram; o bubble é do organista no MRO-68)
-- Continuam os 4 timbres (M1, GRAND, MT-40 e FM EP), os 4 presets de piano, o eco de fita, o flanger, o maximizer e os VUs
+- Continuam os 4 presets de piano, o eco de fita, o flanger, o maximizer e os VUs
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
 - **Banco de riddims filtrado:** a CHORD MACHINE mostra só as 321 músicas com o riddim (a harmonia) da gravação original (luz R acesa)
 - Versão para celular 3.1

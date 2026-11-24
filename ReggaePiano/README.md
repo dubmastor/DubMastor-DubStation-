@@ -18,17 +18,25 @@ Cadeia de saída: **Tape Echo Mastor Tape Echo MTE-12** (o mesmo eco do Dub Stat
 
 ## Timbres de piano
 
-Sete botões logo abaixo do visor (o visor mostra o timbre escolhido):
+Treze botões em duas linhas logo abaixo do visor (o visor mostra o timbre escolhido). Em cima o Korg M1, os acústicos e os Yamaha; embaixo os pianos elétricos e os digitais. O gabinete muda com o timbre (Rhodes, Suitcase, Wurlitzer, Yamaha e Casio têm acabamento próprio).
 
 | Timbre | Som |
 |---|---|
+| **M1 COMP** | o Piano 16 do Korg M1 comprimido, o skank digital do reggae e do dancehall dos anos 90 (cauda alta, quase não muda com o toque) — **timbre inicial** |
 | **M1** | o piano brilhante e "vidrado" estilo Korg M1 (o dos presets P01–P04) |
-| **GRAND** | piano de cauda: mais harmônicos, cordas mais "duras", ataque de martelo grave, sustentação longa e o leve batimento entre as cordas de cada nota |
-| **MT-40** | teclado digital de brinquedo estilo Casio MT-40: onda de pulso, sem sensibilidade ao toque, ~6 bits a 16 kHz, bem lo-fi |
-| **FM EP** | piano elétrico FM estilo Yamaha DX: corpo 1:1 + "tine" metálico 1:14 que some rápido; o toque mais forte abre o brilho |
-| **RHODES** | piano elétrico de palheta: corpo redondo, sino curto (1:7) e "bark" (saturação) que cresce com a força do toque |
-| **UPRIGHT** | piano de armário de estúdio (ska / Studio One): cordas menos afinadas entre si, mais curto e mais batido |
-| **CZ** | Casio CZ-101 da era digital (Steely & Clevie): phase distortion, abre brilhante como serra e fecha em senoide |
+| **M1 GRAND** | o piano de cauda do Korg M1, com a "presença" em 2,8 kHz |
+| **GRAND** | piano de cauda: mais harmônicos, cordas mais "duras", ataque de martelo grave e sustentação longa |
+| **HONKY** | piano de armário Honky Tonk dos estúdios de Kingston: cordas desafinadas entre si, escuro e curto |
+| **CP-80** | piano de cauda elétrico Yamaha CP-80, com o meio "honky" do captador |
+| **C7** | cauda de concerto Yamaha C7, brilhante e com ataque rápido |
+| **RHODES** | Rhodes Stage: tine redondo, sino curto e o "bark" do captador no toque forte |
+| **SUITCASE** | Rhodes Suitcase: mais doce, com o tremolo da maleta |
+| **WURLI** | Wurlitzer 200A: nasal, rosna no toque forte |
+| **FM EP** | piano elétrico FM estilo Yamaha DX |
+| **CZ-101** | Casio CZ-101 (Steely & Clevie): phase distortion, abre brilhante e fecha em senoide |
+| **MT-40** | teclado de brinquedo estilo Casio MT-40, bem lo-fi |
+
+**GUITAR SKANK** (botão com a guitarra, ao lado do VOLUME): a guitarra do skank toca junto com o piano, com o timbre do Mastor Reggae Guitar MRG-68 (Tele, captador da ponte, Twin Reverb), na região G3–E5. Sempre começa desligado.
 
 BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
 
