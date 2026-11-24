@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#3e2110">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Mastor Reggae Organ MRO-68: grooves de órgão de reggae (bubble, chop e fills) dos organistas jamaicanos, por músico, época ou riddim, na contagem com a caixa no 2 e no 4. Toque no celular e baixe o MIDI.">
-<title>Mastor Reggae Organ MRO-68 v1.2 — Dub Station</title>
+<title>Mastor Reggae Organ MRO-68 v1.3 — Dub Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 <style>
@@ -96,6 +96,14 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
 .lesgrid .chip small{display:block;font-weight:400;font-size:9px;opacity:.75}
 .lesread{font-size:10px;margin-top:6px;opacity:.75}
 @media (max-width:760px){.lesbox{grid-template-columns:1fr}#lesCv{margin:0 auto}}
+#eqCv{width:100%;height:220px;display:block;border-radius:5px;background:#0b2236;touch-action:none;cursor:pointer}
+.cols>*{min-width:0}
+.eqk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px}
+.eqk input{min-width:0;flex:1}
+.eqk .sl label{width:48px}
+.mid p{font-size:11px;line-height:1.45;margin:8px 0}
+.mid .chip{width:100%;padding:12px 6px;font-size:12px}
+@media (max-width:760px){.eqk{grid-template-columns:1fr}}
 .kb{position:relative;height:130px;margin-top:10px;background:var(--brown);border-radius:6px;padding:8px 8px 6px;border-top:5px solid #7a1a14;user-select:none;touch-action:none}
 .kb .keys{position:relative;height:100%}
 .w{position:absolute;top:0;bottom:0;background:var(--ivory);border:1px solid #a89a82;border-radius:0 0 4px 4px}
@@ -213,6 +221,35 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
  </div>
 </div>
 
+<!-- ======================= EQ (1.3) -->
+<div class="page" id="p3" hidden>
+ <div class="cols">
+  <div class="panel">
+    <h2>EQUALIZADOR <small>saída do órgão · arraste os pontos · duplo toque zera</small></h2>
+    <canvas id="eqCv"></canvas>
+    <div class="row" style="margin-top:8px"><button class="chip" id="eqOn" style="flex:0 0 90px">EQ</button></div>
+    <div class="eqk">
+      <div><div class="lbl">CORTE</div><div class="sl"><label>FREQ.</label><input type="range" id="eqHpf" min="0" max="1" step="0.001"><output></output></div></div>
+      <div><div class="lbl">GRAVES</div><div class="sl"><label>GANHO</label><input type="range" id="eqLowG" min="-15" max="15" step="0.1"><output></output></div>
+        <div class="sl"><label>FREQ.</label><input type="range" id="eqLowF" min="0" max="1" step="0.001"><output></output></div></div>
+      <div><div class="lbl">MÉDIOS</div><div class="sl"><label>GANHO</label><input type="range" id="eqMidG" min="-15" max="15" step="0.1"><output></output></div>
+        <div class="sl"><label>FREQ.</label><input type="range" id="eqMidF" min="0" max="1" step="0.001"><output></output></div>
+        <div class="sl"><label>Q</label><input type="range" id="eqMidQ" min="0.3" max="4" step="0.01"><output></output></div></div>
+      <div><div class="lbl">AGUDOS</div><div class="sl"><label>GANHO</label><input type="range" id="eqHighG" min="-15" max="15" step="0.1"><output></output></div>
+        <div class="sl"><label>FREQ.</label><input type="range" id="eqHighF" min="0" max="1" step="0.001"><output></output></div></div>
+    </div>
+    <div class="lbl">PRESETS DO EQ</div><div class="row" id="eqPresets"></div>
+  </div>
+  <div class="panel mid">
+    <h2>TIMBRE MIDNITE <small>Ron Benjamin</small></h2>
+    <button class="chip" id="midnite">CARREGAR O TIMBRE MIDNITE</button>
+    <p>Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens, 1989-2015). Os discos <i>Unpolished</i> e <i>Ras Mek Peace</i> foram gravados ao vivo, direto em fita de dois canais, sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.</p>
+    <p>O timbre: bubble oco (8' + 4' + 2⅔'), chop cheio sem percussão, Leslie lenta e discreta, sem eco; o EQ corta o grave do caminho do baixo e realça o médio. O groove continua o do músico escolhido.</p>
+    <p style="opacity:.7">Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.</p>
+  </div>
+ </div>
+</div>
+
 <div class="kb"><div class="keys" id="keys"></div></div>
 <div class="foot">
   Contagem da Dub Station: <b>caixa no 2 e no 4</b> (BPM até 100). Mão direita no contratempo, mão esquerda no "e" e no "a", notas de 1/32.
@@ -224,7 +261,7 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
 <script src="../../riddimbankmenu.js"></script>
 <script>
 'use strict';
-const VERSION = '1.2';
+const VERSION = '1.3';
 document.getElementById('verTxt').textContent = VERSION;
 
 // ====================================================================== motor de grooves (igual ao GrooveEngine.h)
@@ -252,6 +289,16 @@ const LES = [
   {name:'DUB TREMOLO', sub:'rápida e funda',        horn:[0.83,7.2], drum:[0.67,6.4], tH:[0.7,0.45],tD:[2.8,1.8], depth:1.0, speed:1},
 ].map(p=>({on:true,...p}));
 const lesFromMusician=v=>v===2?5:(v===1?1:0);
+// EQUALIZADOR (1.3): igual ao OrganEQ.h do plugin (mesmos presets e o mesmo timbre Midnite)
+const EQ_FLAT={eqOn:true,eqHpf:20,eqLowG:0,eqLowF:120,eqMidG:0,eqMidF:1000,eqMidQ:.8,eqHighG:0,eqHighF:5000};
+const EQ_PRESETS=[
+  ['PLANO','sem EQ',[20,0,120,0,1000,.8,0,5000]],
+  ['ROOTS QUENTE','graves cheios, agudo macio',[40,3,150,1,700,.7,-3,6000]],
+  ['DUB ESCURO','sem agudo, para o eco',[60,2,120,-2,2000,.8,-9,3500]],
+  ['DIGITAL 80','fino e brilhante',[150,-3,200,2,2500,.9,4,7000]],
+  ['ABRE O BAIXO','corta o grave para o baixo',[180,-4,250,1.5,1200,.8,0,5000]]];
+const EQ_KEYS=['eqHpf','eqLowG','eqLowF','eqMidG','eqMidF','eqMidQ','eqHighG','eqHighF'];
+const MIDNITE={bdb:[0,0,8,6,4,0,0,0,0],cdb:[8,6,8,6,0,0,0,0,0],drive:.12,lesPreset:2,lesSpeed:0,lesDepth:.45,eq:[110,-2,220,2.5,1100,.9,-1.5,6500]};
 const EPOCHS = [ // musician, beat, feel(-1 = grade do músico), bpm
   ['ROCKSTEADY','1966-68',1,0,1,80],['EARLY REGGAE','1968-72',2,0,-1,84],['ROOTS','1972-79',3,0,-1,74],['ROCKERS','1975-80',5,1,-1,76],
   ['LOVERS ROCK','1969-94',4,0,-1,72],['RUB A DUB','1979-84',6,0,-1,78],['DIGITAL','1985-89',7,1,-1,92],['RAGGA','1990-95',7,2,-1,94],
@@ -344,7 +391,7 @@ function detectChord(held){
 const S = {mus:1,epoch:-1,bank:-1,grid:gridFrom(MUS[1].rh,MUS[1].lh),beat:0,nota:0,swing:.12,human:.3,ghost:.5,seed:1,
   bubbleOn:true,chopOn:true,fillsOn:true,bubbleLvl:.85,chopLvl:.75,fillStyle:0,fillEvery:4,chordSrc:0,bpm:80,
   instr:0,lesPreset:0,lesSpeed:0,lesBrake:false,lesDepth:.8,drive:.2,echoOn:false,echoVol:.45,echoInt:.4,master:.8,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],
-  quickFeel:2,quickDen:2,page:0,brush:1,edits:null,
+  quickFeel:2,quickDen:2,page:0,...EQ_FLAT,midnite:false,brush:1,edits:null,
   slots:[{root:9,minor:true,dur:1,on:true},{root:2,minor:true,dur:1,on:true},{root:9,minor:true,dur:1,on:true},{root:4,minor:true,dur:1,on:true}]};
 const chords=()=>S.slots.filter((s,i)=>i===0||s.on).map(s=>({root:s.root,minor:s.minor,beats:DURS[s.dur][0]}));
 function settings(){ return {grid:S.grid,beat:S.beat,noteSize:S.nota,swing:S.swing,human:S.human,ghost:S.ghost,seed:S.seed,bubbleOn:S.bubbleOn,chopOn:S.chopOn,fillsOn:S.fillsOn,
@@ -361,7 +408,8 @@ function initAudio(){
   ctx=new (window.AudioContext||window.webkitAudioContext)();
   const out=ctx.createGain(), comp=ctx.createDynamicsCompressor();
   comp.threshold.value=-6; comp.ratio.value=8; comp.attack.value=.002; comp.release.value=.12;
-  out.connect(comp).connect(ctx.destination);
+  const eqF=['highpass','lowshelf','peaking','highshelf'].map(t=>{ const f=ctx.createBiquadFilter(); f.type=t; return f; });
+  out.connect(eqF[0]).connect(eqF[1]).connect(eqF[2]).connect(eqF[3]).connect(comp).connect(ctx.destination);
   const accent=ctx.createGain(), ghost=ctx.createGain(), chop=ctx.createGain();
   accent.connect(out); ghost.connect(out);
   const shaper=ctx.createWaveShaper(); shaper.curve=makeDrive(S.drive);
@@ -382,7 +430,7 @@ function initAudio(){
   for(const [k,b] of [['accent',accent],['ghost',ghost],['chop',chop]]){
     const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=20; epIn[k]=ctx.createGain(); epIn[k].connect(hp).connect(b);
     epTrem[k]=ctx.createGain(); epTrem[k].gain.value=.825; td.connect(epTrem[k].gain); epTrem[k].connect(epIn[k]); }
-  buses={out,accent,ghost,chop,shaper,trem,dry,wet,horn,drum,echoIn,dl,fb,epIn,epTrem};
+  buses={eqF,out,accent,ghost,chop,shaper,trem,dry,wet,horn,drum,echoIn,dl,fb,epIn,epTrem};
   buildWaves(); applySound();
 }
 function applySound(){
@@ -403,6 +451,14 @@ function applySound(){
   }
   B.echoIn.gain.setTargetAtTime(S.echoOn?S.echoVol:0,t,.03);
   B.dl.delayTime.setTargetAtTime(60/S.bpm*.75,t,.05); B.fb.gain.setTargetAtTime(S.echoInt,t,.03);
+  setEqNodes(B.eqF,t); drawEq();
+}
+function setEqNodes(F,t){
+  const on=S.eqOn, set=(p,v)=>t==null?(p.value=v):p.setTargetAtTime(v,t,.02);
+  set(F[0].frequency,on?S.eqHpf:10); F[0].Q.value=-3.0103;   // no passa-altas do Web Audio o Q é em dB: -3 dB = 0,707 (Butterworth, igual ao plugin)
+  set(F[1].frequency,S.eqLowF); set(F[1].gain,on?S.eqLowG:0);
+  set(F[2].frequency,S.eqMidF); set(F[2].gain,on?S.eqMidG:0); set(F[2].Q,S.eqMidQ);
+  set(F[3].frequency,S.eqHighF); set(F[3].gain,on?S.eqHighG:0);
 }
 // Rhodes Stage / Rhodes Suitcase / Wurlitzer 200A: mesmo modelo do Reggae Keys MRK-80 (RootsKeysEngine.h, tipos 10, 11 e 12)
 const epCurves=new Map();
@@ -515,7 +571,7 @@ function setStatus(t){ document.getElementById('status').textContent=t; }
 
 // ====================================================================== os três caminhos
 function applyMusician(i){
-  const m=MUS[i]; S.mus=i; S.edits=null; S.epoch=-1;
+  const m=MUS[i]; S.mus=i; S.edits=null; S.epoch=-1; S.midnite=false;
   Object.assign(S,{grid:gridFrom(m.rh,m.lh),beat:m.beat,swing:m.swing,human:m.human,ghost:m.ghost,fillStyle:m.fillStyle,fillEvery:m.fillEvery,bpm:m.bpm,lesPreset:lesFromMusician(m.leslie),lesSpeed:m.leslie===2?1:0,lesBrake:false,lesDepth:m.leslie?LES[lesFromMusician(m.leslie)].depth:.8,drive:m.drive,bdb:[...m.bdb],cdb:[...m.cdb]});
   buildWaves(); renderDrawbars(); refresh(); applySound();
   if(!playing) setStatus(m.who+'  ·  dê PLAY');
@@ -656,11 +712,12 @@ function renderDrawbars(){
       d.innerHTML=`<span>${n}</span><input type="range" min="0" max="8" step="1" value="${arr[i]}"><b>${arr[i]}</b>`;
       const inp=d.querySelector('input'); inp.oninput=()=>{ arr[i]=+inp.value; d.querySelector('b').textContent=inp.value; buildWaves(); }; el.appendChild(d); }); });
 }
-function setPage(p){ S.page=p; [0,1,2].forEach(k=>$('p'+k).hidden=k!==p); refreshChips('tabs'); if(p===1) drawRoll(); }
+function setPage(p){ S.page=p; [0,1,2,3].forEach(k=>$('p'+k).hidden=k!==p); refreshChips('tabs'); if(p===1) drawRoll(); if(p===3) drawEq(); }
 function refresh(){
   [...$('mus').children].forEach((b,i)=>b.classList.toggle('on',i===S.mus));
   $('epoch').value=String(S.epoch);
-  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','lesPresets','lesSpeed','instr','brush'].forEach(refreshChips);
+  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','lesPresets','lesSpeed','instr','brush','eqPresets'].forEach(refreshChips);
+  $('eqOn').classList.toggle('on',S.eqOn); $('midnite').classList.toggle('on',S.midnite); if(S.page===3) drawEq();
   $('lesBrake').classList.toggle('on',S.lesBrake);
   for(const k of ['bubbleOn','chopOn','fillsOn','echoOn']) $(k).classList.toggle('on',S[k]);
   $('backBtn').disabled=!S.edits; $('backBtn').classList.toggle('on',!!S.edits);
@@ -696,7 +753,7 @@ document.querySelectorAll('.dl [data-l]').forEach(b=>b.onclick=()=>downloadMidi(
 for(const k of ['bubbleOn','chopOn','fillsOn']) $(k).onclick=()=>{ S[k]=!S[k]; S.edits=null; refresh(); };
 $('echoOn').onclick=()=>{ S.echoOn=!S.echoOn; refresh(); applySound(); };
 renderMus(); renderEpochs();
-chips('tabs',['GROOVE','MIDI','ÓRGÃO'],()=>S.page,i=>setPage(i));
+chips('tabs',['GROOVE','MIDI','ÓRGÃO','EQ'],()=>S.page,i=>setPage(i));
 chips('feel',['SKA','ROCKSTEADY','REGGAE'],()=>S.quickFeel,i=>{ S.quickFeel=i; S.grid=makeGrid(S.quickFeel,S.quickDen); S.edits=null; });
 chips('density',['SÓ e','SÓ a','e + a'],()=>S.quickDen,i=>{ S.quickDen=i; S.grid=makeGrid(S.quickFeel,S.quickDen); S.edits=null; });
 chips('beat',['ONE DROP','ROCKERS','STEPPERS'],()=>S.beat,i=>{ S.beat=i; S.edits=null; });
@@ -717,6 +774,66 @@ chips('brush',['BUBBLE','CHOP','FILLS'],()=>S.brush,i=>{ S.brush=i; });
 const clearEd=()=>{ S.edits=null; };
 slider('bpm','bpm',v=>v); slider('swing','swing',undefined,clearEd); slider('human','human',undefined,clearEd); slider('ghost','ghost'); slider('seed','seed',v=>v,clearEd);
 slider('lesDepth','lesDepth'); slider('bubbleLvl','bubbleLvl'); slider('chopLvl','chopLvl'); slider('drive','drive'); slider('echoVol','echoVol'); slider('echoInt','echoInt'); slider('master','master');
+// ---- EQ (1.3)
+const logR=(lo,hi)=>({to:v=>lo*Math.pow(hi/lo,v),from:f=>Math.log(f/lo)/Math.log(hi/lo)});
+const EQ_RANGES={eqHpf:logR(20,400),eqLowF:logR(40,500),eqMidF:logR(200,5000),eqHighF:logR(1500,12000)};
+const fmtHz=f=>f>=1000?(f/1000).toFixed(1)+'k':Math.round(f);
+for(const k of EQ_KEYS){ const el=$(k), o=el.parentNode.querySelector('output'), R=EQ_RANGES[k];
+  const show=()=>{ o.textContent=k==='eqHpf'&&S.eqHpf<20.5?'OFF':R?fmtHz(S[k]):(k==='eqMidQ'?S[k].toFixed(2):(S[k]>0?'+':'')+S[k].toFixed(1)); };
+  el.oninput=()=>{ S[k]=R?R.to(+el.value):+el.value; if(k==='eqHpf'&&S.eqHpf<21) S.eqHpf=20; S.eqOn=true; show(); applySound(); refreshChips('eqPresets'); $('eqOn').classList.add('on'); };
+  if(!R) el.ondblclick=()=>{ if(k!=='eqMidQ'){ S[k]=0; el.value=0; show(); applySound(); } };
+  sliders.push(()=>{ el.value=R?R.from(S[k]):S[k]; show(); }); }
+function eqPresetIndex(){ if(!S.eqOn) return -1; return EQ_PRESETS.findIndex(([,,v])=>EQ_KEYS.every((k,i)=>Math.abs(S[k]-v[i])<=.02*Math.max(1,Math.abs(v[i])))); }
+function setEq(v){ EQ_KEYS.forEach((k,i)=>S[k]=v[i]); S.eqOn=true; }
+chips('eqPresets',EQ_PRESETS.map(p=>p[0]),eqPresetIndex,i=>setEq(EQ_PRESETS[i][2]));
+[...$('eqPresets').children].forEach((b,i)=>b.title=EQ_PRESETS[i][1]);
+$('eqOn').onclick=()=>{ S.eqOn=!S.eqOn; refresh(); applySound(); };
+$('midnite').onclick=()=>{ Object.assign(S,{instr:0,bdb:[...MIDNITE.bdb],cdb:[...MIDNITE.cdb],drive:MIDNITE.drive,echoOn:false,lesPreset:MIDNITE.lesPreset,lesSpeed:MIDNITE.lesSpeed,lesBrake:false,lesDepth:MIDNITE.lesDepth,midnite:true});
+  setEq(MIDNITE.eq); buildWaves(); renderDrawbars(); refresh(); applySound(); };
+// curva: a resposta real dos filtros do navegador (getFrequencyResponse), medida em filtros de um contexto offline
+let eqProbe=null;
+function eqFilters(){   // sempre os filtros de medida: os do áudio deslizam até o valor novo (setTargetAtTime)
+  if(!eqProbe){ const oc=new (window.OfflineAudioContext||window.webkitOfflineAudioContext)(1,128,48000); eqProbe=['highpass','lowshelf','peaking','highshelf'].map(t=>{ const f=oc.createBiquadFilter(); f.type=t; return f; }); }
+  setEqNodes(eqProbe,null); return eqProbe; }
+const EQX={lo:20,hi:20000,db:18}; let eqDrag=-1;
+function eqGeom(cv){ const W=cv.clientWidth, H=cv.clientHeight; return {W,H,x0:30,x1:W-10,y0:12,y1:H-20}; }
+const eqX=(g,f)=>g.x0+(g.x1-g.x0)*Math.log(f/EQX.lo)/Math.log(EQX.hi/EQX.lo);
+const eqF=(g,x)=>EQX.lo*Math.pow(EQX.hi/EQX.lo,Math.min(1,Math.max(0,(x-g.x0)/(g.x1-g.x0))));
+const eqY=(g,db)=>(g.y0+g.y1)/2-db/EQX.db*(g.y1-g.y0)/2;
+const eqDb=(g,y)=>Math.max(-15,Math.min(15,((g.y0+g.y1)/2-y)/((g.y1-g.y0)/2)*EQX.db));
+const EQ_NODES=[['eqHpf',null,'CORTE'],['eqLowF','eqLowG','GRAVES'],['eqMidF','eqMidG','MÉDIOS'],['eqHighF','eqHighG','AGUDOS']];
+function eqNode(g,k){ const [f,d]=EQ_NODES[k]; return [eqX(g,S[f]),eqY(g,d?S[d]:0)]; }
+function drawEq(){
+  const cv=$('eqCv'); if(!cv||cv.offsetParent===null) return; const dpr=window.devicePixelRatio||1, g=eqGeom(cv);
+  cv.width=g.W*dpr; cv.height=g.H*dpr; const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,g.W,g.H);
+  c.font='9px monospace'; c.textAlign='center';
+  for(const f of [20,50,100,200,500,1000,2000,5000,10000,20000]){ const x=eqX(g,f); c.strokeStyle='rgba(143,227,255,.12)'; c.beginPath(); c.moveTo(x,g.y0); c.lineTo(x,g.y1); c.stroke(); c.fillStyle='rgba(143,227,255,.5)'; c.fillText(f>=1000?f/1000+'k':f,x,g.H-6); }
+  c.textAlign='right';
+  for(const db of [-12,-6,0,6,12]){ const y=eqY(g,db); c.strokeStyle=`rgba(143,227,255,${db?0.12:0.3})`; c.beginPath(); c.moveTo(g.x0,y); c.lineTo(g.x1,y); c.stroke(); c.fillStyle='rgba(143,227,255,.5)'; c.fillText((db>0?'+':'')+db,g.x0-4,y+3); }
+  const N=Math.max(64,Math.floor(g.x1-g.x0)), fr=new Float32Array(N), mag=new Float32Array(N), ph=new Float32Array(N), tot=new Float32Array(N);
+  for(let i=0;i<N;i++) fr[i]=eqF(g,g.x0+(g.x1-g.x0)*i/(N-1));
+  if(S.eqOn) for(const F of eqFilters()){ F.getFrequencyResponse(fr,mag,ph); for(let i=0;i<N;i++) tot[i]+=20*Math.log10(mag[i]+1e-12); }
+  const col=S.eqOn?'#ffb347':'rgba(143,227,255,.4)';
+  c.beginPath(); c.moveTo(g.x0,eqY(g,0)); for(let i=0;i<N;i++) c.lineTo(g.x0+(g.x1-g.x0)*i/(N-1),Math.max(g.y0,Math.min(g.y1,eqY(g,tot[i])))); c.lineTo(g.x1,eqY(g,0)); c.closePath();
+  c.fillStyle=S.eqOn?'rgba(255,179,71,.15)':'rgba(143,227,255,.08)'; c.fill();
+  c.beginPath(); for(let i=0;i<N;i++){ const x=g.x0+(g.x1-g.x0)*i/(N-1), y=Math.max(g.y0,Math.min(g.y1,eqY(g,tot[i]))); i?c.lineTo(x,y):c.moveTo(x,y); } c.strokeStyle=col; c.lineWidth=2; c.stroke();
+  c.textAlign='center';
+  EQ_NODES.forEach((n,k)=>{ const [x,y]=eqNode(g,k); c.fillStyle=k===eqDrag?'#fff':col; c.beginPath(); c.arc(x,y,7,0,7); c.fill(); c.strokeStyle='#0b2236'; c.lineWidth=1.5; c.stroke(); c.fillStyle='rgba(143,227,255,.85)'; c.fillText(n[2],x,y-12); });
+  if(!S.eqOn){ c.fillStyle='rgba(143,227,255,.7)'; c.font='bold 12px monospace'; c.fillText('EQ DESLIGADO',g.W/2,g.y0+16); }
+}
+(function eqTouch(){
+  const cv=$('eqCv'), pick=e=>{ const r=cv.getBoundingClientRect(), g=eqGeom(cv), x=e.clientX-r.left, y=e.clientY-r.top; let best=-1, bd=26;
+    EQ_NODES.forEach((n,k)=>{ const [nx,ny]=eqNode(g,k), d=Math.hypot(nx-x,ny-y); if(d<bd){ bd=d; best=k; } }); return {best,x,y,g}; };
+  const clamp2=(k,f)=>{ const R=EQ_RANGES[k], lo=R.to(0), hi=R.to(1); return Math.min(hi,Math.max(lo,f)); };
+  let lastTap=0;
+  cv.addEventListener('pointerdown',e=>{ const p=pick(e); if(p.best<0) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); eqDrag=p.best;
+    const now=performance.now(); if(now-lastTap<300){ const [f,d]=EQ_NODES[p.best]; if(d) S[d]=0; else S.eqHpf=20; eqDrag=-1; refresh(); applySound(); } lastTap=now;
+    if(!S.eqOn){ S.eqOn=true; refresh(); applySound(); } });
+  cv.addEventListener('pointermove',e=>{ if(eqDrag<0) return; const r=cv.getBoundingClientRect(), g=eqGeom(cv), [f,d]=EQ_NODES[eqDrag];
+    S[f]=clamp2(f,eqF(g,e.clientX-r.left)); if(f==='eqHpf'&&S.eqHpf<21) S.eqHpf=20; if(d) S[d]=Math.round(eqDb(g,e.clientY-r.top)*10)/10; refresh(); applySound(); });
+  ['pointerup','pointercancel'].forEach(ev=>cv.addEventListener(ev,()=>{ eqDrag=-1; drawEq(); }));
+  window.addEventListener('resize',drawEq);
+})();
 // BANCO ÚNICO DE RIDDIMS (o mesmo dos plugins e das outras machines)
 if(window.RIDDIM_BANK && window.riddimBankMenu){
   const RB=window.RIDDIM_BANK;

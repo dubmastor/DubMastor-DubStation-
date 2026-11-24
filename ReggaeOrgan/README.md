@@ -1,10 +1,10 @@
-# Mastor Reggae Organ MRO-68 1.2 — o órgão de reggae dos organistas jamaicanos 🎹
+# Mastor Reggae Organ MRO-68 1.3 — o órgão de reggae dos organistas jamaicanos 🎹
 
 *Linha Dub Station*
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.2/MRO-68-Windows-Instalador.exe) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.2/MRO-68-macOS-Instalador.pkg) · 📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/)
+**Downloads:** [Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.3/MRO-68-Windows-Instalador.exe) · [Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRO-68-1.3/MRO-68-macOS-Instalador.pkg) · 📱 [Testar no navegador](https://dubmastor.github.io/DubMastor-DubStation-/web/reggaeorgan/)
 
 Instrumento que toca **o órgão de reggae pronto** — bubble, chop e fills — no andamento da DAW, com o mesmo Hammond do
 **Mastor Reggae Keys MRK-80**. Formatos: **VST3** (Windows/macOS), **AU** (macOS), **AAX** (Pro Tools, depois da assinatura PACE) e **Standalone**.
@@ -65,10 +65,22 @@ Arraste para a timeline **TUDO** (3 trilhas: bubble no canal 1, chop no 2, fills
 Dois organistas: **mão esquerda** (bubble, seco e grave) e **mão direita** (chop e fills, cheio) com registros de drawbar
 separados. Leslie de dois rotores (corneta e tambor, com presets, LENTA/RÁPIDA, FREIO e o gabinete animado), percussão e eco de fita só na mão direita.
 
+## EQ e o timbre Midnite (1.3)
+![Aba EQ com o timbre Midnite](docs/interface-eq.png)
+
+- **EQUALIZADOR** de 4 faixas na saída do órgão: **CORTE** de graves (passa-altas; 20 Hz = desligado), **GRAVES** (shelf),
+  **MÉDIOS** (sino com Q) e **AGUDOS** (shelf), de −15 a +15 dB. Arraste os pontos na curva; roda do mouse no MÉDIOS = Q;
+  duplo clique zera. Presets: PLANO, ROOTS QUENTE, DUB ESCURO, DIGITAL 80 e ABRE O BAIXO. Começa plano.
+- **TIMBRE MIDNITE**: o órgão cru e seco do Ron Benjamin (Midnite, St. Croix). Os discos *Unpolished* e *Ras Mek Peace*
+  foram gravados ao vivo direto em fita de dois canais, sem reverb, sem eco e sem EQ. O botão carrega bubble oco (8' + 4' + 2⅔'),
+  chop cheio sem percussão, Leslie lenta e discreta, key click aparente, sem reverb e sem eco, e o EQ que tira o grave do caminho
+  do baixo e realça o médio. Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
+
 ## Código
 - `Source/GrooveEngine.h` — o motor (C++ puro): grade, músicos, épocas e fills. A versão para celular (`site/web/reggaeorgan/`) usa a mesma lógica e o mesmo gerador aleatório: o mesmo compasso sai igual nos dois.
 - `Source/GroovePlayer.h` — toca o groove (ou o MIDI editado) no tempo da DAW, com o sample exato de cada nota.
 - `Source/OrganTrio.h` — três motores do órgão do MRK-80 (`ReggaeKeys/Source/RootsKeysEngine.h`): bubble acento, bubble fantasma e mão direita.
+- `Source/OrganEQ.h` — o EQUALIZADOR de 4 faixas (filtros RBJ, iguais aos BiquadFilterNode da versão para celular), os presets do EQ e o TIMBRE MIDNITE.
 - O banco de riddims vem de `RiddimBank/Source` (o mesmo das machines).
 - `tests/render_test.cpp` — teste offline: regras da contagem, notas presas e um WAV de 8 compassos por músico.
   `g++ -std=c++17 -O2 -I Source -I ../ReggaeKeys/Source -I ../RiddimBank/Source tests/render_test.cpp -o render_test && ./render_test`
