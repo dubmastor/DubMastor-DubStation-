@@ -6,8 +6,8 @@ inline juce::String U (const char* s) { return juce::String::fromUTF8 (s); }
 
 namespace mmui
 {
-    const juce::Colour body  { 0xff3a3b3d }, body2 { 0xff2c2d2f }, silk { 0xffe8e6e0 }, lcd { 0xff9fd8c6 }, lcd2 { 0xff7cc2ad },
-                       lcdInk { 0xff0e2a24 }, pad { 0xff6b6d70 }, padHi { 0xff8a8c90 }, red { 0xffe0402f }, amber { 0xffffb020 },
+    const juce::Colour bodyC { 0xff3a3b3d }, body2 { 0xff2c2d2f }, silk { 0xffe8e6e0 }, lcd { 0xff9fd8c6 }, lcd2 { 0xff7cc2ad },
+                       lcdInk { 0xff0e2a24 }, padC { 0xff6b6d70 }, padHi { 0xff8a8c90 }, red { 0xffe0402f }, amber { 0xffffb020 },
                        paper { 0xffe8e6e0 }, ink { 0xff1b1b1b };
 }
 

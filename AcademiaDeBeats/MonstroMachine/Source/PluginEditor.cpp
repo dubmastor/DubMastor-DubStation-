@@ -67,7 +67,7 @@ void PadButton::paint (juce::Graphics& g)
     g.setColour (juce::Colours::black); g.fillRoundedRectangle (r.translated (0, f ? 2.f : 4.f), 9.f);
     auto top = r.withTrimmedBottom (4.f).translated (0, f ? 2.f : 0.f);
     juce::Colour hi = f ? juce::Colour (0xffffd27a) : user ? juce::Colour (0xff99bbbb) : padHi;
-    juce::Colour lo = f ? amber : user ? juce::Colour (0xff668888) : pad;
+    juce::Colour lo = f ? amber : user ? juce::Colour (0xff668888) : padC;
     g.setGradientFill (juce::ColourGradient (hi, top.getCentreX(), top.getY() + top.getHeight() * .35f, lo, top.getX(), top.getBottom(), true));
     g.fillRoundedRectangle (top, 9.f);
     if (f) { g.setColour (amber.withAlpha (.35f)); g.drawRoundedRectangle (top.expanded (2.f), 10.f, 4.f); }

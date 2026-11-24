@@ -293,7 +293,7 @@ void MonstroProcessor::setStateInformation (const void* data, int size)
         int c = 0;
         for (int s = 0; s < mm::kSeqs; ++s)
             for (int p = 0; p < mm::kPads; ++p)
-                for (int k = 0; k < mm::kSteps; ++k) grid[s][p][k].store ((uint8_t) juce::jlimit (0, 2, g[c++] - '0'));
+                for (int k = 0; k < mm::kSteps; ++k) grid[s][p][k].store ((uint8_t) juce::jlimit (0, 2, (int) g[c++] - (int) '0'));
     }
     for (int i = 0; i < mm::kPads; ++i)
     {
