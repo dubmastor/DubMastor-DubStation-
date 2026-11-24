@@ -65,7 +65,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout DubChordsProcessor::createLa
         for (int p = 0; p < dub::NumPianists; ++p) pn.add (dub::pianistName (p));
         layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "pianist", 1 }, "Pianista", pn, dub::PnClassico));
     }
-    layout.add (std::make_unique<AudioParameterBool> (ParameterID { "nota64", 1 }, "Nota 1/64", false));
+   #ifndef MCM_NOTA64_DEFAULT
+    #define MCM_NOTA64_DEFAULT 0   // 1/32; o MRP-80 usa 1/64
+   #endif
+    layout.add (std::make_unique<AudioParameterBool> (ParameterID { "nota64", 1 }, "Nota 1/64", MCM_NOTA64_DEFAULT != 0));
     {   // FILLS (seletor separado do pianista): no fim de cada frase de 4 compassos
         StringArray fl;
         for (int f = 0; f < dub::NumFills; ++f) fl.add (dub::fillName (f));
@@ -608,7 +611,11 @@ void DubChordsProcessor::setStateInformation (const void* data, int sizeInBytes)
             auto tree = juce::ValueTree::fromXml (*xml);
             auto ed = tree.getChildWithName ("Edits");
             if (ed.isValid()) tree.removeChild (ed, nullptr);
+            bool hadNota64 = false;
+            for (const auto& c : tree) hadNota64 |= c.getProperty ("id").toString() == "nota64";
             apvts.replaceState (tree);
+            if (! hadNota64)   // projeto de antes da nota de 1/64: continua em 1/32
+                if (auto* prm = apvts.getParameter ("nota64")) prm->setValueNotifyingHost (0.0f);
             if (ed.isValid())
             {
                 std::vector<dub::NoteEvent> ev;

@@ -103,6 +103,10 @@ int main (int argc, char** argv)
                                         + " tocam (rms " + juce::String (rms, 5) + ")");
         }
     }
+    {   // 2c) nota padrão do MRP-80: 1/64
+        RootsKeysProcessor p;
+        check (getP (p.getMachine().apvts, "nota64") > 0.5f, "nota padrao 1/64 na CHORD MACHINE do MRP-80");
+    }
     {   // 3) SOM INTERNO ligado: o som da propria machine (piano M1) na saida
         RootsKeysProcessor p;
         setP (p.apvts, "machineOn", 1.0f);
@@ -149,6 +153,7 @@ int main (int argc, char** argv)
                  && juce::roundToInt (getP (mb, "bpm")) == 82 && getP (mb, "sound") < 0.5f,
                "projeto antigo: sem bubble (o orgao e do MRO-68), registro e BPM mantidos");
         check (getP (p.apvts, "machineOn") > 0.5f, "projeto antigo: 'tocar com a DAW' vira CHORD MACHINE ligada");
+        check (getP (mb, "nota64") < 0.5f, "projeto antigo continua em 1/32");
     }
     {   // 6) capturas da interface
         RootsKeysProcessor p;

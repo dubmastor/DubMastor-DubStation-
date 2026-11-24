@@ -45,7 +45,7 @@ A música carrega a harmonia, o BPM e a batida da gravação, e o organista da �
 | **ATALHOS DE FEEL** | Reescrevem a grade: SKA "ki-koo-ki" (o & manda), ROCKSTEADY "koo-ki-koo" (o e e o a mandam), REGGAE (e forte, a fantasma) |
 | **MÃO ESQUERDA NO** | Só no "e", só no "a" ou nos dois |
 | **BATIDA** | ONE DROP (bumbo com a caixa no 2 e no 4), ROCKERS (bumbo no 1 e no 3), STEPPERS (bumbo em todo tempo): muda o contraste da nota fantasma |
-| **DURAÇÃO DA NOTA** | 1/32 (padrão) ou 1/64 |
+| **DURAÇÃO DA NOTA** | 1/64 (padrão) ou 1/32 |
 | **SWING / HUMAN / GHOST** | Atraso do "e" e do "a" até o shuffle · variação de tempo e força (sempre igual no mesmo compasso) · volume da nota fantasma (o Hammond não tem velocity: a fantasma toca num órgão com volume próprio) |
 | **VARIAÇÃO / JACKPOT** | 64 versões do mesmo groove (humanização e frases dos fills) |
 | **FILLS** | MITTOO (licks), WRIGHT (melodia em oitavas), DOWNIE (acordes), GLADDY (fragmentos graves), a cada 2, 4 ou 8 compassos, nos tempos 3 e 4 |

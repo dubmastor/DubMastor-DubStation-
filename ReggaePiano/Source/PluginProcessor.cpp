@@ -258,6 +258,7 @@ void RootsKeysProcessor::migrateOldDubChords (const juce::ValueTree& old)
     set ("center",   value ("dcRegister", 60));
     set ("velocity", juce::jlimit (0.1, 1.0, value ("dcVel", 0.8)));
     set ("noteSize", value ("dcNoteSize", 0));
+    set ("nota64", 0);   // projeto antigo continua em 1/32 (o padrão novo do MRP-80 é 1/64)
     set ("swing",    value ("dcSwing", 0.0));
     set ("bpm",      value ("dcBpm", 75.0));
     set ("exportReps", value ("dcReps", 1));

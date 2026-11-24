@@ -9,7 +9,7 @@
 //   FILLS   no fim das frases (tempos 3 e 4 do compasso de fill): licks curtos (Mittoo), melodia em oitavas
 //           (Winston Wright), acordes sincopados (Tyrone Downie) ou fragmentos graves e lentos (Gladstone Anderson)
 // Bubble e chop saem de uma GRADE de 16 semicolcheias (Grid), que cada MÚSICO traz pronta e que pode ser editada.
-// Notas de 1/32 por padrão, como o skank e o bubble do MRCM-1240 (NOTA: 1/32 ou 1/64).
+// Notas de 1/64 por padrão, bem curtas no contratempo (NOTA: 1/64 ou 1/32).
 //
 // Ajustes:
 //   grade     vazio / fantasma / acento em cada semicolcheia, para a mão direita e a esquerda
@@ -104,7 +104,7 @@ inline Grid makeGrid (int feel, int density)
 struct Settings
 {
     Grid  grid = makeGrid (FeelReggae, DenEA);
-    int   beat = BeatOneDrop, noteSize = 0;
+    int   beat = BeatOneDrop, noteSize = 1;
     bool  bubbleOn = true, chopOn = true, fillsOn = true;
     float bubbleVel = 0.85f, chopVel = 0.9f, fillVel = 0.8f;   // 0..1 (vai para a velocity do MIDI)
     float ghost = 0.5f;          // força da nota fantasma da mão esquerda em relação ao acento (0..1)
