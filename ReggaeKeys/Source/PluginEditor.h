@@ -91,6 +91,52 @@ private:
     }
 };
 
+// botão GTR SKANK: o LED do teclado e, no lugar do texto, uma guitarra desenhada (corpo de dois bojos, braço e mão)
+class GuitarIconToggle : public juce::ToggleButton
+{
+public:
+    GuitarIconToggle() : juce::ToggleButton ("") {}
+
+    static juce::Path guitarShape (bool details)
+    {
+        juce::Path p;
+        if (! details)
+        {
+            p.addEllipse (0.22f, 0.62f, 0.56f, 0.32f);   // bojo de baixo
+            p.addEllipse (0.29f, 0.45f, 0.42f, 0.24f);   // bojo de cima
+            p.addRoundedRectangle (0.455f, 0.12f, 0.09f, 0.42f, 0.02f);   // braço
+            p.addRoundedRectangle (0.425f, 0.0f, 0.15f, 0.14f, 0.035f);   // mão
+            p.setUsingNonZeroWinding (true);
+        }
+        else
+        {
+            p.addEllipse (0.44f, 0.60f, 0.12f, 0.12f);   // boca / captador
+            p.addRoundedRectangle (0.38f, 0.80f, 0.24f, 0.035f, 0.01f);   // ponte
+        }
+        return p;
+    }
+
+    void paintButton (juce::Graphics& g, bool highlighted, bool down) override
+    {
+        getLookAndFeel().drawToggleButton (g, *this, highlighted, down);
+        auto box = getLocalBounds().toFloat().reduced (1.0f).withTrimmedLeft (16.0f);
+        const float sz = juce::jmin (box.getHeight() - 2.0f, box.getWidth());
+        const auto area = juce::Rectangle<float> (sz, sz).withCentre (box.getCentre());
+        const auto tf = juce::AffineTransform::rotation (juce::degreesToRadians (38.0f), 0.5f, 0.5f)
+                            .scaled (sz, sz).translated (area.getX(), area.getY());
+        const bool on = getToggleState();
+        const juce::Colour body = on ? juce::Colour (0xfff2e6c8) : juce::Colour (0xffb9b9be);
+        auto shape = guitarShape (false);
+        g.setColour (body);
+        g.fillPath (shape, tf);
+        g.setColour (on ? juce::Colour (0xff8e2a20) : juce::Colour (0xff3a3a3d));   // boca e ponte
+        g.fillPath (guitarShape (true), tf);
+        g.setColour (juce::Colours::black.withAlpha (0.45f));                   // cordas
+        juce::Path s; s.startNewSubPath (0.5f, 0.03f); s.lineTo (0.5f, 0.82f);
+        g.strokePath (s, juce::PathStrokeType (0.6f), tf);
+    }
+};
+
 class RootsKeysEditor : public juce::AudioProcessorEditor,
                         private juce::Timer
 {
@@ -152,7 +198,7 @@ private:
     // eco de fita FitaEco TE-12
     juce::ToggleButton echoButton { "ECHO" };
     std::unique_ptr<APVTS::ButtonAttachment> echoAtt;
-    juce::ToggleButton gtrButton { "GTR" };   // GTR SKANK (guitarra do skank junto com o piano)
+    GuitarIconToggle gtrButton;   // GTR SKANK (LED + ícone de guitarra) (guitarra do skank junto com o piano)
     std::unique_ptr<APVTS::ButtonAttachment> gtrAtt;
     juce::ComboBox echoModeBox;
     std::unique_ptr<APVTS::ComboBoxAttachment> echoModeAtt;
