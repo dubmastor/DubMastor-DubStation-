@@ -26,16 +26,19 @@ public:
     void paint (juce::Graphics&) override;
     void mouseDown (const juce::MouseEvent&) override;
     float flash = 0;
+    bool loud = false;      // som desta peça alto demais: marcação ALTO até ser corrigido
 private:
     ReggaePercussionProcessor& proc; int index;
 };
 
 // visor MPC azul do groove
-class LcdComp : public juce::Component
+class LcdComp : public juce::Component, public juce::SettableTooltipClient
 {
 public:
-    explicit LcdComp (ReggaePercussionProcessor& p) : proc (p) {}
+    explicit LcdComp (ReggaePercussionProcessor& p) : proc (p) { setMouseCursor (juce::MouseCursor::PointingHandCursor); }
     void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override { if (onClick) onClick(); }
+    std::function<void()> onClick;      // toque no visor = lista de presets
 private:
     ReggaePercussionProcessor& proc;
 };
@@ -125,6 +128,8 @@ private:
     void exportMidi();
     void refreshBars();
     void refreshNotes();
+    void layoutPads();
+    void showPresetMenu();
     std::vector<juce::Component*> page0(), page1();
 
     ReggaePercussionProcessor& proc;
@@ -140,6 +145,10 @@ private:
 
     // PADS
     std::vector<std::unique_ptr<PadComp>> padComps;
+    juce::TextButton padCat[mrp::numCats + 1];   // TODOS, ACÚSTICA, DIGITAL 80-90, DUB FX
+    int padFilter = -1;
+    juce::TextButton autoMixBtn;
+    juce::String amStatus, shownAm;
     EqComp eq;
     juce::ComboBox eqPreset;
     juce::TextButton eqBtn, satBtn, echoBtn;

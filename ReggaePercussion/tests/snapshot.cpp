@@ -79,6 +79,25 @@ int main (int argc, char** argv)
         proc.padNote[0] = 82; proc.setParam ("snd2", 6.0f); proc.setParam ("bars", 2.0f); proc.loadGroove (0);
     }
 
+    // kits digitais trocam as peças; AUTO MIX tira a marcação ALTO
+    {
+        int sleng = -1; for (int i = 0; i < (int) mrp::grooves().size(); ++i) if (juce::String (mrp::grooves()[(size_t) i].name) == "Kit Sleng Teng (85)") sleng = i;
+        proc.loadGroove (sleng);
+        check (proc.soundOf (2) == mrp::soundIndex ("cxd") && proc.soundOf (5) == mrp::soundIndex ("tsm"), "Kit Sleng Teng: caixa digital e tom Simmons nas linhas");
+        bool anyLoud = false; for (int t = 0; t < mrp::numTracks; ++t) anyLoud = anyLoud || proc.isLoud (t);
+        proc.setParam ("vol5", 1.0f);
+        check (proc.isLoud (5), "tom Simmons no volume m\xc3\xa1ximo fica marcado ALTO");
+        proc.autoMix();
+        bool after = false; for (int t = 0; t < mrp::numTracks; ++t) after = after || proc.isLoud (t);
+        check (! after, "depois do AUTO MIX nenhuma pe\xc3\xa7" "a fica ALTO");
+        proc.setParam ("preview", 1.0f); float pk2 = 0;
+        check (renderRms (proc, 2.0, nullptr, &pk2) > 0.002 && pk2 < 1.0f, "Kit Sleng Teng toca sem estourar");
+        proc.setParam ("preview", 0.0f); renderRms (proc, 2.0);
+        proc.loadGroove (0);
+        check (proc.soundOf (0) == mrp::soundIndex ("egg") && proc.soundOf (2) == mrp::soundIndex ("tam"), "Kit roots volta com as pe\xc3\xa7" "as padr\xc3\xa3o");
+        for (int t = 0; t < mrp::numTracks; ++t) proc.setParam (ReggaePercussionProcessor::tid ("vol", t), mrp::trackDefaults()[(size_t) t].vol);
+    }
+
     // capturas
     std::unique_ptr<juce::AudioProcessorEditor> ed (proc.createEditor());
     auto* pe = dynamic_cast<ReggaePercussionEditor*> (ed.get());

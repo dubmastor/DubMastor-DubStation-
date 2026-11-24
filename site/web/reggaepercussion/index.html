@@ -181,6 +181,20 @@ input[type=file]{display:none}
 .mkey:focus-visible{outline:2px solid #f2a83a;outline-offset:2px}
 .mkey b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:640px){.mutebar{grid-template-columns:repeat(3,minmax(0,1fr))}.mkey{min-height:56px}.mkey b{font-size:11px;letter-spacing:.04em}.mkey small{letter-spacing:.06em}.tn .ms.w{display:none}.tn .ms.cy{display:none}}
+.padcats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.padcats .btn{min-height:34px;font-size:12px;padding:4px 10px}
+.pad.loud{box-shadow:inset 0 0 0 3px #e0352b,0 0 12px rgba(224,53,43,.6)}
+.pad .pn,.pad .ps{right:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.pad .pn{font-size:11px;letter-spacing:.03em}.pad .ps{font-size:10px}}
+.pad.loud::after{content:"ALTO";position:absolute;right:15px;bottom:6px;background:#e0352b;color:#fff;font:800 9px/1 var(--body);letter-spacing:.12em;padding:3px 5px;border-radius:3px}
+.pad.loud .pv{background:repeating-linear-gradient(-45deg,#e0352b 0 3px,#0d0b09 3px 6px)}
+.b .strip.isloud{border:3px dashed #e0352b;border-top:3px solid #e0352b}
+.loudmsg{font-size:11px;font-weight:700;color:#b8261c;min-height:0}
+.loudmsg:empty{display:none}
+.mkey.loud{box-shadow:inset 0 0 0 3px #e0352b,0 5px 0 #1a1613!important}
+.amrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 12px}
+.btn.automix{min-height:52px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:6px 16px;background:linear-gradient(#ffd27a,#f2a83a 60%,#c8702a)!important;color:#1b130d!important;font-size:15px;letter-spacing:.14em}
+.btn.automix small{font-size:10px;letter-spacing:.06em;font-weight:700;opacity:.8;text-transform:none}
+.amstat{font-family:var(--mono);font-size:12px;color:#4b4034}
 .midiopt{display:flex;flex-direction:column;gap:4px;font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:700}
 @keyframes glow{50%{box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 4px 0 #000,0 0 34px rgba(242,165,65,.9)}}
 .mini{cursor:grab;font-size:12px}
@@ -235,6 +249,19 @@ input[type=file]{display:none}
 .b .badge{color:#2b1f0c}
 .b .satface .knob .kl,.b .echoface .knob .kl{color:#f0e6d0}.b .satface .knob .kv,.b .echoface .knob .kv,.b .bigbox .knob .kv{color:#f6efd9}.b .bigbox .hint{color:#d9cfbd}
 
+.b .presetbar .vis{cursor:pointer}.b .presetbar .vis:hover{filter:brightness(1.08)}.b .presetbar .vis:active{filter:brightness(.92)}
+.vis .tap{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:9px;letter-spacing:.12em;background:rgba(10,12,16,.55);padding:3px 6px;border-radius:3px;opacity:.9}
+.pbbox{max-width:760px!important;width:100%;max-height:88vh;overflow:auto;padding:14px!important}
+.pbhead{display:flex;justify-content:space-between;align-items:center;position:sticky;top:-14px;background:var(--cream);padding:4px 0 8px;z-index:2}
+.pbcats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pbcats button{font:600 11px/1 'Work Sans',sans-serif;border:1px solid #6b5a3a;background:#efe3c6;color:#3a2c18;border-radius:14px;padding:7px 11px;cursor:pointer}
+.pbcats button.on{background:#2e66cc;color:#fff;border-color:#1d4aa8}
+.pbg h4{margin:10px 0 6px;font:700 11px/1 'Work Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6b5a3a}
+.pbitems{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.pbitems button{display:flex;gap:8px;align-items:center;text-align:left;border:1px solid #c9b78f;background:#fff8e8;border-radius:5px;padding:10px 10px;font:600 13px/1.2 'Work Sans',sans-serif;color:#2a2014;cursor:pointer;min-height:44px}
+.pbitems button .bk{flex:none;font-size:10px;background:#2e66cc;color:#fff;border-radius:2px;padding:2px 5px}
+.pbitems button.on{background:#2e66cc;color:#fff;border-color:#1d4aa8}.pbitems button.on .bk{background:#fff;color:#1d4aa8}
+@media (max-width:640px){.vis .tap .tx{display:none}.vis .tap{font-size:13px;padding:2px 6px}.vis .n{padding-right:30px}.pbitems{grid-template-columns:1fr}}
 /* ===== visor de presets: MPC azul / SP-404 ===== */
 .b .presetbar .vis{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;text-align:left;text-transform:none;letter-spacing:.06em;min-height:74px;position:relative;overflow:hidden}
 .vis .f,.vis .r{display:flex;justify-content:space-between;gap:10px;font-size:11px;letter-spacing:.18em}
@@ -322,7 +349,7 @@ input[type=file]{display:none}
     <button class="btn big red" id="play">▶ PLAY</button>
     <div class="presetbar">
       <button class="btn" id="prev" aria-label="Groove anterior">◀</button>
-      <div class="lcd vis mpc" id="vis"><div class="f"><span id="lcdCat">KITS COMPLETOS</span><span id="lcdPos">01/20</span></div><div class="n"><span class="bank" id="lcdBank">A01</span><span id="lcdName">Kit roots (Seeco)</span></div><div class="r"><span id="lcdBpm">075.0 BPM</span><span id="lcdSw">SW 58%</span><span id="lcdSt">STOP</span></div></div>
+      <div class="lcd vis mpc" id="vis" role="button" tabindex="0" aria-label="Abrir lista de presets" title="Toque para escolher o preset"><div class="f"><span id="lcdCat">KITS COMPLETOS</span><span id="lcdPos">01/20</span></div><div class="n"><span class="bank" id="lcdBank">A01</span><span id="lcdName">Kit roots (Seeco)</span></div><div class="r"><span id="lcdBpm">075.0 BPM</span><span id="lcdSw">SW 58%</span><span id="lcdSt">STOP</span></div><div class="tap">☰<span class="tx"> TOQUE PARA ESCOLHER</span></div></div>
       <button class="btn" id="next" aria-label="Próximo groove">▶</button>
     </div>
     <select id="preset" aria-label="Escolher groove"></select>
@@ -337,6 +364,7 @@ input[type=file]{display:none}
   <section class="panel" id="p-pads" data-label="PADS">
     <h2>Pads</h2>
     <p class="hint">Toque no pad para tocar: mais perto do topo = mais forte. Os pads acendem quando o sequenciador ou o seu controlador toca a peça.</p>
+    <div class="padcats" id="padcats" role="tablist"><button class="btn on" data-cat="all">TODOS</button><button class="btn" data-cat="ac">ACÚSTICA</button><button class="btn" data-cat="dg">DIGITAL 80–90</button><button class="btn" data-cat="fx">DUB FX</button></div>
     <div class="padwell"><div class="pads" id="pads"></div></div>
     <div class="row" style="margin-top:12px;align-items:center">
       <button class="btn" id="webmidi">Ligar controlador MIDI</button>
@@ -344,6 +372,7 @@ input[type=file]{display:none}
     </div>
   </section>
   <section class="panel" id="p-canais" data-label="CANAIS">
+    <div class="amrow"><button class="btn automix" id="automix">🎚 AUTO MIX<small>regula o volume dos timbres</small></button><span class="amstat" id="amstat">Medindo os timbres…</span></div>
     <h2>Canais</h2>
     <p class="hint">Troque a peça de cada linha (⇄), e ajuste duração, volume e pan (pan de fábrica espalhado como numa mixagem de roots). "Sample" troca a síntese por um arquivo seu (wav/mp3), com variação de afinação e volume a cada nota.</p>
     <div class="strips" id="strips"></div>
@@ -420,13 +449,15 @@ input[type=file]{display:none}
 
 <div class="modal hidden" id="swmodal"><div class="box swbox"><h3 id="swt">Trocar peça</h3><p style="margin:0 0 10px">Escolha o som desta linha. O padrão da grade, volume, pan e duração ficam; muda o som e a nota MIDI. Toque para ouvir.</p>
 <div class="padwell"><div class="pads swpads" id="swgrid"></div></div><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" id="swok">Pronto</button></div></div></div>
+<div class="modal hidden" id="pbmodal"><div class="box pbbox"><div class="pbhead"><h3>Presets</h3><button class="btn" id="pbclose">Fechar</button></div>
+<div class="pbcats" id="pbcats"></div><div id="pblist"></div></div></div>
 <div class="modal hidden" id="vermodal"><div class="box"><h3>Histórico de versões</h3>
-<p><b>v1.0</b> Primeira versão publicada: plugin VST3/AU (Windows e Mac) e esta versão para celular e navegador.<br><b>v0.13</b> Cada canal (e a tecla de mudo da peça) pisca no ritmo em que a peça toca, mais forte no acento.<br><b>v0.12</b> Aba "Perc Machine" (antes Grade MIDI). Setas ◀ ▶ para trocar a peça rapidamente, nos canais e na grade.<br><b>v0.11</b> Duas abas como no Drums: PADS (pads, canais e efeitos) e GRADE MIDI (groove, compassos e MIDI). MIDI no padrão da linha: até 8 compassos com uma cor cada, MIDI colorido (um canal por compasso), BAIXAR MIDI, baixar ou arrastar um compasso só e nota de cada peça ajustável.<br><b>v0.10</b> Layout horizontal no computador: Groove e Pads lado a lado, Canais, Efeitos e Esquema MIDI em abas embaixo. No celular continua empilhado.<br><b>v0.9</b> Teclas grandes de mudo para cada peça acima da grade (luz acesa = tocando), botão Todas e mudo também em cada canal.<br><b>v0.8</b> Botão ⇄ trocar peça em cada linha (23 sons: shakers, ganzá, cabasa, shekere, pandeiro, platinela, woodblocks, clave, cowbell, agogôs, triângulos, guiro, vibraslap, congas e bongôs); 24 pads com nota própria, todos fora da faixa do MRD-12.<br><b>v0.7</b> Pads estilo Battery (12 pads com nota, força pela altura do toque e luz ao tocar), controlador MIDI e esquema de notas sem conflito com o MRD-12 (36–51); canal MIDI selecionável.<br><b>v0.6</b> PAN por peça (knob em cada canal, duplo toque volta ao pan de fábrica).<br><b>v0.5</b> Layout opção B: painel creme e oliva da linha MIF, seções com etiquetas pretas, teclas e knobs cromados.<br><b>v0.4</b> Arrastar MIDI para a DAW (groove inteiro ou por peça, 1 a 8 compassos, notas GM no canal 10, guiro longo/curto).<br><b>v0.3</b> Layout da linha DubMastor: rack de madeira, abas, knobs, Tape Echo com rolos, solo por canal.<br><b>v0.2</b> Grooves do estudo de percussão por peça; guiro com raspado longo/curto.<br><b>v0.1</b> Primeira versão de teste: 6 peças, sequenciador, EQ, Big Knob, saturador, Tape Echo.</p>
+<p><b>v1.0</b> Primeira versão publicada: plugin VST3/AU (Windows e Mac) e esta versão para celular e navegador.<br><b>v0.15</b> Toque no visor azul para abrir a lista de presets (por categoria) e escolher. 7 presets Simmons novos na categoria "Simmons 80" (rockers, steppers, rub-a-dub, virada no 4, Sleng Teng toms, dub toms + eco, 808 dancehall), sempre com a caixa no 2 e no 4.<br><b>v0.14</b> AUTO MIX (regula o volume dos timbres) e marcação ALTO no pad, no canal e na tecla de mudo até o volume ser corrigido. 14 sons novos: percussão digital 80–90 (toms Simmons, caixa digital Sleng Teng, caixa e clap 808, rim MT-40, cowbell 808, hat eletrônico, blip Casio) e Dub FX (laser, sirene, tiro, drop), com 4 kits digitais e 2 kits Dub FX. Filtro dos pads por categoria.<br><b>v0.13</b> Cada canal (e a tecla de mudo da peça) pisca no ritmo em que a peça toca, mais forte no acento.<br><b>v0.12</b> Aba "Perc Machine" (antes Grade MIDI). Setas ◀ ▶ para trocar a peça rapidamente, nos canais e na grade.<br><b>v0.11</b> Duas abas como no Drums: PADS (pads, canais e efeitos) e GRADE MIDI (groove, compassos e MIDI). MIDI no padrão da linha: até 8 compassos com uma cor cada, MIDI colorido (um canal por compasso), BAIXAR MIDI, baixar ou arrastar um compasso só e nota de cada peça ajustável.<br><b>v0.10</b> Layout horizontal no computador: Groove e Pads lado a lado, Canais, Efeitos e Esquema MIDI em abas embaixo. No celular continua empilhado.<br><b>v0.9</b> Teclas grandes de mudo para cada peça acima da grade (luz acesa = tocando), botão Todas e mudo também em cada canal.<br><b>v0.8</b> Botão ⇄ trocar peça em cada linha (23 sons: shakers, ganzá, cabasa, shekere, pandeiro, platinela, woodblocks, clave, cowbell, agogôs, triângulos, guiro, vibraslap, congas e bongôs); 24 pads com nota própria, todos fora da faixa do MRD-12.<br><b>v0.7</b> Pads estilo Battery (12 pads com nota, força pela altura do toque e luz ao tocar), controlador MIDI e esquema de notas sem conflito com o MRD-12 (36–51); canal MIDI selecionável.<br><b>v0.6</b> PAN por peça (knob em cada canal, duplo toque volta ao pan de fábrica).<br><b>v0.5</b> Layout opção B: painel creme e oliva da linha MIF, seções com etiquetas pretas, teclas e knobs cromados.<br><b>v0.4</b> Arrastar MIDI para a DAW (groove inteiro ou por peça, 1 a 8 compassos, notas GM no canal 10, guiro longo/curto).<br><b>v0.3</b> Layout da linha DubMastor: rack de madeira, abas, knobs, Tape Echo com rolos, solo por canal.<br><b>v0.2</b> Grooves do estudo de percussão por peça; guiro com raspado longo/curto.<br><b>v0.1</b> Primeira versão de teste: 6 peças, sequenciador, EQ, Big Knob, saturador, Tape Echo.</p>
 <button class="btn" id="vclose">Fechar</button></div></div>
 
 <script>
-const VERSION = '1.0';
 {
+const VERSION = '1.0';
 const COUNT=['1','e','&','a','2','e','&','a','3','e','&','a','4','e','&','a'];
 const SN=[4,12],SK=[2,6,10,14];
 const SND=[
@@ -436,12 +467,20 @@ const SND=[
  {k:'agh',l:'Agogô',s:'Agudo',n:67,c:'#f2a541'},{k:'agl',l:'Agogô',s:'Grave',n:68,c:'#f2a541'},{k:'trm',l:'Triângulo',s:'Abafado',n:80,c:'#f2a541'},{k:'tro',l:'Triângulo',s:'Aberto',n:81,c:'#f2a541'},
  {k:'gui',l:'Guiro',s:'Curto / longo',n:73,n2:74,c:'#6fbf78'},{k:'vib',l:'Vibraslap',s:'Chocalho',n:58,c:'#6fbf78'},{k:'cgh',l:'Conga',s:'Aberta aguda',n:63,c:'#8fb6d9'},{k:'cgl',l:'Conga',s:'Grave',n:64,c:'#8fb6d9'},
  {k:'cgs',l:'Conga',s:'Slap',n:62,c:'#8fb6d9'},{k:'bgh',l:'Bongô',s:'Agudo',n:60,c:'#8fb6d9'},{k:'bgl',l:'Bongô',s:'Grave',n:61,c:'#8fb6d9'}];
+SND.forEach(x=>x.cat='ac');
+SND.push(
+ {k:'tsh',l:'Tom Simmons',s:'Agudo',n:83,c:'#5fd0c8',cat:'dg'},{k:'tsm',l:'Tom Simmons',s:'Médio',n:84,c:'#5fd0c8',cat:'dg'},{k:'tsg',l:'Tom Simmons',s:'Grave',n:85,c:'#5fd0c8',cat:'dg'},
+ {k:'cxd',l:'Caixa digital',s:'Sleng Teng',n:86,c:'#b98be0',cat:'dg'},{k:'c808',l:'Caixa 808',s:'Analógica',n:87,c:'#b98be0',cat:'dg'},{k:'clp',l:'Clap 808',s:'Palmas',n:92,c:'#b98be0',cat:'dg'},
+ {k:'rim',l:'Rim digital',s:'Aro MT-40',n:93,c:'#b98be0',cat:'dg'},{k:'cb8',l:'Cowbell 808',s:'Analógico',n:94,c:'#5fd0c8',cat:'dg'},{k:'hhe',l:'Hat eletrônico',s:'Fechado',n:95,c:'#5fd0c8',cat:'dg'},
+ {k:'blp',l:'Blip Casio',s:'Synth perc',n:96,c:'#5fd0c8',cat:'dg'},
+ {k:'lz',l:'Laser dub',s:'Zap',n:97,c:'#ff5c8a',cat:'fx'},{k:'sir',l:'Sirene dub',s:'Siren',n:98,c:'#ff5c8a',cat:'fx'},{k:'tir',l:'Tiro dub',s:'Gun shot',n:99,c:'#ff5c8a',cat:'fx'},{k:'drp',l:'Drop dub',s:'Queda',n:100,c:'#ff5c8a',cat:'fx'});
 const SI=k=>SND.findIndex(x=>x.k==k);
+let L0=null;
 const TR=[
  {id:'shk',snd:SI('egg'),dec:15,lvl:80,pan:30},{id:'cab',snd:SI('cab'),dec:12,lvl:70,pan:-25},{id:'tam',snd:SI('tam'),dec:30,lvl:60,pan:-40},
  {id:'wbl',snd:SI('wbh'),dec:20,lvl:60,pan:45},{id:'cow',snd:SI('cow'),dec:25,lvl:55,pan:20},{id:'gui',snd:SI('gui'),dec:40,lvl:60,pan:-15}];
 const setSnd=(t,si)=>{t.snd=si;t.name=SND[si].l;t.sub=SND[si].s;t.c=SND[si].c};TR.forEach(t=>setSnd(t,t.snd));
-const PADS=SND.flatMap((x,si)=>x.n2?[{si,lg:0,n:x.n,l:x.l,s:'Curto',c:x.c},{si,lg:1,n:x.n2,l:x.l,s:'Longo',c:x.c}]:[{si,n:x.n,l:x.l,s:x.s,c:x.c}]);
+const PADS=SND.flatMap((x,si)=>x.n2?[{si,lg:0,n:x.n,l:x.l,s:'Curto',c:x.c,cat:x.cat},{si,lg:1,n:x.n2,l:x.l,s:'Longo',c:x.c,cat:x.cat}]:[{si,n:x.n,l:x.l,s:x.s,c:x.c,cat:x.cat}]);
 const MRD=[[36,'Bumbo'],[37,'Aro'],[38,'Caixa'],[40,'Timbal'],[42,'HH fechado'],[43,'Surdo'],[44,'HH pedal'],[46,'HH aberto'],[47,'Tom 2'],[49,'Prato'],[50,'Tom 1']];
 const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],nname=n=>NN[n%12]+(Math.floor(n/12)-2);
 let PN=PADS.map(p=>p.n);try{const sv=JSON.parse(localStorage.getItem('mrp77notes')||'null');if(Array.isArray(sv)&&sv.length==PN.length)PN=sv}catch(e){}
@@ -473,6 +512,22 @@ const GROUPS=[
  ['Guiro',{
   'Guiro mento/ska':{sw:58,p:{gui:'X-x-X-x-X-x-X-x-'}},
   'Guiro roots':{sw:56,p:{gui:'--X---X---X---X-'}}}],
+ ['Kits digitais 80-90',{
+  'Kit Sleng Teng (85)':{sw:50,snd:['hhe','rim','cxd','blp','cb8','tsm'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'--x---x---x---x-',tam:'----X-------X---',wbl:'--X--X----X--X--',cow:'X-------X-------',gui:'-------------XxX'}},
+  'Kit 808 dancehall (90)':{sw:52,snd:['hhe','clp','c808','cb8','blp','tsh'],p:{shk:'x-Xxx-Xxx-Xxx-Xx',cab:'----X-------X---',tam:'---x---x---x---x',wbl:'X--X--X---X-X---',cow:'------X-------X-',gui:'--------------xX'}},
+  'Kit Simmons roots (80)':{sw:56,snd:['egg','rim','tsh','tsm','tsg','cb8'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'--X---X---X---X-',tam:'---------X--X---',wbl:'-------------X--',cow:'X-----------x--X',gui:'--x-------x-----'}},
+  'Kit steppers digital (90)':{sw:50,snd:['hhe','rim','c808','cb8','blp','tsg'],p:{shk:'xXXxxXXxxXXxxXXx',cab:'--X---X---X---X-',tam:'----X-------X---',wbl:'X---X---X---X---',cow:'--x---x---x---x-',gui:'X-------X-------'}}}],
+ ['Simmons 80',{
+  'Simmons rockers (82)':{sw:56,snd:['hhe','rim','tsh','tsm','tsg','cb8'],p:{shk:'x-x-x-x-x-x-x-x-',cab:'----X-------X---',tam:'--x-------x-----',wbl:'------x-------x-',cow:'X-------X-------',gui:'--x---x---x---x-'}},
+  'Simmons steppers (84)':{sw:52,snd:['hhe','rim','tsg','tsm','tsh','cb8'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'----X-------X---',tam:'X---X---X---X---',wbl:'--x---x---x---x-',cow:'-------------xX-',gui:'X-------X-------'}},
+  'Simmons rub-a-dub (83)':{sw:58,snd:['egg','rim','tsm','tsg','tsh','cb8'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'----X-------X---',tam:'---x-----x-x----',wbl:'X-------X-------',cow:'--------------Xx',gui:'------x-------x-'}},
+  'Simmons virada no 4':{sw:56,snd:['hhe','cxd','tsh','tsm','tsg','rim'],p:{shk:'x-X-x-X-x-X-x-X-',cab:'----X-------X---',tam:'------------xX--',wbl:'--------------Xx',cow:'X-------------xX',gui:'--x-------x-----'}},
+  'Simmons Sleng Teng toms (85)':{sw:50,snd:['hhe','cxd','tsh','tsm','tsg','blp'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'----X-------X---',tam:'--X-----------X-',wbl:'------X----X----',cow:'X-------X--x----',gui:'---------x------'}},
+  'Simmons dub toms + eco':{sw:54,snd:['egg','rim','tsg','tsm','tsh','lz'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'----X-------X---',tam:'X---------------',wbl:'------X---------',cow:'----------X-X---',gui:'---------------X'}},
+  'Simmons 808 dancehall (88)':{sw:52,snd:['hhe','clp','tsh','c808','tsg','cb8'],p:{shk:'x-Xxx-Xxx-Xxx-Xx',cab:'----X-------X---',tam:'---x---x---x---x',wbl:'----X-------X---',cow:'X--X--X---X-----',gui:'------X-------X-'}}}],
+ ['Dub FX',{
+  'Dub FX: laser + drop':{sw:54,snd:['egg','lz','drp','sir','tir','rim'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'-------------X--',tam:'X---------------',wbl:'',gui:'--X---X---X---X-'}},
+  'Dub FX: sirene + tiro':{sw:54,snd:['hhe','sir','tir','lz','drp','rim'],p:{shk:'xxXxxxXxxxXxxxXx',cab:'X---------------',tam:'------------X---',wbl:'---------------X',gui:'--X---X---X---X-'}}}],
  ['Outros',{'Vazio':{sw:54,p:{}}}]];
 const PRE={},CAT={};GROUPS.forEach(g=>{Object.assign(PRE,g[1]);Object.keys(g[1]).forEach(k=>CAT[k]=g[0])});const NAMES=Object.keys(PRE);
 const S={bpm:75,sw:58,hum:40,guia:false,play:false,step:0,name:NAMES[0],bars:4,edit:0,all:true,follow:true};
@@ -557,15 +612,26 @@ grid.addEventListener('click',e=>{
  const t=TR[+b.dataset.t],s=+b.dataset.s,nv=(t.pat[S.edit*16+s]+1)%3;if(S.all){for(let k=0;k<8;k++)t.pat[k*16+s]=nv}else t.pat[S.edit*16+s]=nv;b.dataset.v=nv;midiInfo();
 });
 function showName(){const i=NAMES.indexOf(S.name),gi=GROUPS.findIndex(g=>g[0]==CAT[S.name]);$('lcdName').textContent=S.name;$('lcdCat').textContent=(CAT[S.name]||'Editado').toUpperCase();
- $('lcdPos').textContent=i<0?'--/'+NAMES.length:String(i+1).padStart(2,'0')+'/'+NAMES.length;$('lcdBank').textContent=i<0?'USR':'ABCDEFGH'[gi]+String(Object.keys(GROUPS[gi][1]).indexOf(S.name)+1).padStart(2,'0');
+ $('lcdPos').textContent=i<0?'--/'+NAMES.length:String(i+1).padStart(2,'0')+'/'+NAMES.length;$('lcdBank').textContent=i<0?'USR':'ABCDEFGHIJKL'[gi]+String(Object.keys(GROUPS[gi][1]).indexOf(S.name)+1).padStart(2,'0');
  $('lcdBpm').textContent=String(S.bpm).padStart(3,'0')+'.0 BPM';$('lcdSw').textContent='SW '+S.sw+'%';$('lcdSt').textContent=S.play?'▶ PLAY':'■ STOP'}
 setInterval(()=>{if(typeof showName=='function')showName()},300);
+const DEFSND=['egg','cab','tam','wbh','cow','gui'];
 function loadPreset(n){const p=PRE[n];S.name=n;S.sw=p.sw;kSw.set(p.sw);$('preset').value=n;
- TR.forEach(t=>{const s=p.p[t.id]||'----------------',one=[...s].map(c=>c=='X'?2:c=='x'?1:0);t.pat=[].concat(...Array(8).fill(one))});buildGrid();showName()}
+ (p.snd||DEFSND).forEach((k,i)=>setSnd(TR[i],SI(k)));if(typeof buildStrips=='function'&&$('strips').children.length)buildStrips();
+ TR.forEach(t=>{const s=p.p[t.id]||'----------------',one=[...s].map(c=>c=='X'?2:c=='x'?1:0);t.pat=[].concat(...Array(8).fill(one))});buildGrid();showName();if(typeof updateLoud=='function')updateLoud()}
 $('preset').innerHTML=GROUPS.map(g=>`<optgroup label="${g[0]}">${Object.keys(g[1]).map(k=>`<option>${k}</option>`).join('')}</optgroup>`).join('');
 $('preset').onchange=e=>loadPreset(e.target.value);
 const stepP=d=>loadPreset(NAMES[(Math.max(0,NAMES.indexOf(S.name))+d+NAMES.length)%NAMES.length]);
 $('prev').onclick=()=>stepP(-1);$('next').onclick=()=>stepP(1);
+let PBC='all';
+function buildPB(){$('pbcats').innerHTML=['all',...GROUPS.map(g=>g[0])].map(c=>`<button data-c="${c}" class="${c==PBC?'on':''}">${c=='all'?'Todos':c}</button>`).join('');
+ $('pblist').innerHTML=GROUPS.map((g,gi)=>PBC!='all'&&PBC!=g[0]?'':`<div class="pbg"><h4>${g[0]}</h4><div class="pbitems">${Object.keys(g[1]).map((k,i)=>`<button data-p="${k.replace(/"/g,'&quot;')}" class="${k==S.name?'on':''}"><span class="bk">${'ABCDEFGHIJKL'[gi]}${String(i+1).padStart(2,'0')}</span><span>${k}</span></button>`).join('')}</div></div>`).join('')}
+function openPB(){PBC='all';buildPB();$('pbmodal').classList.remove('hidden');const on=$('pblist').querySelector('button.on');if(on)on.scrollIntoView({block:'center'})}
+$('vis').onclick=openPB;$('vis').onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();openPB()}};
+$('pbcats').onclick=e=>{const b=e.target.closest('button');if(!b)return;PBC=b.dataset.c;buildPB()};
+$('pblist').onclick=e=>{const b=e.target.closest('button');if(!b)return;loadPreset(b.dataset.p);$('pbmodal').classList.add('hidden')};
+$('pbclose').onclick=()=>$('pbmodal').classList.add('hidden');
+$('pbmodal').addEventListener('click',e=>{if(e.target.id=='pbmodal')$('pbmodal').classList.add('hidden')});
 $('clear').onclick=()=>{TR.forEach(t=>t.pat.fill(0));S.name='Vazio';buildGrid();showName()};
 
 /* ---------- canais ---------- */
@@ -574,13 +640,13 @@ $('strips').innerHTML=TR.map((t,i)=>`<div class="group strip" data-ti="${i}" sty
  <label><input type="file" accept="audio/*" data-f="${i}"><button type="button" class="btn" data-fb="${i}" style="min-height:32px;padding:4px 10px">Sample</button></label></h3>
  <button class="btn ${t.mute?'':'on'}" data-smute="${i}" style="min-height:34px" title="Tocar para ${t.mute?'ligar':'mutar'}">${t.mute?'🔇 MUDO':'🔊 TOCANDO'}</button>
  <div class="swrow"><button class="btn arr" data-cy="${i}" data-d="-1" aria-label="Peça anterior para ${t.name}">◀</button><button class="btn swapbtn" data-sw="${i}">⇄ TROCAR <small>nota ${PN[padOf(t.snd,0)]}${SND[t.snd].n2?'/'+PN[padOf(t.snd,1)]:''}</small></button><button class="btn arr" data-cy="${i}" data-d="1" aria-label="Próxima peça para ${t.name}">▶</button></div>
- <div class="src" id="fn${i}">FONTE: ${t.buf?t.bufName:'SÍNTESE'}</div><div class="btn mini" draggable="true" data-md="${i}" style="text-align:center">⇣ MIDI só do ${t.name}</div><div class="knobs" id="kc${i}" style="justify-content:space-around"></div></div>`).join('');
-TR.forEach((t,i)=>{knob($('kc'+i),{label:'Duração',min:0,max:100,val:t.dec,on:v=>t.dec=v,fmt:pct});knob($('kc'+i),{label:'Volume',min:0,max:100,val:t.lvl,on:v=>t.lvl=v,fmt:pct});knob($('kc'+i),{label:'Pan',min:-100,max:100,val:t.pan,bi:1,on:v=>t.pan=v,fmt:panF})});
-}
+ <div class="loudmsg" id="ld${i}"></div><div class="src" id="fn${i}">FONTE: ${t.buf?t.bufName:'SÍNTESE'}</div><div class="btn mini" draggable="true" data-md="${i}" style="text-align:center">⇣ MIDI só do ${t.name}</div><div class="knobs" id="kc${i}" style="justify-content:space-around"></div></div>`).join('');
+TR.forEach((t,i)=>{knob($('kc'+i),{label:'Duração',min:0,max:100,val:t.dec,on:v=>t.dec=v,fmt:pct});knob($('kc'+i),{label:'Volume',min:0,max:100,val:t.lvl,on:v=>{t.lvl=v;updateLoud()},fmt:pct});knob($('kc'+i),{label:'Pan',min:-100,max:100,val:t.pan,bi:1,on:v=>t.pan=v,fmt:panF})});
+if(typeof updateLoud=='function'&&L0)updateLoud()}
 buildStrips();
 $('strips').addEventListener('change',async e=>{
  const i=e.target.dataset.f;if(i===undefined)return;const f=e.target.files[0];if(!f)return;
- try{initAudio();TR[i].buf=await ctx.decodeAudioData(await f.arrayBuffer());TR[i].bufName=f.name;$('fn'+i).textContent='FONTE: '+f.name}catch(err){$('fn'+i).textContent='ARQUIVO NÃO LIDO'}});
+ try{initAudio();TR[i].buf=await ctx.decodeAudioData(await f.arrayBuffer());TR[i].bufName=f.name;$('fn'+i).textContent='FONTE: '+f.name;updateLoud()}catch(err){$('fn'+i).textContent='ARQUIVO NÃO LIDO'}});
 $('strips').addEventListener('click',e=>{const cy=e.target.closest('[data-cy]');if(cy){cyclePiece(+cy.dataset.cy,+cy.dataset.d);return}const m=e.target.closest('[data-smute]');if(m){const t=TR[+m.dataset.smute];t.mute=!t.mute;buildGrid();buildStrips();midiInfo();return}const w=e.target.closest('[data-sw]');if(w){openSwap(+w.dataset.sw);return}const b=e.target.closest('[data-fb]');if(b)document.querySelector(`[data-f="${b.dataset.fb}"]`).click()});
 
 /* ---------- áudio ---------- */
@@ -614,11 +680,12 @@ function osc(t,v,type,f,dec,dest,bp){const o=ctx.createOscillator();o.type=type;
 function hit(t,ti,vel,stepDur,o={}){
  const tr=ti>=0?TR[ti]:{lvl:70,pan:0,dec:30,buf:null,snd:o.snd},out=ctx.createGain();out.gain.value=(tr.lvl/100)**1.5;if(ctx.createStereoPanner){const pn=ctx.createStereoPanner();pn.pan.value=tr.pan/100;out.connect(pn);pn.connect(bus)}else out.connect(bus);
  const dmul=.25+tr.dec/100*1.6,acc=vel>.8,si=o.snd??tr.snd,sd=SND[si],lng=o.lg??acc;
- flashPad(padOf(si,lng),vel,t);if(ti>=0)flashStrip(ti,vel,t);
+ if(!o.silent){flashPad(padOf(si,lng),vel,t);if(ti>=0)flashStrip(ti,vel,t)}
  if(tr.buf){const s=ctx.createBufferSource();s.buffer=tr.buf;s.playbackRate.value=1+(Math.random()-.5)*.04;const g=ctx.createGain();
   const len=Math.min(tr.buf.duration,stepDur*4*dmul);g.gain.setValueAtTime(vel,t);g.gain.setValueAtTime(vel,t+len*.7);g.gain.linearRampToValueAtTime(0,t+len);
   s.connect(g);g.connect(out);s.start(t);s.stop(t+len+.02);return}
  const dec=x=>x*dmul;
+ const sweepOsc=(type,f0,f1,sw,d,v,bp)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+sw);env(g,t,v,.002,d);if(bp){const b=ctx.createBiquadFilter();b.type='lowpass';b.frequency.value=bp;o.connect(b);b.connect(g)}else o.connect(g);g.connect(out);o.start(t);o.stop(t+d+.05)};
  const drum=(f0,f1,d,v)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+.06);env(g,t,v,.002,d);o.connect(g);g.connect(out);o.start(t);o.stop(t+d+.05)};
  switch(sd.k){
  case 'egg':nz(t,vel*.9,'bandpass',5200,1.2,acc?.012:.006,dec(.07),out,4800);break;
@@ -638,7 +705,19 @@ function hit(t,ti,vel,stepDur,o={}){
  case 'cgl':drum(250,215,dec(.28),vel*.85);nz(t,vel*.12,'bandpass',1200,1,.001,.03,out);break;
  case 'cgs':drum(420,380,dec(.06),vel*.5);nz(t,vel*.7,'bandpass',1800,1,.001,dec(.05),out);break;
  case 'bgh':drum(640,580,dec(.12),vel*.7);nz(t,vel*.1,'bandpass',2500,1,.001,.02,out);break;
- case 'bgl':drum(460,410,dec(.15),vel*.75);nz(t,vel*.1,'bandpass',2000,1,.001,.02,out);break}
+ case 'bgl':drum(460,410,dec(.15),vel*.75);nz(t,vel*.1,'bandpass',2000,1,.001,.02,out);break;
+ case 'tsh':case 'tsm':case 'tsg':{const f={tsh:[420,190],tsm:[310,135],tsg:[220,88]}[sd.k];sweepOsc('sine',f[0],f[1],.28,dec(.5),vel*.8);sweepOsc('triangle',f[0]*1.5,f[1]*1.5,.2,dec(.18),vel*.18);nz(t,vel*.3,'bandpass',1400,1,.001,.05,out);break}
+ case 'cxd':osc(t,vel*.35,'square',230,dec(.06),out,900);nz(t,vel*.55,'highpass',2200,.7,.001,dec(.13),out);break;
+ case 'c808':osc(t,vel*.45,'sine',185,dec(.09),out);osc(t,vel*.25,'sine',330,dec(.06),out);nz(t,vel*.5,'highpass',1800,.7,.001,dec(.18),out);break;
+ case 'clp':for(let j=0;j<3;j++)nz(t+j*.011,vel*.55,'bandpass',1150,1.6,.001,.012,out);nz(t+.033,vel*.45,'bandpass',1150,1.4,.002,dec(.16),out);break;
+ case 'rim':osc(t,vel*.5,'sine',1700,dec(.02),out);osc(t,vel*.3,'square',520,dec(.018),out,1600);break;
+ case 'cb8':osc(t,vel*.3,'square',587,dec(.22),out,1500);osc(t,vel*.3,'square',845,dec(.22),out,1500);break;
+ case 'hhe':[205.3,304.4,369.6,522.7,540,800].forEach(f=>osc(t,vel*.07,'square',f*2.1,dec(acc?.09:.045),out,9000));nz(t,vel*.25,'highpass',8000,.7,.001,dec(acc?.08:.04),out);break;
+ case 'blp':sweepOsc('square',1046,880,.03,dec(.07),vel*.22,3500);break;
+ case 'lz':sweepOsc('sawtooth',3200,180,.26*dmul,.32*dmul,vel*.25,4000);break;
+ case 'sir':{const o=ctx.createOscillator(),g=ctx.createGain(),l=ctx.createOscillator(),lg=ctx.createGain(),f=ctx.createBiquadFilter();o.type='square';o.frequency.value=900;l.frequency.value=4.5;lg.gain.value=320;l.connect(lg);lg.connect(o.frequency);f.type='lowpass';f.frequency.value=2800;const d=1.1*dmul;env(g,t,vel*.16,.03,d);o.connect(f);f.connect(g);g.connect(out);o.start(t);l.start(t);o.stop(t+d+.1);l.stop(t+d+.1);break}
+ case 'tir':{nz(t,vel*.8,'lowpass',7000,.7,.001,dec(.3),out);sweepOsc('sine',140,45,.12,dec(.25),vel*.7);break}
+ case 'drp':sweepOsc('sine',950,55,.55*dmul,.7*dmul,vel*.6);break}
 }
 function guide(t,i,stepDur){if(!S.guia)return;const g=ctx.createGain();g.gain.value=.5;g.connect(bus);
  if(SN.includes(i)){nz(t,.6,'bandpass',2000,4,.001,.05,g);osc(t,.5,'sine',420,.04,g);
@@ -762,7 +841,8 @@ $('barchips').addEventListener('dragstart',e=>{const c=e.target.closest('[data-c
 document.addEventListener('pointerup',()=>setTimeout(midiInfo,0))
 
 /* ---------- pads ---------- */
-function buildPads(){$('pads').innerHTML=PADS.map((p,i)=>`<button class="pad" data-p="${i}" style="--c:${p.c}" aria-label="${p.l} ${p.s} nota ${PN[i]}"><span class="pn">${p.l}</span><span class="ps">${p.s}</span><span class="pk">${nname(PN[i])} · ${PN[i]}</span><span class="pv"><i></i></span></button>`).join('')}
+let PCAT='all';
+function buildPads(){$('pads').innerHTML=PADS.map((p,i)=>(PCAT!='all'&&p.cat!=PCAT)?'':`<button class="pad" data-p="${i}" style="--c:${p.c}" aria-label="${p.l} ${p.s} nota ${PN[i]}"><span class="pn">${p.l}</span><span class="ps">${p.s}</span><span class="pk">${nname(PN[i])} · ${PN[i]}</span><span class="pv"><i></i></span></button>`).join('')}
 buildPads();
 function flashStrip(ti,vel,t){const els=document.querySelectorAll(`.strip[data-ti="${ti}"],.mkey[data-mk="${ti}"]`);if(!els.length)return;
  setTimeout(()=>els.forEach(el=>{el.style.setProperty('--hv',vel.toFixed(2));el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('hit'),130)}),Math.max(0,(t-(ctx?ctx.currentTime:0))*1000))}
@@ -794,6 +874,35 @@ $('webmidi').onclick=async()=>{const st=$('midistat');
   $('webmidi').classList.add('on');st.textContent=ins.length?`Ligado: ${ins.map(x=>x.name).join(', ')} · canal ${$('mch').value}`:'Nenhum controlador encontrado'}
  catch(e){st.textContent='O navegador não liberou o MIDI nesta página'}};
 
+/* ---------- AUTO MIX e marcação de timbre alto ---------- */
+const WEIGHT=k=>['egg','tub','mar','gan','cab','skr','pla','hhe','trm','tro'].includes(k)?.8:['lz','sir','tir','drp'].includes(k)?.9:1;
+function rmsShort(chs){const n=chs[0].length,w=2205;let best=0;for(let a=0;a<n;a+=w){let e=0,c=0;for(const ch of chs)for(let i=a;i<Math.min(n,a+w);i++){e+=ch[i]*ch[i];c++}best=Math.max(best,Math.sqrt(e/Math.max(1,c)))}return best}
+async function measureSounds(){
+ if(!window.OfflineAudioContext)return;
+ const res=[];
+ for(let si=0;si<SND.length;si++){
+  const oc=new OfflineAudioContext(2,Math.round(44100*1.3),44100),sv={ctx,bus,noise};
+  ctx=oc;bus=oc.destination;noise=oc.createBuffer(1,44100*2,44100);const d=noise.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  try{hit(.01,-1,1,.2,{snd:si,lg:true,silent:true})}catch(e){}
+  ctx=sv.ctx;bus=sv.bus;noise=sv.noise;
+  const b=await oc.startRendering();res.push(rmsShort([b.getChannelData(0),b.getChannelData(1)])/Math.pow(.7,1.5))}
+ L0=res;updateLoud()}
+function bufLevel(b){return b?rmsShort(Array.from({length:b.numberOfChannels},(_,c)=>b.getChannelData(c)))*1.41:0}
+function targetLevel(){const v=[...L0].sort((a,b)=>a-b);return v[v.length>>1]*Math.pow(.75,1.5)}
+function effLevel(t){const base=t.buf?bufLevel(t.buf):L0[t.snd];return base*Math.pow(t.lvl/100,1.5)}
+function updateLoud(){
+ if(!L0)return;const T=targetLevel();let n=0;const loudSnd=new Set();
+ TR.forEach((t,i)=>{const r=effLevel(t)/(T*WEIGHT(SND[t.snd].k)),loud=r>1.8&&audible(t);t.loud=loud;if(loud){n++;loudSnd.add(t.snd)}
+  const st=document.querySelector(`.strip[data-ti="${i}"]`);if(st)st.classList.toggle('isloud',loud);
+  const m=$('ld'+i);if(m)m.textContent=loud?`⚠ ALTO (+${(20*Math.log10(r)).toFixed(1)} dB): use o AUTO MIX ou baixe o volume`:''});
+ document.querySelectorAll('#pads .pad').forEach(el=>{const p=PADS[+el.dataset.p];el.classList.toggle('loud',loudSnd.has(p.si))});
+ document.querySelectorAll('.mkey[data-mk]').forEach(el=>el.classList.toggle('loud',!!TR[+el.dataset.mk].loud));
+ const st=$('amstat');if(st)st.textContent=n?`${n} peça(s) alta(s) demais`:'Mix equilibrado'}
+function autoMix(){
+ if(!L0){$('amstat').textContent='Medindo os timbres…';measureSounds().then(autoMix);return}
+ const T=targetLevel();let ch=0;
+ TR.forEach(t=>{const base=t.buf?bufLevel(t.buf):L0[t.snd];if(!base)return;const v=Math.round(Math.max(10,Math.min(100,100*Math.pow(T*WEIGHT(SND[t.snd].k)/base,2/3))));if(Math.abs(v-t.lvl)>=1)ch++;t.lvl=v});
+ buildStrips();updateLoud();$('amstat').textContent=`AUTO MIX: ${ch} volume(s) ajustado(s) · mix equilibrado`}
 /* ---------- trocar peça ---------- */
 function cyclePiece(ti,d){const t=TR[ti];setSnd(t,(t.snd+d+SND.length)%SND.length);initAudio();ctx.resume();hit(ctx.currentTime+.01,ti,.95,60/S.bpm/4);buildGrid();buildStrips();midiInfo();
  const f=document.querySelector(`#strips [data-cy="${ti}"][data-d="${d}"]`);if(f&&document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#strips'))f.focus()}
@@ -806,6 +915,10 @@ $('swgrid').addEventListener('click',e=>{const b=e.target.closest('[data-si]');i
  initAudio();ctx.resume();hit(ctx.currentTime+.01,swT,.95,60/S.bpm/4);buildGrid();buildStrips();midiInfo()});
 $('swok').onclick=()=>{$('swmodal').classList.add('hidden');swT=-1};
 $('swmodal').addEventListener('click',e=>{if(e.target.id=='swmodal')$('swok').click()});
+$('padcats').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;PCAT=b.dataset.cat;document.querySelectorAll('#padcats .btn').forEach(x=>x.classList.toggle('on',x==b));buildPads();updateLoud()});
+$('automix').onclick=autoMix;
+setTimeout(()=>measureSounds().catch(e=>{console.error('measure',e);$('amstat').textContent='AUTO MIX indisponível neste navegador'}),300);
+window.__mrp={TR,SND,get L0(){return L0},autoMix,updateLoud,setSnd,buildStrips,buildGrid};
 try{const tb=localStorage.getItem('mrp77tab');if(tb=='grade')document.querySelector('.mt[data-main=grade]').click()}catch(e){}
 loadPreset(NAMES[0]);scope();midiInfo();
 }

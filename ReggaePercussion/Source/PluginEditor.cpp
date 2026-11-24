@@ -84,6 +84,13 @@ void PercLookAndFeel::drawButtonBackground (Graphics& g, Button& b, const Colour
         const Colour lc = b.getProperties().contains ("ledColour") ? Colour ((uint32) (int64) b.getProperties()["ledColour"]) : col::amber;
         g.setColour (lc.withAlpha (jlimit (0.0f, 1.0f, fl))); g.drawRoundedRectangle (body.reduced (1.5f), 5.0f, 3.0f);
     }
+    if ((bool) b.getProperties()["loud"])   // peça alta demais
+    {
+        g.setColour (col::red); g.drawRoundedRectangle (body.reduced (1.0f), 5.0f, 2.2f);
+        auto badge = Rectangle<float> (body.getRight() - 38.0f, body.getY() + 4.0f, 32.0f, 13.0f);
+        g.fillRoundedRectangle (badge, 2.0f);
+        g.setColour (Colours::white); g.setFont (Font (FontOptions (9.0f, Font::bold))); g.drawText ("ALTO", badge, Justification::centred);
+    }
 }
 
 void PercLookAndFeel::drawButtonText (Graphics& g, TextButton& b, bool, bool down)
@@ -146,21 +153,31 @@ void PadComp::paint (Graphics& g)
     const auto& pd = mrp::pads()[(size_t) index];
     const auto& sd = mrp::sounds()[(size_t) pd.snd];
     const Colour c (sd.argb);
+    const bool compact = getHeight() < 56;
     auto r = getLocalBounds().toFloat().reduced (1.0f);
     g.setGradientFill (ColourGradient (Colour (0xff3a322b).interpolatedWith (c, flash * 0.35f), r.getX(), r.getY(), Colour (0xff1a1511), r.getX(), r.getBottom(), false));
     g.fillRoundedRectangle (r, 5.0f);
+    if (loud) { g.setColour (col::red.withAlpha (0.28f)); g.fillRoundedRectangle (r, 5.0f); g.setColour (col::red); g.drawRoundedRectangle (r.reduced (1.0f), 5.0f, 2.2f); }
     if (flash > 0.01f) { g.setColour (c.withAlpha (flash)); g.drawRoundedRectangle (r.reduced (1.0f), 5.0f, 2.5f); }
     g.setColour (Colours::black); g.drawRoundedRectangle (r, 5.0f, 1.0f);
-    g.setColour (c); g.fillRect (r.removeFromTop (5.0f).reduced (1.0f, 0));
-    auto t = getLocalBounds().reduced (8, 6).withTrimmedTop (4);
-    g.setColour (Colour (0xffefe6d0)); g.setFont (sans (11.5f));
-    g.drawText (UP (U (sd.name)), t.removeFromTop (16), Justification::topLeft);
-    g.setColour (Colour (0xffb9a684)); g.setFont (sans (10.0f, false));
-    g.drawText (pd.lg < 0 ? U (sd.sub) : String (pd.lg ? "Longo" : "Curto"), t.removeFromTop (14), Justification::topLeft);
+    g.setColour (c); g.fillRect (r.removeFromTop (compact ? 4.0f : 5.0f).reduced (1.0f, 0));
+    auto t = getLocalBounds().reduced (compact ? 6 : 8, compact ? 3 : 6).withTrimmedTop (compact ? 3 : 4).withTrimmedRight (compact ? 6 : 4);
+    g.setColour (Colour (0xffefe6d0)); g.setFont (sans (compact ? 10.0f : 11.5f));
+    g.drawText (UP (U (sd.name)), t.removeFromTop (compact ? 13 : 16), Justification::topLeft, true);
+    g.setColour (Colour (0xffb9a684)); g.setFont (sans (compact ? 9.0f : 10.0f, false));
+    g.drawText (pd.lg < 0 ? U (sd.sub) : String (pd.lg ? "Longo" : "Curto"), t.removeFromTop (compact ? 11 : 14), Justification::topLeft, true);
     const int n = proc.padNote[(size_t) index].load();
-    g.setColour (col::amber); g.setFont (mono (10.5f));
-    g.drawText (noteName (n) + " . " + String (n), t.removeFromBottom (14), Justification::bottomLeft);
-    auto bar = getLocalBounds().toFloat().removeFromRight (9.0f).reduced (2.0f, 10.0f);
+    auto bottom = t.removeFromBottom (compact ? 12 : 14);
+    if (loud)
+    {
+        g.setFont (mono (compact ? 8.5f : 9.5f));
+        auto badge = bottom.removeFromRight (compact ? 30 : 36).toFloat();
+        g.setColour (col::red); g.fillRoundedRectangle (badge, 2.0f);
+        g.setColour (Colours::white); g.drawText ("ALTO", badge, Justification::centred);
+    }
+    g.setColour (col::amber); g.setFont (mono (compact ? 9.0f : 10.5f));
+    g.drawText (compact ? String (n) : noteName (n) + " . " + String (n), bottom, Justification::bottomLeft);
+    auto bar = getLocalBounds().toFloat().removeFromRight (compact ? 6.0f : 9.0f).reduced (compact ? 1.5f : 2.0f, compact ? 6.0f : 10.0f);
     g.setColour (Colour (0xff0d0b09)); g.fillRoundedRectangle (bar, 2.0f);
     g.setColour (c); g.fillRoundedRectangle (bar.withTrimmedTop (bar.getHeight() * (1.0f - flash)), 2.0f);
 }
@@ -197,13 +214,18 @@ void LcdComp::paint (Graphics& g)
     g.setColour (Colour (0xff1d4aa8)); g.setFont (mono (12.0f));
     g.drawText (String::charToString ((juce_wchar) ('A' + group)) + String (inGroup).paddedLeft ('0', 2), bank, Justification::centred);
     g.setColour (Colour (0xffe8f3ff)); g.setFont (sans (19.0f));
-    g.drawText (gs[(size_t) gi].name, mid.withTrimmedLeft (10), Justification::centredLeft, true);
+    g.drawText (gs[(size_t) gi].name, mid.withTrimmedLeft (10).withTrimmedRight (36), Justification::centredLeft, true);
     g.setColour (Colour (0xffe8f3ff).withAlpha (0.85f)); g.setFont (sans (10.5f));
     const bool playing = proc.playStep.load() >= 0;
     const double bpm = proc.get ("bpm");
     g.drawText (String (bpm, 1).paddedLeft ('0', 5) + " BPM", t, Justification::left);
     g.drawText ("SW " + String (roundToInt (proc.get ("swing") * 100)) + "%", t, Justification::centred);
     g.drawText (playing ? "PLAY" : "STOP", t, Justification::right);
+    // toque no visor: lista de presets
+    auto menu = Rectangle<float> (in.getRight() - 34.0f, in.getCentreY() - 12.0f, 26.0f, 22.0f);
+    g.setColour (Colour (0x8c0a0c10)); g.fillRoundedRectangle (menu, 3.0f);
+    g.setColour (Colour (0xffe8f3ff));
+    for (int k = 0; k < 3; ++k) g.fillRect (menu.getX() + 6.0f, menu.getY() + 6.0f + k * 4.5f, 14.0f, 2.0f);
 }
 
 // ================================================================== EQ
@@ -461,7 +483,19 @@ void StripComp::paint (Graphics& g)
     auto src = getLocalBounds().reduced (10, 0);
     g.setColour (Colour (0xff6b5a48)); g.setFont (mono (9.5f, false));
     const String sn = proc.sampleName (t);
-    g.drawText ("FONTE: " + (sn.isEmpty() ? U ("S\xc3\x8dNTESE") : sn), src.withY (136).withHeight (14), Justification::centredLeft, true);
+    if (proc.isLoud (t))
+    {
+        // peça alta demais: borda vermelha tracejada e aviso até o volume ser corrigido
+        Path p; p.addRoundedRectangle (getLocalBounds().toFloat().reduced (2.0f), 8.0f);
+        const float dashes[2] = { 7.0f, 4.0f };
+        PathStrokeType (2.4f).createDashedStroke (p, p, dashes, 2);
+        g.setColour (col::red); g.fillPath (p);
+        g.setFont (sans (9.5f));
+        g.drawText (U ("\xe2\x9a\xa0 ALTO (+") + String (20.0f * std::log10 (proc.loudRatio (t)), 1) + " dB): AUTO MIX ou baixe o volume",
+                    src.withY (136).withHeight (14), Justification::centredLeft, true);
+    }
+    else
+        g.drawText ("FONTE: " + (sn.isEmpty() ? U ("S\xc3\x8dNTESE") : sn), src.withY (136).withHeight (14), Justification::centredLeft, true);
     g.setColour (col::label); g.setFont (sans (9.5f));
     const char* names[3] = { "DURA\xc3\x87\xc3\x83O", "VOLUME", "PAN" };
     for (int k = 0; k < 3; ++k)
@@ -559,6 +593,22 @@ ReggaePercussionEditor::ReggaePercussionEditor (ReggaePercussionProcessor& p)
 
     // PADS
     for (int i = 0; i < mrp::numPads; ++i) { padComps.push_back (std::make_unique<PadComp> (proc, i)); addAndMakeVisible (*padComps.back()); }
+    for (int c = 0; c <= mrp::numCats; ++c)
+    {
+        const String txt = c == 0 ? String ("TODOS") : UP (U (mrp::catName (c - 1)));
+        button (padCat[c], txt, [this, c] { padFilter = c - 1; layoutPads(); }, "key");
+        padCat[c].setClickingTogglesState (false);
+    }
+    button (autoMixBtn, "AUTO MIX", [this]
+    {
+        const int n = proc.autoMix();
+        amStatus = "AUTO MIX: " + String (n) + U (" volume(s) ajustado(s) \xc2\xb7 mix equilibrado");
+        for (auto& st : strips) st->refresh();
+        repaint();
+    }, "go");
+    autoMixBtn.setTooltip (U ("Regula o volume das 6 pe\xc3\xa7" "as pelo n\xc3\xadvel real de cada timbre"));
+    lcd.onClick = [this] { showPresetMenu(); };
+    lcd.setTooltip (U ("Toque para escolher o preset"));
     addAndMakeVisible (eq);
     eqPreset.addItemList ({ "Flat", "LPF", "HPF", "Banda", "Dub telefone", "Brilho" }, 1);
     eqPreset.setTextWhenNothingSelected ("Presets");
@@ -642,11 +692,11 @@ ReggaePercussionEditor::ReggaePercussionEditor (ReggaePercussionProcessor& p)
     {
         const auto& pd = mrp::pads()[(size_t) i];
         noteLbl[i].setText (pd.lg < 0 ? soundLabel (pd.snd) : U (mrp::sounds()[(size_t) pd.snd].name) + (pd.lg ? " Longo" : " Curto"), dontSendNotification);
-        noteLbl[i].setFont (sans (11.0f, false));
+        noteLbl[i].setFont (sans (9.5f, false)); noteLbl[i].setMinimumHorizontalScale (0.7f);
         addAndMakeVisible (noteLbl[i]);
         noteSl[i].setSliderStyle (Slider::IncDecButtons);
         noteSl[i].setIncDecButtonsMode (Slider::incDecButtonsDraggable_Vertical);
-        noteSl[i].setTextBoxStyle (Slider::TextBoxLeft, false, 34, 16);
+        noteSl[i].setTextBoxStyle (Slider::TextBoxLeft, false, 32, 16);
         noteSl[i].setRange (0, 127, 1);
         noteSl[i].setValue (proc.padNote[(size_t) i].load(), dontSendNotification);
         noteSl[i].onValueChange = [this, i] { proc.padNote[(size_t) i] = (int) noteSl[i].getValue(); refreshNotes(); for (auto& s : strips) s->refresh(); };
@@ -663,8 +713,8 @@ ReggaePercussionEditor::~ReggaePercussionEditor() { stopTimer(); setLookAndFeel 
 
 std::vector<Component*> ReggaePercussionEditor::page0()
 {
-    std::vector<Component*> v { &eq, &eqPreset, &eqBtn, &satBtn, &echoBtn, &big, &drive, &echoFb, &echoMix, &echoTime };
-    for (auto& p : padComps) v.push_back (p.get());
+    std::vector<Component*> v { &eq, &eqPreset, &eqBtn, &satBtn, &echoBtn, &big, &drive, &echoFb, &echoMix, &echoTime, &autoMixBtn };
+    for (int c = 0; c <= mrp::numCats; ++c) v.push_back (&padCat[c]);
     for (auto& s : strips) v.push_back (s.get());
     return v;
 }
@@ -685,6 +735,7 @@ void ReggaePercussionEditor::setPage (int p)
     page = p;
     for (auto* c : page0()) c->setVisible (p == 0);
     for (auto* c : page1()) c->setVisible (p == 1);
+    layoutPads();
     tabPads.setToggleState (p == 0, dontSendNotification);
     tabMach.setToggleState (p == 1, dontSendNotification);
     shownBars = -1;
@@ -740,6 +791,19 @@ void ReggaePercussionEditor::exportMidi()
 
 void ReggaePercussionEditor::timerCallback()
 {
+    // marcação ALTO: pad do som de uma peça alta demais
+    {
+        bool loudSnd[mrp::numSounds] {};
+        int nLoud = 0;
+        for (int t = 0; t < mrp::numTracks; ++t) if (proc.isLoud (t)) { loudSnd[proc.soundOf (t)] = true; ++nLoud; }
+        for (int i = 0; i < mrp::numPads; ++i)
+        {
+            const bool l = loudSnd[mrp::pads()[(size_t) i].snd];
+            if (padComps[(size_t) i]->loud != l) { padComps[(size_t) i]->loud = l; padComps[(size_t) i]->repaint(); }
+        }
+        const String st = nLoud > 0 ? String (nLoud) + U (" pe\xc3\xa7" "a(s) alta(s) demais") : (amStatus.isNotEmpty() ? amStatus : String ("Mix equilibrado"));
+        if (st != shownAm) { shownAm = st; if (nLoud > 0) amStatus.clear(); repaint (640, 508, 290, 36); }
+    }
     // luzes no ritmo: pads, canais, teclas de mudo e nomes da grade
     for (int i = 0; i < mrp::numPads; ++i)
     {
@@ -762,6 +826,7 @@ void ReggaePercussionEditor::timerCallback()
         if (muteKey[t].getButtonText() != txt) muteKey[t].setButtonText (txt);
         muteKey[t].getProperties().set ("ledColour", (int64) d.argb);
         muteKey[t].getProperties().set ("flash", keyFlash[t]);
+        muteKey[t].getProperties().set ("loud", proc.isLoud (t));
         if (page == 1) muteKey[t].repaint();
     }
     // compasso tocando: a grade acompanha (SEGUIR O PLAY)
@@ -846,6 +911,8 @@ void ReggaePercussionEditor::paint (Graphics& g)
         g.setColour (col::amber); g.setFont (sans (11.0f)); g.drawText ("MASTOR BIG KNOB", 1018, 234, 134, 14, Justification::centred);
         g.setColour (Colour (0xffd9cfbd)); g.setFont (sans (10.0f, false)); g.drawText (U ("sa\xc3\xad" "da"), 1018, 392, 134, 12, Justification::centred);
         box ({ 20, 528, 1140, 282 }); tag (32, 518, "C A N A I S");
+        g.setColour (shownAm.contains ("alta") ? col::red : col::label); g.setFont (sans (10.5f));
+        g.drawText (shownAm, 640, 512, 284, 30, Justification::centredRight);
     }
     else
     {
@@ -881,11 +948,9 @@ void ReggaePercussionEditor::resized()
     tabMach.setBounds (594, 160, 556, 46);
 
     // PADS
-    for (int i = 0; i < mrp::numPads; ++i)
-    {
-        const int c = i % 6, r = i / 6;
-        padComps[(size_t) i]->setBounds (34 + c * 98, 240 + r * 64, 94, 60);
-    }
+    for (int c = 0; c <= mrp::numCats; ++c) padCat[c].setBounds (34 + c * 112, 238, 108, 24);
+    autoMixBtn.setBounds (930, 512, 130, 30);
+    layoutPads();
     eqBtn.setBounds (652, 230, 64, 28);
     eqPreset.setBounds (724, 230, 130, 26);
     eq.setBounds (652, 264, 358, 146);
@@ -923,9 +988,49 @@ void ReggaePercussionEditor::resized()
         rowM[t].setBounds (30 + 186, y, 22, 24); rowS[t].setBounds (30 + 210, y, 22, 24);
     }
     resetNotesBtn.setBounds (900, 384, 150, 24);
+    // esquema MIDI: 38 notas em duas colunas
+    const int half = (mrp::numPads + 1) / 2;
     for (int i = 0; i < mrp::numPads; ++i)
     {
-        noteLbl[i].setBounds (900, 414 + i * 16, 160, 16);
-        noteSl[i].setBounds (1062, 414 + i * 16, 90, 16);
+        const int x = 898 + (i / half) * 130, y = 414 + (i % half) * 20;
+        noteLbl[i].setBounds (x, y, 68, 18);
+        noteSl[i].setBounds (x + 68, y + 1, 60, 17);
     }
+}
+
+// pads: TODOS = 38 pads compactos (8 por linha); uma categoria = pads grandes (6 por linha)
+void ReggaePercussionEditor::layoutPads()
+{
+    std::vector<int> shown;
+    for (int i = 0; i < mrp::numPads; ++i)
+    {
+        const bool in = padFilter < 0 || mrp::sounds()[(size_t) mrp::pads()[(size_t) i].snd].cat == padFilter;
+        padComps[(size_t) i]->setVisible (page == 0 && in);
+        if (in) shown.push_back (i);
+    }
+    const bool compact = (int) shown.size() > 24;
+    const int cols = compact ? 8 : 6, w = compact ? 72 : 96, h = compact ? 44 : 55, gap = compact ? 2 : 3;
+    for (size_t k = 0; k < shown.size(); ++k)
+        padComps[(size_t) shown[k]]->setBounds (34 + (int) (k % (size_t) cols) * (w + gap), 268 + (int) (k / (size_t) cols) * (h + gap), w, h);
+    for (int c = 0; c <= mrp::numCats; ++c) padCat[c].setToggleState (padFilter == c - 1, dontSendNotification);
+}
+
+// toque no visor: presets por categoria
+void ReggaePercussionEditor::showPresetMenu()
+{
+    PopupMenu m; PopupMenu sub; String grp;
+    const auto& gs = mrp::grooves();
+    const String curGroup = gs[(size_t) jlimit (0, (int) gs.size() - 1, proc.grooveIndex.load())].group;
+    for (int i = 0; i < (int) gs.size(); ++i)
+    {
+        if (grp != gs[(size_t) i].group)
+        {
+            if (grp.isNotEmpty()) m.addSubMenu (grp, sub, true, nullptr, curGroup == grp);
+            sub = PopupMenu(); grp = gs[(size_t) i].group;
+        }
+        sub.addItem (i + 1, gs[(size_t) i].name, true, i == proc.grooveIndex.load());
+    }
+    if (grp.isNotEmpty()) m.addSubMenu (grp, sub, true, nullptr, curGroup == grp);
+    m.showMenuAsync (PopupMenu::Options().withTargetComponent (&lcd).withMinimumWidth (lcd.getWidth()),
+                     [this] (int r) { if (r > 0) proc.loadGroove (r - 1); });
 }

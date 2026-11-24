@@ -124,9 +124,10 @@ da virada é o 1 do groove (a chegada). MIDI nas notas do MRD-12, canal 10. Tape
 Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
 
 ## Mastor Reggae Percussion MRP-77 (ReggaePercussion/)
-Percussão de reggae com a PERC MACHINE. Os 23 sons, os grooves do estudo, os efeitos e o MIDI ficam em `Source/PercEngine.h`
+Percussão de reggae com a PERC MACHINE. Os 37 sons (acústicos, digitais 80-90 e Dub FX), os presets (kits digitais, Simmons e Dub FX trocam
+as peças das linhas), o AUTO MIX (nível medido de cada timbre, marcação ALTO), os efeitos e o MIDI ficam em `Source/PercEngine.h`
 (sem JUCE); a versão para celular (`site/web/reggaepercussion/`) tem a mesma síntese e os mesmos grooves em JavaScript (`hit`, `GROUPS`):
 ao mudar um, mude o outro. Tudo na contagem com a caixa no 2 e no 4 (1 passo = 1 semicolcheia). As notas dos pads ficam **fora da
-faixa 36–51 do MRD-12** (o teste falha se alguma cair lá). Saturador e Tape Echo começam desligados. MIDI no padrão da linha:
+faixa 36–51 do MRD-12** (o teste falha se alguma cair lá); vão de 54 a 100. Saturador e Tape Echo começam desligados. MIDI no padrão da linha:
 arrastar o groove, uma peça ou um compasso (na cor dele), MIDI colorido (compasso N = canal N) e BAIXAR MIDI.
 Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).

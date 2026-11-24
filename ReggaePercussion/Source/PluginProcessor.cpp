@@ -73,6 +73,7 @@ ReggaePercussionProcessor::ReggaePercussionProcessor()
     for (auto& v : trackVel) v.store (0.0f);
     resetNotes();
     loadGroove (0);
+    (void) mrp::loud::soundLevels();   // mede os timbres uma vez (AUTO MIX)
 }
 
 void ReggaePercussionProcessor::resetNotes()
@@ -115,7 +116,10 @@ void ReggaePercussionProcessor::loadGroove (int index)
     index = jlimit (0, (int) gs.size() - 1, index);
     const auto& g = gs[(size_t) index];
     for (int t = 0; t < mrp::numTracks; ++t)
+    {
         for (int s = 0; s < 128; ++s) setStep (t, s, mrp::stepValue (g.p[t], s % 16));
+        setParam (tid ("snd", t), (float) mrp::grooveSound (g, t));   // kits digitais e Dub FX trocam as peças
+    }
     setParam ("swing", g.swing / 100.0f);
     grooveIndex = index;
 }
@@ -132,6 +136,33 @@ void ReggaePercussionProcessor::cycleSound (int t, int dir)
 {
     setParam (tid ("snd", t), (float) ((soundOf (t) + dir + mrp::numSounds) % mrp::numSounds));
     playPad (mrp::padOf (soundOf (t), true), 0.95f);
+}
+
+// ---------------------------------------------------------------- AUTO MIX
+float ReggaePercussionProcessor::baseLevel (int t) const
+{
+    if (std::atomic_load (&samples[(size_t) t]) != nullptr) return sampleLvl[(size_t) t].load();
+    return mrp::loud::soundLevels()[(size_t) soundOf (t)];
+}
+
+float ReggaePercussionProcessor::loudRatio (int t) const
+{
+    return mrp::loud::ratio (baseLevel (t), soundOf (t), get (tid ("vol", t)));
+}
+
+bool ReggaePercussionProcessor::isLoud (int t) const { return isAudible (t) && loudRatio (t) > mrp::loud::loudRatio; }
+
+int ReggaePercussionProcessor::autoMix()
+{
+    int changed = 0;
+    for (int t = 0; t < mrp::numTracks; ++t)
+    {
+        const float v = mrp::loud::autoVolume (baseLevel (t), soundOf (t));
+        if (v < 0) continue;
+        if (std::abs (v - get (tid ("vol", t))) >= 0.01f) ++changed;
+        setParam (tid ("vol", t), v);
+    }
+    return changed;
 }
 
 void ReggaePercussionProcessor::playPad (int pad, float vel)
@@ -156,6 +187,7 @@ bool ReggaePercussionProcessor::loadSample (int t, const File& f)
     d->rate = r->sampleRate;
     d->l.assign (b.getReadPointer (0), b.getReadPointer (0) + len);
     if (b.getNumChannels() > 1) d->r.assign (b.getReadPointer (1), b.getReadPointer (1) + len);
+    sampleLvl[(size_t) t] = mrp::loud::sampleLevel (*d);
     std::atomic_store (&samples[(size_t) t], std::shared_ptr<const mrp::SampleData> (d));
     sampleFile[(size_t) t] = f;
     return true;

@@ -1,4 +1,4 @@
-// Mastor Reggae Percussion MRP-77 — motor de som (sem JUCE): os 23 sons sintetizados, os grooves do estudo,
+// Mastor Reggae Percussion MRP-77 — motor de som (sem JUCE): os 37 sons sintetizados (acústicos, digitais 80-90 e Dub FX), os grooves do estudo,
 // a cadeia de efeitos (EQ, saturador, Tape Echo, Big Knob) e o MIDI. A versão para celular
 // (site/web/reggaepercussion/index.html) tem a mesma síntese em Web Audio: ao mudar um, mude o outro.
 // Contagem da Dub Station: caixa no 2 e no 4; 1 passo = 1 semicolcheia; 16 passos = 1 compasso.
@@ -25,8 +25,11 @@ struct Rng
 };
 
 // ------------------------------------------------------------------ sons
-struct Sound { const char* key; const char* name; const char* sub; int note; int note2; uint32_t argb; };
-constexpr int numSounds = 23;
+// cat: 0 = acústica, 1 = digital 80-90, 2 = Dub FX
+struct Sound { const char* key; const char* name; const char* sub; int note; int note2; uint32_t argb; int cat = 0; };
+constexpr int numSounds = 37;
+constexpr int numCats = 3;
+inline const char* catName (int c) { static const char* n[numCats] = { "Ac\xc3\xbastica", "Digital 80-90", "Dub FX" }; return n[c % numCats]; }
 inline const std::array<Sound, numSounds>& sounds()
 {
     static const std::array<Sound, numSounds> s { {
@@ -41,7 +44,16 @@ inline const std::array<Sound, numSounds>& sounds()
         { "gui", "Guiro", "Curto / longo", 73, 74, 0xff6fbf78 }, { "vib", "Vibraslap", "Chocalho", 58, -1, 0xff6fbf78 },
         { "cgh", "Conga", "Aberta aguda", 63, -1, 0xff8fb6d9 }, { "cgl", "Conga", "Grave", 64, -1, 0xff8fb6d9 },
         { "cgs", "Conga", "Slap", 62, -1, 0xff8fb6d9 },        { "bgh", "Bong\xc3\xb4", "Agudo", 60, -1, 0xff8fb6d9 },
-        { "bgl", "Bong\xc3\xb4", "Grave", 61, -1, 0xff8fb6d9 } } };
+        { "bgl", "Bong\xc3\xb4", "Grave", 61, -1, 0xff8fb6d9 },
+        // digitais 80-90
+        { "tsh", "Tom Simmons", "Agudo", 83, -1, 0xff5fd0c8, 1 },  { "tsm", "Tom Simmons", "M\xc3\xa9" "dio", 84, -1, 0xff5fd0c8, 1 },
+        { "tsg", "Tom Simmons", "Grave", 85, -1, 0xff5fd0c8, 1 },  { "cxd", "Caixa digital", "Sleng Teng", 86, -1, 0xffb98be0, 1 },
+        { "c808", "Caixa 808", "Anal\xc3\xb3gica", 87, -1, 0xffb98be0, 1 }, { "clp", "Clap 808", "Palmas", 92, -1, 0xffb98be0, 1 },
+        { "rim", "Rim digital", "Aro MT-40", 93, -1, 0xffb98be0, 1 }, { "cb8", "Cowbell 808", "Anal\xc3\xb3gico", 94, -1, 0xff5fd0c8, 1 },
+        { "hhe", "Hat eletr\xc3\xb4nico", "Fechado", 95, -1, 0xff5fd0c8, 1 }, { "blp", "Blip Casio", "Synth perc", 96, -1, 0xff5fd0c8, 1 },
+        // Dub FX
+        { "lz", "Laser dub", "Zap", 97, -1, 0xffff5c8a, 2 },    { "sir", "Sirene dub", "Siren", 98, -1, 0xffff5c8a, 2 },
+        { "tir", "Tiro dub", "Gun shot", 99, -1, 0xffff5c8a, 2 }, { "drp", "Drop dub", "Queda", 100, -1, 0xffff5c8a, 2 } } };
     return s;
 }
 inline int soundIndex (const char* key)
@@ -50,9 +62,9 @@ inline int soundIndex (const char* key)
     return 0;
 }
 
-// pads: um por som (o guiro tem dois: curto e longo) = 24 pads, cada um com a sua nota MIDI
+// pads: um por som (o guiro tem dois: curto e longo) = 38 pads, cada um com a sua nota MIDI
 struct Pad { int snd; int lg; int note; };   // lg: -1 = qualquer, 0 = curto, 1 = longo
-constexpr int numPads = 24;
+constexpr int numPads = 38;
 inline const std::array<Pad, numPads>& pads()
 {
     static const std::array<Pad, numPads> p = [] {
@@ -88,32 +100,48 @@ inline const std::array<TrackDefault, numTracks>& trackDefaults()
 }
 
 // ------------------------------------------------------------------ grooves do estudo (X = acento, x = fraca, - = pausa)
-struct Groove { const char* group; const char* name; int swing; const char* p[numTracks]; };   // p: shk cab tam wbl cow gui
+// p: shk cab tam wbl cow gui. snd: som de cada linha (nullptr = som padrão da peça; os kits digitais e Dub FX trocam as peças)
+struct Groove { const char* group; const char* name; int swing; const char* p[numTracks]; const char* snd[numTracks]; };
+inline const char* defaultSound (int t) { return trackDefaults()[(size_t) t].soundKey; }
 inline const std::vector<Groove>& grooves()
 {
     static const std::vector<Groove> g {
-        { "Kits completos", "Kit roots (Seeco)", 58, { "xxXxxxXxxxXxxxXx", "", "--x---x---x---x-", "", "", "" } },
-        { "Kits completos", "Kit rockers (Sticky)", 52, { "", "xxXxxxXxxxXxxxXx", "", "", "X--X--X---X-X---", "" } },
-        { "Kits completos", "Kit steppers", 50, { "xXXxxXXxxXXxxXXx", "", "", "", "--X---X---X---X-", "" } },
-        { "Kits completos", "Kit ska/rocksteady", 60, { "", "", "----X-------X---", "--X---X---X---X-", "", "X-x-X-x-X-x-X-x-" } },
-        { "Shaker", "Shaker roots (A)", 54, { "xxXxxxXxxxXxxxXx", "", "", "", "", "" } },
-        { "Shaker", "Shaker Seeco (B)", 62, { "x-Xxx-Xxx-Xxx-Xx", "", "", "", "", "" } },
-        { "Shaker", "Shaker steppers (C)", 50, { "xXXxxXXxxXXxxXXx", "", "", "", "", "" } },
-        { "Shaker", "Shaker 3+3+2 (D)", 50, { "X--X--X-X--X--X-", "", "", "", "", "" } },
-        { "Pandeiro", "Pandeiro roots", 56, { "", "", "--X---X---X---X-", "", "", "" } },
-        { "Pandeiro", "Pandeiro shuffle", 62, { "", "", "--Xx--Xx--Xx--Xx", "", "", "" } },
-        { "Pandeiro", "Pandeiro ska/rocksteady", 58, { "", "", "--x-X-x---x-X-x-", "", "", "" } },
-        { "Cabasa", "Cabasa roots/dub", 54, { "", "--X---X---X---X-", "", "", "", "" } },
-        { "Cabasa", "Cabasa rockers", 52, { "", "xxXxxxXxxxXxxxXx", "", "", "", "" } },
-        { "Cowbell", "Cowbell steppers", 50, { "", "", "", "", "--X---X---X---X-", "" } },
-        { "Cowbell", "Cowbell sincopado (Sticky)", 52, { "", "", "", "", "X--X--X---X-X---", "" } },
-        { "Woodblock", "Woodblock ska", 60, { "", "", "", "--X---X---X---X-", "", "" } },
-        { "Woodblock", "Woodblock clave 3+3+2", 54, { "", "", "", "X--X--X---X-X---", "", "" } },
-        { "Guiro", "Guiro mento/ska", 58, { "", "", "", "", "", "X-x-X-x-X-x-X-x-" } },
-        { "Guiro", "Guiro roots", 56, { "", "", "", "", "", "--X---X---X---X-" } },
-        { "Outros", "Vazio", 54, { "", "", "", "", "", "" } } };
+        { "Kits completos", "Kit roots (Seeco)", 58, { "xxXxxxXxxxXxxxXx", "", "--x---x---x---x-", "", "", "" }, {} },
+        { "Kits completos", "Kit rockers (Sticky)", 52, { "", "xxXxxxXxxxXxxxXx", "", "", "X--X--X---X-X---", "" }, {} },
+        { "Kits completos", "Kit steppers", 50, { "xXXxxXXxxXXxxXXx", "", "", "", "--X---X---X---X-", "" }, {} },
+        { "Kits completos", "Kit ska/rocksteady", 60, { "", "", "----X-------X---", "--X---X---X---X-", "", "X-x-X-x-X-x-X-x-" }, {} },
+        { "Shaker", "Shaker roots (A)", 54, { "xxXxxxXxxxXxxxXx", "", "", "", "", "" }, {} },
+        { "Shaker", "Shaker Seeco (B)", 62, { "x-Xxx-Xxx-Xxx-Xx", "", "", "", "", "" }, {} },
+        { "Shaker", "Shaker steppers (C)", 50, { "xXXxxXXxxXXxxXXx", "", "", "", "", "" }, {} },
+        { "Shaker", "Shaker 3+3+2 (D)", 50, { "X--X--X-X--X--X-", "", "", "", "", "" }, {} },
+        { "Pandeiro", "Pandeiro roots", 56, { "", "", "--X---X---X---X-", "", "", "" }, {} },
+        { "Pandeiro", "Pandeiro shuffle", 62, { "", "", "--Xx--Xx--Xx--Xx", "", "", "" }, {} },
+        { "Pandeiro", "Pandeiro ska/rocksteady", 58, { "", "", "--x-X-x---x-X-x-", "", "", "" }, {} },
+        { "Cabasa", "Cabasa roots/dub", 54, { "", "--X---X---X---X-", "", "", "", "" }, {} },
+        { "Cabasa", "Cabasa rockers", 52, { "", "xxXxxxXxxxXxxxXx", "", "", "", "" }, {} },
+        { "Cowbell", "Cowbell steppers", 50, { "", "", "", "", "--X---X---X---X-", "" }, {} },
+        { "Cowbell", "Cowbell sincopado (Sticky)", 52, { "", "", "", "", "X--X--X---X-X---", "" }, {} },
+        { "Woodblock", "Woodblock ska", 60, { "", "", "", "--X---X---X---X-", "", "" }, {} },
+        { "Woodblock", "Woodblock clave 3+3+2", 54, { "", "", "", "X--X--X---X-X---", "", "" }, {} },
+        { "Guiro", "Guiro mento/ska", 58, { "", "", "", "", "", "X-x-X-x-X-x-X-x-" }, {} },
+        { "Guiro", "Guiro roots", 56, { "", "", "", "", "", "--X---X---X---X-" }, {} },
+        { "Kits digitais 80-90", "Kit Sleng Teng (85)", 50, { "xxXxxxXxxxXxxxXx", "--x---x---x---x-", "----X-------X---", "--X--X----X--X--", "X-------X-------", "-------------XxX" }, { "hhe", "rim", "cxd", "blp", "cb8", "tsm" } },
+        { "Kits digitais 80-90", "Kit 808 dancehall (90)", 52, { "x-Xxx-Xxx-Xxx-Xx", "----X-------X---", "---x---x---x---x", "X--X--X---X-X---", "------X-------X-", "--------------xX" }, { "hhe", "clp", "c808", "cb8", "blp", "tsh" } },
+        { "Kits digitais 80-90", "Kit Simmons roots (80)", 56, { "xxXxxxXxxxXxxxXx", "--X---X---X---X-", "---------X--X---", "-------------X--", "X-----------x--X", "--x-------x-----" }, { "egg", "rim", "tsh", "tsm", "tsg", "cb8" } },
+        { "Kits digitais 80-90", "Kit steppers digital (90)", 50, { "xXXxxXXxxXXxxXXx", "--X---X---X---X-", "----X-------X---", "X---X---X---X---", "--x---x---x---x-", "X-------X-------" }, { "hhe", "rim", "c808", "cb8", "blp", "tsg" } },
+        { "Simmons 80", "Simmons rockers (82)", 56, { "x-x-x-x-x-x-x-x-", "----X-------X---", "--x-------x-----", "------x-------x-", "X-------X-------", "--x---x---x---x-" }, { "hhe", "rim", "tsh", "tsm", "tsg", "cb8" } },
+        { "Simmons 80", "Simmons steppers (84)", 52, { "xxXxxxXxxxXxxxXx", "----X-------X---", "X---X---X---X---", "--x---x---x---x-", "-------------xX-", "X-------X-------" }, { "hhe", "rim", "tsg", "tsm", "tsh", "cb8" } },
+        { "Simmons 80", "Simmons rub-a-dub (83)", 58, { "xxXxxxXxxxXxxxXx", "----X-------X---", "---x-----x-x----", "X-------X-------", "--------------Xx", "------x-------x-" }, { "egg", "rim", "tsm", "tsg", "tsh", "cb8" } },
+        { "Simmons 80", "Simmons virada no 4", 56, { "x-X-x-X-x-X-x-X-", "----X-------X---", "------------xX--", "--------------Xx", "X-------------xX", "--x-------x-----" }, { "hhe", "cxd", "tsh", "tsm", "tsg", "rim" } },
+        { "Simmons 80", "Simmons Sleng Teng toms (85)", 50, { "xxXxxxXxxxXxxxXx", "----X-------X---", "--X-----------X-", "------X----X----", "X-------X--x----", "---------x------" }, { "hhe", "cxd", "tsh", "tsm", "tsg", "blp" } },
+        { "Simmons 80", "Simmons dub toms + eco", 54, { "xxXxxxXxxxXxxxXx", "----X-------X---", "X---------------", "------X---------", "----------X-X---", "---------------X" }, { "egg", "rim", "tsg", "tsm", "tsh", "lz" } },
+        { "Simmons 80", "Simmons 808 dancehall (88)", 52, { "x-Xxx-Xxx-Xxx-Xx", "----X-------X---", "---x---x---x---x", "----X-------X---", "X--X--X---X-----", "------X-------X-" }, { "hhe", "clp", "tsh", "c808", "tsg", "cb8" } },
+        { "Dub FX", "Dub FX: laser + drop", 54, { "xxXxxxXxxxXxxxXx", "-------------X--", "X---------------", "", "", "--X---X---X---X-" }, { "egg", "lz", "drp", "sir", "tir", "rim" } },
+        { "Dub FX", "Dub FX: sirene + tiro", 54, { "xxXxxxXxxxXxxxXx", "X---------------", "------------X---", "---------------X", "", "--X---X---X---X-" }, { "hhe", "sir", "tir", "lz", "drp", "rim" } },
+        { "Outros", "Vazio", 54, { "", "", "", "", "", "" }, {} } };
     return g;
 }
+inline int grooveSound (const Groove& g, int t) { return soundIndex (g.snd[t] != nullptr ? g.snd[t] : defaultSound (t)); }
 inline int stepValue (const char* s, int i) { if (s == nullptr || (int) std::char_traits<char>::length (s) <= i) return 0; return s[i] == 'X' ? 2 : (s[i] == 'x' ? 1 : 0); }
 
 // contagem Mastor: caixa no 2 e no 4 (passos 4 e 12), palheta nos "&" (2, 6, 10, 14)
@@ -162,6 +190,7 @@ struct Comp
     float f0 = 440, f1 = 440, sweep = 0.06f;  // varredura de altura (tambores)
     float gain = 0, attack = 0.001f, decay = 0.1f;
     int delay = 0;                            // amostras até começar
+    float lfoF = 0, lfoD = 0, lfoPh = 0;      // vibrato (sirene)
     bool useF = false, useHp = false; Biquad f, hp;
     float phase = 0; int t = 0; bool done = true;
 };
@@ -237,6 +266,34 @@ public:
         else if (k == "cgs") { drum (v, 420, 380, D (0.06f), vel * 0.5f); nz (v, 0, vel * 0.7f, Biquad::BP, 1800, 1, 0.001f, D (0.05f)); }
         else if (k == "bgh") { drum (v, 640, 580, D (0.12f), vel * 0.7f); nz (v, 0, vel * 0.1f, Biquad::BP, 2500, 1, 0.001f, 0.02f); }
         else if (k == "bgl") { drum (v, 460, 410, D (0.15f), vel * 0.75f); nz (v, 0, vel * 0.1f, Biquad::BP, 2000, 1, 0.001f, 0.02f); }
+        // ---- digitais 80-90
+        else if (k == "tsh" || k == "tsm" || k == "tsg")
+        {
+            const float f0 = k == "tsh" ? 420.0f : (k == "tsm" ? 310.0f : 220.0f), f1 = k == "tsh" ? 190.0f : (k == "tsm" ? 135.0f : 88.0f);
+            sweep (v, 0, f0, f1, 0.28f, D (0.5f), vel * 0.8f); sweep (v, 1, f0 * 1.5f, f1 * 1.5f, 0.2f, D (0.18f), vel * 0.18f);
+            nz (v, 0, vel * 0.3f, Biquad::BP, 1400, 1, 0.001f, 0.05f);
+        }
+        else if (k == "cxd") { osc (v, 0, vel * 0.35f, 2, 230, D (0.06f), 900); nz (v, 0, vel * 0.55f, Biquad::HP, 2200, 0.7f, 0.001f, D (0.13f)); }
+        else if (k == "c808") { osc (v, 0, vel * 0.45f, 0, 185, D (0.09f)); osc (v, 0, vel * 0.25f, 0, 330, D (0.06f)); nz (v, 0, vel * 0.5f, Biquad::HP, 1800, 0.7f, 0.001f, D (0.18f)); }
+        else if (k == "clp") { for (int j = 0; j < 3; ++j) nz (v, j * 0.011f, vel * 0.55f, Biquad::BP, 1150, 1.6f, 0.001f, 0.012f); nz (v, 0.033f, vel * 0.45f, Biquad::BP, 1150, 1.4f, 0.002f, D (0.16f)); }
+        else if (k == "rim") { osc (v, 0, vel * 0.5f, 0, 1700, D (0.02f)); osc (v, 0, vel * 0.3f, 2, 520, D (0.018f), 1600); }
+        else if (k == "cb8") { osc (v, 0, vel * 0.3f, 2, 587, D (0.22f), 1500); osc (v, 0, vel * 0.3f, 2, 845, D (0.22f), 1500); }
+        else if (k == "hhe")
+        {
+            const float fs[6] = { 205.3f, 304.4f, 369.6f, 522.7f, 540.0f, 800.0f };
+            for (float f : fs) osc (v, 0, vel * 0.07f, 2, f * 2.1f, D (acc ? 0.09f : 0.045f), 9000);
+            nz (v, 0, vel * 0.25f, Biquad::HP, 8000, 0.7f, 0.001f, D (acc ? 0.08f : 0.04f));
+        }
+        else if (k == "blp") sweep (v, 2, 1046, 880, 0.03f, D (0.07f), vel * 0.22f, 3500);
+        // ---- Dub FX
+        else if (k == "lz") sweep (v, 3, 3200, 180, 0.26f * dmul, 0.32f * dmul, vel * 0.25f, 4000);
+        else if (k == "sir")
+        {
+            sweep (v, 2, 900, 900, 0.001f, 1.1f * dmul, vel * 0.16f, 2800);
+            Comp& c = v.c[(size_t) (v.n - 1)]; c.attack = 0.03f; c.lfoF = 4.5f; c.lfoD = 320; c.lfoPh = 0;
+        }
+        else if (k == "tir") { nz (v, 0, vel * 0.8f, Biquad::LP, 7000, 0.7f, 0.001f, D (0.3f)); sweep (v, 0, 140, 45, 0.12f, D (0.25f), vel * 0.7f); }
+        else if (k == "drp") sweep (v, 0, 950, 55, 0.55f * dmul, 0.7f * dmul, vel * 0.6f);
     }
 
     // guia: bumbo + aro no 2 e no 4, palheta (acorde curto) nos "&"
@@ -298,7 +355,8 @@ public:
                     if (c.noise) x = rng.bi();
                     else
                     {
-                        const float fr = t < c.sweep ? c.f0 * std::pow (c.f1 / c.f0, t / c.sweep) : c.f1;
+                        float fr = t < c.sweep ? c.f0 * std::pow (c.f1 / c.f0, t / c.sweep) : c.f1;
+                        if (c.lfoD > 0) { c.lfoPh += c.lfoF / sr; if (c.lfoPh >= 1.0f) c.lfoPh -= 1.0f; fr = std::max (20.0f, fr + c.lfoD * std::sin (2.0f * kPi * c.lfoPh)); }
                         c.phase += fr / sr; if (c.phase >= 1.0f) c.phase -= 1.0f;
                         x = c.wave == 0 ? std::sin (2.0f * kPi * c.phase)
                           : c.wave == 1 ? 4.0f * std::abs (c.phase - 0.5f) - 1.0f
@@ -341,6 +399,14 @@ private:
         c.phase = rng.next();
         if (bp > 0) { c.useF = true; c.f.set (Biquad::BP, bp, 3, sr); }
     }
+    // oscilador com queda de altura exponencial (toms eletrônicos, efeitos); lp > 0 = passa-baixa
+    void sweep (Voice& v, int wave, float f0, float f1, float sw, float d, float g, float lp = 0)
+    {
+        if (v.n >= Voice::maxComps) return;
+        Comp& c = v.c[(size_t) v.n++]; c = Comp();
+        c.noise = false; c.wave = wave; c.f0 = f0; c.f1 = std::max (20.0f, f1); c.sweep = std::max (0.001f, sw); c.gain = g; c.attack = 0.002f; c.decay = d; c.done = false; c.t = 0; c.phase = 0;
+        if (lp > 0) { c.useF = true; c.f.set (Biquad::LP, lp, 0.707f, sr); }
+    }
     void drum (Voice& v, float f0, float f1, float d, float g)
     {
         if (v.n >= Voice::maxComps) return;
@@ -353,6 +419,72 @@ private:
     int next = 0;
     Rng rng;
 };
+
+// ------------------------------------------------------------------ AUTO MIX: nível de cada timbre (medido renderizando o próprio som)
+// Igual à versão para celular: RMS máximo em janelas de 50 ms, som tocado com vol 0,7 e duração 0,3, normalizado para vol 1.
+namespace loud
+{
+inline float rmsShort (const float* L, const float* R, int n, int w)
+{
+    float best = 0;
+    for (int a = 0; a < n; a += w)
+    {
+        double e = 0; int c = 0;
+        for (int i = a; i < std::min (n, a + w); ++i) { e += (double) L[i] * L[i]; ++c; if (R != nullptr) { e += (double) R[i] * R[i]; ++c; } }
+        best = std::max (best, (float) std::sqrt (e / std::max (1, c)));
+    }
+    return best;
+}
+inline const std::array<float, numSounds>& soundLevels()
+{
+    static const std::array<float, numSounds> lv = [] {
+        std::array<float, numSounds> a {};
+        const float sr = 44100.0f; const int n = (int) (sr * 1.3f);
+        std::vector<float> L ((size_t) n), R ((size_t) n);
+        for (int si = 0; si < numSounds; ++si)
+        {
+            auto syn = std::make_unique<Synth>(); syn->prepare (sr);
+            std::fill (L.begin(), L.end(), 0.0f); std::fill (R.begin(), R.end(), 0.0f);
+            syn->hit (si, 1.0f, true, 0.30f, 0.70f, 0.0f, 0.2f);
+            syn->render (L.data(), R.data(), n);
+            a[(size_t) si] = rmsShort (L.data(), R.data(), n, 2205) / std::pow (0.7f, 1.5f);
+        }
+        return a;
+    }();
+    return lv;
+}
+inline float sampleLevel (const SampleData& s)
+{
+    if (s.l.empty()) return 0;
+    const int w = std::max (1, (int) (s.rate * 0.05));
+    return rmsShort (s.l.data(), s.r.empty() ? nullptr : s.r.data(), (int) s.l.size(), w) * 1.41f;
+}
+// alvo: mediana dos timbres a 75% de volume
+inline float target()
+{
+    auto v = soundLevels(); std::sort (v.begin(), v.end());
+    return v[(size_t) (numSounds / 2)] * std::pow (0.75f, 1.5f);
+}
+// sons brilhantes ficam um pouco abaixo; efeitos quase no nível
+inline float weight (int snd)
+{
+    static const char* br[] = { "egg", "tub", "mar", "gan", "cab", "skr", "pla", "hhe", "trm", "tro" };
+    static const char* fx[] = { "lz", "sir", "tir", "drp" };
+    const char* k = sounds()[(size_t) std::clamp (snd, 0, numSounds - 1)].key;
+    for (auto* b : br) if (std::strcmp (b, k) == 0) return 0.8f;
+    for (auto* f : fx) if (std::strcmp (f, k) == 0) return 0.9f;
+    return 1.0f;
+}
+constexpr float loudRatio = 1.8f;   // acima disso (≈ +5 dB) a peça fica marcada ALTO
+// razão entre o nível da peça (com o volume 0..1) e o alvo; base = nível do som (ou da amostra)
+inline float ratio (float base, int snd, float vol) { return base * std::pow (clampf (vol, 0, 1), 1.5f) / std::max (1e-6f, target() * weight (snd)); }
+// volume que o AUTO MIX põe (0,10 a 1,00)
+inline float autoVolume (float base, int snd)
+{
+    if (base <= 0) return -1;
+    return std::round (clampf (100.0f * std::pow (target() * weight (snd) / base, 2.0f / 3.0f), 10, 100)) / 100.0f;
+}
+} // namespace loud
 
 // ------------------------------------------------------------------ efeitos: EQ → saturador → Tape Echo → Big Knob
 struct FxSettings

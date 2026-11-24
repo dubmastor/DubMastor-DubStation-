@@ -1,5 +1,5 @@
 // Mastor Reggae Percussion MRP-77 — processador: 6 peças de percussão, a PERC MACHINE (grade de até 8 compassos)
-// e os 24 pads (notas fora da faixa 36–51 do MRD-12).
+// e os 38 pads (notas fora da faixa 36–51 do MRD-12).
 #pragma once
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <atomic>
@@ -49,6 +49,12 @@ public:
     void cycleSound (int track, int dir);
     juce::String grooveName() const;
 
+    // ---- AUTO MIX: acerta o volume das 6 peças pelo nível real de cada timbre; isLoud marca a peça alta demais
+    int autoMix();                          // devolve quantos volumes mudaram
+    bool isLoud (int track) const;
+    float loudRatio (int track) const;      // nível / alvo (1,8 ≈ +5 dB = ALTO)
+    float baseLevel (int track) const;
+
     // ---- pads e notas MIDI (ajustáveis para o kit do usuário)
     std::array<std::atomic<int>, mrp::numPads> padNote;
     void resetNotes();
@@ -85,6 +91,7 @@ private:
 
     std::array<std::shared_ptr<const mrp::SampleData>, mrp::numTracks> samples;
     std::array<juce::File, mrp::numTracks> sampleFile;
+    std::array<std::atomic<float>, mrp::numTracks> sampleLvl {};
 
     // toques da tela → áudio
     juce::AbstractFifo uiFifo { 64 };

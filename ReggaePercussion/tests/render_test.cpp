@@ -1,6 +1,6 @@
 // Teste offline do Mastor Reggae Percussion MRP-77 (sem JUCE):
 //   g++ -std=c++17 -O2 -I Source tests/render_test.cpp -o /tmp/mrp_test && /tmp/mrp_test
-// Confere: os 23 sons tocam e acabam (sem voz presa), sem estouro, Tape Echo e saturador em bypass de fábrica,
+// Confere: os 37 sons tocam e acabam (sem voz presa), sem estouro, Tape Echo e saturador em bypass de fábrica,
 // os grooves na contagem (caixa no 2 e no 4), as notas fora da faixa do MRD-12 (36–51) e o MIDI colorido por compasso.
 #include "PercEngine.h"
 #include <cstdio>
@@ -48,9 +48,52 @@ int main()
     std::set<int> notes;
     bool drumFree = true;
     for (auto& p : mrp::pads()) { notes.insert (p.note); drumFree = drumFree && ! mrp::isDrumNote (p.note); }
-    CHECK ((int) notes.size() == mrp::numPads, "24 pads, cada um com nota própria");
+    CHECK ((int) notes.size() == mrp::numPads, "38 pads, cada um com nota própria");
     CHECK (drumFree, "nenhuma nota na faixa do MRD-12 (36 a 51)");
     CHECK (mrp::pads()[(size_t) mrp::padOf (mrp::soundIndex ("gui"), true)].note == 74 && mrp::pads()[(size_t) mrp::padOf (mrp::soundIndex ("gui"), false)].note == 73, "guiro: curto 73, longo 74");
+    {
+        int cats[mrp::numCats] {}; for (auto& sd : mrp::sounds()) ++cats[sd.cat];
+        CHECK (cats[0] == 23 && cats[1] == 10 && cats[2] == 4, "37 sons: 23 acústicos, 10 digitais 80-90, 4 Dub FX");
+        int maxN = 0; for (auto& p : mrp::pads()) maxN = std::max (maxN, p.note);
+        CHECK (maxN <= 100, "notas dos pads até 100");
+    }
+    // ---- AUTO MIX
+    {
+        const auto& lv = mrp::loud::soundLevels();
+        bool allPos = true; for (float v : lv) allPos = allPos && v > 0 && std::isfinite (v);
+        CHECK (allPos, "AUTO MIX: todos os timbres medidos");
+        // peças padrão no volume de fábrica não ficam marcadas ALTO
+        bool defOk = true;
+        for (int t = 0; t < mrp::numTracks; ++t)
+        {
+            const int s = mrp::soundIndex (mrp::trackDefaults()[(size_t) t].soundKey);
+            defOk = defOk && mrp::loud::ratio (lv[(size_t) s], s, mrp::trackDefaults()[(size_t) t].vol) <= mrp::loud::loudRatio;
+        }
+        CHECK (defOk, "kit padrão: nenhuma peça marcada ALTO");
+        // depois do AUTO MIX nenhum timbre fica ALTO (a não ser que já esteja no mínimo de 10%)
+        bool mixOk = true;
+        for (int s = 0; s < mrp::numSounds; ++s)
+        {
+            const float v = mrp::loud::autoVolume (lv[(size_t) s], s);
+            mixOk = mixOk && v >= 0.1f && v <= 1.0f && (v <= 0.1f || mrp::loud::ratio (lv[(size_t) s], s, v) <= mrp::loud::loudRatio);
+        }
+        CHECK (mixOk, "AUTO MIX: nenhum timbre fica ALTO depois de ajustado");
+        const int tsg = mrp::soundIndex ("tsg");
+        CHECK (mrp::loud::ratio (lv[(size_t) tsg], tsg, 1.0f) > mrp::loud::loudRatio, "tom Simmons grave no volume máximo fica marcado ALTO");
+    }
+    // ---- kits com peças próprias
+    {
+        bool kitsOk = true; int simmons = 0, withSnd = 0;
+        for (auto& g : mrp::grooves())
+        {
+            if (std::string (g.group) == "Simmons 80") ++simmons;
+            if (g.snd[0] != nullptr) ++withSnd;
+            for (int t = 0; t < mrp::numTracks; ++t) if (g.snd[t] != nullptr) kitsOk = kitsOk && std::strcmp (mrp::sounds()[(size_t) mrp::grooveSound (g, t)].key, g.snd[t]) == 0;
+        }
+        CHECK (kitsOk && simmons == 7 && withSnd == 13, "13 kits trocam as peças (4 digitais, 7 Simmons, 2 Dub FX)");
+        CHECK ((int) mrp::grooves().size() == 33, "33 presets");
+        CHECK (mrp::grooveSound (mrp::grooves()[0], 0) == mrp::soundIndex ("egg"), "presets antigos usam as peças padrão");
+    }
     // ---- grooves na contagem Mastor
     CHECK (mrp::isSnareStep (4) && mrp::isSnareStep (12) && ! mrp::isSnareStep (8), "caixa no 2 e no 4 (passos 4 e 12), nunca no 3");
     bool ok16 = true;

@@ -19,13 +19,15 @@ Tudo é na contagem da Dub Station: **caixa no 2 e no 4** e palheta nos "&". Cad
 16 passos = 1 compasso (1 e & a 2 e & a 3 e & a 4 e & a). O swing atrasa os "e" e os "a".
 
 ## As duas abas
-- **PADS** — os 24 pads, os efeitos (EQ, Mastor Big Knob, saturador e Tape Echo, os dois em bypass de fábrica) e os 6 canais,
+- **PADS** — os 38 pads (filtro por categoria: acústica, digital 80-90 e Dub FX), o **AUTO MIX** (peça alta demais fica marcada ALTO até ser corrigida), os efeitos (EQ, Mastor Big Knob, saturador e Tape Echo, os dois em bypass de fábrica) e os 6 canais,
   com mudo, troca de peça (setas ou lista), sample próprio, MIDI só da peça e duração, volume e pan. Os canais piscam no ritmo.
 - **PERC MACHINE** — o MIDI (arrastar, baixar, colorido por compasso), o groove (até 8 compassos, uma cor por compasso,
   mudo, solo e troca rápida de peça em cada linha) e o esquema de notas.
 
-## Os grooves (do estudo de percussão)
-| Grupo | Grooves |
+## Os presets
+Toque no visor azul para abrir a lista por categoria (ou use as setas e a lista ao lado).
+
+| Grupo | Presets |
 |---|---|
 | Kits completos | Kit roots (Seeco), Kit rockers (Sticky), Kit steppers, Kit ska/rocksteady |
 | Shaker | roots (A), Seeco (B), steppers (C), 3+3+2 (D) |
@@ -34,6 +36,11 @@ Tudo é na contagem da Dub Station: **caixa no 2 e no 4** e palheta nos "&". Cad
 | Cowbell | steppers, sincopado (Sticky) |
 | Woodblock | ska, clave 3+3+2 |
 | Guiro | mento/ska (acento = raspado longo, fraca = curto), roots |
+| Kits digitais 80-90 | Sleng Teng (85), 808 dancehall (90), Simmons roots (80), steppers digital (90) |
+| Simmons 80 | rockers (82), steppers (84), rub-a-dub (83), virada no 4, Sleng Teng toms (85), dub toms + eco, 808 dancehall (88) |
+| Dub FX | laser + drop, sirene + tiro |
+
+Os kits digitais, Simmons e Dub FX trocam as peças das linhas (tom Simmons, caixa digital, clap 808, laser etc.).
 
 São modelos de estilo para programar, inspirados em Alvin "Seeco" Patterson, Uziah "Sticky" Thompson e Noel "Scully" Simms — não são transcrições de faixas.
 
@@ -50,12 +57,15 @@ O Mastor Reggae Drums MRD-12 usa as notas **36 a 51**. O MRP-77 nunca usa essa f
 | Agogô agudo / grave | 67 / 68 | | Shaker tubular | 88 |
 | Cabasa | 69 | | Platinela | 89 |
 | Maracas | 70 | | Shekere / Ganzá | 90 / 91 |
+| Tom Simmons agudo / médio / grave | 83 / 84 / 85 | | Clap 808 / Rim MT-40 | 92 / 93 |
+| Caixa digital / Caixa 808 | 86 / 87 | | Cowbell 808 / Hat eletrônico / Blip | 94 / 95 / 96 |
+| | | | Laser / Sirene / Tiro / Drop (Dub FX) | 97 / 98 / 99 / 100 |
 
 Nomes das notas como no Cubase e no Battery (C3 = 60). Dá para usar os dois plugins no canal 10. Cada nota é ajustável no
 ESQUEMA MIDI para casar com o seu kit.
 
 ## Código
-- `Source/PercEngine.h` — os 23 sons, os grooves, os efeitos e o MIDI (sem JUCE). A versão para celular
+- `Source/PercEngine.h` — os 37 sons, os presets, o AUTO MIX, os efeitos e o MIDI (sem JUCE). A versão para celular
   (`site/web/reggaepercussion/index.html`) tem a mesma síntese em Web Audio: ao mudar um, mude o outro.
 - `tests/render_test.cpp` — teste offline: `g++ -std=c++17 -O2 -I Source tests/render_test.cpp -o /tmp/mrp_test && /tmp/mrp_test`
 - `tests/snapshot.cpp` — plugin inteiro (PLAY, MIDI que chega, estado, arquivo MIDI) e as imagens de `docs/`:
