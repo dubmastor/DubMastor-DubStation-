@@ -267,6 +267,7 @@ const STYLES = [['SKANK DUPLO', '"&" e "a" · acorde curto, abafado'], ['CONTRAP
 const FILLS = [['SEM', 'só a linha'], ['PUXADA', 'o próximo acorde adiantado no "a" do 4'], ['RAJADA', 'semicolcheias no 4, crescendo'], ['SUBIDA', 'pentatônica subindo no 3 e no 4']];
 // timbres = ajustes do instrumento (o eco nunca liga sozinho: Tape Echo começa sempre desligado)
 const TIMBRES = [
+  { name: 'M1', lcd: 'M1 Clav', f: [1, 1, 0, 0], p: [1, 1], bright: 0.95, decay: 0.45, mute: 0.12, wah: 0, ph: 0, m1: 1 },   // estilo do Clav do Korg M1 (1988): limpo, brilhante, digital
   { name: 'D6', lcd: 'D6 Funky Reggae', f: [1, 0, 1, 0], p: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08, wah: 0, ph: 0 },
   { name: 'MUTE', lcd: 'D6 Muted Chop', f: [0, 1, 1, 0], p: [0, 1], bright: 0.75, decay: 0.4, mute: 0.55, wah: 0, ph: 0 },
   { name: 'WAH', lcd: 'Wah Skank', f: [1, 1, 0, 0], p: [0, 1], bright: 0.9, decay: 0.45, mute: 0.2, wah: 1, ph: 0 },
@@ -274,16 +275,17 @@ const TIMBRES = [
   { name: 'DUB', lcd: 'Dark Dub Clav', f: [0, 0, 1, 1], p: [1, 0], bright: 0.4, decay: 0.6, mute: 0.2, wah: 0, ph: 1 }];
 
 // ------------------------------------------------------------------ estado
-const DEF = { page: 1, bpm: 76, base: true, timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08, vol: 0.8,
+const DEF = { page: 1, bpm: 76, base: true, timbre: 0, m1: true, filters: [1, 1, 0, 0], pickups: [1, 1], bright: 0.95, decay: 0.45, mute: 0.12, vol: 0.8,
   wahOn: false, wahSens: 0.6, wahRange: 0.7, phOn: false, phRate: 0.4, phDepth: 0.55, echoOn: false, echoTime: 1, echoFb: 0.4, echoMix: 0.45,
   maxOn: true, rev: 0.2, master: 0.8, src: 0,
   slots: [{ root: 9, minor: true, dur: 1, on: true }, { root: 2, minor: true, dur: 1, on: true }, { root: 7, minor: false, dur: 1, on: true }, { root: 4, minor: true, dur: 1, on: true }],
-  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 29, reg: 6, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
+  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 29, reg: 7, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
 let S = JSON.parse(JSON.stringify(DEF));
 try { const sv = JSON.parse(localStorage.getItem('mrcl71') || 'null'); if (sv && typeof sv === 'object') S = Object.assign(S, sv); } catch (e) {}
 if ((S.reg | 0) < 4) { S.center = 53; S.reg = 4; S.edits = null; }   // oitava 2 do Cubase (C2 = MIDI 48), pedido de 23/nov
 if ((S.reg | 0) < 5) { Object.assign(S, { timbre: 0, filters: [1, 0, 1, 0], pickups: [1, 0], bright: 0.85, decay: 0.5, mute: 0.08 }); }   // timbre novo (modelo físico)
-if ((S.reg | 0) < 6) { S.reg = 6; S.center = clamp(S.center - 24, 17, 53); S.edits = null; }   // duas oitavas abaixo (pedido de 24/nov)
+if ((S.reg | 0) < 6) { S.center = clamp(S.center - 24, 17, 53); S.edits = null; }   // duas oitavas abaixo (pedido de 24/nov)
+if ((S.reg | 0) < 7) { S.reg = 7; Object.assign(S, { timbre: 0, m1: true, filters: [1, 1, 0, 0], pickups: [1, 1], bright: 0.95, decay: 0.45, mute: 0.12, wahOn: false, phOn: false }); }   // M1 CLAV vira o timbre inicial
 const OCTS = [-1, 0, 1, 2, 3, 4];
 const octOf = () => Math.floor((S.center - 5) / 12) - 2;
 (function keepOct() { if (!OCTS.includes(octOf())) S.center = 29; })();
@@ -371,7 +373,7 @@ function regen() { SUG = [0, 1, 2].map((k) => generate(k, S.seed)); }
 function current() { return S.edits ? { events: S.edits, bars: SUG[S.use].bars } : SUG[S.use]; }
 
 // ------------------------------------------------------------------ áudio
-let ac = null, bus, wahF, wahDry, wahWet, ph, phLfo, phDepthG, phWet, phDry, echo, echoFb, echoLp, echoWet, comp, makeup, master, revWet, inst, toneNodes = [], baseBus;
+let ac = null, m1Shelf, bus, wahF, wahDry, wahWet, ph, phLfo, phDepthG, phWet, phDry, echo, echoFb, echoLp, echoWet, comp, makeup, master, revWet, inst, toneNodes = [], baseBus;
 // ---- corda do clavinet por modelo físico (Karplus-Strong): a tangente bate na corda e a prende, a corda curta vibra
 //      até a ponte, os dois captadores perto da ponte filtram em pente (o som anasalado) e a lã abafa ao soltar a tecla
 const waveCache = new Map();
@@ -419,7 +421,8 @@ function setupAudio() {
   ac = new (window.AudioContext || window.webkitAudioContext)();
   master = ac.createGain();
   comp = ac.createDynamicsCompressor(); makeup = ac.createGain();
-  master.connect(comp); comp.connect(makeup); makeup.connect(ac.destination);
+  const lim = ac.createWaveShaper(); const lc = new Float32Array(2048); for (let i = 0; i < 2048; i++) { const x = (i / 1023.5 - 1) * 1.6; lc[i] = Math.tanh(x * 1.1) / 1.1; } lim.curve = lc;   // limitador suave: nunca passa de 0 dBFS
+  master.connect(comp); comp.connect(makeup); makeup.connect(lim); lim.connect(ac.destination);
   const rv = ac.createConvolver(); rv.buffer = impulse(1.6); revWet = ac.createGain(); rv.connect(revWet); revWet.connect(master);
   // instrumento: voz -> filtro dos botões -> wah -> phaser -> eco -> master
   inst = ac.createGain();
@@ -430,6 +433,7 @@ function setupAudio() {
   let node = amp;
   const shapes = [['highshelf', 3200, 0, 6], ['peaking', 2200, 1.0, 4], ['peaking', 650, 0.9, 4], ['lowpass', 1400, 0.7, 0]];
   toneNodes = shapes.map(([t, f, q, g]) => { const b = ac.createBiquadFilter(); b.type = t; b.frequency.value = f; b.Q.value = q; b.gain.value = 0; node.connect(b); node = b; return { b, t, g }; });
+  m1Shelf = ac.createBiquadFilter(); m1Shelf.type = 'highshelf'; m1Shelf.frequency.value = 5000; m1Shelf.gain.value = 0; node.connect(m1Shelf); node = m1Shelf;
   bus = ac.createGain(); node.connect(bus);
   wahF = ac.createBiquadFilter(); wahF.type = 'lowpass'; wahF.Q.value = 6; wahF.frequency.value = 600;
   wahDry = ac.createGain(); wahWet = ac.createGain();
@@ -454,6 +458,7 @@ function applySound() {
   const t = ac.currentTime;
   S.filters.forEach((on, i) => { const n = toneNodes[i]; if (n.t === 'lowpass') n.b.frequency.setTargetAtTime(on ? 1600 : 20000, t, 0.02); else n.b.gain.setTargetAtTime(on ? n.g : 0, t, 0.02); });
   inst.gain.setTargetAtTime(S.vol, t, 0.02);
+  m1Shelf.gain.setTargetAtTime(S.m1 ? 3.5 : 0, t, 0.02);
   wahDry.gain.setTargetAtTime(S.wahOn ? 0.25 : 1, t, 0.02); wahWet.gain.setTargetAtTime(S.wahOn ? 1 : 0, t, 0.02);
   phLfo.frequency.setTargetAtTime(S.phRate, t, 0.02); phDepthG.gain.setTargetAtTime(700 * S.phDepth, t, 0.02);
   phDry.gain.setTargetAtTime(S.phOn ? 0.7 : 1, t, 0.02); phWet.gain.setTargetAtTime(S.phOn ? 0.7 : 0, t, 0.02);
@@ -462,7 +467,7 @@ function applySound() {
   echoFb.gain.setTargetAtTime(S.echoOn ? S.echoFb : 0, t, 0.02); echoWet.gain.setTargetAtTime(S.echoOn ? S.echoMix : 0, t, 0.02);
   revWet.gain.setTargetAtTime(0.5 * S.rev, t, 0.02);
   comp.threshold.value = S.maxOn ? -18 : 0; comp.ratio.value = S.maxOn ? 6 : 1; comp.attack.value = 0.003; comp.release.value = 0.12;
-  makeup.gain.setTargetAtTime((S.maxOn ? 1.3 : 1) * S.master, t, 0.02);
+  makeup.gain.setTargetAtTime((S.maxOn ? 1.1 : 1) * S.master, t, 0.02);
 }
 // uma nota de clavinet: a corda (modelo físico) e, ao soltar, a lã abafa na hora com o "toc" da tangente voltando
 let thunkBuf = null;
@@ -689,7 +694,7 @@ function chips(id, names, get, set) {
 }
 function setTimbre(i) {
   const T = TIMBRES[i]; S.timbre = i; S.filters = T.f.slice(); S.pickups = T.p.slice(); S.bright = T.bright; S.decay = T.decay; S.mute = T.mute;
-  S.wahOn = !!T.wah; S.phOn = !!T.ph;
+  S.wahOn = !!T.wah; S.phOn = !!T.ph; S.m1 = !!T.m1;
   for (const k of ['bright', 'decay', 'mute']) { $(k).value = S[k]; $('o_' + k).textContent = pct(S[k]); }
   waveCache.clear(); applySound(); save();
 }
