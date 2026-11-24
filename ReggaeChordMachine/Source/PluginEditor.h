@@ -123,6 +123,52 @@ public:
 };
 
 //==============================================================================
+// VISOR MIDI editável (aba MIDI do LOOP): o loop inteiro em rolo de piano, cada acorde numa cor (a mesma do ACORDE 1..4).
+// Clique num espaço vazio põe o acorde que soa ali; arraste o acorde para mover (a nota clicada também sobe/desce);
+// arraste a borda direita para encurtar/esticar; duplo clique (ou botão direito) apaga; roda do mouse = força.
+// Grade de 1/16 (Shift = 1/32). Editou: o plugin toca e exporta o MIDI EDITADO até DESFAZER EDIÇÃO.
+class DubChordRoll : public juce::Component
+{
+public:
+    explicit DubChordRoll (DubChordsProcessor& p);
+    void update();
+    void paint (juce::Graphics&) override;
+    void resized() override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseMove (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+    static juce::Colour slotColour (int slot);
+private:
+    void computeGeometry();
+    int noteAt (juce::Point<float>, bool& onRightEdge) const;
+    std::vector<int> groupOf (int index) const;    // as notas do mesmo ataque (o acorde inteiro)
+    double beatAt (float x) const;
+    int pitchAt (float y) const;
+    juce::Rectangle<float> noteRect (const dub::NoteEvent&) const;
+    void commit();
+
+    DubChordsProcessor& proc;
+    juce::TextButton undoBtn;
+    MidiDragZone dragZone;                 // arraste o MIDI (editado ou não) direto para a DAW
+    std::vector<dub::NoteEvent> events;
+    std::vector<dub::ChordSlot> slots;
+    double loopBeats = 0.0;
+    bool edited = false;
+    juce::Rectangle<float> box, area, header, keysCol;
+    int lo = 48, hi = 84;
+    float rowH = 6.0f;
+    enum class Drag { None, Move, Resize } drag = Drag::None;
+    int dragIndex = -1;
+    std::vector<int> dragGroup;
+    std::vector<dub::NoteEvent> groupOrig;
+    juce::Point<float> dragFrom;
+    bool dragChanged = false;
+};
+
+//==============================================================================
 // Painel com todo o layout no tamanho base; o editor o escala para a janela redimensionável
 class DubChordsPanel : public juce::Component, private juce::Timer
 {
@@ -186,6 +232,10 @@ private:
     juce::TextButton presetBtn { juce::String::fromUTF8 ("PRESETS \xe2\x96\xbe") };
     void showPresets();
     MidiDragZone dragZone;
+    DubChordRoll roll;                                   // visor MIDI editável (aba MIDI)
+    juce::TextButton tabChords { "ACORDES" }, tabMidi { juce::String::fromUTF8 ("MIDI  \xe2\x9c\x8e") };
+    bool midiView = false;
+    void setMidiView (bool);
     std::unique_ptr<juce::FileChooser> chooser;
 
     juce::Image background;

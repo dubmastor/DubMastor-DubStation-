@@ -4,6 +4,7 @@
 - O MRM-0420 continua com o banco inteiro (356 músicas)
 - A HARMONIA mostra o **Mastor Reggae Piano MRP-80** (o antigo Reggae Keys MRK-80, agora só piano)
 - Aba CHORDS (MRCM-1240): **PIANISTA** (estilo do skank: Beckford, Gladdy, Sterling, Downie, Lyn, Steely, Lenky), **FILL** separado no fim de cada frase de 4 compassos e notas de 1/64 (padrão) ou 1/32 — projetos antigos continuam em 1/32
+- Painel da CHORD MACHINE (aba MÁQUINAS): botão MIDI ✎ com o visor editável, cada acorde numa cor, e ARRASTE O MIDI
 - Versão para celular 2.5
 
 ## Mastor Riddim Machine MRM-0420 2.4 — DubStation

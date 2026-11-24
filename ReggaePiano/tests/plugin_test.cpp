@@ -173,6 +173,25 @@ int main (int argc, char** argv)
         save ("interface-piano.png");
         rk->setPage (1);
         save ("interface-chord-machine.png");
+        // aba MIDI da CHORD MACHINE: o visor editável (clica no botão "MIDI")
+        std::function<juce::TextButton* (juce::Component*)> findMidi = [&] (juce::Component* c) -> juce::TextButton*
+        {
+            for (auto* ch : c->getChildren())
+            {
+                if (auto* b = dynamic_cast<juce::TextButton*> (ch); b != nullptr && b->getButtonText().startsWith ("MIDI ")) return b;
+                if (auto* r = findMidi (ch)) return r;
+            }
+            return nullptr;
+        };
+        auto* midiTab = findMidi (ed.get());
+        check (midiTab != nullptr, "aba MIDI na CHORD MACHINE");
+        if (midiTab != nullptr)
+        {
+            setP (p.getMachine().apvts, "pianist", 4.0f);
+            setP (p.getMachine().apvts, "pianoFill", 5.0f);
+            midiTab->triggerClick();
+            save ("interface-chord-machine-midi.png");
+        }
     }
 
     std::printf ("\n%s\n", failures == 0 ? "TUDO OK" : "HA FALHAS");

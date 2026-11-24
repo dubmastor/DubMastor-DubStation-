@@ -577,7 +577,366 @@ void MidiDragZone::mouseDrag (const juce::MouseEvent&)
 }
 
 //==============================================================================
-DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
+//==============================================================================
+// VISOR MIDI editável (aba MIDI)
+juce::Colour DubChordRoll::slotColour (int slot)
+{
+    static const juce::Colour c[4] = { juce::Colour (0xffffa928), juce::Colour (0xffff6f4f), juce::Colour (0xff6fd16f), juce::Colour (0xff5fb8ff) };
+    return c[(size_t) juce::jlimit (0, 3, slot)];
+}
+
+DubChordRoll::DubChordRoll (DubChordsProcessor& p) : proc (p), dragZone (p)
+{
+    addAndMakeVisible (dragZone);
+    setMouseCursor (juce::MouseCursor::CrosshairCursor);
+    undoBtn.setButtonText ("DESFAZER");
+    undoBtn.setTooltip (juce::String::fromUTF8 ("Volta ao MIDI gerado pela m\xc3\xa1quina (o pianista, o fill e os acordes)"));
+    undoBtn.onClick = [this] { proc.clearEdits(); update(); };
+    addAndMakeVisible (undoBtn);
+}
+
+void DubChordRoll::resized()
+{
+    auto r = getLocalBounds().toFloat();
+    r.removeFromTop (12.0f);
+    auto top = r.removeFromTop (48.0f);
+    dragZone.setBounds (top.removeFromRight (250.0f).reduced (6.0f, 0.0f).toNearestInt());
+    undoBtn.setBounds (top.removeFromRight (196.0f).reduced (6.0f, 8.0f).toNearestInt());
+    box = r.reduced (8.0f, 4.0f).withTrimmedBottom (6.0f);
+    computeGeometry();
+}
+
+void DubChordRoll::update()
+{
+    if (drag != Drag::None) { repaint(); return; }   // durante o arraste a cópia local manda
+    slots = proc.getSlots();
+    events = proc.getCurrentLoop (loopBeats);
+    edited = proc.hasEdits();
+    undoBtn.setEnabled (edited);
+    computeGeometry();
+    repaint();
+}
+
+void DubChordRoll::computeGeometry()
+{
+    auto r = box.reduced (10.0f, 8.0f);
+    header = r.removeFromTop (18.0f);
+    keysCol = r.removeFromLeft (34.0f);
+    area = r;
+    int mn = 127, mx = 0;
+    for (const auto& e : events) { mn = std::min (mn, e.note); mx = std::max (mx, e.note); }
+    if (events.empty()) { mn = 55; mx = 79; }
+    lo = mn - 2; hi = mx + 2;
+    if (hi - lo < 24) { const int mid = (hi + lo) / 2; lo = mid - 12; hi = mid + 12; }
+    lo = juce::jmax (24, lo); hi = juce::jmin (108, hi);
+    rowH = area.getHeight() / (float) (hi - lo + 1);
+}
+
+double DubChordRoll::beatAt (float x) const
+{
+    return loopBeats * (double) ((x - area.getX()) / juce::jmax (1.0f, area.getWidth()));
+}
+
+int DubChordRoll::pitchAt (float y) const
+{
+    return juce::jlimit (lo, hi, lo + (int) std::floor ((area.getBottom() - y) / rowH));
+}
+
+juce::Rectangle<float> DubChordRoll::noteRect (const dub::NoteEvent& e) const
+{
+    auto xOf = [&] (double beat) { return area.getX() + (float) (beat / loopBeats) * area.getWidth(); };
+    return juce::Rectangle<float> (xOf (e.start), area.getBottom() - (float) (e.note - lo + 1) * rowH,
+                                   juce::jmax (4.0f, xOf (e.start + e.length) - xOf (e.start)), rowH);
+}
+
+int DubChordRoll::noteAt (juce::Point<float> p, bool& onRightEdge) const
+{
+    onRightEdge = false;
+    for (int i = (int) events.size() - 1; i >= 0; --i)
+    {
+        const auto nr = noteRect (events[(size_t) i]).expanded (1.0f, 1.5f);
+        if (nr.contains (p))
+        {
+            onRightEdge = p.x > nr.getRight() - juce::jmin (6.0f, nr.getWidth() * 0.4f);
+            return i;
+        }
+    }
+    return -1;
+}
+
+std::vector<int> DubChordRoll::groupOf (int index) const
+{
+    std::vector<int> g;
+    if (index < 0 || index >= (int) events.size()) return g;
+    const auto& a = events[(size_t) index];
+    for (int j = 0; j < (int) events.size(); ++j)
+    {
+        const auto& b = events[(size_t) j];
+        if (b.channel == a.channel && b.slot == a.slot && std::abs (b.start - a.start) < 1.0e-6) g.push_back (j);
+    }
+    return g;
+}
+
+void DubChordRoll::commit()
+{
+    proc.setEdits (events, loopBeats);
+    update();
+}
+
+void DubChordRoll::mouseMove (const juce::MouseEvent& e)
+{
+    bool edge = false;
+    const int i = area.contains (e.position) ? noteAt (e.position, edge) : -1;
+    setMouseCursor (i < 0 ? juce::MouseCursor::CrosshairCursor
+                          : (edge ? juce::MouseCursor::LeftRightResizeCursor : juce::MouseCursor::DraggingHandCursor));
+}
+
+void DubChordRoll::mouseDown (const juce::MouseEvent& e)
+{
+    if (loopBeats <= 0.0 || ! area.expanded (0, 2).contains (e.position)) return;
+    bool edge = false;
+    const int i = noteAt (e.position, edge);
+    dragChanged = false;
+    dragFrom = e.position;
+
+    auto eraseGroup = [this] (int idx)
+    {
+        auto g = groupOf (idx);
+        std::sort (g.rbegin(), g.rend());
+        for (int j : g) events.erase (events.begin() + j);
+    };
+    if (e.mods.isPopupMenu())                       // botão direito apaga o acorde
+    {
+        if (i >= 0) { eraseGroup (i); commit(); }
+        return;
+    }
+    if (i < 0)
+    {
+        // espaço vazio: o acorde que soa nesse tempo, no 1/16 mais próximo (Shift = 1/32)
+        const double grid = e.mods.isShiftDown() ? 0.125 : 0.25;
+        const double start = juce::jlimit (0.0, loopBeats - grid, std::floor (beatAt (e.position.x) / grid) * grid);
+        int slot = -1; double pos = 0.0;
+        for (int k = 0; k < (int) slots.size(); ++k)
+        {
+            if (slots[(size_t) k].beats <= 0) continue;
+            if (start >= pos - 1.0e-9 && start < pos + slots[(size_t) k].beats) { slot = k; break; }
+            pos += slots[(size_t) k].beats;
+        }
+        const auto v = proc.getVoicings();
+        if (slot < 0 || slot >= (int) v.notes.size() || v.notes[(size_t) slot].empty()) return;
+        const auto st = proc.getSettings();
+        const double len = juce::jmin (dub::noteSizeBeats (st.noteSize), loopBeats - start);
+        const size_t first = events.size();
+        for (int n : v.notes[(size_t) slot])
+            for (int oct : { 0, 12 })
+                events.push_back ({ start, len, juce::jlimit (0, 127, n + oct), 100, dub::ChSkank, slot });
+        dragIndex = (int) first;
+        drag = Drag::Resize;
+        dragChanged = true;
+    }
+    else
+    {
+        dragIndex = i;
+        drag = edge ? Drag::Resize : Drag::Move;
+    }
+    dragGroup = groupOf (dragIndex);
+    groupOrig.clear();
+    for (int j : dragGroup) groupOrig.push_back (events[(size_t) j]);
+    repaint();
+}
+
+void DubChordRoll::mouseDrag (const juce::MouseEvent& e)
+{
+    if (drag == Drag::None || dragGroup.empty()) return;
+    const double grid = e.mods.isShiftDown() ? 0.125 : 0.25;
+    const double dBeat = beatAt (e.position.x) - beatAt (dragFrom.x);
+    for (size_t k = 0; k < dragGroup.size(); ++k)
+    {
+        auto& n = events[(size_t) dragGroup[k]];
+        const auto& o = groupOrig[k];
+        if (drag == Drag::Move)
+        {
+            n.start = juce::jlimit (0.0, loopBeats - grid, std::round ((o.start + dBeat) / grid) * grid);
+            if (dragGroup[k] == dragIndex)   // a nota clicada também sobe/desce (muda a voz do acorde)
+                n.note = juce::jlimit (lo, hi, o.note + (int) std::round ((dragFrom.y - e.position.y) / rowH));
+        }
+        else
+        {
+            const double fine = e.mods.isShiftDown() ? 0.03125 : 0.0625;   // tamanho em 1/64 (Shift = 1/128)
+            n.length = juce::jlimit (fine, loopBeats - n.start, std::round ((o.length + dBeat) / fine) * fine);
+        }
+        dragChanged = dragChanged || ! juce::exactlyEqual (n.start, o.start) || n.note != o.note || ! juce::exactlyEqual (n.length, o.length);
+    }
+    repaint();
+}
+
+void DubChordRoll::mouseUp (const juce::MouseEvent&)
+{
+    const bool changed = drag != Drag::None && dragChanged;
+    drag = Drag::None;
+    dragIndex = -1;
+    dragGroup.clear();
+    if (changed) commit(); else update();
+}
+
+void DubChordRoll::mouseDoubleClick (const juce::MouseEvent& e)
+{
+    bool edge = false;
+    const int i = noteAt (e.position, edge);
+    if (i < 0) return;
+    auto g = groupOf (i);
+    std::sort (g.rbegin(), g.rend());
+    for (int j : g) events.erase (events.begin() + j);
+    drag = Drag::None;
+    commit();
+}
+
+void DubChordRoll::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& w)
+{
+    bool edge = false;
+    const int i = noteAt (e.position, edge);
+    if (i < 0 || std::abs (w.deltaY) < 1.0e-4f) return;
+    for (int j : groupOf (i))
+        events[(size_t) j].velocity = juce::jlimit (1, 127, events[(size_t) j].velocity + (w.deltaY > 0 ? 8 : -8));
+    commit();
+}
+
+void DubChordRoll::paint (juce::Graphics& g)
+{
+    // fundo do painel (cobre os 4 módulos de acorde) e a moldura da seção
+    g.setColour (colours::plate);
+    g.fillRect (getLocalBounds());
+    auto fr = getLocalBounds().toFloat().reduced (1.0f).withTrimmedTop (10.0f);
+    g.setColour (juce::Colours::white.withAlpha (0.45f));
+    g.drawRoundedRectangle (fr.translated (1, 1), 4.0f, 1.0f);
+    g.setColour (colours::ink.withAlpha (0.55f));
+    g.drawRoundedRectangle (fr, 4.0f, 1.2f);
+    {
+        const juce::String t = juce::String::fromUTF8 ("MIDI  \xc2\xb7  EDIT\xc3\x81VEL");
+        g.setFont (stencil (11.5f, 0.22f));
+        const float tw = juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t) + 22.0f;
+        auto tag = juce::Rectangle<float> (fr.getX() + 12, fr.getY() - 9, tw, 18);
+        g.setColour (colours::labelBg);
+        g.fillRoundedRectangle (tag, 2.0f);
+        g.setColour (colours::cream);
+        g.drawText (t, tag, juce::Justification::centred);
+    }
+    // legenda: cada acorde numa cor (a mesma do MIDI exportado)
+    {
+        float x = fr.getX() + 18.0f;
+        const float y = fr.getY() + 20.0f;
+        g.setFont (stencil (10.0f, 0.12f));
+        for (int i = 0; i < (int) slots.size(); ++i)
+        {
+            if (slots[(size_t) i].beats <= 0) continue;
+            g.setColour (slotColour (i));
+            g.fillRoundedRectangle (x, y + 4.0f, 14.0f, 10.0f, 2.0f);
+            g.setColour (colours::ink);
+            const juce::String t = "ACORDE " + juce::String (i + 1) + "  " + juce::String (dub::chordLabel (slots[(size_t) i]));
+            g.drawText (t, juce::Rectangle<float> (x + 20.0f, y, 150.0f, 18.0f), juce::Justification::centredLeft);
+            x += 20.0f + juce::GlyphArrangement::getStringWidth (g.getCurrentFont(), t) + 22.0f;
+        }
+        g.setColour (colours::inkSoft);
+        g.setFont (stencil (9.0f, 0.08f));
+        g.drawText (juce::String::fromUTF8 (edited ? "MIDI EDITADO \xc2\xb7 TOCA E EXPORTA ASSIM"
+                                                   : "CLIQUE = ACORDE NOVO \xc2\xb7 ARRASTE MOVE \xc2\xb7 BORDA ESTICA \xc2\xb7 DUPLO CLIQUE APAGA"),
+                    juce::Rectangle<float> (x, y, juce::jmax (10.0f, (float) undoBtn.getX() - x - 10.0f), 18.0f), juce::Justification::centredRight);
+    }
+
+    // visor
+    g.setColour (juce::Colours::black.withAlpha (0.35f));
+    g.fillRoundedRectangle (box.translated (0, 2.0f), 5.0f);
+    g.setColour (colours::glass);
+    g.fillRoundedRectangle (box, 5.0f);
+    g.setColour (juce::Colour (0xff0c0907));
+    g.drawRoundedRectangle (box, 5.0f, 2.0f);
+    if (loopBeats <= 0.0) return;
+
+    auto yOf = [&] (int n) { return area.getBottom() - (float) (n - lo + 1) * rowH; };
+    auto xOf = [&] (double beat) { return area.getX() + (float) (beat / loopBeats) * area.getWidth(); };
+
+    for (int n = lo; n <= hi; ++n)
+    {
+        if (isBlack (n % 12))
+        {
+            g.setColour (juce::Colours::black.withAlpha (0.25f));
+            g.fillRect (area.getX(), yOf (n), area.getWidth(), rowH);
+        }
+        if (n % 12 == 0)
+        {
+            g.setColour (colours::amber.withAlpha (0.5f));
+            g.setFont (stencil (8.5f, 0.0f));
+            g.drawText (juce::MidiMessage::getMidiNoteName (n, true, true, 4), keysCol.withY (yOf (n) - 4.0f).withHeight (rowH + 8.0f),
+                        juce::Justification::centredLeft);
+        }
+    }
+    // acordes: faixa tingida com a cor do acorde e o nome na régua
+    double x = 0;
+    for (int i = 0; i < (int) slots.size(); ++i)
+    {
+        const auto& s = slots[(size_t) i];
+        if (s.beats <= 0) continue;
+        const float x0 = xOf (x), x1 = xOf (juce::jmin (loopBeats, x + s.beats));
+        g.setColour (slotColour (i).withAlpha (0.06f));
+        g.fillRect (x0, area.getY(), x1 - x0, area.getHeight());
+        g.setColour (slotColour (i).withAlpha (0.55f));
+        g.drawVerticalLine ((int) x0, header.getY(), area.getBottom());
+        g.setColour (slotColour (i));
+        g.setFont (stencil (11.0f, 0.08f));
+        g.drawText (juce::String (dub::chordLabel (s)), juce::Rectangle<float> (x0 + 5.0f, header.getY(), x1 - x0 - 6.0f, header.getHeight()),
+                    juce::Justification::centredLeft);
+        x += s.beats;
+    }
+    // grade: compassos, tempos e semicolcheias; a caixa (2 e 4) marcada na régua
+    for (double b = 0.0; b < loopBeats - 1.0e-9; b += 0.25)
+    {
+        const bool bar = std::fmod (b, 4.0) < 1e-6, beat = std::fmod (b, 1.0) < 1e-6;
+        if (b > 0.0)
+        {
+            g.setColour (colours::amber.withAlpha (bar ? 0.2f : (beat ? 0.09f : 0.035f)));
+            g.drawVerticalLine ((int) xOf (b), area.getY(), area.getBottom());
+        }
+        const int beatInBar = (int) std::lround (std::fmod (b, 4.0));
+        if (beat && (beatInBar == 1 || beatInBar == 3))
+        {
+            g.setColour (juce::Colour (0xffe5484d).withAlpha (0.8f));
+            g.fillRect (xOf (b), header.getBottom() - 3.0f, xOf (b + 1.0) - xOf (b), 2.0f);
+        }
+    }
+
+    const double pos = proc.getPlayPositionInLoop();
+    for (int i = 0; i < (int) events.size(); ++i)
+    {
+        const auto& e = events[(size_t) i];
+        auto nr = noteRect (e).reduced (0.0f, rowH > 6.0f ? 1.0f : 0.0f);
+        const bool now = pos >= 0.0 && pos >= e.start && pos < e.start + e.length;
+        const bool held = drag != Drag::None && std::find (dragGroup.begin(), dragGroup.end(), i) != dragGroup.end();
+        const auto c = slotColour (e.slot);
+        const float a = 0.45f + 0.55f * (float) e.velocity / 127.0f;
+        if (now || held)
+        {
+            g.setColour (c.withAlpha (0.35f));
+            g.fillRoundedRectangle (nr.expanded (2.5f), 3.0f);
+        }
+        g.setColour ((now || held) ? c.brighter (0.5f) : c.withAlpha (a));
+        g.fillRoundedRectangle (nr, 1.5f);
+        g.setColour (juce::Colours::black.withAlpha (0.55f));
+        g.drawRoundedRectangle (nr, 1.5f, 0.6f);
+    }
+    if (pos >= 0.0)
+    {
+        g.setColour (juce::Colours::white.withAlpha (0.8f));
+        g.drawVerticalLine ((int) xOf (pos), header.getY(), area.getBottom());
+    }
+    if (edited)
+    {
+        g.setColour (colours::amber);
+        g.setFont (stencil (9.5f, 0.12f));
+        g.drawText ("MIDI EDITADO", header.withTrimmedRight (4.0f), juce::Justification::centredRight);
+    }
+}
+
+DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p), roll (p)
 {
     setLookAndFeel (&lnf);
 
@@ -632,6 +991,16 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     presetBtn.setTooltip (juce::String::fromUTF8 ("Harmonias clássicas por estilo: roots, rockers, rub a dub, lovers rock, dancehall digital e new roots"));
     addAndMakeVisible (presetBtn);
     addAndMakeVisible (dragZone);
+    addChildComponent (roll);
+    for (auto* t : { &tabChords, &tabMidi })
+    {
+        t->setClickingTogglesState (false);
+        addAndMakeVisible (*t);
+    }
+    tabChords.onClick = [this] { setMidiView (false); };
+    tabMidi.onClick   = [this] { setMidiView (true); };
+    tabMidi.setTooltip (juce::String::fromUTF8 ("Visor MIDI editÃ¡vel: o loop inteiro, cada acorde numa cor"));
+    setMidiView (false);
 
     voicings = proc.getVoicings();
     setSize (1240, 846);
@@ -643,6 +1012,24 @@ DubChordsPanel::~DubChordsPanel()
 {
     stopTimer();
     setLookAndFeel (nullptr);
+}
+
+void DubChordsPanel::setMidiView (bool v)
+{
+    midiView = v;
+    roll.setVisible (v);
+    if (v) { roll.update(); roll.toFront (false); }
+    for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
+    {
+        auto& m = mods[(size_t) i];
+        for (juce::Component* c : { (juce::Component*) m.keys.get(), (juce::Component*) m.mode.get(),
+                                    (juce::Component*) m.inv.get(), (juce::Component*) m.dur.get() })
+            c->setVisible (! v);
+        if (i > 0) m.on.button.setVisible (! v);
+    }
+    tabChords.setToggleState (! v, juce::dontSendNotification);
+    tabMidi.setToggleState (v, juce::dontSendNotification);
+    repaint();
 }
 
 void DubChordsPanel::setupKnob (Knob& k, const juce::String& id, const juce::String& name)
@@ -708,6 +1095,7 @@ void DubChordsPanel::timerCallback()
                       + (int) proc.apvts.getRawParameterValue ("pianoFill")->load();
         if (key != lastPianistKey) { lastPianistKey = key; repaint (patternArea.getUnion (noteSizeArea()).getUnion (fillArea())); }
     }
+    if (midiView) roll.update();
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);
@@ -1285,7 +1673,10 @@ void DubChordsPanel::resized()
 
     loopRow  = { 62, 788, W - 124, 34 };
     presetBtn.setBounds (loopRow.withWidth (150));
-    timeline = loopRow.withTrimmedLeft (162);
+    tabChords.setBounds (loopRow.withTrimmedLeft (162).withWidth (110));
+    tabMidi.setBounds (loopRow.withTrimmedLeft (280).withWidth (110));
+    timeline = loopRow.withTrimmedLeft (402);
+    roll.setBounds (44, 80, W - 88, 462);
     renderBackground();
 }
 
