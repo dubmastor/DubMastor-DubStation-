@@ -58,7 +58,8 @@ target_sources(MastorDubHorns PRIVATE
 target_compile_definitions(MastorDubHorns PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
-    JUCE_VST3_CAN_REPLACE_VST2=0)
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_USE_MP3AUDIOFORMAT=1)
 
 target_link_libraries(MastorDubHorns
     PRIVATE
@@ -78,7 +79,7 @@ if(HORNS_SNAPSHOT)
         Source/PluginEditor.cpp)
     target_compile_definitions(HornsSnapshot PRIVATE
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0
-        JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
+        JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0 JUCE_USE_MP3AUDIOFORMAT=1
         JucePlugin_Name="Mastor Dub Horns MDH-70" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=0 JucePlugin_IsMidiEffect=0)
     target_link_libraries(HornsSnapshot PRIVATE juce::juce_audio_utils

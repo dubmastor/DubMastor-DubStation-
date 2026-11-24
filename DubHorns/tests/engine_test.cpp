@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <vector>
 #include "../Source/HornEngine.h"
+#include "../Source/PhraseStyles.h"
+#include "../Source/Transcriber.h"
 
 using namespace horns;
 
@@ -112,6 +114,50 @@ int main (int argc, char** argv)
         };
         const double pp = tenth (0.25f), ff = tenth (1.0f);
         CHECK (ff - pp > 15.0, "trompete: ff tem bem mais harmonicos agudos que pp (10a-1a: pp %.1f dB, ff %.1f dB)", pp, ff);
+    }
+
+
+    // --- v1.4: biblioteca por estilo e transcrição de áudio
+    {
+        int n = 0;
+        for (const auto& st : phraseStyles())
+            for (const auto& pd : st.pats)
+            {
+                ++n;
+                bool ok = (pd.len == 32 || pd.len == 64) && ! pd.ev.empty() && (int) pd.ev.size() <= kMaxEvents;
+                for (const auto& e : pd.ev) ok = ok && e[0] >= 0 && e[0] < pd.len && e[1] >= 1 && e[3] >= 0 && e[3] < kNumArtic;
+                CHECK (ok, "frase '%s' (%s) dentro do formato", pd.name, st.name);
+            }
+        CHECK (phraseStyles().size() == 8 && n >= 40, "biblioteca: %zu estilos e %d frases", phraseStyles().size(), n);
+
+        // o trompete toca uma frase conhecida; a transcrição tem que achar as notas
+        const int sr = 44100; const double bpm = 74, s16 = 60.0 / bpm / 4.0;
+        const auto ph = makePhrase (phraseStyles()[2].pats[1], true, 9, 1);
+        Engine e; Params p; for (auto& i : p.inst) i.on = false;
+        p.inst[0].on = true; p.inst[0].oct = 0; p.echoOn = false; p.room = 0.15f; p.hiss = 0.1f;
+        e.prepare (sr, 256); e.setParams (p);
+        const int N = (int) ((0.5 + ph.length * s16 + 1.5) * sr);
+        std::vector<float> mono ((size_t) N);
+        for (int i = 0; i < N; ++i)
+        {
+            const double t = i / (double) sr - 0.5;
+            for (const auto& ev : ph.events)
+            {
+                if (std::abs (t - ev.start * s16) < 0.5 / sr) e.noteOn (ev.note, 0.85f, ev.artic, 1);
+                if (std::abs (t - (ev.start + ev.dur * (ev.artic == Stac ? 0.5 : 0.9)) * s16) < 0.5 / sr) e.noteOff (ev.note, 1);
+            }
+            float l, r; e.render (&l, &r, 1); mono[(size_t) i] = 0.5f * (l + r);
+        }
+        const auto tr = transcribe (mono, sr, bpm, false);
+        int best = 0;
+        for (int sh = -4; sh <= 4; ++sh)
+        {
+            int ok = 0;
+            for (const auto& ev : ph.events)
+                for (const auto& t : tr.phrase.events) if (std::abs (t.start - ev.start - sh) <= 1 && t.note == ev.note) { ++ok; break; }
+            best = std::max (best, ok);
+        }
+        CHECK (best * 10 >= (int) ph.events.size() * 8, "transcricao: %d de %zu notas certas", best, ph.events.size());
     }
 
     for (double sr : { 44100.0, 48000.0, 96000.0 })
