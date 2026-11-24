@@ -134,7 +134,8 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <div class="grid-mods" style="margin-top:16px">
   <section class="mod"><div class="tag">RITMO</div>
     <div class="lbl" style="margin-top:2px">PADRÃO DO SKANK</div>
-    <div class="stepper"><div class="val"><b style="font-size:15px">CONTRATEMPO</b></div></div>
+    <div class="btns c2" id="pattern"><button class="b" data-p="0">CONTRATEMPO</button><button class="b" data-p="1">BANG BANG</button></div>
+    <div class="hint" id="patternHint" style="margin-top:4px"></div>
     <div class="lbl">DURAÇÃO DAS NOTAS</div>
     <div class="stepper"><div class="val"><b>1/32</b><small>FUSA · SEMPRE</small></div></div>
     <div style="margin-top:12px">
@@ -176,7 +177,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 <div class="dock"><button class="preview" id="preview2"><span class="lamp"></span><span class="txt">▶ PREVIEW</span></button>
   <button class="green" id="export2">⬇ MIDI</button></div>
 
-<script src="../../chords/engine.js"></script>
+<script src="engine.js"></script>
 <script src="../../chords/presets.js"></script>
 <script src="../../chords/presetmenu.js"></script>
 <script src="../../riddimbank.js"></script>
@@ -203,7 +204,7 @@ function load() {
   return structuredClone(DEFAULTS);
 }
 const st = load();
-st.slots[0].on = true; st.pattern = 0;   // skank sempre no contratempo
+st.slots[0].on = true; st.pattern = st.pattern === 1 ? 1 : 0;   // 0 contratempo, 1 bang bang
 function save() { try { localStorage.setItem('mrk80-teste', JSON.stringify(st)); } catch (e) {} }
 
 function slotsForEngine() {
@@ -555,6 +556,17 @@ for (const id of ['export', 'export2']) $(id).onclick = download;
 render();
 
 // ---------------------------------------------------------------- teclado do instrumento (toque e mouse)
+(function patternButtons() {
+  const hint = ['O acorde no contratempo "&" de cada tempo (caixa no 2 e no 4).',
+                'Bang dobrado: o acorde no "&" e de novo no "a" de cada tempo, o segundo mais fraco.'];
+  function show() {
+    for (const b of $('pattern').children) b.classList.toggle('on', +b.dataset.p === st.pattern);
+    $('patternHint').textContent = hint[st.pattern];
+  }
+  for (const b of $('pattern').children) b.onclick = () => { st.pattern = +b.dataset.p; show(); changed(); };
+  show();
+})();
+
 (function keyboard() {
   const el = $('piano'), WHITE = [0, 2, 4, 5, 7, 9, 11], NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const OCTS = 2, held = new Map();   // pointerId -> { key, g }
