@@ -44,16 +44,16 @@ juce_add_plugin(ReggaeOrgan
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     VST3_CATEGORIES Instrument Synth)
 
-# o órgão, o visual e as fontes são os mesmos do Mastor Reggae Keys MRK-80 (pasta ReggaeKeys/)
+# o órgão, o visual e as fontes são os mesmos do Mastor Reggae Keys MRK-80 (pasta ReggaePiano/)
 juce_add_binary_data(ReggaeOrganFonts SOURCES
-    ../ReggaeKeys/Resources/ArchivoBlack-Regular.ttf
-    ../ReggaeKeys/Resources/RootsKeysDisplay-BoldItalic.ttf)
+    ../ReggaePiano/Resources/ArchivoBlack-Regular.ttf
+    ../ReggaePiano/Resources/RootsKeysDisplay-BoldItalic.ttf)
 
 target_sources(ReggaeOrgan PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp)
 
-target_include_directories(ReggaeOrgan PRIVATE Source ../ReggaeKeys/Source ../RiddimBank/Source)
+target_include_directories(ReggaeOrgan PRIVATE Source ../ReggaePiano/Source ../RiddimBank/Source)
 
 target_compile_definitions(ReggaeOrgan PUBLIC
     RIDDIMBANK_REQUIRE=1   # banco de riddims: só as músicas com o riddim (harmonia) da gravação (luz R)
@@ -79,7 +79,7 @@ option(RO_SNAPSHOT "Gerador de captura de tela" OFF)
 if(RO_SNAPSHOT)
     juce_add_console_app(ReggaeOrganSnapshot PRODUCT_NAME "ReggaeOrganSnapshot")
     target_sources(ReggaeOrganSnapshot PRIVATE tests/snapshot.cpp Source/PluginProcessor.cpp Source/PluginEditor.cpp)
-    target_include_directories(ReggaeOrganSnapshot PRIVATE Source ../ReggaeKeys/Source ../RiddimBank/Source)
+    target_include_directories(ReggaeOrganSnapshot PRIVATE Source ../ReggaePiano/Source ../RiddimBank/Source)
     target_compile_definitions(ReggaeOrganSnapshot PRIVATE RIDDIMBANK_REQUIRE=1
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0

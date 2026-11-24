@@ -55,7 +55,7 @@ O MRM-0420 compila o código destas pastas direto, sem cópia:
 - `ReggaeChordMachine/` — Mastor Reggae Chord Machine MRCM-1240
 - `ReggaeBassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `ReggaeBass/Source`)
 - `BigKnob/` — Mastor Big Knob (aba CONTROL ROOM)
-- `ReggaeKeys/Source/` — timbres do piano M1 / Hammond
+- `ReggaePiano/Source/` — timbres do piano M1 / Hammond
 
 **Sempre que mudar uma dessas máquinas, atualize o MRM-0420 também:**
 1. Compile e rode o teste offline do MRM-0420 (`RiddimMachine/tests/render_test.cpp`, alvo `mrm_render`); todos os modos precisam passar.
@@ -79,7 +79,7 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 - **Mastor Reggae Drums MRD-12** (`ReggaeDrums/`, antigo Dub Battery Reggae DBR) tem o MRDM-12 inteiro na aba DUB DRUMS.
 - **Mastor Reggae Bass MRB-69** (`ReggaeBass/`, antigo Dub Bass MRDBI-07) tem o MRBM-69 inteiro na aba BASS MACHINE
   (`Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`; nomes repetidos trocados em `MachineNames.h`).
-- **Mastor Reggae Keys MRK-80** (`ReggaeKeys/`, antigo Roots Keys) tem o MRCM-1240 inteiro na aba CHORD MACHINE (só maior e menor;
+- **Mastor Reggae Keys MRK-80** (`ReggaePiano/`, antigo Roots Keys) tem o MRCM-1240 inteiro na aba CHORD MACHINE (só maior e menor;
   `Source/MachineProcessorUnit.cpp` e `MachineEditorUnit.cpp`). Projetos da antiga aba DUB CHORDS migram em `migrateOldDubChords`.
   Versão para celular em `site/keys/` (usa `site/chords/engine.js`, que continua sendo o motor web da machine).
 - As machines separadas (MRDM-12, MRBM-69, MRCM-1240) ficam como **legado** no `plugins.json` (`"legado": "<instrumento>"`):
@@ -91,7 +91,7 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
 
 ## Mastor Reggae Organ MRO-68 (ReggaeOrgan/)
 Usa direto, sem cópia, o órgão (`RootsKeysEngine.h`, `TapeEchoDSP.h`), o visual (`VintageLookAndFeel.h`, `SkinTextures.h`, `VUMeter.h`)
-e as fontes de `ReggaeKeys/`, e o banco de riddims de `RiddimBank/Source`. Mudou o motor do órgão no MRK-80 ou o banco?
+e as fontes de `ReggaePiano/`, e o banco de riddims de `RiddimBank/Source`. Mudou o motor do órgão no MRK-80 ou o banco?
 Rode também o teste do MRO-68 (`ReggaeOrgan/tests/render_test.cpp`). Tudo nele é na contagem com a caixa no 2 e no 4.
 O motor de grooves (`ReggaeOrgan/Source/GrooveEngine.h`) tem uma cópia em JavaScript na versão para celular (`site/web/reggaeorgan/`):
 ao mudar um, mude o outro (mesmo gerador aleatório: o mesmo compasso tem que sair igual).

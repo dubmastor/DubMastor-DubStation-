@@ -51,7 +51,7 @@ if(BASSMACHINE_PLUGIN)
         Source/PluginEditor.cpp)
 
     # timbres compartilhados: piano M1 + Hammond do Roots Keys (usados pela ponte do Dub Chords)
-    target_include_directories(BassMachine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)
+    target_include_directories(BassMachine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaePiano/Source)
 
     target_compile_definitions(BassMachine PUBLIC
         JUCE_WEB_BROWSER=0
@@ -80,7 +80,7 @@ if(BASSMACHINE_SNAPSHOT)
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="Mastor Reggae Bass Machine MRBM-69" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1 JucePlugin_WantsMidiInput=1
         JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
-    target_include_directories(BassMachineSnapshot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)
+    target_include_directories(BassMachineSnapshot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaePiano/Source)
     target_link_libraries(BassMachineSnapshot PRIVATE juce::juce_audio_utils juce::juce_dsp
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 endif()

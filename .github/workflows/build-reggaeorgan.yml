@@ -5,8 +5,8 @@ on:
     branches: [main]
     paths:
       - 'ReggaeOrgan/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeKeys/Resources/**'
+      - 'ReggaePiano/Source/**'
+      - 'ReggaePiano/Resources/**'
       - 'RiddimBank/**'
       - '.github/workflows/build-reggaeorgan.yml'
       - '.github/scripts/**'
@@ -16,8 +16,8 @@ on:
   pull_request:
     paths:
       - 'ReggaeOrgan/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeKeys/Resources/**'
+      - 'ReggaePiano/Source/**'
+      - 'ReggaePiano/Resources/**'
       - 'RiddimBank/**'
       - '.github/workflows/build-reggaeorgan.yml'
       - '.github/scripts/**'
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Compilar e rodar o teste do groove (regras, notas presas, 5 eras em WAV)
         run: |
-          g++ -std=c++17 -O2 -Wall -Wextra -I Source -I ../ReggaeKeys/Source -I ../RiddimBank/Source tests/render_test.cpp -o render_test
+          g++ -std=c++17 -O2 -Wall -Wextra -I Source -I ../ReggaePiano/Source -I ../RiddimBank/Source tests/render_test.cpp -o render_test
           ./render_test
 
   build:

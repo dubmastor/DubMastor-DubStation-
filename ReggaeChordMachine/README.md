@@ -1,6 +1,6 @@
 # Mastor Reggae Chord Machine MRCM-1240 2.4 (legado)
 
-> O MRCM-1240 virou a aba **CHORD MACHINE** do **Mastor Reggae Keys MRK-80** (pasta `ReggaeKeys/`). Esta pasta continua: o MRK-80 e o MRM-0420 compilam o código dela. A versão 2.4 fica para download só para abrir projetos antigos.
+> O MRCM-1240 virou a aba **CHORD MACHINE** do **Mastor Reggae Keys MRK-80** (pasta `ReggaePiano/`). Esta pasta continua: o MRK-80 e o MRM-0420 compilam o código dela. A versão 2.4 fica para download só para abrir projetos antigos.
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
@@ -97,7 +97,7 @@ O mesmo banco está no **MRM-0420** e nas versões para celular. Fonte única: `
 - `Source/DubEngine.h`: lógica da harmonia (C++ puro). É aqui que se adiciona padrão novo.
 - `Source/PluginProcessor.*`: parâmetros, sincronia com a DAW, saída MIDI, exportação.
 - `Source/PluginEditor.*`: interface (LookAndFeel do Big Knob + teclado, botões e contadores clicáveis).
-- `Source/RootsKeysSound.h`: som interno; toca pelo `rk::Engine` do Roots Keys (`../ReggaeKeys/Source/RootsKeysEngine.h`) com os valores de `rkdefaults`.
+- `Source/RootsKeysSound.h`: som interno; toca pelo `rk::Engine` do Roots Keys (`../ReggaePiano/Source/RootsKeysEngine.h`) com os valores de `rkdefaults`.
 - `Source/DubSynth.h`: som de teclado antigo, mantido porque o Mastor Reggae Bass Machine MRBM-69 usa.
 - `tests/engine_test.cpp`: teste do motor (roda no CI antes do build).
 - `tests/snapshot.cpp`: gera o PNG da interface sem DAW (`-DDUBCHORDS_SNAPSHOT=ON`); com um nome `.wav`, grava o PREVIEW e um `.mid` exportado; `ruido` e `mexer` testam som preso ao alternar o SOM INTERNO e ao mexer nos controles com o preview tocando.

@@ -1,5 +1,5 @@
 // Som interno do Mastor Reggae Chord Machine (MRCM-1240): toca pelo próprio motor do
-// DubMastor Roots Keys (rk::Engine, ReggaeKeys/Source/RootsKeysEngine.h), com a mesma
+// DubMastor Roots Keys (rk::Engine, ReggaePiano/Source/RootsKeysEngine.h), com a mesma
 // cadeia do Roots Keys (vozes -> chorus/Leslie -> reverb -> master -> Maximizer).
 //  - skank (canal 1): piano estilo Korg M1 com o timbre INICIAL do Roots Keys
 //    (= preset "Piano: M1 Classic", os valores padrão dos parâmetros do Roots Keys)
@@ -9,7 +9,7 @@
 //
 // IMPORTANTE: os números em RootsKeysPiano / RootsKeysOrgan têm que ser iguais aos do
 // Roots Keys. O teste tests/check_rootskeys_timbre.py (roda no CI) lê
-// ReggaeKeys/Source/PluginProcessor.cpp e falha se alguém mudar o timbre lá e não aqui.
+// ReggaePiano/Source/PluginProcessor.cpp e falha se alguém mudar o timbre lá e não aqui.
 // Header-only, sem JUCE.
 #pragma once
 #include "RootsKeysEngine.h"

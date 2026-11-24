@@ -2,7 +2,7 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "PluginProcessor.h"
-#include "VintageLookAndFeel.h"   // o mesmo visual do Mastor Reggae Keys MRK-80 (ReggaeKeys/Source)
+#include "VintageLookAndFeel.h"   // o mesmo visual do Mastor Reggae Keys MRK-80 (ReggaePiano/Source)
 #include "VUMeter.h"
 
 // Drawbar estilo Hammond (igual à do MRK-80): puxar PARA BAIXO aumenta o volume (0..8)

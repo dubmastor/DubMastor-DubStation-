@@ -1,5 +1,5 @@
 // Teste offline do Mastor Reggae Organ MRO-68 (sem JUCE, sem DAW)
-//   g++ -std=c++17 -O2 -I Source -I ../ReggaeKeys/Source tests/render_test.cpp -o render_test && ./render_test
+//   g++ -std=c++17 -O2 -I Source -I ../ReggaePiano/Source tests/render_test.cpp -o render_test && ./render_test
 // Contagem da Dub Station: caixa no 2 e no 4. Confere as regras do groove (posições, acentos, duração 1/32,
 // fills, determinismo, notas presas) e grava um WAV de 8 compassos por músico em out/
 // (Am | Dm | Am | Em, com a bateria de referência da batida do músico).

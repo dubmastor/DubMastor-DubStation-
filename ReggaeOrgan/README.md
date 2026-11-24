@@ -68,8 +68,8 @@ separados. Leslie, percussão e eco de fita só na mão direita.
 ## Código
 - `Source/GrooveEngine.h` — o motor (C++ puro): grade, músicos, épocas e fills. A versão para celular (`site/web/reggaeorgan/`) usa a mesma lógica e o mesmo gerador aleatório: o mesmo compasso sai igual nos dois.
 - `Source/GroovePlayer.h` — toca o groove (ou o MIDI editado) no tempo da DAW, com o sample exato de cada nota.
-- `Source/OrganTrio.h` — três motores do órgão do MRK-80 (`ReggaeKeys/Source/RootsKeysEngine.h`): bubble acento, bubble fantasma e mão direita.
+- `Source/OrganTrio.h` — três motores do órgão do MRK-80 (`ReggaePiano/Source/RootsKeysEngine.h`): bubble acento, bubble fantasma e mão direita.
 - O banco de riddims vem de `RiddimBank/Source` (o mesmo das machines).
 - `tests/render_test.cpp` — teste offline: regras da contagem, notas presas e um WAV de 8 compassos por músico.
-  `g++ -std=c++17 -O2 -I Source -I ../ReggaeKeys/Source -I ../RiddimBank/Source tests/render_test.cpp -o render_test && ./render_test`
+  `g++ -std=c++17 -O2 -I Source -I ../ReggaePiano/Source -I ../RiddimBank/Source tests/render_test.cpp -o render_test && ./render_test`
 - `tests/snapshot.cpp` — desenha as três abas em `docs/` e confere o estado salvo (com o MIDI editado) e o MIDI exportado.

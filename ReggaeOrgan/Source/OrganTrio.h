@@ -1,6 +1,6 @@
 // OrganTrio.h — o som do Mastor Reggae Organ MRO-68 (header-only, sem JUCE)
 //
-// Usa o MESMO órgão tonewheel do Mastor Reggae Keys MRK-80 (ReggaeKeys/Source/RootsKeysEngine.h),
+// Usa o MESMO órgão tonewheel do Mastor Reggae Keys MRK-80 (ReggaePiano/Source/RootsKeysEngine.h),
 // em três instâncias, como dois organistas dividindo as partes (Tyrone Downie e Wire Lindo nos Wailers):
 //   [0] BUBBLE acento   registro próprio, sem Leslie (o bubble é seco e grave)
 //   [1] BUBBLE fantasma  mesmo registro, volume do knob GHOST (o Hammond não tem velocity:
