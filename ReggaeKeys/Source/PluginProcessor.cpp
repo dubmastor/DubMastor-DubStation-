@@ -129,6 +129,7 @@ void RootsKeysProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     machine->prepareToPlay (sampleRate, samplesPerBlock);
     machineBuf.setSize (2, juce::jmax (1, samplesPerBlock));
     machineMidi.ensureSize (2048);
+    engine.enableGuitar();   // GTR SKANK: só o MRK-80 aloca as cordas do MRG-68
     engine.prepare (sampleRate);
     setLatencySamples (engine.latencySamples());   // lookahead do maximizer
     keyboardState.reset();

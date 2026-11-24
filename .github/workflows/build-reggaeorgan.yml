@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeOrgan/**'
       - 'ReggaeKeys/Source/**'
       - 'ReggaeKeys/Resources/**'
@@ -15,6 +16,7 @@ on:
       - 'MRO-68-*'
   pull_request:
     paths:
+      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeOrgan/**'
       - 'ReggaeKeys/Source/**'
       - 'ReggaeKeys/Resources/**'

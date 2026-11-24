@@ -241,6 +241,33 @@ int main()
                      kNomes[t], f0, f1, ratio, ok ? "ok" : "FALHOU");
         if (! ok) g_ok = false;
     }
+    // 9) GTR SKANK: a guitarra do MRG-68 junto com o piano (skank no "e", 1/64) — desligada não soa nada
+    {
+        auto skank = [] (bool gtrOn, float pianoLevel)
+        {
+            rk::Engine e; e.enableGuitar(); e.params.mode = 0; e.params.pianoType = 7; e.params.reverb = 0;
+            e.params.gtrOn = gtrOn; e.params.pianoLevel = pianoLevel; e.prepare (48000);
+            const int sr = 48000, beat = (int) (60.0 / 76.0 * sr), N = 8 * beat;
+            std::vector<float> L ((size_t) N), R ((size_t) N);
+            int pos = 0;
+            for (int b = 0; b < 8; ++b)
+            {
+                const int on = b * beat + beat / 2, off = on + beat / 16;
+                e.render (&L[(size_t) pos], &R[(size_t) pos], on - pos); pos = on;
+                for (int nn : { 57, 60, 64 }) e.noteOn (nn, 0.8f);
+                e.render (&L[(size_t) pos], &R[(size_t) pos], off - pos); pos = off;
+                for (int nn : { 57, 60, 64 }) e.noteOff (nn);
+            }
+            e.render (&L[(size_t) pos], &R[(size_t) pos], N - pos);
+            double en = 0; bool fin = true;
+            for (int i = 0; i < N; ++i) { en += (double) L[(size_t) i] * L[(size_t) i] + (double) R[(size_t) i] * R[(size_t) i]; fin = fin && std::isfinite (L[(size_t) i]); }
+            return fin ? std::sqrt (en / (2.0 * N)) : -1.0;
+        };
+        const double so = skank (true, 0.0f), off = skank (false, 0.0f);
+        const bool ok = so > 0.005 && off < 1.0e-6;
+        std::printf ("gtr skank: guitarra sozinha rms %.4f, botao desligado rms %.6f %s\n", so, off, ok ? "ok" : "FALHOU");
+        if (! ok) g_ok = false;
+    }
     std::printf (g_ok ? "OK: todos os testes passaram\n" : "ERRO: algum teste falhou\n");
     return g_ok ? 0 : 1;
 }

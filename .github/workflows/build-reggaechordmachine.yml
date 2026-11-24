@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeChordMachine/**'
       - 'RiddimBank/Source/**'
       - 'ReggaeKeys/Source/RootsKeysEngine.h'
@@ -17,6 +18,7 @@ on:
       - 'MRCM-1240-*'
   pull_request:
     paths:
+      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeChordMachine/**'
       - 'RiddimBank/Source/**'
       - 'ReggaeKeys/Source/RootsKeysEngine.h'

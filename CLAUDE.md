@@ -92,6 +92,14 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
   são eles que mantêm os projetos antigos abrindo.
 - Toda alteração de bateria vale para o MRD-12, o MRM-0420 e o código do MRDM-12.
 
+## GUITAR SKANK do MRK-80 (ReggaeKeys/Source/GuitarSkank.h)
+O botão GUITAR SKANK do Mastor Reggae Keys MRK-80 toca a guitarra do skank junto com o piano usando o **motor do
+Mastor Reggae Guitar MRG-68** direto, sem cópia (`ReggaeGuitar/Source/GuitarEngine.h`: `mrg::StringVoice` e `mrg::Chain`).
+Mudou o motor do MRG-68? Rode também o teste do MRK-80 (`ReggaeKeys/tests/render_demo.cpp`, item GTR SKANK) e o do MRO-68.
+O botão sempre começa desligado. Só o MRK-80 aloca as cordas (`engine.enableGuitar()` antes do `prepare`); o MRO-68, o MRM-0420
+e as machines que usam o `RootsKeysEngine.h` não gastam memória com a guitarra. Os workflows desses plugins rodam quando
+`ReggaeGuitar/Source/**` muda.
+
 ## Mastor Reggae Organ MRO-68 (ReggaeOrgan/)
 Usa direto, sem cópia, o órgão (`RootsKeysEngine.h`, `TapeEchoDSP.h`), o visual (`VintageLookAndFeel.h`, `SkinTextures.h`, `VUMeter.h`)
 e as fontes de `ReggaeKeys/`, e o banco de riddims de `RiddimBank/Source`. Mudou o motor do órgão no MRK-80 ou o banco?

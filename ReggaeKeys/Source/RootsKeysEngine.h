@@ -135,9 +135,9 @@ struct Params
     float flDepth    = 0.8f;    // amplitude da varredura
     float flManual   = 0.3f;    // atraso base (posição do "pente")
     float flFeedback = 0.65f;   // -0.95..0.95 (regeneração; negativo = timbre oco)
-    // GTR SKANK: a guitarra do skank (timbre do MRG-68) tocando junto com o piano — sempre começa desligada
+    // GTR SKANK: a guitarra do skank (motor do MRG-68) tocando junto com o piano — sempre começa desligada
     bool  gtrOn    = false;
-    float gtrLevel = 0.6f;
+    float gtrLevel = 1.0f;
     float flMix      = 0.5f;
     // Master / Maximizer
     float reverb = 0.18f;
@@ -827,6 +827,8 @@ public:
         heldKeys = 0;
     }
 
+    void enableGuitar() { gtr.enable(); }
+
     void noteOn (int note, float vel)
     {
         ++stamp;
@@ -897,7 +899,6 @@ public:
 
     void renderChunk (float* outL, float* outR, int n)
     {
-        gtr.flush();   // palhetada com as notas do piano que chegaram juntas
         const Params& p = params;
         float dbTarget[9];
         for (int i = 0; i < 9; ++i)
@@ -946,10 +947,22 @@ public:
             float ol = (od * (1 - m) + ll * m) * p.organLevel;
             float orr = (od * (1 - m) + lr * m) * p.organLevel;
 
-            // guitarra do skank: um pouco para a direita, entra no eco e no reverb como o piano
-            const float gt = gtr.tick() * p.gtrLevel;
-            bufL[s] = pl + ol + gt * 0.75f;
-            bufR[s] = pr + orr + gt;
+            bufL[s] = pl + ol;
+            bufR[s] = pr + orr;
+        }
+
+        // guitarra do skank (motor do MRG-68, com o próprio Twin e mola): entra antes do eco e do reverb, como o piano
+        if (gtr.isEnabled() && (p.gtrOn || gtrTail))
+        {
+            float gl[kChunk] = {}, gr[kChunk] = {};
+            gtr.render (gl, gr, n);
+            float pk = 0;
+            for (int s = 0; s < n; ++s)
+            {
+                bufL[s] += gl[s] * p.gtrLevel; bufR[s] += gr[s] * p.gtrLevel;
+                pk = std::max (pk, std::fabs (gl[s]) + std::fabs (gr[s]));
+            }
+            gtrTail = pk > 1.0e-5f;   // desligou o botão: a cauda termina de tocar
         }
 
         // eco de fita FitaEco TE-12 (antes do reverb, como num rack de dub).
@@ -1011,6 +1024,7 @@ private:
     Leslie leslie;
     Reverb reverb;
     GuitarSkank gtr;
+    bool gtrTail = false;
     fitaeco::TapeEcho echo;
     Flanger flanger;
     static constexpr int kChunk = 256;
