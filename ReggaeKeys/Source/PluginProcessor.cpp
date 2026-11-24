@@ -97,6 +97,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
     // CHORD MACHINE (MRCM-1240): os acordes tocam junto com a DAW (o PREVIEW da aba toca sempre). No fim da lista:
     // os parâmetros antigos não mudam de lugar.
     l.add (std::make_unique<AudioParameterBool> (ParameterID { "machineOn", 1 }, "Chord Machine On", false));
+    // 3.3: PAN do piano (todos os timbres) e da guitarra do skank
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "pianoPan", 1 }, "Piano Pan", NormalisableRange<float> (-1.0f, 1.0f), 0.0f));
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "gtrPan", 1 }, "Guitar Skank Pan", NormalisableRange<float> (-1.0f, 1.0f), 0.0f));   // no centro: projetos antigos soam igual
     return l;
 }
 
@@ -167,6 +170,8 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.master     = get ("master");
     p.echoOn        = get ("echoOn") > 0.5f;
     p.gtrOn         = get ("gtrOn") > 0.5f;
+    p.pianoPan      = get ("pianoPan");
+    p.gtrPan        = get ("gtrPan");
     p.echoMode      = (int) get ("echoMode") + 1;
     p.echoRate      = get ("echoRate");
     p.echoIntensity = get ("echoIntensity");
@@ -231,6 +236,8 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 }
 
 // =====================================================================  CHORD MACHINE (MRCM-1240)
+juce::RangedAudioParameter* RootsKeysProcessor::machinePreviewParam() { return machine->apvts.getParameter ("preview"); }
+
 void RootsKeysProcessor::runMachine (juce::MidiBuffer& midi, int numSamples)
 {
     machine->setPlayHead (getPlayHead());

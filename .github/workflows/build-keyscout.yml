@@ -5,35 +5,22 @@ on:
     branches: [main]
     paths:
       - 'KeyScout/**'
-      - 'Tune/Source/TuneDSP.h'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - '.github/workflows/build-keyscout.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MKS-0420-*'
   pull_request:
     paths:
       - 'KeyScout/**'
-      - 'Tune/Source/TuneDSP.h'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'RiddimMachine/Source/MrmStyle.h'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - 'TapeEcho/Resources/KaushanScript-Regular.ttf'
-      - '.github/workflows/build-keyscout.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+
+# só o build mais novo de cada branch / PR roda: um push novo cancela o anterior (economiza as máquinas Mac)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

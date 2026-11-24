@@ -4,32 +4,23 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeOrgan/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeKeys/Resources/**'
-      - 'RiddimBank/**'
-      - '.github/workflows/build-reggaeorgan.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRO-68-*'
   pull_request:
     paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
       - 'ReggaeOrgan/**'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeKeys/Resources/**'
-      - 'RiddimBank/**'
-      - '.github/workflows/build-reggaeorgan.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+
+# só o build mais novo de cada branch / PR roda: um push novo cancela o anterior (economiza as máquinas Mac)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

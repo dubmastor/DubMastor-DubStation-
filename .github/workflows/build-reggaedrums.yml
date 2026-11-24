@@ -7,28 +7,22 @@ on:
     branches: [main]
     paths:
       - 'ReggaeDrums/**'
-      - 'RiddimBank/Source/**'
-      - 'ReggaeDrumMachine/Source/**'
-      - 'ReggaeDrumMachine/CMakeLists.txt'
-      - '.github/workflows/build-dubbatteryreggae.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRD-12-*'
   pull_request:
     paths:
       - 'ReggaeDrums/**'
-      - 'RiddimBank/Source/**'
-      - 'ReggaeDrumMachine/Source/**'
-      - '.github/workflows/build-dubbatteryreggae.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+
+# só o build mais novo de cada branch / PR roda: um push novo cancela o anterior (economiza as máquinas Mac)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

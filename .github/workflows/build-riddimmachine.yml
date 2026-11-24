@@ -4,50 +4,21 @@ name: Build Mastor Riddim Machine MRM-0420
 # timbres do MRDBI-07 em DubBass) e do Mastor Big Knob (BigKnob) direto das pastas deles: quando qualquer um
 # muda, o MRM-0420 é recompilado, testado e publicado também (sempre com os timbres e samples atuais).
 on:
+  # regra do dono: só compila e publica quando ele pedir (tag ou Actions › Run workflow)
   push:
-    branches: [main]
-    paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
-      - 'RiddimMachine/**'
-      - 'RiddimBank/Source/**'
-      - 'ReggaeChordMachine/Source/**'
-      - 'ReggaeChordMachine/CMakeLists.txt'
-      - 'ReggaeDrumMachine/Source/**'
-      - 'ReggaeDrumMachine/Samples/**'
-      - 'ReggaeDrumMachine/CMakeLists.txt'
-      - 'ReggaeDrums/CMakeLists.txt'
-      - 'ReggaeBass/CMakeLists.txt'
-      - 'ReggaeBassMachine/Source/**'
-      - 'ReggaeBassMachine/CMakeLists.txt'
-      - 'ReggaeBass/Source/**'
-      - 'BigKnob/Source/**'
-      - 'BigKnob/CMakeLists.txt'
-      - 'ReggaeKeys/Source/**'
-      - 'ReggaeChordMachine/Source/**'
-      - 'ReggaeDrumMachine/Source/**'
-      - 'ReggaeKeys/Source/RootsKeysEngine.h'
-      - '.github/workflows/build-riddimmachine.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MRM-0420-*'
-  pull_request:
-    paths:
-      - 'ReggaeGuitar/Source/**'   # motor da guitarra do GTR SKANK (RootsKeysEngine -> GuitarSkank)
-      - 'RiddimMachine/**'
-      - 'RiddimBank/Source/**'
-      - 'ReggaeChordMachine/Source/**'
-      - 'ReggaeDrumMachine/Source/**'
-      - 'ReggaeKeys/Source/RootsKeysEngine.h'
-      - '.github/workflows/build-riddimmachine.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+
+# só o build mais novo de cada branch / PR roda: um push novo cancela o anterior (economiza as máquinas Mac)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

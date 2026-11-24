@@ -1,3 +1,10 @@
+## Mastor Reggae Keys MRK-80 3.3 🟢🟡⚫
+
+- **PRESETS no padrão do mega banco** da Riddim Machine MRM-0420: o botão PRESETS da aba CHORD MACHINE abre **ESTILOS** (estilo ▸ riddim ▸ música), **RIDDIMS A–Z**, **MÚSICAS A–Z** e **★ FAVORITOS** (☆ FAVORITAR a música atual; os favoritos ficam guardados no computador e valem para todos os projetos). **Só entram os riddims com a harmonia levantada** (321 músicas: conferida ● ou aproximada ◐); os 35 com harmonia pendente ficaram de fora. O banco antigo do MRCM saiu do menu (projetos antigos abrem igual).
+- **PREVIEW na aba INSTRUMENTO:** botão ao lado dos presets P01–P04 que toca o loop da CHORD MACHINE no timbre escolhido, sem trocar de aba (é o mesmo PREVIEW da aba CHORD MACHINE).
+- **PAN do piano** (vale para os 13 timbres) e **PAN do GUITAR SKANK**, os dois começando no centro (projetos antigos soam igual). O GUITAR SKANK continua começando desligado.
+- Versão para celular 3.3 com as mesmas novidades (mega banco, PREVIEW na aba do instrumento, PAN do piano e GUITAR SKANK com PAN), e o menu de presets do site, que não abria, voltou.
+
 ## Mastor Reggae Keys MRK-80 3.2 🟢🟡⚫
 
 - **GUITAR SKANK:** botão novo ao lado do VOLUME, com o ícone de uma guitarra elétrica, que põe a guitarra do skank para tocar junto com o piano, com o **motor do próprio Mastor Reggae Guitar MRG-68** (as mesmas cordas e o mesmo Fender Twin com mola: Tele 68, captador da ponte; duas guitarras em estéreo, como no MRG-68). A guitarra pega as notas do piano, leva para a região do skank (G3 a E5), palheta para baixo e abafa quando a tecla solta. **Sempre começa desligado.**

@@ -5,6 +5,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "../../ReggaeChordMachine/Source/PluginProcessor.h"
+#include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 namespace
 {
@@ -64,6 +65,24 @@ double render (RootsKeysProcessor& p, double seconds, bool& finite)
     }
     p.setPlayHead (nullptr);
     return std::sqrt (sum / (double) juce::jmax (1L, n));
+}
+// toca com a DAW parada (só o PREVIEW da machine) e devolve o RMS de cada lado
+void renderLR (RootsKeysProcessor& p, double seconds, double& l, double& r)
+{
+    const double sr = 48000.0; const int bs = 512;
+    FakePlayHead ph; ph.playing = false;
+    p.setPlayHead (&ph);
+    p.prepareToPlay (sr, bs);
+    juce::AudioBuffer<float> buf (2, bs);
+    double sl = 0, sr2 = 0; long n = 0;
+    for (int b = 0; b < (int) (seconds * sr / bs); ++b)
+    {
+        if (b % 8 == 0) juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
+        juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+        for (int i = 0; i < bs; ++i) { sl += (double) buf.getSample (0, i) * buf.getSample (0, i); sr2 += (double) buf.getSample (1, i) * buf.getSample (1, i); ++n; }
+    }
+    p.setPlayHead (nullptr);
+    l = std::sqrt (sl / (double) juce::jmax (1L, n)); r = std::sqrt (sr2 / (double) juce::jmax (1L, n));
 }
 } // namespace
 
@@ -153,7 +172,36 @@ int main (int argc, char** argv)
         check (getP (p.apvts, "machineOn") > 0.5f && juce::roundToInt (getP (p.apvts, "mode")) == 1,
                "projeto antigo: 'tocar com a DAW' vira CHORD MACHINE ligada (o valor do modo fica guardado)");
     }
-    {   // 6) capturas da interface
+    {   // 6) 3.3: PREVIEW na aba do instrumento, PAN do piano e da guitarra, presets do mega banco
+        RootsKeysProcessor p;
+        check (std::abs (getP (p.apvts, "pianoPan")) < 1e-6f && std::abs (getP (p.apvts, "gtrPan")) < 1e-6f, "PAN do piano e da guitarra começam no centro");
+        auto* pp = p.machinePreviewParam();
+        check (pp != nullptr, "PREVIEW da aba INSTRUMENTO ligado ao PREVIEW da CHORD MACHINE");
+        if (pp != nullptr) pp->setValueNotifyingHost (1.0f);
+        double l = 0, r = 0;
+        renderLR (p, 3.0, l, r);
+        check (l > 0.01 && r > 0.01 && std::abs (l - r) / (l + r) < 0.2, "PREVIEW toca com a DAW parada, piano no centro (L " + juce::String (l, 4) + " R " + juce::String (r, 4) + ")");
+        setP (p.apvts, "pianoPan", -1.0f);
+        renderLR (p, 3.0, l, r);
+        check (l > 0.01 && r < l * 0.2, "PAN do piano todo para a esquerda (sobra só o reverb) (L " + juce::String (l, 4) + " R " + juce::String (r, 5) + ")");
+        setP (p.apvts, "pianoPan", 0.0f);
+        setP (p.apvts, "gtrOn", 1.0f); setP (p.apvts, "pianoLevel", 0.0f); setP (p.apvts, "gtrPan", 1.0f);
+        renderLR (p, 3.0, l, r);
+        check (r > 0.003 && l < r * 0.2, "PAN da guitarra do skank toda para a direita (L " + juce::String (l, 5) + " R " + juce::String (r, 4) + ")");
+        int withH = 0, pend = 0;
+        for (int i = 0; i < riddimbank::numEntries; ++i) { withH += riddimbank::hasHarmony (i); pend += riddimbank::entries[i].harmony >= 2; }
+        check (withH > 300 && withH + pend == riddimbank::numEntries, "mega banco: " + juce::String (withH) + juce::String::fromUTF8 (" músicas com harmonia, ") + juce::String (pend) + " pendentes fora");
+        {
+            juce::PopupMenu m; riddimbank::addMegaMenus (m, 0, "MRK-80-teste");
+            check (m.getNumItems() >= 6, "mega banco: menu com estilos, riddims A-Z, musicas A-Z e favoritos");
+            const bool before = riddimbank::isFavorite ("MRK-80-teste", 0);
+            riddimbank::toggleFavorite ("MRK-80-teste", 0);
+            check (riddimbank::isFavorite ("MRK-80-teste", 0) != before, "favoritar e desfavoritar uma musica");
+            riddimbank::toggleFavorite ("MRK-80-teste", 0);
+            riddimbank::favFile ("MRK-80-teste").getFile().deleteFile();
+        }
+    }
+    {   // 7) capturas da interface
         RootsKeysProcessor p;
         setP (p.getMachine().apvts, "bubble", 1.0f);
         std::unique_ptr<juce::AudioProcessorEditor> ed (p.createEditor());

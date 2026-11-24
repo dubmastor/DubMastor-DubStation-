@@ -5,23 +5,22 @@ on:
     branches: [main]
     paths:
       - 'TapeEcho/**'
-      - '.github/workflows/build-tapeecho.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
     tags:
       - 'MTE-12-*'
   pull_request:
     paths:
       - 'TapeEcho/**'
-      - '.github/workflows/build-tapeecho.yml'
-      - '.github/scripts/**'
-      - '.github/installer/**'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag da release que deve receber os instaladores (vazio = só compilar)'
         required: false
         default: ''
+
+# só o build mais novo de cada branch / PR roda: um push novo cancela o anterior (economiza as máquinas Mac)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

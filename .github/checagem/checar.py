@@ -148,8 +148,9 @@ else:
             continue
         v = versao(p["pasta"])
         if pac["plugins"].get(p["sigla"]) != v:
-            err("DubStation", f"{p['sigla']} está na {v}, o instalador completo registra {pac['plugins'].get(p['sigla'])}: "
-                "atualize 'pacote' → 'plugins' e suba 'pacote' → 'versao' no plugins.json")
+            # regra do dono: o instalador completo só é atualizado quando ele pedir (alguns plugins ainda estão em teste)
+            warn("DubStation", f"{p['sigla']} está na {v}, o instalador completo {pv} tem a {pac['plugins'].get(p['sigla'])} "
+                 "(atualize 'pacote' só quando o dono pedir)")
     if pac.get("pausado"):
         # instalador completo pausado: fica fora do site até ser liberado (tirar "pausado" e pôr os links de volta)
         warn("DubStation", f"instalador completo {pv} pausado (sem link no site)")

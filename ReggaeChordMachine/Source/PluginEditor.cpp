@@ -641,7 +641,11 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
     exportBtn.onClick = [this] { exportMidi(); };
     addAndMakeVisible (exportBtn);
     presetBtn.onClick = [this] { showPresets(); };
+#ifdef MCM_MEGA_BANK
+    presetBtn.setTooltip (juce::String::fromUTF8 ("Mega banco: estilos, riddims A–Z, músicas A–Z e favoritos (só riddims com a harmonia levantada)"));
+#else
     presetBtn.setTooltip (juce::String::fromUTF8 ("Harmonias clássicas por estilo: roots, rockers, rub a dub, lovers rock, dancehall digital e new roots"));
+#endif
     addAndMakeVisible (presetBtn);
     addAndMakeVisible (dragZone);
 
@@ -1227,6 +1231,23 @@ void DubChordsPanel::resized()
 // PRESETS: um submenu por estilo de reggae, com a década e os acordes de cada preset
 void DubChordsPanel::showPresets()
 {
+#ifdef MCM_MEGA_BANK
+    // MRK-80: o mesmo padrão de presets do mega banco da Riddim Machine (só riddims com a harmonia levantada)
+    {
+        juce::PopupMenu mega;
+        riddimbank::addMegaMenus (mega, proc.getBankEntry(), MCM_MEGA_BANK);
+        juce::Component::SafePointer<DubChordsPanel> safe (this);
+        mega.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&presetBtn),
+                            [safe] (int r)
+                            {
+                                if (safe == nullptr || r == 0) return;
+                                if (r == riddimbank::favToggleId) { riddimbank::toggleFavorite (MCM_MEGA_BANK, safe->proc.getBankEntry()); safe->showPresets(); return; }
+                                if (const int e = riddimbank::entryFromMenuResult (r); e >= 0 && riddimbank::hasHarmony (e)) safe->proc.applyBankEntry (e);
+                                safe->repaint();
+                            });
+        return;
+    }
+#endif
     juce::PopupMenu menu;
     // BANCO ÚNICO DE RIDDIMS (o mesmo do MRBM-69, MRDM-12 e MRM-0420)
     riddimbank::addMenus (menu, proc.getBankEntry());
