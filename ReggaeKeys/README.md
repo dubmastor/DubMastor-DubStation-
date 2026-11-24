@@ -21,7 +21,7 @@ Cadeia de saída: **Tape Echo Mastor Tape Echo MTE-12** (o mesmo eco do Dub Stat
 
 ## Timbres de piano
 
-Sete botões logo abaixo do visor do modo piano (o visor mostra o timbre escolhido). O plugin abre no **M1 GR**:
+Dez botões, em duas linhas, logo abaixo do visor do modo piano (o visor mostra o timbre escolhido). O plugin abre no **M1 GRAND**:
 
 | Timbre | Som |
 |---|---|
@@ -31,7 +31,10 @@ Sete botões logo abaixo do visor do modo piano (o visor mostra o timbre escolhi
 | **FM EP** | piano elétrico FM estilo Yamaha DX: corpo 1:1 + "tine" metálico 1:14 que some rápido; o toque mais forte abre o brilho |
 | **CP-80** | piano de cauda elétrico estilo Yamaha CP-80: cordas curtas, captador piezo, meio "honky", pouco grave e sustentação curta |
 | **C7** | cauda de concerto estilo Yamaha C7: ataque rápido, brilho em volta de 3 kHz que corta a mistura, cordas mais limpas |
-| **M1 GR** | o Grand Piano do Korg M1: cauda com a "presença" do M1 em 2,8 kHz, pouca inarmonicidade e o decaimento do loop da ROM (**timbre de fábrica**) |
+| **M1 GRAND** | o Grand Piano do Korg M1: cauda com a "presença" do M1 em 2,8 kHz, pouca inarmonicidade e o decaimento do loop da ROM (**timbre de fábrica**) |
+| **M1 COMP** | o Piano 16 do Korg M1 comprimido como no reggae e dancehall dos anos 90: ataque duro, cauda alta, quase não muda com o toque |
+| **HONKY** | piano de armário Honky Tonk: cordas desafinadas entre si (batimento rápido), caixa de meio, pouco agudo e curto — o piano dos estúdios de Kingston |
+| **CZ-101** | piano do Casio CZ-101 por phase distortion: começa com brilho de serra e o DCW fecha para o seno; sem velocity |
 
 BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
 
@@ -115,7 +118,7 @@ Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, 
 - Nome novo **Mastor Reggae Keys MRK-80**; aba **CHORD MACHINE** com o MRCM-1240 inteiro (só maior e menor) no lugar da DUB CHORDS; banco único de riddims; versão para celular.
 
 ## Novidades da 2.4
-- Timbres de piano **GRAND**, **MT-40** (estilo Casio), **FM EP** (estilo Yamaha DX), **CP-80** e **C7** (Yamaha) e **M1 GR** (Grand Piano do Korg M1, o de fábrica), além do M1.
+- Timbres de piano **GRAND**, **MT-40** (estilo Casio), **FM EP** (estilo Yamaha DX), **CP-80** e **C7** (Yamaha) **M1 GRAND** (Grand Piano do Korg M1, o de fábrica), **M1 COMP**, **HONKY** (Honky Tonk) e **CZ-101** (Casio), além do M1.
 - Rodas **PITCH** e **MOD** usáveis com o mouse; pitch bend (±2 semitons) e vibrato agora soam (também pelo MIDI).
 
 ## Novidades da 2.3

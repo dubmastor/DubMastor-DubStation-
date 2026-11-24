@@ -103,7 +103,8 @@ struct Params
     int   mode = 0;            // 0 = Piano, 1 = Órgão
     // Piano
     float pianoLevel  = 0.8f;
-    int   pianoType = 0;       // 0 = M1, 1 = Grand Piano, 2 = MT-40 (Casio), 3 = FM EP (Yamaha DX), 4 = Yamaha CP-80, 5 = Yamaha C7, 6 = M1 Grand Piano (Korg)
+    int   pianoType = 0;       // 0 = M1, 1 = Grand Piano, 2 = MT-40 (Casio), 3 = FM EP (Yamaha DX), 4 = Yamaha CP-80, 5 = Yamaha C7, 6 = M1 Grand Piano (Korg),
+                               //   7 = M1 Piano 16 comprimido, 8 = Honky Tonk (piano de armário), 9 = Casio CZ-101 (phase distortion)
     float pianoBright = 0.6f;
     float pianoDecay  = 0.5f;
     float pianoChorus = 0.5f;
@@ -248,6 +249,7 @@ struct PianoVoice
     float bph[MaxP], binc[MaxP], bdep[MaxP];
     // MT-40 (Casio) e FM EP (Yamaha DX)
     float oPh = 0, oInc = 0, oEnv = 0, oCoef = 0, oLp = 0, oLpCoef = 0, oHold = 0, oHoldCnt = 0, oHoldLen = 1;
+    float pdD = 0.5f, pdCoef = 1, pdTarget = 0.5f;   // CZ-101: "DCW" (quanto a fase entorta) e o seu envelope
     float cPh[2] {}, mPh[2] {}, cInc[2] {}, mInc[2] {}, idx[2] {}, idxCoef[2] {}, cAmp[2] {}, cE1 = 0, cE2 = 0, cC1 = 0, cC2 = 0;
 
     void start (int n, float vel, float sr, const Params& p, uint64_t stamp)
@@ -255,17 +257,20 @@ struct PianoVoice
         active = true; held = true; releasing = false; note = n; age = stamp;
         rng.s = 0x9e3779b9u * (uint32_t) (n + 1) + (uint32_t) stamp;
         type = juce_clampType (p.pianoType);
-        if (type == 1 || type >= 4) { startGrand (n, vel, sr, p, type); return; }
+        if (type == 1 || (type >= 4 && type <= 6) || type == 8) { startGrand (n, vel, sr, p, type); return; }
         if (type == 2) { startCasio (n, sr, p); return; }
+        if (type == 9) { startCz (n, sr, p); return; }
+        const bool comp = type == 7;   // M1 Piano 16 "comprimido até o talo", como no dancehall dos anos 90
         if (type == 3) { startFm (n, vel, sr, p); return; }
 
         const float f    = midiToHz ((float) n);
         const float v    = clampf (vel, 0.0f, 1.0f);
         const float br   = p.pianoBright;
         const float B    = 0.00012f * std::pow (2.0f, ((float) n - 60.0f) / 16.0f); // inarmonicidade
-        const float pw   = clampf (2.0f - 0.9f * br - 0.7f * v, 0.55f, 2.2f);       // inclinação espectral
+        const float pw   = clampf ((comp ? 1.75f : 2.0f) - 0.9f * br - (comp ? 0.35f : 0.7f) * v, 0.5f, 2.2f);   // inclinação espectral
         const float tBase = clampf ((1.2f + 10.0f * p.pianoDecay) * std::pow (2.0f, -((float) n - 60.0f) / 18.0f), 0.25f, 22.0f);
-        const float gain = 0.16f * (0.2f + 0.8f * std::pow (v, 1.3f));
+        const float gain = comp ? 0.15f * (0.7f + 0.3f * v)                       // compressão: quase não muda com o toque
+                                : 0.16f * (0.2f + 0.8f * std::pow (v, 1.3f));
 
         np = 0;
         for (int k = 1; k <= MaxP; ++k)
@@ -281,7 +286,7 @@ struct PianoVoice
 
             const float t2 = tBase / (1.0f + 0.12f * (float) (k - 1) + 1.6f * std::pow (fk / 1000.0f, 1.25f));
             const float t1 = std::min (0.35f, 0.04f + t2 * 0.08f);
-            const float w  = clampf (0.30f + 0.045f * (float) k, 0.0f, 0.93f);
+            const float w  = clampf ((comp ? 0.12f : 0.30f) + 0.045f * (float) k, 0.0f, 0.93f);   // comprimido: a cauda fica alta
 
             ph[np]  = rng.uni();
             inc[np] = fk / sr;
@@ -300,7 +305,23 @@ struct PianoVoice
         nzFilt.set (std::min (6.0f * f, 7000.0f), 0.9f, sr);
     }
 
-    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 6 ? 6 : t); }
+    static int juce_clampType (int t) { return t < 0 ? 0 : (t > 9 ? 9 : t); }
+
+    // ---- CASIO CZ-101: piano por phase distortion — começa entortado (brilho de serra) e o DCW fecha para o seno
+    void startCz (int n, float sr, const Params& p)
+    {
+        const float f = midiToHz ((float) n);
+        oPh = 0; oInc = f / sr;
+        oEnv = 0.17f;                                                   // o CZ-101 não tem velocity
+        oCoef = std::exp (-1.0f / ((0.6f + 2.2f * p.pianoDecay) * sr));
+        pdD = clampf (0.06f + 0.12f * (1.0f - p.pianoBright), 0.04f, 0.2f);   // fase bem entortada no ataque
+        pdTarget = 0.5f;                                                // 0,5 = seno puro
+        pdCoef = std::exp (-1.0f / ((0.10f + 0.25f * p.pianoBright) * sr));
+        oLp = 0; oLpCoef = 1.0f - std::exp (-kTwoPi * 9000.0f / sr);
+        np = 0; nzEnv = 0; nzLvl = 0;
+        att = 0; attInc = 1.0f / (0.001f * sr);
+        rel = 1; relCoef = 1;
+    }
 
     // ---- GRAND PIANO: mais parciais e inarmonicidade, decaimento longo, cordas que batem
     // variante 4 = Yamaha CP-80 (piano de cauda elétrico: cordas curtas, captador piezo, som "honky" e curto)
@@ -309,13 +330,14 @@ struct PianoVoice
     //              pouca inarmonicidade e decaimento um pouco mais curto (o loop da amostra), com chorus do M1
     void startGrand (int n, float vel, float sr, const Params& p, int variant = 1)
     {
-        const bool cp = variant == 4, c7 = variant == 5, m1g = variant == 6;
+    // variante 8 = Honky Tonk (piano de armário dos estúdios de Kingston, cordas desafinadas entre si, mais curto e escuro)
+        const bool cp = variant == 4, c7 = variant == 5, m1g = variant == 6, ht = variant == 8;
         const float f  = midiToHz ((float) n);
         const float v  = clampf (vel, 0.0f, 1.0f);
         const float br = p.pianoBright;
         const float B  = (cp ? 0.0011f : c7 ? 0.00024f : m1g ? 0.00018f : 0.00028f) * std::pow (2.0f, ((float) n - 60.0f) / 14.0f);
         const float pw = clampf ((cp ? 1.9f : c7 ? 2.1f : m1g ? 2.0f : 2.4f) - 0.8f * br - 1.0f * v, 0.6f, 2.6f);
-        const float tBase = clampf ((cp ? 1.4f + 6.0f * p.pianoDecay : m1g ? 2.0f + 11.0f * p.pianoDecay : 2.5f + 14.0f * p.pianoDecay) * std::pow (2.0f, -((float) n - 60.0f) / 16.0f), 0.3f, 30.0f);
+        const float tBase = clampf ((cp ? 1.4f + 6.0f * p.pianoDecay : ht ? 1.2f + 5.0f * p.pianoDecay : m1g ? 2.0f + 11.0f * p.pianoDecay : 2.5f + 14.0f * p.pianoDecay) * std::pow (2.0f, -((float) n - 60.0f) / 16.0f), 0.3f, 30.0f);
         const float gain = (m1g ? 0.125f : 0.15f) * (0.15f + 0.85f * std::pow (v, 1.5f));
         np = 0;
         for (int k = 1; k <= MaxP; ++k)
@@ -328,6 +350,11 @@ struct PianoVoice
             {
                 const float d = (fk - 1200.0f) / 700.0f;                    // ressonância do captador piezo
                 a *= (0.55f + 1.3f * std::exp (-d * d)) * (fk < 180.0f ? 0.6f : 1.0f);   // pouco grave, meio "honky"
+            }
+            else if (ht)
+            {
+                const float d = (fk - 900.0f) / 900.0f;                     // caixa do armário: meio e pouco agudo
+                a *= (0.7f + 0.8f * std::exp (-d * d)) * (fk > 4000.0f ? 0.5f : 1.0f);
             }
             else if (m1g)
             {
@@ -345,8 +372,8 @@ struct PianoVoice
             ph[np] = rng.uni(); inc[np] = fk / sr;
             e1[np] = gain * a * w; e2[np] = gain * a * (1.0f - w);
             c1[np] = std::exp (-1.0f / (t1 * sr)); c2[np] = std::exp (-1.0f / (t2 * sr));
-            bph[np] = rng.uni(); binc[np] = (0.35f + 1.6f * rng.uni()) / sr;
-            bdep[np] = (k <= 10 ? 0.22f : 0.08f) * (cp ? 1.3f : c7 ? 0.7f : m1g ? 0.6f : 1.0f);
+            bph[np] = rng.uni(); binc[np] = (ht ? 2.5f + 4.0f * rng.uni() : 0.35f + 1.6f * rng.uni()) / sr;   // honky: cordas ~10 cents fora
+            bdep[np] = (k <= 10 ? 0.22f : 0.08f) * (cp ? 1.3f : c7 ? 0.7f : m1g ? 0.6f : ht ? 2.6f : 1.0f);
             ++np;
         }
         att = 0; attInc = 1.0f / (0.0015f * sr);
@@ -401,6 +428,8 @@ struct PianoVoice
         float t = note > 88 ? 1.2f : 0.11f;   // notas agudas sem abafador
         if (type == 1 || type == 5 || type == 6) t = note > 88 ? 1.8f : 0.16f;
         if (type == 4) t = note > 88 ? 0.9f : 0.12f;
+        if (type == 8) t = note > 88 ? 0.8f : 0.13f;
+        if (type == 9) t = 0.08f;
         if (type == 2) t = 0.06f;
         if (type == 3) t = 0.22f;
         relCoef = std::exp (-1.0f / (t * sr));
@@ -420,6 +449,20 @@ struct PianoVoice
             if (--oHoldCnt <= 0.0f) { oHold = std::round (oLp * 48.0f) / 48.0f; oHoldCnt += oHoldLen; }   // ~6 bits + 16 kHz
             att = std::min (1.0f, att + attInc);
             const float out = oHold * oEnv * att * rel;
+            oEnv *= oCoef;
+            if (releasing) rel *= relCoef;
+            if (rel < 1.0e-4f || oEnv < 1.0e-4f) active = false;
+            return out;
+        }
+        if (type == 9)
+        {
+            oPh += oInc * fm; if (oPh >= 1.0f) oPh -= 1.0f;
+            pdD = pdTarget + (pdD - pdTarget) * pdCoef;
+            const float w = oPh < pdD ? 0.5f * oPh / pdD : 0.5f + 0.5f * (oPh - pdD) / (1.0f - pdD);   // phase distortion
+            const float x = -S (wrap1 (w + 0.25f));                                                       // -cos
+            oLp += (x - oLp) * oLpCoef;
+            att = std::min (1.0f, att + attInc);
+            const float out = oLp * oEnv * att * rel;
             oEnv *= oCoef;
             if (releasing) rel *= relCoef;
             if (rel < 1.0e-4f || oEnv < 1.0e-4f) active = false;
@@ -446,7 +489,7 @@ struct PianoVoice
         }
 
         float s = 0;
-        if (type == 1 || type >= 4)
+        if (type == 1 || (type >= 4 && type <= 6) || type == 8)
         {
             for (int i = 0; i < np; ++i)
             {
@@ -469,7 +512,8 @@ struct PianoVoice
         const float nz = nzFilt.bp (rng.next()) * nzEnv * nzLvl;
         nzEnv *= nzCoef;
         att = std::min (1.0f, att + attInc);
-        const float out = (s + nz) * att * rel;
+        float out = (s + nz) * att * rel;
+        if (type == 7) out = 0.42f * std::tanh (2.4f * out);   // M1 comprimido: segura o pico, sobe a cauda
         if (releasing) rel *= relCoef;
         if (rel < 1.0e-4f || (np > 0 && e2[0] < 1.0e-6f && nzEnv < 1.0e-4f)) active = false;
         return out;

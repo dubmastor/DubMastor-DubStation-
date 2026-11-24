@@ -200,8 +200,8 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
 
     // piano: timbres
     {
-        const char* names[7] = { "M1", "GRAND", "MT-40", "FM EP", "CP-80", "C7", "M1 GR" };
-        for (int i = 0; i < 7; ++i)
+        const char* names[kNumTimbres] = { "M1", "GRAND", "MT-40", "FM EP", "CP-80", "C7", "M1 GRAND", "M1 COMP", "HONKY", "CZ-101" };
+        for (int i = 0; i < kNumTimbres; ++i)
         {
             pianoTimbre[i].setButtonText (names[i]);
             pianoTimbre[i].getProperties().set ("style", "chip");
@@ -425,8 +425,9 @@ void RootsKeysEditor::updateLcd()
     auto pct = [this] (const char* id) { return juce::String (juce::roundToInt (proc.apvts.getRawParameterValue (id)->load() * 100.0f)).paddedLeft (' ', 2); };
     const int prog = proc.getCurrentProgram();
     const int type = (int) proc.apvts.getRawParameterValue ("pianoType")->load();
-    static const char* typeNames[7] = { "M1", "GRAND PIANO", "MT-40", "FM EP", "YAMAHA CP-80", "YAMAHA C7", "M1 GRAND PIANO" };
-    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, 6, type)]
+    static const char* typeNames[kNumTimbres] = { "M1", "GRAND PIANO", "MT-40", "FM EP", "YAMAHA CP-80", "YAMAHA C7", "M1 GRAND PIANO",
+                                                  "M1 PIANO 16 COMP", "HONKY TONK", "CASIO CZ-101" };
+    const juce::String l1 = type != 0 ? juce::String ("TIMBRE  ") + typeNames[juce::jlimit (0, kNumTimbres - 1, type)]
                           : prog < RootsKeysProcessor::getNumPianoPresets()
                               ? "P0" + juce::String (prog + 1) + " " + proc.getProgramName (prog)
                               : juce::String ("P--  Piano: Edit");
@@ -448,7 +449,7 @@ void RootsKeysEditor::timerCallback()
         pianoPreset[i].setToggleState (prog == i && (int) proc.apvts.getRawParameterValue ("pianoType")->load() == 0, juce::dontSendNotification);
         organPreset[i].setToggleState (prog == np + i, juce::dontSendNotification);
     }
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i < kNumTimbres; ++i)
         pianoTimbre[i].setToggleState ((int) proc.apvts.getRawParameterValue ("pianoType")->load() == i, juce::dontSendNotification);
     if (skin == 0)
     {
@@ -579,7 +580,7 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.setFont (VintageLookAndFeel::mono (9.0f, false));
             g.setColour (juce::Colour (0xff95959a));
             for (int i = 0; i < 4; ++i)
-                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 228, 96, 12, juce::Justification::centred);
+                g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 230, 96, 12, juce::Justification::centred);
 
             sectionTitle (kEcho, "TAPE ECHO", "MTE-12", plasticText, plasticMuted);
             sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
@@ -704,9 +705,14 @@ void RootsKeysEditor::resized()
     // piano
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
-        pianoPreset[i].setBounds (290 + i * 106, 198, 84, 26);
-    for (int i = 0; i < 7; ++i)
-        pianoTimbre[i].setBounds (290 + i * 57, 166, 54, 24);
+        pianoPreset[i].setBounds (290 + i * 106, 207, 84, 22);
+    {
+        // timbres em duas linhas de 5, agrupados por família (o índice do botão continua sendo o do parâmetro)
+        static const int order[kNumTimbres] = { 0, 6, 7, 1, 8,      // Korg M1 e acústicos
+                                                4, 5, 3, 9, 2 };    // Yamaha CP-80, C7, FM EP, Casio CZ-101, MT-40
+        for (int slot = 0; slot < kNumTimbres; ++slot)
+            pianoTimbre[order[slot]].setBounds (280 + (slot % 5) * 89, 164 + (slot / 5) * 21, 84, 19);
+    }
     {
         Knob* fs[4] = { &faderBright, &faderDecay, &faderChorus, &faderLevel };
         for (int i = 0; i < 4; ++i)

@@ -2,6 +2,8 @@
 
 - **Timbre inicial do piano:** o plugin agora abre no **M1 Grand Piano**, o piano de cauda do Korg M1 (antes abria no piano M1 da house).
 - **Timbres Yamaha:** novos botões **CP-80** (piano de cauda elétrico Yamaha CP-80, com o meio "honky" do captador) e **C7** (cauda de concerto Yamaha C7, brilhante e com ataque rápido), além do FM EP estilo DX que já existia.
+- **Timbres do skank digital jamaicano** (estudo dos teclados mais usados no reggae e no dancehall): **M1 COMP**, o Piano 16 do Korg M1 comprimido como no dancehall dos anos 90 (cauda alta, quase não muda com o toque); **HONKY**, piano de armário Honky Tonk com as cordas desafinadas entre si, escuro e curto, como os pianos dos estúdios de Kingston; e **CZ-101**, o piano por phase distortion do Casio CZ-101 (mini teclado de Steely & Clevie).
+- Os 10 timbres ficam em duas linhas abaixo do visor: Korg M1 e acústicos em cima, Yamaha e Casio embaixo.
 - Os presets de piano M1 e os timbres antigos continuam iguais; projetos salvos abrem com o timbre que tinham.
 
 ## Mastor Reggae Keys MRK-80 3.0 🟢🟡⚫
