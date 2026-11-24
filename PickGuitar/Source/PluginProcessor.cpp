@@ -285,7 +285,7 @@ void PickGuitarProcessor::setStateInformation (const void* data, int sizeInBytes
         {
             auto tree = ValueTree::fromXml (*xml);
             const String e = tree.getProperty ("ppEdits").toString();
-            for (int i = 0; i < mpg::kCycle; ++i) edits[(size_t) i].store ((int8_t) (i < e.length() ? jlimit (0, 2, e[i] - '0') : 0));
+            for (int i = 0; i < mpg::kCycle; ++i) edits[(size_t) i].store ((int8_t) (i < e.length() ? jlimit (0, 2, (int) e[i] - (int) '0') : 0));
             apvts.replaceState (tree);
         }
 }

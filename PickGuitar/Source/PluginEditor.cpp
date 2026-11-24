@@ -359,8 +359,9 @@ int EqGraph::hitNode (Point<float> p) const
 void EqGraph::setBand (int i, float f, float g, float q, bool)
 {
     const String n (i + 1);
-    for (auto [id, v] : { std::pair<String, float> { "eqF" + n, f }, { "eqG" + n, g }, { "eqQ" + n, q } })
-        if (auto* p = proc.apvts.getParameter (id)) p->setValueNotifyingHost (p->convertTo0to1 (v));
+    const std::array<std::pair<String, float>, 3> vals { { { "eqF" + n, f }, { "eqG" + n, g }, { "eqQ" + n, q } } };
+    for (const auto& iv : vals)
+        if (auto* p = proc.apvts.getParameter (iv.first)) p->setValueNotifyingHost (p->convertTo0to1 (iv.second));
 }
 void EqGraph::updateReadout (int i)
 {
