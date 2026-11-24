@@ -273,7 +273,7 @@ const DEF = { page: 1, bpm: 76, base: true, timbre: 0, filters: [1, 0, 1, 0], pi
   wahOn: false, wahSens: 0.6, wahRange: 0.7, phOn: false, phRate: 0.4, phDepth: 0.55, echoOn: false, echoTime: 1, echoFb: 0.4, echoMix: 0.45,
   maxOn: true, rev: 0.2, master: 0.8, src: 0,
   slots: [{ root: 9, minor: true, dur: 1, on: true }, { root: 2, minor: true, dur: 1, on: true }, { root: 7, minor: false, dur: 1, on: true }, { root: 4, minor: true, dur: 1, on: true }],
-  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 48, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
+  mus: 0, fill: 0, fillEvery: 4, nota: 0, center: 48, reg: 2, density: 0.8, swing: 0.15, velocity: 0.85, seed: 1, use: 0, edits: null, bank: -1 };
 let S = JSON.parse(JSON.stringify(DEF));
 try { const sv = JSON.parse(localStorage.getItem('mrcl71') || 'null'); if (sv && typeof sv === 'object') S = Object.assign(S, sv); } catch (e) {}
 if ((S.reg | 0) < 2) { S.center = clamp(S.center - 12, 40, 62); S.reg = 2; S.edits = null; }   // uma oitava abaixo (teste de 23/nov)
