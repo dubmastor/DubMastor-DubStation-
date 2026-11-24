@@ -123,3 +123,10 @@ na versão para celular (`site/web/introfills/`, funções `buildSequence`, `per
 da virada é o 1 do groove (a chegada). MIDI nas notas do MRD-12, canal 10. Tape Echo e saturador começam desligados.
 Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
 
+## Mastor Reggae Percussion MRP-77 (ReggaePercussion/)
+Percussão de reggae com a PERC MACHINE. Os 23 sons, os grooves do estudo, os efeitos e o MIDI ficam em `Source/PercEngine.h`
+(sem JUCE); a versão para celular (`site/web/reggaepercussion/`) tem a mesma síntese e os mesmos grooves em JavaScript (`hit`, `GROUPS`):
+ao mudar um, mude o outro. Tudo na contagem com a caixa no 2 e no 4 (1 passo = 1 semicolcheia). As notas dos pads ficam **fora da
+faixa 36–51 do MRD-12** (o teste falha se alguma cair lá). Saturador e Tape Echo começam desligados. MIDI no padrão da linha:
+arrastar o groove, uma peça ou um compasso (na cor dele), MIDI colorido (compasso N = canal N) e BAIXAR MIDI.
+Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
