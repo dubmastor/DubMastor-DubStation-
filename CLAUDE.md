@@ -100,3 +100,10 @@ e as fontes de `ReggaeKeys/`, e o banco de riddims de `RiddimBank/Source`. Mudou
 Rode também o teste do MRO-68 (`ReggaeOrgan/tests/render_test.cpp`). Tudo nele é na contagem com a caixa no 2 e no 4.
 O motor de grooves (`ReggaeOrgan/Source/GrooveEngine.h`) tem uma cópia em JavaScript na versão para celular (`site/web/reggaeorgan/`):
 ao mudar um, mude o outro (mesmo gerador aleatório: o mesmo compasso tem que sair igual).
+
+## Mastor Reggae Clavinet MRCL-71 (ReggaeClavinet/)
+O som (`Source/ClavEngine.h`, corda por modelo físico) e o gerador das linhas (`Source/LineEngine.h`) têm uma cópia em JavaScript
+na versão para celular (`site/web/reggaeclavinet/`, funções `clavBuf` e `generate`): ao mudar um, mude o outro.
+Tudo na contagem com a caixa no 2 e no 4; nomes das notas como no Cubase (C3 = dó central). Timbre inicial: M1. Tape Echo começa desligado.
+A machine não escuta outros plugins: segue os acordes do plugin (banco de riddims) ou o MIDI que chega na trilha (o do MRP-80 ou do MRM-0420).
+Testes: `tests/render_test.cpp` (sem JUCE) e `tests/snapshot.cpp` (plugin inteiro + imagens de `docs/`).
