@@ -208,6 +208,8 @@ private:
     void mouseDown (const juce::MouseEvent&) override;   // PIANISTA (lista), FILL (lista) e DURAÇÃO DAS NOTAS (1/32 ou 1/64)
     juce::Rectangle<int> noteSizeArea() const;
     juce::Rectangle<int> fillArea() const;               // FILL (lista), à esquerda da DURAÇÃO DAS NOTAS
+    juce::Rectangle<int> pianistArea() const;            // PIANISTA: a janela grande ou, no MRP-80, a plaqueta ao lado do FILL
+    juce::Rectangle<int> plaque (int i) const;
     int lastPianistKey = -1;
     void setupKnob (Knob&, const juce::String& paramId, const juce::String& name);
     void setupToggle (Toggle&, const juce::String& paramId, const juce::String& text);
@@ -225,6 +227,7 @@ private:
     Knob center, velocity, swing;
     Knob bpm, pianoLvl, organLvl, reps;
     juce::Rectangle<int> patternArea;   // skank sempre no contratempo (janela fixa)
+    std::unique_ptr<ChoiceWindow> patternWin;   // só no Reggae Keys MRK-80: CONTRATEMPO ou BANG BANG
     Toggle bubble, sound;
     PreviewButton previewBtn;
     std::unique_ptr<ButtonAttach> previewAtt;

@@ -87,6 +87,9 @@ O workflow `.github/workflows/build-riddimmachine.yml` já roda quando qualquer 
   o piano é só piano e o órgão é o **Mastor Reggae Organ MRO-68** (um plugin por músico; o MIDI arrastado toca no instrumento certo).
   O motor `ReggaePiano/Source/RootsKeysEngine.h` continua com o órgão porque o MRO-68, o MRCM-1240 e o MRM-0420 usam.
   Projetos da antiga aba DUB CHORDS migram em `migrateOldDubChords`. Versão para celular em `site/piano/` (usa `site/chords/engine.js`).
+  Só ele mostra o padrão do skank (parâmetro `pattern` do MRCM: CONTRATEMPO ou BANG BANG; no MRCM-1240 e no MRM-0420 fica 0);
+  o PIANISTA e o FILL viram plaquetas embaixo da janela do padrão. Sem SOM INTERNO: a machine toca sempre no piano do instrumento.
+  `site/keys/` redireciona para `site/piano/`.
 - As machines separadas (MRDM-12, MRBM-69, MRCM-1240) ficam como **legado** no `plugins.json` (`"legado": "<instrumento>"`):
   saem do site e do pacote, a última release fica congelada (o workflow só publica por tag manual), mas a pasta continua
   porque o instrumento e o MRM-0420 compilam o código dela. Mudou uma machine? Teste o instrumento dela e o MRM-0420.

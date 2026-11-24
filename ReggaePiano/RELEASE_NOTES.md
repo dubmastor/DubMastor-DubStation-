@@ -1,18 +1,28 @@
-## Mastor Reggae Piano MRP-80 3.1 🟢🟡⚫
+## Mastor Reggae Piano MRP-80 3.2 🟢🟡⚫
 
-- **Nome novo: Mastor Reggae Piano MRP-80** (antes Mastor Reggae Keys MRK-80). Agora é **só piano**: o órgão saiu e é o **Mastor Reggae Organ MRO-68**. Um plugin por músico: o MIDI do skank arrastado para a DAW toca neste piano, e o do órgão toca no MRO-68. Projetos antigos abrem igual (no piano); o instalador apaga a cópia com o nome antigo
-- **PIANISTA** na CHORD MACHINE (clique em PIANISTA): o estilo do skank inspirado nos tecladistas jamaicanos, na contagem com a caixa no 2 e no 4 — CLÁSSICO (o skank de sempre), BECKFORD (shuffle do ska), GLADDY (curto), STERLING (seco, com espaço), DOWNIE (respostas sincopadas), LYN (lovers rock, mais longo), STEELY (digital, grade presa) e LENKY (stabs dos anos 2000). São inspirados no estilo de cada um, não transcrições
-- **FILL** (seletor separado, ao lado de NOTAS): no fim de cada frase de 4 compassos, nos tempos 3 e 4 — SEM FILL, BECKFORD (corrida do ska), GLADDY (fragmentos graves), STERLING (acorde segurado), DOWNIE (respostas sincopadas), LYN (arpejo), STEELY (semicolcheias digitais) e LENKY (stabs nos "e" e "a"). Combine qualquer pianista com qualquer fill
+- **Nome novo: Mastor Reggae Piano MRP-80** (antes Mastor Reggae Keys MRK-80): o piano é só piano e o órgão é o **Mastor Reggae Organ MRO-68**. Um plugin por músico: o MIDI do skank arrastado para a DAW toca neste piano, e o do órgão toca no MRO-68. Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo
+- **PIANISTA** na CHORD MACHINE (plaqueta PIANISTA, embaixo do PADRÃO DO SKANK): o estilo do skank inspirado nos tecladistas jamaicanos, na contagem com a caixa no 2 e no 4 — CLÁSSICO (o skank de sempre), BECKFORD (shuffle do ska), GLADDY (curto), STERLING (seco, com espaço), DOWNIE (respostas sincopadas), LYN (lovers rock, mais longo), STEELY (digital, grade presa) e LENKY (stabs dos anos 2000). São inspirados no estilo de cada um, não transcrições
+- **FILL** (plaqueta ao lado do PIANISTA e das NOTAS): no fim de cada frase de 4 compassos, nos tempos 3 e 4 — SEM FILL, BECKFORD (corrida do ska), GLADDY (fragmentos graves), STERLING (acorde segurado), DOWNIE (respostas sincopadas), LYN (arpejo), STEELY (semicolcheias digitais) e LENKY (stabs nos "e" e "a"). Combine qualquer pianista com qualquer fill
 - **FILLS só de acordes** (a firula do pianista na base): PUXADA (o próximo acorde adiantado no "a" do 4), DOBRADO, RAJADA, INVERSÕES, TERCINA e ARRASTADO, e o fill **a cada 4 ou 8 compassos** (no menu do FILL; o loop curto se repete até a frase)
 - **Visor MIDI editável** na CHORD MACHINE (botão MIDI ✎ na linha do LOOP): o loop inteiro em rolo de piano, cada acorde numa cor (as mesmas cores/canais do MIDI exportado). Clique põe o acorde que soa ali, arraste move, a borda estica, duplo clique apaga, roda do mouse muda a força; ARRASTE O MIDI leva o loop editado direto para a DAW e DESFAZER volta ao groove
 - **Nota de 1/64**: a duração das notas agora é 1/64 (padrão) ou 1/32, clicando na plaqueta NOTAS (projetos antigos continuam em 1/32)
-- **13 timbres de piano** em duas linhas: **M1 COMP** (o Piano 16 do Korg M1 comprimido, o skank digital do dancehall dos anos 90 — agora o timbre inicial), M1, **M1 GRAND**, GRAND, **HONKY** (piano de armário de Kingston), **CP-80** e **C7** (Yamaha), **RHODES**, **SUITCASE** (com tremolo), **WURLI** (Wurlitzer 200A), FM EP, **CZ-101** e MT-40. O gabinete muda com o timbre (Rhodes, Suitcase, Wurlitzer, Yamaha e Casio). Projetos salvos abrem com o timbre que tinham
-- **GUITAR SKANK**: botão novo ao lado do VOLUME que põe a guitarra do skank (timbre do Mastor Reggae Guitar MRG-68) tocando junto com o piano. Sempre começa desligado
-- A CHORD MACHINE toca só o **skank de piano** (o botão BUBBLE e o nível do Hammond saíram; o bubble é do organista no MRO-68)
-- Continuam os 4 presets de piano, o eco de fita, o flanger, o maximizer e os VUs
+- A CHORD MACHINE toca só o **skank de piano**: o botão BUBBLE saiu (o bubble é do organista no MRO-68). O pianista CLÁSSICO toca o PADRÃO DO SKANK escolhido (CONTRATEMPO ou BANG BANG); os outros pianistas têm o desenho próprio
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
 - **Banco de riddims filtrado:** a CHORD MACHINE mostra só as 321 músicas com o riddim (a harmonia) da gravação original (luz R acesa)
-- Versão para celular 3.1
+- Versão para celular 3.2
+
+## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+
+- **Só piano:** o órgão Hammond saiu do Reggae Keys (agora está no **Mastor Reggae Organ MRO-68**). Saíram o botão ORGAN, os drawbars e os presets de órgão. Projetos antigos no modo órgão abrem no piano.
+- **CHORD MACHINE:** o skank e o bubble tocam sempre no piano do instrumento (o SOM INTERNO da machine, com o Hammond, saiu daqui).
+- **Padrão BANG BANG** no skank (janela PADRÃO DO SKANK da aba CHORD MACHINE): além do CONTRATEMPO (o acorde no "&" de cada tempo, com a caixa no 2 e no 4), o **BANG BANG** dobra o bang: no "&" e de novo no "a" de cada tempo, o segundo um pouco mais fraco. As notas continuam de 1/32.
+- **Timbre inicial do piano:** o plugin agora abre no **M1 COMP**, o Piano 16 do Korg M1 comprimido, o piano mais usado no skank digital do reggae e do dancehall (antes abria no M1 sem compressão).
+- **M1 GRAND:** novo timbre com o piano de cauda do Korg M1.
+- **Timbres Yamaha:** novos botões **CP-80** (piano de cauda elétrico Yamaha CP-80, com o meio "honky" do captador) e **C7** (cauda de concerto Yamaha C7, brilhante e com ataque rápido), além do FM EP estilo DX que já existia.
+- **Timbres do skank digital jamaicano** (estudo dos teclados mais usados no reggae e no dancehall): **M1 COMP**, o Piano 16 do Korg M1 comprimido como no dancehall dos anos 90 (cauda alta, quase não muda com o toque); **HONKY**, piano de armário Honky Tonk com as cordas desafinadas entre si, escuro e curto, como os pianos dos estúdios de Kingston; e **CZ-101**, o piano por phase distortion do Casio CZ-101 (mini teclado de Steely & Clevie).
+- **Pianos elétricos:** **RHODES** (Rhodes Stage: tine redondo, sino curto e o "bark" do captador quando se toca forte), **SUITCASE** (Rhodes Suitcase, mais doce, com o tremolo da maleta) e **WURLI** (Wurlitzer 200A, nasal, rosna no toque forte).
+- Os 13 timbres ficam em duas linhas abaixo do visor: Korg M1, acústicos e Yamaha em cima; pianos elétricos e digitais embaixo.
+- Os presets de piano M1 e os timbres antigos continuam iguais; projetos salvos abrem com o timbre que tinham.
 
 ## Mastor Reggae Keys MRK-80 3.0 🟢🟡⚫
 

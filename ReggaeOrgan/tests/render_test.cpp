@@ -7,6 +7,7 @@
 #include <cstring>
 #include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include "GroovePlayer.h"
 
@@ -184,7 +185,7 @@ int main()
         s.ghost = mu.ghost; s.fillStyle = mu.fillStyle; s.fillEvery = mu.fillEvery;
         SoundParams sp;
         for (int d = 0; d < 9; ++d) { sp.bubbleDb[d] = (float) mu.bubbleDb[d]; sp.chopDb[d] = (float) mu.chopDb[d]; }
-        sp.ghostLevel = mu.ghost; sp.leslie = mu.leslie; sp.drive = mu.drive; sp.perc = mu.perc; sp.echoOn = true; sp.echoVol = 0.3f;
+        sp.ghostLevel = mu.ghost; sp.lesPreset = leslieFromMusician (mu.leslie); sp.lesSpeed = mu.leslie == 2 ? 1 : 0; sp.drive = mu.drive; sp.perc = mu.perc; sp.echoOn = true; sp.echoVol = 0.3f;
 
         const int sr = 48000, blk = 256;
         OrganTrio trio; trio.prepare (sr); trio.setParams (sp);
@@ -248,6 +249,58 @@ int main()
         writeWav (name.c_str(), L, R, sr);
     }
 
+    // ---- pianos elétricos no lugar do Hammond: o mesmo groove soa em todos, sem NaN e sem passar do teto
+    {
+        const char* nomes[5] = { "B3", "Rhodes Stage", "Rhodes Suitcase", "Wurlitzer", "DX EP" };
+        for (int ins = 0; ins < 5; ++ins)
+        {
+            const float sr = 48000.0f; const int N = (int) (6.0f * sr);
+            SoundParams sp; sp.instr = ins;
+            auto trioP = std::make_unique<OrganTrio>(); OrganTrio& trio = *trioP;   // no heap: 3 motores não cabem na pilha junto com o outro teste
+            trio.prepare (sr); trio.setParams (sp);
+            std::vector<float> L ((size_t) N), R ((size_t) N);
+            const int chord[3] = { 57, 60, 64 };
+            int pos = 0;
+            for (int k = 0; k < 8; ++k)   // skank/chop no contratempo: o "e" de cada tempo a 100 BPM
+            {
+                const int on = (int) ((k + 0.5) * 0.6 * sr), off = on + (int) (0.6 * sr / 16);
+                trio.render (&L[(size_t) pos], &R[(size_t) pos], on - pos); pos = on;
+                for (int nn : chord) trio.engine (OrganTrio::Chop).noteOn (nn, 0.8f);
+                trio.render (&L[(size_t) pos], &R[(size_t) pos], off - pos); pos = off;
+                for (int nn : chord) trio.engine (OrganTrio::Chop).noteOff (nn);
+            }
+            trio.render (&L[(size_t) pos], &R[(size_t) pos], N - pos);
+            float pk = 0; double e = 0;
+            for (int i = 0; i < N; ++i) { pk = std::max (pk, std::fabs (L[(size_t) i])); e += (double) L[(size_t) i] * L[(size_t) i]; }
+            const double db = 10.0 * std::log10 (e / N + 1e-12);
+            char msg[120]; std::snprintf (msg, sizeof msg, "instrumento %s soa (%.1f dB RMS) sem NaN e abaixo do teto", nomes[ins], db);
+            CHECK (pk > 0.02f && pk <= 1.0f && std::isfinite (db) && db > -45.0, msg);
+        }
+    }
+    // ---- Leslie de dois rotores: a corneta acelera antes do tambor, o freio para os dois, o som gira sem NaN
+    {
+        const float sr = 48000.0f; const int blk = 480;
+        LeslieDSP les; les.prepare (sr);
+        std::vector<float> L ((size_t) blk), R ((size_t) blk);
+        auto run = [&] (double secs)
+        {
+            for (int b = 0; b < (int) (secs * sr / blk); ++b)
+            {
+                for (int i = 0; i < blk; ++i) { const float x = 0.3f * std::sin (6.2831853f * 440.0f * (float) (b * blk + i) / sr); L[(size_t) i] = R[(size_t) i] = x; }
+                les.process (L.data(), R.data(), blk);
+                for (int i = 0; i < blk; ++i) CHECK (std::isfinite (L[(size_t) i]) && std::fabs (L[(size_t) i]) < 1.0f, "Leslie sem NaN e sem estourar");
+            }
+        };
+        les.set (1, 0, false, 0.8f); run (6.0);
+        CHECK (std::fabs (les.hornRate.load() - 0.83f) < 0.05f && std::fabs (les.drumRate.load() - 0.67f) < 0.05f, "122 CL\xc3\x81SSICA lenta: corneta 0,83 e tambor 0,67 rot/s");
+        les.set (1, 1, false, 0.8f); run (0.6);
+        CHECK (les.hornRate.load() > 6.0f && les.drumRate.load() < 4.5f, "na R\xc3\x81PIDA a corneta chega antes do tambor");
+        run (3.0);
+        CHECK (les.drumRate.load() > 5.5f, "o tambor chega na R\xc3\x81PIDA em ~2,4 s");
+        les.set (1, 1, true, 0.8f); run (6.0);
+        CHECK (les.hornRate.load() < 0.1f && les.drumRate.load() < 0.2f, "FREIO para os rotores");
+        for (int p = 0; p < NumLesliePresets; ++p) { les.set (p, 1, false, 1.0f); run (0.5); }
+    }
     std::printf (fails ? "\n%d FALHA(S)\n" : "\nTudo certo.\n", fails);
     return fails ? 1 : 0;
 }

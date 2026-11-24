@@ -1,12 +1,15 @@
-## Mastor Riddim Machine MRM-0420 2.5 — DubStation
+## Mastor Riddim Machine MRM-0420 2.6 — DubStation
 
 - **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
 - O MRM-0420 continua com o banco inteiro (356 músicas)
 - A HARMONIA mostra o **Mastor Reggae Piano MRP-80** (o antigo Reggae Keys MRK-80, agora só piano)
 - Aba CHORDS (MRCM-1240): **PIANISTA** (estilo do skank: Beckford, Gladdy, Sterling, Downie, Lyn, Steely, Lenky), **FILL** separado no fim de cada frase de 4 compassos e notas de 1/64 (padrão) ou 1/32 — projetos antigos continuam em 1/32
 - Painel da CHORD MACHINE (aba MÁQUINAS): botão MIDI ✎ com o visor editável, cada acorde numa cor, e ARRASTE O MIDI
-- O skank do piano agora toca no **M1 COMP** (o Piano 16 do Korg M1 comprimido), o novo timbre inicial do MRP-80
-- Versão para celular 2.5
+- Versão para celular 2.6
+
+## Mastor Riddim Machine MRM-0420 2.5 — DubStation
+
+- O skank do piano agora toca no **M1 COMP** (o Piano 16 do Korg M1 comprimido), o novo timbre de fábrica do Reggae Keys MRK-80 3.1.
 
 ## Mastor Riddim Machine MRM-0420 2.4 — DubStation
 

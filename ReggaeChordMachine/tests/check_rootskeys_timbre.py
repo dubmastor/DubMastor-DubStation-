@@ -48,7 +48,7 @@ def choice_default(pid):
         return 0   # Roots Keys antigo, sem esse parâmetro: só existia o M1
     return int(m.group(1))
 
-def preset(name):
+def preset(name, required=True):
     m = re.search(r'\{\s*"%s"\s*,(.*?)\},?\s*\n' % re.escape(name), rk)
     if not m:
         sys.exit(f'não achei o preset "{name}" no piano')

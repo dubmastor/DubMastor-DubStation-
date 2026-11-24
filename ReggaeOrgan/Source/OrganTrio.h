@@ -5,11 +5,12 @@
 //   [0] BUBBLE acento   registro próprio, sem Leslie (o bubble é seco e grave)
 //   [1] BUBBLE fantasma  mesmo registro, volume do knob GHOST (o Hammond não tem velocity:
 //                        a nota fantasma precisa de um nível próprio para soar mais fraca)
-//   [2] CHOP + FILLS     registro cheio (888), Leslie, drive, percussão opcional, eco de fita
+//   [2] CHOP + FILLS     registro cheio (888), drive, percussão opcional, eco de fita e a Leslie de dois rotores (LeslieDSP.h)
 // Depois da soma: reverb (de cada motor), master e o mesmo maximizer do MRP-80.
 #pragma once
 
 #include "RootsKeysEngine.h"
+#include "LeslieDSP.h"
 
 namespace mro
 {
@@ -18,14 +19,25 @@ struct SoundParams
     float bubbleDb[9] = { 0, 0, 8, 2, 0, 0, 0, 0, 0 };
     float chopDb[9]   = { 8, 8, 8, 0, 0, 0, 0, 0, 0 };
     float bubbleLevel = 0.85f, ghostLevel = 0.5f, chopLevel = 0.75f;
-    int   leslie = 0;          // 0 desligada, 1 lenta, 2 rápida (mão direita)
+    int   lesPreset = 0;       // Leslie da mão direita: preset (LeslieDSP.h), 0 = sem Leslie
+    int   lesSpeed = 0;        // 0 lenta (chorale), 1 rápida (tremolo)
+    bool  lesBrake = false;    // freio: os rotores param
+    float lesDepth = 0.8f;
     bool  perc = false;
     float drive = 0.2f, click = 0.35f;
     bool  echoOn = false;
     float echoVol = 0.5f, echoIntensity = 0.4f, echoRate = 0.5f;
     float reverb = 0.15f, master = 0.8f;
     bool  maxOn = true;
+    int   instr = 0;           // 0 Hammond B3 · 1 Rhodes Stage · 2 Rhodes Suitcase · 3 Wurlitzer 200A · 4 FM EP (DX7)
 };
+
+// instrumento -> timbre de piano elétrico do motor do MRK-80 (o 0 é o órgão)
+inline int epPianoType (int instr)
+{
+    static const int t[5] = { 0, 10, 11, 12, 3 };
+    return t[instr < 0 ? 0 : (instr > 4 ? 4 : instr)];
+}
 
 class OrganTrio
 {
@@ -35,6 +47,7 @@ public:
     void prepare (double sr)
     {
         for (auto& e : eng) e.prepare (sr);
+        les.prepare (sr);
         maxi.prepare ((float) sr);
     }
 
@@ -43,25 +56,33 @@ public:
     float gainReductionDb() const { return maxi.grDb; }
 
     rk::Engine& engine (int i) { return eng[i]; }
+    LeslieDSP& leslie() { return les; }
 
     void setParams (const SoundParams& sp)
     {
         for (int i = 0; i < NumEngines; ++i)
         {
             rk::Params& p = eng[i].params;
-            p.mode = 1;                       // sempre órgão
             const bool rh = (i == Chop);
+            // HAMMOND: o órgão de sempre. Os pianos elétricos tocam o MESMO groove (bubble, chop e fills)
+            // com o timbre do MRK-80; os drawbars e a percussão só valem no Hammond; a Leslie (depois do motor) vale para todos.
+            p.mode = sp.instr == 0 ? 1 : 0;
+            p.pianoType   = epPianoType (sp.instr);
+            p.pianoBright = rh ? 0.6f : 0.45f;     // bubble mais redondo, chop mais brilhante
+            p.pianoDecay  = rh ? 0.45f : 0.3f;
+            p.pianoChorus = sp.instr == 2 ? 0.15f : (rh ? 0.35f : 0.2f);
             for (int d = 0; d < 9; ++d) p.drawbar[d] = rh ? sp.chopDb[d] : sp.bubbleDb[d];
             p.percOn     = rh && sp.perc;
             p.perc3rd    = true;
             p.percFast   = true;
             p.click      = sp.click;
             p.drive      = rh ? sp.drive : sp.drive * 0.5f;
-            p.leslieFast = rh && sp.leslie == 2;
-            p.leslieMix  = (rh && sp.leslie > 0) ? 0.85f : 0.0f;
+            p.leslieFast = false;
+            p.leslieMix  = 0.0f;              // a Leslie antiga do motor fica desligada: a de dois rotores vem depois
             p.organLevel = i == Accent ? sp.bubbleLevel
                          : i == Ghost  ? sp.bubbleLevel * (0.12f + 0.88f * sp.ghostLevel)
                                        : sp.chopLevel;
+            p.pianoLevel = p.organLevel;
             // eco de fita só na mão direita (o bubble seco segura o groove), como num rack de dub
             p.echoOn        = rh && sp.echoOn;
             p.echoMode      = 7;
@@ -76,6 +97,7 @@ public:
             p.master = 1.0f;
             p.maxOn  = false;                 // a limitação é feita uma vez só, depois da soma
         }
+        les.set (sp.lesPreset, sp.lesSpeed, sp.lesBrake, sp.lesDepth);
         master = sp.master;
         maxOn  = sp.maxOn;
     }
@@ -87,9 +109,10 @@ public:
             const int m = std::min (n, kChunk);
             std::fill (L, L + m, 0.0f);
             std::fill (R, R + m, 0.0f);
-            for (auto& e : eng)
+            for (int i = 0; i < NumEngines; ++i)
             {
-                e.render (tL, tR, m);
+                eng[i].render (tL, tR, m);
+                if (i == Chop) les.process (tL, tR, m);
                 for (int s = 0; s < m; ++s) { L[s] += tL[s]; R[s] += tR[s]; }
             }
             for (int s = 0; s < m; ++s)
@@ -109,6 +132,7 @@ private:
     static constexpr int kChunk = 256;
     rk::Engine eng[NumEngines];
     rk::Maximizer maxi;
+    LeslieDSP les;
     float tL[kChunk] = {}, tR[kChunk] = {};
     float master = 0.8f, gain = 1.122f;
     bool maxOn = true;

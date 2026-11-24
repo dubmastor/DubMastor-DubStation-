@@ -1,8 +1,8 @@
-# Mastor Reggae Piano MRP-80 3.1
+# Mastor Reggae Piano MRP-80 3.2
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRP-80-3.1/MRP-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRP-80-3.1/MRP-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/piano/)**
+**[⬇️ Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRP-80-3.2/MRP-80-Windows-Instalador.exe)** · **[⬇️ macOS](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRP-80-3.2/MRP-80-macOS-Instalador.pkg)** · **📱 [Tocar no celular / navegador](https://dubmastor.github.io/DubMastor-DubStation-/piano/)**
 
 (Antes se chamava **DubMastor Roots Keys**, **Mastor Roots Keys MRK-80** e **Mastor Reggae Keys MRK-80**. Na 3.0 absorveu o **Mastor Reggae Chord Machine MRCM-1240** (aba CHORD MACHINE); na 3.1 o órgão saiu e virou o **Mastor Reggae Organ MRO-68**.)
 
@@ -36,7 +36,6 @@ Treze botões em duas linhas logo abaixo do visor (o visor mostra o timbre escol
 | **CZ-101** | Casio CZ-101 (Steely & Clevie): phase distortion, abre brilhante e fecha em senoide |
 | **MT-40** | teclado de brinquedo estilo Casio MT-40, bem lo-fi |
 
-**GUITAR SKANK** (botão com a guitarra, ao lado do VOLUME): a guitarra do skank toca junto com o piano, com o timbre do Mastor Reggae Guitar MRG-68 (Tele, captador da ponte, Twin Reverb), na região G3–E5. Sempre começa desligado.
 
 BRILHO e DECAY agem em todos os timbres. Os presets P01–P04 voltam para o M1.
 
@@ -51,9 +50,10 @@ As duas rodas do lado do teclado funcionam com o mouse e com o MIDI:
 
 Clique em **CHORD MACHINE** no cabeçalho: é o **Mastor Reggae Chord Machine MRCM-1240** inteiro (o código vem direto de `ReggaeChordMachine/`, nada copiado), só com acordes **maior e menor**:
 
-- **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano no contratempo com as duas mãos (o bubble de órgão é do Mastor Reggae Organ MRO-68).
+- **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano com as duas mãos no **PADRÃO DO SKANK**: CONTRATEMPO (o acorde no "&" de cada tempo) ou BANG BANG (no "&" e de novo no "a"), sempre com a caixa no 2 e no 4 (o bubble de órgão é do Mastor Reggae Organ MRO-68).
+- **PIANISTA**, **FILL** (a cada 4 ou 8 compassos) e **NOTAS** (1/64 ou 1/32): plaquetas embaixo do padrão do skank. O pianista CLÁSSICO toca o padrão escolhido; os outros têm o desenho próprio. **MIDI ✎** abre o visor editável, com cada acorde numa cor.
 - **PRESETS**: o banco único de riddims (356 músicas, 155 riddims; ESTILOS, RIDDIMS A–Z, MÚSICAS A–Z, luzes D B R) e as 180 harmonias clássicas.
-- **Som**: com o **SOM INTERNO** desligado (o padrão), os acordes tocam no piano do instrumento, passando pelo eco, flanger, reverb e maximizer. Ligado, toca o som próprio da machine (piano M1).
+- **Som**: os acordes tocam sempre no piano do instrumento, no timbre escolhido, passando pelo eco, flanger, reverb e maximizer.
 - **Tocar**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCA COM A DAW** (no cabeçalho) segue o play, o BPM e o loop da DAW.
 - **MIDI**: EXPORTAR ou ARRASTAR para a timeline, com repetição 1x a 8x.
 
@@ -78,7 +78,7 @@ M1 Classic · M1 Dub Skank · M1 Bright House · M1 Soft Ballad (P01–P04, timb
 
 ## Compilar
 
-O GitHub Actions (`.github/workflows/build-reggaekeys.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa os instaladores e os zips à release `MRK-80-x.y` (uma por versão; ela não vira a "latest" do repositório).
+O GitHub Actions (`.github/workflows/build-reggaepiano.yml`) testa o DSP, compila para Windows e Mac (universal), valida com **pluginval** e **auval** e anexa os instaladores e os zips à release `MRP-80-x.y` (uma por versão; ela não vira a "latest" do repositório).
 
 Localmente:
 ```bash
@@ -107,7 +107,7 @@ Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, 
 - Nome novo **Mastor Reggae Keys MRK-80**; aba **CHORD MACHINE** com o MRCM-1240 inteiro (só maior e menor) no lugar da DUB CHORDS; banco único de riddims; versão para celular.
 
 ## Novidades da 2.4
-- Timbres de piano **GRAND**, **MT-40** (estilo Casio) e **FM EP** (estilo Yamaha DX), além do M1.
+- Timbres de piano **GRAND**, **MT-40** (estilo Casio), **FM EP** (estilo Yamaha DX), **CP-80** e **C7** (Yamaha) **M1 GRAND** (Grand Piano do Korg M1), **M1 COMP** (o de fábrica), **HONKY** (Honky Tonk) **CZ-101** (Casio), **RHODES**, **SUITCASE** e **WURLI**, além do M1.
 - Rodas **PITCH** e **MOD** usáveis com o mouse; pitch bend (±2 semitons) e vibrato agora soam (também pelo MIDI).
 
 ## Novidades da 2.3

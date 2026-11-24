@@ -983,6 +983,18 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p),
         k->slider.updateText();
     }
 
+   #ifdef MCM_PANEL_TITLE
+    // Reggae Piano MRP-80 (antes Reggae Keys MRK-80 3.1): só piano. Os acordes tocam sempre no piano do instrumento:
+    // sem SOM INTERNO e sem os níveis do piano M1 / Hammond da machine. E o skank escolhe CONTRATEMPO ou BANG BANG.
+    patternWin = std::make_unique<ChoiceWindow> (*proc.apvts.getParameter ("pattern"), [] (int p) -> std::pair<juce::String, juce::String>
+    {
+        return std::make_pair (juce::String (p == dub::SkankBangBang ? "BANG BANG" : "CONTRATEMPO"), juce::String());
+    });
+    addAndMakeVisible (*patternWin);
+    for (juce::Component* c : { (juce::Component*) &sound.button, (juce::Component*) &pianoLvl.slider, (juce::Component*) &pianoLvl.label,
+                                (juce::Component*) &organLvl.slider, (juce::Component*) &organLvl.label })
+        c->setVisible (false);
+   #endif
     setupKnob (reps, "exportReps", "REPETIR");
     reps.slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     exportBtn.onClick = [this] { exportMidi(); };
@@ -1412,11 +1424,14 @@ void DubChordsPanel::renderBackground()
        #ifdef MCM_NO_BUBBLE   // dentro do Mastor Reggae Piano MRP-80: sem órgão (o bubble é do Mastor Reggae Organ MRO-68)
         if (k != &organLvl)
        #endif
-        drawKnobScale (g, k->slider, 11);
+        if (k->slider.isVisible()) drawKnobScale (g, k->slider, 11);
     g.setColour (colours::inkSoft);
     g.setFont (stencil (9.0f, 0.3f));
-    g.drawText (juce::String::fromUTF8 ("PIANISTA  \xe2\x96\xbe"), patternArea.translated (0, -15).withHeight (12), juce::Justification::centred);
-    {   // PIANISTA: janela que abre a lista dos chops (o nome é desenhado no paint)
+    g.drawText (patternWin != nullptr ? juce::String::fromUTF8 ("PADR\xc3\x83O DO SKANK") : juce::String::fromUTF8 ("PIANISTA  \xe2\x96\xbe"),
+                patternArea.translated (0, -15).withHeight (12), juce::Justification::centred);
+    if (patternWin == nullptr)
+    {   // PIANISTA: janela que abre a lista (o nome é desenhado no paint). No MRP-80 a janela é o PADRÃO DO SKANK
+        // e o PIANISTA vira uma plaqueta ao lado do FILL e das NOTAS.
         auto b = patternArea.toFloat();
         g.setColour (juce::Colours::black.withAlpha (0.35f));
         g.fillRoundedRectangle (b.translated (0, 2.0f), 5.0f);
@@ -1434,33 +1449,41 @@ void DubChordsPanel::renderBackground()
         g.fillRoundedRectangle (win, 2.0f);
     }
     // FILL (lista) e duração das notas: 1/32 (padrão) ou 1/64, clicando nas plaquetas (os valores são desenhados no paint)
-    for (auto [area, label] : { std::pair { fillArea(), "FILL  \xe2\x96\xbe" }, std::pair { noteSizeArea(), "NOTAS  \xe2\x96\xb8" } })
+    for (auto [area, label] : { std::pair { fillArea(), "FILL  \xe2\x96\xbe" }, std::pair { noteSizeArea(), "NOTAS  \xe2\x96\xb8" },
+                                std::pair { pianistArea(), "PIANISTA  \xe2\x96\xbe" } })
     {
+        if (area == patternArea) continue;   // sem o padrão do skank: o PIANISTA fica na janela grande
         auto r = area.toFloat();
         g.setColour (juce::Colours::white.withAlpha (0.45f));
         g.drawRoundedRectangle (r.translated (1, 1), 4.0f, 1.0f);
         g.setColour (colours::ink.withAlpha (0.55f));
         g.drawRoundedRectangle (r, 4.0f, 1.2f);
         g.setColour (colours::inkSoft);
-        g.setFont (stencil (9.0f, 0.3f));
-        g.drawText (juce::String::fromUTF8 (label), r.withHeight (r.getHeight() * 0.45f).translated (0, 4), juce::Justification::centred);
+        const bool narrow = patternWin != nullptr;   // três plaquetas: texto sem a seta e mais junto
+        juce::String txt = juce::String::fromUTF8 (label);
+        if (narrow) txt = txt.upToFirstOccurrenceOf (" ", false, false);
+        g.setFont (stencil (narrow ? 8.5f : 9.0f, narrow ? 0.12f : 0.3f));
+        g.drawText (txt, r.withHeight (r.getHeight() * 0.45f).translated (0, 4), juce::Justification::centred);
     }
     drawKnobScale (g, reps.slider, 4, { "1x", "2x", "4x", "8x" });
 }
 
-juce::Rectangle<int> DubChordsPanel::noteSizeArea() const
+// plaquetas embaixo da janela: FILL e NOTAS (e PIANISTA, quando a janela é o PADRÃO DO SKANK do MRP-80)
+juce::Rectangle<int> DubChordsPanel::plaque (int i) const
 {
-    return patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44).withTrimmedLeft (patternArea.getWidth() / 2 + 3);
+    const auto row = patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44);
+    const int n = patternWin != nullptr ? 3 : 2;
+    const int w = (row.getWidth() - 6 * (n - 1)) / n;
+    return row.withX (row.getX() + i * (w + 6)).withWidth (w);
 }
 
-juce::Rectangle<int> DubChordsPanel::fillArea() const
-{
-    return patternArea.translated (0, patternArea.getHeight() + 30).withHeight (44).withWidth (patternArea.getWidth() / 2 - 3);
-}
+juce::Rectangle<int> DubChordsPanel::pianistArea() const { return patternWin != nullptr ? plaque (0) : patternArea; }
+juce::Rectangle<int> DubChordsPanel::fillArea() const     { return plaque (patternWin != nullptr ? 1 : 0); }
+juce::Rectangle<int> DubChordsPanel::noteSizeArea() const { return plaque (patternWin != nullptr ? 2 : 1); }
 
 void DubChordsPanel::mouseDown (const juce::MouseEvent& e)
 {
-    if (patternArea.contains (e.getPosition()))
+    if (pianistArea().contains (e.getPosition()))
     {
         juce::PopupMenu m;
         const int cur = (int) proc.apvts.getRawParameterValue ("pianist")->load();
@@ -1468,7 +1491,7 @@ void DubChordsPanel::mouseDown (const juce::MouseEvent& e)
         for (int p = 0; p < dub::NumPianists; ++p)
             m.addItem (p + 1, juce::String (dub::pianistName (p)) + "    " + juce::String::fromUTF8 (dub::pianistWho (p)), true, p == cur);
         juce::Component::SafePointer<DubChordsPanel> safe (this);
-        m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withTargetScreenArea (localAreaToGlobal (patternArea)),
+        m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (this).withTargetScreenArea (localAreaToGlobal (pianistArea())),
                          [safe] (int r)
                          {
                              if (safe == nullptr || r <= 0) return;
@@ -1522,10 +1545,20 @@ void DubChordsPanel::paint (juce::Graphics& g)
 
     {   // PIANISTA e DURAÇÃO DAS NOTAS (mudam com o clique)
         const int pn = juce::jlimit (0, dub::NumPianists - 1, (int) proc.apvts.getRawParameterValue ("pianist")->load());
-        auto win = patternArea.toFloat().reduced (14.0f, 7.0f);
         g.setColour (colours::ink);
-        g.setFont (stencil (pn == 0 ? 15.0f : 17.0f, 0.06f));
-        g.drawText (pn == 0 ? juce::String ("CONTRATEMPO") : juce::String (dub::pianistName (pn)), win, juce::Justification::centred);
+        if (patternWin == nullptr)
+        {
+            auto win = patternArea.toFloat().reduced (14.0f, 7.0f);
+            g.setFont (stencil (pn == 0 ? 15.0f : 17.0f, 0.06f));
+            g.drawText (pn == 0 ? juce::String ("CONTRATEMPO") : juce::String (dub::pianistName (pn)), win, juce::Justification::centred);
+        }
+        else
+        {
+            auto pr = pianistArea().toFloat();
+            const juce::String pname = pn == 0 ? juce::String::fromUTF8 ("CL\xc3\x81SSICO") : juce::String (dub::pianistName (pn));
+            g.setFont (stencil (pname.length() > 7 ? 10.5f : 12.5f, 0.06f));
+            g.drawText (pname, pr.withTrimmedTop (pr.getHeight() * 0.42f), juce::Justification::centred);
+        }
         const bool n64 = proc.apvts.getRawParameterValue ("nota64")->load() > 0.5f;
         auto r = noteSizeArea().toFloat();
         g.setFont (stencil (14.0f, 0.12f));
@@ -1656,6 +1689,7 @@ void DubChordsPanel::resized()
         a.removeFromTop (34);
         auto left = a.removeFromLeft (190);
         patternArea = left.removeFromTop (52);
+        if (patternWin != nullptr) patternWin->setBounds (patternArea);
         a.removeFromLeft (8);
         const int kw = a.getWidth() / 3;
         for (auto* k : { &center, &velocity, &swing })

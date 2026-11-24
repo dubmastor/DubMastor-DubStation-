@@ -146,11 +146,6 @@ RootsKeysEditor::RootsKeysEditor (RootsKeysProcessor& p)
     setupKnob (faderLevel,  "pianoLevel",  "Volume", true);
     addChildComponent (wheels);
 
-    // GTR SKANK: a guitarra do skank (timbre do MRG-68) tocando junto com o piano — sempre começa desligada
-    gtrButton.getProperties().set ("style", "led");
-    gtrButton.setTooltip ("Guitarra do skank junto com o piano (timbre do Mastor Reggae Guitar MRG-68)");
-    addChildComponent (gtrButton);
-    gtrAtt = std::make_unique<APVTS::ButtonAttachment> (s, "gtrOn", gtrButton);
 
     // eco de fita FitaEco TE-12
     addAndMakeVisible (echoButton);
@@ -298,7 +293,6 @@ void RootsKeysEditor::updateVisibility()
     lcd.setVisible (inst && piano);
     for (auto& b : pianoPreset) b.setVisible (inst && piano);
     for (auto& b : pianoTimbre) b.setVisible (inst && piano);
-    gtrButton.setVisible (inst && piano);
     for (auto* k : { &faderBright, &faderDecay, &faderChorus, &faderLevel })
     { k->slider.setVisible (inst && piano); k->label.setVisible (inst && piano); }
     for (auto* k : { &eRate, &eIntensity, &eVol, &eSpring, &eWow, &eAge, &fRate, &fDepth, &fManual, &fFeedback, &fMix,
@@ -548,10 +542,6 @@ void RootsKeysEditor::renderBackground (juce::Graphics& g, int forSkin)
             g.setColour (juce::Colour (0xff95959a));
             for (int i = 0; i < 4; ++i)
                 g.drawText (kPianoPresetShort[i], 290 + i * 106 - 6, 230, 96, 12, juce::Justification::centred);
-            g.setFont (VintageLookAndFeel::mono (10.0f));
-            g.setColour (plasticText);
-            g.drawText ("GUITAR", 706, 244, 74, 12, juce::Justification::centred);
-            g.drawText ("SKANK", 706, 256, 74, 12, juce::Justification::centred);
 
             sectionTitle (kEcho, "TAPE ECHO", "MTE-12", plasticText, plasticMuted);
             sectionTitle (kFlanger, "FLANGER", "DUB JET SWEEP", plasticText, plasticMuted);
@@ -674,7 +664,6 @@ void RootsKeysEditor::resized()
     lcd.setBounds (kLcd);
     for (int i = 0; i < 4; ++i)
         pianoPreset[i].setBounds (290 + i * 106, 207, 84, 22);
-    gtrButton.setBounds (711, 272, 64, 44);
     {
         // timbres em duas linhas de 7, agrupados por família (o índice do botão continua sendo o do parâmetro)
         static const int order[kNumTimbres] = { 7, 0, 6, 1, 8, 4, 5,          // Korg M1, acústicos e Yamaha CP-80 / C7

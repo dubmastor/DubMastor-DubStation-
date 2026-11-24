@@ -87,6 +87,20 @@ int main (int argc, char** argv)
         const double rms = render (p, 6.0, fin);
         check (fin && rms > 1.0e-3, "CHORD MACHINE toca no piano do MRP-80 (rms " + juce::String (rms, 5) + ")");
         check (getP (p.getMachine().apvts, "bubble") < 0.5f, "so piano: BUBBLE da machine desligado");
+        // BANG BANG: o bang dobrado, no & e no a de cada tempo (caixa no 2 e no 4)
+        setP (p.getMachine().apvts, "pattern", 1.0f);
+        double beats = 0;
+        const auto ev = dub::buildLoop (p.getMachine().getSlots(), p.getMachine().getSettings(), beats);
+        int onAnd = 0, onA = 0, other = 0;
+        for (const auto& e : ev)
+        {
+            if (e.channel != dub::ChSkank) continue;
+            const int st = (int) std::lround (e.start * 4.0) % 4;
+            if (st == 2) ++onAnd; else if (st == 3) ++onA; else ++other;
+        }
+        check (onAnd > 0 && onA == onAnd && other == 0, "BANG BANG: skank no & e no a (" + juce::String (onAnd) + " / " + juce::String (onA) + ")");
+        const double rmsBang = render (p, 6.0, fin);
+        check (fin && rmsBang > rms, "BANG BANG toca mais (rms " + juce::String (rmsBang, 5) + ")");
     }
     {   // 2b) PIANISTAS, FILLS, nota de 1/64 e os timbres novos tocam pela CHORD MACHINE
         for (int pn = 1; pn < 8; ++pn)
@@ -108,13 +122,13 @@ int main (int argc, char** argv)
         RootsKeysProcessor p;
         check (getP (p.getMachine().apvts, "nota64") > 0.5f, "nota padrao 1/64 na CHORD MACHINE do MRP-80");
     }
-    {   // 3) SOM INTERNO ligado: o som da propria machine (piano M1) na saida
+    {   // 3) SOM INTERNO ligado (projeto antigo): toca no piano do instrumento, sem o som proprio da machine
         RootsKeysProcessor p;
         setP (p.apvts, "machineOn", 1.0f);
         setP (p.getMachine().apvts, "sound", 1.0f);
         bool fin = true;
         const double rms = render (p, 6.0, fin);
-        check (fin && rms > 1.0e-3, "SOM INTERNO da machine (piano M1 no skank) na saida (rms " + juce::String (rms, 5) + ")");
+        check (fin && rms > 1.0e-3, "SOM INTERNO antigo: o skank toca no piano (rms " + juce::String (rms, 5) + ")");
     }
     {   // 4) projeto salvo: a machine volta igual
         RootsKeysProcessor a, b;
@@ -178,10 +192,6 @@ int main (int argc, char** argv)
                                      "interface-piano-yamaha.png", "interface-piano-casio.png" };
             for (int i = 0; i < 5; ++i) { setP (p.apvts, "pianoType", (float) types[i]); save (names[i]); }
             setP (p.apvts, "pianoType", 7.0f);
-            check (getP (p.apvts, "gtrOn") < 0.5f, "GTR SKANK começa desligado");
-            setP (p.apvts, "gtrOn", 1.0f);
-            save ("interface-piano-gtr.png");
-            setP (p.apvts, "gtrOn", 0.0f);
         }
         rk->setPage (1);
         save ("interface-chord-machine.png");
@@ -204,6 +214,12 @@ int main (int argc, char** argv)
             midiTab->triggerClick();
             save ("interface-chord-machine-midi.png");
         }
+        setP (p.getMachine().apvts, "pattern", 1.0f);
+        setP (p.getMachine().apvts, "pianist", 0.0f);
+        setP (p.getMachine().apvts, "pianoFill", 0.0f);
+        rk->setPage (0);
+        rk->setPage (1);
+        save ("interface-chord-machine-bang-bang.png");
     }
 
     std::printf ("\n%s\n", failures == 0 ? "TUDO OK" : "HA FALHAS");

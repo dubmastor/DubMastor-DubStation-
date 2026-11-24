@@ -64,7 +64,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout RootsKeysProcessor::createLa
 
     // Maximizer
     l.add (std::make_unique<AudioParameterBool>  (ParameterID { "maxOn", 1 }, "Maximizer On", true));
-    l.add (std::make_unique<AudioParameterBool>  (ParameterID { "gtrOn", 1 }, "Guitar Skank On", false));   // sempre começa desligado
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "maxGain", 1 }, "Maximizer Gain",
                                                   NormalisableRange<float> (0.0f, 18.0f, 0.1f), 3.0f,
                                                   AudioParameterFloatAttributes().withLabel ("dB")));
@@ -132,7 +131,6 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     p.reverb     = get ("reverb");
     p.master     = get ("master");
     p.echoOn        = get ("echoOn") > 0.5f;
-    p.gtrOn         = get ("gtrOn") > 0.5f;
     p.echoMode      = (int) get ("echoMode") + 1;
     p.echoRate      = get ("echoRate");
     p.echoIntensity = get ("echoIntensity");
@@ -188,9 +186,6 @@ void RootsKeysProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     }
     if (pos < n) engine.render (L + pos, R + pos, n - pos);
 
-    // SOM INTERNO da machine ligado: o piano M1 + Hammond dela somados à saída
-    for (int ch = 0; ch < 2; ++ch)
-        buffer.addFrom (ch, 0, machineBuf, ch, 0, n);
 
     // medidores (média quadrática do bloco) para o VU
     float sl = 0, sr = 0;
@@ -210,11 +205,10 @@ void RootsKeysProcessor::runMachine (juce::MidiBuffer& midi, int numSamples)
     machine->processBlock (machineBuf, machineMidi);   // limpa o buffer e escreve o som interno (se ligado)
 
     const bool heard = get ("machineOn") > 0.5f || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
-    const bool ownSound = machine->apvts.getRawParameterValue ("sound")->load() > 0.5f;
-    if (! heard) { machineBuf.clear(); return; }
-    if (ownSound) return;   // as notas já tocaram no som da machine (machineBuf vai para a saída)
+    machineBuf.clear();   // 3.1: o SOM INTERNO da machine (piano M1 + Hammond) não toca mais aqui
+    if (! heard) return;
 
-    // SOM INTERNO desligado: as notas (skank no canal 1, bubble no 3) tocam no piano/órgão deste instrumento
+    // as notas (skank no canal 1, bubble no 3) tocam sempre no piano deste instrumento
     for (const auto meta : machineMidi)
     {
         auto m = meta.getMessage();
@@ -266,7 +260,7 @@ void RootsKeysProcessor::migrateOldDubChords (const juce::ValueTree& old)
     set ("swing",    value ("dcSwing", 0.0));
     set ("bpm",      value ("dcBpm", 75.0));
     set ("exportReps", value ("dcReps", 1));
-    // padrão: 0 = Auto (segue o instrumento: órgão = bubble), 4 = Bubble (órgão)
+    // padrão: 0 = Auto (segue o instrumento: órgão = bubble), 4 = Bubble (o bubble agora toca no piano)
     const int pattern = (int) value ("dcPattern", 0);
     juce::ignoreUnused (pattern);
     set ("bubble", 0);   // sem órgão no plugin: o bubble é do organista (Mastor Reggae Organ MRO-68)
@@ -341,6 +335,7 @@ void RootsKeysProcessor::setStateInformation (const void* data, int sizeInBytes)
             }
             auto tree = juce::ValueTree::fromXml (*xml);
             currentProgram = (int) tree.getProperty ("program", 0);
+            if (! juce::isPositiveAndBelow (currentProgram, kNumPresets)) currentProgram = 0;   // presets de órgão antigos -> P01
             apvts.replaceState (tree);
             if (! hadMachine) migrateOldDubChords (tree);
             // só piano: projeto do MRK-80 3.0 com o BUBBLE ligado abre sem ele (o bubble é do Mastor Reggae Organ MRO-68)

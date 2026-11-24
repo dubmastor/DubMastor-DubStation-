@@ -26,7 +26,7 @@ for (let k = 0; k < 600; k++) {
     const on = i < n || rnd() < 0.3;
     slots.push([Math.floor(rnd() * 12), rnd() < 0.5 ? 0 : 1, on ? M.DURATIONS[Math.floor(rnd() * 6)].beats : 0, Math.floor(rnd() * 4) - 1]);
   }
-  scenarios.push({ s: { pattern: 0, centerNote: 48 + Math.floor(rnd() * 25),
+  scenarios.push({ s: { pattern: rnd() < 0.3 ? 1 : 0, centerNote: 48 + Math.floor(rnd() * 25),
     velocity: f32(Math.round(rnd() * 90 + 10) / 100), noteSize: Math.floor(rnd() * 6),
     swing: f32(Math.round(rnd() * 100) / 100), bubble: rnd() < 0.6 ? 1 : 0, pianist: Math.floor(rnd() * 8), fill: Math.floor(rnd() * 14), fillEvery: rnd() < 0.5 ? 4 : 8 }, slots });
 }
