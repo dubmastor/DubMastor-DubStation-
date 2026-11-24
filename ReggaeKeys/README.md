@@ -44,7 +44,7 @@ As duas rodas do lado do teclado funcionam com o mouse e com o MIDI:
 Clique em **CHORD MACHINE** no cabeçalho: é o **Mastor Reggae Chord Machine MRCM-1240** inteiro (o código vem direto de `ReggaeChordMachine/`, nada copiado), só com acordes **maior e menor**:
 
 - **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano no contratempo com as duas mãos e, com **BUBBLE**, o bubble de Hammond.
-- **PRESETS**: o banco único de riddims (356 músicas, 155 riddims; ESTILOS, RIDDIMS A–Z, MÚSICAS A–Z, luzes H B D) e as 180 harmonias clássicas.
+- **PRESETS**: o banco único de riddims (356 músicas, 155 riddims; ESTILOS, RIDDIMS A–Z, MÚSICAS A–Z, luzes D B R) e as 180 harmonias clássicas.
 - **Som**: com o **SOM INTERNO** desligado (o padrão), os acordes tocam no piano ou no órgão do instrumento, passando pelo eco, flanger, reverb e maximizer. Ligado, toca o som próprio da machine: piano M1 no skank e Hammond no bubble ao mesmo tempo (PIANO M1 e HAMMOND ajustam os níveis).
 - **Tocar**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCA COM A DAW** (no cabeçalho) segue o play, o BPM e o loop da DAW.
 - **MIDI**: EXPORTAR ou ARRASTAR para a timeline, com repetição 1x a 8x.

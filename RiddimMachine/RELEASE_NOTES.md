@@ -1,3 +1,9 @@
+## Mastor Riddim Machine MRM-0420 2.5 — DubStation
+
+- **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
+- O MRM-0420 continua com o banco inteiro (356 músicas)
+- Versão para celular 2.5
+
 ## Mastor Riddim Machine MRM-0420 2.4 — DubStation
 
 - **BANCO ÚNICO DE RIDDIMS nos PRESETS da aba RIDDIM:** 356 músicas em 10 estilos e 155 riddims de A a Z, o mesmo banco do MRCM-1240, do MRDM-12 e do MRBM-69 (`RiddimBank/`). A música vai inteira para as três máquinas: harmonia conferida, BPM, kit, baterista e baixista mais próximos de quem gravou

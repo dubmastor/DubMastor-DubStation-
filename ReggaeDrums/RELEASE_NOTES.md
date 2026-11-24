@@ -1,3 +1,9 @@
+## Mastor Reggae Drums MRD-12 2.1 — Dub Station
+
+- **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
+- **Banco de riddims filtrado:** a aba DUB DRUMS mostra só as 117 músicas com a bateria da gravação original (luz D acesa)
+- Versão para celular 2.1
+
 ## Mastor Reggae Drums MRD-12 2.0 — Dub Station
 
 - **Nome novo:** o Mastor Dub Battery Reggae DBR passa a se chamar **Mastor Reggae Drums MRD-12** e absorve o Mastor Reggae Drum Machine MRDM-12, que deixa de ser um plugin separado (o MRDM-12 2.7 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo

@@ -7,7 +7,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
 
 # Mastor Dub Battery Reggae DBR: sampler de bateria com 16 pads + aba Dub Drums (MRDM-12)
-project(DubBatteryReggae VERSION 2.0.0)   # alvo interno com o nome antigo: o ID de estado e o BUNDLE_ID não mudam
+project(DubBatteryReggae VERSION 2.1.0)   # alvo interno com o nome antigo: o ID de estado e o BUNDLE_ID não mudam
 
 # versão curta para a plaqueta (ex.: "1.2") e a do MRDM-12 embutido (lida da pasta dele)
 set(DBR_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
@@ -63,6 +63,7 @@ set(DBR_SOURCES
     Source/DrumsEditorUnit.cpp
     ../ReggaeDrumMachine/Source/PatternGenerator.cpp)
 set(DBR_DEFINES
+    RIDDIMBANK_REQUIRE=4   # banco de riddims: só as músicas com a bateria da gravação (luz D)
     DBR_VERSION_SHORT="${DBR_VERSION_SHORT}"
     DD_VERSION_SHORT="${DBR_DRUMS_VER}"
     DD_GROOVE_MENU_V2=1                 # menu de grooves em dois caminhos (por baterista ou por estilo), só no Battery por enquanto

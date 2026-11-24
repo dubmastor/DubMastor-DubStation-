@@ -1,3 +1,9 @@
+## Mastor Reggae Keys MRK-80 3.1 🟢🟡⚫
+
+- **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
+- **Banco de riddims filtrado:** a CHORD MACHINE mostra só as 321 músicas com o riddim (a harmonia) da gravação original (luz R acesa)
+- Versão para celular 3.1
+
 ## Mastor Reggae Keys MRK-80 3.0 🟢🟡⚫
 
 - **Nome novo:** o Mastor Roots Keys MRK-80 passa a se chamar **Mastor Reggae Keys MRK-80** e absorve o Mastor Reggae Chord Machine MRCM-1240, que deixa de ser um plugin separado (o MRCM-1240 2.4 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo

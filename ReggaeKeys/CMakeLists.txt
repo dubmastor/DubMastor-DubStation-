@@ -6,7 +6,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
 # Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-project(RootsKeys VERSION 3.0.0)
+project(RootsKeys VERSION 3.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -63,6 +63,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 target_compile_definitions(RootsKeys PUBLIC
+    RIDDIMBANK_REQUIRE=1   # banco de riddims: só as músicas com o riddim (harmonia) da gravação (luz R)
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -84,7 +85,7 @@ if(ROOTSKEYS_TESTS)
         Source/PluginEditor.cpp
         ${MRK_MACHINE_SOURCES})
     target_include_directories(RootsKeysTest PRIVATE Source)
-    target_compile_definitions(RootsKeysTest PRIVATE
+    target_compile_definitions(RootsKeysTest PRIVATE RIDDIMBANK_REQUIRE=1
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="Mastor Reggae Keys MRK-80" JucePlugin_VersionString="${PROJECT_VERSION}"

@@ -1,3 +1,9 @@
+# Mastor Reggae Organ MRO-68 1.1
+
+- **Luzes D B R** no banco de riddims, nesta ordem: **D** = bateria, **B** = baixo, **R** = riddim (a harmonia da música; antes era o H). Acesa = a parte veio da gravação original
+- O MRO-68 continua com o banco inteiro (356 músicas)
+- Versão para celular 1.1
+
 # Mastor Reggae Organ MRO-68 1.0
 
 Instrumento novo da linha Dub Station: **o órgão de reggae dos organistas jamaicanos**, pronto no andamento da DAW.

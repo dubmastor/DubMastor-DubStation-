@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Keys MRK-80 3.0 — Dub Station</title>
+<title>Mastor Reggae Keys MRK-80 3.1 — Dub Station</title>
 <meta name="description" content="Mastor Reggae Keys MRK-80 no celular: toque o piano M1 e o órgão Hammond na tela, monte o riddim na CHORD MACHINE e baixe o MIDI para a sua DAW.">
 <style>
 :root{
@@ -186,7 +186,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '3.0';
+const VERSION = '3.1';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)
@@ -540,7 +540,8 @@ for (const id of ['export', 'export2']) $(id).onclick = download;
   const RB = window.RIDDIM_BANK;
   let last = -1;
   riddimBankMenu($('bank'), {
-    label: `BANCO DE RIDDIMS ▾  ${RB.entries.length} músicas · ${RB.families.length} riddims`,
+    require: 1,   // Reggae Keys: só as músicas com o riddim (harmonia) da gravação (luz R)
+    label: `BANCO DE RIDDIMS ▾  ${RB.entries.filter((e) => e.orig & 1).length} músicas com o riddim da gravação`,
     current: () => last,
     onPick: (e, i) => {
       last = i;

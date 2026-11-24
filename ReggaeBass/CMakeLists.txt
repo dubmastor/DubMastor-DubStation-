@@ -7,7 +7,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 # versão: aparece no título da interface ("... MRDBI-07 1.5") e no plugin
 # Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-project(DubBass VERSION 2.0.0)   # alvo interno com o nome antigo: o ID de estado e o BUNDLE_ID não mudam
+project(DubBass VERSION 2.1.0)   # alvo interno com o nome antigo: o ID de estado e o BUNDLE_ID não mudam
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -58,6 +58,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 target_compile_definitions(DubBass PUBLIC
+    RIDDIMBANK_REQUIRE=2   # banco de riddims: só as músicas com o baixo da gravação (luz B)
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0)
@@ -80,7 +81,7 @@ if(DUBBASS_TESTS)
         Source/PluginEditor.cpp
         ${MRB_MACHINE_SOURCES})
     target_include_directories(DubBassTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)
-    target_compile_definitions(DubBassTest PRIVATE
+    target_compile_definitions(DubBassTest PRIVATE RIDDIMBANK_REQUIRE=2
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_ALSA=0 JUCE_JACK=0 JUCE_MODAL_LOOPS_PERMITTED=1
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="Mastor Reggae Dub Bass Instrument MRDBI-07" JucePlugin_VersionString="${PROJECT_VERSION}"

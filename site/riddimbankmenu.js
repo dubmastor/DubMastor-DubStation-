@@ -1,5 +1,5 @@
 // Menu do BANCO ÚNICO DE RIDDIMS no navegador (MRCM-1240, MRDM-12, MRBM-69 e MRM-0420): o mesmo dos plugins.
-// ESTILOS · RIDDIMS A–Z (cada riddim com as músicas gravadas nele) · MÚSICAS A–Z, e as luzes H B D
+// ESTILOS · RIDDIMS A–Z (cada riddim com as músicas gravadas nele) · MÚSICAS A–Z, e as luzes D B R
 // (acesa = harmonia, baixo ou bateria vieram da gravação original). Usa riddimbank.js (RIDDIM_BANK).
 (function (root) {
   const CSS = `
@@ -35,9 +35,9 @@
 .rbm .note{padding:8px 10px;font-size:10.5px;opacity:.6;line-height:1.4}`;
 
   const NOTES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-  const LED = [['H', '#e5484d'], ['B', '#f5c542'], ['D', '#3fb950']];
+  const LED = [['D', '#3fb950', 4], ['B', '#f5c542', 2], ['R', '#e5484d', 1]];   // ordem D B R: bateria, baixo, riddim
   const chordsText = (e) => e.chords.length ? e.chords.map((c) => NOTES[c[0]] + (c[1] ? 'm' : '')).join('-') + (e.harmony === 1 ? ' ~' : '') : 'harmonia pendente';
-  const lights = (e) => '<span class="rbled">' + LED.map(([l, c], k) => `<i style="color:${c};background:${c}" class="${(e.orig >> k) & 1 ? 'on' : ''}"></i>${l}`).join(' ') + '</span>';
+  const lights = (e) => '<span class="rbled">' + LED.map(([l, c, bit]) => `<i style="color:${c};background:${c}" class="${e.orig & bit ? 'on' : ''}"></i>${l}`).join(' ') + '</span>';
   const title = (e) => e.name + (e.artist ? ' — ' + e.artist : '') + (e.year ? ' (' + e.year + ')' : '');
   const usable = (B, i) => i >= 0 && i < B.entries.length && B.entries[i].chords.length > 0;
   const firstLetter = (name) => { let s = name.trim(); if (/^the /i.test(s)) s = s.slice(4); const c = s.charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : 'A'; };
@@ -69,7 +69,11 @@
       if (hover) sm.addEventListener('mouseenter', () => { if (!d.open) { d.open = true; d.hoverAt = performance.now(); } });
       sm.addEventListener('click', (e) => { if (d.open && performance.now() - (d.hoverAt || 0) < 700) e.preventDefault(); });
     };
-    const shown = (i) => !only || B.entries[i].orig === 7;
+    // filtro do instrumento (opts.require: 4 = só com a bateria da gravação, 2 = baixo, 1 = riddim/harmonia)
+    const req = opts.require || 0;
+    const shown = (i) => (B.entries[i].orig & req) === req && (!only || B.entries[i].orig === 7);
+    const total = B.entries.filter((e) => (e.orig & req) === req).length;
+    const filterName = { 4: ' COM A BATERIA DA GRAVAÇÃO', 2: ' COM O BAIXO DA GRAVAÇÃO', 1: ' COM O RIDDIM DA GRAVAÇÃO' }[req] || '';
     const song = (i, cur, prefix) => {
       const e = B.entries[i];
       const b = document.createElement('button'); b.type = 'button'; b.className = 'song' + (i === cur ? ' on' : '');
@@ -88,7 +92,7 @@
 
     function render() {
       const cur = opts.current ? opts.current() : -1;
-      pm.innerHTML = `<div class="hd">BANCO DE RIDDIMS · ${B.entries.length} MÚSICAS · ${B.families.length} RIDDIMS</div>`;
+      pm.innerHTML = `<div class="hd">BANCO DE RIDDIMS · ${total} MÚSICAS${filterName}${req ? '' : ' · ' + B.families.length + ' RIDDIMS'}</div>`;
       const tabs = document.createElement('div'); tabs.className = 'tabs';
       ['ESTILOS', 'RIDDIMS A–Z', 'MÚSICAS A–Z'].forEach((t, k) => {
         const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.className = k === view ? 'on' : '';
@@ -97,7 +101,7 @@
       });
       pm.appendChild(tabs);
       const ol = document.createElement('label'); ol.className = 'only';
-      ol.innerHTML = `<input type="checkbox" ${only ? 'checked' : ''}> Só completos (harmonia, baixo e bateria da gravação)`;
+      ol.innerHTML = `<input type="checkbox" ${only ? 'checked' : ''}> Só completos (bateria, baixo e riddim da gravação)`;
       ol.querySelector('input').onchange = (ev) => { only = ev.target.checked; try { root.localStorage.setItem('rbm-only', only ? '1' : '0'); } catch (e) {} render(); };
       pm.appendChild(ol);
 
@@ -136,7 +140,7 @@
         }
       }
       const n = document.createElement('div'); n.className = 'note';
-      n.textContent = 'Luzes H B D: harmonia, baixo e bateria. Acesa = veio da gravação original; apagada = escolhida pelo músico mais próximo de quem gravou. ~ = aproximada.';
+      n.textContent = 'Luzes D B R: bateria, baixo e riddim (a harmonia). Acesa = veio da gravação original; apagada = escolhida pelo músico mais próximo de quem gravou. ~ = aproximada.';
       pm.appendChild(n);
     }
 

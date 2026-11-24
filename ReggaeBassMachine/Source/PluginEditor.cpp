@@ -1724,7 +1724,7 @@ void RiddimBox::paint (juce::Graphics& g)
     g.setFont (mono (10.0f, false));
     g.setColour (ink.withAlpha (0.85f));
     if (const int b = proc.currentBank(); b >= 0 && b < riddimbank::numEntries)
-    {   // música do BANCO ÚNICO: número no banco, estilo, nome, baixista e luzes H B D
+    {   // música do BANCO ÚNICO: número no banco, estilo, nome, baixista e luzes D B R
         const auto& e = riddimbank::entries[b];
         g.drawText ("=BANCO= " + juce::String (b + 1).paddedLeft ('0', 3) + "/" + juce::String (riddimbank::numEntries), top, juce::Justification::centredLeft);
         g.drawText (juce::String ("[") + riddimbank::styles[e.style] + "]", top, juce::Justification::centredRight);
@@ -1782,7 +1782,7 @@ void RiddimBox::mouseDown (const juce::MouseEvent& e)
     {   // setas no BANCO: próxima / anterior música com harmonia
         const int dir = e.x < 26 ? -1 : 1;
         int n = b;
-        do n = (n + dir + riddimbank::numEntries) % riddimbank::numEntries; while (! riddimbank::usable (n) && n != b);
+        do n = (n + dir + riddimbank::numEntries) % riddimbank::numEntries; while (! riddimbank::allowed (n) && n != b);
         loadBank (n);
         return;
     }

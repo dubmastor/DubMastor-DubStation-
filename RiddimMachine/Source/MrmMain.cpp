@@ -583,14 +583,15 @@ void RiddimPresetPanel::paint (juce::Graphics& g)
         const auto& e = riddimbank::entries[cur];
         const auto count = juce::String (songs.indexOf (cur) + 1).paddedLeft ('0', 2) + "/" + juce::String (songs.size()).paddedLeft ('0', 2);
         mpc::text (g, count, t.withHeight (16.0f), juce::Justification::centredRight, 12.0f, 0.8f);
-        {   // luzes H B D: acesa = a parte veio da gravação original
-            static const juce::uint32 ledCol[3] = { 0xffe5484d, 0xfff5c542, 0xff3fb950 };
-            static const char* const ledTxt[3] = { "H", "B", "D" };
+        {   // luzes D B R (bateria, baixo, riddim/harmonia): acesa = a parte veio da gravação original
+            static const juce::uint32 ledCol[3] = { 0xff3fb950, 0xfff5c542, 0xffe5484d };
+            static const char* const ledTxt[3] = { "D", "B", "R" };
+            static const int ledBit[3] = { 4, 2, 1 };
             auto row = t.withHeight (16.0f).withTrimmedRight (70.0f).removeFromRight (78.0f);
             for (int k = 0; k < 3; ++k)
             {
                 auto cell = row.removeFromLeft (26.0f);
-                const bool on = (e.orig >> k) & 1;
+                const bool on = (e.orig & ledBit[k]) != 0;
                 const auto dot = cell.removeFromLeft (10.0f).withSizeKeepingCentre (8.0f, 8.0f);
                 g.setColour (juce::Colour (ledCol[k]).withAlpha (on ? 1.0f : 0.18f));
                 g.fillEllipse (dot);
@@ -1717,7 +1718,7 @@ void MainPage::renderBackground()
     engraved (g, u8 ("BYPASS: DESLIGA O BIG KNOB INTEIRO"), juce::Rectangle<float> (196.0f, 727.0f, 220.0f, 11.0f), juce::Justification::centred, 6.5f, 0.15f);
     engraved (g, u8 ("TUDO NA ABA CONTROL ROOM"), juce::Rectangle<float> (196.0f, 784.0f, 220.0f, 11.0f), juce::Justification::centred, 7.5f, 0.2f);
 
-    section (g, presetBox, u8 ("PRESETS  \xc2\xb7  BANCO \xc3\x9aNICO DE RIDDIMS  \xc2\xb7  ESTILO, RIDDIM E M\xc3\x9aSICA A-Z  \xc2\xb7  H B D = PARTES DA GRAVA\xc3\x87\xc3\x83O"));
+    section (g, presetBox, u8 ("PRESETS  \xc2\xb7  BANCO \xc3\x9aNICO DE RIDDIMS  \xc2\xb7  ESTILO, RIDDIM E M\xc3\x9aSICA A-Z  \xc2\xb7  D B R = PARTES DA GRAVA\xc3\x87\xc3\x83O"));
     section (g, bpmBox, u8 ("BPM  \xc2\xb7  DIGITE, BATA NO TEMPO OU ESCOLHA O PRESET DE BPM"));
     section (g, sirenSection, u8 ("DUB SIREN  \xc2\xb7  A SIRENE DO MASTOR BIG KNOB"));
     engraved (g, u8 ("SEGURE O FIRE  \xc2\xb7  O DELAY CONTINUA DEPOIS"), juce::Rectangle<float> (196.0f, 882.0f, 380.0f, 9.0f), juce::Justification::centredLeft, 7.0f, 0.2f);

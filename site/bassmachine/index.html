@@ -391,7 +391,7 @@ function loadBank(i) {
   for (const id of ['density', 'variation', 'swing', 'bpm']) { $(id).value = st[id]; $('o-' + id).textContent = SLIDERS[id][0](st[id]); }
   engine.tempoChanged(); changedGen(); publish(); showRiddim(); fillRiddimSelects();
 }
-riddimBankMenu($('bank'), { label: `BANCO DE RIDDIMS ▾  ${RB.entries.length} músicas · ${RB.families.length} riddims`, current: () => st.bank, onPick: (e, i) => loadBank(i) });
+riddimBankMenu($('bank'), { require: 2, label: `BANCO DE RIDDIMS ▾  ${RB.entries.filter((e) => e.orig & 2).length} músicas com o baixo da gravação`, current: () => st.bank, onPick: (e, i) => loadBank(i) });
 $('rgroup').onchange = () => fillRiddimSelects(+$('rgroup').value);
 $('rpick').onchange = () => { const v = +$('rpick').value; if (v >= 0) loadRiddim(v); };
 $('rprev').onclick = () => loadRiddim(st.riddim <= 0 ? RD.riddims.length - 1 : st.riddim - 1);

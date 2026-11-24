@@ -2130,7 +2130,7 @@ void GrooveSelector::paint (juce::Graphics& g)
     const int d = drummer(), gr = proc.getGroove();
     const auto list = activeList();
     if (const int b = proc.getBankEntry(); b >= 0 && gr == riddimbank::entries[b].groove && dubdrums::groovePresets[gr].drummer == d)
-    {   // música do BANCO ÚNICO: o nome dela, o groove que toca e as luzes H B D
+    {   // música do BANCO ÚNICO: o nome dela, o groove que toca e as luzes D B R
         const auto& e = riddimbank::entries[b];
         const auto& gp = dubdrums::groovePresets[gr];
         blueText (g, juce::String::fromUTF8 (e.name).toUpperCase(), t.removeFromTop (t.getHeight() * 0.55f).withTrimmedRight (30.0f),
