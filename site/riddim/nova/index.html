@@ -52,6 +52,11 @@ nav.tabs button{flex:none;display:flex;align-items:center;gap:7px;font-family:va
 nav.tabs button small{font-family:var(--mono);font-size:10px;opacity:.75}
 nav.tabs button.active{background:linear-gradient(180deg,var(--th1),var(--th2));color:var(--tl);box-shadow:inset 0 2px 0 var(--c)}
 nav.tabs button.muted .dot{opacity:.25;box-shadow:none}
+.tmute{display:inline-grid;place-items:center;width:26px;height:26px;margin:-8px -4px -8px -8px;border-radius:50%;cursor:pointer}
+.tmute:hover{background:rgba(255,255,255,.08)}
+nav.tabs button.muted .tmute{position:relative}
+nav.tabs button.muted .tmute::after{content:"";position:absolute;width:15px;height:2px;background:#e8573f;transform:rotate(-45deg);border-radius:1px}
+nav.tabs button.muted{color:#8a7a62}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none;box-shadow:0 0 6px var(--c);display:inline-block}
 .dot.hit{box-shadow:0 0 12px 4px var(--c);transform:scale(1.3)}
 .panel{display:none;background:linear-gradient(180deg,var(--plate),#2e2117);min-height:360px}
@@ -661,12 +666,12 @@ const midiBtn=(sub)=>`<span class="midi" draggable="true" role="button" tabindex
 
 /* ---------- abas ---------- */
 const tabs=$('tabs'),panels=$('panels');
-tabs.innerHTML=TABS.map(t=>`<button role="tab" data-t="${t.id}" style="--c:${t.color};--th1:${t.th[0]};--th2:${t.th[1]};--tl:${t.th[4]}"><span class="dot" data-dot="${t.id}"></span>${t.name}${t.code?` <small>${t.code}</small>`:''}</button>`).join('');
+tabs.innerHTML=TABS.map(t=>`<button role="tab" data-t="${t.id}" style="--c:${t.color};--th1:${t.th[0]};--th2:${t.th[1]};--tl:${t.th[4]}">${'mute' in t?`<span class="tmute" data-tmute="${t.id}" title="Mutar / desmutar ${t.name}" aria-label="Mutar ou desmutar ${t.name}"><span class="dot" data-dot="${t.id}"></span></span>`:`<span class="dot" data-dot="${t.id}"></span>`}${t.name}${t.code?` <small>${t.code}</small>`:''}</button>`).join('');
 function show(id){const T=byId[id];if(T.kind&&T.renderGen)T.renderGen();tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.t===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on)});panels.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='p-'+id));
  const u=$('unit').style;u.setProperty('--h1',T.th[0]);u.setProperty('--h2',T.th[1]);u.setProperty('--l1',T.th[2]);u.setProperty('--l2',T.th[3]);u.setProperty('--l3',T.th[3]);u.setProperty('--htx',T.th[4]);
  $('hsub').textContent=T.code?`${T.full} · ${T.code}`:T.main?'Principal · controla todas as machines':T.riddim?'Riddim · harmonia':'Dub Station · DubMastor';
 }
-tabs.onclick=e=>{const b=e.target.closest('button');if(b){show(b.dataset.t);b.scrollIntoView({inline:'nearest',block:'nearest'})}};
+tabs.onclick=e=>{const tm=e.target.closest('[data-tmute]');if(tm){const I=byId[tm.dataset.tmute];if(aud(I)){I.mute=true;I.solo=false}else{I.mute=false;if(anySolo())I.solo=true}renderToggles();return}const b=e.target.closest('button');if(b){show(b.dataset.t);b.scrollIntoView({inline:'nearest',block:'nearest'})}};
 const mk=h=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstElementChild};
 const thVars=I=>`--c:${I.color};--th1:${I.th[0]};--th2:${I.th[1]};--tg1:${I.th[2]};--tg2:${I.th[3]};--tl:${I.th[4]}`;
 function cab(I,name,sub,extra){return `<div class="cab"><div><div class="cabn">${name}</div><div class="cabs">${sub}</div><div class="stripes"><i></i><i></i><i></i></div></div>${I.code?`<span class="badge">${I.code}</span>`:''}<span class="grow"></span>${extra||''}</div>`}
