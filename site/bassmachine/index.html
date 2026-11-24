@@ -171,6 +171,8 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
     <div class="lbl">BATERIA DE ACOMPANHAMENTO</div>
     <div class="row" style="margin-bottom:6px"><button class="toggle" id="drumsOn"><i></i>BATERIA</button></div>
     <div class="btns c4" id="drumBtns"></div>
+    <div class="lbl" style="margin-top:8px">HI-HAT · COLCHEIA OU SEMICOLCHEIA</div>
+    <div class="btns c2" id="hatBtns"></div>
     <div class="slider"><span>BATERIA</span><input type="range" id="drumVol" min="0" max="1" step="0.01"><output id="o-drumVol"></output></div>
     <div class="slider"><span>VOLUME</span><input type="range" id="volume" min="0" max="1" step="0.01"><output id="o-volume"></output></div>
     <div class="note">O teclado do Roots Keys (skank e bubble) fica só no plugin.</div>
@@ -233,7 +235,7 @@ function storeEdits() {
   publish();
 }
 function publish() {
-  drums = st.drumsOn ? M.buildDrums(line.loopBeats, st.drumStyle, st.swing) : [];
+  drums = st.drumsOn ? M.buildDrums(line.loopBeats, st.drumStyle, st.swing, !!st.hat16) : [];
   $('clearEdits').disabled = !edited; $('stamp').classList.toggle('show', edited);
   geom(); drawRoll();
 }
@@ -272,6 +274,7 @@ refreshers.push(buttons($('styleBtns'), M.styleNames.map((n, i) => n + '<small>'
 const TIMBRES = ['ROOTS (SINE)', 'SUPER TONE', '808'];
 refreshers.push(buttons($('timbreBtns'), TIMBRES, () => st.timbre, i => { st.timbre = i; save(); }));
 refreshers.push(buttons($('drumBtns'), M.DrumStyles, () => st.drumStyle, i => { st.drumStyle = i; save(); publish(); }));
+refreshers.push(buttons($('hatBtns'), ['1/8', '1/16'], () => (st.hat16 ? 1 : 0), i => { st.hat16 = i === 1; save(); publish(); }));
 refreshers.push(buttons($('repBtns'), ['1x', '2x', '4x', '8x'], () => st.reps, i => { st.reps = i; save(); }));
 $('drumsOn').onclick = () => { st.drumsOn = !st.drumsOn; save(); publish(); refresh(); };
 
@@ -391,7 +394,10 @@ function loadBank(i) {
   for (const id of ['density', 'variation', 'swing', 'bpm']) { $(id).value = st[id]; $('o-' + id).textContent = SLIDERS[id][0](st[id]); }
   engine.tempoChanged(); changedGen(); publish(); showRiddim(); fillRiddimSelects();
 }
-riddimBankMenu($('bank'), { label: `BANCO DE RIDDIMS ▾  ${RB.entries.length} músicas · ${RB.families.length} riddims`, current: () => st.bank, onPick: (e, i) => loadBank(i) });
+// só os riddims com o BAIXO ORIGINAL da gravação (luz B acesa) ficam ativos no banco
+const comBaixo = RB.entries.filter(e => (e.orig & 2) && e.chords.length).length;
+riddimBankMenu($('bank'), { label: `BANCO DE RIDDIMS ▾  ${comBaixo} com baixo original · ${RB.entries.length} músicas`, current: () => st.bank, onPick: (e, i) => loadBank(i),
+  enabled: (e) => (e.orig & 2) !== 0, enabledNote: 'Só ficam ativos os riddims com o baixo original da gravação (luz B acesa).' });
 $('rgroup').onchange = () => fillRiddimSelects(+$('rgroup').value);
 $('rpick').onchange = () => { const v = +$('rpick').value; if (v >= 0) loadRiddim(v); };
 $('rprev').onclick = () => loadRiddim(st.riddim <= 0 ? RD.riddims.length - 1 : st.riddim - 1);
