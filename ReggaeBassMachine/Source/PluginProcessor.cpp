@@ -79,6 +79,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
 
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "exportReps", 1 }, "Repeticoes no export",
                                                         StringArray { "1x", "2x", "4x", "8x" }, 1));
+    // chimbal da bateria de acompanhamento: 1/8 (como antes) ou 1/16
+    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "hat16", 1 }, "Hi-hat 1/16", false));
     return layout;
 }
 
@@ -254,7 +256,7 @@ void BassMachineProcessor::rebuild()
     }
     accLoop.clear();
     if (param ("drumsOn") > 0.5f)
-        accLoop = mbm::buildDrums (loopBeats, (int) param ("drumStyle"), s.swing);
+        accLoop = mbm::buildDrums (loopBeats, (int) param ("drumStyle"), s.swing, param ("hat16") > 0.5f);
     if (param ("keysOn") > 0.5f)
     {
         const auto k = mbm::buildKeys (slots, (int) param ("keysMode"), s.swing);

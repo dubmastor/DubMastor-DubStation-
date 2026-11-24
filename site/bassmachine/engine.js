@@ -162,7 +162,8 @@
   const drum = { Kick: 36, Rim: 37, Snare: 38, Clap: 39, ClosedHat: 42, OpenHat: 46, TomLow: 43, TomMid: 47, TomHigh: 50, TimbaleHi: 65, TimbaleLo: 66 };
   const isDigitalKit = st => st === 2 || st === 3;
 
-  function drumBar(style, fill) {
+  // hat16: chimbal em 1/16 (as semicolcheias do meio, mais fracas, entre as colcheias de sempre); falso = 1/8, como antes
+  function drumBar(style, fill, hat16) {
     const h = [];
     const add = (step, note, vel, offset = 0) => h.push({ step, note, vel: f(vel), offset });
     const hats8 = (on, off, until) => { for (let s = 0; s < until; s += 2) add(s, drum.ClosedHat, s % 4 === 0 ? on : off); };
@@ -192,10 +193,15 @@
         if (fill) { add(12, drum.TimbaleHi, .8); add(13, drum.TimbaleHi, .7); add(14, drum.TimbaleLo, .8); add(15, drum.TimbaleLo, .9); }
         else { add(7, drum.TimbaleHi, .55); add(15, drum.TimbaleLo, .6); }
     }
+    if (hat16) {
+      const until = fill && style <= 1 ? 12 : 16;
+      for (let s = 1; s < until; s += 2)
+        if (!h.some(x => x.step === s && (x.note === drum.ClosedHat || x.note === drum.OpenHat))) add(s, drum.ClosedHat, s % 4 === 3 ? .34 : .3);
+    }
     return h;
   }
 
-  function buildDrums(loopBeats, style, swing) {
+  function buildDrums(loopBeats, style, swing, hat16 = false) {
     const ev = [];
     if (loopBeats <= 0) return ev;
     const sw = f(swing);
@@ -203,7 +209,7 @@
     const bars = Math.ceil(loopBeats / 4.0 - 1e-9);
     const fillBar = Math.max(0, Math.floor((loopBeats - 1e-6) / 4.0) - ((loopBeats % 4.0) > 1e-6 ? 1 : 0));
     for (let b = 0; b < bars; b++)
-      for (const hit of drumBar(style, b === fillBar && bars > 1)) {
+      for (const hit of drumBar(style, b === fillBar && bars > 1, hat16)) {
         let st = b * 4.0 + hit.step * 0.25 + hit.offset;
         const sib = hit.step % 4;
         if (sib === 2 && hit.offset < 1e-9) st += sw * (2.0 / 3.0 - 0.5) * 0.6;

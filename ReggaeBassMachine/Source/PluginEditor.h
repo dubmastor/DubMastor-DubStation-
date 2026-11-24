@@ -242,6 +242,7 @@ private:
 
     std::array<ChordModule, BassMachineProcessor::numSlots> mods;
     std::unique_ptr<InterlockKeys> styleKeys, drumKeys, keysKeys, timbreKeys;
+    std::unique_ptr<InterlockKeys> hatKeys;   // chimbal da bateria: 1/8 ou 1/16
     juce::TextButton clearEditsBtn { juce::String::fromUTF8 ("DESFAZER EDIÇÃO") };
 
     // letreiro de palhetas (split-flap) com o nome do baixista

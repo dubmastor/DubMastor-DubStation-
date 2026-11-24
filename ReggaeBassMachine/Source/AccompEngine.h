@@ -62,7 +62,8 @@ inline bool isDigitalKit (int style) { return style == DrumDigital || style == D
 // Um compasso de bateria (16 semicolcheias); fill = compasso de virada
 struct DrumHit { int step; int note; float vel; double offset = 0.0; };
 
-inline std::vector<DrumHit> drumBar (int style, bool fill)
+// hat16: chimbal em 1/16 (as semicolcheias do meio, mais fracas, entre as colcheias de sempre); false = 1/8, como antes
+inline std::vector<DrumHit> drumBar (int style, bool fill, bool hat16 = false)
 {
     using namespace drum;
     std::vector<DrumHit> h;
@@ -125,10 +126,20 @@ inline std::vector<DrumHit> drumBar (int style, bool fill)
             }
             break;
     }
+    if (hat16)
+    {
+        const int until = (fill && style <= DrumOneDrop) ? 12 : 16;
+        for (int s = 1; s < until; s += 2)
+        {
+            bool has = false;
+            for (const auto& x : h) has = has || (x.step == s && (x.note == ClosedHat || x.note == OpenHat));
+            if (! has) h.push_back ({ s, ClosedHat, (s % 4 == 3) ? 0.34f : 0.30f });
+        }
+    }
     return h;
 }
 
-inline std::vector<AccEvent> buildDrums (double loopBeats, int style, float swing)
+inline std::vector<AccEvent> buildDrums (double loopBeats, int style, float swing, bool hat16 = false)
 {
     std::vector<AccEvent> ev;
     if (loopBeats <= 0) return ev;
@@ -137,7 +148,7 @@ inline std::vector<AccEvent> buildDrums (double loopBeats, int style, float swin
     const int fillBar = std::max (0, (int) std::floor ((loopBeats - 1e-6) / 4.0) - (std::fmod (loopBeats, 4.0) > 1e-6 ? 1 : 0));
 
     for (int b = 0; b < bars; ++b)
-        for (const auto& hit : drumBar (style, b == fillBar && bars > 1))
+        for (const auto& hit : drumBar (style, b == fillBar && bars > 1, hat16))
         {
             double st = b * 4.0 + hit.step * 0.25 + hit.offset;
             const int stepInBeat = hit.step % 4;

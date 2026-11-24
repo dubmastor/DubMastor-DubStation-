@@ -54,15 +54,18 @@ inline juce::String creditsText (const Entry& e) { return juce::String::fromUTF8
 
 inline bool usable (int i) { return i >= 0 && i < numEntries && entries[i].numChords > 0; }
 
-inline void addItem (juce::PopupMenu& m, int i, int current, bool onlyComplete)
+// needBass (Bass Machine): só ficam ativas as músicas com o baixo original da gravação (luz B acesa)
+inline bool active (int i, bool needBass) { return usable (i) && (! needBass || (entries[i].orig & 2) != 0); }
+
+inline void addItem (juce::PopupMenu& m, int i, int current, bool onlyComplete, bool needBass = false)
 {
     const auto& e = entries[i];
     if (onlyComplete && e.orig != 7) return;
-    m.addItem (menuIdBase + i, itemText (e), usable (i), i == current);
+    m.addItem (menuIdBase + i, itemText (e), active (i, needBass), i == current);
 }
 
 // ESTILOS ▸ RIDDIMS A–Z ▸ MÚSICAS A–Z (ticks no caminho da entrada atual)
-inline void addMenus (juce::PopupMenu& menu, int current)
+inline void addMenus (juce::PopupMenu& menu, int current, bool needBass = false)
 {
     const bool onlyComplete = riddimbank::onlyComplete();
     const auto star = juce::String::fromUTF8 ("\xc2\xb7");
@@ -75,7 +78,7 @@ inline void addMenus (juce::PopupMenu& menu, int current)
         juce::PopupMenu sub;
         int n = 0;
         for (int i = 0; i < numEntries; ++i)
-            if (entries[i].style == s && (! onlyComplete || entries[i].orig == 7)) { addItem (sub, i, current, onlyComplete); ++n; }
+            if (entries[i].style == s && (! onlyComplete || entries[i].orig == 7)) { addItem (sub, i, current, onlyComplete, needBass); ++n; }
         byStyle.addSubMenu (juce::String (styles[s]) + "  " + styleYears[s] + "   (" + juce::String (n) + ")", sub, n > 0, nullptr,
                             current >= 0 && entries[current].style == s);
     }
@@ -104,7 +107,7 @@ inline void addMenus (juce::PopupMenu& menu, int current)
             if (fam.count == 1)
             {
                 const int i = members[fam.first];
-                letter.addItem (menuIdBase + i, head + "    " + title (entries[i]) + "    " + lights (entries[i]), usable (i), i == current);
+                letter.addItem (menuIdBase + i, head + "    " + title (entries[i]) + "    " + lights (entries[i]), active (i, needBass), i == current);
             }
             else
             {
@@ -114,7 +117,7 @@ inline void addMenus (juce::PopupMenu& menu, int current)
                     const int i = members[fam.first + k];
                     if (onlyComplete && entries[i].orig != 7) continue;
                     fm.addItem (menuIdBase + i, (k == 0 ? juce::String::fromUTF8 ("ORIGEM  ") : juce::String()) + itemText (entries[i]),
-                                usable (i), i == current);
+                                active (i, needBass), i == current);
                 }
                 letter.addSubMenu (head + "   " + juce::String (shown) + juce::String::fromUTF8 (" MÚSICAS"), fm, true, nullptr, famHere);
             }
@@ -137,7 +140,7 @@ inline void addMenus (juce::PopupMenu& menu, int current)
             const bool match = (L == 'A' && ! juce::CharacterFunctions::isLetter (c)) || c == (juce::juce_wchar) L;
             if (! match) continue;
             if (onlyComplete && entries[i].orig != 7) continue;
-            addItem (letter, i, current, onlyComplete);
+            addItem (letter, i, current, onlyComplete, needBass);
             here |= i == current;
             ++n;
         }
@@ -148,6 +151,8 @@ inline void addMenus (juce::PopupMenu& menu, int current)
     menu.addSubMenu (juce::String::fromUTF8 ("RIDDIMS A–Z"), byRiddim);
     menu.addSubMenu (juce::String::fromUTF8 ("MÚSICAS A–Z"), bySong);
     menu.addItem (toggleCompleteId, juce::String::fromUTF8 ("Só completos (harmonia, baixo e bateria da gravação)"), true, onlyComplete);
+    if (needBass)
+        menu.addItem (-1, juce::String::fromUTF8 ("Só ficam ativos os riddims com o baixo original da gravação (luz B acesa)"), false);
     menu.addItem (-1, juce::String::fromUTF8 ("Luzes: H harmonia · B baixo · D bateria  (\xe2\x97\x8f = da gravação, \xe2\x97\x8b = escolhida pelo músico mais próximo)"), false);
 }
 

@@ -1,4 +1,4 @@
-# Mastor Reggae Bass MRB-69 2.0
+# Mastor Reggae Bass MRB-69 2.1
 
 O antigo **Dub Bass** (Mastor Reggae Dub Bass Instrument MRDBI-07), agora com o **Mastor Reggae Bass Machine MRBM-69** inteiro na aba **BASS MACHINE**: a linha gerada toca por este som (válvula, EQ, reverb e maximizer), com bateria e teclado de acompanhamento. Ligue **BASS MACHINE LIGADA** para a linha tocar com a DAW.
 

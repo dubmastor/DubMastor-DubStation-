@@ -1,3 +1,9 @@
+## Mastor Reggae Bass MRB-69 2.1 🟢🟡⚫
+
+- **BASS MACHINE · banco de riddims:** só ficam ativos os riddims com o **baixo original da gravação** (luz B acesa): 160 músicas. As outras aparecem apagadas no menu e as setas do visor pulam direto para a próxima com baixo original. Os 160 riddims do MRBM-69 continuam todos lá.
+- **BASS MACHINE · bateria de acompanhamento:** chave **HH 1/8 · HH 1/16** embaixo do botão BATERIA. Em 1/8 o chimbal toca como antes (padrão); em 1/16 entram as semicolcheias do meio, mais fracas e com o mesmo swing, nos quatro estilos, sempre com a caixa no 2 e no 4.
+- Versão para celular 2.1 com as mesmas novidades na aba BASS MACHINE.
+
 ## Mastor Reggae Bass MRB-69 2.0 🟢🟡⚫
 
 - **Nome novo:** o Mastor Reggae Dub Bass Instrument MRDBI-07 passa a se chamar **Mastor Reggae Bass MRB-69** e absorve o Mastor Reggae Bass Machine MRBM-69, que deixa de ser um plugin separado (o MRBM-69 3.0 fica para download como legado). Projetos antigos abrem igual; o instalador apaga a cópia com o nome antigo

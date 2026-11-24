@@ -43,7 +43,7 @@ for (const c of lines) {
 // 3. bateria
 const drums = JSON.parse(fs.readFileSync(drumsFile, 'utf8'));
 for (const c of drums) {
-  const d = M.buildDrums(c.L, c.style, c.swing);
+  const d = M.buildDrums(c.L, c.style, c.swing, !!c.hat16);
   if (d.length !== c.ev.length) { fail('bateria', c.style, c.L, d.length, c.ev.length); continue; }
   c.ev.forEach((e, i) => {
     const g = d[i];

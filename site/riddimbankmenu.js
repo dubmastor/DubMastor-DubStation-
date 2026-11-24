@@ -73,7 +73,7 @@
     const song = (i, cur, prefix) => {
       const e = B.entries[i];
       const b = document.createElement('button'); b.type = 'button'; b.className = 'song' + (i === cur ? ' on' : '');
-      b.disabled = !usable(B, i);
+      b.disabled = !usable(B, i) || (opts.enabled ? !opts.enabled(e, i) : false);
       b.innerHTML = `${prefix ? '<span class="orig">ORIGEM</span>' : ''}${title(e)}${lights(e)}<small>${chordsText(e)} · ${e.bpmMeasured ? '' : '~'}${e.bpm} BPM${e.riddim && e.riddim !== e.name ? ' · ' + e.riddim + ' riddim' : ''}${e.credits ? '<br>' + e.credits : ''}</small>`;
       b.onclick = () => { close(); opts.onPick(e, i); };
       return b;
@@ -136,7 +136,7 @@
         }
       }
       const n = document.createElement('div'); n.className = 'note';
-      n.textContent = 'Luzes H B D: harmonia, baixo e bateria. Acesa = veio da gravação original; apagada = escolhida pelo músico mais próximo de quem gravou. ~ = aproximada.';
+      n.textContent = (opts.enabledNote ? opts.enabledNote + ' ' : '') + 'Luzes H B D: harmonia, baixo e bateria. Acesa = veio da gravação original; apagada = escolhida pelo músico mais próximo de quem gravou. ~ = aproximada.';
       pm.appendChild(n);
     }
 
