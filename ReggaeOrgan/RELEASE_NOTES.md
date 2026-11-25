@@ -12,6 +12,7 @@
   O botão carrega um som cru, seco, opaco e escuro: bubble oco (8' + 4' e um pouco de 2⅔'), chop cheio sem percussão, Leslie ROOTS SUAVE discreta,
   sem key click, sem reverb e sem eco, e o EQ tirando o grave profundo do caminho do baixo, encorpando o médio-grave (150–350 Hz) e tirando médio (−5 dB em 1,2 kHz) e bastante agudo (−7 dB acima de 3 kHz) para um som opaco e escuro, com o volume compensado na SAÍDA (soa tão alto quanto os outros timbres). O groove continua o do músico.
   Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
+- **3 variações do timbre Midnite**, nos botões da aba EQ: **ABAFADO** (mais escuro e redondo, quase sem agudo), **CORPO** (mais médio-grave e o 16' cheio no chop) e **AO VIVO** (Leslie 122 lenta, um pouco de sala e mais drive). Todas sem percussão e sem key click, com o volume igualado na SAÍDA.
 - Versão para celular 1.3 com a mesma aba EQ (curva no toque) e o mesmo timbre.
 
 ## 1.2

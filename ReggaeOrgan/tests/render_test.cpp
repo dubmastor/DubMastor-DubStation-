@@ -177,9 +177,10 @@ int main()
 
     // ---------------- áudio: 8 compassos por músico
     if (std::system ("mkdir -p out") != 0) return 1;
-    for (int m = 0; m <= NumMusicians; ++m)   // o último: o groove do Mittoo com o TIMBRE MIDNITE (1.3)
+    for (int m = 0; m < NumMusicians + NumMidniteTimbres; ++m)   // os últimos: o groove do Mittoo com os TIMBRES MIDNITE (1.3)
     {
-        const bool midnite = m == NumMusicians;
+        const bool midnite = m >= NumMusicians;
+        const int tIdx = m - NumMusicians;
         const Musician& mu = musician (midnite ? (int) MusMittoo : m);
         Settings s;
         s.grid = gridFrom (mu.rh, mu.lh); s.beat = mu.beat; s.swing = mu.swing; s.human = mu.human;
@@ -189,7 +190,7 @@ int main()
         sp.ghostLevel = mu.ghost; sp.lesPreset = leslieFromMusician (mu.leslie); sp.lesSpeed = mu.leslie == 2 ? 1 : 0; sp.drive = mu.drive; sp.perc = mu.perc; sp.echoOn = true; sp.echoVol = 0.3f;
         if (midnite)
         {
-            const OrganTimbre& t = midniteTimbre();
+            const OrganTimbre& t = midniteTimbre (tIdx);
             for (int d = 0; d < 9; ++d) { sp.bubbleDb[d] = (float) t.bubbleDb[d]; sp.chopDb[d] = (float) t.chopDb[d]; }
             sp.perc = t.perc; sp.drive = t.drive; sp.click = t.click; sp.reverb = t.reverb; sp.echoOn = false;
             sp.lesPreset = t.lesPreset; sp.lesSpeed = t.lesSpeed; sp.lesDepth = t.lesDepth; sp.eq = t.eq;
@@ -249,14 +250,14 @@ int main()
         static double mittooRms = 0;
         if (m == (int) MusMittoo) mittooRms = rmsDb;
         if (midnite) CHECK (std::fabs (rmsDb - mittooRms) < 0.7, "MIDNITE: volume compensado (mesmo RMS do timbre do Mittoo)");
-        std::printf ("%-9s %5.1f BPM  notas %4d  pico %.2f  RMS %5.1f dB\n", midnite ? "MIDNITE" : mu.name, bpm, notesOn, pk, rmsDb);
+        std::printf ("%-9s %5.1f BPM  notas %4d  pico %.2f  RMS %5.1f dB\n", midnite ? midniteTimbre (tIdx).name : mu.name, bpm, notesOn, pk, rmsDb);
         CHECK (pk > 0.05f && pk <= 1.0f, "\xc3\xb3rg\xc3\xa3o soa e n\xc3\xa3o passa do teto");
         CHECK (rmsDb > -40.0 && std::isfinite (rmsDb), "n\xc3\xadvel do \xc3\xb3rg\xc3\xa3o razo\xc3\xa1vel, sem NaN");
 
         float mx = 0;
         for (int i = 0; i < N; ++i) mx = std::max (mx, std::max (std::fabs (L[(size_t) i]), std::fabs (R[(size_t) i])));
         if (mx > 0.98f) for (int i = 0; i < N; ++i) { L[(size_t) i] *= 0.98f / mx; R[(size_t) i] *= 0.98f / mx; }
-        const std::string name = "out/MRO-68_" + std::to_string (m + 1) + "_" + (midnite ? "MIDNITE" : mu.name) + ".wav";
+        const std::string name = "out/MRO-68_" + std::to_string (m + 1) + "_" + (midnite ? std::string ("MIDNITE_") + midniteTimbre (tIdx).name : std::string (mu.name)) + ".wav";
         writeWav (name.c_str(), L, R, sr);
     }
 
@@ -343,6 +344,9 @@ int main()
         e = EqParams(); e.out = 4.0f;
         CHECK (std::fabs (OrganEQ::responseDb (e, 300.0) - 4.0) < 0.01, "SA\xc3\x8d" "DA +4 dB");
         CHECK (midniteTimbre().reverb == 0.0f && ! midniteTimbre().perc, "MIDNITE: seco (sem reverb) e sem percuss\xc3\xa3o");
+        for (int k = 0; k < NumMidniteTimbres; ++k)
+            CHECK (! midniteTimbre (k).perc && midniteTimbre (k).click == 0.0f && midniteTimbre (k).eq.highG <= -6.0f,
+                   "timbres Midnite: sem percuss\xc3\xa3o, sem key click e escuros");
     }
     std::printf (fails ? "\n%d FALHA(S)\n" : "\nTudo certo.\n", fails);
     return fails ? 1 : 0;

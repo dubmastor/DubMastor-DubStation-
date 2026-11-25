@@ -102,7 +102,7 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
 .eqk input{min-width:0;flex:1}
 .eqk .sl label{width:48px}
 .mid p{font-size:11px;line-height:1.45;margin:8px 0}
-.mid .chip{width:100%;padding:12px 6px;font-size:12px}
+.mid .chip{flex:1 1 45%;padding:12px 6px;font-size:12px}
 @media (max-width:760px){.eqk{grid-template-columns:1fr}}
 .kb{position:relative;height:130px;margin-top:10px;background:var(--brown);border-radius:6px;padding:8px 8px 6px;border-top:5px solid #7a1a14;user-select:none;touch-action:none}
 .kb .keys{position:relative;height:100%}
@@ -242,10 +242,11 @@ canvas#roll{width:100%;height:300px;display:block;border-radius:6px;background:v
     <div class="lbl">PRESETS DO EQ</div><div class="row" id="eqPresets"></div>
   </div>
   <div class="panel mid">
-    <h2>TIMBRE MIDNITE <small>Ron Benjamin</small></h2>
-    <button class="chip" id="midnite">CARREGAR O TIMBRE MIDNITE</button>
+    <h2>TIMBRES MIDNITE <small>Ron Benjamin</small></h2>
+    <div class="row" id="midnite"></div>
     <p>Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens, 1989-2015). Os discos <i>Unpolished</i> e <i>Ras Mek Peace</i> foram gravados ao vivo, direto em fita de dois canais, sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.</p>
-    <p>O timbre, opaco e escuro: bubble oco (8' + 4' e um pouco de 2⅔'), chop cheio sem percussão e sem key click, Leslie lenta e discreta, sem eco; o EQ corta o grave profundo do caminho do baixo, encorpa o médio-grave, tira médio e bastante agudo e compensa o volume na SAÍDA. O groove continua o do músico escolhido.</p>
+    <p><b>MIDNITE</b>, o original: opaco e escuro, bubble oco (8' + 4' e um pouco de 2⅔'), chop sem percussão e sem key click, Leslie lenta e discreta, seco; o EQ corta o grave profundo, encorpa o médio-grave e tira médio e agudo.
+    <b>ABAFADO</b>: mais escuro e redondo. <b>CORPO</b>: mais médio-grave e o 16' cheio. <b>AO VIVO</b>: Leslie 122 lenta e mais drive. Todos com o volume igualado na SAÍDA. O groove continua o do músico escolhido.</p>
     <p style="opacity:.7">Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.</p>
   </div>
  </div>
@@ -299,7 +300,12 @@ const EQ_PRESETS=[
   ['DIGITAL 80','fino e brilhante',[150,-3,200,2,2500,.9,4,7000,0]],
   ['ABRE O BAIXO','corta o grave para o baixo',[180,-4,250,1.5,1200,.8,0,5000,0]]];
 const EQ_KEYS=['eqHpf','eqLowG','eqLowF','eqMidG','eqMidF','eqMidQ','eqHighG','eqHighF','eqOut'];
-const MIDNITE={bdb:[0,0,8,6,2,0,0,0,0],cdb:[8,6,8,4,0,0,0,0,0],drive:.12,lesPreset:2,lesSpeed:0,lesDepth:.45,eq:[120,3.5,380,-5,1200,.8,-7,3000,2.8]};
+// TIMBRES MIDNITE: os mesmos do OrganEQ.h (midniteTimbre). O reverb do AO VIVO fica só no plugin.
+const MIDNITE=[
+  {name:'MIDNITE',sub:'o original: seco, opaco e escuro',bdb:[0,0,8,6,2,0,0,0,0],cdb:[8,6,8,4,0,0,0,0,0],drive:.12,lesPreset:2,lesSpeed:0,lesDepth:.45,eq:[120,3.5,380,-5,1200,.8,-7,3000,2.8]},
+  {name:'ABAFADO',sub:'mais escuro e redondo, quase sem agudo',bdb:[0,0,8,4,0,0,0,0,0],cdb:[8,4,8,2,0,0,0,0,0],drive:.10,lesPreset:2,lesSpeed:0,lesDepth:.35,eq:[120,4,360,-6,1100,.8,-10,2200,3.4]},
+  {name:'CORPO',sub:"mais médio-grave e o 16' cheio no chop",bdb:[0,0,8,6,2,0,0,0,0],cdb:[8,8,8,4,0,0,0,0,0],drive:.14,lesPreset:2,lesSpeed:0,lesDepth:.45,eq:[110,5,420,-4.5,1300,.8,-7,3000,.4]},
+  {name:'AO VIVO',sub:'Leslie 122 lenta e mais drive',bdb:[0,0,8,6,2,0,0,0,0],cdb:[8,6,8,4,0,0,0,0,0],drive:.18,lesPreset:1,lesSpeed:0,lesDepth:.7,eq:[120,3.5,380,-5,1200,.8,-6,3200,2.5]}];
 const EPOCHS = [ // musician, beat, feel(-1 = grade do músico), bpm
   ['ROCKSTEADY','1966-68',1,0,1,80],['EARLY REGGAE','1968-72',2,0,-1,84],['ROOTS','1972-79',3,0,-1,74],['ROCKERS','1975-80',5,1,-1,76],
   ['LOVERS ROCK','1969-94',4,0,-1,72],['RUB A DUB','1979-84',6,0,-1,78],['DIGITAL','1985-89',7,1,-1,92],['RAGGA','1990-95',7,2,-1,94],
@@ -392,7 +398,7 @@ function detectChord(held){
 const S = {mus:1,epoch:-1,bank:-1,grid:gridFrom(MUS[1].rh,MUS[1].lh),beat:0,nota:0,swing:.12,human:.3,ghost:.5,seed:1,
   bubbleOn:true,chopOn:true,fillsOn:true,bubbleLvl:.85,chopLvl:.75,fillStyle:0,fillEvery:4,chordSrc:0,bpm:80,
   instr:0,lesPreset:0,lesSpeed:0,lesBrake:false,lesDepth:.8,drive:.2,echoOn:false,echoVol:.45,echoInt:.4,master:.8,bdb:[0,0,8,2,0,0,0,0,0],cdb:[8,8,8,0,0,0,0,0,0],
-  quickFeel:2,quickDen:2,page:0,...EQ_FLAT,midnite:false,brush:1,edits:null,
+  quickFeel:2,quickDen:2,page:0,...EQ_FLAT,midnite:-1,brush:1,edits:null,
   slots:[{root:9,minor:true,dur:1,on:true},{root:2,minor:true,dur:1,on:true},{root:9,minor:true,dur:1,on:true},{root:4,minor:true,dur:1,on:true}]};
 const chords=()=>S.slots.filter((s,i)=>i===0||s.on).map(s=>({root:s.root,minor:s.minor,beats:DURS[s.dur][0]}));
 function settings(){ return {grid:S.grid,beat:S.beat,noteSize:S.nota,swing:S.swing,human:S.human,ghost:S.ghost,seed:S.seed,bubbleOn:S.bubbleOn,chopOn:S.chopOn,fillsOn:S.fillsOn,
@@ -573,7 +579,7 @@ function setStatus(t){ document.getElementById('status').textContent=t; }
 
 // ====================================================================== os três caminhos
 function applyMusician(i){
-  const m=MUS[i]; S.mus=i; S.edits=null; S.epoch=-1; S.midnite=false;
+  const m=MUS[i]; S.mus=i; S.edits=null; S.epoch=-1; S.midnite=-1;
   Object.assign(S,{grid:gridFrom(m.rh,m.lh),beat:m.beat,swing:m.swing,human:m.human,ghost:m.ghost,fillStyle:m.fillStyle,fillEvery:m.fillEvery,bpm:m.bpm,lesPreset:lesFromMusician(m.leslie),lesSpeed:m.leslie===2?1:0,lesBrake:false,lesDepth:m.leslie?LES[lesFromMusician(m.leslie)].depth:.8,drive:m.drive,bdb:[...m.bdb],cdb:[...m.cdb]});
   buildWaves(); renderDrawbars(); refresh(); applySound();
   if(!playing) setStatus(m.who+'  ·  dê PLAY');
@@ -718,8 +724,8 @@ function setPage(p){ S.page=p; [0,1,2,3].forEach(k=>$('p'+k).hidden=k!==p); refr
 function refresh(){
   [...$('mus').children].forEach((b,i)=>b.classList.toggle('on',i===S.mus));
   $('epoch').value=String(S.epoch);
-  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','lesPresets','lesSpeed','instr','brush','eqPresets'].forEach(refreshChips);
-  $('eqOn').classList.toggle('on',S.eqOn); $('midnite').classList.toggle('on',S.midnite); if(S.page===3) drawEq();
+  ['tabs','feel','density','beat','nota','fillStyle','fillEvery','chordSrc','lesPresets','lesSpeed','instr','brush','eqPresets','midnite'].forEach(refreshChips);
+  $('eqOn').classList.toggle('on',S.eqOn); if(S.page===3) drawEq();
   $('lesBrake').classList.toggle('on',S.lesBrake);
   for(const k of ['bubbleOn','chopOn','fillsOn','echoOn']) $(k).classList.toggle('on',S[k]);
   $('backBtn').disabled=!S.edits; $('backBtn').classList.toggle('on',!!S.edits);
@@ -790,8 +796,10 @@ function setEq(v){ EQ_KEYS.forEach((k,i)=>S[k]=v[i]); S.eqOn=true; }
 chips('eqPresets',EQ_PRESETS.map(p=>p[0]),eqPresetIndex,i=>setEq(EQ_PRESETS[i][2]));
 [...$('eqPresets').children].forEach((b,i)=>b.title=EQ_PRESETS[i][1]);
 $('eqOn').onclick=()=>{ S.eqOn=!S.eqOn; refresh(); applySound(); };
-$('midnite').onclick=()=>{ Object.assign(S,{instr:0,bdb:[...MIDNITE.bdb],cdb:[...MIDNITE.cdb],drive:MIDNITE.drive,echoOn:false,lesPreset:MIDNITE.lesPreset,lesSpeed:MIDNITE.lesSpeed,lesBrake:false,lesDepth:MIDNITE.lesDepth,midnite:true});
-  setEq(MIDNITE.eq); buildWaves(); renderDrawbars(); refresh(); applySound(); };
+chips('midnite',MIDNITE.map(t=>t.name),()=>S.midnite,i=>{ const T=MIDNITE[i];
+  Object.assign(S,{instr:0,bdb:[...T.bdb],cdb:[...T.cdb],drive:T.drive,echoOn:false,lesPreset:T.lesPreset,lesSpeed:T.lesSpeed,lesBrake:false,lesDepth:T.lesDepth,midnite:i});
+  setEq(T.eq); buildWaves(); renderDrawbars(); });
+[...$('midnite').children].forEach((b,i)=>b.title=MIDNITE[i].sub);
 // curva: a resposta real dos filtros do navegador (getFrequencyResponse), medida em filtros de um contexto offline
 let eqProbe=null;
 function eqFilters(){   // sempre os filtros de medida: os do áudio deslizam até o valor novo (setTargetAtTime)

@@ -272,7 +272,7 @@ private:
     std::unique_ptr<APVTS::ButtonAttachment> eqOnAtt;
     Knob eqOut, eqHpf, eqLowG, eqLowF, eqMidG, eqMidF, eqMidQ, eqHighG, eqHighF;
     Chips eqPresets;
-    juce::TextButton midniteBtn;
+    Chips midniteChips;   // MIDNITE, ABAFADO, CORPO, AO VIVO
     juce::Label midniteInfo;
 
     GrooveKeyboard keyboard;

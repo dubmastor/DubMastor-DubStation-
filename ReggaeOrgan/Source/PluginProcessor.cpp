@@ -245,9 +245,10 @@ int ReggaeOrganProcessor::getEqPreset() const
     return -1;
 }
 
-void ReggaeOrganProcessor::applyMidnite()
+void ReggaeOrganProcessor::applyMidnite (int i)
 {
-    const OrganTimbre& t = midniteTimbre();
+    i = juce::jlimit (0, (int) NumMidniteTimbres - 1, i);
+    const OrganTimbre& t = midniteTimbre (i);
     setParam ("instr", 0.0f);   // é Hammond (drawbars)
     for (int i = 0; i < 9; ++i)
     {
@@ -264,10 +265,15 @@ void ReggaeOrganProcessor::applyMidnite()
     setParam ("lesBrake", 0.0f);
     setParam ("lesDepth", t.lesDepth);
     setEq (t.eq);
-    apvts.state.setProperty ("timbre", "midnite", nullptr);
+    apvts.state.setProperty ("timbre", "midnite" + juce::String (i), nullptr);
 }
 
-bool ReggaeOrganProcessor::isMidnite() const { return apvts.state.getProperty ("timbre").toString() == "midnite"; }
+int ReggaeOrganProcessor::midniteIndex() const
+{
+    const juce::String t = apvts.state.getProperty ("timbre").toString();
+    if (! t.startsWith ("midnite")) return -1;
+    return juce::jlimit (0, (int) NumMidniteTimbres - 1, t.substring (7).getIntValue());
+}
 
 void ReggaeOrganProcessor::applyEpoch (int e)
 {

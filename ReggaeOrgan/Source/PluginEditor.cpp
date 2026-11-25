@@ -938,16 +938,23 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
     }
     eqPresets.current = [this] { return proc.getEqPreset(); };
     eqPresets.onPick = [this] (int i) { proc.applyEqPreset (i); };
-    midniteBtn.setButtonText (u8 ("CARREGAR O TIMBRE MIDNITE"));
-    midniteBtn.getProperties().set ("style", "chip");
-    midniteBtn.setTooltip (u8 ("Troca registros, Leslie, drive, click, reverb, eco e EQ. O groove continua o do m\xc3\xbasico."));
-    midniteBtn.onClick = [this] { proc.applyMidnite(); };
-    addAndMakeVisible (midniteBtn);
+    {
+        juce::StringArray names;
+        for (int i = 0; i < mro::NumMidniteTimbres; ++i) names.add (u8 (mro::midniteTimbre (i).name));
+        setupChips (midniteChips, {}, names);
+        for (int i = 0; i < mro::NumMidniteTimbres; ++i)
+            midniteChips.buttons[i]->setTooltip (u8 (mro::midniteTimbre (i).sub)
+                                                 + u8 (". Troca registros, Leslie, drive, click, reverb, eco e EQ; o groove continua o do m\xc3\xbasico."));
+        midniteChips.current = [this] { return proc.midniteIndex(); };
+        midniteChips.onPick = [this] (int i) { proc.applyMidnite (i); };
+    }
     midniteInfo.setText (u8 ("Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens, 1989-2015). "
                              "Os discos Unpolished e Ras Mek Peace foram gravados ao vivo, direto em fita de dois canais, "
                              "sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.\n\n"
-                             "O timbre, opaco e escuro: bubble oco (8' + 4' e um pouco de 2 2/3'), chop cheio sem percuss\xc3\xa3o, Leslie lenta e discreta, "
-                             "sem key click, sem reverb e sem eco; o EQ corta o grave profundo do caminho do baixo, encorpa o m\xc3\xa9" "dio-grave, tira m\xc3\xa9" "dio e bastante agudo e compensa o volume na SA\xc3\x8d" "DA.\n\n"
+                             "MIDNITE, o original: opaco e escuro, bubble oco (8' + 4' e um pouco de 2 2/3'), chop sem percuss\xc3\xa3o e sem key click, "
+                             "Leslie lenta e discreta, seco; o EQ corta o grave profundo, encorpa o m\xc3\xa9" "dio-grave e tira m\xc3\xa9" "dio e agudo.\n"
+                             "ABAFADO: mais escuro e redondo. CORPO: mais m\xc3\xa9" "dio-grave e o 16' cheio. AO VIVO: Leslie 122 lenta, um pouco de sala e mais drive. "
+                             "Todos com o volume igualado na SA\xc3\x8d" "DA.\n\n"
                              "Nenhuma fonte diz qual \xc3\xb3rg\xc3\xa3o ele usava: os registros s\xc3\xa3o uma aproxima\xc3\xa7\xc3\xa3o de ouvido."),
                          juce::dontSendNotification);
     midniteInfo.setFont (VintageLookAndFeel::mono (9.5f, false));
@@ -1064,7 +1071,7 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
         v.push_back (&eqOnBtn);
         for (auto* k : { &eqOut, &eqHpf, &eqLowG, &eqLowF, &eqMidG, &eqMidF, &eqMidQ, &eqHighG, &eqHighF }) addK (*k);
         addC (eqPresets);
-        v.push_back (&midniteBtn);
+        addC (midniteChips);
         v.push_back (&midniteInfo);
     }
     else
@@ -1100,9 +1107,8 @@ void ReggaeOrganEditor::timerCallback()
         const int newLook = juce::jlimit (0, 4, (int) proc.apvts.getRawParameterValue ("instr")->load());
         if (newLook != look) { look = newLook; repaint(); }
     }
-    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &lesPreset, &lesSpeed, &instr, &brush, &eqPresets })
+    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &lesPreset, &lesSpeed, &instr, &brush, &eqPresets, &midniteChips })
         refreshChips (*c);
-    midniteBtn.setToggleState (proc.isMidnite(), juce::dontSendNotification);
     if (page == 3) eqCurve.repaint();
     lesBrake.setToggleState (proc.get ("lesBrake") > 0.5f, juce::dontSendNotification);
     if (page == 2)
@@ -1326,7 +1332,7 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
         g.setColour (brownInk.withAlpha (0.25f));
         for (int gx : { x + 146, x + 296, x + 476 }) g.drawVerticalLine (gx, (float) y, (float) y + 96);
         smallLabel ("PRESETS DO EQ", x, kGridPan.getY() + 362);
-        ivoryPanel (kSide, "TIMBRE MIDNITE", "RON BENJAMIN");
+        ivoryPanel (kSide, "TIMBRES MIDNITE", "RON BENJAMIN");
     }
     else
     {
@@ -1478,8 +1484,9 @@ void ReggaeOrganEditor::resized()
         placeKnob (eqHighF, { x + 580, y + 44 }, 38, 60);
         layoutChips (eqPresets, { x, kGridPan.getY() + 376, w, 26 }, 4);
         const int sx = kSide.getX() + 14, sw = kSide.getWidth() - 28;
-        midniteBtn.setBounds (sx, kSide.getY() + 34, sw, 34);
-        midniteInfo.setBounds (sx - 4, kSide.getY() + 78, sw + 8, kSide.getHeight() - 88);
+        for (int i = 0; i < mro::NumMidniteTimbres; ++i)
+            midniteChips.buttons[i]->setBounds (sx + (i % 2) * (sw / 2 + 3), kSide.getY() + 34 + (i / 2) * 34, sw / 2 - 3, 30);
+        midniteInfo.setBounds (sx - 4, kSide.getY() + 110, sw + 8, kSide.getHeight() - 120);
     }
 
     keyboard.setBounds (152, 653, 812, 127);

@@ -40,13 +40,16 @@ inline const EqPreset& eqPreset (int i)
     return t[i < 0 ? 0 : (i >= NumEqPresets ? NumEqPresets - 1 : i)];
 }
 
-// TIMBRE MIDNITE (Ron Benjamin, Midnite · St. Croix, 1997-2015): órgão cru, seco, opaco e escuro, como nos discos gravados
+// TIMBRES MIDNITE (Ron Benjamin, Midnite · St. Croix, 1997-2015): órgão cru, seco, opaco e escuro, como nos discos gravados
 // ao vivo direto em fita de dois canais (Unpolished, Ras Mek Peace), sem reverb e sem eco; bubble oco
-// (8' + 4' + 2⅔'), chop cheio, sem percussão e sem key click, Leslie lenta e discreta; o EQ tira o grave
-// do caminho do baixo pesado, encorpa o médio-grave (150–350 Hz), tira médio (1,2 kHz) e compensa o volume na SAÍDA. Registros e EQ são uma aproximação de ouvido.
+// (8' + 4' e um pouco de 2⅔'), chop cheio, sem percussão e sem key click, Leslie lenta e discreta; o EQ tira o grave
+// do caminho do baixo pesado, encorpa o médio-grave (150–350 Hz), tira médio (1,2 kHz) e bastante agudo e compensa o volume
+// na SAÍDA (medida no teste: o mesmo RMS do timbre do Mittoo). O MIDNITE é o original; ABAFADO, CORPO e AO VIVO são variações.
+// Registros e EQ são uma aproximação de ouvido. Ao mudar a tabela, mude também MIDNITE no index.html da versão para celular.
 struct OrganTimbre
 {
     const char* name;
+    const char* sub;
     int bubbleDb[9], chopDb[9];
     bool perc;
     float drive, click, reverb;
@@ -54,17 +57,25 @@ struct OrganTimbre
     float lesDepth;
     EqParams eq;
 };
-constexpr float kMidniteOutDb = 2.8f;   // compensação de volume (medida no teste: mesmo RMS do timbre do Mittoo)
-inline const OrganTimbre& midniteTimbre()
+enum { NumMidniteTimbres = 4 };
+inline const OrganTimbre& midniteTimbre (int i = 0)
 {
-    static const OrganTimbre t {
-        "MIDNITE",
-        { 0, 0, 8, 6, 2, 0, 0, 0, 0 }, { 8, 6, 8, 4, 0, 0, 0, 0, 0 },
-        false, 0.12f, 0.0f, 0.0f,        // sem percussão e sem key click: nada de ataque percussivo
-        2, 0, 0.45f,
-        { true, 120.0f, 3.5f, 380.0f, -5.0f, 1200.0f, 0.8f, -7.0f, 3000.0f, kMidniteOutDb }
+    //   sem percussão e sem key click em todos: nada de ataque percussivo
+    static const OrganTimbre t[NumMidniteTimbres] = {
+        { "MIDNITE", "o original: seco, opaco e escuro",
+          { 0, 0, 8, 6, 2, 0, 0, 0, 0 }, { 8, 6, 8, 4, 0, 0, 0, 0, 0 }, false, 0.12f, 0.0f, 0.0f, 2, 0, 0.45f,
+          { true, 120.0f, 3.5f, 380.0f, -5.0f, 1200.0f, 0.8f, -7.0f, 3000.0f, 2.8f } },
+        { "ABAFADO", "mais escuro e redondo, quase sem agudo",
+          { 0, 0, 8, 4, 0, 0, 0, 0, 0 }, { 8, 4, 8, 2, 0, 0, 0, 0, 0 }, false, 0.10f, 0.0f, 0.0f, 2, 0, 0.35f,
+          { true, 120.0f, 4.0f, 360.0f, -6.0f, 1100.0f, 0.8f, -10.0f, 2200.0f, 3.4f } },
+        { "CORPO", "mais m\xc3\xa9" "dio-grave e o 16' cheio no chop",
+          { 0, 0, 8, 6, 2, 0, 0, 0, 0 }, { 8, 8, 8, 4, 0, 0, 0, 0, 0 }, false, 0.14f, 0.0f, 0.0f, 2, 0, 0.45f,
+          { true, 110.0f, 5.0f, 420.0f, -4.5f, 1300.0f, 0.8f, -7.0f, 3000.0f, 0.4f } },
+        { "AO VIVO", "Leslie 122 lenta, um pouco de sala e mais drive",
+          { 0, 0, 8, 6, 2, 0, 0, 0, 0 }, { 8, 6, 8, 4, 0, 0, 0, 0, 0 }, false, 0.18f, 0.0f, 0.12f, 1, 0, 0.70f,
+          { true, 120.0f, 3.5f, 380.0f, -5.0f, 1200.0f, 0.8f, -6.0f, 3200.0f, 2.5f } },
     };
-    return t;
+    return t[i < 0 ? 0 : (i >= NumMidniteTimbres ? NumMidniteTimbres - 1 : i)];
 }
 
 // um biquad estéreo (forma direta transposta II)

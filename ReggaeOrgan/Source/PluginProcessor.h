@@ -58,8 +58,9 @@ public:
     mro::EqParams getEq() const;
     void applyEqPreset (int i);
     int getEqPreset() const;                         // -1 = ajuste próprio
-    void applyMidnite();                             // TIMBRE MIDNITE (Ron Benjamin): registros, Leslie, drive, click e EQ
-    bool isMidnite() const;
+    void applyMidnite (int i = 0);                   // TIMBRES MIDNITE (Ron Benjamin): registros, Leslie, drive, click e EQ
+    int midniteIndex() const;                        // -1 = nenhum timbre Midnite carregado
+    bool isMidnite() const { return midniteIndex() >= 0; }
 
     // atalhos da grade
     void applyFeel (int feel, int density);
