@@ -177,15 +177,24 @@ int main()
 
     // ---------------- áudio: 8 compassos por músico
     if (std::system ("mkdir -p out") != 0) return 1;
-    for (int m = 0; m < NumMusicians; ++m)
+    for (int m = 0; m < NumMusicians + NumMidniteTimbres; ++m)   // os últimos: o groove do Mittoo com os TIMBRES MIDNITE (1.3)
     {
-        const Musician& mu = musician (m);
+        const bool midnite = m >= NumMusicians;
+        const int tIdx = m - NumMusicians;
+        const Musician& mu = musician (midnite ? (int) MusMittoo : m);
         Settings s;
         s.grid = gridFrom (mu.rh, mu.lh); s.beat = mu.beat; s.swing = mu.swing; s.human = mu.human;
         s.ghost = mu.ghost; s.fillStyle = mu.fillStyle; s.fillEvery = mu.fillEvery;
         SoundParams sp;
         for (int d = 0; d < 9; ++d) { sp.bubbleDb[d] = (float) mu.bubbleDb[d]; sp.chopDb[d] = (float) mu.chopDb[d]; }
         sp.ghostLevel = mu.ghost; sp.lesPreset = leslieFromMusician (mu.leslie); sp.lesSpeed = mu.leslie == 2 ? 1 : 0; sp.drive = mu.drive; sp.perc = mu.perc; sp.echoOn = true; sp.echoVol = 0.3f;
+        if (midnite)
+        {
+            const OrganTimbre& t = midniteTimbre (tIdx);
+            for (int d = 0; d < 9; ++d) { sp.bubbleDb[d] = (float) t.bubbleDb[d]; sp.chopDb[d] = (float) t.chopDb[d]; }
+            sp.perc = t.perc; sp.drive = t.drive; sp.click = t.click; sp.reverb = t.reverb; sp.echoOn = false;
+            sp.lesPreset = t.lesPreset; sp.lesSpeed = t.lesSpeed; sp.lesDepth = t.lesDepth; sp.eq = t.eq;
+        }
 
         const int sr = 48000, blk = 256;
         OrganTrio trio; trio.prepare (sr); trio.setParams (sp);
@@ -238,14 +247,17 @@ int main()
         float pk = 0; double ms = 0;
         for (int i = 0; i < N; ++i) { pk = std::max (pk, std::fabs (keys[(size_t) i])); ms += keys[(size_t) i] * keys[(size_t) i]; }
         const double rmsDb = 10 * std::log10 (ms / N + 1e-12);
-        std::printf ("%-9s %5.1f BPM  notas %4d  pico %.2f  RMS %5.1f dB\n", mu.name, bpm, notesOn, pk, rmsDb);
+        static double mittooRms = 0;
+        if (m == (int) MusMittoo) mittooRms = rmsDb;
+        if (midnite) CHECK (std::fabs (rmsDb - mittooRms) < 0.7, "MIDNITE: volume compensado (mesmo RMS do timbre do Mittoo)");
+        std::printf ("%-9s %5.1f BPM  notas %4d  pico %.2f  RMS %5.1f dB\n", midnite ? midniteTimbre (tIdx).name : mu.name, bpm, notesOn, pk, rmsDb);
         CHECK (pk > 0.05f && pk <= 1.0f, "\xc3\xb3rg\xc3\xa3o soa e n\xc3\xa3o passa do teto");
         CHECK (rmsDb > -40.0 && std::isfinite (rmsDb), "n\xc3\xadvel do \xc3\xb3rg\xc3\xa3o razo\xc3\xa1vel, sem NaN");
 
         float mx = 0;
         for (int i = 0; i < N; ++i) mx = std::max (mx, std::max (std::fabs (L[(size_t) i]), std::fabs (R[(size_t) i])));
         if (mx > 0.98f) for (int i = 0; i < N; ++i) { L[(size_t) i] *= 0.98f / mx; R[(size_t) i] *= 0.98f / mx; }
-        const std::string name = "out/MRO-68_" + std::to_string (m + 1) + "_" + mu.name + ".wav";
+        const std::string name = "out/MRO-68_" + std::to_string (m + 1) + "_" + (midnite ? std::string ("MIDNITE_") + midniteTimbre (tIdx).name : std::string (mu.name)) + ".wav";
         writeWav (name.c_str(), L, R, sr);
     }
 
@@ -300,6 +312,41 @@ int main()
         les.set (1, 1, true, 0.8f); run (6.0);
         CHECK (les.hornRate.load() < 0.1f && les.drumRate.load() < 0.2f, "FREIO para os rotores");
         for (int p = 0; p < NumLesliePresets; ++p) { les.set (p, 1, false, 1.0f); run (0.5); }
+    }
+    // ---- EQUALIZADOR (1.3): plano não muda nada; a curva da tela bate com o som; corte e realces onde devem
+    {
+        CHECK (std::fabs (OrganEQ::responseDb (eqPreset (0).p, 1000.0)) < 0.01, "EQ PLANO: 0 dB");
+        EqParams e; e.midG = 6.0f; e.midF = 1000.0f;
+        CHECK (std::fabs (OrganEQ::responseDb (e, 1000.0) - 6.0) < 0.1, "M\xc3\x89" "DIOS +6 dB em 1 kHz");
+        e = EqParams(); e.hpf = 200.0f;
+        CHECK (OrganEQ::responseDb (e, 50.0) < -20.0 && std::fabs (OrganEQ::responseDb (e, 2000.0)) < 0.2, "CORTE em 200 Hz: -20 dB em 50 Hz, 2 kHz intacto");
+        e = EqParams(); e.lowG = -9.0f; e.highG = 6.0f;
+        CHECK (OrganEQ::responseDb (e, 40.0) < -8.0 && OrganEQ::responseDb (e, 15000.0) > 5.5, "GRAVES e AGUDOS (shelves)");
+        e.on = false;
+        CHECK (OrganEQ::responseDb (e, 40.0) == 0.0, "EQ desligado: 0 dB");
+        // a conta da tela = o som: seno de 1 kHz com +6 dB nos médios sai ~2x mais forte
+        const double sr = 48000.0;
+        for (double f : { 80.0, 1000.0, 8000.0 })
+        {
+            const EqParams& t = midniteTimbre().eq;
+            OrganEQ q; q.prepare (sr); q.set (t);
+            const int N = 48000;
+            std::vector<float> L ((size_t) N), R ((size_t) N);
+            for (int i = 0; i < N; ++i) L[(size_t) i] = R[(size_t) i] = 0.25f * (float) std::sin (6.283185307 * f * i / sr);
+            q.process (L.data(), R.data(), N);
+            double e2 = 0; for (int i = N / 2; i < N; ++i) e2 += (double) L[(size_t) i] * L[(size_t) i];
+            const double got = 10 * std::log10 (e2 / (N / 2) / (0.25 * 0.25 / 2));
+            char msg[120]; std::snprintf (msg, sizeof msg, "EQ Midnite em %.0f Hz: som %.2f dB = tela %.2f dB", f, got, OrganEQ::responseDb (t, f, sr));
+            CHECK (std::fabs (got - OrganEQ::responseDb (t, f, sr)) < 0.15, msg);
+        }
+        const EqParams& t = midniteTimbre().eq;
+        CHECK (OrganEQ::responseDb (t, 60.0) - t.out < -6.0 && OrganEQ::responseDb (t, 1100.0) - t.out < -1.5, "MIDNITE: grave fora do caminho do baixo e um pouco menos de m\xc3\xa9" "dio");
+        e = EqParams(); e.out = 4.0f;
+        CHECK (std::fabs (OrganEQ::responseDb (e, 300.0) - 4.0) < 0.01, "SA\xc3\x8d" "DA +4 dB");
+        CHECK (midniteTimbre().reverb == 0.0f && ! midniteTimbre().perc, "MIDNITE: seco (sem reverb) e sem percuss\xc3\xa3o");
+        for (int k = 0; k < NumMidniteTimbres; ++k)
+            CHECK (! midniteTimbre (k).perc && midniteTimbre (k).click == 0.0f && midniteTimbre (k).eq.highG <= -6.0f,
+                   "timbres Midnite: sem percuss\xc3\xa3o, sem key click e escuros");
     }
     std::printf (fails ? "\n%d FALHA(S)\n" : "\nTudo certo.\n", fails);
     return fails ? 1 : 0;

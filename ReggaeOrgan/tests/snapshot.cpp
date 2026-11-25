@@ -68,6 +68,38 @@ int main (int argc, char** argv)
         proc.setParam ("instr", 0.0f);
         re->refreshForSnapshot();
     }
+    {   // aba EQ (1.3) com o TIMBRE MIDNITE carregado
+        proc.applyMidnite (0);
+        for (int k = 0; k < 4; ++k) { b.clear(); m.clear(); proc.processBlock (b, m); }
+        re->setPage (3);
+        re->refreshForSnapshot();
+        auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale);
+        juce::File f = base.getSiblingFile (base.getFileNameWithoutExtension() + "-eq" + base.getFileExtension());
+        f.deleteFile();
+        juce::FileOutputStream os (f);
+        juce::PNGImageFormat png;
+        const bool w = png.writeImageToStream (img, os);
+        ok = ok && w;
+        std::printf ("%s %s\n", w ? "PNG" : "FALHOU", f.getFullPathName().toRawUTF8());
+        juce::MemoryBlock mm; proc.getStateInformation (mm);
+        ReggaeOrganProcessor p3; p3.setStateInformation (mm.getData(), (int) mm.getSize());
+        const bool eqOk = p3.isMidnite() && std::abs (p3.get ("eqHpf") - mro::midniteTimbre().eq.hpf) < 0.5f
+                          && std::abs (p3.get ("eqMidG") - mro::midniteTimbre().eq.midG) < 0.05f && p3.get ("reverb") == 0.0f;
+        std::printf ("EQ e timbre Midnite no estado %s\n", eqOk ? "ok" : "FALHOU");
+        ok = ok && eqOk;
+        {   // as variações: CORPO volta do estado como CORPO
+            ReggaeOrganProcessor p4; p4.applyMidnite (2);
+            juce::MemoryBlock m4; p4.getStateInformation (m4);
+            ReggaeOrganProcessor p5; p5.setStateInformation (m4.getData(), (int) m4.getSize());
+            const bool vOk = p5.midniteIndex() == 2 && std::abs (p5.get ("eqOut") - mro::midniteTimbre (2).eq.out) < 0.05f;
+            std::printf ("varia\xc3\xa7\xc3\xa3o CORPO no estado %s\n", vOk ? "ok" : "FALHOU");
+            ok = ok && vOk;
+        }
+        proc.applyMusician (mro::MusWright);   // volta ao estado do resto do teste
+        proc.setParam ("echoOn", 1.0f);
+        proc.applyEqPreset (0);
+        ok = ok && ! proc.isMidnite() && proc.getEqPreset() == 0;
+    }
     re->setPage (0);
 
     // estado: salva e restaura

@@ -1,4 +1,19 @@
-# Mastor Reggae Organ MRO-68 1.2
+# Mastor Reggae Organ MRO-68 1.3
+
+## 1.3
+
+- **Aba EQ, nova:** equalizador de 4 faixas na saída do órgão (depois da soma das três partes, antes do maximizer):
+  **CORTE** de graves (passa-altas, 20 Hz = desligado), **GRAVES** (shelf), **MÉDIOS** (sino com Q) e **AGUDOS** (shelf), de −15 a +15 dB, e **SAÍDA** (−12 a +12 dB) para compensar o volume.
+  - Visor azul com a curva de 20 Hz a 20 kHz: arraste os pontos (frequência e ganho), roda do mouse no MÉDIOS muda o Q, duplo clique zera.
+  - **Presets:** PLANO, ROOTS QUENTE, DUB ESCURO, DIGITAL 80 e ABRE O BAIXO.
+  - Começa plano: projetos antigos abrem com o mesmo som.
+- **TIMBRE MIDNITE** (na aba EQ): o órgão do Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens).
+  Os discos *Unpolished* e *Ras Mek Peace* foram gravados ao vivo, direto em fita de dois canais, sem reverb, sem eco e sem EQ.
+  O botão carrega um som cru, seco, opaco e escuro: bubble oco (8' + 4' e um pouco de 2⅔'), chop cheio sem percussão, Leslie ROOTS SUAVE discreta,
+  sem key click, sem reverb e sem eco, e o EQ tirando o grave profundo do caminho do baixo, encorpando o médio-grave (150–350 Hz) e tirando médio (−5 dB em 1,2 kHz) e bastante agudo (−7 dB acima de 3 kHz) para um som opaco e escuro, com o volume compensado na SAÍDA (soa tão alto quanto os outros timbres). O groove continua o do músico.
+  Nenhuma fonte diz qual órgão ele usava: os registros são uma aproximação de ouvido.
+- **3 variações do timbre Midnite**, nos botões da aba EQ: **ABAFADO** (mais escuro e redondo, quase sem agudo), **CORPO** (mais médio-grave e o 16' cheio no chop) e **AO VIVO** (Leslie 122 lenta, um pouco de sala e mais drive). Todas sem percussão e sem key click, com o volume igualado na SAÍDA.
+- Versão para celular 1.3 com a mesma aba EQ (curva no toque) e o mesmo timbre.
 
 ## 1.2
 

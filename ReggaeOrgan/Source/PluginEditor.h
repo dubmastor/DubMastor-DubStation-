@@ -155,6 +155,32 @@ private:
     ReggaeOrganProcessor& proc;
 };
 
+// A curva do EQUALIZADOR (1.3): visor azul com a resposta de 20 Hz a 20 kHz; arraste os pontos
+// (CORTE só para os lados; GRAVES, MÉDIOS e AGUDOS em frequência e ganho), roda do mouse no MÉDIOS = Q,
+// duplo clique zera o ganho (ou tira o corte).
+class EqCurve : public juce::Component
+{
+public:
+    explicit EqCurve (ReggaeOrganProcessor& p) : proc (p) { setMouseCursor (juce::MouseCursor::PointingHandCursor); }
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+private:
+    juce::Rectangle<float> plot() const { return getLocalBounds().toFloat().reduced (30.0f, 14.0f).withTrimmedBottom (6.0f); }
+    float xOf (double f) const;
+    double fOf (float x) const;
+    float yOf (double db) const;
+    double dbOf (float y) const;
+    juce::Point<float> node (int k) const;
+    int nodeAt (juce::Point<float>) const;
+    void gesture (bool begin);
+    ReggaeOrganProcessor& proc;
+    int dragNode = -1;
+};
+
 class ReggaeOrganEditor : public juce::AudioProcessorEditor, private juce::Timer
 {
 public:
@@ -239,6 +265,15 @@ private:
     std::unique_ptr<APVTS::ButtonAttachment> percAtt, echoAtt, maxAtt;
     Knob drive, click, echoVol, echoInt, echoRate, reverb, master;
     VUMeter vu { "OUT" };
+
+    // aba EQ (1.3)
+    EqCurve eqCurve { proc };
+    juce::ToggleButton eqOnBtn { "EQ" };
+    std::unique_ptr<APVTS::ButtonAttachment> eqOnAtt;
+    Knob eqOut, eqHpf, eqLowG, eqLowF, eqMidG, eqMidF, eqMidQ, eqHighG, eqHighF;
+    Chips eqPresets;
+    Chips midniteChips;   // MIDNITE, ABAFADO, CORPO, AO VIVO
+    juce::Label midniteInfo;
 
     GrooveKeyboard keyboard;
 

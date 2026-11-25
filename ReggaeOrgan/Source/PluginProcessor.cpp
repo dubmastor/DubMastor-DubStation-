@@ -109,6 +109,30 @@ juce::AudioProcessorValueTreeState::ParameterLayout ReggaeOrganProcessor::create
     l.add (onOff ("lesBrake", "Leslie freio", false));
     l.add (pct ("lesDepth", "Leslie profundidade", m.leslie ? lesliePreset (leslieFromMusician (m.leslie)).depth : 0.8f));
     l.add (choice ("instr", "Instrumento", { "Hammond B3", "Rhodes Stage", "Rhodes Suitcase", "Wurlitzer 200A", "FM EP (DX7)" }, 0));
+
+    // ---- EQUALIZADOR da saída (1.3): começa plano (não muda o som de projetos antigos)
+    {
+        auto hz = [] (const char* id, const char* name, float lo, float hi, float def)
+        {
+            NormalisableRange<float> r (lo, hi);
+            r.setSkewForCentre (std::sqrt (lo * hi));
+            return std::make_unique<AudioParameterFloat> (ParameterID { id, 1 }, name, r, def, AudioParameterFloatAttributes().withLabel ("Hz"));
+        };
+        auto db = [] (const char* id, const char* name)
+        { return std::make_unique<AudioParameterFloat> (ParameterID { id, 1 }, name, NormalisableRange<float> (-15.0f, 15.0f, 0.1f), 0.0f,
+                                                        AudioParameterFloatAttributes().withLabel ("dB")); };
+        l.add (onOff ("eqOn", "EQ ligado", true));
+        l.add (hz ("eqHpf", "EQ corte de graves", 20.0f, 400.0f, 20.0f));
+        l.add (db ("eqLowG", "EQ graves"));
+        l.add (hz ("eqLowF", "EQ graves frequencia", 40.0f, 500.0f, 120.0f));
+        l.add (db ("eqMidG", "EQ medios"));
+        l.add (hz ("eqMidF", "EQ medios frequencia", 200.0f, 5000.0f, 1000.0f));
+        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "eqMidQ", 1 }, "EQ medios Q", NormalisableRange<float> (0.3f, 4.0f, 0.01f, 0.5f), 0.8f));
+        l.add (db ("eqHighG", "EQ agudos"));
+        l.add (hz ("eqHighF", "EQ agudos frequencia", 1500.0f, 12000.0f, 5000.0f));
+        l.add (std::make_unique<AudioParameterFloat> (ParameterID { "eqOut", 1 }, "EQ saida", NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f,
+                                                      AudioParameterFloatAttributes().withLabel ("dB")));
+    }
     return l;
 }
 
@@ -175,6 +199,80 @@ void ReggaeOrganProcessor::applyMusician (int mIndex)
     setParam ("perc", m.perc ? 1.0f : 0.0f);
     setParam ("drive", m.drive);
     apvts.state.setProperty ("epochSel", -1, nullptr);
+    apvts.state.setProperty ("timbre", "", nullptr);   // o músico traz o registro dele: sai do timbre Midnite
+}
+
+// ---------------------------------------------------------------- EQ e timbres (1.3)
+void ReggaeOrganProcessor::setEq (const EqParams& e)
+{
+    setParam ("eqOn", e.on ? 1.0f : 0.0f);
+    setParam ("eqHpf", e.hpf);
+    setParam ("eqLowG", e.lowG);   setParam ("eqLowF", e.lowF);
+    setParam ("eqMidG", e.midG);   setParam ("eqMidF", e.midF);   setParam ("eqMidQ", e.midQ);
+    setParam ("eqHighG", e.highG); setParam ("eqHighF", e.highF);
+    setParam ("eqOut", e.out);
+}
+
+EqParams ReggaeOrganProcessor::getEq() const
+{
+    EqParams e;
+    e.on = get ("eqOn") > 0.5f;
+    e.hpf = get ("eqHpf");
+    e.lowG = get ("eqLowG");   e.lowF = get ("eqLowF");
+    e.midG = get ("eqMidG");   e.midF = get ("eqMidF");   e.midQ = get ("eqMidQ");
+    e.highG = get ("eqHighG"); e.highF = get ("eqHighF");
+    e.out = get ("eqOut");
+    return e;
+}
+
+void ReggaeOrganProcessor::applyEqPreset (int i)
+{
+    if (! juce::isPositiveAndBelow (i, (int) NumEqPresets)) return;
+    setEq (eqPreset (i).p);
+}
+
+int ReggaeOrganProcessor::getEqPreset() const
+{
+    const EqParams e = getEq();
+    auto near = [] (float a, float b) { return std::abs (a - b) <= 0.02f * std::max (1.0f, std::abs (b)); };
+    for (int i = 0; i < NumEqPresets; ++i)
+    {
+        const EqParams& p = eqPreset (i).p;
+        if (e.on && near (e.hpf, p.hpf) && near (e.lowG, p.lowG) && near (e.lowF, p.lowF) && near (e.midG, p.midG)
+            && near (e.midF, p.midF) && near (e.midQ, p.midQ) && near (e.highG, p.highG) && near (e.highF, p.highF) && near (e.out, p.out))
+            return i;
+    }
+    return -1;
+}
+
+void ReggaeOrganProcessor::applyMidnite (int i)
+{
+    i = juce::jlimit (0, (int) NumMidniteTimbres - 1, i);
+    const OrganTimbre& t = midniteTimbre (i);
+    setParam ("instr", 0.0f);   // é Hammond (drawbars)
+    for (int i = 0; i < 9; ++i)
+    {
+        setParam ("bdb" + juce::String (i + 1), (float) t.bubbleDb[i]);
+        setParam ("cdb" + juce::String (i + 1), (float) t.chopDb[i]);
+    }
+    setParam ("perc", t.perc ? 1.0f : 0.0f);
+    setParam ("drive", t.drive);
+    setParam ("click", t.click);
+    setParam ("reverb", t.reverb);
+    setParam ("echoOn", 0.0f);  // seco: "before reverb and without delay"
+    setParam ("lesPreset", (float) t.lesPreset);
+    setParam ("lesSpeed", (float) t.lesSpeed);
+    setParam ("lesBrake", 0.0f);
+    setParam ("lesDepth", t.lesDepth);
+    setEq (t.eq);
+    apvts.state.setProperty ("timbre", "midnite" + juce::String (i), nullptr);
+}
+
+int ReggaeOrganProcessor::midniteIndex() const
+{
+    const juce::String t = apvts.state.getProperty ("timbre").toString();
+    if (! t.startsWith ("midnite")) return -1;
+    return juce::jlimit (0, (int) NumMidniteTimbres - 1, t.substring (7).getIntValue());
 }
 
 void ReggaeOrganProcessor::applyEpoch (int e)
@@ -324,6 +422,7 @@ SoundParams ReggaeOrganProcessor::getSound() const
     sp.master        = get ("master");
     sp.maxOn         = get ("maxOn") > 0.5f;
     sp.instr         = (int) get ("instr");
+    sp.eq            = getEq();
     return sp;
 }
 

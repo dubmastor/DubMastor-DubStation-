@@ -56,6 +56,154 @@ juce::String yearsOf (const char* who)
 } // namespace
 
 // =====================================================================  Drawbar
+// ---------------------------------------------------------------- curva do EQ (1.3)
+static const char* const kEqIds[4][2] = { { "eqHpf", nullptr }, { "eqLowF", "eqLowG" }, { "eqMidF", "eqMidG" }, { "eqHighF", "eqHighG" } };
+
+float EqCurve::xOf (double f) const
+{
+    const auto r = plot();
+    return r.getX() + r.getWidth() * (float) (std::log (f / 20.0) / std::log (1000.0));
+}
+double EqCurve::fOf (float x) const
+{
+    const auto r = plot();
+    return 20.0 * std::pow (1000.0, juce::jlimit (0.0, 1.0, (double) ((x - r.getX()) / r.getWidth())));
+}
+float EqCurve::yOf (double db) const
+{
+    const auto r = plot();
+    return r.getCentreY() - (float) (db / 18.0) * r.getHeight() * 0.5f;
+}
+double EqCurve::dbOf (float y) const
+{
+    const auto r = plot();
+    return juce::jlimit (-15.0, 15.0, (double) ((r.getCentreY() - y) / (r.getHeight() * 0.5f) * 18.0f));
+}
+juce::Point<float> EqCurve::node (int k) const
+{
+    if (k == 0) return { xOf (proc.get ("eqHpf")), yOf (0.0) };
+    return { xOf (proc.get (kEqIds[k][0])), yOf (proc.get (kEqIds[k][1])) };
+}
+int EqCurve::nodeAt (juce::Point<float> p) const
+{
+    int best = -1;
+    float bd = 14.0f;
+    for (int k = 0; k < 4; ++k)
+    {
+        const float d = node (k).getDistanceFrom (p);
+        if (d < bd) { bd = d; best = k; }
+    }
+    return best;
+}
+void EqCurve::gesture (bool begin)
+{
+    if (dragNode < 0) return;
+    for (auto* id : kEqIds[dragNode])
+        if (id != nullptr)
+            if (auto* prm = proc.apvts.getParameter (id)) { if (begin) prm->beginChangeGesture(); else prm->endChangeGesture(); }
+}
+void EqCurve::mouseDown (const juce::MouseEvent& e)
+{
+    dragNode = nodeAt (e.position);
+    if (dragNode >= 0) { if (proc.get ("eqOn") < 0.5f) proc.setParam ("eqOn", 1.0f); gesture (true); }
+}
+void EqCurve::mouseDrag (const juce::MouseEvent& e)
+{
+    if (dragNode < 0) return;
+    auto set = [this] (const char* id, float v)
+    {
+        if (auto* prm = proc.apvts.getParameter (id)) prm->setValueNotifyingHost (prm->convertTo0to1 (v));
+    };
+    set (kEqIds[dragNode][0], (float) fOf (e.position.x));
+    if (kEqIds[dragNode][1] != nullptr) set (kEqIds[dragNode][1], (float) dbOf (e.position.y));
+    repaint();
+}
+void EqCurve::mouseUp (const juce::MouseEvent&) { gesture (false); dragNode = -1; }
+void EqCurve::mouseDoubleClick (const juce::MouseEvent& e)
+{
+    const int k = nodeAt (e.position);
+    if (k == 0) proc.setParam ("eqHpf", 20.0f);
+    else if (k > 0) proc.setParam (kEqIds[k][1], 0.0f);
+    repaint();
+}
+void EqCurve::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDetails& w)
+{
+    if (nodeAt (e.position) != 2) return;
+    proc.setParam ("eqMidQ", juce::jlimit (0.3f, 4.0f, proc.get ("eqMidQ") * (w.deltaY > 0 ? 1.12f : 1.0f / 1.12f)));
+    repaint();
+}
+void EqCurve::paint (juce::Graphics& g)
+{
+    const auto b = getLocalBounds().toFloat();
+    g.setColour (lcdBlue);
+    g.fillRoundedRectangle (b, 4.0f);
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.drawRoundedRectangle (b.reduced (0.5f), 4.0f, 1.0f);
+    const auto r = plot();
+    g.setFont (VintageLookAndFeel::mono (8.5f, false));
+    // grade: frequências e ganhos
+    for (double f : { 20.0, 50.0, 100.0, 200.0, 500.0, 1000.0, 2000.0, 5000.0, 10000.0, 20000.0 })
+    {
+        const float x = xOf (f);
+        g.setColour (lcdCyan.withAlpha (0.12f));
+        g.drawVerticalLine ((int) x, r.getY(), r.getBottom());
+        g.setColour (lcdCyan.withAlpha (0.5f));
+        const juce::String t = f >= 1000.0 ? juce::String ((int) (f / 1000.0)) + "k" : juce::String ((int) f);
+        g.drawText (t, (int) x - 16, (int) r.getBottom() + 2, 32, 12, juce::Justification::centred);
+    }
+    for (int db : { -12, -6, 0, 6, 12 })
+    {
+        const float y = yOf (db);
+        g.setColour (lcdCyan.withAlpha (db == 0 ? 0.3f : 0.12f));
+        g.drawHorizontalLine ((int) y, r.getX(), r.getRight());
+        g.setColour (lcdCyan.withAlpha (0.5f));
+        g.drawText ((db > 0 ? "+" : "") + juce::String (db), 0, (int) y - 6, 26, 12, juce::Justification::centredRight);
+    }
+    // a curva
+    const mro::EqParams ep = proc.getEq();
+    juce::Path curve, fill;
+    for (int i = 0; i <= (int) r.getWidth(); i += 2)
+    {
+        const float x = r.getX() + (float) i;
+        const float y = juce::jlimit (r.getY(), r.getBottom(), yOf (mro::OrganEQ::responseDb (ep, fOf (x)) - ep.out));   // a SAÍDA vai escrita no canto
+        if (i == 0) { curve.startNewSubPath (x, y); fill.startNewSubPath (x, yOf (0)); }
+        curve.lineTo (x, y);
+        fill.lineTo (x, y);
+    }
+    fill.lineTo (r.getRight(), yOf (0));
+    fill.closeSubPath();
+    const juce::Colour c = ep.on ? juce::Colour (0xffffb347) : lcdCyan.withAlpha (0.4f);
+    g.setColour (c.withAlpha (0.15f));
+    g.fillPath (fill);
+    g.setColour (c);
+    g.strokePath (curve, juce::PathStrokeType (2.0f));
+    // os pontos
+    const char* names[4] = { "CORTE", "GRAVES", "M\xc3\x89" "DIOS", "AGUDOS" };
+    for (int k = 0; k < 4; ++k)
+    {
+        const auto p = node (k);
+        g.setColour (k == dragNode ? juce::Colours::white : c);
+        g.fillEllipse (juce::Rectangle<float> (12.0f, 12.0f).withCentre (p));
+        g.setColour (lcdBlue);
+        g.drawEllipse (juce::Rectangle<float> (12.0f, 12.0f).withCentre (p), 1.5f);
+        g.setColour (lcdCyan.withAlpha (0.8f));
+        g.drawText (juce::String::fromUTF8 (names[k]), (int) p.x - 30, (int) p.y - 22, 60, 11, juce::Justification::centred);
+    }
+    if (ep.on && std::abs (ep.out) > 0.05f)
+    {
+        g.setColour (lcdCyan.withAlpha (0.8f));
+        g.setFont (VintageLookAndFeel::mono (9.5f));
+        g.drawText (u8 ("SA\xc3\x8d" "DA ") + (ep.out > 0 ? "+" : "") + juce::String (ep.out, 1) + " dB",
+                    r.toNearestInt().reduced (4), juce::Justification::topRight);
+    }
+    if (! ep.on)
+    {
+        g.setColour (lcdCyan.withAlpha (0.7f));
+        g.setFont (VintageLookAndFeel::mono (11.0f));
+        g.drawText ("EQ DESLIGADO", r.toNearestInt(), juce::Justification::centredTop);
+    }
+}
+
 // ---------------------------------------------------------------- Leslie animada
 void LeslieCabinet::paint (juce::Graphics& g)
 {
@@ -631,7 +779,7 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
     jackpot.onClick = [this] { proc.newVariation(); jackpotFlash = 18; };
     addAndMakeVisible (jackpot);
 
-    setupChips (tabs, {}, { "GROOVE", "MIDI", u8 ("\xc3\x93RG\xc3\x83O") });
+    setupChips (tabs, {}, { "GROOVE", "MIDI", u8 ("\xc3\x93RG\xc3\x83O"), "EQ" });
     tabs.onPick = [this] (int i) { setPage (i); };
     tabs.current = [this] { return page; };
     status.setFont (VintageLookAndFeel::mono (11.0f));
@@ -765,6 +913,56 @@ ReggaeOrganEditor::ReggaeOrganEditor (ReggaeOrganProcessor& p)
     vu.setColours (juce::Colour (0xfff7efd9), juce::Colour (0xff2a2420), juce::Colour (0xff2a231e));
     addAndMakeVisible (vu);
 
+    // ---- aba EQ (1.3)
+    addAndMakeVisible (eqCurve);
+    eqOnBtn.getProperties().set ("style", "rocker");
+    addAndMakeVisible (eqOnBtn);
+    eqOnAtt = std::make_unique<APVTS::ButtonAttachment> (s, "eqOn", eqOnBtn);
+    setupKnob (eqOut,   "eqOut",   "Ganho");
+    eqOut.slider.setDoubleClickReturnValue (true, 0.0);
+    setupKnob (eqHpf,   "eqHpf",   "Corte");
+    setupKnob (eqLowG,  "eqLowG",  "Ganho");
+    setupKnob (eqLowF,  "eqLowF",  "Freq.");
+    setupKnob (eqMidG,  "eqMidG",  "Ganho");
+    setupKnob (eqMidF,  "eqMidF",  "Freq.");
+    setupKnob (eqMidQ,  "eqMidQ",  "Q");
+    setupKnob (eqHighG, "eqHighG", "Ganho");
+    setupKnob (eqHighF, "eqHighF", "Freq.");
+    for (auto* k : { &eqLowG, &eqMidG, &eqHighG }) k->slider.setDoubleClickReturnValue (true, 0.0);
+    eqHpf.slider.setDoubleClickReturnValue (true, 20.0);
+    {
+        juce::StringArray names;
+        for (int i = 0; i < mro::NumEqPresets; ++i) names.add (u8 (mro::eqPreset (i).name));
+        setupChips (eqPresets, {}, names);
+        for (int i = 0; i < mro::NumEqPresets; ++i) eqPresets.buttons[i]->setTooltip (u8 (mro::eqPreset (i).sub));
+    }
+    eqPresets.current = [this] { return proc.getEqPreset(); };
+    eqPresets.onPick = [this] (int i) { proc.applyEqPreset (i); };
+    {
+        juce::StringArray names;
+        for (int i = 0; i < mro::NumMidniteTimbres; ++i) names.add (u8 (mro::midniteTimbre (i).name));
+        setupChips (midniteChips, {}, names);
+        for (int i = 0; i < mro::NumMidniteTimbres; ++i)
+            midniteChips.buttons[i]->setTooltip (u8 (mro::midniteTimbre (i).sub)
+                                                 + u8 (". Troca registros, Leslie, drive, click, reverb, eco e EQ; o groove continua o do m\xc3\xbasico."));
+        midniteChips.current = [this] { return proc.midniteIndex(); };
+        midniteChips.onPick = [this] (int i) { proc.applyMidnite (i); };
+    }
+    midniteInfo.setText (u8 ("Ron Benjamin, tecladista e diretor musical do Midnite (St. Croix, Ilhas Virgens, 1989-2015). "
+                             "Os discos Unpolished e Ras Mek Peace foram gravados ao vivo, direto em fita de dois canais, "
+                             "sem reverb, sem eco e sem EQ: um som cru, simples e pesado, com o baixo na frente.\n\n"
+                             "MIDNITE, o original: opaco e escuro, bubble oco (8' + 4' e um pouco de 2 2/3'), chop sem percuss\xc3\xa3o e sem key click, "
+                             "Leslie lenta e discreta, seco; o EQ corta o grave profundo, encorpa o m\xc3\xa9" "dio-grave e tira m\xc3\xa9" "dio e agudo.\n"
+                             "ABAFADO: mais escuro e redondo. CORPO: mais m\xc3\xa9" "dio-grave e o 16' cheio. AO VIVO: Leslie 122 lenta, um pouco de sala e mais drive. "
+                             "Todos com o volume igualado na SA\xc3\x8d" "DA.\n\n"
+                             "Nenhuma fonte diz qual \xc3\xb3rg\xc3\xa3o ele usava: os registros s\xc3\xa3o uma aproxima\xc3\xa7\xc3\xa3o de ouvido."),
+                         juce::dontSendNotification);
+    midniteInfo.setFont (VintageLookAndFeel::mono (9.5f, false));
+    midniteInfo.setColour (juce::Label::textColourId, brownInk);
+    midniteInfo.setJustificationType (juce::Justification::topLeft);
+    midniteInfo.setMinimumHorizontalScale (1.0f);
+    addAndMakeVisible (midniteInfo);
+
     // ---- teclado
     keyboard.setAvailableRange (36, 96);
     keyboard.setScrollButtonsVisible (false);
@@ -867,6 +1065,15 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
         v.push_back (&repsBox);
         v.push_back (&backToGroove);
     }
+    else if (p == 3)
+    {
+        v.push_back (&eqCurve);
+        v.push_back (&eqOnBtn);
+        for (auto* k : { &eqOut, &eqHpf, &eqLowG, &eqLowF, &eqMidG, &eqMidF, &eqMidQ, &eqHighG, &eqHighF }) addK (*k);
+        addC (eqPresets);
+        addC (midniteChips);
+        v.push_back (&midniteInfo);
+    }
     else
     {
         for (int i = 0; i < 9; ++i) { v.push_back (bubbleDb[i].get()); v.push_back (chopDb[i].get()); }
@@ -886,8 +1093,8 @@ std::vector<juce::Component*> ReggaeOrganEditor::pageComponents (int p)
 
 void ReggaeOrganEditor::setPage (int p)
 {
-    page = juce::jlimit (0, 2, p);
-    for (int k = 0; k < 3; ++k)
+    page = juce::jlimit (0, 3, p);
+    for (int k = 0; k < 4; ++k)
         for (auto* c : pageComponents (k)) c->setVisible (k == page);
     refreshChips (tabs);
     if (page == 1) roll.update();
@@ -900,8 +1107,9 @@ void ReggaeOrganEditor::timerCallback()
         const int newLook = juce::jlimit (0, 4, (int) proc.apvts.getRawParameterValue ("instr")->load());
         if (newLook != look) { look = newLook; repaint(); }
     }
-    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &lesPreset, &lesSpeed, &instr, &brush })
+    for (auto* c : { &tabs, &feel, &density, &beat, &nota, &fillStyle, &fillEvery, &chordSrc, &lesPreset, &lesSpeed, &instr, &brush, &eqPresets, &midniteChips })
         refreshChips (*c);
+    if (page == 3) eqCurve.repaint();
     lesBrake.setToggleState (proc.get ("lesBrake") > 0.5f, juce::dontSendNotification);
     if (page == 2)
     {
@@ -1112,6 +1320,20 @@ void ReggaeOrganEditor::renderBackground (juce::Graphics& g)
         smallLabel ("PINCEL (NOTA NOVA)", kContent.getX() + 14, 572);
         smallLabel ("ARRASTE PARA A DAW", kContent.getX() + 300, 572);
     }
+    else if (page == 3)
+    {
+        ivoryPanel (kGridPan, "EQUALIZADOR", u8 ("SA\xc3\x8d" "DA DO \xc3\x93RG\xc3\x83O \xc2\xb7 ARRASTE OS PONTOS \xc2\xb7 RODA = Q DO M\xc3\x89" "DIO"));
+        const int x = kGridPan.getX() + 14, y = kGridPan.getY() + 252;
+        smallLabel ("CORTE", x + 70, y);
+        smallLabel (u8 ("SA\xc3\x8d" "DA"), x + 12, y + 34);
+        smallLabel ("GRAVES", x + 168, y);
+        smallLabel (u8 ("M\xc3\x89" "DIOS"), x + 318, y);
+        smallLabel ("AGUDOS", x + 498, y);
+        g.setColour (brownInk.withAlpha (0.25f));
+        for (int gx : { x + 146, x + 296, x + 476 }) g.drawVerticalLine (gx, (float) y, (float) y + 96);
+        smallLabel ("PRESETS DO EQ", x, kGridPan.getY() + 362);
+        ivoryPanel (kSide, "TIMBRES MIDNITE", "RON BENJAMIN");
+    }
     else
     {
         consolePanel (kBubCon, u8 ("M\xc3\x83O ESQUERDA \xc2\xb7 BUBBLE"), u8 ("SECO E GRAVE: S\xc3\x93 O 8' E UM POUCO DE 4'"));
@@ -1169,8 +1391,8 @@ void ReggaeOrganEditor::resized()
     epochBox.setBounds (24, 142, 230, 32);
     riddim.setBounds (262, 140, 566, 36);
     jackpot.setBounds (836, 142, 140, 32);
-    layoutChips (tabs, { 24, 184, 330, 24 }, 6);
-    status.setBounds (364, 184, 612, 24);
+    layoutChips (tabs, { 24, 184, 400, 24 }, 6);
+    status.setBounds (434, 184, 542, 24);
 
     // aba GROOVE
     {
@@ -1244,6 +1466,27 @@ void ReggaeOrganEditor::resized()
         lesBrake.setBounds (lx, ly + 340, lw / 2 - 4, 23);
         placeKnob (lesDepth, { lx + lw * 3 / 4, ly + 348 }, 30, 70);
         lesRead.setBounds (lx - 4, ly + 388, lw + 8, 14);
+    }
+
+    // aba EQ
+    {
+        const int x = kGridPan.getX() + 14, w = kGridPan.getWidth() - 28, y = kGridPan.getY() + 252;
+        eqCurve.setBounds (x, kGridPan.getY() + 32, w, 212);
+        eqOnBtn.setBounds (x, y + 2, 56, 30);
+        placeKnob (eqOut, { x + 28, y + 62 }, 34, 56);
+        placeKnob (eqHpf,  { x + 96, y + 44 }, 38, 60);
+        placeKnob (eqLowG, { x + 186, y + 44 }, 38, 60);
+        placeKnob (eqLowF, { x + 252, y + 44 }, 38, 60);
+        placeKnob (eqMidG, { x + 330, y + 44 }, 38, 60);
+        placeKnob (eqMidF, { x + 384, y + 44 }, 38, 60);
+        placeKnob (eqMidQ, { x + 436, y + 44 }, 38, 50);
+        placeKnob (eqHighG, { x + 520, y + 44 }, 38, 60);
+        placeKnob (eqHighF, { x + 580, y + 44 }, 38, 60);
+        layoutChips (eqPresets, { x, kGridPan.getY() + 376, w, 26 }, 4);
+        const int sx = kSide.getX() + 14, sw = kSide.getWidth() - 28;
+        for (int i = 0; i < mro::NumMidniteTimbres; ++i)
+            midniteChips.buttons[i]->setBounds (sx + (i % 2) * (sw / 2 + 3), kSide.getY() + 34 + (i / 2) * 34, sw / 2 - 3, 30);
+        midniteInfo.setBounds (sx - 4, kSide.getY() + 110, sw + 8, kSide.getHeight() - 120);
     }
 
     keyboard.setBounds (152, 653, 812, 127);

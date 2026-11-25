@@ -6,11 +6,12 @@
 //   [1] BUBBLE fantasma  mesmo registro, volume do knob GHOST (o Hammond não tem velocity:
 //                        a nota fantasma precisa de um nível próprio para soar mais fraca)
 //   [2] CHOP + FILLS     registro cheio (888), drive, percussão opcional, eco de fita e a Leslie de dois rotores (LeslieDSP.h)
-// Depois da soma: reverb (de cada motor), master e o mesmo maximizer do MRK-80.
+// Depois da soma: reverb (de cada motor), master, o EQUALIZADOR (OrganEQ.h, 1.3) e o mesmo maximizer do MRK-80.
 #pragma once
 
 #include "RootsKeysEngine.h"
 #include "LeslieDSP.h"
+#include "OrganEQ.h"
 
 namespace mro
 {
@@ -29,6 +30,7 @@ struct SoundParams
     float echoVol = 0.5f, echoIntensity = 0.4f, echoRate = 0.5f;
     float reverb = 0.15f, master = 0.8f;
     bool  maxOn = true;
+    EqParams eq;               // equalizador da saída (1.3)
     int   instr = 0;           // 0 Hammond B3 · 1 Rhodes Stage · 2 Rhodes Suitcase · 3 Wurlitzer 200A · 4 FM EP (DX7)
 };
 
@@ -48,6 +50,7 @@ public:
     {
         for (auto& e : eng) e.prepare (sr);
         les.prepare (sr);
+        eq.prepare (sr);
         maxi.prepare ((float) sr);
     }
 
@@ -98,6 +101,7 @@ public:
             p.maxOn  = false;                 // a limitação é feita uma vez só, depois da soma
         }
         les.set (sp.lesPreset, sp.lesSpeed, sp.lesBrake, sp.lesDepth);
+        eq.set (sp.eq);
         master = sp.master;
         maxOn  = sp.maxOn;
     }
@@ -115,6 +119,7 @@ public:
                 if (i == Chop) les.process (tL, tR, m);
                 for (int s = 0; s < m; ++s) { L[s] += tL[s]; R[s] += tR[s]; }
             }
+            eq.process (L, R, m);
             for (int s = 0; s < m; ++s)
             {
                 float l = L[s] * master, r = R[s] * master;
@@ -133,6 +138,7 @@ private:
     rk::Engine eng[NumEngines];
     rk::Maximizer maxi;
     LeslieDSP les;
+    OrganEQ eq;
     float tL[kChunk] = {}, tR[kChunk] = {};
     float master = 0.8f, gain = 1.122f;
     bool maxOn = true;
