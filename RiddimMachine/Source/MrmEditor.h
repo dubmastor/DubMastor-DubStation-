@@ -5,6 +5,7 @@
 #pragma once
 
 #include "MrmMain.h"
+#include "MrmPages.h"
 
 namespace mrmui
 {
@@ -153,6 +154,9 @@ private:
     DubPanel         knobPanel;
     mrmui::PanelHolder chordsHolder, drumsHolder, bassHolder;
     mrmui::ControlRoomPage controlRoom;
+    mrmui::ArrangePage arrangePage;
+    mrmui::MixerPage mixerPage;
+    mrmui::ShowPage showPage;
     mrmui::Header header;
 };
 

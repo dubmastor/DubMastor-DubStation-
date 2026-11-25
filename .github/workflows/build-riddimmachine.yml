@@ -29,7 +29,7 @@ defaults:
 
 jobs:
   render-test:
-    name: Teste offline (5 abas, MIDI do riddim e de cada máquina, harmonia ligada, edições, intro alinhada, samples DM e estado)
+    name: Teste offline (8 abas, arranjo, show, exportar, sirene, mixer, MIDI do riddim e de cada máquina, harmonia ligada, edições, intro alinhada, samples DM e estado)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,10 +57,18 @@ jobs:
           mkdir -p test-out && cd test-out
           R=../build-test/mrm_render_artefacts/Release/mrm_render
           $R riddim.png 0
-          $R harmonia.png 1
-          $R bateria.png 2
-          $R baixo.png 3
-          $R control-room.png 4
+          $R bateria.png 1
+          $R baixo.png 2
+          $R harmonia.png 3
+          $R arranjo.png 4
+          $R mixer.png 5
+          $R show.png 6
+          $R control-room.png 7
+          $R arranjo
+          $R show
+          $R exportar
+          $R sirene
+          $R mixer
           $R alavanca.png 0 alavanca
           $R links
           $R samples

@@ -1,5 +1,10 @@
 // Teste do MRM-0420 sem DAW.
-//   mrm_render riddim.png 0            -> imagem da aba (0 RIDDIM, 1 HARMONIA, 2 BATERIA, 3 BAIXO, 4 BIG KNOB)
+//   mrm_render riddim.png 0            -> imagem da aba (0 PRINCIPAL, 1 BATERIA, 2 BAIXO, 3 RIDDIM, 4 ARRANJO, 5 MIXER, 6 SHOW, 7 CONTROL ROOM)
+//   mrm_render arranjo                 -> ARRANJO: cada parte toca só as máquinas dela, a música para no fim
+//   mrm_render show                    -> SHOW: salva, carrega e fica no projeto
+//   mrm_render exportar                -> EXPORTAR WAV + MIDI do arranjo, fora do tempo real
+//   mrm_render sirene                  -> sirene pelo Tape Echo MTE-12: eco depois de soltar e silêncio depois do rabo
+//   mrm_render mixer                   -> MIXER: baixo -2 dB de fábrica, volume, pan e solo
 //   mrm_render riddim.png 0 alavanca   -> a mesma imagem depois de puxar a ALAVANCA (riddim 100% aleatório)
 //   mrm_render riddim.mid [intro]      -> o MIDI do ARRASTE O RIDDIM (faixas, tamanho, harmonia e baixo depois da intro)
 //   mrm_render play.wav [intro]        -> 12 s do PLAY RIDDIM com as três máquinas e o Big Knob
@@ -12,6 +17,7 @@
 //   mrm_render estado                  -> salva e recarrega o estado (aba, BPM, harmonia, edições, Big Knob)
 #include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 #include <juce_audio_utils/juce_audio_utils.h>
+#include <map>
 #include "../Source/MrmProcessor.h"
 #include "../Source/MrmEditor.h"
 #include "../../ReggaeDrumMachine/Source/DMSamples.h"
@@ -416,6 +422,156 @@ int main (int argc, char** argv)
         const auto t = readMidi (f, end);
         ok = ok && notesIn (t, "Baixo") < 0 && notesIn (t, "Bateria") > 0;
         std::printf ("maquinas: %s (baixo desligado fica fora do riddim)\n", ok ? "ok" : "FALHOU");
+        return ok ? 0 : 1;
+    }
+
+    // DAW de mentira tocando: devolve o MIDI por compasso (canal -> notas)
+    auto runDaw = [&proc] (double seconds, std::function<void (double)> onBlock = {}) -> std::map<int, std::map<int, int>>
+    {
+        const double sr = 48000.0; const int block = 480;
+        proc.setPlayConfigDetails (0, 2, sr, block);
+        proc.prepareToPlay (sr, block);
+        FakeDaw fake;
+        proc.setPlayHead (&fake);
+        juce::AudioBuffer<float> buf (2, block);
+        juce::MidiBuffer midi;
+        std::map<int, std::map<int, int>> perBar;
+        for (int i = 0; i < (int) (seconds * sr / block); ++i)
+        {
+            midi.clear();
+            proc.processBlock (buf, midi);
+            for (const auto m : midi)
+                if (m.getMessage().isNoteOn())
+                    perBar[(int) ((fake.ppq + m.samplePosition / sr * fake.bpm / 60.0) / 4.0)][m.getMessage().getChannel()]++;
+            if (onBlock) onBlock (fake.ppq);
+            fake.ppq += (double) block / sr * fake.bpm / 60.0;
+        }
+        proc.setPlayHead (nullptr);
+        return perBar;
+    };
+
+    if (arg1 == "arranjo")
+    {
+        // Intro (sem baixo) 1 compasso, Verso (todos) 1, Dub (sem riddim) 1: depois a música para
+        auto a = mrm::Arrangement::makeDefault();
+        a.sections[0].bars = 1; a.sections[1].bars = 1; a.sections[4].bars = 1;
+        a.order = { 0, 1, 4 };
+        a.on = true;
+        proc.setArrangement (a);
+        set (proc.getKnob().apvts, "echoOn", 0.0f);
+        pump();
+        std::vector<int> slots;
+        const auto bars = runDaw (4 * 4 * 60.0 / 75.0 + 0.5, [&] (double) { slots.push_back (proc.getArrangeSlot()); });
+        auto n = [&] (int bar, int ch) { auto it = bars.find (bar); if (it == bars.end()) return 0; auto j = it->second.find (ch); return j == it->second.end() ? 0 : j->second; };
+        const int drumCh = juce::roundToInt (get (proc.getDrums().apvts, "channel"));
+        bool ok = n (0, 1) > 0 && n (0, 2) == 0 && n (0, drumCh) > 0     // intro: skank e bateria, sem baixo
+               && n (1, 1) > 0 && n (1, 2) > 0 && n (1, drumCh) > 0     // verso: todos
+               && n (2, 1) == 0 && n (2, 2) > 0 && n (2, drumCh) > 0     // dub: sem o riddim
+               && n (3, 1) + n (3, 2) + n (3, drumCh) == 0;               // fim: nada
+        const bool sawAll = std::find (slots.begin(), slots.end(), 0) != slots.end() && std::find (slots.begin(), slots.end(), 2) != slots.end()
+                         && proc.isArrangeEnded();
+        ok = ok && sawAll;
+        // estado: o arranjo fica no projeto
+        juce::MemoryBlock mb;
+        proc.getStateInformation (mb);
+        MrmProcessor other;
+        other.setStateInformation (mb.getData(), (int) mb.getSize());
+        const auto b2 = other.getArrangement();
+        ok = ok && b2.on && b2.order.size() == 3 && b2.sections[4].bars == 1 && ! b2.sections[4].on[MrmProcessor::Chords];
+        std::printf ("arranjo: %s (intro skank %d baixo %d | verso skank %d baixo %d | dub skank %d baixo %d | fim %d)\n", ok ? "ok" : "FALHOU",
+                     n (0, 1), n (0, 2), n (1, 1), n (1, 2), n (2, 1), n (2, 2), n (3, 1) + n (3, 2) + n (3, drumCh));
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "show")
+    {
+        set (proc.apvts, "bpm", 92.0f);
+        pump();
+        proc.saveShowSlot (3, "Show teste");
+        set (proc.apvts, "bpm", 100.0f);
+        pump();
+        bool ok = proc.getShowSlot (3).used && proc.getShowSlot (3).name == "Show teste" && ! proc.getShowSlot (0).used;
+        ok = ok && proc.loadShowSlot (3);
+        pump();
+        ok = ok && (int) get (proc.apvts, "bpm") == 92 && proc.getShowSlot (3).used;   // carregar não apaga o SHOW
+        juce::MemoryBlock mb;
+        proc.getStateInformation (mb);
+        MrmProcessor other;
+        other.setStateInformation (mb.getData(), (int) mb.getSize());
+        ok = ok && other.getShowSlot (3).used && other.getShowSlot (3).info.contains ("92 BPM");
+        const auto f = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("teste.mrmshow");
+        ok = ok && proc.exportShow (f);
+        MrmProcessor third;
+        ok = ok && third.importShow (f) && third.getShowSlot (3).name == "Show teste";
+        std::printf ("show: %s (%s)\n", ok ? "ok" : "FALHOU", other.getShowSlot (3).info.toRawUTF8());
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "exportar")
+    {
+        auto a = mrm::Arrangement::makeDefault();
+        a.sections[1].bars = 2;
+        a.order = { 1 };
+        proc.setArrangement (a);
+        pump();
+        const auto wav = juce::File::getCurrentWorkingDirectory().getChildFile ("arranjo.wav");
+        if (! proc.startSongExport (wav)) return fail ("exportar não começou");
+        for (int i = 0; i < 1200 && proc.getExportProgress() >= 0.0f; ++i) pump (1);
+        juce::AudioFormatManager fm; fm.registerBasicFormats();
+        std::unique_ptr<juce::AudioFormatReader> r (fm.createReaderFor (wav));
+        double end = 0.0;
+        const auto tracks = readMidi (wav.withFileExtension ("mid"), end);
+        const double sec = r != nullptr ? (double) r->lengthInSamples / r->sampleRate : 0.0;
+        float lo = 0, hi = 0;
+        if (r) { juce::Range<float> rg[2]; r->readMaxLevels (0, r->lengthInSamples, rg, 2); lo = rg[0].getStart(); hi = juce::jmax (rg[0].getEnd(), rg[1].getEnd()); }
+        int notes = 0; for (auto& t : tracks) notes += t.notes;
+        const bool ok = r != nullptr && r->bitsPerSample == 24 && sec > 2 * 4 * 60.0 / 75.0 && sec < 2 * 4 * 60.0 / 75.0 + 4.5 && hi > 0.05f
+                     && notes > 10 && end <= 9.0;
+        std::printf ("exportar: %s (%.2f s, pico %.2f, MIDI %d notas em %d faixas, fim %.2f tempos) %s\n", ok ? "ok" : "FALHOU", sec, hi, notes,
+                     (int) tracks.size(), end, proc.getExportMessage().toRawUTF8());
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "sirene")
+    {
+        // DAW parada: só a sirene. 0,5 s de FIRE, depois o eco do MTE-12 continua e some; 12 s depois, silêncio total
+        const double sr = 48000.0; const int block = 480;
+        proc.setPlayConfigDetails (0, 2, sr, block);
+        proc.prepareToPlay (sr, block);
+        juce::AudioBuffer<float> buf (2, block);
+        juce::MidiBuffer midi;
+        double dry = 0, tail = 0, late = 0;
+        bool knobSilent = get (proc.getKnob().apvts, "sirFire") < 0.5f;
+        for (int i = 0; i < (int) (15.0 * sr / block); ++i)
+        {
+            const double t = i * block / sr;
+            set (proc.apvts, "sirenFire", t < 0.5 ? 1.0f : 0.0f);
+            midi.clear();
+            proc.processBlock (buf, midi);
+            const double pk = buf.getMagnitude (0, 0, block);
+            if (t < 0.5) dry = std::max (dry, pk);
+            else if (t > 0.9 && t < 3.0) tail = std::max (tail, pk);
+            else if (t > 12.5) late = std::max (late, pk);
+        }
+        const bool echoOn = get (proc.apvts, "sirEchoOn") > 0.5f && (int) get (proc.apvts, "sirEchoMode") == 6;
+        const bool ok = dry > 0.05 && tail > 0.02 && late < 1.0e-5 && echoOn && knobSilent;
+        std::printf ("sirene: %s (sirene %.3f, eco depois de soltar %.3f, depois do rabo %.6f, tape echo ligado no Mode 7: %s)\n",
+                     ok ? "ok" : "FALHOU", dry, tail, late, echoOn ? "sim" : "nao");
+        return ok ? 0 : 1;
+    }
+
+    if (arg1 == "mixer")
+    {
+        bool ok = std::abs (get (proc.apvts, MrmProcessor::volId (MrmProcessor::Bass)) + 2.0f) < 0.01f
+               && std::abs (get (proc.apvts, MrmProcessor::volId (MrmProcessor::Drums))) < 0.01f;
+        set (proc.getKnob().apvts, "echoOn", 0.0f);
+        set (proc.apvts, MrmProcessor::soloId (MrmProcessor::Drums), 1.0f);
+        pump();
+        float lv[3] {};
+        runDaw (3.0, [&] (double) { for (int m = 0; m < 3; ++m) lv[m] = std::max (lv[m], proc.getMachineLevel (m)); });
+        ok = ok && lv[MrmProcessor::Drums] > 0.05f && lv[MrmProcessor::Chords] < 1.0e-4f && lv[MrmProcessor::Bass] < 1.0e-4f;
+        std::printf ("mixer: %s (baixo %.1f dB de fabrica; solo bateria: bateria %.3f riddim %.5f baixo %.5f)\n", ok ? "ok" : "FALHOU",
+                     get (proc.apvts, MrmProcessor::volId (MrmProcessor::Bass)), lv[0], lv[1], lv[2]);
         return ok ? 0 : 1;
     }
 
