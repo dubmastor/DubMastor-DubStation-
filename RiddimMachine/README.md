@@ -1,18 +1,18 @@
-# Mastor Riddim Machine MRM-0420 2.6 — DubStation
+# Mastor Riddim Machine MRM-0420 2.7 — DubStation
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.6/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.6/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
-(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.6/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.6/MRM-0420-macOS.zip))
+**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
+(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-macOS.zip))
 
-![MRM-0420, aba RIDDIM](docs/interface-riddim.png)
+![MRM-0420, aba PRINCIPAL](docs/interface-riddim.png)
 
 As máquinas da DubStation num instrumento só, para começar um riddim em segundos:
 
 | Máquina | Parte | Aba |
 |---|---|---|
 | **Mastor Reggae Drum Machine MRDM-12** | bateria, com os samples DM (`ReggaeDrumMachine/Samples`) | BATERIA |
-| **Mastor Reggae Chord Machine MRCM-1240** | skank de piano M1 e bubble de órgão | HARMONIA |
+| **Mastor Reggae Chord Machine MRCM-1240** | skank de piano M1 e bubble de órgão | RIDDIM |
 | **Mastor Reggae Bass Machine MRBM-69** | linha de baixo, com os timbres do MRDBI-07 | BAIXO |
 | **Mastor Big Knob** | filtro, tape echo, sirene e maximizer no master | CONTROL ROOM |
 
@@ -68,6 +68,24 @@ Uma máquina por aba, cada uma com o painel **completo**, igual ao plugin separa
 máquinas entra no MRM-0420 no próximo build). Só a primeira aba (RIDDIM) é diferente: ela junta o principal de cada
 máquina e do Big Knob. Na aba BAIXO até o acompanhamento interno do MRBM-69 (bateria e teclado) está à mão; ele
 começa desligado, porque no MRM-0420 a bateria e o teclado já tocam de verdade.
+
+## Abas novas da 2.7
+Ordem das abas: **PRINCIPAL, BATERIA, BAIXO, RIDDIM (harmonia · MRK-80), ARRANJO, MIXER, SHOW e CONTROL ROOM** (as máquinas sempre na ordem bateria, baixo e riddim).
+
+### ARRANJO
+![MRM-0420, aba ARRANJO](docs/interface-arranjo.png)
+Partes da música (Intro, Verso, Refrão, Ponte, Dub, Outro e partes novas), com quantos compassos e quais máquinas tocam em cada uma, e a
+ordem da música em quadrados. Com **TOCAR O ARRANJO** ligado, a DAW (ou o PLAY RIDDIM) toca a música parte por parte: a harmonia recomeça
+em cada parte, o quadrado tocando acende e a música para no fim (ou repete). **EXPORTAR WAV + MIDI** grava a música inteira fora do tempo real.
+
+### MIXER
+![MRM-0420, aba MIXER](docs/interface-mixer.png)
+Volume, pan, mute e solo de cada máquina, com medidor (o baixo começa em −2 dB), e a sirene com o **Mastor Tape Echo MTE-12** inteiro
+(Mode 1–12, Input, Repeat Rate, Intensity, Echo, Reverb, Wow & Flutter, Tape Age), ligado de fábrica no Mode 7 com tempo livre.
+
+### SHOW
+![MRM-0420, aba SHOW](docs/interface-show.png)
+10 riddims salvos no projeto para tocar ao vivo: ▶ TOCAR carrega e toca; dá para renomear, apagar, exportar e importar o show (.mrmshow).
 
 ## Aba CONTROL ROOM
 ![MRM-0420, aba CONTROL ROOM](docs/interface-control-room.png)

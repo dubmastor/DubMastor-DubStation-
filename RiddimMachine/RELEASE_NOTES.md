@@ -1,4 +1,16 @@
-## Mastor Riddim Machine MRM-0420 2.6 — DubStation
+## Mastor Riddim Machine MRM-0420 2.7 — DubStation
+
+- **Ordem das máquinas sempre BATERIA, BAIXO e RIDDIM**: nas abas (PRINCIPAL, BATERIA, BAIXO, RIDDIM, ARRANJO, MIXER, SHOW, CONTROL ROOM), nas linhas da aba PRINCIPAL e no mixer. A aba da harmonia (Mastor Reggae Keys MRK-80) passa a se chamar RIDDIM
+- **Aba ARRANJO**: partes da música (Intro, Verso, Refrão, Ponte, Dub, Outro e partes novas) com quantos compassos e quais máquinas tocam em cada uma; a ordem da música em quadrados (arraste ou ◀ ▶ ×); TOCAR O ARRANJO segue a DAW ou o PLAY RIDDIM, a harmonia recomeça no início de cada parte e a música para no fim (ou repete); o quadrado que está tocando fica aceso, com o compasso; clicar num quadrado com o PLAY RIDDIM pula para ele. O MIDI ao vivo só sai das máquinas que tocam na parte
+- **EXPORTAR WAV + MIDI**: a música inteira na ordem do arranjo, renderizada fora do tempo real (WAV 24 bits 44,1 kHz com o rabo do eco) e o MIDI de cada máquina com o nome das partes
+- **Aba SHOW**: 10 riddims salvos no projeto (harmonia, BPM, músicos, edições, mixer, efeitos e arranjo); ▶ TOCAR carrega e toca; renomear, apagar, EXPORTAR e IMPORTAR o show (.mrmshow)
+- **Aba MIXER**: volume (dB), pan, mute e solo de cada máquina, com medidor; o baixo começa 2 dB mais baixo
+- **Sirene com o Mastor Tape Echo MTE-12**: o mesmo motor do plugin (3 cabeças, mola, wow & flutter, saturação e chiado de fita), ligado de fábrica, Mode 7 e tempo livre pelo Repeat Rate; FIRE, HOLD, TAPE ECHO, REPEAT e INTENSITY na aba PRINCIPAL e todos os controles na aba MIXER. A fita para 10 s depois da sirene: nada de chiado no riddim
+- Projetos antigos abrem igual (o HOLD da sirene do Big Knob passa para a sirene nova; o arranjo começa desligado)
+- Testes novos `mrm_render arranjo`, `show`, `exportar`, `sirene` e `mixer`
+- Versão para celular 2.7
+
+### Mastor Riddim Machine MRM-0420 2.6
 
 - Correção no motor de piano compartilhado com o Reggae Keys MRK-80 (fase de timbres em notas muito agudas).
 

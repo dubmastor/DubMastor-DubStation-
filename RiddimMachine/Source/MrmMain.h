@@ -368,7 +368,7 @@ private:
     std::unique_ptr<MusicianKeys> drumStyle, filterMode;   // estilo de reggae da bateria; HIGH/LOW PASS do Big Knob
     std::unique_ptr<MusicianKeys> bassTimbre;              // TIMBRE do baixo: ROOTS, SUPER TONE (Casio da era digital) ou 808
     std::unique_ptr<BigDial> bigKnob;
-    std::unique_ptr<PowerSwitch> knobBypass, sirenHold;                 // BYPASS do Big Knob; HOLD da sirene
+    std::unique_ptr<PowerSwitch> knobBypass, sirenHold, sirenEcho;      // BYPASS do Big Knob; HOLD e TAPE ECHO da sirene
     std::unique_ptr<SirenFire> sirenFire;
     std::unique_ptr<MusicianKeys> sirenWave;
     std::array<std::unique_ptr<BigDial>, 6> sirenDials;                 // PITCH, RATE, DEPTH, DELAY, REPEATS, LEVEL

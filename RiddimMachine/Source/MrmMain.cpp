@@ -1465,14 +1465,18 @@ MainPage::MainPage (MrmProcessor& p)
     knobBypass = std::make_unique<PowerSwitch> (*k.getParameter ("bypass"), "BYPASS", "BYPASS");
     addAndMakeVisible (*knobBypass);
     // --- DUB SIREN (a sirene do Mastor Big Knob)
-    sirenFire = std::make_unique<SirenFire> (*k.getParameter ("sirFire"));
-    sirenHold = std::make_unique<PowerSwitch> (*k.getParameter ("sirHold"), "HOLD", "HOLD");
+    // 2.7: o FIRE e o HOLD são do MRM (a sirene passa pelo Mastor Tape Echo MTE-12); timbre e nível continuam no Big Knob
+    sirenFire = std::make_unique<SirenFire> (*proc.apvts.getParameter ("sirenFire"));
+    sirenHold = std::make_unique<PowerSwitch> (*proc.apvts.getParameter ("sirenHold"), "HOLD", "HOLD");
+    sirenEcho = std::make_unique<PowerSwitch> (*proc.apvts.getParameter ("sirEchoOn"), "TAPE ECHO", "TAPE ECHO");
+    addAndMakeVisible (*sirenEcho);
     sirenWave = std::make_unique<MusicianKeys> (*k.getParameter ("sirWave"),
                     juce::StringArray { "SENO", juce::String::fromUTF8 ("TRI\xc3\x82NG."), "QUADRADA", "SOBE", "DESCE" }, 5);
-    const char* sirenIds[] = { "sirPitch", "sirRate", "sirDepth", "sirDly", "sirFb", "sirLevel" };
+    const char* sirenIds[] = { "sirPitch", "sirRate", "sirDepth", "sirEchoRate", "sirEchoInt", "sirLevel" };
     for (size_t i = 0; i < sirenDials.size(); ++i)
     {
-        sirenDials[i] = std::make_unique<BigDial> (*k.getParameter (sirenIds[i]));
+        auto& st = (i == 3 || i == 4) ? proc.apvts : k;   // REPEAT RATE e INTENSITY: do Tape Echo da sirene
+        sirenDials[i] = std::make_unique<BigDial> (*st.getParameter (sirenIds[i]));
         addAndMakeVisible (*sirenDials[i]);
     }
     for (juce::Component* c : { (juce::Component*) sirenFire.get(), (juce::Component*) sirenHold.get(), (juce::Component*) sirenWave.get() })
@@ -1602,7 +1606,8 @@ void MainPage::resized()
     for (int m = 0; m < MrmProcessor::NumMachines; ++m)
     {
         auto& row = rows[(size_t) m];
-        const int y = 330 + m * 104;
+        const int slot = m == MrmProcessor::Drums ? 0 : m == MrmProcessor::Bass ? 1 : 2;   // bateria, baixo, riddim
+        const int y = 330 + slot * 104;
         row.area = { 64, y, 1152, 96 };
         row.plateArea = { 64, y, 160, 96 };
         row.power->setBounds (70, y + 42, 148, 28);
@@ -1616,7 +1621,7 @@ void MainPage::resized()
     }
 
     drumStyle->setBounds (234, 330 + 14, 290, 26);
-    bassTimbre->setBounds (234, 330 + 2 * 104 + 14, 290, 26);
+    bassTimbre->setBounds (234, 330 + 1 * 104 + 14, 290, 26);
 
     // big knob · control room
     bigKnob->setBounds (70, 684, 112, 108);
@@ -1632,6 +1637,7 @@ void MainPage::resized()
     // dub siren
     sirenFire->setBounds (70, 836, 112, 100);
     sirenHold->setBounds (196, 842, 150, 36);
+    sirenEcho->setBounds (356, 842, 220, 36);
     sirenWave->setBounds (196, 892, 380, 40);
     for (size_t i = 0; i < sirenDials.size(); ++i)
         sirenDials[i]->setBounds (600 + (int) i * 103, 840, 84, 76);
@@ -1719,15 +1725,15 @@ void MainPage::renderBackground()
 
     section (g, presetBox, u8 ("PRESETS  \xc2\xb7  BANCO \xc3\x9aNICO DE RIDDIMS  \xc2\xb7  ESTILO, RIDDIM E M\xc3\x9aSICA A-Z  \xc2\xb7  H B D = PARTES DA GRAVA\xc3\x87\xc3\x83O"));
     section (g, bpmBox, u8 ("BPM  \xc2\xb7  DIGITE, BATA NO TEMPO OU ESCOLHA O PRESET DE BPM"));
-    section (g, sirenSection, u8 ("DUB SIREN  \xc2\xb7  A SIRENE DO MASTOR BIG KNOB"));
-    engraved (g, u8 ("SEGURE O FIRE  \xc2\xb7  O DELAY CONTINUA DEPOIS"), juce::Rectangle<float> (196.0f, 882.0f, 380.0f, 9.0f), juce::Justification::centredLeft, 7.0f, 0.2f);
+    section (g, sirenSection, u8 ("DUB SIREN  \xc2\xb7  COM O MASTOR TAPE ECHO MTE-12"));
+    engraved (g, u8 ("SEGURE O FIRE  \xc2\xb7  O ECO CONTINUA DEPOIS"), juce::Rectangle<float> (196.0f, 882.0f, 380.0f, 9.0f), juce::Justification::centredLeft, 7.0f, 0.2f);
     engraved (g, "FORMA DA ONDA", juce::Rectangle<float> (360.0f, 848.0f, 216.0f, 12.0f), juce::Justification::centredRight, 8.5f, 0.3f);
-    const char* sirenNames[] = { "PITCH", "RATE", "DEPTH", "DELAY", "REPEATS", "LEVEL" };
+    const char* sirenNames[] = { "PITCH", "RATE", "DEPTH", "ECO: REPEAT", "ECO: INTENS.", "LEVEL" };
     for (int i = 0; i < 6; ++i)
         engraved (g, sirenNames[i], juce::Rectangle<float> (600.0f + i * 103.0f - 10.0f, 918.0f, 104.0f, 13.0f), juce::Justification::centred, 9.0f, 0.3f);
 
     // plaquetas de cada máquina
-    const char* names[]  = { "BATERIA", "HARMONIA", "BAIXO" };
+    const char* names[]  = { "BATERIA", "RIDDIM", "BAIXO" };
     const juce::String models[] = { juce::String ("MRD-12 ") + MRM_DRUMS_VER, juce::String ("MRK-80 ") + MRM_CHORDS_VER,
                                     juce::String ("MRB-69 ") + MRM_BASS_VER };
     const char* players[] = { "ESTILO DE REGGAE  \xc2\xb7  BATERISTA", "PADR\xc3\x83O DO SKANK", "TIMBRE  \xc2\xb7  BAIXISTA" };

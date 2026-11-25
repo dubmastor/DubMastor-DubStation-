@@ -38,14 +38,15 @@ void TabKey::paint (juce::Graphics& g)
         g.fillRoundedRectangle (cap.withTop (cap.getBottom() - 3.0f).reduced (10.0f, 0.0f).translated (0, -2.0f), 1.5f);
     }
 
-    lamp (g, juce::Rectangle<float> (10.0f, 10.0f).withCentre ({ cap.getX() + 16.0f, cap.getCentreY() }), selected);
+    const bool narrow = getWidth() < 110;
+    lamp (g, juce::Rectangle<float> (narrow ? 8.0f : 10.0f, narrow ? 8.0f : 10.0f).withCentre ({ cap.getX() + (narrow ? 11.0f : 16.0f), cap.getCentreY() }), selected);
 
-    auto txt = cap.withTrimmedLeft (28.0f).withTrimmedRight (6.0f);
+    auto txt = cap.withTrimmedLeft (narrow ? 18.0f : 28.0f).withTrimmedRight (narrow ? 3.0f : 6.0f);
     g.setColour (selected ? col::amber : col::cream.withAlpha (0.62f));
-    g.setFont (stencil (14.5f, 0.14f));
+    g.setFont (stencil (getWidth() < 110 ? 12.5f : 14.5f, getWidth() < 110 ? 0.06f : 0.14f));
     g.drawFittedText (title, txt.withTrimmedBottom (txt.getHeight() * 0.42f).toNearestInt(), juce::Justification::centredBottom, 1, 0.8f);
     g.setColour (selected ? col::cream : col::cream.withAlpha (0.42f));
-    g.setFont (stencil (8.5f, 0.24f));
+    g.setFont (stencil (getWidth() < 110 ? 7.5f : 8.5f, getWidth() < 110 ? 0.1f : 0.24f));
     g.drawFittedText (sub, txt.withTrimmedTop (txt.getHeight() * 0.6f).toNearestInt(), juce::Justification::centredTop, 1, 0.8f);
 }
 
@@ -186,8 +187,10 @@ Header::Header (MrmProcessor& p, std::function<void (int)> onTab)
     : proc (p), bpm (p)
 {
     setOpaque (true);
-    const char* titles[MrmProcessor::numTabs] = { "RIDDIM", "HARMONIA", "BATERIA", "BAIXO", "CONTROL ROOM" };
-    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRK-80", "MRD-12", "MRB-69", u8 ("BIG KNOB  \xc2\xb7  MUTE") };
+    // ordem das máquinas: sempre bateria, baixo e riddim
+    const juce::String titles[MrmProcessor::numTabs] = { "PRINCIPAL", "BATERIA", "BAIXO", "RIDDIM", "ARRANJO", "MIXER", "SHOW", "CONTROL" };
+    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRD-12", "MRB-69", u8 ("MRK-80 \xc2\xb7 KEYS"), "PARTES", "+ SIRENE",
+                                                       "10 RIDDIMS", "ROOM \xc2\xb7 BIG KNOB" };
     for (int i = 0; i < MrmProcessor::numTabs; ++i)
     {
         tabs[(size_t) i] = std::make_unique<TabKey> (titles[i], subs[i]);
@@ -282,7 +285,7 @@ void Header::renderBackground()
     g.drawText (title, juce::Rectangle<float> (60.0f, 14.0f, titleW + 10.0f, 38.0f).translated (0.8f, 1.0f), juce::Justification::left);
     g.setColour (juce::Colour (0xfff3e6c8));
     g.drawText (title, juce::Rectangle<float> (60.0f, 14.0f, titleW + 10.0f, 38.0f), juce::Justification::left);
-    engraved (g, u8 ("BATERIA + HARMONIA + BAIXO + CONTROL ROOM  \xc2\xb7  RIDDIM STARTER"),
+    engraved (g, u8 ("BATERIA + BAIXO + RIDDIM + ARRANJO + MIXER + SHOW  \xc2\xb7  RIDDIM STARTER"),
               juce::Rectangle<float> (62.0f, 51.0f, 700.0f, 13.0f), juce::Justification::left, 10.0f, 0.25f, juce::Colour (0xfff3e6c8).withAlpha (0.75f));
 
     {   // placa de latão grande com o modelo
@@ -506,10 +509,12 @@ MrmRoot::MrmRoot (MrmProcessor& p)
       chordsPanel (p.getChords()), drumsPanel (p.getDrums()), bassPanel (p.getBass()), knobPanel (p.getKnob()),
       chordsHolder (chordsPanel, kCropChords), drumsHolder (drumsPanel, kCropDrums),
       bassHolder (bassPanel, kCropBass), controlRoom (p, knobPanel, kCropKnob),
+      arrangePage (p), mixerPage (p), showPage (p),
       header (p, [this] (int t) { showTab (t); })
 {
     for (juce::Component* c : { (juce::Component*) &mainPage, (juce::Component*) &chordsHolder, (juce::Component*) &drumsHolder,
-                                (juce::Component*) &bassHolder, (juce::Component*) &controlRoom })
+                                (juce::Component*) &bassHolder, (juce::Component*) &controlRoom, (juce::Component*) &arrangePage,
+                                (juce::Component*) &mixerPage, (juce::Component*) &showPage })
         addChildComponent (c);
     addAndMakeVisible (header);
 
@@ -521,11 +526,15 @@ void MrmRoot::showTab (int t)
 {
     t = juce::jlimit (0, MrmProcessor::numTabs - 1, t);
     proc.setCurrentTab (t);
-    mainPage.setVisible (t == 0);
-    chordsHolder.setVisible (t == 1);
-    drumsHolder.setVisible (t == 2);
-    bassHolder.setVisible (t == 3);
-    controlRoom.setVisible (t == 4);
+    mainPage.setVisible (t == MrmProcessor::TabMain);
+    drumsHolder.setVisible (t == MrmProcessor::TabDrums);
+    bassHolder.setVisible (t == MrmProcessor::TabBass);
+    chordsHolder.setVisible (t == MrmProcessor::TabChords);
+    arrangePage.setVisible (t == MrmProcessor::TabArrange);
+    mixerPage.setVisible (t == MrmProcessor::TabMixer);
+    showPage.setVisible (t == MrmProcessor::TabShow);
+    controlRoom.setVisible (t == MrmProcessor::TabControl);
+    if (t == MrmProcessor::TabArrange) arrangePage.refresh();
     header.setTab (t);
 }
 
@@ -546,6 +555,8 @@ void MrmRoot::resized()
     for (auto* h : { &chordsHolder, &drumsHolder, &bassHolder })
         h->setBounds (content);
     controlRoom.setBounds (content);
+    for (juce::Component* c : { (juce::Component*) &arrangePage, (juce::Component*) &mixerPage, (juce::Component*) &showPage })
+        c->setBounds (content);
 }
 
 //==============================================================================
