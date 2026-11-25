@@ -644,14 +644,14 @@ const fillStart=()=>{let m=16;byId.mif.pat.forEach(r=>r.forEach((v,s)=>{if(v&&s<
 /* ---------- master ---------- */
 const FX={hpf:20,lpf:20000,eqBy:false,sat:{on:false,mode:0,drive:.4},echo:{on:false,time:3,fb:.45,tone:.5},big:1};
 function curve(mode,dr){const n=1024,c=new Float32Array(n),k=1+dr*12;for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=mode===0?Math.tanh(k*x)/Math.tanh(k):mode===1?(x>=0?Math.tanh(k*x)/Math.tanh(k):Math.tanh(k*.6*x)/Math.tanh(k*.6)):Math.max(-1,Math.min(1,x*k*.5))/Math.min(1,k*.5)}return c}
-function initAudio(){ctx=new (window.AudioContext||window.webkitAudioContext)();
+function initAudio(off){ctx=off||new (window.AudioContext||window.webkitAudioContext)();
  noiseBuf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
  const G=()=>ctx.createGain();bus=G();hp=ctx.createBiquadFilter();hp.type='highpass';lp=ctx.createBiquadFilter();lp.type='lowpass';
  const sIn=G(),sOut=G();dry=G();wet=G();shaper=ctx.createWaveShaper();big=G();const lim=ctx.createDynamicsCompressor();lim.threshold.value=-3;lim.ratio.value=20;lim.attack.value=.002;lim.release.value=.08;an=ctx.createAnalyser();an.fftSize=1024;
  bus.connect(hp);hp.connect(lp);lp.connect(sIn);sIn.connect(dry);sIn.connect(shaper);shaper.connect(wet);dry.connect(sOut);wet.connect(sOut);sOut.connect(big);big.connect(lim);lim.connect(an);an.connect(ctx.destination);
  eIn=G();dl=ctx.createDelay(2);fb=G();ef=ctx.createBiquadFilter();ef.type='lowpass';eOut=G();eIn.connect(dl);dl.connect(ef);ef.connect(fb);fb.connect(dl);ef.connect(eOut);eOut.connect(bus);
  M.forEach(I=>{const c={in:G(),pan:ctx.createStereoPanner(),send:G(),an:ctx.createAnalyser()};c.an.fftSize=512;c.in.connect(c.pan);c.pan.connect(bus);c.pan.connect(c.an);c.in.connect(c.send);c.send.connect(eIn);chans[I.id]=c;applyCh(I)});
- applyFX();loadDM();if(typeof seBuild==='function')seBuild()}
+ applyFX();if(off)return;loadDM();if(typeof seBuild==='function')seBuild()}
 function applyCh(I){const c=chans[I.id];if(!c)return;c.in.gain.value=I.p.vol;c.pan.pan.value=I.p.pan;c.send.gain.value=I.p.echo}
 function applyFX(){if(!ctx)return;hp.frequency.value=FX.eqBy?10:FX.hpf;lp.frequency.value=FX.eqBy?22000:FX.lpf;
  shaper.curve=curve(FX.sat.mode,FX.sat.drive);dry.gain.value=FX.sat.on?0:1;wet.gain.value=FX.sat.on?.85:0;
@@ -1206,8 +1206,8 @@ function arrTick(){while(nextT<ctx.currentTime+.12){
 const AR=byId.arr;
 const ap=mk(`<section class="panel" id="p-arr" style="${thVars(AR)}">${cab(AR,'Arranjo','Partes da música e a ordem delas',midiBtn('a música inteira · todas as machines'))}
 <div class="pbody">
-<div class="row" style="flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px"><button class="btn big" id="arron">TOCAR O ARRANJO: NÃO</button><button class="btn" id="arrloop">Repetir no fim: não</button><button class="btn" id="arrfill">Virada no fim de cada parte: sim</button><span class="arrsum" id="arrsum"></span><span class="arrsum" id="arrnow" style="color:var(--amber);font-weight:700"></span></div>
-<div class="group" style="margin-bottom:12px"><h3>Ordem da música <span class="row"><button class="btn" id="arrstd">Ordem padrão</button><button class="btn" id="arrclr">Limpar</button></span></h3><p class="hint" style="margin:0 0 8px">Arraste os quadrados para mudar a ordem (no celular use ◀ ▶). Toque num quadrado para pular para ele quando a música estiver tocando.</p><div class="tl" id="tl"></div></div>
+<div class="row" style="flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px"><button class="btn big" id="arron">TOCAR O ARRANJO: NÃO</button><button class="btn" id="arrloop">Repetir no fim: não</button><button class="btn" id="arrfill">Virada no fim de cada parte: sim</button><button class="btn green" id="arrmp3">⬇ EXPORTAR MP3</button><span class="arrsum" id="arrsum"></span><span class="arrsum" id="arrnow" style="color:var(--amber);font-weight:700"></span></div>
+<div class="group" style="margin-bottom:12px"><h3>Ordem da música <span class="row"><button class="btn" id="arrstd">Ordem padrão</button><button class="btn" id="arrclr">Limpar</button></span></h3><p class="hint" style="margin:0 0 8px">EXPORTAR MP3 grava a música inteira na ordem abaixo (com as partes, as viradas, o mixer e os efeitos do master), sem precisar tocar. MP3 gerado com o <a href="https://lame.sourceforge.io/" target="_blank" rel="noopener" style="color:var(--amber)">LAME</a> (LGPL).</p><p class="hint" style="margin:0 0 8px">Arraste os quadrados para mudar a ordem (no celular use ◀ ▶). Toque num quadrado para pular para ele quando a música estiver tocando.</p><div class="tl" id="tl"></div></div>
 <div class="group"><h3>Partes da música <span class="row"><button class="btn" id="arrnew">+ Nova parte</button></span></h3><p class="hint" style="margin:0 0 8px">Diga quantos compassos tem cada parte e quais machines tocam nela. O riddim (harmonia) recomeça no início de cada parte.</p><div class="secs" id="secs"></div></div>
 </div></section>`);
 panels.append(ap);
@@ -1262,6 +1262,41 @@ function evArr(I){const st=24,ev=[],ch=I.kind==='drum'?9:0,pat=patOf(I),fs=fillS
   for(let s=0;s<16;s++){if(I.id==='drums'&&fillNow&&s>=fs)continue;pat.forEach((row,l)=>{const v=row[s];if(!v)return;const ns=I.kind==='drum'?[I.midi[l]]:I.notes(l,chordAt(rb,s),s),len=I.kind==='drum'?12:Math.max(6,Math.round(DUR[I.p.dur]*st)),tk=(off+s)*st;
    ns.forEach(n=>{ev.push([tk,0x90|ch,n,v===2?112:84]);ev.push([tk+len,0x80|ch,n,0])})})}}});return ev}
 function evArrHarm(){const ev=[];let off=0;ARR.order.forEach(k=>{const sec=ARR.secs[k];if(!sec)return;for(let ab=0;ab<sec.bars;ab++,off+=16)for(const h of [0,8]){const c=chordAt(ab%H.bars,h);voic(c.slice(0,3),57).forEach(n=>{ev.push([(off+h)*24,0x90,n,90]);ev.push([(off+h+8)*24-4,0x80,n,0])})}});return ev}
+/* ---------- EXPORTAR MP3: renderiza o arranjo offline (mesmo motor e mixer) e codifica com o LAME ---------- */
+function loadLame(){return window.lamejs?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='lame.min.js';sc.onload=ok;sc.onerror=()=>no(new Error('lame'));document.head.append(sc)})}
+const sleep0=()=>new Promise(r=>setTimeout(r,0));
+let exporting=false;
+async function exportMp3(){if(exporting)return;if(!H.ready){toastMsg('Crie ou carregue um riddim antes de exportar');return}
+ if(!ARR.order.length){toastMsg('Monte a ordem da música antes de exportar');return}
+ const btn=$('arrmp3'),say=m=>btn.textContent=m;exporting=true;btn.disabled=true;
+ try{if(playing)$('play').click();if(!ctx)initAudio();for(let i=0;i<100&&!dmReady;i++)await new Promise(r=>setTimeout(r,50));
+  say('Carregando o codificador…');await loadLame();
+  say('Gravando a música…');await sleep0();
+  const SRATE=44100,sd=stepDur(),bars=arrBars(),len=Math.ceil((bars*16*sd+4)*SRATE);
+  const off=new OfflineAudioContext(2,len,SRATE);
+  /* cada compasso é agendado só pouco antes de tocar (suspend/resume): o render fica linear e não trava em músicas longas */
+  const cap=()=>({ctx,noiseBuf,bus,hp,lp,dry,wet,shaper,big,an,eIn,dl,fb,ef,eOut,chans:{...chans},lastBass,openHats:[...openHats]});
+  const put=g=>{({ctx,noiseBuf,bus,hp,lp,dry,wet,shaper,big,an,eIn,dl,fb,ef,eOut,lastBass}=g);Object.assign(chans,g.chans);openHats.length=0;openHats.push(...g.openHats)};
+  const live=cap();let og;
+  try{initAudio(off);lastBass=null;openHats.length=0;og=cap()}finally{put(live)}
+  const plan=[];let t=.05;ARR.order.forEach(k=>{const sec=ARR.secs[k];if(!sec)return;for(let ab=0;ab<sec.bars;ab++){plan.push({t,sec,ab});t+=16*sd}});
+  const q=128/SRATE,doBar=i=>{const P=plan[i];put(og);try{for(let st=0;st<16;st++)sched(st,P.ab%H.bars,P.t+st*sd,{sec:P.sec,last:P.ab===P.sec.bars-1})}finally{og=cap();put(live);hitQ.length=0}};
+  doBar(0);if(plan.length>1)doBar(1);
+  for(let i=2;i<plan.length;i++){const at=Math.max(q,Math.floor((plan[i].t-.5)/q)*q);off.suspend(at).then(()=>{doBar(i);say(`Gravando a música… ${Math.round(i/plan.length*100)}%`);off.resume()})}
+  const buf=await off.startRendering();
+  say('Codificando MP3… 0%');await sleep0();
+  const L=buf.getChannelData(0),R=buf.getChannelData(1);let end=L.length;while(end>SRATE&&Math.abs(L[end-1])<1e-4&&Math.abs(R[end-1])<1e-4)end--;end=Math.min(L.length,end+SRATE/4|0);
+  const enc=new lamejs.Mp3Encoder(2,SRATE,192),out=[],B=1152,l16=new Int16Array(B),r16=new Int16Array(B),cv=x=>Math.max(-32768,Math.min(32767,Math.round(x*32767)));
+  for(let i=0,n=0;i<end;i+=B,n++){const m=Math.min(B,end-i);for(let j=0;j<m;j++){l16[j]=cv(L[i+j]);r16[j]=cv(R[i+j])}
+   const d=enc.encodeBuffer(m<B?l16.subarray(0,m):l16,m<B?r16.subarray(0,m):r16);if(d.length)out.push(new Uint8Array(d));
+   if(n%200===0){say(`Codificando MP3… ${Math.round(i/end*100)}%`);await sleep0()}}
+  const fl=enc.flush();if(fl.length)out.push(new Uint8Array(fl));
+  const blob=new Blob(out,{type:'audio/mpeg'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`MRM-0420 ${fileTag()} (arranjo ${bars} compassos, ${H.bpm} BPM).mp3`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+  toastMsg(`MP3 pronto: ${mmss(end/SRATE)} · ${(blob.size/1048576).toFixed(1)} MB`)}
+ catch(e){console.error(e);toastMsg(e&&e.message==='lame'?'Não consegui carregar o codificador de MP3':'Não consegui exportar o MP3 neste navegador')}
+ finally{exporting=false;btn.disabled=false;btn.textContent='⬇ EXPORTAR MP3'}}
+$('arrmp3').onclick=exportMp3;
 dragMidi(ap.querySelector('.cab .midi'),()=>[`MRM-0420 ${fileTag()} (arranjo ${arrBars()} compassos).mid`,smf([{n:'Acordes',ev:evArrHarm()},...M.filter(I=>aud(I)&&ARR.order.some(k=>ARR.secs[k]&&ARR.secs[k].on[I.id]!==false)).map(I=>({n:`${mlabel(I)} ${I.code}`,ev:evArr(I)}))])]);
 renderArr();
 
