@@ -301,7 +301,12 @@ nav.tabs button.need::after{content:"GERAR";font-family:var(--mono);font-size:9p
 .blk .bn{font-weight:800;font-size:13px;line-height:1.1}.blk .bb{font-family:var(--mono);font-size:11px;opacity:.8}
 .blk .bi{position:absolute;top:4px;right:6px;font-family:var(--mono);font-size:10px;opacity:.7}
 .blk .bx{display:flex;gap:3px}.blk .bx button{border:0;border-radius:4px;background:rgba(0,0,0,.28);color:#fff;font-size:12px;min-width:24px;min-height:22px;cursor:pointer;padding:0 5px}
-.blk.now{outline:3px solid #fff;outline-offset:2px}.blk .pg{position:absolute;left:0;bottom:0;height:4px;background:#fff;border-radius:0 0 0 7px}
+.tl.live .blk:not(.now){filter:brightness(.45) saturate(.6)}
+.blk.now{outline:3px solid #fff;outline-offset:2px;filter:brightness(1.25) saturate(1.2);box-shadow:0 0 18px 4px var(--sc),0 0 42px 8px color-mix(in srgb,var(--sc) 55%,transparent);transform:translateY(-3px);z-index:1;transition:transform .12s}
+.blk.now.beat{box-shadow:0 0 26px 8px var(--sc),0 0 60px 14px color-mix(in srgb,var(--sc) 70%,transparent)}
+.blk.now .bn::before{content:'▶ ';}
+.blk .pg{position:absolute;left:0;bottom:0;height:6px;background:#fff;border-radius:0 0 0 7px;transition:width .15s linear}
+.sec.now{box-shadow:0 0 0 2px var(--sc) inset,0 0 18px 2px color-mix(in srgb,var(--sc) 50%,transparent);background:color-mix(in srgb,var(--sc) 18%,#120c07)}
 .blk.drag{opacity:.35}.blk.ins{box-shadow:-5px 0 0 #fff}
 .arrsum{font-family:var(--mono);font-size:13px;color:var(--cream)}
 @media (max-width:760px){.sec{grid-template-columns:1fr auto;}.sec .ms3{grid-column:1/-1}.sec .add{grid-column:1/-1}}
@@ -1199,7 +1204,7 @@ function arrTick(){while(nextT<ctx.currentTime+.12){
 const AR=byId.arr;
 const ap=mk(`<section class="panel" id="p-arr" style="${thVars(AR)}">${cab(AR,'Arranjo','Partes da música e a ordem delas',midiBtn('a música inteira · todas as machines'))}
 <div class="pbody">
-<div class="row" style="flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px"><button class="btn big" id="arron">TOCAR O ARRANJO: NÃO</button><button class="btn" id="arrloop">Repetir no fim: não</button><button class="btn" id="arrfill">Virada no fim de cada parte: sim</button><span class="arrsum" id="arrsum"></span></div>
+<div class="row" style="flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px"><button class="btn big" id="arron">TOCAR O ARRANJO: NÃO</button><button class="btn" id="arrloop">Repetir no fim: não</button><button class="btn" id="arrfill">Virada no fim de cada parte: sim</button><span class="arrsum" id="arrsum"></span><span class="arrsum" id="arrnow" style="color:var(--amber);font-weight:700"></span></div>
 <div class="group" style="margin-bottom:12px"><h3>Ordem da música <span class="row"><button class="btn" id="arrstd">Ordem padrão</button><button class="btn" id="arrclr">Limpar</button></span></h3><p class="hint" style="margin:0 0 8px">Arraste os quadrados para mudar a ordem (no celular use ◀ ▶). Toque num quadrado para pular para ele quando a música estiver tocando.</p><div class="tl" id="tl"></div></div>
 <div class="group"><h3>Partes da música <span class="row"><button class="btn" id="arrnew">+ Nova parte</button></span></h3><p class="hint" style="margin:0 0 8px">Diga quantos compassos tem cada parte e quais machines tocam nela. O riddim (harmonia) recomeça no início de cada parte.</p><div class="secs" id="secs"></div></div>
 </div></section>`);
@@ -1212,7 +1217,7 @@ function renderArr(){
  renderTl()}
 function renderTl(){const tot=arrBars(),sd=stepDur()*16;
  $('tl').innerHTML=ARR.order.map((k,i)=>{const x=ARR.secs[k];if(!x)return'';return `<div class="blk" draggable="true" data-bi="${i}" style="--sc:${x.c};flex:${x.bars} 1 ${Math.max(70,x.bars*14)}px"><span class="bi">${i+1}</span><div class="bn">${esc(x.n)}</div><div class="bb">${x.bars} comp.</div><div class="bx"><button data-bl="${i}" aria-label="Para a esquerda">◀</button><button data-br="${i}" aria-label="Para a direita">▶</button><button data-bd="${i}" aria-label="Tirar da música">×</button></div><i class="pg"></i></div>`}).join('');
- $('arrsum').textContent=`${ARR.order.length} partes · ${tot} compassos · ${mmss(tot*sd)} a ${H.bpm} BPM`;
+ if(arrShown>=0)requestAnimationFrame(()=>arrShown>=0&&arrShown<ARR.order.length&&arrLight(arrShown,arrLastB));$('arrsum').textContent=`${ARR.order.length} partes · ${tot} compassos · ${mmss(tot*sd)} a ${H.bpm} BPM`;
  $('arron').textContent='TOCAR O ARRANJO: '+(ARR.on?'SIM':'NÃO');$('arron').classList.toggle('on',ARR.on);
  $('arrloop').textContent='Repetir no fim: '+(ARR.loop?'sim':'não');$('arrloop').classList.toggle('on',ARR.loop);
  $('arrfill').textContent='Virada no fim de cada parte: '+(ARR.fill?'sim':'não');$('arrfill').classList.toggle('on',ARR.fill)}
@@ -1239,10 +1244,14 @@ $('tl').addEventListener('dragover',e=>{if(dragI<0)return;e.preventDefault();doc
 $('tl').addEventListener('drop',e=>{if(dragI<0)return;e.preventDefault();const b=e.target.closest('.blk');let to=b?+b.dataset.bi:ARR.order.length;const[k]=ARR.order.splice(dragI,1);if(to>dragI)to--;ARR.order.splice(to,0,k);dragI=-1;renderTl()});
 $('tl').addEventListener('dragend',()=>{dragI=-1;document.querySelectorAll('.blk.drag,.blk.ins').forEach(x=>x.classList.remove('drag','ins'))});
 /* posição tocando */
-let arrShown=-1;
-function arrFrame(now){while(arrQ.length&&arrQ[0].t<=now){const q=arrQ.shift();arrShown=q.i;
-  document.querySelectorAll('.blk').forEach(b=>{const on=+b.dataset.bi===q.i;b.classList.toggle('now',on);const pg=b.querySelector('.pg');if(pg)pg.style.width=on?((q.b+1)/ARR.secs[ARR.order[q.i]].bars*100)+'%':'0'})}
- if(!playing&&arrShown>=0){arrShown=-1;document.querySelectorAll('.blk.now').forEach(b=>b.classList.remove('now'))}}
+let arrShown=-1,arrBeat=0,arrLastB=0;
+function arrLight(i,b){const k=i>=0?ARR.order[i]:null,x=k?ARR.secs[k]:null;$('tl').classList.toggle('live',i>=0);
+ document.querySelectorAll('.blk').forEach(el=>{const on=+el.dataset.bi===i;el.classList.toggle('now',on);const pg=el.querySelector('.pg');if(pg)pg.style.width=on&&x?((b+1)/x.bars*100)+'%':'0'});
+ document.querySelectorAll('.sec').forEach(el=>el.classList.toggle('now',!!k&&el.dataset.sec===k));
+ const lt=$('arrnow');if(lt)lt.textContent=x?`▶ ${x.n} · compasso ${b+1} de ${x.bars} · parte ${i+1} de ${ARR.order.length}`:''}
+function arrFrame(now){while(arrQ.length&&arrQ[0].t<=now){const q=arrQ.shift();arrShown=q.i;arrLastB=q.b;arrLight(q.i,q.b)}
+ if((!playing||!arrActive())&&arrShown>=0){arrShown=-1;arrLight(-1,0)}
+ if(arrShown>=0){const bt=Math.floor(now/(stepDur()*4));if(bt!==arrBeat){arrBeat=bt;const el=document.querySelector('.blk.now');if(el){el.classList.add('beat');setTimeout(()=>el.classList.remove('beat'),110)}}}}
 /* MIDI do arranjo: cada machine segue as partes (quem toca, viradas no fim, harmonia recomeçando) */
 function evArr(I){const st=24,ev=[],ch=I.kind==='drum'?9:0,pat=patOf(I),fs=fillStart(),mif=byId.mif;let off=0;
  ARR.order.forEach(k=>{const sec=ARR.secs[k];if(!sec)return;for(let ab=0;ab<sec.bars;ab++,off+=16){const rb=ab%H.bars,last=ab===sec.bars-1,fOn=ARR.fill&&sec.on.mif!==false,fillNow=fOn&&aud(mif)&&last;
