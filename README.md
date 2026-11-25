@@ -148,8 +148,8 @@ Um instalador só com a coleção inteira — na instalação dá para desmarcar
 
 Versão **4.0**, com os 18 plugins (11 instrumentos, 6 efeitos e a Riddim Machine):
 
-- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-4.0/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
-- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-4.0/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
+- **Windows:** [⬇️ DubStation-Windows-Instalador.exe](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-4.1/DubStation-Windows-Instalador.exe) — VST3 em `C:\Program Files\Common Files\VST3` (Cubase, Ableton Live, FL Studio, Reaper, Studio One, Bitwig) e os programas standalone no menu Iniciar.
+- **Mac:** [⬇️ DubStation-macOS-Instalador.pkg](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/DubStation-4.1/DubStation-macOS-Instalador.pkg) — VST3 e AU em `/Library/Audio/Plug-Ins` (Logic, GarageBand, Cubase, Ableton Live, FL Studio…), Intel e Apple Silicon.
 
 - **Pro Tools (AAX):** em preparação — veja [PROTOOLS.md](PROTOOLS.md).
 
