@@ -302,11 +302,11 @@ nav.tabs button.need::after{content:"GERAR";font-family:var(--mono);font-size:9p
 .blk .bi{position:absolute;top:4px;right:6px;font-family:var(--mono);font-size:10px;opacity:.7}
 .blk .bx{display:flex;gap:3px}.blk .bx button{border:0;border-radius:4px;background:rgba(0,0,0,.28);color:#fff;font-size:12px;min-width:24px;min-height:22px;cursor:pointer;padding:0 5px}
 .tl.live .blk:not(.now){filter:brightness(.45) saturate(.6)}
-.blk.now{outline:3px solid #fff;outline-offset:2px;filter:brightness(1.25) saturate(1.2);box-shadow:0 0 18px 4px var(--sc),0 0 42px 8px color-mix(in srgb,var(--sc) 55%,transparent);transform:translateY(-3px);z-index:1;transition:transform .12s}
-.blk.now.beat{box-shadow:0 0 26px 8px var(--sc),0 0 60px 14px color-mix(in srgb,var(--sc) 70%,transparent)}
+.blk.now{outline:3px solid #fff;outline-offset:2px;filter:brightness(1.25) saturate(1.2);box-shadow:0 0 18px 4px var(--sc),0 0 42px 8px var(--sg);transform:translateY(-3px);z-index:1;transition:transform .12s}
+.blk.now.beat{box-shadow:0 0 26px 8px var(--sc),0 0 60px 14px var(--sg)}
 .blk.now .bn::before{content:'▶ ';}
 .blk .pg{position:absolute;left:0;bottom:0;height:6px;background:#fff;border-radius:0 0 0 7px;transition:width .15s linear}
-.sec.now{box-shadow:0 0 0 2px var(--sc) inset,0 0 18px 2px color-mix(in srgb,var(--sc) 50%,transparent);background:color-mix(in srgb,var(--sc) 18%,#120c07)}
+.sec.now{box-shadow:0 0 0 2px var(--sc) inset,0 0 18px 2px var(--sg);background:var(--sb)}
 .blk.drag{opacity:.35}.blk.ins{box-shadow:-5px 0 0 #fff}
 .arrsum{font-family:var(--mono);font-size:13px;color:var(--cream)}
 @media (max-width:760px){.sec{grid-template-columns:1fr auto;}.sec .ms3{grid-column:1/-1}.sec .add{grid-column:1/-1}}
@@ -668,7 +668,7 @@ function tick(){if(arrActive())return arrTick();while(nextT<ctx.currentTime+.12)
 const $=id=>document.getElementById(id);
 let userStopped=false;
 $('play').onclick=e=>{if(!H.ready&&!playing){openSetup(true);return}if(!ctx)initAudio();ctx.resume();playing=!playing;if(!playing&&e&&e.isTrusted)userStopped=true;const b=$('play');
- if(playing){cur=0;bar=0;arrI=0;arrB=0;arrJump=-1;arrEndAt=0;nextT=ctx.currentTime+.05;timer=setInterval(tick,25);b.textContent='■ STOP';b.className='btn big red'}
+ if(playing){if(typeof arrAuto==='function')arrAuto();cur=0;bar=0;arrI=arrStart;arrB=0;arrStart=0;arrJump=-1;arrEndAt=0;nextT=ctx.currentTime+.05;timer=setInterval(tick,25);b.textContent='■ STOP';b.className='btn big red'}
  else{clearInterval(timer);uiQ.length=0;b.textContent='▶ PLAY';b.className='btn big green';showStep(-1,0)}document.body.classList.toggle('live',playing);const b2=$('play2');b2.textContent=playing?'■ STOP':'▶ PLAY';b2.className='btn big '+(playing?'red':'green');};
 const setBpm=v=>{H.bpm=Math.max(40,Math.min(180,Math.round(v)));$('bpmv').textContent=H.bpm;applyFX();if(typeof renderTl==='function'&&$('tl'))renderTl();if(typeof seApply==='function')seApply()};
 $('bm').onclick=()=>setBpm(H.bpm-1);$('bp').onclick=()=>setBpm(H.bpm+1);
@@ -1191,7 +1191,9 @@ const secOn=(off)=>Object.fromEntries(M.map(I=>[I.id,!off.includes(I.id)]));
 const ARR={on:false,loop:false,fill:true,secs:{},order:[]};
 SECDEF.forEach(([id,n,c,b])=>ARR.secs[id]={n,c,bars:b,on:secOn(id==='intro'||id==='outro'?['bass','pick','perc']:id==='dub'?['piano','organ','skank','pick','clav']:[])});
 ARR.order=['intro','verso','refrao','verso','refrao','dub','refrao','outro'];
-let arrI=0,arrB=0,arrJump=-1,arrEndAt=0;const arrQ=[];
+let arrI=0,arrB=0,arrJump=-1,arrEndAt=0,arrStart=0;
+/* apertou PLAY com a aba Arranjo aberta: toca o arranjo */
+function arrAuto(){const p=document.getElementById('p-arr');if(p&&p.classList.contains('active')&&ARR.order.length&&!ARR.on){ARR.on=true;renderTl()}}const arrQ=[];
 const arrActive=()=>ARR.on&&ARR.order.length>0;
 const arrBars=()=>ARR.order.reduce((a,k)=>a+(ARR.secs[k]?ARR.secs[k].bars:0),0);
 const mmss=sec=>Math.floor(sec/60)+':'+String(Math.round(sec%60)).padStart(2,'0');
@@ -1209,16 +1211,17 @@ const ap=mk(`<section class="panel" id="p-arr" style="${thVars(AR)}">${cab(AR,'A
 <div class="group"><h3>Partes da música <span class="row"><button class="btn" id="arrnew">+ Nova parte</button></span></h3><p class="hint" style="margin:0 0 8px">Diga quantos compassos tem cada parte e quais machines tocam nela. O riddim (harmonia) recomeça no início de cada parte.</p><div class="secs" id="secs"></div></div>
 </div></section>`);
 panels.append(ap);
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
 const mlabel=I=>I.id==='piano'?'Riddim':I.name;
 function renderArr(){
- $('secs').innerHTML=Object.entries(ARR.secs).map(([k,x])=>`<div class="sec" style="--sc:${x.c}" data-sec="${k}"><input class="sn" value="${esc(x.n)}" data-sname="${k}" aria-label="Nome da parte"><div class="bars"><button class="btn" data-sb="${k}" data-d="-1" aria-label="Menos compassos">−</button><div><b>${x.bars}</b><small>compassos</small></div><button class="btn" data-sb="${k}" data-d="1" aria-label="Mais compassos">+</button></div>
+ $('secs').innerHTML=Object.entries(ARR.secs).map(([k,x])=>`<div class="sec" style="--sc:${x.c};--sg:${rgba(x.c,.5)};--sb:${rgba(x.c,.18)}" data-sec="${k}"><input class="sn" value="${esc(x.n)}" data-sname="${k}" aria-label="Nome da parte"><div class="bars"><button class="btn" data-sb="${k}" data-d="-1" aria-label="Menos compassos">−</button><div><b>${x.bars}</b><small>compassos</small></div><button class="btn" data-sb="${k}" data-d="1" aria-label="Mais compassos">+</button></div>
  <div class="ms3">${M.map(I=>`<button class="mchip ${x.on[I.id]!==false?'on':''}" style="--c:${I.color};${I.mute?'opacity:.45':''}" title="${I.mute?'Desligada na Principal: ligue lá para tocar':'Toca nesta parte'}" data-sm="${k}" data-mid="${I.id}" aria-pressed="${x.on[I.id]!==false}">${mlabel(I)}</button>`).join('')}</div>
  <div class="row add" style="gap:6px"><button class="btn green" data-sadd="${k}">+ na música</button>${SECDEF.some(d=>d[0]===k)?'':`<button class="btn" data-sdel="${k}" aria-label="Apagar parte">×</button>`}</div></div>`).join('');
  renderTl()}
 function renderTl(){const tot=arrBars(),sd=stepDur()*16;
- $('tl').innerHTML=ARR.order.map((k,i)=>{const x=ARR.secs[k];if(!x)return'';return `<div class="blk" draggable="true" data-bi="${i}" style="--sc:${x.c};flex:${x.bars} 1 ${Math.max(70,x.bars*14)}px"><span class="bi">${i+1}</span><div class="bn">${esc(x.n)}</div><div class="bb">${x.bars} comp.</div><div class="bx"><button data-bl="${i}" aria-label="Para a esquerda">◀</button><button data-br="${i}" aria-label="Para a direita">▶</button><button data-bd="${i}" aria-label="Tirar da música">×</button></div><i class="pg"></i></div>`}).join('');
+ $('tl').innerHTML=ARR.order.map((k,i)=>{const x=ARR.secs[k];if(!x)return'';return `<div class="blk" draggable="true" data-bi="${i}" style="--sc:${x.c};--sg:${rgba(x.c,.6)};flex:${x.bars} 1 ${Math.max(70,x.bars*14)}px"><span class="bi">${i+1}</span><div class="bn">${esc(x.n)}</div><div class="bb">${x.bars} comp.</div><div class="bx"><button data-bl="${i}" aria-label="Para a esquerda">◀</button><button data-br="${i}" aria-label="Para a direita">▶</button><button data-bd="${i}" aria-label="Tirar da música">×</button></div><i class="pg"></i></div>`}).join('');
  if(arrShown>=0)requestAnimationFrame(()=>arrShown>=0&&arrShown<ARR.order.length&&arrLight(arrShown,arrLastB));$('arrsum').textContent=`${ARR.order.length} partes · ${tot} compassos · ${mmss(tot*sd)} a ${H.bpm} BPM`;
- $('arron').textContent='TOCAR O ARRANJO: '+(ARR.on?'SIM':'NÃO');$('arron').classList.toggle('on',ARR.on);
+ $('arron').textContent='TOCAR O ARRANJO: '+(ARR.on?'SIM':'NÃO');if(arrShown<0)arrLight(-1,0);$('arron').classList.toggle('on',ARR.on);
  $('arrloop').textContent='Repetir no fim: '+(ARR.loop?'sim':'não');$('arrloop').classList.toggle('on',ARR.loop);
  $('arrfill').textContent='Virada no fim de cada parte: '+(ARR.fill?'sim':'não');$('arrfill').classList.toggle('on',ARR.fill)}
 ap.addEventListener('click',e=>{const b=e.target.closest('button,.blk');if(!b)return;const d=b.dataset;
@@ -1229,7 +1232,7 @@ ap.addEventListener('click',e=>{const b=e.target.closest('button,.blk');if(!b)re
  else if(d.bl!==undefined){const i=+d.bl;if(i>0){[ARR.order[i-1],ARR.order[i]]=[ARR.order[i],ARR.order[i-1]]}renderTl()}
  else if(d.br!==undefined){const i=+d.br;if(i<ARR.order.length-1){[ARR.order[i+1],ARR.order[i]]=[ARR.order[i],ARR.order[i+1]]}renderTl()}
  else if(d.bd!==undefined){ARR.order.splice(+d.bd,1);if(arrI>=ARR.order.length)arrI=0;renderTl()}
- else if(b.classList.contains('blk')){const i=+d.bi;if(playing&&arrActive()){arrJump=i;toastMsg(`Vai para ${ARR.secs[ARR.order[i]].n} (${i+1}) no próximo compasso`)}else{arrI=i;arrB=0}}
+ else if(b.classList.contains('blk')){const i=+d.bi;if(!ARR.on){ARR.on=true;renderTl()}if(playing){arrJump=i;toastMsg(`Vai para ${ARR.secs[ARR.order[i]].n} (${i+1}) no próximo compasso`)}else{arrStart=i;$('play').click()}}
  else if(b.id==='arron'){ARR.on=!ARR.on;if(ARR.on&&!ARR.order.length)ARR.order=['intro','verso','refrao','verso','refrao','outro'].filter(k=>ARR.secs[k]);arrI=0;arrB=0;arrJump=-1;arrEndAt=0;renderTl()}
  else if(b.id==='arrloop'){ARR.loop=!ARR.loop;renderTl()}
  else if(b.id==='arrfill'){ARR.fill=!ARR.fill;renderTl()}
@@ -1248,7 +1251,7 @@ let arrShown=-1,arrBeat=0,arrLastB=0;
 function arrLight(i,b){const k=i>=0?ARR.order[i]:null,x=k?ARR.secs[k]:null;$('tl').classList.toggle('live',i>=0);
  document.querySelectorAll('.blk').forEach(el=>{const on=+el.dataset.bi===i;el.classList.toggle('now',on);const pg=el.querySelector('.pg');if(pg)pg.style.width=on&&x?((b+1)/x.bars*100)+'%':'0'});
  document.querySelectorAll('.sec').forEach(el=>el.classList.toggle('now',!!k&&el.dataset.sec===k));
- const lt=$('arrnow');if(lt)lt.textContent=x?`▶ ${x.n} · compasso ${b+1} de ${x.bars} · parte ${i+1} de ${ARR.order.length}`:''}
+ const lt=$('arrnow');if(lt)lt.textContent=x?`▶ ${x.n} · compasso ${b+1} de ${x.bars} · parte ${i+1} de ${ARR.order.length}`:ARR.on?'':'Arranjo desligado: o riddim toca em loop. Toque num quadrado ou em TOCAR O ARRANJO.'}
 function arrFrame(now){while(arrQ.length&&arrQ[0].t<=now){const q=arrQ.shift();arrShown=q.i;arrLastB=q.b;arrLight(q.i,q.b)}
  if((!playing||!arrActive())&&arrShown>=0){arrShown=-1;arrLight(-1,0)}
  if(arrShown>=0){const bt=Math.floor(now/(stepDur()*4));if(bt!==arrBeat){arrBeat=bt;const el=document.querySelector('.blk.now');if(el){el.classList.add('beat');setTimeout(()=>el.classList.remove('beat'),110)}}}}
