@@ -121,7 +121,7 @@ private:
         int machine = 0;
     };
     MrmProcessor& proc;
-    std::array<Strip, MrmProcessor::NumMachines> strips;
+    std::array<Strip, MrmProcessor::NumMixer> strips;
     std::unique_ptr<SirenFire> fire;
     std::unique_ptr<PowerSwitch> hold, echoOn;
     std::unique_ptr<MusicianKeys> mode;

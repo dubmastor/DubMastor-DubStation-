@@ -3,6 +3,7 @@
 //   MRDM-12   Mastor Reggae Drum Machine   (bateria, com os samples DM)
 //   MRCM-1240 Mastor Reggae Chord Machine  (skank de piano e bubble de órgão)
 //   MRBM-69   Mastor Reggae Bass Machine   (linha de baixo, com os timbres do MRDBI-07)
+//   MRO-68    Mastor Reggae Organ          (aba ÓRGÃO, desde a 2.8: grooves de órgão e timbres, como o plugin separado)
 //   Mastor Big Knob                        (CONTROL ROOM: filtro, tape echo, sirene e maximizer no master)
 // A harmonia (4 acordes) é uma só para o MRCM-1240 e o MRBM-69, e o BPM é um só para todos.
 // Tudo roda no mesmo relógio: a bateria começa no compasso 1 (ou na intro), a harmonia e o baixo
@@ -52,8 +53,12 @@ public:
     DubDrumsProcessor&    getDrums()  noexcept { return drums; }
     BassMachineProcessor& getBass()   noexcept { return bass; }
     DubKnobProcessor&     getKnob()   noexcept { return knob; }
+    ReggaeOrganProcessor& getOrgan()  noexcept { return organ; }
 
     enum Machine { Drums = 0, Chords, Bass, NumMachines };
+    // 2.8 · o órgão (MRO-68) vem depois das três máquinas do riddim: tem ligar, mute, volume, pan e solo,
+    // e no ARRANJO toca onde a harmonia (RIDDIM) toca. Organ = NumMachines.
+    static constexpr int Organ = NumMachines, NumMixer = NumMachines + 1;
     static const char* machineOnId (int m);        // "drumsOn", "chordsOn", "bassOn"
     bool isMachineOn (int m) const;
     static const char* muteId (int m);             // CONTROL ROOM: "muteDrums", "muteChords", "muteBass"
@@ -87,8 +92,8 @@ public:
 
     // abas: PRINCIPAL, BATERIA, BAIXO, RIDDIM (harmonia · keys), ARRANJO, MIXER, SHOW, CONTROL ROOM
     // (a ordem das máquinas é sempre bateria, baixo e riddim)
-    enum Tab { TabMain = 0, TabDrums, TabBass, TabChords, TabArrange, TabMixer, TabShow, TabControl };
-    static constexpr int numTabs = 8;
+    enum Tab { TabMain = 0, TabDrums, TabBass, TabChords, TabOrgan, TabArrange, TabMixer, TabShow, TabControl };
+    static constexpr int numTabs = 9;
     int  getCurrentTab() const noexcept     { return currentTab.load(); }
     void setCurrentTab (int t) noexcept     { currentTab.store (juce::jlimit (0, numTabs - 1, t)); }
 
@@ -96,7 +101,7 @@ public:
     static const char* volId (int m);   // "volDrums", "volChords", "volBass"
     static const char* panId (int m);
     static const char* soloId (int m);
-    float getMachineLevel (int m) const noexcept { return meters[(size_t) juce::jlimit (0, NumMachines - 1, m)].load(); }
+    float getMachineLevel (int m) const noexcept { return meters[(size_t) juce::jlimit (0, NumMixer - 1, m)].load(); }
 
     // ---- ARRANJO (editado na aba ARRANJO; vale quando "TOCAR O ARRANJO" está ligado)
     mrm::Arrangement getArrangement() const;
@@ -160,15 +165,16 @@ private:
     DubDrumsProcessor    drums;
     BassMachineProcessor bass;
     DubKnobProcessor     knob;
-    SubPlayHead chordsHead, drumsHead, bassHead, knobHead;
+    ReggaeOrganProcessor organ;
+    SubPlayHead chordsHead, drumsHead, bassHead, knobHead, organHead;
 
-    juce::AudioBuffer<float> chordsBuf, drumsBuf, bassBuf, mixBuf, fxBuf;
+    juce::AudioBuffer<float> chordsBuf, drumsBuf, bassBuf, organBuf, mixBuf, fxBuf;
     juce::MidiBuffer chordsMidi, drumsMidi, bassMidi, scratchMidi, emptyMidi;
 
     double sr = 44100.0;
     bool wasMaster = false;
     double masterPpq = 0.0;
-    float gains[NumMachines] { 1.0f, 1.0f, 1.0f };
+    float gains[NumMixer] { 1.0f, 1.0f, 1.0f, 1.0f };
     float fxGain = 1.0f;
 
     std::atomic<double> hostBpm { 0.0 };
@@ -186,8 +192,8 @@ private:
     std::atomic<int> arrJump { -1 };
 
     // MIXER
-    float panL[NumMachines] { 1, 1, 1 }, panR[NumMachines] { 1, 1, 1 };
-    std::array<std::atomic<float>, NumMachines> meters {};
+    float panL[NumMixer] { 1, 1, 1, 1 }, panR[NumMixer] { 1, 1, 1, 1 };
+    std::array<std::atomic<float>, NumMixer> meters {};
     juce::MidiBuffer spanMidi, spanIn;
     void renderSpan (int off, int len, const juce::AudioPlayHead::PositionInfo&, bool playing,
                      const juce::MidiBuffer& input, const std::array<bool, NumMachines>& sectionOn, bool master);
@@ -216,7 +222,7 @@ private:
     int lastSeed = -1;
     mrmlink::Writer linkWriter;   // harmonia para o Mastor Tune MT-0420
     void publishLink();
-    bool lastPreview[NumMachines] {};
+    bool lastPreview[NumMixer] {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MrmProcessor)
 };

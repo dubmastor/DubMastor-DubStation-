@@ -188,8 +188,8 @@ Header::Header (MrmProcessor& p, std::function<void (int)> onTab)
 {
     setOpaque (true);
     // ordem das máquinas: sempre bateria, baixo e riddim
-    const juce::String titles[MrmProcessor::numTabs] = { "PRINCIPAL", "BATERIA", "BAIXO", "RIDDIM", "ARRANJO", "MIXER", "SHOW", "CONTROL" };
-    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRD-12", "MRB-69", u8 ("MRK-80 \xc2\xb7 KEYS"), "PARTES", "+ SIRENE",
+    const juce::String titles[MrmProcessor::numTabs] = { "PRINCIPAL", "BATERIA", "BAIXO", "RIDDIM", u8 ("\xc3\x93RG\xc3\x83O"), "ARRANJO", "MIXER", "SHOW", "CONTROL" };
+    const juce::String subs[MrmProcessor::numTabs] = { "RESUMO", "MRD-12", "MRB-69", u8 ("MRK-80 \xc2\xb7 KEYS"), "MRO-68", "PARTES", "+ SIRENE",
                                                        "10 RIDDIMS", "ROOM \xc2\xb7 BIG KNOB" };
     for (int i = 0; i < MrmProcessor::numTabs; ++i)
     {
@@ -453,10 +453,11 @@ ControlRoomPage::ControlRoomPage (MrmProcessor& p, juce::Component& knobPanel, i
       bass   (*p.apvts.getParameter ("muteBass"),   "BASS",   u8 ("MRB-69  \xc2\xb7  BAIXO"),   col::jamGold),
       riddim (*p.apvts.getParameter ("muteChords"), "RIDDIM", u8 ("MRCM-1240  \xc2\xb7  SKANK E BUBBLE"), juce::Colour (0xffe8432c)),
       fx   (*p.apvts.getParameter ("fxOn"), "CONTROL ROOM", "CONTROL ROOM"),
-      echo (*p.getKnob().apvts.getParameter ("echoOn"), "TAPE ECHO", "TAPE ECHO")
+      echo (*p.getKnob().apvts.getParameter ("echoOn"), "TAPE ECHO", "TAPE ECHO"),
+      organ (*p.apvts.getParameter ("muteOrgan"), u8 ("\xc3\x93RG\xc3\x83O"), u8 ("MRO-68  \xc2\xb7  GROOVES"), juce::Colour (0xff4f9a5a))
 {
     for (juce::Component* c : { (juce::Component*) &holder, (juce::Component*) &drums, (juce::Component*) &bass,
-                                (juce::Component*) &riddim, (juce::Component*) &fx, (juce::Component*) &echo })
+                                (juce::Component*) &riddim, (juce::Component*) &fx, (juce::Component*) &echo, (juce::Component*) &organ })
         addAndMakeVisible (c);
 }
 
@@ -467,10 +468,11 @@ void ControlRoomPage::resized()
     muteSection   = { 52, 686, 820, 144 };
     masterSection = { 892, 686, W - 52 - 892, 144 };
     auto m = muteSection.reduced (14, 0).withTrimmedTop (16).withHeight (116);
-    const int gap = 14, kw = (m.getWidth() - 2 * gap) / 3;
+    const int gap = 12, kw = (m.getWidth() - 3 * gap) / 4;
     drums.setBounds (m.removeFromLeft (kw));  m.removeFromLeft (gap);
     bass.setBounds (m.removeFromLeft (kw));   m.removeFromLeft (gap);
-    riddim.setBounds (m);
+    riddim.setBounds (m.removeFromLeft (kw)); m.removeFromLeft (gap);
+    organ.setBounds (m);
     auto a = masterSection.reduced (14, 0).withTrimmedTop (22);
     fx.setBounds (a.removeFromTop (44));
     a.removeFromTop (14);
@@ -495,7 +497,80 @@ void ControlRoomPage::paint (juce::Graphics& g)
     if (background.isValid())
         g.drawImage (background, juce::Rectangle<float> (0.0f, 660.0f, (float) getWidth(), (float) getHeight() - 660.0f));
 }
+
+//==============================================================================
+OrganPage::OrganPage (MrmProcessor& p, juce::Component& organPanel)
+    : proc (p), holder (organPanel, 0),
+      power (*p.apvts.getParameter ("organOn"), u8 ("\xc3\x93RG\xc3\x83O LIGADO"), u8 ("\xc3\x93RG\xc3\x83O DESLIGADO")),
+      solo  (*p.apvts.getParameter ("soloOrgan"), "SOLO", "SOLO"),
+      mute  (*p.apvts.getParameter ("muteOrgan"), u8 ("\xc3\x93RG\xc3\x83O"), u8 ("MRO-68  \xc2\xb7  NO RIDDIM"), juce::Colour (0xff4f9a5a)),
+      vol   (*p.apvts.getParameter ("volOrgan")),
+      pan   (*p.apvts.getParameter ("panOrgan"))
+{
+    for (juce::Component* c : { (juce::Component*) &holder, (juce::Component*) &power, (juce::Component*) &solo,
+                                (juce::Component*) &mute, (juce::Component*) &vol, (juce::Component*) &pan })
+        addAndMakeVisible (c);
+    startTimerHz (10);
+}
+
+OrganPage::~OrganPage() { stopTimer(); }
+
+void OrganPage::timerCallback()
+{
+    const float db = proc.apvts.getRawParameterValue ("volOrgan")->load();
+    if (db != lastDb) { lastDb = db; repaint (mixSection); }
+}
+
+void OrganPage::resized()
+{
+    const int W = getWidth(), H = getHeight(), top = barTop();
+    holder.setBounds (0, 0, W, top);
+    keySection = { 52, top + 22, 760, H - top - 40 };
+    mixSection = { 832, top + 22, W - 52 - 832, H - top - 40 };
+    auto k = keySection.reduced (16, 0).withTrimmedTop (22);
+    power.setBounds (k.removeFromLeft (250).withHeight (44).translated (0, 24));
+    k.removeFromLeft (18);
+    mute.setBounds (k.removeFromLeft (240).withHeight (92));
+    k.removeFromLeft (18);
+    solo.setBounds (k.withHeight (44).translated (0, 24));
+    auto m = mixSection.reduced (14, 0).withTrimmedTop (14);
+    vol.setBounds (m.removeFromLeft (100).withHeight (90));
+    m.removeFromLeft (110);
+    pan.setBounds (m.removeFromLeft (100).withHeight (90));
+
+    background = juce::Image (juce::Image::ARGB, W * 2, (H - top) * 2, true);
+    juce::Graphics g (background);
+    g.addTransform (juce::AffineTransform::scale (2.0f).translated (0.0f, -(float) top * 2.0f));
+    juce::Random rng (5);
+    paintWood (g, { 0, top, 28, H - top }, rng);
+    paintWood (g, { W - 28, top, 28, H - top }, rng);
+    paintPlate (g, { 28, top, W - 56, H - top }, rng, false, true);
+    screw (g, 40.0f, (float) H - 12.0f, rng);
+    screw (g, (float) W - 40.0f, (float) H - 12.0f, rng);
+    section (g, keySection, u8 ("\xc3\x93RG\xc3\x83O NO RIDDIM  \xc2\xb7  HARMONIA E BPM DO RIDDIM"));
+    section (g, mixSection, "VOLUME E PAN");
+}
+
+void OrganPage::paint (juce::Graphics& g)
+{
+    const int top = barTop();
+    g.fillAll (col::woodDark);
+    if (background.isValid())
+        g.drawImage (background, juce::Rectangle<float> (0.0f, (float) top, (float) getWidth(), (float) (getHeight() - top)));
+    // volume num visor âmbar, entre o VOLUME e o PAN
+    auto m = mixSection.reduced (14, 0).withTrimmedTop (14);
+    auto box = juce::Rectangle<float> ((float) m.getX() + 108.0f, (float) m.getY() + 24.0f, 96.0f, 40.0f);
+    displayGlass (g, box);
+    g.setFont (stencil (17.0f, 0.0f));
+    glowText (g, lastDb <= -59.9f ? u8 ("\xe2\x88\x92\xe2\x88\x9e") : juce::String (lastDb, 1) + " dB", box, juce::Justification::centred);
+    engraved (g, "VOLUME", juce::Rectangle<float> ((float) m.getX(), (float) m.getY() + 94.0f, 100.0f, 13.0f), juce::Justification::centred, 9.5f, 0.3f);
+    engraved (g, "PAN", juce::Rectangle<float> ((float) m.getX() + 210.0f, (float) m.getY() + 94.0f, 100.0f, 13.0f), juce::Justification::centred, 9.5f, 0.3f);
+    auto k = keySection.reduced (16, 0).withTrimmedTop (22);
+    engraved (g, "LIGA O MRO-68 NO RIDDIM", juce::Rectangle<float> ((float) k.getX(), (float) k.getY() + 2.0f, 250.0f, 13.0f), juce::Justification::centred, 8.5f, 0.2f);
+    engraved (g, u8 ("S\xc3\x93 O \xc3\x93RG\xc3\x83O TOCANDO"), juce::Rectangle<float> ((float) k.getRight() - 236.0f, (float) k.getY() + 2.0f, 236.0f, 13.0f), juce::Justification::centred, 8.5f, 0.2f);
+}
 } // namespace mrmui
+
 
 //==============================================================================
 namespace
@@ -506,15 +581,15 @@ namespace
 
 MrmRoot::MrmRoot (MrmProcessor& p)
     : proc (p), mainPage (p),
-      chordsPanel (p.getChords()), drumsPanel (p.getDrums()), bassPanel (p.getBass()), knobPanel (p.getKnob()),
+      chordsPanel (p.getChords()), drumsPanel (p.getDrums()), bassPanel (p.getBass()), knobPanel (p.getKnob()), organPanel (p.getOrgan()),
       chordsHolder (chordsPanel, kCropChords), drumsHolder (drumsPanel, kCropDrums),
-      bassHolder (bassPanel, kCropBass), controlRoom (p, knobPanel, kCropKnob),
+      bassHolder (bassPanel, kCropBass), controlRoom (p, knobPanel, kCropKnob), organPage (p, organPanel),
       arrangePage (p), mixerPage (p), showPage (p),
       header (p, [this] (int t) { showTab (t); })
 {
     for (juce::Component* c : { (juce::Component*) &mainPage, (juce::Component*) &chordsHolder, (juce::Component*) &drumsHolder,
                                 (juce::Component*) &bassHolder, (juce::Component*) &controlRoom, (juce::Component*) &arrangePage,
-                                (juce::Component*) &mixerPage, (juce::Component*) &showPage })
+                                (juce::Component*) &mixerPage, (juce::Component*) &showPage, (juce::Component*) &organPage })
         addChildComponent (c);
     addAndMakeVisible (header);
 
@@ -530,6 +605,7 @@ void MrmRoot::showTab (int t)
     drumsHolder.setVisible (t == MrmProcessor::TabDrums);
     bassHolder.setVisible (t == MrmProcessor::TabBass);
     chordsHolder.setVisible (t == MrmProcessor::TabChords);
+    organPage.setVisible (t == MrmProcessor::TabOrgan);
     arrangePage.setVisible (t == MrmProcessor::TabArrange);
     mixerPage.setVisible (t == MrmProcessor::TabMixer);
     showPage.setVisible (t == MrmProcessor::TabShow);
@@ -555,6 +631,7 @@ void MrmRoot::resized()
     for (auto* h : { &chordsHolder, &drumsHolder, &bassHolder })
         h->setBounds (content);
     controlRoom.setBounds (content);
+    organPage.setBounds (content);
     for (juce::Component* c : { (juce::Component*) &arrangePage, (juce::Component*) &mixerPage, (juce::Component*) &showPage })
         c->setBounds (content);
 }

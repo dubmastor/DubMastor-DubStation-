@@ -35,23 +35,23 @@ int MrmProcessor::lengthBars (int index) { return kLengths[juce::jlimit (0, numL
 
 const char* MrmProcessor::muteId (int m)
 {
-    static const char* ids[NumMachines] = { "muteDrums", "muteChords", "muteBass" };
-    return ids[juce::jlimit (0, NumMachines - 1, m)];
+    static const char* ids[NumMixer] = { "muteDrums", "muteChords", "muteBass", "muteOrgan" };
+    return ids[juce::jlimit (0, NumMixer - 1, m)];
 }
 
 bool MrmProcessor::isAudible (int m) const { return isMachineOn (m) && raw (muteId (m)) < 0.5f; }
 
 const char* MrmProcessor::machineOnId (int m)
 {
-    static const char* ids[NumMachines] = { "drumsOn", "chordsOn", "bassOn" };
-    return ids[juce::jlimit (0, NumMachines - 1, m)];
+    static const char* ids[NumMixer] = { "drumsOn", "chordsOn", "bassOn", "organOn" };
+    return ids[juce::jlimit (0, NumMixer - 1, m)];
 }
 
 bool MrmProcessor::isMachineOn (int m) const { return raw (machineOnId (m)) > 0.5f; }
 
-const char* MrmProcessor::volId (int m)  { static const char* ids[NumMachines] = { "volDrums", "volChords", "volBass" };    return ids[juce::jlimit (0, NumMachines - 1, m)]; }
-const char* MrmProcessor::panId (int m)  { static const char* ids[NumMachines] = { "panDrums", "panChords", "panBass" };    return ids[juce::jlimit (0, NumMachines - 1, m)]; }
-const char* MrmProcessor::soloId (int m) { static const char* ids[NumMachines] = { "soloDrums", "soloChords", "soloBass" }; return ids[juce::jlimit (0, NumMachines - 1, m)]; }
+const char* MrmProcessor::volId (int m)  { static const char* ids[NumMixer] = { "volDrums", "volChords", "volBass", "volOrgan" };    return ids[juce::jlimit (0, NumMixer - 1, m)]; }
+const char* MrmProcessor::panId (int m)  { static const char* ids[NumMixer] = { "panDrums", "panChords", "panBass", "panOrgan" };    return ids[juce::jlimit (0, NumMixer - 1, m)]; }
+const char* MrmProcessor::soloId (int m) { static const char* ids[NumMixer] = { "soloDrums", "soloChords", "soloBass", "soloOrgan" }; return ids[juce::jlimit (0, NumMixer - 1, m)]; }
 
 //==============================================================================
 juce::AudioProcessorValueTreeState::ParameterLayout MrmProcessor::createLayout()
@@ -73,16 +73,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout MrmProcessor::createLayout()
     layout.add (std::make_unique<AudioParameterBool>  (ParameterID { "muteDrums", 1 },  "Mute DRUMS", false));
     layout.add (std::make_unique<AudioParameterBool>  (ParameterID { "muteChords", 1 }, "Mute RIDDIM (harmonia)", false));
     layout.add (std::make_unique<AudioParameterBool>  (ParameterID { "muteBass", 1 },   "Mute BASS", false));
+    // 2.8 · ÓRGÃO (MRO-68): liga junto com as outras máquinas (projetos antigos abrem com ele desligado)
+    layout.add (std::make_unique<AudioParameterBool>  (ParameterID { "organOn", 1 },    "Orgao (MRO-68)", true));
+    layout.add (std::make_unique<AudioParameterBool>  (ParameterID { "muteOrgan", 1 },  "Mute ORGAO", false));
 
     // 2.7 · MIXER: volume, pan e solo de cada máquina (o baixo começa 2 dB mais baixo, como na versão para celular)
-    const char* mixNames[NumMachines] = { "BATERIA", "RIDDIM (harmonia)", "BAIXO" };
-    for (int m = 0; m < NumMachines; ++m)
+    const char* mixNames[NumMixer] = { "BATERIA", "RIDDIM (harmonia)", "BAIXO", "ORGAO" };
+    for (int m = 0; m < NumMixer; ++m)
     {
         layout.add (std::make_unique<AudioParameterFloat> (ParameterID { volId (m), 1 }, String ("Volume ") + mixNames[m],
-                        NormalisableRange<float> (-60.0f, 6.0f, 0.1f, 2.5f), m == Bass ? -2.0f : 0.0f,
+                        NormalisableRange<float> (-60.0f, 6.0f, 0.1f, 2.5f), m == Bass ? -2.0f : (m == Organ ? -3.0f : 0.0f),
                         AudioParameterFloatAttributes().withLabel ("dB")));
         layout.add (std::make_unique<AudioParameterFloat> (ParameterID { panId (m), 1 }, String ("Pan ") + mixNames[m],
-                        NormalisableRange<float> (-1.0f, 1.0f, 0.01f), 0.0f));
+                        NormalisableRange<float> (-1.0f, 1.0f, 0.01f), m == Organ ? -0.15f : 0.0f));
         layout.add (std::make_unique<AudioParameterBool>  (ParameterID { soloId (m), 1 }, String ("Solo ") + mixNames[m], false));
     }
 
@@ -113,6 +116,10 @@ MrmProcessor::MrmProcessor()
     drums.setPlayHead (&drumsHead);
     bass.setPlayHead (&bassHead);
     knob.setPlayHead (&knobHead);
+    organ.setPlayHead (&organHead);
+    // o órgão segue a harmonia do riddim (não o teclado) e o PLAY dele fica com o MRM
+    setParam (organ.apvts, "chordSrc", 0.0f);
+    setParam (organ.apvts, "play", 0.0f);
 
     // preset inicial: o baixo toca junto com a bateria e a harmonia de verdade (o acompanhamento interno
     // dele começa desligado, mas fica à mão na aba BAIXO) e o TAPE ECHO começa desligado
@@ -151,12 +158,13 @@ void MrmProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     sr = sampleRate > 0.0 ? sampleRate : 44100.0;
     const int bs = juce::jmax (512, samplesPerBlock);
     knob.setPlayConfigDetails (2, 2, sr, bs);
-    for (auto* p : { (juce::AudioProcessor*) &chords, (juce::AudioProcessor*) &drums, (juce::AudioProcessor*) &bass, (juce::AudioProcessor*) &knob })
+    organ.setPlayConfigDetails (0, 2, sr, bs);
+    for (auto* p : { (juce::AudioProcessor*) &chords, (juce::AudioProcessor*) &drums, (juce::AudioProcessor*) &bass, (juce::AudioProcessor*) &knob, (juce::AudioProcessor*) &organ })
     {
         p->setRateAndBufferSizeDetails (sr, bs);
         p->prepareToPlay (sr, bs);
     }
-    for (auto* b : { &chordsBuf, &drumsBuf, &bassBuf, &mixBuf, &fxBuf, &sirenBuf, &sirenWet })
+    for (auto* b : { &chordsBuf, &drumsBuf, &bassBuf, &organBuf, &mixBuf, &fxBuf, &sirenBuf, &sirenWet })
         b->setSize (2, bs);
     for (auto* m : { &chordsMidi, &drumsMidi, &bassMidi, &scratchMidi, &spanMidi, &spanIn })
         m->ensureSize (4096);
@@ -165,7 +173,7 @@ void MrmProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     sirenEchoMix = raw ("sirEchoOn") > 0.5f ? 1.0f : 0.0f;
     wasMaster = false;
     masterPpq = 0.0;
-    for (int m = 0; m < NumMachines; ++m) gains[m] = targetGain (m, true);
+    for (int m = 0; m < NumMixer; ++m) gains[m] = targetGain (m, true);
     fxGain = raw ("fxOn") > 0.5f ? 1.0f : 0.0f;
 }
 
@@ -175,6 +183,7 @@ void MrmProcessor::releaseResources()
     drums.releaseResources();
     bass.releaseResources();
     knob.releaseResources();
+    organ.releaseResources();
 }
 
 int MrmProcessor::riddimBars() const     { return lengthBars ((int) raw ("riddimBars")); }
@@ -185,7 +194,7 @@ float MrmProcessor::targetGain (int m, bool sectionOn) const
 {
     if (! sectionOn || ! isAudible (m)) return 0.0f;
     bool anySolo = false;
-    for (int k = 0; k < NumMachines; ++k) anySolo = anySolo || raw (soloId (k)) > 0.5f;
+    for (int k = 0; k < NumMixer; ++k) anySolo = anySolo || raw (soloId (k)) > 0.5f;
     if (anySolo && raw (soloId (m)) < 0.5f) return 0.0f;
     return juce::Decibels::decibelsToGain (raw (volId (m)), -59.9f);
 }
@@ -198,7 +207,7 @@ void MrmProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuf
     if (n <= 0) { midi.clear(); return; }
 
     if (chordsBuf.getNumSamples() < n)          // bloco maior que o anunciado (raro)
-        for (auto* b : { &chordsBuf, &drumsBuf, &bassBuf, &mixBuf, &fxBuf, &sirenBuf, &sirenWet })
+        for (auto* b : { &chordsBuf, &drumsBuf, &bassBuf, &organBuf, &mixBuf, &fxBuf, &sirenBuf, &sirenWet })
             b->setSize (2, n, false, false, true);
 
     // --- relógio: DAW tocando, ou PLAY RIDDIM com a DAW parada
@@ -242,7 +251,7 @@ void MrmProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuf
     const double songBeat0 = playing ? *pos.getPpqPosition() : 0.0;
     playBeat.store (playing ? juce::jmax (0.0, songBeat0) : -1.0);
 
-    for (auto* b : { &drumsBuf, &chordsBuf, &bassBuf }) b->clear (0, n);
+    for (auto* b : { &drumsBuf, &chordsBuf, &bassBuf, &organBuf }) b->clear (0, n);
     drumsMidi.clear(); chordsMidi.clear(); bassMidi.clear();
 
     // --- ARRANJO: a música vai parte por parte; cada parte reinicia a harmonia e escolhe quem toca.
@@ -295,14 +304,15 @@ void MrmProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuf
     if (master) masterPpq += blockBeats;
 
     // --- mistura: volume, pan e solo do MIXER; máquina desligada (ou fora da parte) some com rampa, sem estalo
-    const juce::AudioBuffer<float>* srcs[NumMachines] = { &drumsBuf, &chordsBuf, &bassBuf };
+    // o órgão toca onde a harmonia (RIDDIM) toca
+    const juce::AudioBuffer<float>* srcs[NumMixer] = { &drumsBuf, &chordsBuf, &bassBuf, &organBuf };
     mixBuf.clear (0, 0, n);
     mixBuf.clear (1, 0, n);
-    for (int m = 0; m < NumMachines; ++m)
+    for (int m = 0; m < NumMixer; ++m)
     {
         const float pan = raw (panId (m));
         const float pl = pan > 0.0f ? 1.0f - pan : 1.0f, pr = pan < 0.0f ? 1.0f + pan : 1.0f;
-        const float target = targetGain (m, lastMask[(size_t) m]);
+        const float target = targetGain (m, lastMask[(size_t) (m == Organ ? Chords : m)]);
         const float g0 = gains[m];
         const float l0 = panL[m], r0 = panR[m];
         gains[m] = target; panL[m] = pl; panR[m] = pr;
@@ -443,6 +453,13 @@ void MrmProcessor::renderSpan (int off, int len, const juce::AudioPlayHead::Posi
         processDelayed (bass, bassHead, view, spanMidi, scratchMidi, pos, playing, spanBeats, nullptr, len);
         if (sectionOn[Bass]) bassMidi.addEvents (spanMidi, 0, len, off);
     }
+    // --- órgão (MRO-68): entra junto com a harmonia, depois da intro; o som vai para a mistura (o órgão não manda MIDI)
+    {
+        float* ptrs[2] = { organBuf.getWritePointer (0) + off, organBuf.getWritePointer (1) + off };
+        juce::AudioBuffer<float> view (ptrs, 2, len);
+        processDelayed (organ, organHead, view, spanMidi, scratchMidi, pos, playing, spanBeats, nullptr, len);
+        spanMidi.clear();
+    }
 }
 
 void MrmProcessor::processDelayed (juce::AudioProcessor& proc, SubPlayHead& head, juce::AudioBuffer<float>& out,
@@ -501,6 +518,8 @@ void MrmProcessor::buildLinks()
     // BPM: um só para todos
     links.push_back ({ { { &apvts, "bpm", bpmIn, plain }, { &chords.apvts, "bpm", bpmIn, plain },
                          { &drums.apvts, "bpm", bpmIn, plain }, { &bass.apvts, "bpm", bpmIn, plain } }, {} });
+    // o BPM do MRO-68 só vale no PLAY dele (vai até 140); tocando, o órgão segue o relógio do MRM
+    links.push_back ({ { { &apvts, "bpm", bpmIn, plain }, { &organ.apvts, "bpm", [] (float v) { return juce::roundToInt (v); }, plain } }, {} });
 
     // Harmonia: a mesma para o MRCM-1240 e o MRBM-69 (o MRCM-1240 só tem maior e menor:
     // um acorde "7" do baixo vira maior e um "m7" vira menor)
@@ -511,11 +530,12 @@ void MrmProcessor::buildLinks()
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
     {
         const juce::String n (i);
-        links.push_back ({ { { &chords.apvts, "root" + n, identity, plain }, { &bass.apvts, "root" + n, identity, plain } }, {} });
-        links.push_back ({ { { &chords.apvts, "dur" + n,  identity, plain }, { &bass.apvts, "dur" + n,  identity, plain } }, {} });
-        links.push_back ({ { { &chords.apvts, "qual" + n, chordQualIn, chordQualOut }, { &bass.apvts, "qual" + n, bassQualIn, bassQualOut } }, {} });
+        const juce::String o (i + 1);   // no MRO-68 os acordes contam de 1 a 4 (mesmas tônicas e durações)
+        links.push_back ({ { { &chords.apvts, "root" + n, identity, plain }, { &bass.apvts, "root" + n, identity, plain }, { &organ.apvts, "root" + o, identity, plain } }, {} });
+        links.push_back ({ { { &chords.apvts, "dur" + n,  identity, plain }, { &bass.apvts, "dur" + n,  identity, plain }, { &organ.apvts, "dur" + o, identity, plain } }, {} });
+        links.push_back ({ { { &chords.apvts, "qual" + n, chordQualIn, chordQualOut }, { &bass.apvts, "qual" + n, bassQualIn, bassQualOut }, { &organ.apvts, "minor" + o, boolIn, plain } }, {} });
         if (i > 0)
-            links.push_back ({ { { &chords.apvts, "on" + n, boolIn, plain }, { &bass.apvts, "on" + n, boolIn, plain } }, {} });
+            links.push_back ({ { { &chords.apvts, "on" + n, boolIn, plain }, { &bass.apvts, "on" + n, boolIn, plain }, { &organ.apvts, "on" + o, boolIn, plain } }, {} });
     }
     for (auto& l : links) l.last.assign (l.points.size(), std::numeric_limits<int>::min());
 }
@@ -562,20 +582,24 @@ void MrmProcessor::timerCallback()
 
     // um relógio por vez: PREVIEW de uma máquina ligado durante o PLAY RIDDIM para o PLAY RIDDIM;
     // PLAY RIDDIM ligado ou DAW tocando desligam os PREVIEWs separados
-    juce::AudioProcessorValueTreeState* subs[NumMachines] = { &drums.apvts, &chords.apvts, &bass.apvts };
+    // (o PREVIEW do órgão é o PLAY do MRO-68)
+    juce::AudioProcessorValueTreeState* subs[NumMixer] = { &drums.apvts, &chords.apvts, &bass.apvts, &organ.apvts };
+    const char* prevId[NumMixer] = { "preview", "preview", "preview", "play" };
     bool started = false;
-    for (int m = 0; m < NumMachines; ++m)
+    for (int m = 0; m < NumMixer; ++m)
     {
-        const bool on = getParam (*subs[m], "preview") > 0.5f;
+        const bool on = getParam (*subs[m], prevId[m]) > 0.5f;
         if (on && ! lastPreview[m]) started = true;
     }
     if (raw ("play") > 0.5f && started)
         setParam (apvts, "play", 0.0f);
     else if (raw ("play") > 0.5f || hostPlaying.load())
-        for (auto* s : subs)
-            if (getParam (*s, "preview") > 0.5f) setParam (*s, "preview", 0.0f);
-    for (int m = 0; m < NumMachines; ++m)
-        lastPreview[m] = getParam (*subs[m], "preview") > 0.5f;
+        for (int m = 0; m < NumMixer; ++m)
+            if (getParam (*subs[m], prevId[m]) > 0.5f) setParam (*subs[m], prevId[m], 0.0f);
+    for (int m = 0; m < NumMixer; ++m)
+        lastPreview[m] = getParam (*subs[m], prevId[m]) > 0.5f;
+    // o órgão segue sempre a harmonia do riddim
+    if (getParam (organ.apvts, "chordSrc") > 0.5f) setParam (organ.apvts, "chordSrc", 0.0f);
 }
 
 // harmonia e acorde do momento para o Mastor Tune MT-0420 (ver MrmLink.h)
@@ -833,6 +857,7 @@ juce::XmlElement MrmProcessor::buildState (bool withShow)
     juce::XmlElement root ("MRM0420");
     root.setAttribute ("version", JucePlugin_VersionString);
     root.setAttribute ("tab", currentTab.load());
+    root.setAttribute ("tabs", numTabs);   // 2.8: a aba ÓRGÃO entrou depois da RIDDIM
     if (auto x = apvts.copyState().createXml()) root.addChildElement (x.release());
 
     // cada máquina salva o estado completo dela (com o MIDI editado), dentro de uma etiqueta própria
@@ -847,6 +872,7 @@ juce::XmlElement MrmProcessor::buildState (bool withShow)
     store (drums,  "MRDM12");
     store (bass,   "MRBM69");
     store (knob,   "BIGKNOB");
+    store (organ,  "MRO68");
     {
         const juce::ScopedLock sl (arrLock);
         if (auto x = arrangement.toTree().createXml()) root.addChildElement (x.release());
@@ -866,7 +892,11 @@ void MrmProcessor::setStateInformation (const void* data, int size)
     auto xml = getXmlFromBinary (data, size);
     if (xml == nullptr || ! xml->hasTagName ("MRM0420")) return;
 
-    setCurrentTab (xml->getIntAttribute ("tab", 0));
+    {
+        int t = xml->getIntAttribute ("tab", 0);
+        if (xml->getIntAttribute ("tabs", 8) < 9 && t >= TabOrgan) ++t;   // projetos até a 2.7 (sem a aba ÓRGÃO)
+        setCurrentTab (t);
+    }
     if (auto* x = xml->getChildByName (apvts.state.getType()))
         apvts.replaceState (juce::ValueTree::fromXml (*x));
 
@@ -883,6 +913,11 @@ void MrmProcessor::setStateInformation (const void* data, int size)
     restore (drums,  "MRDM12");
     restore (bass,   "MRBM69");
     restore (knob,   "BIGKNOB");
+    // ÓRGÃO (2.8+): projetos antigos abrem com ele desligado, para soar igual ao que era
+    if (xml->getChildByName ("MRO68") != nullptr) restore (organ, "MRO68");
+    else setParam (apvts, "organOn", 0.0f);
+    setParam (organ.apvts, "chordSrc", 0.0f);
+    setParam (organ.apvts, "play", 0.0f);
 
     // projetos até a 2.6: a sirene era a do Big Knob; o HOLD ligado passa para a sirene do MRM
     if (getParam (knob.apvts, "sirHold") > 0.5f) setParam (apvts, "sirenHold", 1.0f);

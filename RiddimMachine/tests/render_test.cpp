@@ -1,5 +1,5 @@
 // Teste do MRM-0420 sem DAW.
-//   mrm_render riddim.png 0            -> imagem da aba (0 PRINCIPAL, 1 BATERIA, 2 BAIXO, 3 RIDDIM, 4 ARRANJO, 5 MIXER, 6 SHOW, 7 CONTROL ROOM)
+//   mrm_render riddim.png 0            -> imagem da aba (0 PRINCIPAL, 1 BATERIA, 2 BAIXO, 3 RIDDIM, 4 ÓRGÃO, 5 ARRANJO, 6 MIXER, 7 SHOW, 8 CONTROL ROOM)
 //   mrm_render arranjo                 -> ARRANJO: cada parte toca só as máquinas dela, a música para no fim
 //   mrm_render show                    -> SHOW: salva, carrega e fica no projeto
 //   mrm_render exportar                -> EXPORTAR WAV + MIDI do arranjo, fora do tempo real
@@ -15,6 +15,7 @@
 //   mrm_render samples                 -> o kit da bateria é o dos samples DM (os WAVs de ReggaeDrumMachine/Samples)
 //   mrm_render banco                  -> BANCO ÚNICO DE RIDDIMS: cada música vai inteira para as três máquinas e fica salva no projeto
 //   mrm_render estado                  -> salva e recarrega o estado (aba, BPM, harmonia, edições, Big Knob)
+//   mrm_render orgao                   -> ÓRGÃO MRO-68 (2.8): harmonia e BPM ligados, solo e mute no mixer, salvo no projeto, projeto 2.7 sem órgão
 #include "../../ReggaeChordMachine/Source/HarmonyPresets.h"
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <map>
@@ -338,7 +339,7 @@ int main (int argc, char** argv)
         set (proc.getKnob().apvts, "echoOn", 0.0f);
         pump();
         const double all = render (m1);
-        for (int m = 0; m < MrmProcessor::NumMachines; ++m) set (proc.apvts, MrmProcessor::muteId (m), 1.0f);
+        for (int m = 0; m < MrmProcessor::NumMixer; ++m) set (proc.apvts, MrmProcessor::muteId (m), 1.0f);   // 2.8: o órgão também
         pump();
         const double none = render (m2);
         const bool ok = all > 0.01 && none < 1.0e-4 && m2;
@@ -572,6 +573,62 @@ int main (int argc, char** argv)
         ok = ok && lv[MrmProcessor::Drums] > 0.05f && lv[MrmProcessor::Chords] < 1.0e-4f && lv[MrmProcessor::Bass] < 1.0e-4f;
         std::printf ("mixer: %s (baixo %.1f dB de fabrica; solo bateria: bateria %.3f riddim %.5f baixo %.5f)\n", ok ? "ok" : "FALHOU",
                      get (proc.apvts, MrmProcessor::volId (MrmProcessor::Bass)), lv[0], lv[1], lv[2]);
+        return ok ? 0 : 1;
+    }
+
+    // 2.8 · ÓRGÃO (MRO-68): toca junto com o riddim, segue a harmonia e o BPM, mixer (solo e mute),
+    // fica no projeto e projetos antigos abrem com ele desligado (e a aba certa)
+    if (arg1 == "orgao")
+    {
+        set (proc.getKnob().apvts, "echoOn", 0.0f);
+        set (proc.getChords().apvts, "root0", 7.0f);    // G
+        set (proc.getChords().apvts, "qual0", 0.0f);    // maior
+        set (proc.apvts, "bpm", 84.0f);
+        pump();
+        const bool linked = (int) get (proc.getOrgan().apvts, "root1") == 7 && get (proc.getOrgan().apvts, "minor1") < 0.5f
+                         && (int) get (proc.getOrgan().apvts, "bpm") == 84 && get (proc.getOrgan().apvts, "chordSrc") < 0.5f;
+        const bool onDefault = get (proc.apvts, "organOn") > 0.5f;
+        set (proc.apvts, MrmProcessor::soloId (MrmProcessor::Organ), 1.0f);
+        pump();
+        float lv[4] {};
+        runDaw (6.0, [&] (double) { for (int m = 0; m < 4; ++m) lv[m] = std::max (lv[m], proc.getMachineLevel (m)); });
+        const bool solo = lv[MrmProcessor::Organ] > 0.01f && lv[MrmProcessor::Drums] < 1.0e-4f && lv[MrmProcessor::Bass] < 1.0e-4f;
+        set (proc.apvts, MrmProcessor::soloId (MrmProcessor::Organ), 0.0f);
+        set (proc.apvts, MrmProcessor::muteId (MrmProcessor::Organ), 1.0f);
+        pump();
+        float lv2[4] {};
+        runDaw (4.0, [&] (double t) { if (t > 2.0) for (int m = 0; m < 4; ++m) lv2[m] = std::max (lv2[m], proc.getMachineLevel (m)); });   // o medidor cai devagar
+        const bool mute = lv2[MrmProcessor::Organ] < 1.0e-4f && lv2[MrmProcessor::Drums] > 0.05f;
+        set (proc.apvts, MrmProcessor::muteId (MrmProcessor::Organ), 0.0f);
+
+        // estado: o órgão vai inteiro no projeto
+        set (proc.getOrgan().apvts, "musico", 3.0f);
+        proc.setCurrentTab (MrmProcessor::TabOrgan);
+        pump();
+        juce::MemoryBlock mb;
+        proc.getStateInformation (mb);
+        MrmProcessor other;
+        other.setStateInformation (mb.getData(), (int) mb.getSize());
+        pump();
+        const bool saved = (int) get (other.getOrgan().apvts, "musico") == 3 && other.getCurrentTab() == MrmProcessor::TabOrgan
+                        && get (other.apvts, "organOn") > 0.5f && (int) get (other.getOrgan().apvts, "root1") == 7;
+
+        // projeto da 2.7: sem o órgão no estado e com a aba ARRANJO no índice 4
+        auto xml = juce::AudioProcessor::getXmlFromBinary (mb.getData(), (int) mb.getSize());
+        xml->removeChildElement (xml->getChildByName ("MRO68"), true);
+        xml->removeAttribute ("tabs");
+        xml->setAttribute ("tab", 4);
+        juce::MemoryBlock old;
+        juce::AudioProcessor::copyXmlToBinary (*xml, old);
+        MrmProcessor legacy;
+        legacy.setStateInformation (old.getData(), (int) old.getSize());
+        pump();
+        const bool oldOk = get (legacy.apvts, "organOn") < 0.5f && legacy.getCurrentTab() == MrmProcessor::TabArrange;
+
+        const bool ok = linked && onDefault && solo && mute && saved && oldOk;
+        std::printf ("orgao: %s (harmonia/BPM ligados: %s, ligado de fabrica: %s, solo: orgao %.3f bateria %.5f baixo %.5f, mute: orgao %.5f bateria %.3f, "
+                     "salvo no projeto: %s, projeto 2.7 abre sem orgao e na aba ARRANJO: %s)\n", ok ? "ok" : "FALHOU",
+                     linked ? "sim" : "NAO", onDefault ? "sim" : "NAO", lv[3], lv[0], lv[2], lv2[3], lv2[0], saved ? "sim" : "NAO", oldOk ? "sim" : "NAO");
         return ok ? 0 : 1;
     }
 

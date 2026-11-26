@@ -1,3 +1,14 @@
+## Mastor Riddim Machine MRM-0420 2.8 — DubStation
+
+- **Aba ÓRGÃO, nova (depois da RIDDIM):** o Mastor Reggae Organ MRO-68 1.3 inteiro dentro do MRM-0420, compilado direto da pasta dele: os grooves dos organistas (Mittoo, Wright, Downie, Gladdy…), grade, drawbars, Leslie animada, os pianos elétricos (Rhodes, Suitcase, Wurlitzer, DX EP), a aba EQ e os **timbres Midnite** (MIDNITE, ABAFADO, CORPO e AO VIVO)
+  - toca com a **harmonia e o BPM do riddim** (os 4 acordes ligados ao MRCM-1240 e ao MRBM-69) e entra junto com a harmonia, depois da intro da bateria
+  - embaixo do painel: **ÓRGÃO LIGADO**, **MUTE**, **SOLO**, **VOLUME** (começa em −3 dB) e **PAN**
+  - no **ARRANJO** o órgão toca nas partes em que a harmonia (RIDDIM) toca
+- **MIXER** com o quarto canal, ÓRGÃO, e **CONTROL ROOM** com o mute do órgão
+- Tudo na contagem com a caixa no 2 e no 4; o Tape Echo e o saturador do órgão começam desligados, como no MRO-68
+- **Projetos antigos** abrem com o órgão desligado (soam igual ao que eram) e na mesma aba
+- Versão para celular 2.8: o órgão ganhou os timbres DX EP e Midnite do MRO-68
+
 ## Mastor Riddim Machine MRM-0420 2.7 — DubStation
 
 - **Ordem das máquinas sempre BATERIA, BAIXO e RIDDIM**: nas abas (PRINCIPAL, BATERIA, BAIXO, RIDDIM, ARRANJO, MIXER, SHOW, CONTROL ROOM), nas linhas da aba PRINCIPAL e no mixer. A aba da harmonia (Mastor Reggae Keys MRK-80) passa a se chamar RIDDIM

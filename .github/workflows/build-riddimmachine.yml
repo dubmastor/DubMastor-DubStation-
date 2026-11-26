@@ -60,10 +60,11 @@ jobs:
           $R bateria.png 1
           $R baixo.png 2
           $R harmonia.png 3
-          $R arranjo.png 4
-          $R mixer.png 5
-          $R show.png 6
-          $R control-room.png 7
+          $R orgao.png 4
+          $R arranjo.png 5
+          $R mixer.png 6
+          $R show.png 7
+          $R control-room.png 8
           $R arranjo
           $R show
           $R exportar
@@ -80,6 +81,7 @@ jobs:
           $R play-riddim.wav intro
           $R daw-intro.wav intro
           $R estado
+          $R orgao
           $R banco
           $R inicial
           $R presets
