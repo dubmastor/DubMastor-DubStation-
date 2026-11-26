@@ -128,8 +128,31 @@ private:
     PanelHolder holder;
     MuteKey drums, bass, riddim;
     PowerSwitch fx, echo;
+    MuteKey organ;
     juce::Image background;
     juce::Rectangle<int> muteSection, masterSection;
+};
+
+// Aba ÓRGÃO (2.8): o Mastor Reggae Organ MRO-68 inteiro (grooves, drawbars, Leslie, EQ e timbres Midnite),
+// com a harmonia e o BPM do riddim, e embaixo as chaves do órgão no riddim: LIGADO, MUTE, SOLO, VOLUME e PAN
+class OrganPage : public juce::Component, private juce::Timer
+{
+public:
+    OrganPage (MrmProcessor&, juce::Component& organPanel);
+    ~OrganPage() override;
+    void paint (juce::Graphics&) override;
+    void resized() override;
+private:
+    void timerCallback() override;
+    int barTop() const { return getHeight() - 170; }   // o painel do órgão ocupa o resto da aba
+    MrmProcessor& proc;
+    PanelHolder holder;
+    PowerSwitch power, solo;
+    MuteKey mute;
+    BigDial vol, pan;
+    juce::Image background;
+    juce::Rectangle<int> keySection, mixSection;
+    float lastDb = 1000.0f;
 };
 } // namespace mrmui
 
@@ -152,8 +175,10 @@ private:
     DubDrumsPanel    drumsPanel;
     BassMachinePanel bassPanel;
     DubPanel         knobPanel;
+    ReggaeOrganEditor organPanel;
     mrmui::PanelHolder chordsHolder, drumsHolder, bassHolder;
     mrmui::ControlRoomPage controlRoom;
+    mrmui::OrganPage organPage;
     mrmui::ArrangePage arrangePage;
     mrmui::MixerPage mixerPage;
     mrmui::ShowPage showPage;

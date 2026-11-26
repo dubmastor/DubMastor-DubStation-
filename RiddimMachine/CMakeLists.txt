@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
 
-# Mastor Riddim Machine MRM-0420 (DubStation): MRDM-12 + MRCM-1240 + MRBM-69 + Mastor Big Knob num só instrumento
+# Mastor Riddim Machine MRM-0420 (DubStation): MRDM-12 + MRCM-1240 + MRBM-69 + MRO-68 (órgão) + Mastor Big Knob num só instrumento
 # Windows: runtime do C++ embutido no plugin (não depende do Visual C++ Redistributable do PC)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "")
-project(MastorRiddimMachine VERSION 2.7.0)
+project(MastorRiddimMachine VERSION 2.8.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -59,7 +59,8 @@ mrm_version(ReggaeDrums MRM_DRUMS_VER)        # a bateria é a do Mastor Reggae 
 mrm_version(ReggaeKeys MRM_CHORDS_VER)          # a harmonia é a do Mastor Reggae Keys MRK-80 (aba CHORD MACHINE)
 mrm_version(ReggaeBass MRM_BASS_VER)            # o baixo é o do Mastor Reggae Bass MRB-69 (aba BASS MACHINE)
 mrm_version(BigKnob     MRM_KNOB_VER)
-message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRK-80 ${MRM_CHORDS_VER}, MRB-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}")
+mrm_version(ReggaeOrgan MRM_ORGAN_VER)         # o órgão é o do Mastor Reggae Organ MRO-68 (aba ÓRGÃO)
+message(STATUS "MRM-0420 ${PROJECT_VERSION}: MRD-12 ${MRM_DRUMS_VER}, MRK-80 ${MRM_CHORDS_VER}, MRB-69 ${MRM_BASS_VER}, Big Knob ${MRM_KNOB_VER}, MRO-68 ${MRM_ORGAN_VER}")
 
 set(MRM_SOURCES
     Source/MrmProcessor.cpp
@@ -74,20 +75,29 @@ set(MRM_SOURCES
     Source/BassEditorUnit.cpp
     Source/KnobProcessorUnit.cpp
     Source/KnobEditorUnit.cpp
+    Source/OrganProcessorUnit.cpp
+    Source/OrganEditorUnit.cpp
     ../ReggaeDrumMachine/Source/PatternGenerator.cpp)
 set(MRM_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source
-    ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source)     # timbres do piano M1 / Hammond
+    ${CMAKE_CURRENT_SOURCE_DIR}/../ReggaeKeys/Source      # timbres do piano M1 / Hammond
+    ${CMAKE_CURRENT_SOURCE_DIR}/../RiddimBank/Source)     # banco de riddims (usado pelo órgão MRO-68)
 set(MRM_DEFINES
     DD_VERSION_SHORT="${MRM_DRUMS_VER}"
     MRM_DRUMS_VER="${MRM_DRUMS_VER}"
     MRM_CHORDS_VER="${MRM_CHORDS_VER}"
     MRM_BASS_VER="${MRM_BASS_VER}"
     MRM_KNOB_VER="${MRM_KNOB_VER}"
+    MRM_ORGAN_VER="${MRM_ORGAN_VER}"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_DISPLAY_SPLASH_SCREEN=0)
+
+# fontes do painel do órgão (as mesmas do MRK-80 e do MRO-68)
+juce_add_binary_data(MrmOrganFonts SOURCES
+    ../ReggaeKeys/Resources/ArchivoBlack-Regular.ttf
+    ../ReggaeKeys/Resources/RootsKeysDisplay-BoldItalic.ttf)
 
 target_sources(MastorRiddimMachine PRIVATE ${MRM_SOURCES})
 target_include_directories(MastorRiddimMachine PRIVATE ${MRM_INCLUDES})
@@ -100,6 +110,7 @@ endif()
 
 target_link_libraries(MastorRiddimMachine
     PRIVATE
+        MrmOrganFonts
         juce::juce_audio_utils
         juce::juce_dsp
     PUBLIC
@@ -119,5 +130,5 @@ if(MRM_RENDER_TEST)
         JUCE_USE_XRANDR=0 JUCE_USE_XINERAMA=0 JUCE_USE_XCURSOR=0
         JucePlugin_Name="Mastor Riddim Machine MRM-0420" JucePlugin_VersionString="${PROJECT_VERSION}" JucePlugin_IsSynth=1
         JucePlugin_WantsMidiInput=1 JucePlugin_ProducesMidiOutput=1 JucePlugin_IsMidiEffect=0)
-    target_link_libraries(mrm_render PRIVATE juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
+    target_link_libraries(mrm_render PRIVATE MrmOrganFonts juce::juce_audio_utils juce::juce_dsp juce::juce_recommended_config_flags)
 endif()

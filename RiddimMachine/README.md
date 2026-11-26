@@ -1,9 +1,9 @@
-# Mastor Riddim Machine MRM-0420 2.7 — DubStation
+# Mastor Riddim Machine MRM-0420 2.8 — DubStation
 
 ← [Voltar para a página inicial do repositório](../README.md)
 
-**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
-(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.7/MRM-0420-macOS.zip))
+**[⬇️ Instalador Windows (.exe)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.8/MRM-0420-Windows-Instalador.exe)** · **[⬇️ Instalador Mac (.pkg)](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.8/MRM-0420-macOS-Instalador.pkg)** · **📱 [Versão para celular](https://dubmastor.github.io/DubMastor-DubStation-/riddim/)**
+(sem instalador: [zip Windows](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.8/MRM-0420-Windows.zip) · [zip Mac](https://github.com/dubmastor/DubMastor-DubStation-/releases/download/MRM-0420-2.8/MRM-0420-macOS.zip))
 
 ![MRM-0420, aba PRINCIPAL](docs/interface-riddim.png)
 
@@ -68,6 +68,15 @@ Uma máquina por aba, cada uma com o painel **completo**, igual ao plugin separa
 máquinas entra no MRM-0420 no próximo build). Só a primeira aba (RIDDIM) é diferente: ela junta o principal de cada
 máquina e do Big Knob. Na aba BAIXO até o acompanhamento interno do MRBM-69 (bateria e teclado) está à mão; ele
 começa desligado, porque no MRM-0420 a bateria e o teclado já tocam de verdade.
+
+## Aba ÓRGÃO (2.8)
+
+O Mastor Reggae Organ MRO-68 inteiro, compilado direto da pasta `ReggaeOrgan/`: grooves dos organistas, drawbars, Leslie,
+pianos elétricos, EQ e os timbres Midnite. Toca com a harmonia e o BPM do riddim (entra depois da intro, junto com a harmonia),
+tem ÓRGÃO LIGADO, MUTE, SOLO, VOLUME e PAN embaixo do painel, canal próprio no MIXER e mute no CONTROL ROOM.
+No ARRANJO toca nas partes em que a harmonia (RIDDIM) toca. Projetos antigos abrem com o órgão desligado.
+
+![MRM-0420, aba ÓRGÃO](docs/interface-orgao.png)
 
 ## Abas novas da 2.7
 Ordem das abas: **PRINCIPAL, BATERIA, BAIXO, RIDDIM (harmonia · MRK-80), ARRANJO, MIXER, SHOW e CONTROL ROOM** (as máquinas sempre na ordem bateria, baixo e riddim).

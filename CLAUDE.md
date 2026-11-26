@@ -59,6 +59,9 @@ O MRM-0420 compila o código destas pastas direto, sem cópia:
 - `ReggaeBassMachine/` — Mastor Reggae Bass Machine MRBM-69 (timbres do MRDBI-07 em `ReggaeBass/Source`)
 - `BigKnob/` — Mastor Big Knob (aba CONTROL ROOM)
 - `ReggaeKeys/Source/` — timbres do piano M1 / Hammond
+- `ReggaeOrgan/Source/` — Mastor Reggae Organ MRO-68 (aba ÓRGÃO desde a 2.8; `OrganProcessorUnit.cpp`/`OrganEditorUnit.cpp`, nomes em `OrganNames.h`).
+  Fica fora do enum das 3 máquinas do riddim: é o índice `MrmProcessor::Organ` (= `NumMachines`) nos ids do mixer (`NumMixer`),
+  toca onde a harmonia toca no ARRANJO e projetos sem a etiqueta `MRO68` abrem com `organOn` desligado. Mudou o MRO-68? Rode também `mrm_render orgao`.
 
 **Regra do dono (nov/2026): o MRM-0420 só é atualizado (versão, build, release) quando ele pedir.** O `build-riddimmachine.yml` só roda por tag
 ou manual. Quando ele pedir para atualizar o MRM-0420:

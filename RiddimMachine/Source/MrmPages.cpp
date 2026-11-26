@@ -5,9 +5,11 @@ namespace mrmui
 namespace
 {
     constexpr int kW = MainPage::kW, kH = MainPage::kH;
-    const juce::Colour machineColour[MrmProcessor::NumMachines] = { juce::Colour (0xff2fbf55), juce::Colour (0xffe8432c), col::jamGold };
-    const char* machineName[MrmProcessor::NumMachines] = { "BATERIA", "RIDDIM", "BAIXO" };
-    const char* machineModel[MrmProcessor::NumMachines] = { "MRD-12", "MRK-80", "MRB-69" };
+    // 2.8: o órgão (MRO-68) entra no MIXER como quarto canal
+    const juce::Colour machineColour[MrmProcessor::NumMixer] = { juce::Colour (0xff2fbf55), juce::Colour (0xffe8432c), col::jamGold, juce::Colour (0xff4f9a5a) };
+    const char* machineName[MrmProcessor::NumMixer] = { "BATERIA", "RIDDIM", "BAIXO", "\xc3\x93RG\xc3\x83O" };
+    const char* machineModel[MrmProcessor::NumMixer] = { "MRD-12", "MRK-80", "MRB-69", "MRO-68" };
+    constexpr int mixerOrder[MrmProcessor::NumMixer] = { MrmProcessor::Drums, MrmProcessor::Bass, MrmProcessor::Chords, MrmProcessor::Organ };
     // ordem das máquinas na tela: sempre bateria, baixo e riddim
     constexpr int screenOrder[MrmProcessor::NumMachines] = { MrmProcessor::Drums, MrmProcessor::Bass, MrmProcessor::Chords };
 
@@ -534,14 +536,14 @@ MixerPage::MixerPage (MrmProcessor& p) : proc (p)
     setOpaque (true);
     mixSection   = { 52, 22, 1176, 640 };
     sirenSection = { 52, 690, 1176, 420 };
-    for (int s = 0; s < MrmProcessor::NumMachines; ++s)
+    for (int s = 0; s < MrmProcessor::NumMixer; ++s)
     {
-        const int m = screenOrder[s];
+        const int m = mixerOrder[s];
         auto& st = strips[(size_t) s];
         st.machine = m;
         st.fader = std::make_unique<ChannelFader> (*proc.apvts.getParameter (MrmProcessor::volId (m)), [this, m] { return proc.getMachineLevel (m); }, machineColour[m]);
         st.pan = std::make_unique<BigDial> (*proc.apvts.getParameter (MrmProcessor::panId (m)));
-        st.mute = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (m)), machineName[m], machineModel[m], machineColour[m]);
+        st.mute = std::make_unique<MuteKey> (*proc.apvts.getParameter (MrmProcessor::muteId (m)), juce::String::fromUTF8 (machineName[m]), machineModel[m], machineColour[m]);
         st.solo = std::make_unique<PowerSwitch> (*proc.apvts.getParameter (MrmProcessor::soloId (m)), "SOLO", "SOLO");
         for (juce::Component* c : { (juce::Component*) st.fader.get(), (juce::Component*) st.pan.get(), (juce::Component*) st.mute.get(), (juce::Component*) st.solo.get() })
             addAndMakeVisible (*c);
@@ -568,15 +570,15 @@ MixerPage::~MixerPage() { stopTimer(); }
 
 void MixerPage::resized()
 {
-    for (int s = 0; s < MrmProcessor::NumMachines; ++s)
+    for (int s = 0; s < MrmProcessor::NumMixer; ++s)
     {
         auto& st = strips[(size_t) s];
-        const int x = 110 + s * 360;
-        st.area = { x, 60, 320, 580 };
-        st.mute->setBounds (x + 20, 74, 280, 74);
-        st.solo->setBounds (x + 70, 160, 180, 36);
-        st.pan->setBounds (x + 120, 206, 80, 76);
-        st.fader->setBounds (x + 76, 300, 150, 320);
+        const int x = 78 + s * 284;
+        st.area = { x, 60, 262, 580 };
+        st.mute->setBounds (x + 14, 74, 234, 74);
+        st.solo->setBounds (x + 46, 160, 170, 36);
+        st.pan->setBounds (x + 91, 206, 80, 76);
+        st.fader->setBounds (x + 46, 300, 150, 320);
     }
     fire->setBounds (80, 724, 120, 110);
     hold->setBounds (214, 732, 150, 36);
@@ -599,9 +601,9 @@ void MixerPage::paint (juce::Graphics& g)
         g.fillRoundedRectangle (ar, 6.0f);
         g.setColour (machineColour[m]);
         g.fillRect (ar.withHeight (4.0f).reduced (8.0f, 0.0f));
-        engraved (g, "PAN", juce::Rectangle<float> (ar.getX() + 50.0f, 238.0f, 60.0f, 13.0f), juce::Justification::centredRight, 10.0f, 0.3f);
+        engraved (g, "PAN", juce::Rectangle<float> (ar.getX() + 22.0f, 238.0f, 60.0f, 13.0f), juce::Justification::centredRight, 10.0f, 0.3f);
         const float db = proc.apvts.getRawParameterValue (MrmProcessor::volId (m))->load();
-        auto box = juce::Rectangle<float> (ar.getX() + 236.0f, 440.0f, 70.0f, 34.0f);
+        auto box = juce::Rectangle<float> (ar.getX() + 190.0f, 440.0f, 66.0f, 34.0f);
         displayGlass (g, box);
         g.setFont (stencil (16.0f, 0.0f));
         glowText (g, db <= -59.9f ? u8 ("\xe2\x88\x92\xe2\x88\x9e") : juce::String (db, 1), box.withTrimmedBottom (10.0f), juce::Justification::centred);
@@ -622,7 +624,7 @@ void MixerPage::paint (juce::Graphics& g)
 void MixerPage::timerCallback()
 {
     for (auto& st : strips) st.fader->tick();
-    static float lastDb[3] {};
+    static float lastDb[MrmProcessor::NumMixer] {};
     bool ch = false;
     for (const auto& st : strips)
     {
