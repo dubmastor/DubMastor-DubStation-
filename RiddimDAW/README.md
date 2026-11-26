@@ -1,12 +1,13 @@
-# Riddim Machine DAW RMD-0420 1.0
+# Riddim Machine DAW RMD-0420 1.1
 
 Projeto separado do VST **Mastor Riddim Machine MRM-0420**: o MRM-0420 continua sendo o plugin que abre dentro da DAW;
 a Riddim Machine DAW é o estúdio no navegador, com a música inteira numa timeline, gravação de voz, mixer e exportação.
 
 Em teste: por enquanto só a versão no site, em https://dubmastor.github.io/DubMastor-DubStation-/daw/
 
-## O que tem na 1.0
+## O que tem (1.1)
 
+- 1.1: botões M (mute) e S (solo) de cada machine na aba e no cabeçalho da machine
 - Aba ESTÚDIO: timeline com as partes do Arranjo, os acordes de cada compasso e todas as machines (ligar ou desligar cada machine em cada parte)
 - Faixas de áudio: gravar o microfone (contagem de um compasso, metrônomo com o 2 e o 4 acentuados, ajuste de latência) ou importar arquivos
 - Clipes: arrastar na grade, cortar no cursor, duplicar, volume e trocar de faixa

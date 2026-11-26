@@ -321,4 +321,14 @@ setInterval(()=>{if(asHold&&H.ready){asHold=false;$('dban').innerHTML=''}
  if(sig!==lastSig){lastSig=sig;applyAllT();if(!drag)renderStudio()}
  const s=snap('');s.date=0;const js=JSON.stringify(s);if(js!==lastSnap){if(lastSnap)autosave();lastSnap=js}},700);
 tabs.addEventListener('click',()=>setTimeout(()=>{if(studioOn())renderStudio()},0));
+/* 1.1: botões M (mute) e S (solo) de cada machine na aba e no cabeçalho da machine */
+function decorateMS(){M.forEach(I=>{const tb=tabs.querySelector(`[data-t="${I.id}"]`);
+  if(tb&&!tb.querySelector('.tms'))tb.insertAdjacentHTML('beforeend',`<span class="tms"><span class="tq m" data-qm="${I.id}" role="button" title="Mute ${esc(I.name)}" aria-label="Mute ${esc(I.name)}">M</span><span class="tq s" data-qs="${I.id}" role="button" title="Solo ${esc(I.name)}" aria-label="Solo ${esc(I.name)}">S</span></span>`);
+  const p=$('p-'+I.id);if(!p)return;const cb=p.querySelector('.cab');
+  if(cb&&!cb.querySelector('.cabms')){p.querySelectorAll('.tools [data-mute],.tools [data-solo]').forEach(b=>b.remove());const g=cb.querySelector('.grow');(g||cb.lastElementChild).insertAdjacentHTML('afterend',`<div class="cabms">${msBtns(I)}</div>`);renderToggles()}})}
+function syncMS(){tabs.querySelectorAll('[data-qm]').forEach(b=>b.classList.toggle('on',byId[b.dataset.qm].mute));tabs.querySelectorAll('[data-qs]').forEach(b=>b.classList.toggle('on',byId[b.dataset.qs].solo))}
+tabs.addEventListener('click',e=>{const q=e.target.closest('[data-qm],[data-qs]');if(!q)return;e.stopPropagation();e.preventDefault();const I=byId[q.dataset.qm||q.dataset.qs];
+ if(q.dataset.qm){I.mute=!I.mute;if(I.mute)I.solo=false}else{I.solo=!I.solo;if(I.solo)I.mute=false}renderToggles();syncMS();applyAllT();if(studioOn())renderStudio()},true);
+new MutationObserver(decorateMS).observe(panels,{childList:true,subtree:true});
+decorateMS();syncMS();setInterval(syncMS,250);
 renderStudio();show('studio');
