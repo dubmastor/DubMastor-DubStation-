@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Keys MRK-80 3.3 — Dub Station</title>
+<title>Mastor Reggae Keys MRK-80 3.4 — Dub Station</title>
 <meta name="description" content="Mastor Reggae Keys MRK-80 no celular: toque o piano M1 na tela, monte o riddim na CHORD MACHINE e baixe o MIDI para a sua DAW.">
 <style>
 :root{
@@ -234,7 +234,7 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '3.3';
+const VERSION = '3.4';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)
@@ -640,14 +640,29 @@ function buildChords() {
       b.style.left = `calc(${k * ww}% + 1px)`; b.style.width = `calc(${ww}% - 2px)`; keys.appendChild(b); });
     BLACK.forEach(([n, after]) => { const b = document.createElement('button'); b.className = 'k'; b.dataset.n = n; b.textContent = M.ROOTS[n];
       b.style.left = `calc(${(after + 1) * ww}% - ${ww * 0.31}%)`; b.style.width = `${ww * 0.62}%`; keys.appendChild(b); });
-    keys.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; s.root = +b.dataset.n; changed(); };
-    ['MAIOR', 'MENOR'].forEach((t, q) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t; b.onclick = () => { s.quality = q; changed(); }; $('q' + i).appendChild(b); });
-    ['AUTO', 'FUND', '1ª', '2ª'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t; b.onclick = () => { s.inv = k - 1; changed(); }; $('inv' + i).appendChild(b); });
+    // 3.4: ouvir o acorde — tônica, maior/menor e inversão tocam o acorde enquanto o dedo/mouse estiver apertado
+    keys.onpointerdown = (e) => { const b = e.target.closest('button'); if (!b) return; e.preventDefault(); s.root = +b.dataset.n; changed(); auditionStart(i); };
+    ['MAIOR', 'MENOR'].forEach((t, q) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t;
+      b.onpointerdown = (e) => { e.preventDefault(); s.quality = q; changed(); auditionStart(i); }; $('q' + i).appendChild(b); });
+    ['AUTO', 'FUND', '1ª', '2ª'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t;
+      b.onpointerdown = (e) => { e.preventDefault(); s.inv = k - 1; changed(); auditionStart(i); }; $('inv' + i).appendChild(b); });
     $('dDn' + i).onclick = () => { s.dur = Math.max(0, s.dur - 1); changed(); };
     $('dUp' + i).onclick = () => { s.dur = Math.min(M.DURATIONS.length - 1, s.dur + 1); changed(); };
     if (i > 0) $('on' + i).onclick = () => { s.on = !s.on; changed(); };
   });
 }
+
+// ---------------------------------------------------------------- ouvir o acorde (mesmas notas do loop: inversão, registro e duas mãos)
+let auditionGains = [];
+function auditionStop() { auditionGains.forEach((g) => audio.liveOff(g)); auditionGains = []; }
+function auditionStart(i) {
+  auditionStop();
+  const slots = slotsForEngine();
+  if (slots[i].beats <= 0) slots[i].beats = 4;   // cartão OFF também pode ser ouvido
+  const left = M.voiceProgression(slots, st.center).notes[i] || [];
+  auditionGains = [...left, ...left.map((n) => n + 12)].map((n) => audio.liveOn(n));
+}
+['pointerup', 'pointercancel', 'blur'].forEach((ev) => window.addEventListener(ev, auditionStop));
 
 function slider(id, fmt, onChange) {
   const el = $(id); el.value = st[id];

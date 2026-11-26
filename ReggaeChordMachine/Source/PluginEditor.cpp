@@ -236,7 +236,11 @@ int NoteKeys::keyAt (juce::Point<float> p) const
 void NoteKeys::mouseDown (const juce::MouseEvent& e)
 {
     const int k = keyAt (e.position);
-    if (k >= 0) select (k);
+    if (k >= 0)
+    {
+        select (k);
+        pressed();   // toca o acorde enquanto o botão estiver apertado
+    }
 }
 
 void NoteKeys::paint (juce::Graphics& g)
@@ -591,6 +595,12 @@ DubChordsPanel::DubChordsPanel (DubChordsProcessor& p) : proc (p), dragZone (p)
                                                     [this, i] { return voicings.suggested.empty() ? 0 : voicings.suggested[(size_t) i]; });
         m.dur  = std::make_unique<ChoiceWindow>   (*proc.apvts.getParameter ("dur" + n), [] (int d) -> std::pair<juce::String, juce::String>
                  { return { dub::durationShort (d), d <= 1 ? "COMPASSO" : "COMPASSOS" }; });
+        // ouvir o acorde ao escolher: soa enquanto o botão do mouse estiver apertado
+        for (ParamControl* pc : { (ParamControl*) m.keys.get(), (ParamControl*) m.mode.get(), (ParamControl*) m.inv.get() })
+        {
+            pc->onPress   = [this, i] { proc.auditionStart (i); };
+            pc->onRelease = [this]    { proc.auditionStop(); };
+        }
         addAndMakeVisible (*m.keys);
         addAndMakeVisible (*m.mode);
         addAndMakeVisible (*m.inv);

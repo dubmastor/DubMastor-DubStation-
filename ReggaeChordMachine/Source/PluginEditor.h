@@ -46,7 +46,11 @@ public:
         setMouseCursor (juce::MouseCursor::PointingHandCursor);
         setRepaintsOnMouseActivity (true);
     }
+    // ouvir o acorde: toca enquanto o botão do mouse estiver apertado (tônica, maior/menor, inversão)
+    std::function<void()> onPress, onRelease;
+    void mouseUp (const juce::MouseEvent&) override { if (onRelease) onRelease(); }
 protected:
+    void pressed() { if (onPress) onPress(); }
     int  index() const       { return juce::roundToInt (value); }
     void select (int i)      { att.setValueAsCompleteGesture ((float) i); }
     int  numChoices() const  { return param.getNumSteps(); }
@@ -78,7 +82,7 @@ class ModeSwitch : public ParamControl
 public:
     using ParamControl::ParamControl;
     void paint (juce::Graphics&) override;
-    void mouseDown (const juce::MouseEvent& e) override { select (e.position.x < (float) getWidth() * 0.5f ? 0 : 1); }
+    void mouseDown (const juce::MouseEvent& e) override { select (e.position.x < (float) getWidth() * 0.5f ? 0 : 1); pressed(); }
 };
 
 // Inversão: AUTO / FUND / 1ª / 2ª, botões de pressão intertravados.
@@ -92,6 +96,7 @@ public:
     void mouseDown (const juce::MouseEvent& e) override
     {
         select (juce::jlimit (0, 3, (int) (e.position.x / ((float) getWidth() / 4.0f))));
+        pressed();
     }
 private:
     std::function<int()> suggested;   // 0 = FUND, 1 = 1ª, 2 = 2ª

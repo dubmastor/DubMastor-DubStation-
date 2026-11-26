@@ -63,6 +63,14 @@ public:
     void applyBankEntry (int index);              // thread da interface: harmonia e BPM da música
     int  getBankEntry() const;                    // entrada atual do banco (-1 = nenhuma)
 
+    // OUVIR O ACORDE: ao escolher tônica, maior/menor ou inversão, o acorde do cartão soa enquanto
+    // o botão do mouse estiver apertado (as mesmas notas que o loop toca: inversão, registro e duas mãos).
+    // Thread da interface; a thread de áudio toca no próximo bloco.
+    void auditionStart (int slot);
+    void auditionStop();
+    // notas do "ouvir o acorde" saídas no último bloco (o MRK-80 toca mesmo com PREVIEW desligado)
+    const juce::MidiBuffer& getAuditionMidi() const noexcept { return auditionOut; }
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:
@@ -95,6 +103,15 @@ private:
     std::atomic<bool> hasIncoming { false };
     std::atomic<bool> dirty { true };
     float pianoGain = 0.0f, organGain = 0.0f;  // últimos ganhos aplicados (rampas sem estalo)
+
+    // ouvir o acorde
+    static constexpr int maxAudition = 12;
+    juce::SpinLock auditionLock;
+    int auditionReqNotes[maxAudition] {}, auditionReqCount = 0, auditionReqVel = 100;
+    std::atomic<int> auditionReq { 0 };       // 1 = tocar, 2 = soltar
+    int auditionNotes[maxAudition] {}, auditionCount = 0;
+    juce::MidiBuffer auditionOut;
+    void runAudition (juce::MidiBuffer& midi);
 
     struct Pending { int sample; bool on; int channel; int note; int vel; };
     std::vector<Pending> pending;

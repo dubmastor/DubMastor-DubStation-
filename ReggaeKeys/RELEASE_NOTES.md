@@ -1,3 +1,8 @@
+## Mastor Reggae Keys MRK-80 3.4 🟢🟡⚫
+
+- **OUVIR O ACORDE na CHORD MACHINE:** ao clicar numa tecla da **TÔNICA** (ou em **MAIOR / MENOR** ou numa **INVERSÃO**), o acorde daquele cartão toca no piano **enquanto o botão do mouse estiver apertado**, e para ao soltar. Soam as mesmas notas que o loop vai tocar (a inversão escolhida ou a do AUTO, o REGISTRO e as duas mãos), no timbre escolhido e com o GUITAR SKANK se estiver ligado. Funciona com a DAW parada e com o PREVIEW desligado, e também num cartão desligado (OFF).
+- Versão para celular 3.4 com o mesmo recurso: o acorde soa enquanto o dedo estiver na tecla.
+
 ## Mastor Reggae Keys MRK-80 3.3 🟢🟡⚫
 
 - **PRESETS no padrão do mega banco** da Riddim Machine MRM-0420: o botão PRESETS da aba CHORD MACHINE abre **ESTILOS** (estilo ▸ riddim ▸ música), **RIDDIMS A–Z**, **MÚSICAS A–Z** e **★ FAVORITOS** (☆ FAVORITAR a música atual; os favoritos ficam guardados no computador e valem para todos os projetos). **Só entram os riddims com a harmonia levantada** (321 músicas: conferida ● ou aproximada ◐); os 35 com harmonia pendente ficaram de fora. O banco antigo do MRCM saiu do menu (projetos antigos abrem igual).

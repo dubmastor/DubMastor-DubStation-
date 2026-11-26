@@ -201,6 +201,45 @@ int main (int argc, char** argv)
             riddimbank::favFile ("MRK-80-teste").getFile().deleteFile();
         }
     }
+    {   // 8) 3.4 OUVIR O ACORDE: clicar na tônica/maior-menor/inversão toca o acorde no piano com tudo parado
+        RootsKeysProcessor p;
+        const double sr = 48000.0; const int bs = 512;
+        FakePlayHead ph; ph.playing = false;
+        p.setPlayHead (&ph);
+        p.prepareToPlay (sr, bs);
+        juce::AudioBuffer<float> buf (2, bs);
+        auto run = [&] (int blocks)
+        {
+            double s = 0; long n = 0;
+            for (int b = 0; b < blocks; ++b)
+            {
+                juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+                for (int i = 0; i < bs; ++i) { s += (double) buf.getSample (0, i) * buf.getSample (0, i); ++n; }
+            }
+            return std::sqrt (s / (double) juce::jmax (1L, n));
+        };
+        auto countOn = [&] { int k = 0; for (int nn = 0; nn < 128; ++nn) if (p.keyboardState.isNoteOn (1, nn)) ++k; return k; };
+        check (run (20) < 1.0e-6, "ouvir acorde: silencio antes do clique");
+        setP (p.getMachine().apvts, "root1", 7.0f);   // cartão 2 = G
+        setP (p.getMachine().apvts, "qual1", 0.0f);   //            maior
+        p.getMachine().auditionStart (1);
+        const double held = run (40);
+        const int lit = countOn();
+        bool hasG = false;
+        for (int nn = 0; nn < 128; ++nn) if (p.keyboardState.isNoteOn (1, nn) && nn % 12 == 7) hasG = true;
+        check (held > 1.0e-3 && lit == 6 && hasG, "ouvir acorde: G maior soa com 6 notas (duas maos) enquanto clica (rms "
+                                                   + juce::String (held, 5) + ", " + juce::String (lit) + " notas)");
+        setP (p.getMachine().apvts, "on3", 0.0f);
+        p.getMachine().auditionStart (3);            // cartão OFF também pode ser ouvido
+        run (4);
+        check (countOn() == 6, "ouvir acorde: cartao desligado tambem toca (troca de acorde sem nota presa)");
+        p.getMachine().auditionStop();
+        run (4);
+        check (countOn() == 0, "ouvir acorde: soltar o mouse solta todas as notas");
+        const double tail = run (200);
+        check (tail < held * 0.2, "ouvir acorde: som morre depois de soltar");
+        p.setPlayHead (nullptr);
+    }
     {   // 7) capturas da interface
         RootsKeysProcessor p;
         setP (p.getMachine().apvts, "bubble", 1.0f);

@@ -249,7 +249,15 @@ void RootsKeysProcessor::runMachine (juce::MidiBuffer& midi, int numSamples)
 
     const bool heard = get ("machineOn") > 0.5f || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
     machineBuf.clear();   // 3.1: o SOM INTERNO da machine (piano M1 + Hammond) não toca mais aqui
-    if (! heard) return;
+
+    // 3.4: OUVIR O ACORDE (cartão clicado na aba CHORD MACHINE) toca no piano mesmo com tudo parado
+    // (se a machine estiver tocando, essas notas já vêm no machineMidi abaixo)
+    if (! heard)
+    {
+        for (const auto meta : machine->getAuditionMidi())
+            midi.addEvent (meta.getMessage(), meta.samplePosition);
+        return;
+    }
 
     // as notas (skank no canal 1, bubble no 3) tocam sempre no piano deste instrumento
     for (const auto meta : machineMidi)
