@@ -69,6 +69,14 @@ ou manual. Quando ele pedir para atualizar o MRM-0420:
 
 O workflow `.github/workflows/build-riddimmachine.yml` não roda mais sozinho quando essas pastas mudam (só por tag `MRM-0420-x.y` ou manual).
 
+## Riddim Machine DAW RMD-0420 (RiddimDAW/) — projeto separado do MRM-0420
+Estúdio no navegador (timeline, gravação de voz, mixer, exportar WAV/MP3/stems). **Não é plugin**: fica fora do `plugins.json`,
+sem workflow de build e sem release; por enquanto só a versão no site (`site/daw/`), com card "EM TESTE" em `site/machines.html`.
+Regra do dono: o MRM-0420 continua sendo o VST que abre dentro da DAW; não misturar os dois.
+`site/daw/index.html` é gerado por `python3 RiddimDAW/build_web.py` (versão web do MRM-0420 + `RiddimDAW/web/daw.js` e `daw.css`):
+nunca editar o `site/daw/index.html` à mão. Mudou a versão web do MRM-0420 (`site/riddim/`)? Rode o build da DAW também.
+Toda alteração sobe a versão nos `rep(...)` do `build_web.py`, no README da pasta e no card do site.
+
 ## Instalador completo (Dub Station, todos os plugins)
 - Workflow `.github/workflows/build-pacote.yml`, script `.github/scripts/pacote.py`. Lê a lista do `plugins.json`: plugin novo entra sozinho.
 - Release `DubStation-<versão>` com `DubStation-Windows-Instalador.exe` e `DubStation-macOS-Instalador.pkg` (nunca `latest`).
