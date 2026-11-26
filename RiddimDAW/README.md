@@ -7,7 +7,7 @@ Em teste: por enquanto só a versão no site, em https://dubmastor.github.io/Dub
 
 ## O que tem (1.1)
 
-- 1.1: botões M (mute) e S (solo) de cada machine na aba e no cabeçalho da machine
+- 1.1: botões M (mute) e S (solo) de cada machine na aba e no cabeçalho da machine; no órgão, os timbres novos do MRO-68 (DX EP e Midnite: original, abafado, corpo e ao vivo)
 - Aba ESTÚDIO: timeline com as partes do Arranjo, os acordes de cada compasso e todas as machines (ligar ou desligar cada machine em cada parte)
 - Faixas de áudio: gravar o microfone (contagem de um compasso, metrônomo com o 2 e o 4 acentuados, ajuste de latência) ou importar arquivos
 - Clipes: arrastar na grade, cortar no cursor, duplicar, volume e trocar de faixa
