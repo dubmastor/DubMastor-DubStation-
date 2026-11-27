@@ -124,6 +124,8 @@ ao mudar um, mude o outro (as mesmas 3 sugestões, na mesma ordem). Vale para a 
 BASS MACHINE (`ReggaeBassMachine/Source/PluginEditor.cpp`, `updateHints`: MRB-69, MRBM-69, MRM-0420; 7 conta como maior, m7 como menor).
 O teclado da TÔNICA da BASS MACHINE é o mesmo sistema da CHORD MACHINE: ouvir ao apertar (`auditionStart`/`auditionStop`, a fundamental no REGISTRO)
 e as notas tocando em verde (`takePlayingMask`); na versão para celular (`site/bassmachine/`) o teclado usa o mesmo CSS do `site/keys/` (`.pkeys`).
+Botão **EQ -2k** da BASS MACHINE (parâmetro `eq2k`, começa desligado): `ReggaeBassMachine/Source/HighCut2k.h` (Butterworth de 16ª ordem, quina em 1,8 kHz),
+no som da machine (`renderSynth`) e no MRB-69 (antes do maximizer); no celular, os mesmos 8 biquads em `site/bassmachine/` (Q em dB = 20·log10 Q).
 
 ## GUITAR SKANK do MRK-80 (ReggaeKeys/Source/GuitarSkank.h)
 O botão GUITAR SKANK do Mastor Reggae Keys MRK-80 toca a guitarra do skank junto com o piano usando o **motor do

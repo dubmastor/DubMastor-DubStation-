@@ -1101,6 +1101,8 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     for (auto* k : { &tone, &drive, &volume })
         k->slider.textFromValueFunction = percent;
     setupToggle (sound, "sound", "SOM INTERNO");
+    setupToggle (eq2k, "eq2k", "EQ  -2k");
+    eq2k.button.setTooltip (juce::String::fromUTF8 ("EQ: corta tudo acima de 2 kHz no baixo"));
     setupToggle (drumsOn, "drumsOn", "BATERIA");
     setupToggle (keysOn, "keysOn", "TECLADO");
     setupKnob (drumVol, "drumVol", "VOLUME");
@@ -1738,7 +1740,9 @@ void BassMachinePanel::resized()
         for (auto* k : { &inGain, &tone, &drive, &volume })
             placeKnob (*k, knobs.removeFromLeft (kw));
         a.removeFromTop (2);
-        sound.button.setBounds (a.removeFromTop (28).reduced (50, 0));
+        auto row = a.removeFromTop (28);
+        eq2k.button.setBounds (row.removeFromRight (row.getWidth() * 2 / 5).reduced (4, 0));
+        sound.button.setBounds (row.reduced (4, 0));
     }
     scope.setBounds (scopePanel.reduced (8, 0).withTrimmedTop (16).withTrimmedBottom (6));
     {

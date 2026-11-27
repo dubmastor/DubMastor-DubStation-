@@ -259,6 +259,55 @@ int main (int argc, char** argv)
         juce::uint32 after = 0; for (int c = 0; c < 4; ++c) after |= mach.takePlayingMask (c);
         check (after == 0, "tonica no play: parar apaga as teclas");
     }
+    {   // 2.2: botão EQ da BASS MACHINE corta tudo acima de 2 kHz (no MRB-69 e no som da própria machine)
+        auto measure = [] (auto& proc, double sr, int blocks)   // energia acima de 3 kHz e total (dB), depois de estabilizar
+        {
+            juce::dsp::IIR::Filter<float> hp[4];   // passa-alta Butterworth de 8ª ordem em 3 kHz (o que está acima de 2k)
+            const float q[4] = { 0.50979558f, 0.60134489f, 0.89997622f, 2.56291545f };
+            for (int k = 0; k < 4; ++k) hp[k].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass (sr, 3000.0f, q[k]);
+            double hi = 0, all = 0;
+            for (int b = 0; b < blocks; ++b)
+            {
+                juce::AudioBuffer<float> buf (2, 512); juce::MidiBuffer mm;
+                proc.processBlock (buf, mm);
+                if (b < 20) continue;
+                for (int i = 0; i < 512; ++i) { const float x = buf.getSample (0, i); float h = x; for (auto& f : hp) h = f.processSample (h); hi += h * h; all += x * x; }
+            }
+            return std::make_pair (10.0 * std::log10 (hi + 1e-20), 10.0 * std::log10 (all + 1e-20));
+        };
+        for (int round = 0; round < 2; ++round)
+        {
+            DubBassAudioProcessor b;
+            setP (b, ParamID::mode, 2);                         // SUPER TONE: cheio de harmônicos
+            setP (b, ParamID::drvOn, 1); setP (b, ParamID::drive, 12);
+            b.prepareToPlay (48000.0, 512);
+            auto& mach = b.getMachine();
+            setP (mach, "drumsOn", 0.0f); setP (mach, "keysOn", 0.0f);
+            check (mach.apvts.getRawParameterValue ("eq2k")->load() < 0.5f || round == 1, "EQ -2k comeca desligado");
+            if (round == 1) setP (mach, "eq2k", 1.0f);
+            setP (mach, "preview", 1.0f);
+            static std::pair<double, double> offRes;
+            const auto r = measure (b, 48000.0, 300);
+            if (round == 0) offRes = r;
+            else
+                check (r.first - r.second < -60.0 && offRes.first - r.first > 20.0 && offRes.second - r.second < 3.0,
+                       "MRB-69: com EQ -2k o que sobra acima de 3 kHz fica " + juce::String (r.first - r.second, 1)
+                       + " dB abaixo do total (desligado: " + juce::String (offRes.first - offRes.second, 1) + " dB) e o grave fica");
+        }
+        {   // a machine sozinha (MRBM-69 / MRM-0420), com o som interno
+            double cut[2] {};
+            for (int round = 0; round < 2; ++round)
+            {
+                BassMachineProcessor m;
+                setP (m, "timbre", (float) mbm::SuperTone); setP (m, "drumsOn", 0.0f); setP (m, "keysOn", 0.0f);
+                setP (m, "eq2k", round == 1 ? 1.0f : 0.0f); setP (m, "preview", 1.0f);
+                m.prepareToPlay (48000.0, 512);
+                const auto rr = measure (m, 48000.0, 300); cut[round] = rr.first - rr.second;
+            }
+            check (cut[1] < -70.0 && cut[0] - cut[1] > 20.0, "BASS MACHINE sozinha: com EQ -2k o que sobra acima de 3 kHz fica "
+                   + juce::String (cut[1], 1) + " dB abaixo do total (desligado: " + juce::String (cut[0], 1) + " dB)");
+        }
+    }
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");
     return failures == 0 ? 0 : 1;
 }

@@ -268,6 +268,7 @@ private:
     Knob inGain, tone, drive, volume;
     Knob reps;
     Toggle sound, drumsOn, keysOn;
+    Toggle eq2k;   // EQ: corta tudo acima de 2 kHz no baixo
     Knob drumVol, keysVol;
     std::unique_ptr<CounterWindow> idea;
     std::unique_ptr<PlayButton> play;

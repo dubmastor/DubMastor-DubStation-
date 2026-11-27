@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
+#include "../../ReggaeBassMachine/Source/HighCut2k.h"
 #include <array>
 #include <atomic>
 #include <memory>
@@ -118,6 +119,7 @@ private:
     void handleAsyncUpdate() override;    // timbre escolhido na BASS MACHINE -> ajustes de fábrica do oscilador
     std::unique_ptr<BassMachineProcessor> machine;
     juce::AudioBuffer<float> machineBuf;
+    mbm::HighCut2k machineCut;   // botão EQ da BASS MACHINE: corta tudo acima de 2 kHz no baixo
     juce::MidiBuffer machineMidi;
     std::atomic<int> machineTimbre { -1 };
     int lastMachineTimbre = -1;

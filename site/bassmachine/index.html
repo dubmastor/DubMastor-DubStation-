@@ -185,6 +185,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
     <div class="slider"><span>BPM</span><input type="range" id="bpm" min="50" max="180" step="1"><output id="o-bpm"></output></div>
     <div class="lbl">TIMBRE · MRDBI-07</div>
     <div class="btns c3" id="timbreBtns"></div>
+    <div class="row" style="margin:6px 0"><button class="toggle" id="eq2k" title="EQ: corta tudo acima de 2 kHz no baixo"><i></i>EQ -2k</button></div>
     <div class="lbl">BATERIA DE ACOMPANHAMENTO</div>
     <div class="row" style="margin-bottom:6px"><button class="toggle" id="drumsOn"><i></i>BATERIA</button></div>
     <div class="btns c4" id="drumBtns"></div>
@@ -226,7 +227,7 @@ const DEFAULTS = {
   style: 0, seed: 1, density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7,
   chords: [{ root: 9, quality: 1, dur: 0, on: true }, { root: 2, quality: 1, dur: 0, on: true },
            { root: 4, quality: 3, dur: 1, on: false }, { root: 7, quality: 0, dur: 1, on: false }],
-  bpm: 75, timbre: 0, drumsOn: false, drumStyle: 1, drumVol: .7, volume: .75, reps: 1,
+  bpm: 75, timbre: 0, eq2k: false, drumsOn: false, drumStyle: 1, drumVol: .7, volume: .75, reps: 1,
 };
 function load() { try { return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(localStorage.getItem('mrbm69') || '{}')); } catch (e) { return JSON.parse(JSON.stringify(DEFAULTS)); } }
 const st = load();
@@ -295,6 +296,7 @@ refreshers.push(buttons($('drumBtns'), M.DrumStyles, () => st.drumStyle, i => { 
 refreshers.push(buttons($('hatBtns'), ['1/8', '1/16'], () => (st.hat16 ? 1 : 0), i => { st.hat16 = i === 1; save(); publish(); }));
 refreshers.push(buttons($('repBtns'), ['1x', '2x', '4x', '8x'], () => st.reps, i => { st.reps = i; save(); }));
 $('drumsOn').onclick = () => { st.drumsOn = !st.drumsOn; save(); publish(); refresh(); };
+$('eq2k').onclick = () => { st.eq2k = !st.eq2k; save(); engine.setEq(); refresh(); };
 
 const fmtPct = v => Math.round(v * 100) + '%';
 const noteName = n => M.ROOT_NAMES[n % 12] + (Math.floor(n / 12) - 1);
@@ -376,6 +378,7 @@ function refresh() {
   $('idea').textContent = String(st.seed).padStart(3, '0');
   $('tagline').textContent = M.taglines[st.style];
   $('drumsOn').classList.toggle('on', st.drumsOn);
+  $('eq2k').classList.toggle('on', st.eq2k);
   $('timbreName').textContent = TIMBRES[st.timbre];
 }
 $('ideaDown').onclick = () => { st.seed = Math.max(1, st.seed - 1); changedGen(); };
@@ -462,7 +465,7 @@ fillRiddimSelects(); showRiddim();
 
 // ---------------------------------------------------------------- som (timbres do MRDBI-07, bateria sintetizada)
 const engine = (() => {
-  let ctx = null, bassBus, bassAn, drumBus, mix, vol, noiseBuf, waves, curves;
+  let ctx = null, bassBus, bassAn, drumBus, mix, vol, noiseBuf, waves, curves, eqDry, eqWet;
   let playing = false, anchorTime = 0, anchorBeat = 0, scheduledTo = 0, timer = 0;
   const midiHz = n => 440 * Math.pow(2, (n - 69) / 12);
   const curve = (fn, n = 2048) => { const c = new Float32Array(n); for (let i = 0; i < n; i++) c[i] = fn(i / (n - 1) * 2 - 1); return c; };
@@ -479,9 +482,16 @@ const engine = (() => {
     const trim = g(Math.pow(10, -5 / 20));
     bassAn = ctx.createAnalyser(); bassAn.fftSize = 2048;
     bassBus.connect(makeup).connect(comp).connect(clip).connect(trim);
-    trim.connect(bassAn);
     drumBus = g(1); mix = g(1); vol = g(st.volume);
-    trim.connect(mix); drumBus.connect(mix);
+    // botão EQ -2k: passa-baixa Butterworth de 16ª ordem (8 biquads, quina em 1,8 kHz), igual ao HighCut2k.h do plugin
+    eqDry = g(st.eq2k ? 0 : 1); eqWet = g(st.eq2k ? 1 : 0);
+    let node = trim;
+    for (const q of [5.10114862, 1.7224471, 1.06067769, 0.78815462, 0.64682178, 0.56694403, 0.52249861, 0.50241929]) {
+      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1800; f.Q.value = 20 * Math.log10(q); node.connect(f); node = f;
+    }
+    trim.connect(eqDry); node.connect(eqWet);
+    const bassOut = g(1); eqDry.connect(bassOut); eqWet.connect(bassOut);
+    bassOut.connect(bassAn); bassOut.connect(mix); drumBus.connect(mix);
     const safety = ctx.createDynamicsCompressor(); safety.threshold.value = -2; safety.ratio.value = 12; safety.attack.value = .002; safety.release.value = .1;
     mix.connect(vol).connect(safety).connect(ctx.destination);
     // ondas: BASS (senoide + harm. 2 15 % + harm. 3 8 %), senoide pura (808) e SUPER TONE (quadrada suave)
@@ -591,6 +601,7 @@ const engine = (() => {
     isPlaying: () => playing,
     tempoChanged() { if (!ctx || !playing) return; const b = beatNow(); anchorBeat = b; anchorTime = ctx.currentTime; scheduledTo = Math.max(scheduledTo, b); },
     position() { if (!playing || line.loopBeats <= 0) return -1; const b = beatNow(); return b < 0 ? -1 : b % line.loopBeats; },
+    setEq() { if (!ctx) return; const t = ctx.currentTime; eqDry.gain.setTargetAtTime(st.eq2k ? 0 : 1, t, .007); eqWet.gain.setTargetAtTime(st.eq2k ? 1 : 0, t, .007); },
     setVolume() { if (vol) vol.gain.setTargetAtTime(st.volume, ctx.currentTime, .02); },
     analyser: () => bassAn,
   };
