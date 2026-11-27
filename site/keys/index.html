@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2e1a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23ffa928%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%232e1a0d%27/%3E%3C/svg%3E">
-<title>Mastor Reggae Keys MRK-80 3.3 — Dub Station</title>
+<title>Mastor Reggae Keys MRK-80 3.4 — Dub Station</title>
 <meta name="description" content="Mastor Reggae Keys MRK-80 no celular: toque o piano M1 na tela, monte o riddim na CHORD MACHINE e baixe o MIDI para a sua DAW.">
 <style>
 :root{
@@ -59,6 +59,14 @@ h1{margin:0;font-size:clamp(14px,3.4vw,25px);letter-spacing:.16em;font-weight:80
 .keys .on.k{color:var(--amber);transform:translateY(3px)}
 .keys .on::after{content:"";position:absolute;bottom:20px;width:7px;height:7px;border-radius:50%;background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 7px var(--amber)}
 .keys .k.on::after{bottom:14px}
+.keys .hint{outline:1.5px solid rgba(234,189,18,.7);outline-offset:-2px}
+.keys .h1{outline:2.5px solid #eabd12}
+.keys .deg{position:absolute;left:50%;transform:translateX(-50%);bottom:21px;font-size:8.5px;line-height:13px;padding:0 3px;border-radius:3px;background:#2b241d;color:#eabd12;border:1px solid #eabd12;white-space:nowrap;pointer-events:none}
+.keys .k .deg{bottom:auto;top:6px;font-size:7.5px;padding:0 2px}
+.keys .h1 .deg{background:#eabd12;color:#2b241d;border-color:#2b241d}
+.keys .w.on.hint::after{bottom:37px}
+.keys .lit.w{background:linear-gradient(180deg,#8fe0a8,#2fa45c);box-shadow:inset 0 0 0 2px #0b6b30,0 0 10px rgba(11,138,60,.6);color:#04361a}
+.keys .lit.k{background:linear-gradient(180deg,#5fcf86,#06501f);color:#fff;box-shadow:0 0 9px rgba(11,138,60,.8)}
 .stepper{display:flex;align-items:center;gap:6px;justify-content:center}
 .stepper button{width:44px;height:42px;border:0;border-radius:5px;background:var(--label);color:var(--amber);font-size:18px;font-weight:800;cursor:pointer}
 .stepper button:disabled{color:rgba(239,229,204,.2)}
@@ -230,11 +238,12 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}header .flag{dis
 
 <script src="../chords/engine.js"></script>
 <script src="../riddimbank.js"></script>
+<script src="../cadence.js"></script>
 <script>
 'use strict';
 const M = window.MRCM;
 const $ = (id) => document.getElementById(id);
-const VERSION = '3.3';
+const VERSION = '3.4';
 const CHORD_COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
 // ---------------------------------------------------------------- estado (mesmos padrões do plugin)
@@ -514,6 +523,7 @@ const audio = (() => {
         if (t < from) continue;
         const when = beatTime + (t - beatPos) * spb, len = e.length * spb;
         play(when, e.note, e.velocity, len);
+        lit.push({ slot: e.slot, pc: e.note % 12, on: when, off: when + Math.max(len, 0.1) });   // pinta a tecla da tônica
       }
     }
     if (st.gtr) for (const gr of skankGroups(active)) {
@@ -541,13 +551,22 @@ const audio = (() => {
     beatTime += (toBeat - beatPos) * spb; beatPos = toBeat;
     const now = ctx.currentTime; voices = voices.filter((v) => v.end > now);
   }
+  let lit = [];   // notas agendadas: { slot, pc, on, off } em segundos do AudioContext
+  function litNow() {
+    const masks = [0, 0, 0, 0];
+    if (!ctx || !playing) return masks;
+    const now = ctx.currentTime;
+    lit = lit.filter((x) => x.off > now);
+    for (const x of lit) if (x.on <= now && x.slot >= 0 && x.slot < 4) masks[x.slot] |= 1 << x.pc;
+    return masks;
+  }
   function start() {
     ensure(); if (ctx.state === 'suspended') ctx.resume();
     active = loop; pending = null; beatPos = 0; beatTime = ctx.currentTime + 0.08; organHeldUntil = 0; playing = true;
     clearInterval(timer); timer = setInterval(tick, 25); tick();
   }
   function stop() {
-    playing = false; clearInterval(timer);
+    playing = false; clearInterval(timer); lit = [];
     if (ctx) for (const v of voices) { try { v.g.gain.cancelScheduledValues(ctx.currentTime); v.g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.02); } catch (e) {} }
     voices = [];
   }
@@ -564,7 +583,7 @@ const audio = (() => {
     organHeldUntil = Math.min(organHeldUntil, t);
   }
   return {
-    start, stop, isPlaying: () => playing, liveOn, liveOff,
+    start, stop, isPlaying: () => playing, liveOn, liveOff, litNow,
     unlock() { ensure(); if (ctx.state === 'suspended') ctx.resume(); return ctx; },
     setLoop(l) { if (playing) pending = l; else active = l; },
     setLevels() { if (!ctx) return; const t = ctx.currentTime; pianoGain.gain.setTargetAtTime(st.pianoLvl / 100, t, 0.03); organGain.gain.setTargetAtTime(st.organLvl / 100, t, 0.03);
@@ -640,14 +659,39 @@ function buildChords() {
       b.style.left = `calc(${k * ww}% + 1px)`; b.style.width = `calc(${ww}% - 2px)`; keys.appendChild(b); });
     BLACK.forEach(([n, after]) => { const b = document.createElement('button'); b.className = 'k'; b.dataset.n = n; b.textContent = M.ROOTS[n];
       b.style.left = `calc(${(after + 1) * ww}% - ${ww * 0.31}%)`; b.style.width = `${ww * 0.62}%`; keys.appendChild(b); });
-    keys.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; s.root = +b.dataset.n; changed(); };
-    ['MAIOR', 'MENOR'].forEach((t, q) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t; b.onclick = () => { s.quality = q; changed(); }; $('q' + i).appendChild(b); });
-    ['AUTO', 'FUND', '1ª', '2ª'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t; b.onclick = () => { s.inv = k - 1; changed(); }; $('inv' + i).appendChild(b); });
+    // 3.4: ouvir o acorde — tônica, maior/menor e inversão tocam o acorde enquanto o dedo/mouse estiver apertado
+    keys.onpointerdown = (e) => { const b = e.target.closest('button'); if (!b) return; e.preventDefault(); s.root = +b.dataset.n;
+      const h = hintsFor(i).find((x) => x.root === s.root); if (h) s.quality = h.minor;   // tecla sugerida já escolhe maior/menor
+      changed(); auditionStart(i); };
+    ['MAIOR', 'MENOR'].forEach((t, q) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t;
+      b.onpointerdown = (e) => { e.preventDefault(); s.quality = q; changed(); auditionStart(i); }; $('q' + i).appendChild(b); });
+    ['AUTO', 'FUND', '1ª', '2ª'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t;
+      b.onpointerdown = (e) => { e.preventDefault(); s.inv = k - 1; changed(); auditionStart(i); }; $('inv' + i).appendChild(b); });
     $('dDn' + i).onclick = () => { s.dur = Math.max(0, s.dur - 1); changed(); };
     $('dUp' + i).onclick = () => { s.dur = Math.min(M.DURATIONS.length - 1, s.dur + 1); changed(); };
     if (i > 0) $('on' + i).onclick = () => { s.on = !s.on; changed(); };
   });
 }
+
+// ---------------------------------------------------------------- próximas harmonias (cadências do reggae, ../cadence.js)
+function hintsFor(i) {
+  if (i === 0) return [];
+  let p = i - 1; while (p > 0 && !st.slots[p].on) p--;
+  const t = st.slots[0], q = st.slots[p];
+  return cadenceHints(t.root, t.quality, q.root, q.quality);
+}
+
+// ---------------------------------------------------------------- ouvir o acorde (mesmas notas do loop: inversão, registro e duas mãos)
+let auditionGains = [];
+function auditionStop() { auditionGains.forEach((g) => audio.liveOff(g)); auditionGains = []; }
+function auditionStart(i) {
+  auditionStop();
+  const slots = slotsForEngine();
+  if (slots[i].beats <= 0) slots[i].beats = 4;   // cartão OFF também pode ser ouvido
+  const left = M.voiceProgression(slots, st.center).notes[i] || [];
+  auditionGains = [...left, ...left.map((n) => n + 12)].map((n) => audio.liveOn(n));
+}
+['pointerup', 'pointercancel', 'blur'].forEach((ev) => window.addEventListener(ev, auditionStop));
 
 function slider(id, fmt, onChange) {
   const el = $(id); el.value = st[id];
@@ -666,7 +710,14 @@ function render() {
     const d = $('disp' + i);
     d.textContent = on ? `${M.ROOTS[s.root]} ${s.quality ? 'MENOR' : 'MAIOR'}  ·  ${M.INVERSIONS[v.used[i]]}` : 'OFF';
     d.classList.toggle('off', !on);
-    $('keys' + i).querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.n === s.root));
+    const hints = hintsFor(i);
+    $('keys' + i).querySelectorAll('button').forEach((b) => {
+      b.classList.toggle('on', +b.dataset.n === s.root);
+      const h = hints.find((x) => x.root === +b.dataset.n);
+      b.classList.toggle('hint', !!h); b.classList.toggle('h1', !!h && h.rank === 1);
+      let tag = b.querySelector('.deg'); if (h && !tag) { tag = document.createElement('span'); tag.className = 'deg'; b.appendChild(tag); }
+      if (tag) { if (h) tag.textContent = h.label; else tag.remove(); }
+    });
     [...$('q' + i).children].forEach((b, q) => b.classList.toggle('on', q === s.quality));
     [...$('inv' + i).children].forEach((b, k) => { b.classList.toggle('on', k === s.inv + 1); b.classList.toggle('sug', k === v.suggested[i] + 1); });
     $('dVal' + i).innerHTML = `<b>${M.DURATIONS[s.dur].name}</b><small>${s.dur <= 1 ? 'COMPASSO' : 'COMPASSOS'}</small>`;
@@ -854,6 +905,12 @@ render();
   const h = $('head'), b = audio.playhead(), L = audio.loopBeats();
   if (b >= 0 && L > 0) { h.style.display = 'block'; h.style.left = `calc(5px + ${(b / L) * 100}% - ${(b / L) * 10}px)`; }
   else h.style.display = 'none';
+  // notas tocando agora: pintadas de verde no teclado da tônica de cada cartão
+  audio.litNow().forEach((mask, i) => {
+    const k = $('keys' + i); if (!k || k.dataset.lit == mask) return;
+    k.dataset.lit = mask;
+    k.querySelectorAll('button').forEach((b) => b.classList.toggle('lit', ((mask >> +b.dataset.n) & 1) === 1));
+  });
   requestAnimationFrame(anim);
 })();
 </script>

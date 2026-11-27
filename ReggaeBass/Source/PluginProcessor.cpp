@@ -180,6 +180,8 @@ void DubBassAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     machine->setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
     machine->prepareToPlay (sampleRate, samplesPerBlock);
     machineBuf.setSize (2, juce::jmax (1, samplesPerBlock));
+    machineCut.setMode (machineCutMode());
+    machineCut.prepare (sampleRate);
     keyboardState.reset();
     const int  nCh   = juce::jlimit (1, 2, getTotalNumOutputChannels());
     const auto block = (juce::uint32) juce::jmax (1, samplesPerBlock);
@@ -433,7 +435,11 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const bool machineHeard = apvts.getRawParameterValue (ParamID::machineOn)->load() > 0.5f
                            || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
     if (machineHeard) midi.addEvents (machineMidi, 0, numSamples, 0);
-    else              machineBuf.clear();
+    else
+    {
+        machineBuf.clear();
+        midi.addEvents (machine->getAuditionMidi(), 0, numSamples, 0);   // ouvir a tônica com a BASS MACHINE desligada
+    }
     {   // timbre escolhido na BASS MACHINE (ou por um riddim): leva os ajustes de fábrica do oscilador
         const int t = juce::roundToInt (machine->apvts.getRawParameterValue ("timbre")->load());
         if (t != machineTimbre.load()) { machineTimbre.store (t); triggerAsyncUpdate(); }
@@ -502,6 +508,10 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
             dest[(size_t) ch].store (juce::Decibels::gainToDecibels (buffer.getMagnitude (src, 0, numSamples), -100.0f));
         }
     };
+
+    // 5b) EQ da BASS MACHINE: -2k ou -1k, deixa só os graves (depois da saturação, antes do maximizer)
+    machineCut.setMode (machineCutMode());
+    machineCut.process (buffer, numSamples);
 
     // 6) Maximizer (com bypass)
     storePeaks (inPeakDb);
@@ -584,4 +594,9 @@ void DubBassAudioProcessor::handleAsyncUpdate()
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DubBassAudioProcessor();
+}
+
+int DubBassAudioProcessor::machineCutMode() const
+{
+    return juce::roundToInt (machine->apvts.getRawParameterValue ("eqCut")->load());
 }

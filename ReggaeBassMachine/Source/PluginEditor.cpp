@@ -1,6 +1,7 @@
 #include "PluginEditor.h"
 #include "RiddimPresets.h"
 #include "../../RiddimBank/Source/RiddimBankMenu.h"
+#include "../../ReggaeChordMachine/Source/CadenceHints.h"
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
@@ -201,7 +202,7 @@ void BassLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton& b
 
     g.setColour (colours::cream.withAlpha (on ? 1.0f : 0.65f));
     g.setFont (stencil (11.0f, 0.08f));
-    g.drawText (b.getButtonText(), r.withTrimmedLeft (22), juce::Justification::centred);
+    g.drawFittedText (b.getButtonText(), r.withTrimmedLeft (20).toNearestInt(), juce::Justification::centred, 1, 0.6f);   // botão estreito: letra menor
 }
 
 // EXPORTAR / NOVA IDEIA: tampa verde grande de botão de pedal (igual ao THROW do Big Knob)
@@ -265,7 +266,10 @@ int NoteKeys::keyAt (juce::Point<float> p) const
 void NoteKeys::mouseDown (const juce::MouseEvent& e)
 {
     const int k = keyAt (e.position);
-    if (k >= 0) select (k);
+    if (k < 0) return;
+    select (k);
+    if (hints[(size_t) k].rank > 0 && onHintQuality) onHintQuality (hints[(size_t) k].minor);
+    pressed();   // a tônica soa no baixo enquanto o botão estiver apertado
 }
 
 void NoteKeys::paint (juce::Graphics& g)
@@ -279,9 +283,11 @@ void NoteKeys::paint (juce::Graphics& g)
     auto drawKey = [&] (int n)
     {
         const bool black = isBlack (n), on = n == active, over = n == hover;
+        const bool lit = (playing >> n) & 1u;                   // nota da linha tocando agora no play
         auto r = keyRect (n).reduced (black ? 0.0f : 1.0f, 0.0f);
         r = r.withTrimmedTop (on ? 3.0f : 0.0f);               // tecla afundada
         const float rad = 3.0f;
+        const juce::Colour jamGreen (0xff0b8a3c);
 
         if (! black)
         {
@@ -301,7 +307,16 @@ void NoteKeys::paint (juce::Graphics& g)
                 g.setColour (colours::amber.withAlpha (0.18f));
                 g.fillRoundedRectangle (r, rad);
             }
-            g.setColour (on ? juce::Colour (0xff6b3f05) : colours::inkSoft);
+            if (lit)
+            {
+                juce::ColourGradient gl (jamGreen.brighter (0.9f).withAlpha (0.75f), r.getCentreX(), r.getY(),
+                                         jamGreen.withAlpha (0.45f), r.getCentreX(), r.getBottom(), false);
+                g.setGradientFill (gl);
+                g.fillRoundedRectangle (r, rad);
+                g.setColour (jamGreen.darker (0.2f));
+                g.drawRoundedRectangle (r.reduced (1.0f), rad, 2.0f);
+            }
+            g.setColour (lit ? juce::Colour (0xff04361a) : on ? juce::Colour (0xff6b3f05) : colours::inkSoft);
             g.setFont (stencil (9.5f, 0.0f));
             g.drawText (mbm::rootName (n), r.withTrimmedBottom (9.0f).withTop (r.getBottom() - 28.0f), juce::Justification::centred);
         }
@@ -315,6 +330,29 @@ void NoteKeys::paint (juce::Graphics& g)
             g.fillRoundedRectangle (r, rad);
             g.setColour (juce::Colours::white.withAlpha (on ? 0.05f : 0.14f));
             g.fillRoundedRectangle (r.reduced (3.0f, 2.0f).withHeight (r.getHeight() * 0.55f), 2.0f);
+            if (lit)
+            {
+                juce::ColourGradient gl (jamGreen.brighter (0.6f), r.getCentreX(), r.getY(),
+                                         jamGreen.darker (0.5f), r.getCentreX(), r.getBottom(), false);
+                g.setGradientFill (gl);
+                g.fillRoundedRectangle (r.reduced (1.0f), rad);
+            }
+        }
+
+        // próxima harmonia sugerida: contorno dourado + grau (IV, V, IIm, bVII...)
+        if (const auto& h = hints[(size_t) n]; h.rank > 0)
+        {
+            const auto gold = juce::Colour (0xffeabd12);
+            g.setColour (gold.withAlpha (h.rank == 1 ? 1.0f : h.rank == 2 ? 0.8f : 0.6f));
+            g.drawRoundedRectangle (r.reduced (1.5f), rad, h.rank == 1 ? 2.6f : 1.6f);
+            auto pill = black ? juce::Rectangle<float> (r.getWidth() - 2.0f, 13.0f).withCentre ({ r.getCentreX(), r.getY() + 16.0f })
+                              : juce::Rectangle<float> (juce::jmin (r.getWidth() - 4.0f, 34.0f), 14.0f).withCentre ({ r.getCentreX(), r.getBottom() - 38.0f });
+            g.setColour (h.rank == 1 ? gold : juce::Colour (0xff2b241d));
+            g.fillRoundedRectangle (pill, 3.0f);
+            g.setColour (h.rank == 1 ? juce::Colour (0xff2b241d) : gold);
+            g.drawRoundedRectangle (pill, 3.0f, 1.0f);
+            g.setFont (stencil (h.label.length() > 3 ? 7.5f : 9.0f, 0.0f));
+            g.drawText (h.label, pill, juce::Justification::centred);
         }
 
         if (on)
@@ -337,6 +375,7 @@ void QualitySwitch::mouseDown (const juce::MouseEvent& e)
 {
     const int i = juce::jlimit (0, mbm::NumQualities - 1, (int) (e.position.x / (float) getWidth() * (float) mbm::NumQualities));
     select (i);
+    pressed();
 }
 
 void QualitySwitch::paint (juce::Graphics& g)
@@ -986,6 +1025,23 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
         m.keys = std::make_unique<NoteKeys>      (*proc.apvts.getParameter ("root" + n));
         m.qual = std::make_unique<QualitySwitch> (*proc.apvts.getParameter ("qual" + n));
         m.dur  = std::make_unique<CounterWindow> (*proc.apvts.getParameter ("dur" + n), CounterWindow::Duration);
+        if (i > 0)   // tecla sugerida (cadência) já escolhe maior/menor; com 7 ou m7 escolhido, fica 7 ou m7
+            m.keys->onHintQuality = [this, n] (int minor)
+            {
+                if (auto* q = proc.apvts.getParameter ("qual" + n))
+                {
+                    const bool seventh = juce::roundToInt (q->convertFrom0to1 (q->getValue())) >= mbm::Dom7;
+                    const int v = seventh ? (minor ? mbm::Min7 : mbm::Dom7) : (minor ? mbm::Min : mbm::Maj);
+                    q->beginChangeGesture();
+                    q->setValueNotifyingHost (q->convertTo0to1 ((float) v));
+                    q->endChangeGesture();
+                }
+            };
+        for (ParamControl* pc : { (ParamControl*) m.keys.get(), (ParamControl*) m.qual.get() })   // ouvir a tônica ao escolher
+        {
+            pc->onPress   = [this, i] { proc.auditionStart (i); };
+            pc->onRelease = [this]    { proc.auditionStop(); };
+        }
         addAndMakeVisible (*m.keys);
         addAndMakeVisible (*m.qual);
         addAndMakeVisible (*m.dur);
@@ -1045,6 +1101,9 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     for (auto* k : { &tone, &drive, &volume })
         k->slider.textFromValueFunction = percent;
     setupToggle (sound, "sound", "SOM INTERNO");
+    for (auto* b : { &eq2kBtn, &eq1kBtn }) { b->setClickingTogglesState (false); addAndMakeVisible (*b); }
+    eq2kBtn.onClick = [this] { setEqCut (eq2kBtn.getToggleState() ? 0 : mbm::BassCut::Cut2k); };
+    eq1kBtn.onClick = [this] { setEqCut (eq1kBtn.getToggleState() ? 0 : mbm::BassCut::Cut1k); };
     setupToggle (drumsOn, "drumsOn", "BATERIA");
     setupToggle (keysOn, "keysOn", "TECLADO");
     setupKnob (drumVol, "drumVol", "VOLUME");
@@ -1131,8 +1190,57 @@ void BassMachinePanel::exportMidi()
                           });
 }
 
+// Cada acorde (do 2 ao 4) destaca as próximas harmonias que combinam com o acorde ligado antes dele,
+// na tonalidade do ACORDE 1, conforme as cadências das músicas do banco de riddims (7 conta como maior, m7 como menor).
+void BassMachinePanel::updateHints()
+{
+    auto val = [this] (const char* id, int i) { return juce::roundToInt (proc.apvts.getRawParameterValue (id + juce::String (i))->load()); };
+    auto isMinor = [] (int q) { return q == mbm::Min || q == mbm::Min7 ? 1 : 0; };
+    const int tonic = val ("root", 0), tonicMinor = isMinor (val ("qual", 0));
+    for (int i = 1; i < BassMachineProcessor::numSlots; ++i)
+    {
+        int prev = i - 1;
+        while (prev > 0 && ! slotEnabled (prev)) --prev;
+        std::array<NoteKeys::KeyHint, 12> h {};
+        for (const auto& s : cadence::suggest (tonic, tonicMinor, val ("root", prev), isMinor (val ("qual", prev))))
+            h[(size_t) s.root] = { s.minor, s.rank, juce::String (cadence::degreeName (tonic, s.root, s.minor)) };
+        mods[(size_t) i].keys->setHints (h);
+    }
+}
+
+// EQ da BASS MACHINE: -2k ou -1k (o mesmo botão de novo volta para SEM CORTE)
+void BassMachinePanel::setEqCut (int mode)
+{
+    if (auto* p = proc.apvts.getParameter ("eqCut"))
+    {
+        p->beginChangeGesture();
+        p->setValueNotifyingHost (p->convertTo0to1 ((float) mode));
+        p->endChangeGesture();
+    }
+    timerCallback();
+}
+
 void BassMachinePanel::timerCallback()
 {
+    {
+        const int cut = juce::roundToInt (proc.apvts.getRawParameterValue ("eqCut")->load());
+        eq2kBtn.setToggleState (cut == mbm::BassCut::Cut2k, juce::dontSendNotification);
+        eq1kBtn.setToggleState (cut == mbm::BassCut::Cut1k, juce::dontSendNotification);
+    }
+    updateHints();
+    for (int i = 0; i < BassMachineProcessor::numSlots; ++i)   // pinta as notas da linha que estão tocando (cada tecla fica ~100 ms acesa)
+    {
+        const auto now = proc.takePlayingMask (i);
+        juce::uint32 mask = 0;
+        auto& hold = litHold[(size_t) i];
+        for (int n = 0; n < 12; ++n)
+        {
+            if ((now >> n) & 1u) hold[(size_t) n] = 3;
+            else if (hold[(size_t) n] > 0) --hold[(size_t) n];
+            if (hold[(size_t) n] > 0) mask |= 1u << n;
+        }
+        mods[(size_t) i].keys->setPlaying (mask);
+    }
     for (int i = 0; i < BassMachineProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);
@@ -1650,7 +1758,11 @@ void BassMachinePanel::resized()
         for (auto* k : { &inGain, &tone, &drive, &volume })
             placeKnob (*k, knobs.removeFromLeft (kw));
         a.removeFromTop (2);
-        sound.button.setBounds (a.removeFromTop (28).reduced (50, 0));
+        auto row = a.removeFromTop (28);
+        const int w3 = row.getWidth() / 4;
+        eq1kBtn.setBounds (row.removeFromRight (w3).reduced (2, 0));
+        eq2kBtn.setBounds (row.removeFromRight (w3).reduced (2, 0));
+        sound.button.setBounds (row.reduced (2, 0));
     }
     scope.setBounds (scopePanel.reduced (8, 0).withTrimmedTop (16).withTrimmedBottom (6));
     {

@@ -10,6 +10,7 @@
 #include "../../ReggaeBassMachine/Source/PluginProcessor.h"   // aba BASS MACHINE (MRBM-69)
 #include "../../ReggaeBassMachine/Source/RiddimPresets.h"
 #include "../../ReggaeBassMachine/Source/AccompEngine.h"
+#include "../../ReggaeChordMachine/Source/CadenceHints.h"
 #include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 static int failures = 0;
@@ -189,6 +190,23 @@ int main (int argc, char** argv)
     juce::FileOutputStream os (png);
     juce::PNGImageFormat fmt;
     check (os.openedOk() && fmt.writeImageToStream (img, os), "interface salva em " + png.getFullPathName());
+    {   // foto do EQ com o corte do botão EQ -2k da BASS MACHINE desenhado na tela verde
+        setP (p.getMachine(), "eqCut", 1.0f);
+        for (int f = 0; f < 6; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+        auto imgEq = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale * (float) ed->getChildComponent (0)->getWidth() / (float) ed->getWidth());
+        auto pngEq = dir.getChildFile ("interface_eq2k.png");
+        pngEq.deleteFile();
+        juce::FileOutputStream osEq (pngEq);
+        check (osEq.openedOk() && juce::PNGImageFormat().writeImageToStream (imgEq, osEq), "interface com EQ -2k salva");
+        setP (p.getMachine(), "eqCut", 2.0f);
+        for (int f = 0; f < 6; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+        auto img1k = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale * (float) ed->getChildComponent (0)->getWidth() / (float) ed->getWidth());
+        auto png1k = dir.getChildFile ("interface_eq1k.png");
+        png1k.deleteFile();
+        juce::FileOutputStream os1k (png1k);
+        check (os1k.openedOk() && juce::PNGImageFormat().writeImageToStream (img1k, os1k), "interface com EQ -1k salva");
+        setP (p.getMachine(), "eqCut", 0.0f);
+    }
     // segunda foto: modo 808 com o preset MÉDIO (as teclas de preset aparecem no envelope)
     setP (p, ParamID::mode, 1); setP (p, ParamID::attack, 1.0f); setP (p, ParamID::decay, 750.0f);
     setP (p, ParamID::release, 220.0f); setP (p, ParamID::pitchTime, 70.0f);
@@ -202,6 +220,7 @@ int main (int argc, char** argv)
     {   // terceira foto: aba BASS MACHINE (o MRBM-69 inteiro dentro do Mastor Reggae Bass MRB-69)
         p.apvts.state.setProperty ("tab", 1, nullptr);
         p.getMachine().loadRiddim (0);
+        setP (p.getMachine(), "eqCut", 2.0f);   // foto com o EQ -1k aceso
         std::unique_ptr<juce::AudioProcessorEditor> edm (p.createEditor());
         for (int f = 0; f < 10; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
         auto imgM = edm->createComponentSnapshot (edm->getLocalBounds(), true, scale * 1300.0f / (float) edm->getWidth());
@@ -209,6 +228,7 @@ int main (int argc, char** argv)
         pngM.deleteFile();
         juce::FileOutputStream osM (pngM);
         check (osM.openedOk() && fmt.writeImageToStream (imgM, osM), "interface BASS MACHINE salva em " + pngM.getFullPathName());
+        setP (p.getMachine(), "eqCut", 0.0f);
         p.apvts.state.setProperty ("tab", 0, nullptr);
     }
 
@@ -222,6 +242,89 @@ int main (int argc, char** argv)
         int on = 0;
         for (int i = 0; i < riddimbank::numEntries; ++i) on += riddimbank::active (i, true);
         check (on == 160, "banco: só os " + juce::String (on) + " riddims com baixo original ficam ativos");
+    }
+    {   // 2.2: próximas harmonias (cadências do reggae) na BASS MACHINE — mesmo cálculo do MRK-80
+        auto h = cadence::suggest (9, 1, 9, 1);   // Am → G (bVII) primeiro
+        check (! h.empty() && h[0].root == 7 && h[0].minor == 0 && h.size() == 3, "cadencia: depois de Am a mais comum e G (bVII)");
+        h = cadence::suggest (0, 0, 0, 0);        // C → F (IV)
+        check (! h.empty() && h[0].root == 5 && h[0].minor == 0, "cadencia: depois de C a mais comum e F (IV)");
+    }
+    {   // 2.2: teclado da tônica da BASS MACHINE igual ao da CHORD MACHINE (ouvir ao apertar, notas pintadas no play)
+        DubBassAudioProcessor b;
+        b.prepareToPlay (48000.0, 512);
+        auto& mach = b.getMachine();
+        setP (mach, "drumsOn", 0.0f); setP (mach, "keysOn", 0.0f);
+        auto run = [&] (int n) { float pk = 0.0f; for (int i = 0; i < n; ++i) { juce::AudioBuffer<float> buf (2, 512); juce::MidiBuffer mm; b.processBlock (buf, mm); pk = juce::jmax (pk, buf.getMagnitude (0, 0, 512)); } return pk; };
+        check (run (20) < 1.0e-4f, "ouvir tonica: silencio antes do clique");
+        setP (mach, "root1", 7.0f);                 // acorde 2 = G
+        mach.auditionStart (1);
+        const float held = run (30);
+        const int note = juce::roundToInt (b.currentNote.load());
+        const int base = juce::roundToInt (mach.apvts.getRawParameterValue ("base")->load());
+        check (held > 0.01f && note % 12 == 7 && note >= base && note < base + 12,
+               "ouvir tonica: G soa no baixo, no REGISTRO da linha, com a BASS MACHINE desligada (nota " + juce::String (note) + ")");
+        mach.auditionStop();
+        run (4);
+        const float tail = run (200);
+        check (tail < held * 0.2f, "ouvir tonica: soltar o mouse solta a nota");
+
+        setP (mach, "preview", 1.0f);               // play: o acorde 1 acende a tônica dele (e as notas de passagem que ele tocar)
+        juce::uint32 seen[4] {};
+        for (int i = 0; i < 300; ++i) { run (1); for (int c = 0; c < 4; ++c) seen[c] |= mach.takePlayingMask (c); }
+        const int r0 = juce::roundToInt (mach.apvts.getRawParameterValue ("root0")->load());
+        check ((seen[0] >> r0) & 1u, "tonica no play: o acorde 1 acende a tonica dele (mask " + juce::String::toHexString ((int) seen[0]) + ")");
+        setP (mach, "preview", 0.0f);
+        run (4); for (int c = 0; c < 4; ++c) mach.takePlayingMask (c);
+        juce::uint32 after = 0; for (int c = 0; c < 4; ++c) after |= mach.takePlayingMask (c);
+        check (after == 0, "tonica no play: parar apaga as teclas");
+    }
+    {   // 2.2: EQ da BASS MACHINE (-2k e -1k) deixa só os graves, no MRB-69 e no som da própria machine
+        // energia acima de um ponto (passa-alta Butterworth de 8ª ordem) e total, em dB, depois de estabilizar
+        auto measure = [] (auto& proc, double sr, int blocks, float above)
+        {
+            juce::dsp::IIR::Filter<float> hp[4];
+            const float q[4] = { 0.50979558f, 0.60134489f, 0.89997622f, 2.56291545f };
+            for (int k = 0; k < 4; ++k) hp[k].coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass (sr, above, q[k]);
+            double hi = 0, all = 0;
+            for (int b = 0; b < blocks; ++b)
+            {
+                juce::AudioBuffer<float> buf (2, 512); juce::MidiBuffer mm;
+                proc.processBlock (buf, mm);
+                if (b < 20) continue;
+                for (int i = 0; i < 512; ++i) { const float x = buf.getSample (0, i); float h = x; for (auto& f : hp) h = f.processSample (h); hi += h * h; all += x * x; }
+            }
+            return std::make_pair (10.0 * std::log10 (hi + 1e-20), 10.0 * std::log10 (all + 1e-20));
+        };
+        auto mrb = [&] (int cutMode, float above)   // MRB-69 com SUPER TONE + drive (cheio de harmônicos)
+        {
+            DubBassAudioProcessor b;
+            setP (b, ParamID::mode, 2); setP (b, ParamID::drvOn, 1); setP (b, ParamID::drive, 12);
+            b.prepareToPlay (48000.0, 512);
+            auto& mach = b.getMachine();
+            setP (mach, "drumsOn", 0.0f); setP (mach, "keysOn", 0.0f); setP (mach, "eqCut", (float) cutMode); setP (mach, "preview", 1.0f);
+            return measure (b, 48000.0, 300, above);
+        };
+        auto machineOnly = [&] (int cutMode, float above)
+        {
+            BassMachineProcessor m;
+            setP (m, "timbre", (float) mbm::SuperTone); setP (m, "drumsOn", 0.0f); setP (m, "keysOn", 0.0f);
+            setP (m, "eqCut", (float) cutMode); setP (m, "preview", 1.0f);
+            m.prepareToPlay (48000.0, 512);
+            return measure (m, 48000.0, 300, above);
+        };
+        check (juce::roundToInt (BassMachineProcessor().apvts.getRawParameterValue ("eqCut")->load()) == 0, "EQ da BASS MACHINE comeca sem corte");
+        const struct { int mode; float above; const char* name; } cuts[] = { { 1, 3000.0f, "-2k (acima de 3 kHz)" }, { 2, 1500.0f, "-1k (acima de 1,5 kHz)" } };
+        for (const auto& c : cuts)
+        {
+            const auto off = mrb (0, c.above), on = mrb (c.mode, c.above);
+            check (on.first - on.second < -60.0 && off.first - on.first > 20.0 && off.second - on.second < 3.0,
+                   juce::String ("MRB-69 EQ ") + c.name + ": sobra " + juce::String (on.first - on.second, 1) + " dB do total (sem corte: "
+                   + juce::String (off.first - off.second, 1) + " dB) e o grave fica");
+            const auto moff = machineOnly (0, c.above), mon = machineOnly (c.mode, c.above);
+            check (mon.first - mon.second < -60.0 && (moff.first - moff.second) - (mon.first - mon.second) > 20.0,
+                   juce::String ("BASS MACHINE EQ ") + c.name + ": sobra " + juce::String (mon.first - mon.second, 1) + " dB do total (sem corte: "
+                   + juce::String (moff.first - moff.second, 1) + " dB)");
+        }
     }
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");
     return failures == 0 ? 0 : 1;

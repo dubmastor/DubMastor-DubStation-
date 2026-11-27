@@ -46,7 +46,11 @@ public:
         setMouseCursor (juce::MouseCursor::PointingHandCursor);
         setRepaintsOnMouseActivity (true);
     }
+    // ouvir o acorde: toca enquanto o botão do mouse estiver apertado (tônica, maior/menor, inversão)
+    std::function<void()> onPress, onRelease;
+    void mouseUp (const juce::MouseEvent&) override { if (onRelease) onRelease(); }
 protected:
+    void pressed() { if (onPress) onPress(); }
     int  index() const       { return juce::roundToInt (value); }
     void select (int i)      { att.setValueAsCompleteGesture ((float) i); }
     int  numChoices() const  { return param.getNumSteps(); }
@@ -66,10 +70,18 @@ public:
     void mouseDown (const juce::MouseEvent&) override;
     void mouseMove (const juce::MouseEvent& e) override { hover = keyAt (e.position); repaint(); }
     void mouseExit (const juce::MouseEvent&) override   { hover = -1; repaint(); }
+    // notas do acorde que está tocando no play (bit 0..11 = dó..si): ficam pintadas de verde
+    void setPlaying (juce::uint32 mask) { if (mask != playing) { playing = mask; repaint(); } }
+    // próximas harmonias que combinam (cadências do reggae): grau marcado na tecla, rank 1 = a mais comum
+    struct KeyHint { int minor = 0, rank = 0; juce::String label; bool operator!= (const KeyHint& o) const { return minor != o.minor || rank != o.rank || label != o.label; } };
+    void setHints (const std::array<KeyHint, 12>& h) { bool ch = false; for (int k = 0; k < 12; ++k) ch = ch || (h[(size_t) k] != hints[(size_t) k]); if (ch) { hints = h; repaint(); } }
+    std::function<void (int minor)> onHintQuality;   // tocar numa tecla sugerida já escolhe maior/menor da sugestão
 private:
+    std::array<KeyHint, 12> hints {};
     juce::Rectangle<float> keyRect (int note) const;
     int keyAt (juce::Point<float>) const;
     int hover = -1;
+    juce::uint32 playing = 0;
 };
 
 // Maior / menor: dois botões de pressão intertravados com lâmpada
@@ -78,7 +90,7 @@ class ModeSwitch : public ParamControl
 public:
     using ParamControl::ParamControl;
     void paint (juce::Graphics&) override;
-    void mouseDown (const juce::MouseEvent& e) override { select (e.position.x < (float) getWidth() * 0.5f ? 0 : 1); }
+    void mouseDown (const juce::MouseEvent& e) override { select (e.position.x < (float) getWidth() * 0.5f ? 0 : 1); pressed(); }
 };
 
 // Inversão: AUTO / FUND / 1ª / 2ª, botões de pressão intertravados.
@@ -92,6 +104,7 @@ public:
     void mouseDown (const juce::MouseEvent& e) override
     {
         select (juce::jlimit (0, 3, (int) (e.position.x / ((float) getWidth() / 4.0f))));
+        pressed();
     }
 private:
     std::function<int()> suggested;   // 0 = FUND, 1 = 1ª, 2 = 2ª
@@ -189,6 +202,8 @@ private:
     juce::Rectangle<int> woodL, woodR, plate;
     juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline, loopRow;
     std::array<bool, DubChordsProcessor::numSlots> lastOn {};
+    std::array<std::array<int, 12>, DubChordsProcessor::numSlots> litHold {};
+    void updateHints();   // quadros que a tecla ainda fica acesa
     dub::Voicings voicings;   // atualizado pelo timer (inversões sugeridas/usadas)
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubChordsPanel)

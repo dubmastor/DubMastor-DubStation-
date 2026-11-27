@@ -6,6 +6,7 @@
 #include "PluginEditor.h"
 #include "../../ReggaeChordMachine/Source/PluginProcessor.h"
 #include "../../RiddimBank/Source/RiddimBankMenu.h"
+#include "../../ReggaeChordMachine/Source/CadenceHints.h"
 
 namespace
 {
@@ -201,6 +202,91 @@ int main (int argc, char** argv)
             riddimbank::favFile ("MRK-80-teste").getFile().deleteFile();
         }
     }
+    {   // 8) 3.4 OUVIR O ACORDE: clicar na tônica/maior-menor/inversão toca o acorde no piano com tudo parado
+        RootsKeysProcessor p;
+        const double sr = 48000.0; const int bs = 512;
+        FakePlayHead ph; ph.playing = false;
+        p.setPlayHead (&ph);
+        p.prepareToPlay (sr, bs);
+        juce::AudioBuffer<float> buf (2, bs);
+        auto run = [&] (int blocks)
+        {
+            double s = 0; long n = 0;
+            for (int b = 0; b < blocks; ++b)
+            {
+                juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+                for (int i = 0; i < bs; ++i) { s += (double) buf.getSample (0, i) * buf.getSample (0, i); ++n; }
+            }
+            return std::sqrt (s / (double) juce::jmax (1L, n));
+        };
+        auto countOn = [&] { int k = 0; for (int nn = 0; nn < 128; ++nn) if (p.keyboardState.isNoteOn (1, nn)) ++k; return k; };
+        check (run (20) < 1.0e-6, "ouvir acorde: silencio antes do clique");
+        setP (p.getMachine().apvts, "root1", 7.0f);   // cartão 2 = G
+        setP (p.getMachine().apvts, "qual1", 0.0f);   //            maior
+        p.getMachine().auditionStart (1);
+        const double held = run (40);
+        const int lit = countOn();
+        bool hasG = false;
+        for (int nn = 0; nn < 128; ++nn) if (p.keyboardState.isNoteOn (1, nn) && nn % 12 == 7) hasG = true;
+        check (held > 1.0e-3 && lit == 6 && hasG, "ouvir acorde: G maior soa com 6 notas (duas maos) enquanto clica (rms "
+                                                   + juce::String (held, 5) + ", " + juce::String (lit) + " notas)");
+        setP (p.getMachine().apvts, "on3", 0.0f);
+        p.getMachine().auditionStart (3);            // cartão OFF também pode ser ouvido
+        run (4);
+        check (countOn() == 6, "ouvir acorde: cartao desligado tambem toca (troca de acorde sem nota presa)");
+        p.getMachine().auditionStop();
+        run (4);
+        check (countOn() == 0, "ouvir acorde: soltar o mouse solta todas as notas");
+        const double tail = run (200);
+        check (tail < held * 0.2, "ouvir acorde: som morre depois de soltar");
+        p.setPlayHead (nullptr);
+    }
+    {   // 10) 3.4 PRÓXIMAS HARMONIAS: cadências do reggae a partir do ACORDE 1
+        auto top = [] (int t, int tm, int p, int pm) { auto h = cadence::suggest (t, tm, p, pm); return h.empty() ? cadence::Hint { -1, 0, 0 } : h[0]; };
+        const auto c = top (0, 0, 0, 0);    // C maior → F (IV)
+        check (c.root == 5 && c.minor == 0, "cadencia: depois de C (I) a mais comum e F (IV)");
+        const auto a = top (9, 1, 9, 1);    // A menor → G (bVII)
+        check (a.root == 7 && a.minor == 0, "cadencia: depois de Am (Im) a mais comum e G (bVII)");
+        const auto f = top (0, 0, 5, 0);    // em C, depois de F (IV) → G (V)
+        check (f.root == 7 && f.minor == 0, "cadencia: em C, depois de F (IV) vem G (V)");
+        const auto h = cadence::suggest (2, 0, 2, 0);
+        bool ok = h.size() == 3;
+        for (size_t k = 0; k < h.size(); ++k) ok = ok && h[k].rank == (int) k + 1 && h[k].root != 2;
+        check (ok, "cadencia: 3 sugestoes, em ordem, sem repetir o acorde anterior");
+        check (cadence::degreeName (9, 7, 0) == "bVII" && cadence::degreeName (0, 2, 1) == "IIm", "cadencia: nome dos graus");
+    }
+    {   // 9) 3.4 TECLADO DA TÔNICA PINTADO NO PLAY: o cartão mostra as notas que estão tocando agora
+        RootsKeysProcessor p;
+        const double sr = 48000.0; const int bs = 512;
+        FakePlayHead ph; ph.playing = true;
+        p.setPlayHead (&ph);
+        setP (p.apvts, "machineOn", 1.0f);
+        p.prepareToPlay (sr, bs);
+        auto& m = p.getMachine();
+        juce::AudioBuffer<float> buf (2, bs);
+        const auto v = dub::voiceProgression (m.getSlots(), m.getSettings().centerNote);
+        juce::uint32 chord0 = 0;
+        for (int n : v.notes[0]) chord0 |= 1u << (n % 12);
+        juce::uint32 seen0 = 0, outside = 0;
+        for (int b = 0; b < 400; ++b)   // só a duração do 1º cartão
+        {
+            juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+            ph.ppq += (double) bs / sr * ph.bpm / 60.0;
+            if (ph.ppq >= m.getSlots()[0].beats - 0.05) break;
+            const auto k = m.takePlayingMask (0);
+            seen0 |= k; outside |= k & ~chord0;
+            for (int c = 1; c < 4; ++c) outside |= m.takePlayingMask (c);
+        }
+        check (seen0 == chord0 && outside == 0, "tonica no play: cartao 1 acende as notas do acorde dele e nenhuma outra (mask "
+                                                + juce::String::toHexString ((int) seen0) + " / " + juce::String::toHexString ((int) chord0) + ")");
+        ph.playing = false;
+        for (int b = 0; b < 4; ++b) { juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi); }
+        m.takePlayingMask (0);
+        juce::uint32 after = 0;
+        for (int c = 0; c < 4; ++c) after |= m.takePlayingMask (c);
+        check (after == 0, "tonica no play: parar apaga as teclas");
+        p.setPlayHead (nullptr);
+    }
     {   // 7) capturas da interface
         RootsKeysProcessor p;
         setP (p.getMachine().apvts, "bubble", 1.0f);
@@ -233,6 +319,32 @@ int main (int argc, char** argv)
         save ("interface-chord-machine.png");
         setP (p.getMachine().apvts, "pattern", 1.0f);
         save ("interface-chord-machine-bang-bang.png");
+        {   // tocando: as teclas da tônica acendem com as notas do acorde
+            FakePlayHead ph; ph.playing = true;
+            p.setPlayHead (&ph);
+            setP (p.apvts, "machineOn", 1.0f);
+            p.prepareToPlay (48000.0, 512);
+            juce::AudioBuffer<float> buf (2, 512);
+            for (int f = 0; f < 40; ++f)
+            {
+                for (int b = 0; b < 3; ++b)
+                {
+                    juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+                    ph.ppq += 512.0 / 48000.0 * ph.bpm / 60.0;
+                }
+                juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+                if (f == 39)   // no meio do skank do 1º acorde: as teclas dele acesas
+                {
+                    auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 1.4f);
+                    juce::File fo = outDir.getChildFile ("interface-chord-machine-tocando.png");
+                    fo.deleteFile();
+                    juce::FileOutputStream os (fo);
+                    juce::PNGImageFormat fmt;
+                    check (os.openedOk() && fmt.writeImageToStream (img, os), "imagem " + fo.getFileName());
+                }
+            }
+            p.setPlayHead (nullptr);
+        }
     }
 
     std::printf ("\n%s\n", failures == 0 ? "TUDO OK" : "HA FALHAS");

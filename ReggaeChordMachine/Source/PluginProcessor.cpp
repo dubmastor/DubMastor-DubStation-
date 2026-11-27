@@ -160,6 +160,48 @@ dub::Voicings DubChordsProcessor::getVoicings() const
     return dub::voiceProgression (getSlots(), getSettings().centerNote);
 }
 
+//==============================================================================
+// OUVIR O ACORDE
+void DubChordsProcessor::auditionStart (int slot)
+{
+    auto slots = getSlots();
+    if (! juce::isPositiveAndBelow (slot, (int) slots.size())) return;
+    if (slots[(size_t) slot].beats <= 0.0) slots[(size_t) slot].beats = 4.0;   // cartão OFF: ouve como se estivesse ligado
+    const auto st = getSettings();
+    const auto v = dub::voiceProgression (slots, st.centerNote);
+    const auto& left = v.notes[(size_t) slot];
+    if (left.empty()) return;
+
+    const juce::SpinLock::ScopedLockType sl (auditionLock);
+    auditionReqCount = 0;
+    for (int n : left)       if (auditionReqCount < maxAudition) auditionReqNotes[auditionReqCount++] = juce::jlimit (0, 127, n);
+    for (int n : left)       if (auditionReqCount < maxAudition) auditionReqNotes[auditionReqCount++] = juce::jlimit (0, 127, n + 12);   // duas mãos
+    auditionReqVel = juce::jlimit (30, 127, juce::roundToInt (st.velocity * 127.0f));
+    auditionReq.store (1);
+}
+
+void DubChordsProcessor::auditionStop() { auditionReq.store (2); }
+
+void DubChordsProcessor::runAudition (juce::MidiBuffer& midi)
+{
+    auditionOut.clear();
+    const int req = auditionReq.exchange (0);
+    if (req == 0) return;
+
+    auto add = [&] (const juce::MidiMessage& m) { midi.addEvent (m, 0); auditionOut.addEvent (m, 0); };
+    for (int k = 0; k < auditionCount; ++k) add (juce::MidiMessage::noteOff (1, auditionNotes[k]));
+    auditionCount = 0;
+    if (req != 1) return;
+
+    const juce::SpinLock::ScopedTryLockType sl (auditionLock);   // a interface só segura o lock por microssegundos
+    if (! sl.isLocked()) { auditionReq.store (1); return; }       // tenta de novo no próximo bloco
+    for (int k = 0; k < auditionReqCount; ++k)
+    {
+        auditionNotes[auditionCount++] = auditionReqNotes[k];
+        add (juce::MidiMessage::noteOn (1, auditionReqNotes[k], (juce::uint8) auditionReqVel));
+    }
+}
+
 double DubChordsProcessor::getExportBpm() const
 {
     const double h = hostBpm.load();
@@ -209,6 +251,17 @@ void DubChordsProcessor::allNotesOff (juce::MidiBuffer& midi, int sample)
             }
 }
 
+// Notas soando no fim do bloco, por cartão (a interface pinta o teclado da tônica com elas)
+void DubChordsProcessor::publishPlaying()
+{
+    juce::uint32 m[numSlots] {};
+    for (int ch = 1; ch <= 16; ++ch)
+        for (int n = 0; n < 128; ++n)
+            if (active[ch][n] && juce::isPositiveAndBelow ((int) activeSlot[ch][n], numSlots))
+                m[activeSlot[ch][n]] |= 1u << (n % 12);
+    for (int i = 0; i < numSlots; ++i) playMask[(size_t) i].store (m[i]);
+}
+
 //==============================================================================
 void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
@@ -216,6 +269,8 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     buffer.clear();
     const int numSamples = buffer.getNumSamples();
     if (numSamples <= 0) return;
+
+    runAudition (midi);   // ouvir o acorde (cartão clicado na interface)
 
     // render offline (bounce) pode não deixar a thread de mensagens rodar: monta aqui mesmo
     if (isNonRealtime() && dirty.exchange (false))
@@ -271,7 +326,7 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
                 if (occ >= ppq)
                 {
                     const int s = juce::jlimit (0, numSamples - 1, (int) ((occ - ppq) / blockBeats * numSamples));
-                    pending.push_back ({ s, on, e.channel, e.note, e.velocity });
+                    pending.push_back ({ s, on, e.channel, e.note, e.velocity, e.slot });
                 }
                 occ += loopBeats;
             }
@@ -298,6 +353,9 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
                 if (isOn) midi.addEvent (juce::MidiMessage::noteOff (p.channel, p.note), p.sample);
                 midi.addEvent (juce::MidiMessage::noteOn (p.channel, p.note, (juce::uint8) p.vel), p.sample);
                 isOn = true;
+                activeSlot[p.channel][p.note] = (signed char) p.slot;
+                if (juce::isPositiveAndBelow (p.slot, numSlots))
+                    hitMask[(size_t) p.slot].fetch_or (1u << (p.note % 12));
             }
             else if (isOn)
             {
@@ -311,6 +369,7 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         if (! hostPlaying) internalPpq = end;
         displayPos.store (std::fmod (std::max (0.0, ppq), loopBeats));
     }
+    publishPlaying();
 
     // --- Som interno (o MIDI gerado continua saindo para a DAW) ---
     const bool soundOn = param ("sound") > 0.5f;

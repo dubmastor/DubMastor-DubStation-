@@ -63,6 +63,22 @@ public:
     void applyBankEntry (int index);              // thread da interface: harmonia e BPM da música
     int  getBankEntry() const;                    // entrada atual do banco (-1 = nenhuma)
 
+    // OUVIR O ACORDE: ao escolher tônica, maior/menor ou inversão, o acorde do cartão soa enquanto
+    // o botão do mouse estiver apertado (as mesmas notas que o loop toca: inversão, registro e duas mãos).
+    // Thread da interface; a thread de áudio toca no próximo bloco.
+    void auditionStart (int slot);
+    void auditionStop();
+    // notas do "ouvir o acorde" saídas no último bloco (o MRK-80 toca mesmo com PREVIEW desligado)
+    const juce::MidiBuffer& getAuditionMidi() const noexcept { return auditionOut; }
+
+    // notas do loop soando agora em cada cartão (bit 0..11 = dó..si), para pintar o teclado da tônica.
+    // Inclui as notas que tocaram e já soltaram desde a última leitura (skank curto não some entre dois quadros).
+    juce::uint32 takePlayingMask (int slot) noexcept
+    {
+        if (! juce::isPositiveAndBelow (slot, numSlots)) return 0;
+        return playMask[(size_t) slot].load() | hitMask[(size_t) slot].exchange (0);
+    }
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:
@@ -96,10 +112,22 @@ private:
     std::atomic<bool> dirty { true };
     float pianoGain = 0.0f, organGain = 0.0f;  // últimos ganhos aplicados (rampas sem estalo)
 
-    struct Pending { int sample; bool on; int channel; int note; int vel; };
+    // ouvir o acorde
+    static constexpr int maxAudition = 12;
+    juce::SpinLock auditionLock;
+    int auditionReqNotes[maxAudition] {}, auditionReqCount = 0, auditionReqVel = 100;
+    std::atomic<int> auditionReq { 0 };       // 1 = tocar, 2 = soltar
+    int auditionNotes[maxAudition] {}, auditionCount = 0;
+    juce::MidiBuffer auditionOut;
+    void runAudition (juce::MidiBuffer& midi);
+
+    struct Pending { int sample; bool on; int channel; int note; int vel; int slot; };
     std::vector<Pending> pending;
 
     bool active[17][128] {};
+    signed char activeSlot[17][128] {};       // cartão de cada nota soando
+    std::array<std::atomic<juce::uint32>, numSlots> playMask {}, hitMask {};
+    void publishPlaying();
     bool wasPlaying = false;
     bool soundWasOn = true;
     double expectedPpq = 0.0;

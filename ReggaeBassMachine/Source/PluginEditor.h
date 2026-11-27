@@ -46,9 +46,12 @@ public:
         setMouseCursor (juce::MouseCursor::PointingHandCursor);
         setRepaintsOnMouseActivity (true);
     }
+    std::function<void()> onPress, onRelease;   // ouvir a tônica enquanto o mouse estiver apertado
+    void mouseUp (const juce::MouseEvent&) override { if (onRelease) onRelease(); }
 protected:
     int  index() const  { return juce::roundToInt (value); }
     void select (int i) { att.setValueAsCompleteGesture ((float) i); }
+    void pressed()      { if (onPress) onPress(); }
 
     juce::RangedAudioParameter& param;
     float value = 0.0f;
@@ -65,10 +68,18 @@ public:
     void mouseDown (const juce::MouseEvent&) override;
     void mouseMove (const juce::MouseEvent& e) override { hover = keyAt (e.position); repaint(); }
     void mouseExit (const juce::MouseEvent&) override   { hover = -1; repaint(); }
+    // próximas harmonias que combinam (cadências do reggae, ReggaeChordMachine/Source/CadenceHints.h): grau na tecla, rank 1 = a mais comum
+    struct KeyHint { int minor = 0, rank = 0; juce::String label; bool operator!= (const KeyHint& o) const { return minor != o.minor || rank != o.rank || label != o.label; } };
+    void setHints (const std::array<KeyHint, 12>& h) { bool ch = false; for (int k = 0; k < 12; ++k) ch = ch || (h[(size_t) k] != hints[(size_t) k]); if (ch) { hints = h; repaint(); } }
+    std::function<void (int minor)> onHintQuality;   // tocar numa tecla sugerida já escolhe maior/menor da sugestão
+    // notas da linha tocando agora no play (bit 0..11 = dó..si): ficam pintadas de verde
+    void setPlaying (juce::uint32 mask) { if (mask != playing) { playing = mask; repaint(); } }
 private:
     juce::Rectangle<float> keyRect (int note) const;
     int keyAt (juce::Point<float>) const;
     int hover = -1;
+    std::array<KeyHint, 12> hints {};
+    juce::uint32 playing = 0;
 };
 
 // Tipo do acorde: 4 botões de pressão intertravados (MAIOR, MENOR, 7, m7)
@@ -236,6 +247,8 @@ private:
     void drawKnobScale (juce::Graphics&, juce::Slider&, int ticks, const juce::StringArray& labels = {}, float labelW = 44.0f);
     void exportMidi();
     bool slotEnabled (int i) const;
+    void updateHints();
+    std::array<std::array<int, 12>, BassMachineProcessor::numSlots> litHold {};   // quadros que a tecla ainda fica acesa
 
     BassMachineProcessor& proc;
     BassLookAndFeel lnf;
@@ -255,6 +268,8 @@ private:
     Knob inGain, tone, drive, volume;
     Knob reps;
     Toggle sound, drumsOn, keysOn;
+    juce::ToggleButton eq2kBtn { "EQ -2k" }, eq1kBtn { "EQ -1k" };   // EQ (parâmetro eqCut): ligar um desliga o outro; os dois deixam só os graves
+    void setEqCut (int mode);
     Knob drumVol, keysVol;
     std::unique_ptr<CounterWindow> idea;
     std::unique_ptr<PlayButton> play;

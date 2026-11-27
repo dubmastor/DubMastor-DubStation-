@@ -59,6 +59,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
 
     // som interno
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "eqCut", 1 }, "EQ corte",
+                                                        juce::StringArray { "Sem corte", "-2k", "-1k" }, 0));   // começa sem corte
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "timbre", 1 }, "Timbre", timbres, mbm::RootsSine));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "inGain", 1 }, "Ganho de entrada", NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f,
                                                         AudioParameterFloatAttributes().withLabel ("dB")));
@@ -114,6 +116,8 @@ void BassMachineProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 {
     sr = sampleRate;
     synth.prepare (sampleRate, samplesPerBlock);
+    bassCut.setMode (juce::roundToInt (param ("eqCut")));
+    bassCut.prepare (sampleRate);
     monoBuf.setSize (1, juce::jmax (1, samplesPerBlock), false, true, false);
     setLatencySamples (synth.getLatencySamples());
     acousticDrums.prepare (sampleRate);
@@ -283,6 +287,42 @@ void BassMachineProcessor::allNotesOff (juce::MidiBuffer& midi, int sample)
 }
 
 //==============================================================================
+// Ouvir a tônica: a fundamental do acorde no registro da linha (REGISTRO), com a VELOCITY da linha
+void BassMachineProcessor::auditionStart (int slot)
+{
+    if (! juce::isPositiveAndBelow (slot, numSlots)) return;
+    const int root = juce::roundToInt (param ("root" + juce::String (slot)));
+    const int base = juce::roundToInt (param ("base"));
+    auditionReqNote.store (juce::jlimit (0, 127, base + ((root - base) % 12 + 12) % 12));
+    auditionReqVel.store (juce::jlimit (30, 127, juce::roundToInt (param ("velocity") * 127.0f)));
+    auditionReq.store (1);
+}
+
+void BassMachineProcessor::auditionStop() { auditionReq.store (2); }
+
+void BassMachineProcessor::runAudition (juce::MidiBuffer& midi)
+{
+    auditionOut.clear();
+    const int req = auditionReq.exchange (0);
+    if (req == 0) return;
+    auto add = [&] (const juce::MidiMessage& m) { midi.addEvent (m, 0); auditionOut.addEvent (m, 0); };
+    if (auditionNote >= 0) add (juce::MidiMessage::noteOff (kMidiChannel, auditionNote));
+    auditionNote = -1;
+    if (req != 1) return;
+    auditionNote = auditionReqNote.load();
+    add (juce::MidiMessage::noteOn (kMidiChannel, auditionNote, (juce::uint8) auditionReqVel.load()));
+}
+
+// Notas da linha soando no fim do bloco, por acorde (a interface pinta o teclado da tônica com elas)
+void BassMachineProcessor::publishPlaying()
+{
+    juce::uint32 m[numSlots] {};
+    for (int n = 0; n < 128; ++n)
+        if (active[n] && juce::isPositiveAndBelow ((int) activeSlot[n], numSlots))
+            m[activeSlot[n]] |= 1u << (n % 12);
+    for (int i = 0; i < numSlots; ++i) playMask[(size_t) i].store (m[i]);
+}
+
 void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -291,6 +331,8 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
     if (dirty.exchange (false))
         rebuild();
+
+    runAudition (midi);   // ouvir a tônica (teclado clicado na interface)
 
     // --- Posição de transporte ---
     double bpm = 0.0, ppq = 0.0;
@@ -342,7 +384,7 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
                 if (occ >= ppq)
                 {
                     const int s = juce::jlimit (0, numSamples - 1, (int) ((occ - ppq) / blockBeats * numSamples));
-                    pending.push_back ({ s, on, e.note, e.velocity });
+                    pending.push_back ({ s, on, e.note, e.velocity, e.slot });
                 }
                 occ += loopBeats;
             }
@@ -390,6 +432,9 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
                 if (isOn) midi.addEvent (juce::MidiMessage::noteOff (kMidiChannel, p.note), p.sample);
                 midi.addEvent (juce::MidiMessage::noteOn (kMidiChannel, p.note, (juce::uint8) p.vel), p.sample);
                 isOn = true;
+                activeSlot[p.note] = (signed char) p.slot;
+                if (juce::isPositiveAndBelow (p.slot, numSlots))
+                    hitMask[(size_t) p.slot].fetch_or (1u << (p.note % 12));
             }
             else if (isOn)
             {
@@ -403,6 +448,7 @@ void BassMachineProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
         if (! hostPlaying) internalPpq = end;
         displayPos.store (std::fmod (std::max (0.0, ppq), loopBeats));
     }
+    publishPlaying();
 
     // --- Som interno (o MIDI gerado continua saindo para a DAW) ---
     synth.set ((int) param ("timbre"), param ("tone"), param ("drive"));
@@ -508,6 +554,8 @@ void BassMachineProcessor::renderSynth (juce::AudioBuffer<float>& buffer, const 
     }
     if (pos < numSamples) synth.renderVoice (mono, pos, numSamples);
     synth.finish (monoBuf, numSamples);
+    bassCut.setMode (juce::roundToInt (param ("eqCut")));   // EQ: -2k ou -1k deixam só os graves
+    bassCut.process (monoBuf, numSamples);
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         buffer.copyFrom (ch, 0, monoBuf, 0, 0, numSamples);

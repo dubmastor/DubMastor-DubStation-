@@ -42,9 +42,26 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}
 .b.nolamp::before{display:none}
 .btns.style .b{justify-content:flex-start;padding-left:12px}
 .btns.style .b small{margin-left:auto;opacity:.35;font-size:10px}
-.keys12 .b{font-size:11px;letter-spacing:0;padding:8px 2px;min-height:34px}
 .btns.c3 .b,.btns.c4 .b{font-size:10.5px;letter-spacing:.03em;gap:5px;padding:8px 3px;white-space:normal;line-height:1.15;text-align:center}
-.keys12 .b.sharp{background:linear-gradient(180deg,#151210,#050403);color:#a89c84}
+/* teclado da TÔNICA: o mesmo da CHORD MACHINE do MRK-80 (site/keys) */
+.pkeys{position:relative;height:92px;background:#0e0c0a;border-radius:4px;padding:9px 3px 3px;box-shadow:0 0 0 4px rgba(43,36,29,.25)}
+.pkeys::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:6px;background:linear-gradient(180deg,#d8d6d0,#5e5b55);border-bottom:2px solid #5a1414}
+.pkeys .w,.pkeys .k{position:absolute;bottom:3px;border:0;padding:0 0 5px;cursor:pointer;font-weight:800;display:flex;align-items:flex-end;justify-content:center}
+.pkeys .w{height:80px;background:linear-gradient(180deg,#f6ecd2,#d9c69a);border-radius:0 0 4px 4px;box-shadow:inset 0 -6px 0 #b39d6a,0 0 0 1px #3d3124;color:var(--ink2);font-size:11px}
+.pkeys .k{height:48px;bottom:35px;background:linear-gradient(135deg,#3d3833,#070605);border-radius:0 0 3px 3px;color:rgba(239,229,204,.75);font-size:8px;z-index:2;box-shadow:1px 2px 0 rgba(0,0,0,.45)}
+.pkeys .on.w{background:linear-gradient(180deg,#e9d9ae,#c2ad78);box-shadow:inset 0 0 0 40px rgba(255,169,40,.18),0 0 0 1px #3d3124;color:#6b3f05;transform:translateY(3px)}
+.pkeys .on.k{color:var(--amber);transform:translateY(3px)}
+.pkeys .on::after{content:"";position:absolute;bottom:20px;width:7px;height:7px;border-radius:50%;background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 7px var(--amber)}
+.pkeys .k.on::after{bottom:14px}
+.pkeys .hint{outline:1.5px solid rgba(234,189,18,.7);outline-offset:-2px}
+.pkeys .h1{outline:2.5px solid #eabd12}
+.pkeys .deg{position:absolute;left:50%;transform:translateX(-50%);bottom:21px;font-size:8.5px;line-height:13px;padding:0 3px;border-radius:3px;background:#2b241d;color:#eabd12;border:1px solid #eabd12;white-space:nowrap;pointer-events:none}
+.pkeys .k .deg{bottom:auto;top:6px;font-size:7.5px;padding:0 2px}
+.pkeys .h1 .deg{background:#eabd12;color:#2b241d;border-color:#2b241d}
+.pkeys .w.on.hint::after{bottom:37px}
+.pkeys .lit.w{background:linear-gradient(180deg,#8fe0a8,#2fa45c);box-shadow:inset 0 0 0 2px #0b6b30,0 0 10px rgba(11,138,60,.6);color:#04361a}
+.pkeys .lit.k{background:linear-gradient(180deg,#5fcf86,#06501f);color:#fff;box-shadow:0 0 9px rgba(11,138,60,.8)}
+.pkeys{touch-action:none;user-select:none;-webkit-user-select:none}
 /* riddims clássicos */
 .riddim{margin-bottom:14px}
 .rdisp{font-family:"Courier New",Courier,monospace;color:#e6efff;border-radius:2px;padding:8px 12px;min-height:60px;
@@ -168,6 +185,9 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
     <div class="slider"><span>BPM</span><input type="range" id="bpm" min="50" max="180" step="1"><output id="o-bpm"></output></div>
     <div class="lbl">TIMBRE · MRDBI-07</div>
     <div class="btns c3" id="timbreBtns"></div>
+    <div class="row" style="margin:6px 0;align-items:center;gap:8px"><button class="toggle" id="eq2k" title="EQ: corta tudo acima de 2 kHz no baixo (fica só o grave)"><i></i>EQ -2k</button>
+      <button class="toggle" id="eq1k" title="EQ: corta tudo acima de 1 kHz no baixo (fica só o grave)"><i></i>EQ -1k</button>
+      <canvas id="eqGraph" width="220" height="64" style="flex:1;min-width:0;height:64px;background:#0b1a0f;border-radius:5px;box-shadow:inset 0 0 0 2px #000"></canvas></div>
     <div class="lbl">BATERIA DE ACOMPANHAMENTO</div>
     <div class="row" style="margin-bottom:6px"><button class="toggle" id="drumsOn"><i></i>BATERIA</button></div>
     <div class="btns c4" id="drumBtns"></div>
@@ -197,6 +217,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <script src="engine.js"></script>
 <script src="riddims.js"></script>
 <script src="../riddimbank.js"></script>
+<script src="../cadence.js"></script>
 <script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
@@ -208,7 +229,7 @@ const DEFAULTS = {
   style: 0, seed: 1, density: .6, variation: .5, swing: 0, base: 31, velocity: .85, gate: .7,
   chords: [{ root: 9, quality: 1, dur: 0, on: true }, { root: 2, quality: 1, dur: 0, on: true },
            { root: 4, quality: 3, dur: 1, on: false }, { root: 7, quality: 0, dur: 1, on: false }],
-  bpm: 75, timbre: 0, drumsOn: false, drumStyle: 1, drumVol: .7, volume: .75, reps: 1,
+  bpm: 75, timbre: 0, eqCut: 0, drumsOn: false, drumStyle: 1, drumVol: .7, volume: .75, reps: 1,
 };
 function load() { try { return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(localStorage.getItem('mrbm69') || '{}')); } catch (e) { return JSON.parse(JSON.stringify(DEFAULTS)); } }
 const st = load();
@@ -277,6 +298,31 @@ refreshers.push(buttons($('drumBtns'), M.DrumStyles, () => st.drumStyle, i => { 
 refreshers.push(buttons($('hatBtns'), ['1/8', '1/16'], () => (st.hat16 ? 1 : 0), i => { st.hat16 = i === 1; save(); publish(); }));
 refreshers.push(buttons($('repBtns'), ['1x', '2x', '4x', '8x'], () => st.reps, i => { st.reps = i; save(); }));
 $('drumsOn').onclick = () => { st.drumsOn = !st.drumsOn; save(); publish(); refresh(); };
+// EQ: 0 sem corte, 1 = -2k, 2 = -1k (igual ao parâmetro eqCut do plugin); o mesmo botão de novo volta para sem corte
+const setEqCut = m => { st.eqCut = st.eqCut === m ? 0 : m; save(); engine.setEq(); refresh(); };
+$('eq2k').onclick = () => setEqCut(1);
+$('eq1k').onclick = () => setEqCut(2);
+// gráfico do EQ: resposta do passa-baixa (Butterworth de 16ª ordem; quina em 1,8 kHz no -2k e 900 Hz no -1k), de 20 Hz a 20 kHz, 0 a -60 dB
+function drawEqGraph() {
+  const cv = $('eqGraph'), dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 220, H = cv.clientHeight || 64;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const xf = f => W * Math.log(f / 20) / Math.log(1000), yd = db => 6 + (H - 16) * Math.min(1, -db / 60);
+  c.strokeStyle = 'rgba(120,255,150,.13)'; c.lineWidth = 1;
+  for (const f of [100, 1000, 10000]) { c.beginPath(); c.moveTo(xf(f), 0); c.lineTo(xf(f), H); c.stroke(); }
+  const cut = st.eqCut || 0, mark = cut === 2 ? 1000 : 2000, corner = cut === 2 ? 900 : 1800;
+  if (cut) { c.fillStyle = 'rgba(255,169,40,.12)'; c.fillRect(xf(mark), 0, W - xf(mark), H); }
+  c.beginPath();
+  for (let i = 0; i <= W; i++) {
+    const f = 20 * Math.pow(1000, i / W), db = cut ? -10 * Math.log10(1 + Math.pow(f / corner, 32)) : 0;
+    i ? c.lineTo(i, yd(db)) : c.moveTo(i, yd(db));
+  }
+  c.strokeStyle = cut ? '#7dffa0' : 'rgba(125,255,160,.45)'; c.lineWidth = 1.8; c.stroke();
+  c.font = 'bold 8px monospace'; c.fillStyle = 'rgba(125,255,160,.55)';
+  c.fillText('100', xf(100) + 2, H - 3); c.fillText('1k', xf(1000) + 2, H - 3); c.fillText('10k', xf(10000) + 2, H - 3);
+  c.fillStyle = '#ffa928'; if (cut) c.fillText(cut === 2 ? '-1k' : '-2k', xf(mark) + 3, 10);
+}
+window.addEventListener('resize', drawEqGraph);
 
 const fmtPct = v => Math.round(v * 100) + '%';
 const noteName = n => M.ROOT_NAMES[n % 12] + (Math.floor(n / 12) - 1);
@@ -294,11 +340,25 @@ const chordRefresh = [];
 st.chords.forEach((c, i) => {
   const box = document.createElement('div'); box.className = 'chord';
   box.innerHTML = `<div class="chordhead"><div class="num">${i + 1}</div><div class="cdisp"></div>${i === 0 ? '<span class="toggle on fixed"><i></i>SEMPRE</span>' : '<button class="toggle"><i></i>ON</button>'}</div>
-    <div class="chordbody"><div class="btns c6 keys12"></div><div style="height:6px"></div><div class="btns c4 qual"></div><div style="height:6px"></div>
+    <div class="chordbody"><div class="lbl" style="font-size:9px;letter-spacing:.3em;color:var(--ink2);text-align:center;margin-bottom:4px">TÔNICA</div><div class="pkeys"></div><div style="height:6px"></div><div class="btns c4 qual"></div><div style="height:6px"></div>
     <div class="stepper"><button>◀</button><div class="val"></div><button>▶</button></div></div>`;
   $('chords').appendChild(box);
-  const rk = buttons(box.querySelector('.keys12'), M.ROOT_NAMES, () => c.root, r => { c.root = r; changedGen(); }, r => [1, 3, 6, 8, 10].includes(r) ? 'sharp nolamp' : 'nolamp');
+  // teclado de uma oitava (marfim e baquelite), como na CHORD MACHINE: apertar escolhe a tônica e ela soa no baixo enquanto o dedo estiver na tecla
+  const pk = box.querySelector('.pkeys'), ww = 100 / 7, keyBtns = [];
+  [0, 2, 4, 5, 7, 9, 11].forEach((n, k) => { const b = document.createElement('button'); b.className = 'w'; b.dataset.n = n; b.textContent = M.ROOT_NAMES[n];
+    b.style.left = `calc(${k * ww}% + 1px)`; b.style.width = `calc(${ww}% - 2px)`; pk.appendChild(b); keyBtns[n] = b; });
+  [[1, 0], [3, 1], [6, 3], [8, 4], [10, 5]].forEach(([n, after]) => { const b = document.createElement('button'); b.className = 'k'; b.dataset.n = n; b.textContent = M.ROOT_NAMES[n];
+    b.style.left = `calc(${(after + 1) * ww}% - ${ww * 0.31}%)`; b.style.width = `${ww * 0.62}%`; pk.appendChild(b); keyBtns[n] = b; });
+  pk.onpointerdown = (e) => {
+    const b = e.target.closest('button'); if (!b) return; e.preventDefault();
+    const r = +b.dataset.n; c.root = r;
+    const h = hintsFor(i).find(x => x.root === r);   // tecla sugerida já escolhe maior/menor (com 7 ou m7, fica 7 ou m7)
+    if (h) c.quality = c.quality >= 2 ? (h.minor ? 3 : 2) : (h.minor ? 1 : 0);
+    changedGen(); auditionStart(i);
+  };
+  const rk = () => keyBtns.forEach((b, r) => b.classList.toggle('on', c.root === r));
   const rq = buttons(box.querySelector('.qual'), ['MAIOR', 'MENOR', '7', 'm7'], () => c.quality, q => { c.quality = q; changedGen(); });
+  box.querySelectorAll('.qual .b').forEach(b => b.addEventListener('pointerdown', () => setTimeout(() => auditionStart(i), 0)));
   const [dn, val, up] = box.querySelectorAll('.stepper > *');
   dn.onclick = () => { c.dur = Math.max(0, c.dur - 1); changedGen(); refresh(); };
   up.onclick = () => { c.dur = Math.min(5, c.dur + 1); changedGen(); refresh(); };
@@ -306,6 +366,13 @@ st.chords.forEach((c, i) => {
   if (tg) tg.onclick = () => { c.on = !c.on; changedGen(); refresh(); };
   chordRefresh.push(() => {
     rk(); rq();
+    const hints = hintsFor(i);
+    keyBtns.forEach((b, r) => {
+      const h = hints.find(x => x.root === r);
+      b.classList.toggle('hint', !!h); b.classList.toggle('h1', !!h && h.rank === 1);
+      let tag = b.querySelector('.deg'); if (h && !tag) { tag = document.createElement('span'); tag.className = 'deg'; b.appendChild(tag); }
+      if (tag) { if (h) tag.textContent = h.label; else tag.remove(); }
+    });
     const on = i === 0 || c.on;
     box.classList.toggle('off', !on);
     if (tg) tg.classList.toggle('on', c.on);
@@ -314,12 +381,32 @@ st.chords.forEach((c, i) => {
   });
 });
 
+// ouvir a tônica: a fundamental do acorde no REGISTRO da linha, enquanto o dedo/mouse estiver apertado
+let auditionH = null;
+function auditionStop() { if (auditionH) engine.liveOff(auditionH); auditionH = null; }
+function auditionStart(i) {
+  auditionStop();
+  const c = st.chords[i], base = st.base;
+  auditionH = engine.liveOn(base + (((c.root - base) % 12) + 12) % 12, st.velocity);
+}
+['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, auditionStop));
+
+// próximas harmonias (cadências do reggae, ../cadence.js): acorde 2 a 4, a partir do acorde ligado antes, na tonalidade do acorde 1
+function hintsFor(i) {
+  if (i === 0 || !window.cadenceHints) return [];
+  let p = i - 1; while (p > 0 && !st.chords[p].on) p--;
+  const mn = q => (q === 1 || q === 3 ? 1 : 0), t = st.chords[0], q = st.chords[p];
+  return cadenceHints(t.root, mn(t.quality), q.root, mn(q.quality));
+}
 function changedGen() { save(); regenerate(); refresh(); }
 function refresh() {
   refreshers.forEach(f => f()); chordRefresh.forEach(f => f());
   $('idea').textContent = String(st.seed).padStart(3, '0');
   $('tagline').textContent = M.taglines[st.style];
   $('drumsOn').classList.toggle('on', st.drumsOn);
+  $('eq2k').classList.toggle('on', st.eqCut === 1);
+  $('eq1k').classList.toggle('on', st.eqCut === 2);
+  drawEqGraph();
   $('timbreName').textContent = TIMBRES[st.timbre];
 }
 $('ideaDown').onclick = () => { st.seed = Math.max(1, st.seed - 1); changedGen(); };
@@ -406,7 +493,7 @@ fillRiddimSelects(); showRiddim();
 
 // ---------------------------------------------------------------- som (timbres do MRDBI-07, bateria sintetizada)
 const engine = (() => {
-  let ctx = null, bassBus, bassAn, drumBus, mix, vol, noiseBuf, waves, curves;
+  let ctx = null, bassBus, bassAn, drumBus, mix, vol, noiseBuf, waves, curves, eqDry, eqWet;
   let playing = false, anchorTime = 0, anchorBeat = 0, scheduledTo = 0, timer = 0;
   const midiHz = n => 440 * Math.pow(2, (n - 69) / 12);
   const curve = (fn, n = 2048) => { const c = new Float32Array(n); for (let i = 0; i < n; i++) c[i] = fn(i / (n - 1) * 2 - 1); return c; };
@@ -423,9 +510,19 @@ const engine = (() => {
     const trim = g(Math.pow(10, -5 / 20));
     bassAn = ctx.createAnalyser(); bassAn.fftSize = 2048;
     bassBus.connect(makeup).connect(comp).connect(clip).connect(trim);
-    trim.connect(bassAn);
     drumBus = g(1); mix = g(1); vol = g(st.volume);
-    trim.connect(mix); drumBus.connect(mix);
+    // EQ -2k / -1k: passa-baixa Butterworth de 16ª ordem (8 biquads; quina em 1,8 kHz e 900 Hz), igual ao BassCut.h do plugin
+    const cut0 = st.eqCut || 0;
+    eqDry = g(cut0 ? 0 : 1); eqWet = [g(cut0 === 1 ? 1 : 0), g(cut0 === 2 ? 1 : 0)];
+    const bassOut = g(1); trim.connect(eqDry); eqDry.connect(bassOut);
+    [1800, 900].forEach((fc, k) => {
+      let node = trim;
+      for (const q of [5.10114862, 1.7224471, 1.06067769, 0.78815462, 0.64682178, 0.56694403, 0.52249861, 0.50241929]) {
+        const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = fc; f.Q.value = 20 * Math.log10(q); node.connect(f); node = f;
+      }
+      node.connect(eqWet[k]); eqWet[k].connect(bassOut);
+    });
+    bassOut.connect(bassAn); bassOut.connect(mix); drumBus.connect(mix);
     const safety = ctx.createDynamicsCompressor(); safety.threshold.value = -2; safety.ratio.value = 12; safety.attack.value = .002; safety.release.value = .1;
     mix.connect(vol).connect(safety).connect(ctx.destination);
     // ondas: BASS (senoide + harm. 2 15 % + harm. 3 8 %), senoide pura (808) e SUPER TONE (quadrada suave)
@@ -505,6 +602,16 @@ const engine = (() => {
     }
   }
 
+  let lit = [];   // notas agendadas da linha: { slot, pc, on, off } em segundos do AudioContext
+  function litNow() {
+    const m = [0, 0, 0, 0]; if (!ctx || !playing) return m;
+    const now = ctx.currentTime; lit = lit.filter(x => x.off > now);
+    for (const x of lit) if (x.on <= now && x.slot >= 0 && x.slot < 4) m[x.slot] |= 1 << x.pc;
+    return m;
+  }
+  // tecla da tônica: a nota soa até soltar (nota longa, cortada no liveOff)
+  function liveOn(note, vel) { ensure(); if (ctx.state === 'suspended') ctx.resume(); bassNote(ctx.currentTime + .005, note, vel, 8); return lastBass; }
+  function liveOff(h) { if (!ctx || !h) return; const t = ctx.currentTime; try { h.amp.gain.cancelScheduledValues(t); h.amp.gain.setTargetAtTime(0, t, .03); } catch (e) {} }
   const spb = () => 60 / st.bpm;
   function beatNow() { return ctx ? anchorBeat + (ctx.currentTime - anchorTime) / spb() : 0; }
   function tick() {
@@ -514,21 +621,33 @@ const engine = (() => {
     if (until <= from) return;
     const timeOf = b => anchorTime + (b - anchorBeat) * spb();
     const each = (start, fn) => { for (let k = Math.floor((from - start) / L); start + k * L < until; k++) { const b = start + k * L; if (b >= from) fn(b); } };
-    for (const e of line.events) each(e.start, b => bassNote(timeOf(b), e.note, e.velocity / 127, e.length * spb()));
+    for (const e of line.events) each(e.start, b => { const t0 = timeOf(b), len = e.length * spb(); bassNote(t0, e.note, e.velocity / 127, len); lit.push({ slot: e.slot, pc: e.note % 12, on: t0, off: t0 + Math.max(len, .1) }); });
     for (const e of drums) each(e.start, b => drumHit(timeOf(b), e.note, e.velocity, e.target === 1));
     scheduledTo = until;
   }
   return {
     start() { ensure(); ctx.resume(); anchorTime = ctx.currentTime + .06; anchorBeat = 0; scheduledTo = 0; playing = true; tick(); timer = setInterval(tick, 25); },
-    stop() { playing = false; clearInterval(timer); if (ctx) { const t = ctx.currentTime; mix.gain.setTargetAtTime(0, t, .03); setTimeout(() => mix.gain.setTargetAtTime(1, ctx.currentTime, .01), 250); } },
+    liveOn, liveOff, litNow,
+    stop() { playing = false; clearInterval(timer); lit = []; if (ctx) { const t = ctx.currentTime; mix.gain.setTargetAtTime(0, t, .03); setTimeout(() => mix.gain.setTargetAtTime(1, ctx.currentTime, .01), 250); } },
     isPlaying: () => playing,
     tempoChanged() { if (!ctx || !playing) return; const b = beatNow(); anchorBeat = b; anchorTime = ctx.currentTime; scheduledTo = Math.max(scheduledTo, b); },
     position() { if (!playing || line.loopBeats <= 0) return -1; const b = beatNow(); return b < 0 ? -1 : b % line.loopBeats; },
+    setEq() { if (!ctx) return; const t = ctx.currentTime, c = st.eqCut || 0; eqDry.gain.setTargetAtTime(c ? 0 : 1, t, .007);
+      eqWet[0].gain.setTargetAtTime(c === 1 ? 1 : 0, t, .007); eqWet[1].gain.setTargetAtTime(c === 2 ? 1 : 0, t, .007); },
     setVolume() { if (vol) vol.gain.setTargetAtTime(st.volume, ctx.currentTime, .02); },
     analyser: () => bassAn,
   };
 })();
 $('volume').addEventListener('input', () => engine.setVolume());
+// notas da linha tocando agora: pintadas de verde no teclado da tônica de cada acorde
+(function litLoop() {
+  engine.litNow().forEach((mask, i) => {
+    const k = document.querySelectorAll('#chords .pkeys')[i]; if (!k || k.dataset.lit == mask) return;
+    k.dataset.lit = mask;
+    k.querySelectorAll('button').forEach(b => b.classList.toggle('lit', ((mask >> +b.dataset.n) & 1) === 1));
+  });
+  requestAnimationFrame(litLoop);
+})();
 function togglePlay() { if (engine.isPlaying()) engine.stop(); else engine.start(); }
 $('play').onclick = togglePlay; $('play2').onclick = togglePlay;
 

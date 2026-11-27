@@ -1,3 +1,10 @@
+## Mastor Reggae Keys MRK-80 3.4 🟢🟡⚫
+
+- **OUVIR O ACORDE na CHORD MACHINE:** ao clicar numa tecla da **TÔNICA** (ou em **MAIOR / MENOR** ou numa **INVERSÃO**), o acorde daquele cartão toca no piano **enquanto o botão do mouse estiver apertado**, e para ao soltar. Soam as mesmas notas que o loop vai tocar (a inversão escolhida ou a do AUTO, o REGISTRO e as duas mãos), no timbre escolhido e com o GUITAR SKANK se estiver ligado. Funciona com a DAW parada e com o PREVIEW desligado, e também num cartão desligado (OFF).
+- **TÔNICA PINTADA NO PLAY:** com a DAW tocando (ou o PREVIEW ligado), o teclado da TÔNICA de cada cartão acende **em verde as notas que estão soando naquele instante**, em tempo real, no ritmo do skank e do bubble. A lâmpada âmbar continua marcando a tônica escolhida. Ao parar, as teclas apagam.
+- **PRÓXIMAS HARMONIAS (cadências do reggae):** escolhido o ACORDE 1, o teclado da TÔNICA dos cartões seguintes destaca em dourado as **3 harmonias que mais combinam** depois do acorde anterior, com o grau escrito na tecla (IV, V, IIm, bVII, IVm...). A mais comum ganha o selo cheio. As sugestões vêm das passagens de acorde das **321 músicas com harmonia do banco de riddims**, na tonalidade do ACORDE 1 (ex.: depois de C vem F, G ou Dm; depois de Am vem G, Dm ou Em; em C, depois de F vem G). Tocar numa tecla sugerida já escolhe maior/menor da sugestão (dá para trocar depois).
+- Versão para celular 3.4 com os três recursos: o acorde soa enquanto o dedo estiver na tecla, no play as notas tocando acendem em verde e as próximas harmonias aparecem destacadas.
+
 ## Mastor Reggae Keys MRK-80 3.3 🟢🟡⚫
 
 - **PRESETS no padrão do mega banco** da Riddim Machine MRM-0420: o botão PRESETS da aba CHORD MACHINE abre **ESTILOS** (estilo ▸ riddim ▸ música), **RIDDIMS A–Z**, **MÚSICAS A–Z** e **★ FAVORITOS** (☆ FAVORITAR a música atual; os favoritos ficam guardados no computador e valem para todos os projetos). **Só entram os riddims com a harmonia levantada** (321 músicas: conferida ● ou aproximada ◐); os 35 com harmonia pendente ficaram de fora. O banco antigo do MRCM saiu do menu (projetos antigos abrem igual).
