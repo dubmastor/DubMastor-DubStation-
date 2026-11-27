@@ -70,10 +70,13 @@ public:
     void mouseDown (const juce::MouseEvent&) override;
     void mouseMove (const juce::MouseEvent& e) override { hover = keyAt (e.position); repaint(); }
     void mouseExit (const juce::MouseEvent&) override   { hover = -1; repaint(); }
+    // notas do acorde que está tocando no play (bit 0..11 = dó..si): ficam pintadas de verde
+    void setPlaying (juce::uint32 mask) { if (mask != playing) { playing = mask; repaint(); } }
 private:
     juce::Rectangle<float> keyRect (int note) const;
     int keyAt (juce::Point<float>) const;
     int hover = -1;
+    juce::uint32 playing = 0;
 };
 
 // Maior / menor: dois botões de pressão intertravados com lâmpada
@@ -194,6 +197,7 @@ private:
     juce::Rectangle<int> woodL, woodR, plate;
     juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline, loopRow;
     std::array<bool, DubChordsProcessor::numSlots> lastOn {};
+    std::array<std::array<int, 12>, DubChordsProcessor::numSlots> litHold {};   // quadros que a tecla ainda fica acesa
     dub::Voicings voicings;   // atualizado pelo timer (inversões sugeridas/usadas)
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubChordsPanel)

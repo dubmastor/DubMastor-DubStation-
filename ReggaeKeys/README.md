@@ -52,7 +52,7 @@ Clique em **CHORD MACHINE** no cabeçalho: é o **Mastor Reggae Chord Machine MR
 - **4 acordes**: tônica no teclado mecânico, MAIOR / MENOR, inversão (AUTO escolhe a mais próxima do acorde anterior) e duração de 1/2 a 8 compassos. Skank de piano no contratempo com as duas mãos e, com **BUBBLE**, o bubble de Hammond.
 - **PRESETS** (3.3): no padrão do mega banco da Riddim Machine — ESTILOS (estilo ▸ riddim ▸ música), RIDDIMS A–Z, MÚSICAS A–Z e ★ FAVORITOS — só com os riddims que têm a harmonia levantada (321 músicas, ● conferida / ◐ aproximada). Os favoritos ficam em `DubMastor/MRK-80.settings`.
 - **PREVIEW na aba INSTRUMENTO** (3.3): toca o loop da machine sem trocar de aba.
-- **OUVIR O ACORDE** (3.4): clicar na TÔNICA, em MAIOR / MENOR ou numa INVERSÃO toca o acorde do cartão no piano enquanto o botão do mouse estiver apertado (as mesmas notas do loop), mesmo com a DAW parada e o PREVIEW desligado.
+- **OUVIR O ACORDE** (3.4): clicar na TÔNICA, em MAIOR / MENOR ou numa INVERSÃO toca o acorde do cartão no piano enquanto o botão do mouse estiver apertado (as mesmas notas do loop), mesmo com a DAW parada e o PREVIEW desligado. No play, as notas que estão soando acendem em verde no teclado da tônica.
 - **Som**: com o **SOM INTERNO** desligado (o padrão), os acordes tocam no piano ou no órgão do instrumento, passando pelo eco, flanger, reverb e maximizer. Ligado, toca o som próprio da machine: piano M1 no skank e Hammond no bubble ao mesmo tempo (PIANO M1 e HAMMOND ajustam os níveis).
 - **Tocar**: **PREVIEW** toca sem a DAW (BPM no knob); **TOCA COM A DAW** (no cabeçalho) segue o play, o BPM e o loop da DAW.
 - **MIDI**: EXPORTAR ou ARRASTAR para a timeline, com repetição 1x a 8x.
@@ -118,6 +118,9 @@ Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, 
 
 ## Novidades da 3.4
 - OUVIR O ACORDE: ao escolher a tônica, maior/menor ou a inversão, o acorde do cartão toca enquanto o mouse estiver apertado.
+- TÔNICA PINTADA NO PLAY: o teclado da tônica acende em verde as notas que estão tocando, em tempo real.
+
+![Aba CHORD MACHINE tocando](docs/interface-chord-machine-tocando.png)
 
 ## Novidades da 3.3
 - Presets da CHORD MACHINE no padrão do mega banco (só riddims com harmonia), PREVIEW na aba do instrumento, PAN do piano e do GUITAR SKANK.

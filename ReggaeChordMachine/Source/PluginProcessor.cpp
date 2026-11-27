@@ -251,6 +251,17 @@ void DubChordsProcessor::allNotesOff (juce::MidiBuffer& midi, int sample)
             }
 }
 
+// Notas soando no fim do bloco, por cartão (a interface pinta o teclado da tônica com elas)
+void DubChordsProcessor::publishPlaying()
+{
+    juce::uint32 m[numSlots] {};
+    for (int ch = 1; ch <= 16; ++ch)
+        for (int n = 0; n < 128; ++n)
+            if (active[ch][n] && juce::isPositiveAndBelow ((int) activeSlot[ch][n], numSlots))
+                m[activeSlot[ch][n]] |= 1u << (n % 12);
+    for (int i = 0; i < numSlots; ++i) playMask[(size_t) i].store (m[i]);
+}
+
 //==============================================================================
 void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
@@ -315,7 +326,7 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
                 if (occ >= ppq)
                 {
                     const int s = juce::jlimit (0, numSamples - 1, (int) ((occ - ppq) / blockBeats * numSamples));
-                    pending.push_back ({ s, on, e.channel, e.note, e.velocity });
+                    pending.push_back ({ s, on, e.channel, e.note, e.velocity, e.slot });
                 }
                 occ += loopBeats;
             }
@@ -342,6 +353,9 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
                 if (isOn) midi.addEvent (juce::MidiMessage::noteOff (p.channel, p.note), p.sample);
                 midi.addEvent (juce::MidiMessage::noteOn (p.channel, p.note, (juce::uint8) p.vel), p.sample);
                 isOn = true;
+                activeSlot[p.channel][p.note] = (signed char) p.slot;
+                if (juce::isPositiveAndBelow (p.slot, numSlots))
+                    hitMask[(size_t) p.slot].fetch_or (1u << (p.note % 12));
             }
             else if (isOn)
             {
@@ -355,6 +369,7 @@ void DubChordsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
         if (! hostPlaying) internalPpq = end;
         displayPos.store (std::fmod (std::max (0.0, ppq), loopBeats));
     }
+    publishPlaying();
 
     // --- Som interno (o MIDI gerado continua saindo para a DAW) ---
     const bool soundOn = param ("sound") > 0.5f;

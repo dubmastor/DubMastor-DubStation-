@@ -254,6 +254,7 @@ void NoteKeys::paint (juce::Graphics& g)
     auto drawKey = [&] (int n)
     {
         const bool black = isBlack (n), on = n == active, over = n == hover;
+        const bool lit = (playing >> n) & 1u;                   // nota tocando agora no play
         auto r = keyRect (n).reduced (black ? 0.0f : 1.0f, 0.0f);
         r = r.withTrimmedTop (on ? 3.0f : 0.0f);               // tecla afundada
         const float rad = 3.0f;
@@ -277,7 +278,16 @@ void NoteKeys::paint (juce::Graphics& g)
                 g.setColour (colours::amber.withAlpha (0.18f));
                 g.fillRoundedRectangle (r, rad);
             }
-            g.setColour (on ? juce::Colour (0xff6b3f05) : colours::inkSoft);
+            if (lit)
+            {
+                juce::ColourGradient gl (colours::jamGreen.brighter (0.9f).withAlpha (0.75f), r.getCentreX(), r.getY(),
+                                         colours::jamGreen.withAlpha (0.45f), r.getCentreX(), r.getBottom(), false);
+                g.setGradientFill (gl);
+                g.fillRoundedRectangle (r, rad);
+                g.setColour (colours::jamGreen.darker (0.2f));
+                g.drawRoundedRectangle (r.reduced (1.0f), rad, 2.0f);
+            }
+            g.setColour (lit ? juce::Colour (0xff04361a) : on ? juce::Colour (0xff6b3f05) : colours::inkSoft);
             g.setFont (stencil (11.0f, 0.02f));
             g.drawText (dub::rootName (n), r.withTrimmedBottom (10.0f).withTop (r.getBottom() - 32.0f), juce::Justification::centred);
         }
@@ -291,7 +301,14 @@ void NoteKeys::paint (juce::Graphics& g)
             g.fillRoundedRectangle (r, rad);
             g.setColour (juce::Colours::white.withAlpha (on ? 0.05f : 0.14f));
             g.fillRoundedRectangle (r.reduced (3.0f, 2.0f).withHeight (r.getHeight() * 0.55f), 2.0f);
-            g.setColour (on ? colours::amber : colours::cream.withAlpha (0.75f));
+            if (lit)
+            {
+                juce::ColourGradient gl (colours::jamGreen.brighter (0.6f), r.getCentreX(), r.getY(),
+                                         colours::jamGreen.darker (0.5f), r.getCentreX(), r.getBottom(), false);
+                g.setGradientFill (gl);
+                g.fillRoundedRectangle (r.reduced (1.0f), rad);
+            }
+            g.setColour (lit ? juce::Colours::white : on ? colours::amber : colours::cream.withAlpha (0.75f));
             g.setFont (stencil (8.5f, 0.0f));
             g.drawText (dub::rootName (n), r.withTop (r.getBottom() - 24.0f).withTrimmedBottom (10.0f), juce::Justification::centred);
         }
@@ -728,6 +745,19 @@ void DubChordsPanel::exportMidi()
 void DubChordsPanel::timerCallback()
 {
     voicings = proc.getVoicings();
+    for (int i = 0; i < DubChordsProcessor::numSlots; ++i)   // pinta as notas que estão tocando (cada tecla fica ~100 ms acesa)
+    {
+        const auto now = proc.takePlayingMask (i);
+        juce::uint32 mask = 0;
+        auto& hold = litHold[(size_t) i];
+        for (int n = 0; n < 12; ++n)
+        {
+            if ((now >> n) & 1u) hold[(size_t) n] = 3;
+            else if (hold[(size_t) n] > 0) --hold[(size_t) n];
+            if (hold[(size_t) n] > 0) mask |= 1u << n;
+        }
+        mods[(size_t) i].keys->setPlaying (mask);
+    }
     for (int i = 0; i < DubChordsProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);

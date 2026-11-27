@@ -59,6 +59,8 @@ h1{margin:0;font-size:clamp(14px,3.4vw,25px);letter-spacing:.16em;font-weight:80
 .keys .on.k{color:var(--amber);transform:translateY(3px)}
 .keys .on::after{content:"";position:absolute;bottom:20px;width:7px;height:7px;border-radius:50%;background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 7px var(--amber)}
 .keys .k.on::after{bottom:14px}
+.keys .lit.w{background:linear-gradient(180deg,#8fe0a8,#2fa45c);box-shadow:inset 0 0 0 2px #0b6b30,0 0 10px rgba(11,138,60,.6);color:#04361a}
+.keys .lit.k{background:linear-gradient(180deg,#5fcf86,#06501f);color:#fff;box-shadow:0 0 9px rgba(11,138,60,.8)}
 .stepper{display:flex;align-items:center;gap:6px;justify-content:center}
 .stepper button{width:44px;height:42px;border:0;border-radius:5px;background:var(--label);color:var(--amber);font-size:18px;font-weight:800;cursor:pointer}
 .stepper button:disabled{color:rgba(239,229,204,.2)}
@@ -514,6 +516,7 @@ const audio = (() => {
         if (t < from) continue;
         const when = beatTime + (t - beatPos) * spb, len = e.length * spb;
         play(when, e.note, e.velocity, len);
+        lit.push({ slot: e.slot, pc: e.note % 12, on: when, off: when + Math.max(len, 0.1) });   // pinta a tecla da tônica
       }
     }
     if (st.gtr) for (const gr of skankGroups(active)) {
@@ -541,13 +544,22 @@ const audio = (() => {
     beatTime += (toBeat - beatPos) * spb; beatPos = toBeat;
     const now = ctx.currentTime; voices = voices.filter((v) => v.end > now);
   }
+  let lit = [];   // notas agendadas: { slot, pc, on, off } em segundos do AudioContext
+  function litNow() {
+    const masks = [0, 0, 0, 0];
+    if (!ctx || !playing) return masks;
+    const now = ctx.currentTime;
+    lit = lit.filter((x) => x.off > now);
+    for (const x of lit) if (x.on <= now && x.slot >= 0 && x.slot < 4) masks[x.slot] |= 1 << x.pc;
+    return masks;
+  }
   function start() {
     ensure(); if (ctx.state === 'suspended') ctx.resume();
     active = loop; pending = null; beatPos = 0; beatTime = ctx.currentTime + 0.08; organHeldUntil = 0; playing = true;
     clearInterval(timer); timer = setInterval(tick, 25); tick();
   }
   function stop() {
-    playing = false; clearInterval(timer);
+    playing = false; clearInterval(timer); lit = [];
     if (ctx) for (const v of voices) { try { v.g.gain.cancelScheduledValues(ctx.currentTime); v.g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.02); } catch (e) {} }
     voices = [];
   }
@@ -564,7 +576,7 @@ const audio = (() => {
     organHeldUntil = Math.min(organHeldUntil, t);
   }
   return {
-    start, stop, isPlaying: () => playing, liveOn, liveOff,
+    start, stop, isPlaying: () => playing, liveOn, liveOff, litNow,
     unlock() { ensure(); if (ctx.state === 'suspended') ctx.resume(); return ctx; },
     setLoop(l) { if (playing) pending = l; else active = l; },
     setLevels() { if (!ctx) return; const t = ctx.currentTime; pianoGain.gain.setTargetAtTime(st.pianoLvl / 100, t, 0.03); organGain.gain.setTargetAtTime(st.organLvl / 100, t, 0.03);
@@ -869,6 +881,12 @@ render();
   const h = $('head'), b = audio.playhead(), L = audio.loopBeats();
   if (b >= 0 && L > 0) { h.style.display = 'block'; h.style.left = `calc(5px + ${(b / L) * 100}% - ${(b / L) * 10}px)`; }
   else h.style.display = 'none';
+  // notas tocando agora: pintadas de verde no teclado da tônica de cada cartão
+  audio.litNow().forEach((mask, i) => {
+    const k = $('keys' + i); if (!k || k.dataset.lit == mask) return;
+    k.dataset.lit = mask;
+    k.querySelectorAll('button').forEach((b) => b.classList.toggle('lit', ((mask >> +b.dataset.n) & 1) === 1));
+  });
   requestAnimationFrame(anim);
 })();
 </script>

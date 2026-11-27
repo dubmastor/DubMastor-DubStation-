@@ -71,6 +71,14 @@ public:
     // notas do "ouvir o acorde" saídas no último bloco (o MRK-80 toca mesmo com PREVIEW desligado)
     const juce::MidiBuffer& getAuditionMidi() const noexcept { return auditionOut; }
 
+    // notas do loop soando agora em cada cartão (bit 0..11 = dó..si), para pintar o teclado da tônica.
+    // Inclui as notas que tocaram e já soltaram desde a última leitura (skank curto não some entre dois quadros).
+    juce::uint32 takePlayingMask (int slot) noexcept
+    {
+        if (! juce::isPositiveAndBelow (slot, numSlots)) return 0;
+        return playMask[(size_t) slot].load() | hitMask[(size_t) slot].exchange (0);
+    }
+
     juce::AudioProcessorValueTreeState apvts;
 
 private:
@@ -113,10 +121,13 @@ private:
     juce::MidiBuffer auditionOut;
     void runAudition (juce::MidiBuffer& midi);
 
-    struct Pending { int sample; bool on; int channel; int note; int vel; };
+    struct Pending { int sample; bool on; int channel; int note; int vel; int slot; };
     std::vector<Pending> pending;
 
     bool active[17][128] {};
+    signed char activeSlot[17][128] {};       // cartão de cada nota soando
+    std::array<std::atomic<juce::uint32>, numSlots> playMask {}, hitMask {};
+    void publishPlaying();
     bool wasPlaying = false;
     bool soundWasOn = true;
     double expectedPpq = 0.0;

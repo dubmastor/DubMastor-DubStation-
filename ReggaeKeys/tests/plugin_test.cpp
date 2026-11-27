@@ -240,6 +240,38 @@ int main (int argc, char** argv)
         check (tail < held * 0.2, "ouvir acorde: som morre depois de soltar");
         p.setPlayHead (nullptr);
     }
+    {   // 9) 3.4 TECLADO DA TÔNICA PINTADO NO PLAY: o cartão mostra as notas que estão tocando agora
+        RootsKeysProcessor p;
+        const double sr = 48000.0; const int bs = 512;
+        FakePlayHead ph; ph.playing = true;
+        p.setPlayHead (&ph);
+        setP (p.apvts, "machineOn", 1.0f);
+        p.prepareToPlay (sr, bs);
+        auto& m = p.getMachine();
+        juce::AudioBuffer<float> buf (2, bs);
+        const auto v = dub::voiceProgression (m.getSlots(), m.getSettings().centerNote);
+        juce::uint32 chord0 = 0;
+        for (int n : v.notes[0]) chord0 |= 1u << (n % 12);
+        juce::uint32 seen0 = 0, outside = 0;
+        for (int b = 0; b < 400; ++b)   // só a duração do 1º cartão
+        {
+            juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+            ph.ppq += (double) bs / sr * ph.bpm / 60.0;
+            if (ph.ppq >= m.getSlots()[0].beats - 0.05) break;
+            const auto k = m.takePlayingMask (0);
+            seen0 |= k; outside |= k & ~chord0;
+            for (int c = 1; c < 4; ++c) outside |= m.takePlayingMask (c);
+        }
+        check (seen0 == chord0 && outside == 0, "tonica no play: cartao 1 acende as notas do acorde dele e nenhuma outra (mask "
+                                                + juce::String::toHexString ((int) seen0) + " / " + juce::String::toHexString ((int) chord0) + ")");
+        ph.playing = false;
+        for (int b = 0; b < 4; ++b) { juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi); }
+        m.takePlayingMask (0);
+        juce::uint32 after = 0;
+        for (int c = 0; c < 4; ++c) after |= m.takePlayingMask (c);
+        check (after == 0, "tonica no play: parar apaga as teclas");
+        p.setPlayHead (nullptr);
+    }
     {   // 7) capturas da interface
         RootsKeysProcessor p;
         setP (p.getMachine().apvts, "bubble", 1.0f);
@@ -272,6 +304,32 @@ int main (int argc, char** argv)
         save ("interface-chord-machine.png");
         setP (p.getMachine().apvts, "pattern", 1.0f);
         save ("interface-chord-machine-bang-bang.png");
+        {   // tocando: as teclas da tônica acendem com as notas do acorde
+            FakePlayHead ph; ph.playing = true;
+            p.setPlayHead (&ph);
+            setP (p.apvts, "machineOn", 1.0f);
+            p.prepareToPlay (48000.0, 512);
+            juce::AudioBuffer<float> buf (2, 512);
+            for (int f = 0; f < 40; ++f)
+            {
+                for (int b = 0; b < 3; ++b)
+                {
+                    juce::MidiBuffer midi; buf.clear(); p.processBlock (buf, midi);
+                    ph.ppq += 512.0 / 48000.0 * ph.bpm / 60.0;
+                }
+                juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+                if (f == 39)   // no meio do skank do 1º acorde: as teclas dele acesas
+                {
+                    auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 1.4f);
+                    juce::File fo = outDir.getChildFile ("interface-chord-machine-tocando.png");
+                    fo.deleteFile();
+                    juce::FileOutputStream os (fo);
+                    juce::PNGImageFormat fmt;
+                    check (os.openedOk() && fmt.writeImageToStream (img, os), "imagem " + fo.getFileName());
+                }
+            }
+            p.setPlayHead (nullptr);
+        }
     }
 
     std::printf ("\n%s\n", failures == 0 ? "TUDO OK" : "HA FALHAS");

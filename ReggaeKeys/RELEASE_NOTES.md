@@ -1,7 +1,8 @@
 ## Mastor Reggae Keys MRK-80 3.4 🟢🟡⚫
 
 - **OUVIR O ACORDE na CHORD MACHINE:** ao clicar numa tecla da **TÔNICA** (ou em **MAIOR / MENOR** ou numa **INVERSÃO**), o acorde daquele cartão toca no piano **enquanto o botão do mouse estiver apertado**, e para ao soltar. Soam as mesmas notas que o loop vai tocar (a inversão escolhida ou a do AUTO, o REGISTRO e as duas mãos), no timbre escolhido e com o GUITAR SKANK se estiver ligado. Funciona com a DAW parada e com o PREVIEW desligado, e também num cartão desligado (OFF).
-- Versão para celular 3.4 com o mesmo recurso: o acorde soa enquanto o dedo estiver na tecla.
+- **TÔNICA PINTADA NO PLAY:** com a DAW tocando (ou o PREVIEW ligado), o teclado da TÔNICA de cada cartão acende **em verde as notas que estão soando naquele instante**, em tempo real, no ritmo do skank e do bubble. A lâmpada âmbar continua marcando a tônica escolhida. Ao parar, as teclas apagam.
+- Versão para celular 3.4 com os dois recursos: o acorde soa enquanto o dedo estiver na tecla, e no play as notas tocando acendem em verde.
 
 ## Mastor Reggae Keys MRK-80 3.3 🟢🟡⚫
 
