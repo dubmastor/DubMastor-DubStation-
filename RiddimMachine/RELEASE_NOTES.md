@@ -1,3 +1,16 @@
+## Mastor Riddim Machine MRM-0420 2.9 — DubStation
+
+Traz as melhorias da CHORD MACHINE do Mastor Reggae Keys MRK-80 3.4 e da BASS MACHINE do Mastor Reggae Bass MRB-69 2.2 (código compilado direto das pastas delas):
+
+- **Aba RIDDIM (harmonia) · teclado da TÔNICA:**
+  - **Ouvir o acorde:** clicar na tônica, em MAIOR / MENOR ou na inversão toca o acorde do cartão (as mesmas notas do loop, duas mãos) enquanto o mouse estiver apertado, mesmo com o PLAY parado.
+  - **Notas tocando em verde:** no play, as notas que estão soando acendem em verde no teclado do cartão, em tempo real.
+  - **Próximas harmonias:** escolhido o ACORDE 1, os cartões seguintes destacam em dourado as 3 harmonias que mais combinam depois do acorde anterior, com o grau na tecla (IV, V, IIm, bVII, IVm...). Vem das passagens de acorde das 321 músicas com harmonia do banco de riddims. Tocar numa tecla sugerida já escolhe maior/menor da sugestão.
+- **Aba BAIXO (BASS MACHINE):**
+  - O mesmo teclado da TÔNICA: ouvir a tônica no baixo ao apertar (no REGISTRO da linha), notas da linha em verde no play e as próximas harmonias (7 conta como maior, m7 como menor).
+  - **EQ -2k e EQ -1k** (SOM DO BAIXO, ao lado do SOM INTERNO): deixam só os graves, com filtro de 96 dB por oitava (-2k: -15 dB em 2 kHz, -71 dB em 3 kHz; -1k: -15 dB em 1 kHz, -71 dB em 1,5 kHz). Ligar um desliga o outro; começa sem corte.
+- **Versão para celular 2.9:** na RIDDIM, cada acorde (do 2 em diante) mostra os botões "combina" com as 3 próximas harmonias (o mesmo cálculo do plugin); tocar num deles troca o acorde.
+
 ## Mastor Riddim Machine MRM-0420 2.8 — DubStation
 
 - **Aba ÓRGÃO, nova (depois da RIDDIM):** o Mastor Reggae Organ MRO-68 1.3 inteiro dentro do MRM-0420, compilado direto da pasta dele: os grooves dos organistas (Mittoo, Wright, Downie, Gladdy…), grade, drawbars, Leslie animada, os pianos elétricos (Rhodes, Suitcase, Wurlitzer, DX EP), a aba EQ e os **timbres Midnite** (MIDNITE, ABAFADO, CORPO e AO VIVO)
