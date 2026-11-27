@@ -180,7 +180,7 @@ void DubBassAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     machine->setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
     machine->prepareToPlay (sampleRate, samplesPerBlock);
     machineBuf.setSize (2, juce::jmax (1, samplesPerBlock));
-    machineCut.setOn (machine->apvts.getRawParameterValue ("eq2k")->load() > 0.5f);
+    machineCut.setMode (machineCutMode());
     machineCut.prepare (sampleRate);
     keyboardState.reset();
     const int  nCh   = juce::jlimit (1, 2, getTotalNumOutputChannels());
@@ -509,8 +509,8 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
         }
     };
 
-    // 5b) EQ da BASS MACHINE: corta tudo acima de 2 kHz no baixo (depois da saturação, antes do maximizer)
-    machineCut.setOn (machine->apvts.getRawParameterValue ("eq2k")->load() > 0.5f);
+    // 5b) EQ da BASS MACHINE: -2k ou -1k, deixa só os graves (depois da saturação, antes do maximizer)
+    machineCut.setMode (machineCutMode());
     machineCut.process (buffer, numSamples);
 
     // 6) Maximizer (com bypass)
@@ -596,7 +596,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new DubBassAudioProcessor();
 }
 
-bool DubBassAudioProcessor::isMachineCut2kOn() const
+int DubBassAudioProcessor::machineCutMode() const
 {
-    return machine->apvts.getRawParameterValue ("eq2k")->load() > 0.5f;
+    return juce::roundToInt (machine->apvts.getRawParameterValue ("eqCut")->load());
 }

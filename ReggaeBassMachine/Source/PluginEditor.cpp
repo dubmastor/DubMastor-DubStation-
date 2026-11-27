@@ -202,7 +202,7 @@ void BassLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton& b
 
     g.setColour (colours::cream.withAlpha (on ? 1.0f : 0.65f));
     g.setFont (stencil (11.0f, 0.08f));
-    g.drawText (b.getButtonText(), r.withTrimmedLeft (22), juce::Justification::centred);
+    g.drawFittedText (b.getButtonText(), r.withTrimmedLeft (20).toNearestInt(), juce::Justification::centred, 1, 0.6f);   // botão estreito: letra menor
 }
 
 // EXPORTAR / NOVA IDEIA: tampa verde grande de botão de pedal (igual ao THROW do Big Knob)
@@ -1101,8 +1101,9 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
     for (auto* k : { &tone, &drive, &volume })
         k->slider.textFromValueFunction = percent;
     setupToggle (sound, "sound", "SOM INTERNO");
-    setupToggle (eq2k, "eq2k", "EQ  -2k");
-    eq2k.button.setTooltip (juce::String::fromUTF8 ("EQ: corta tudo acima de 2 kHz no baixo"));
+    for (auto* b : { &eq2kBtn, &eq1kBtn }) { b->setClickingTogglesState (false); addAndMakeVisible (*b); }
+    eq2kBtn.onClick = [this] { setEqCut (eq2kBtn.getToggleState() ? 0 : mbm::BassCut::Cut2k); };
+    eq1kBtn.onClick = [this] { setEqCut (eq1kBtn.getToggleState() ? 0 : mbm::BassCut::Cut1k); };
     setupToggle (drumsOn, "drumsOn", "BATERIA");
     setupToggle (keysOn, "keysOn", "TECLADO");
     setupKnob (drumVol, "drumVol", "VOLUME");
@@ -1207,8 +1208,25 @@ void BassMachinePanel::updateHints()
     }
 }
 
+// EQ da BASS MACHINE: -2k ou -1k (o mesmo botão de novo volta para SEM CORTE)
+void BassMachinePanel::setEqCut (int mode)
+{
+    if (auto* p = proc.apvts.getParameter ("eqCut"))
+    {
+        p->beginChangeGesture();
+        p->setValueNotifyingHost (p->convertTo0to1 ((float) mode));
+        p->endChangeGesture();
+    }
+    timerCallback();
+}
+
 void BassMachinePanel::timerCallback()
 {
+    {
+        const int cut = juce::roundToInt (proc.apvts.getRawParameterValue ("eqCut")->load());
+        eq2kBtn.setToggleState (cut == mbm::BassCut::Cut2k, juce::dontSendNotification);
+        eq1kBtn.setToggleState (cut == mbm::BassCut::Cut1k, juce::dontSendNotification);
+    }
     updateHints();
     for (int i = 0; i < BassMachineProcessor::numSlots; ++i)   // pinta as notas da linha que estão tocando (cada tecla fica ~100 ms acesa)
     {
@@ -1741,8 +1759,10 @@ void BassMachinePanel::resized()
             placeKnob (*k, knobs.removeFromLeft (kw));
         a.removeFromTop (2);
         auto row = a.removeFromTop (28);
-        eq2k.button.setBounds (row.removeFromRight (row.getWidth() * 2 / 5).reduced (4, 0));
-        sound.button.setBounds (row.reduced (4, 0));
+        const int w3 = row.getWidth() / 4;
+        eq1kBtn.setBounds (row.removeFromRight (w3).reduced (2, 0));
+        eq2kBtn.setBounds (row.removeFromRight (w3).reduced (2, 0));
+        sound.button.setBounds (row.reduced (2, 0));
     }
     scope.setBounds (scopePanel.reduced (8, 0).withTrimmedTop (16).withTrimmedBottom (6));
     {

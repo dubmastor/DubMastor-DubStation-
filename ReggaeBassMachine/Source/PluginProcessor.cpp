@@ -59,7 +59,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout BassMachineProcessor::create
 
     // som interno
     layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "sound", 1 }, "Som interno", true));
-    layout.add (std::make_unique<AudioParameterBool>   (ParameterID { "eq2k", 1 }, "EQ corta 2k", false));   // começa desligado
+    layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "eqCut", 1 }, "EQ corte",
+                                                        juce::StringArray { "Sem corte", "-2k", "-1k" }, 0));   // começa sem corte
     layout.add (std::make_unique<AudioParameterChoice> (ParameterID { "timbre", 1 }, "Timbre", timbres, mbm::RootsSine));
     layout.add (std::make_unique<AudioParameterFloat>  (ParameterID { "inGain", 1 }, "Ganho de entrada", NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f,
                                                         AudioParameterFloatAttributes().withLabel ("dB")));
@@ -115,7 +116,7 @@ void BassMachineProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 {
     sr = sampleRate;
     synth.prepare (sampleRate, samplesPerBlock);
-    bassCut.setOn (param ("eq2k") > 0.5f);
+    bassCut.setMode (juce::roundToInt (param ("eqCut")));
     bassCut.prepare (sampleRate);
     monoBuf.setSize (1, juce::jmax (1, samplesPerBlock), false, true, false);
     setLatencySamples (synth.getLatencySamples());
@@ -553,7 +554,7 @@ void BassMachineProcessor::renderSynth (juce::AudioBuffer<float>& buffer, const 
     }
     if (pos < numSamples) synth.renderVoice (mono, pos, numSamples);
     synth.finish (monoBuf, numSamples);
-    bassCut.setOn (param ("eq2k") > 0.5f);   // EQ: corta tudo acima de 2 kHz
+    bassCut.setMode (juce::roundToInt (param ("eqCut")));   // EQ: -2k ou -1k deixam só os graves
     bassCut.process (monoBuf, numSamples);
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)

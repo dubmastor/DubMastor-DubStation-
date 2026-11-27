@@ -1198,11 +1198,12 @@ void CrtEqCurve::paint (juce::Graphics& g)
     if (boostOn)
         filters.push_back (Coeffs::makePeakFilter (sr, DubBassAudioProcessor::boostFreq, DubBassAudioProcessor::boostQ,
                                                    juce::Decibels::decibelsToGain (DubBassAudioProcessor::boostGainDb)));
-    // botão EQ -2k da BASS MACHINE: o mesmo passa-baixa de 16ª ordem que o som usa (HighCut2k.h)
-    const bool cut2k = proc.isMachineCut2kOn();
+    // EQ -2k / -1k da BASS MACHINE: o mesmo passa-baixa de 16ª ordem que o som usa (BassCut.h)
+    const int cutMode = proc.machineCutMode();
+    const bool cut2k = cutMode != mbm::BassCut::Off;
     if (cut2k)
-        for (float q : mbm::HighCut2k::kQ)
-            filters.push_back (Coeffs::makeLowPass (sr, mbm::HighCut2k::kCutoffHz, q));
+        for (float q : mbm::BassCut::kQ)
+            filters.push_back (Coeffs::makeLowPass (sr, mbm::BassCut::cornerHz (cutMode), q));
 
     juce::Path curve;
     const int steps = juce::jmax (2, (int) screen.getWidth());
@@ -1241,12 +1242,13 @@ void CrtEqCurve::paint (juce::Graphics& g)
     {
         // região cortada (de 2 kHz para cima) e a etiqueta do botão
         g.setColour (colours::amber.withAlpha (0.10f));
-        g.fillRect (juce::Rectangle<float>::leftTopRightBottom (xFor (2000.0), screen.getY(), screen.getRight(), screen.getBottom()));
+        const double mark = mbm::BassCut::markHz (cutMode);
+        g.fillRect (juce::Rectangle<float>::leftTopRightBottom (xFor (mark), screen.getY(), screen.getRight(), screen.getBottom()));
         g.setColour (colours::amber.withAlpha (0.55f));
-        const float x2 = xFor (2000.0);
+        const float x2 = xFor (mark);
         for (float y = screen.getY(); y < screen.getBottom(); y += 6.0f) g.drawLine (x2, y, x2, juce::jmin (y + 3.0f, screen.getBottom()), 1.0f);
         g.setColour (colours::amber);
-        g.drawText ("EQ -2k (BASS MACHINE)", screen.reduced (8.0f, 4.0f).withTrimmedTop (boostOn ? 13.0f : 0.0f), juce::Justification::topRight);
+        g.drawText (juce::String ("EQ ") + mbm::BassCut::name (cutMode) + " (BASS MACHINE)", screen.reduced (8.0f, 4.0f).withTrimmedTop (boostOn ? 13.0f : 0.0f), juce::Justification::topRight);
     }
 
     // pontos das 10 bandas (arrastáveis)

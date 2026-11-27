@@ -268,7 +268,8 @@ private:
     Knob inGain, tone, drive, volume;
     Knob reps;
     Toggle sound, drumsOn, keysOn;
-    Toggle eq2k;   // EQ: corta tudo acima de 2 kHz no baixo
+    juce::ToggleButton eq2kBtn { "EQ -2k" }, eq1kBtn { "EQ -1k" };   // EQ (parâmetro eqCut): ligar um desliga o outro; os dois deixam só os graves
+    void setEqCut (int mode);
     Knob drumVol, keysVol;
     std::unique_ptr<CounterWindow> idea;
     std::unique_ptr<PlayButton> play;

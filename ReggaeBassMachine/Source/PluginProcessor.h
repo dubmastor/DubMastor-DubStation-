@@ -3,7 +3,7 @@
 #include "BassEngine.h"
 #include "DubBassTimbre.h"
 #include "AccompEngine.h"
-#include "HighCut2k.h"
+#include "BassCut.h"
 #include "../../ReggaeDrumMachine/Source/DrumSynth.h"      // bateria acústica do Dub Drums
 #include "../../ReggaeChordMachine/Source/DubSynth.h"      // piano M1 + Hammond do Roots Keys
 
@@ -112,7 +112,7 @@ private:
     bool editsOn = false;
 
     mbm::DubBassPreview synth;   // sistema de timbres do Dub Bass
-    mbm::HighCut2k bassCut;      // botão EQ: corta tudo acima de 2 kHz no baixo
+    mbm::BassCut bassCut;        // EQ: SEM CORTE, -2k ou -1k (deixa só os graves)
 
     std::vector<mbm::NoteEvent> loop;
     std::vector<mbm::AccEvent> accLoop;        // bateria + teclado (só para o som do preview)
