@@ -6,6 +6,7 @@
 #include "PluginEditor.h"
 #include "../../ReggaeChordMachine/Source/PluginProcessor.h"
 #include "../../RiddimBank/Source/RiddimBankMenu.h"
+#include "../../ReggaeChordMachine/Source/CadenceHints.h"
 
 namespace
 {
@@ -239,6 +240,20 @@ int main (int argc, char** argv)
         const double tail = run (200);
         check (tail < held * 0.2, "ouvir acorde: som morre depois de soltar");
         p.setPlayHead (nullptr);
+    }
+    {   // 10) 3.4 PRÓXIMAS HARMONIAS: cadências do reggae a partir do ACORDE 1
+        auto top = [] (int t, int tm, int p, int pm) { auto h = cadence::suggest (t, tm, p, pm); return h.empty() ? cadence::Hint { -1, 0, 0 } : h[0]; };
+        const auto c = top (0, 0, 0, 0);    // C maior → F (IV)
+        check (c.root == 5 && c.minor == 0, "cadencia: depois de C (I) a mais comum e F (IV)");
+        const auto a = top (9, 1, 9, 1);    // A menor → G (bVII)
+        check (a.root == 7 && a.minor == 0, "cadencia: depois de Am (Im) a mais comum e G (bVII)");
+        const auto f = top (0, 0, 5, 0);    // em C, depois de F (IV) → G (V)
+        check (f.root == 7 && f.minor == 0, "cadencia: em C, depois de F (IV) vem G (V)");
+        const auto h = cadence::suggest (2, 0, 2, 0);
+        bool ok = h.size() == 3;
+        for (size_t k = 0; k < h.size(); ++k) ok = ok && h[k].rank == (int) k + 1 && h[k].root != 2;
+        check (ok, "cadencia: 3 sugestoes, em ordem, sem repetir o acorde anterior");
+        check (cadence::degreeName (9, 7, 0) == "bVII" && cadence::degreeName (0, 2, 1) == "IIm", "cadencia: nome dos graus");
     }
     {   // 9) 3.4 TECLADO DA TÔNICA PINTADO NO PLAY: o cartão mostra as notas que estão tocando agora
         RootsKeysProcessor p;

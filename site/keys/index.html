@@ -59,6 +59,11 @@ h1{margin:0;font-size:clamp(14px,3.4vw,25px);letter-spacing:.16em;font-weight:80
 .keys .on.k{color:var(--amber);transform:translateY(3px)}
 .keys .on::after{content:"";position:absolute;bottom:20px;width:7px;height:7px;border-radius:50%;background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 7px var(--amber)}
 .keys .k.on::after{bottom:14px}
+.keys .hint{outline:1.5px solid rgba(234,189,18,.7);outline-offset:-2px}
+.keys .h1{outline:2.5px solid #eabd12}
+.keys .deg{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;font-size:8.5px;line-height:13px;padding:0 3px;border-radius:3px;background:#2b241d;color:#eabd12;border:1px solid #eabd12;white-space:nowrap;pointer-events:none}
+.keys .k .deg{bottom:auto;top:6px;font-size:7.5px;padding:0 2px}
+.keys .h1 .deg{background:#eabd12;color:#2b241d;border-color:#2b241d}
 .keys .lit.w{background:linear-gradient(180deg,#8fe0a8,#2fa45c);box-shadow:inset 0 0 0 2px #0b6b30,0 0 10px rgba(11,138,60,.6);color:#04361a}
 .keys .lit.k{background:linear-gradient(180deg,#5fcf86,#06501f);color:#fff;box-shadow:0 0 9px rgba(11,138,60,.8)}
 .stepper{display:flex;align-items:center;gap:6px;justify-content:center}
@@ -653,7 +658,9 @@ function buildChords() {
     BLACK.forEach(([n, after]) => { const b = document.createElement('button'); b.className = 'k'; b.dataset.n = n; b.textContent = M.ROOTS[n];
       b.style.left = `calc(${(after + 1) * ww}% - ${ww * 0.31}%)`; b.style.width = `${ww * 0.62}%`; keys.appendChild(b); });
     // 3.4: ouvir o acorde — tônica, maior/menor e inversão tocam o acorde enquanto o dedo/mouse estiver apertado
-    keys.onpointerdown = (e) => { const b = e.target.closest('button'); if (!b) return; e.preventDefault(); s.root = +b.dataset.n; changed(); auditionStart(i); };
+    keys.onpointerdown = (e) => { const b = e.target.closest('button'); if (!b) return; e.preventDefault(); s.root = +b.dataset.n;
+      const h = hintsFor(i).find((x) => x.root === s.root); if (h) s.quality = h.minor;   // tecla sugerida já escolhe maior/menor
+      changed(); auditionStart(i); };
     ['MAIOR', 'MENOR'].forEach((t, q) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t;
       b.onpointerdown = (e) => { e.preventDefault(); s.quality = q; changed(); auditionStart(i); }; $('q' + i).appendChild(b); });
     ['AUTO', 'FUND', '1ª', '2ª'].forEach((t, k) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = t;
@@ -662,6 +669,54 @@ function buildChords() {
     $('dUp' + i).onclick = () => { s.dur = Math.min(M.DURATIONS.length - 1, s.dur + 1); changed(); };
     if (i > 0) $('on' + i).onclick = () => { s.on = !s.on; changed(); };
   });
+}
+
+// ---------------------------------------------------------------- próximas harmonias (cadências do reggae)
+// Cópia de ReggaeChordMachine/Source/CadenceHints.h: mudou um, mude o outro (mesma ordem, mesmo desempate).
+const DEGREES = ['I', 'bII', 'II', 'bIII', 'III', 'IV', 'bV', 'V', 'bVI', 'VI', 'bVII', 'VII'];
+const cadCode = (iv, minor) => (((iv % 12) + 12) % 12) * 2 + (minor ? 1 : 0);
+const CAD_RULES = [
+  [0, cadCode(0, 0), [cadCode(5, 0), cadCode(7, 0), cadCode(2, 1), cadCode(9, 1)]],
+  [0, cadCode(5, 0), [cadCode(7, 0), cadCode(0, 0), cadCode(2, 1)]],
+  [0, cadCode(7, 0), [cadCode(5, 0), cadCode(0, 0), cadCode(9, 1)]],
+  [0, cadCode(2, 1), [cadCode(7, 0), cadCode(5, 0)]],
+  [0, cadCode(9, 1), [cadCode(5, 0), cadCode(2, 1), cadCode(7, 0)]],
+  [0, cadCode(4, 1), [cadCode(5, 0), cadCode(9, 1)]],
+  [0, cadCode(10, 0), [cadCode(5, 0), cadCode(0, 0)]],
+  [1, cadCode(0, 1), [cadCode(10, 0), cadCode(5, 1), cadCode(7, 1), cadCode(8, 0)]],
+  [1, cadCode(5, 1), [cadCode(0, 1), cadCode(10, 0), cadCode(7, 1)]],
+  [1, cadCode(7, 1), [cadCode(5, 1), cadCode(0, 1)]],
+  [1, cadCode(8, 0), [cadCode(10, 0), cadCode(7, 1)]],
+  [1, cadCode(10, 0), [cadCode(0, 1), cadCode(8, 0), cadCode(5, 1)]],
+  [1, cadCode(3, 0), [cadCode(5, 1), cadCode(10, 0)]],
+];
+function cadenceHints(tonic, tonicMinor, prev, prevMinor, maxHints = 3) {
+  const from = cadCode(prev - tonic, prevMinor), count = new Array(24).fill(0); let total = 0;
+  for (const e of (window.RIDDIM_BANK || { entries: [] }).entries) {
+    const c = e.chords || [];
+    if (e.harmony >= 2 || c.length < 2 || (c[0][1] !== 0) !== (tonicMinor !== 0)) continue;
+    const t = c[0][0];
+    for (let k = 1; k < Math.min(c.length, 4); k++) if (cadCode(c[k - 1][0] - t, c[k - 1][1]) === from) { count[cadCode(c[k][0] - t, c[k][1])]++; total++; }
+  }
+  const theory = new Array(24).fill(99);
+  for (const [mk, f, to] of CAD_RULES) if (mk === (tonicMinor ? 1 : 0) && f === from) to.forEach((c, k) => { theory[c] = k; });
+  const order = [];
+  for (let c = 0; c < 24; c++) if (c !== from && ((total >= 3 && count[c] > 0) || theory[c] < 99)) order.push(c);
+  order.sort((a, b) => { const ca = total >= 3 ? count[a] : 0, cb = total >= 3 ? count[b] : 0; return ca !== cb ? cb - ca : theory[a] - theory[b] || a - b; });
+  const out = [];
+  for (const c of order) {
+    const root = (tonic + (c >> 1)) % 12;
+    if (out.some((h) => h.root === root)) continue;
+    out.push({ root, minor: c & 1, rank: out.length + 1, label: DEGREES[(c >> 1)] + (c & 1 ? 'm' : '') });
+    if (out.length >= maxHints) break;
+  }
+  return out;
+}
+function hintsFor(i) {
+  if (i === 0) return [];
+  let p = i - 1; while (p > 0 && !st.slots[p].on) p--;
+  const t = st.slots[0], q = st.slots[p];
+  return cadenceHints(t.root, t.quality, q.root, q.quality);
 }
 
 // ---------------------------------------------------------------- ouvir o acorde (mesmas notas do loop: inversão, registro e duas mãos)
@@ -693,7 +748,14 @@ function render() {
     const d = $('disp' + i);
     d.textContent = on ? `${M.ROOTS[s.root]} ${s.quality ? 'MENOR' : 'MAIOR'}  ·  ${M.INVERSIONS[v.used[i]]}` : 'OFF';
     d.classList.toggle('off', !on);
-    $('keys' + i).querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.n === s.root));
+    const hints = hintsFor(i);
+    $('keys' + i).querySelectorAll('button').forEach((b) => {
+      b.classList.toggle('on', +b.dataset.n === s.root);
+      const h = hints.find((x) => x.root === +b.dataset.n);
+      b.classList.toggle('hint', !!h); b.classList.toggle('h1', !!h && h.rank === 1);
+      let tag = b.querySelector('.deg'); if (h && !tag) { tag = document.createElement('span'); tag.className = 'deg'; b.appendChild(tag); }
+      if (tag) { if (h) tag.textContent = h.label; else tag.remove(); }
+    });
     [...$('q' + i).children].forEach((b, q) => b.classList.toggle('on', q === s.quality));
     [...$('inv' + i).children].forEach((b, k) => { b.classList.toggle('on', k === s.inv + 1); b.classList.toggle('sug', k === v.suggested[i] + 1); });
     $('dVal' + i).innerHTML = `<b>${M.DURATIONS[s.dur].name}</b><small>${s.dur <= 1 ? 'COMPASSO' : 'COMPASSOS'}</small>`;

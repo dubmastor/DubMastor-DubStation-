@@ -119,6 +119,7 @@ Teste do plugin (CHORD MACHINE no som do teclado, projeto antigo da DUB CHORDS, 
 ## Novidades da 3.4
 - OUVIR O ACORDE: ao escolher a tônica, maior/menor ou a inversão, o acorde do cartão toca enquanto o mouse estiver apertado.
 - TÔNICA PINTADA NO PLAY: o teclado da tônica acende em verde as notas que estão tocando, em tempo real.
+- PRÓXIMAS HARMONIAS: depois do ACORDE 1, cada cartão destaca as 3 harmonias que mais combinam (cadências das músicas do banco de riddims), com o grau na tecla.
 
 ![Aba CHORD MACHINE tocando](docs/interface-chord-machine-tocando.png)
 

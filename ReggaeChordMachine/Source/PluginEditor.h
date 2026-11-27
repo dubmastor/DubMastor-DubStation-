@@ -72,7 +72,12 @@ public:
     void mouseExit (const juce::MouseEvent&) override   { hover = -1; repaint(); }
     // notas do acorde que está tocando no play (bit 0..11 = dó..si): ficam pintadas de verde
     void setPlaying (juce::uint32 mask) { if (mask != playing) { playing = mask; repaint(); } }
+    // próximas harmonias que combinam (cadências do reggae): grau marcado na tecla, rank 1 = a mais comum
+    struct KeyHint { int minor = 0, rank = 0; juce::String label; bool operator!= (const KeyHint& o) const { return minor != o.minor || rank != o.rank || label != o.label; } };
+    void setHints (const std::array<KeyHint, 12>& h) { bool ch = false; for (int k = 0; k < 12; ++k) ch = ch || (h[(size_t) k] != hints[(size_t) k]); if (ch) { hints = h; repaint(); } }
+    std::function<void (int minor)> onHintQuality;   // tocar numa tecla sugerida já escolhe maior/menor da sugestão
 private:
+    std::array<KeyHint, 12> hints {};
     juce::Rectangle<float> keyRect (int note) const;
     int keyAt (juce::Point<float>) const;
     int hover = -1;
@@ -197,7 +202,8 @@ private:
     juce::Rectangle<int> woodL, woodR, plate;
     juce::Rectangle<int> chordPanel, rhythmPanel, soundPanel, midiPanel, timeline, loopRow;
     std::array<bool, DubChordsProcessor::numSlots> lastOn {};
-    std::array<std::array<int, 12>, DubChordsProcessor::numSlots> litHold {};   // quadros que a tecla ainda fica acesa
+    std::array<std::array<int, 12>, DubChordsProcessor::numSlots> litHold {};
+    void updateHints();   // quadros que a tecla ainda fica acesa
     dub::Voicings voicings;   // atualizado pelo timer (inversões sugeridas/usadas)
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DubChordsPanel)

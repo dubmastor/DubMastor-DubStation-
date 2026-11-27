@@ -117,6 +117,11 @@ Toda alteração sobe a versão nos `rep(...)` do `build_web.py`, no README da p
   são eles que mantêm os projetos antigos abrindo.
 - Toda alteração de bateria vale para o MRD-12, o MRM-0420 e o código do MRDM-12.
 
+## Próximas harmonias da CHORD MACHINE (ReggaeChordMachine/Source/CadenceHints.h)
+As sugestões de cadência (contagem das passagens de acorde do banco de riddims + tabela de teoria) têm uma cópia em JavaScript
+na versão para celular do MRK-80 (`site/keys/index.html`, `cadenceHints`): ao mudar um, mude o outro (as mesmas 3 sugestões, na mesma ordem).
+O código vale também para o MRCM-1240 e o MRM-0420 (mesmo editor).
+
 ## GUITAR SKANK do MRK-80 (ReggaeKeys/Source/GuitarSkank.h)
 O botão GUITAR SKANK do Mastor Reggae Keys MRK-80 toca a guitarra do skank junto com o piano usando o **motor do
 Mastor Reggae Guitar MRG-68** direto, sem cópia (`ReggaeGuitar/Source/GuitarEngine.h`: `mrg::StringVoice` e `mrg::Chain`).
