@@ -75,6 +75,7 @@ public:
     // BASS MACHINE: o gerador do MRBM-69 toca a linha pela voz e pela cadeia de som deste baixo;
     // a bateria e o teclado de acompanhamento dele somam por cima
     BassMachineProcessor& getMachine() noexcept { return *machine; }
+    bool isMachineCut2kOn() const;   // botão EQ -2k da BASS MACHINE ligado (a tela do EQ desenha o corte)
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}

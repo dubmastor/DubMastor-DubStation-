@@ -1198,6 +1198,11 @@ void CrtEqCurve::paint (juce::Graphics& g)
     if (boostOn)
         filters.push_back (Coeffs::makePeakFilter (sr, DubBassAudioProcessor::boostFreq, DubBassAudioProcessor::boostQ,
                                                    juce::Decibels::decibelsToGain (DubBassAudioProcessor::boostGainDb)));
+    // botão EQ -2k da BASS MACHINE: o mesmo passa-baixa de 16ª ordem que o som usa (HighCut2k.h)
+    const bool cut2k = proc.isMachineCut2kOn();
+    if (cut2k)
+        for (float q : mbm::HighCut2k::kQ)
+            filters.push_back (Coeffs::makeLowPass (sr, mbm::HighCut2k::kCutoffHz, q));
 
     juce::Path curve;
     const int steps = juce::jmax (2, (int) screen.getWidth());
@@ -1210,7 +1215,7 @@ void CrtEqCurve::paint (juce::Graphics& g)
         const float y = yFor ((float) juce::Decibels::gainToDecibels (mag));
         if (i == 0) curve.startNewSubPath (x, y); else curve.lineTo (x, y);
     }
-    const float alpha = eqOn || boostOn ? 1.0f : 0.35f;
+    const float alpha = eqOn || boostOn || cut2k ? 1.0f : 0.35f;
     juce::Path fill (curve);
     fill.lineTo (screen.getRight(), yFor (0.0f));
     fill.lineTo (screen.getX(), yFor (0.0f));
@@ -1231,6 +1236,17 @@ void CrtEqCurve::paint (juce::Graphics& g)
     {
         g.setColour (colours::amber);
         g.drawText ("BOOST +4 dB @ 60 Hz", screen.reduced (8.0f, 4.0f), juce::Justification::topRight);
+    }
+    if (cut2k)
+    {
+        // região cortada (de 2 kHz para cima) e a etiqueta do botão
+        g.setColour (colours::amber.withAlpha (0.10f));
+        g.fillRect (juce::Rectangle<float>::leftTopRightBottom (xFor (2000.0), screen.getY(), screen.getRight(), screen.getBottom()));
+        g.setColour (colours::amber.withAlpha (0.55f));
+        const float x2 = xFor (2000.0);
+        for (float y = screen.getY(); y < screen.getBottom(); y += 6.0f) g.drawLine (x2, y, x2, juce::jmin (y + 3.0f, screen.getBottom()), 1.0f);
+        g.setColour (colours::amber);
+        g.drawText ("EQ -2k (BASS MACHINE)", screen.reduced (8.0f, 4.0f).withTrimmedTop (boostOn ? 13.0f : 0.0f), juce::Justification::topRight);
     }
 
     // pontos das 10 bandas (arrastáveis)

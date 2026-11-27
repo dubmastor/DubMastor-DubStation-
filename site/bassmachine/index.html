@@ -185,7 +185,8 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
     <div class="slider"><span>BPM</span><input type="range" id="bpm" min="50" max="180" step="1"><output id="o-bpm"></output></div>
     <div class="lbl">TIMBRE · MRDBI-07</div>
     <div class="btns c3" id="timbreBtns"></div>
-    <div class="row" style="margin:6px 0"><button class="toggle" id="eq2k" title="EQ: corta tudo acima de 2 kHz no baixo"><i></i>EQ -2k</button></div>
+    <div class="row" style="margin:6px 0;align-items:center;gap:8px"><button class="toggle" id="eq2k" title="EQ: corta tudo acima de 2 kHz no baixo"><i></i>EQ -2k</button>
+      <canvas id="eqGraph" width="220" height="64" style="flex:1;min-width:0;height:64px;background:#0b1a0f;border-radius:5px;box-shadow:inset 0 0 0 2px #000"></canvas></div>
     <div class="lbl">BATERIA DE ACOMPANHAMENTO</div>
     <div class="row" style="margin-bottom:6px"><button class="toggle" id="drumsOn"><i></i>BATERIA</button></div>
     <div class="btns c4" id="drumBtns"></div>
@@ -297,6 +298,26 @@ refreshers.push(buttons($('hatBtns'), ['1/8', '1/16'], () => (st.hat16 ? 1 : 0),
 refreshers.push(buttons($('repBtns'), ['1x', '2x', '4x', '8x'], () => st.reps, i => { st.reps = i; save(); }));
 $('drumsOn').onclick = () => { st.drumsOn = !st.drumsOn; save(); publish(); refresh(); };
 $('eq2k').onclick = () => { st.eq2k = !st.eq2k; save(); engine.setEq(); refresh(); };
+// gráfico do EQ -2k: resposta do passa-baixa (Butterworth de 16ª ordem, quina em 1,8 kHz), de 20 Hz a 20 kHz, 0 a -60 dB
+function drawEqGraph() {
+  const cv = $('eqGraph'), dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 220, H = cv.clientHeight || 64;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const xf = f => W * Math.log(f / 20) / Math.log(1000), yd = db => 6 + (H - 16) * Math.min(1, -db / 60);
+  c.strokeStyle = 'rgba(120,255,150,.13)'; c.lineWidth = 1;
+  for (const f of [100, 1000, 10000]) { c.beginPath(); c.moveTo(xf(f), 0); c.lineTo(xf(f), H); c.stroke(); }
+  if (st.eq2k) { c.fillStyle = 'rgba(255,169,40,.12)'; c.fillRect(xf(2000), 0, W - xf(2000), H); }
+  c.beginPath();
+  for (let i = 0; i <= W; i++) {
+    const f = 20 * Math.pow(1000, i / W), db = st.eq2k ? -10 * Math.log10(1 + Math.pow(f / 1800, 32)) : 0;
+    i ? c.lineTo(i, yd(db)) : c.moveTo(i, yd(db));
+  }
+  c.strokeStyle = st.eq2k ? '#7dffa0' : 'rgba(125,255,160,.45)'; c.lineWidth = 1.8; c.stroke();
+  c.font = 'bold 8px monospace'; c.fillStyle = 'rgba(125,255,160,.55)';
+  c.fillText('100', xf(100) + 2, H - 3); c.fillText('1k', xf(1000) + 2, H - 3); c.fillText('10k', xf(10000) + 2, H - 3);
+  c.fillStyle = '#ffa928'; if (st.eq2k) c.fillText('-2k', xf(2000) + 3, 10);
+}
+window.addEventListener('resize', drawEqGraph);
 
 const fmtPct = v => Math.round(v * 100) + '%';
 const noteName = n => M.ROOT_NAMES[n % 12] + (Math.floor(n / 12) - 1);
@@ -379,6 +400,7 @@ function refresh() {
   $('tagline').textContent = M.taglines[st.style];
   $('drumsOn').classList.toggle('on', st.drumsOn);
   $('eq2k').classList.toggle('on', st.eq2k);
+  drawEqGraph();
   $('timbreName').textContent = TIMBRES[st.timbre];
 }
 $('ideaDown').onclick = () => { st.seed = Math.max(1, st.seed - 1); changedGen(); };

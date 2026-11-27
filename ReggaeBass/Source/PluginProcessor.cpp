@@ -595,3 +595,8 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DubBassAudioProcessor();
 }
+
+bool DubBassAudioProcessor::isMachineCut2kOn() const
+{
+    return machine->apvts.getRawParameterValue ("eq2k")->load() > 0.5f;
+}

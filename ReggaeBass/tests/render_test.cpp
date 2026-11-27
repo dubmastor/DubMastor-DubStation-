@@ -190,6 +190,16 @@ int main (int argc, char** argv)
     juce::FileOutputStream os (png);
     juce::PNGImageFormat fmt;
     check (os.openedOk() && fmt.writeImageToStream (img, os), "interface salva em " + png.getFullPathName());
+    {   // foto do EQ com o corte do botão EQ -2k da BASS MACHINE desenhado na tela verde
+        setP (p.getMachine(), "eq2k", 1.0f);
+        for (int f = 0; f < 6; ++f) juce::MessageManager::getInstance()->runDispatchLoopUntil (34);
+        auto imgEq = ed->createComponentSnapshot (ed->getLocalBounds(), true, scale * (float) ed->getChildComponent (0)->getWidth() / (float) ed->getWidth());
+        auto pngEq = dir.getChildFile ("interface_eq2k.png");
+        pngEq.deleteFile();
+        juce::FileOutputStream osEq (pngEq);
+        check (osEq.openedOk() && juce::PNGImageFormat().writeImageToStream (imgEq, osEq), "interface com EQ -2k salva");
+        setP (p.getMachine(), "eq2k", 0.0f);
+    }
     // segunda foto: modo 808 com o preset MÉDIO (as teclas de preset aparecem no envelope)
     setP (p, ParamID::mode, 1); setP (p, ParamID::attack, 1.0f); setP (p, ParamID::decay, 750.0f);
     setP (p, ParamID::release, 220.0f); setP (p, ParamID::pitchTime, 70.0f);
