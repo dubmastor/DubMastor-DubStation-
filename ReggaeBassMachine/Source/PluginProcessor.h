@@ -46,6 +46,17 @@ public:
     bool writeMidiFile (const juce::File& file) const;
     double getPlayPositionInLoop() const { return displayPos.load(); }   // -1 = parado
     int getSoundingNote() const { return soundingNote.load(); }          // -1 = nenhuma
+
+    // ouvir a tônica ao escolher (teclado da TÔNICA, mesmo sistema da CHORD MACHINE): a nota do baixo soa enquanto o mouse estiver apertado
+    void auditionStart (int slot);
+    void auditionStop();
+    const juce::MidiBuffer& getAuditionMidi() const noexcept { return auditionOut; }
+    // notas da linha soando agora em cada acorde (bit 0..11 = dó..si), para pintar o teclado da tônica no play
+    juce::uint32 takePlayingMask (int slot) noexcept
+    {
+        if (! juce::isPositiveAndBelow (slot, numSlots)) return 0;
+        return playMask[(size_t) slot].load() | hitMask[(size_t) slot].exchange (0);
+    }
     void newIdea();                                                      // sorteia outra IDEIA
 
     // MIDI editável (thread da interface). A linha editada fica salva no projeto e vale até um
@@ -114,10 +125,18 @@ private:
     std::atomic<bool> dirty { true };
     std::atomic<bool> strictReggae { false };
 
-    struct Pending { int sample; bool on; int note; int vel; };
+    struct Pending { int sample; bool on; int note; int vel; int slot; };
     std::vector<Pending> pending;
 
     bool active[128] {};
+    signed char activeSlot[128] {};
+    std::array<std::atomic<juce::uint32>, numSlots> playMask {}, hitMask {};
+    void publishPlaying();
+
+    std::atomic<int> auditionReq { 0 }, auditionReqNote { -1 }, auditionReqVel { 100 };   // 1 = tocar, 2 = soltar
+    int auditionNote = -1;
+    juce::MidiBuffer auditionOut;
+    void runAudition (juce::MidiBuffer&);
     bool wasPlaying = false;
     double expectedPpq = 0.0;
     double internalPpq = 0.0;

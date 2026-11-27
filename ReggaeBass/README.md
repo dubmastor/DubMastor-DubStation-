@@ -2,6 +2,8 @@
 
 O antigo **Dub Bass** (Mastor Reggae Dub Bass Instrument MRDBI-07), agora com o **Mastor Reggae Bass Machine MRBM-69** inteiro na aba **BASS MACHINE**: a linha gerada toca por este som (válvula, EQ, reverb e maximizer), com bateria e teclado de acompanhamento. Ligue **BASS MACHINE LIGADA** para a linha tocar com a DAW.
 
+Novidades da 2.2 na BASS MACHINE: o teclado da TÔNICA funciona como o da CHORD MACHINE do Mastor Reggae Keys MRK-80 (toca a tônica no baixo enquanto o mouse estiver apertado, acende em verde as notas da linha no play) e destaca as **próximas harmonias** que combinam, conforme as cadências do reggae.
+
 Instrumento de baixo de reggae (VST3 / AU / Standalone) da linha **DubMastor · Dub Station**, no mesmo visual do Dub Chords: painel creme envelhecido, laterais de madeira, nome e versão no título (MASTOR REGGAE BASS MRB-69 x.y), plaqueta de latão DUB STATION, knobs de baquelite e lâmpadas âmbar.
 
 ![Interface](docs/interface.png)

@@ -42,14 +42,26 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}
 .b.nolamp::before{display:none}
 .btns.style .b{justify-content:flex-start;padding-left:12px}
 .btns.style .b small{margin-left:auto;opacity:.35;font-size:10px}
-.keys12 .b{font-size:11px;letter-spacing:0;padding:8px 2px;min-height:34px}
 .btns.c3 .b,.btns.c4 .b{font-size:10.5px;letter-spacing:.03em;gap:5px;padding:8px 3px;white-space:normal;line-height:1.15;text-align:center}
-.keys12 .b{position:relative}
-.keys12 .b.hint{outline:1.5px solid rgba(234,189,18,.7);outline-offset:-2px}
-.keys12 .b.h1{outline:2.5px solid #eabd12}
-.keys12 .deg{position:absolute;top:-6px;right:-2px;font-size:8.5px;line-height:12px;padding:0 3px;border-radius:3px;background:#2b241d;color:#eabd12;border:1px solid #eabd12;pointer-events:none;letter-spacing:0}
-.keys12 .h1 .deg{background:#eabd12;color:#2b241d;border-color:#2b241d}
-.keys12 .b.sharp{background:linear-gradient(180deg,#151210,#050403);color:#a89c84}
+/* teclado da TÔNICA: o mesmo da CHORD MACHINE do MRK-80 (site/keys) */
+.pkeys{position:relative;height:92px;background:#0e0c0a;border-radius:4px;padding:9px 3px 3px;box-shadow:0 0 0 4px rgba(43,36,29,.25)}
+.pkeys::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:6px;background:linear-gradient(180deg,#d8d6d0,#5e5b55);border-bottom:2px solid #5a1414}
+.pkeys .w,.pkeys .k{position:absolute;bottom:3px;border:0;padding:0 0 5px;cursor:pointer;font-weight:800;display:flex;align-items:flex-end;justify-content:center}
+.pkeys .w{height:80px;background:linear-gradient(180deg,#f6ecd2,#d9c69a);border-radius:0 0 4px 4px;box-shadow:inset 0 -6px 0 #b39d6a,0 0 0 1px #3d3124;color:var(--ink2);font-size:11px}
+.pkeys .k{height:48px;bottom:35px;background:linear-gradient(135deg,#3d3833,#070605);border-radius:0 0 3px 3px;color:rgba(239,229,204,.75);font-size:8px;z-index:2;box-shadow:1px 2px 0 rgba(0,0,0,.45)}
+.pkeys .on.w{background:linear-gradient(180deg,#e9d9ae,#c2ad78);box-shadow:inset 0 0 0 40px rgba(255,169,40,.18),0 0 0 1px #3d3124;color:#6b3f05;transform:translateY(3px)}
+.pkeys .on.k{color:var(--amber);transform:translateY(3px)}
+.pkeys .on::after{content:"";position:absolute;bottom:20px;width:7px;height:7px;border-radius:50%;background:radial-gradient(#ffe3a0,var(--amber));box-shadow:0 0 7px var(--amber)}
+.pkeys .k.on::after{bottom:14px}
+.pkeys .hint{outline:1.5px solid rgba(234,189,18,.7);outline-offset:-2px}
+.pkeys .h1{outline:2.5px solid #eabd12}
+.pkeys .deg{position:absolute;left:50%;transform:translateX(-50%);bottom:21px;font-size:8.5px;line-height:13px;padding:0 3px;border-radius:3px;background:#2b241d;color:#eabd12;border:1px solid #eabd12;white-space:nowrap;pointer-events:none}
+.pkeys .k .deg{bottom:auto;top:6px;font-size:7.5px;padding:0 2px}
+.pkeys .h1 .deg{background:#eabd12;color:#2b241d;border-color:#2b241d}
+.pkeys .w.on.hint::after{bottom:37px}
+.pkeys .lit.w{background:linear-gradient(180deg,#8fe0a8,#2fa45c);box-shadow:inset 0 0 0 2px #0b6b30,0 0 10px rgba(11,138,60,.6);color:#04361a}
+.pkeys .lit.k{background:linear-gradient(180deg,#5fcf86,#06501f);color:#fff;box-shadow:0 0 9px rgba(11,138,60,.8)}
+.pkeys{touch-action:none;user-select:none;-webkit-user-select:none}
 /* riddims clássicos */
 .riddim{margin-bottom:14px}
 .rdisp{font-family:"Courier New",Courier,monospace;color:#e6efff;border-radius:2px;padding:8px 12px;min-height:60px;
@@ -300,17 +312,25 @@ const chordRefresh = [];
 st.chords.forEach((c, i) => {
   const box = document.createElement('div'); box.className = 'chord';
   box.innerHTML = `<div class="chordhead"><div class="num">${i + 1}</div><div class="cdisp"></div>${i === 0 ? '<span class="toggle on fixed"><i></i>SEMPRE</span>' : '<button class="toggle"><i></i>ON</button>'}</div>
-    <div class="chordbody"><div class="btns c6 keys12"></div><div style="height:6px"></div><div class="btns c4 qual"></div><div style="height:6px"></div>
+    <div class="chordbody"><div class="lbl" style="font-size:9px;letter-spacing:.3em;color:var(--ink2);text-align:center;margin-bottom:4px">TÔNICA</div><div class="pkeys"></div><div style="height:6px"></div><div class="btns c4 qual"></div><div style="height:6px"></div>
     <div class="stepper"><button>◀</button><div class="val"></div><button>▶</button></div></div>`;
   $('chords').appendChild(box);
-  const rk = buttons(box.querySelector('.keys12'), M.ROOT_NAMES, () => c.root, r => {
-    c.root = r;
+  // teclado de uma oitava (marfim e baquelite), como na CHORD MACHINE: apertar escolhe a tônica e ela soa no baixo enquanto o dedo estiver na tecla
+  const pk = box.querySelector('.pkeys'), ww = 100 / 7, keyBtns = [];
+  [0, 2, 4, 5, 7, 9, 11].forEach((n, k) => { const b = document.createElement('button'); b.className = 'w'; b.dataset.n = n; b.textContent = M.ROOT_NAMES[n];
+    b.style.left = `calc(${k * ww}% + 1px)`; b.style.width = `calc(${ww}% - 2px)`; pk.appendChild(b); keyBtns[n] = b; });
+  [[1, 0], [3, 1], [6, 3], [8, 4], [10, 5]].forEach(([n, after]) => { const b = document.createElement('button'); b.className = 'k'; b.dataset.n = n; b.textContent = M.ROOT_NAMES[n];
+    b.style.left = `calc(${(after + 1) * ww}% - ${ww * 0.31}%)`; b.style.width = `${ww * 0.62}%`; pk.appendChild(b); keyBtns[n] = b; });
+  pk.onpointerdown = (e) => {
+    const b = e.target.closest('button'); if (!b) return; e.preventDefault();
+    const r = +b.dataset.n; c.root = r;
     const h = hintsFor(i).find(x => x.root === r);   // tecla sugerida já escolhe maior/menor (com 7 ou m7, fica 7 ou m7)
     if (h) c.quality = c.quality >= 2 ? (h.minor ? 3 : 2) : (h.minor ? 1 : 0);
-    changedGen();
-  }, r => [1, 3, 6, 8, 10].includes(r) ? 'sharp nolamp' : 'nolamp');
-  const keyBtns = [...box.querySelectorAll('.keys12 .b')];
+    changedGen(); auditionStart(i);
+  };
+  const rk = () => keyBtns.forEach((b, r) => b.classList.toggle('on', c.root === r));
   const rq = buttons(box.querySelector('.qual'), ['MAIOR', 'MENOR', '7', 'm7'], () => c.quality, q => { c.quality = q; changedGen(); });
+  box.querySelectorAll('.qual .b').forEach(b => b.addEventListener('pointerdown', () => setTimeout(() => auditionStart(i), 0)));
   const [dn, val, up] = box.querySelectorAll('.stepper > *');
   dn.onclick = () => { c.dur = Math.max(0, c.dur - 1); changedGen(); refresh(); };
   up.onclick = () => { c.dur = Math.min(5, c.dur + 1); changedGen(); refresh(); };
@@ -332,6 +352,16 @@ st.chords.forEach((c, i) => {
     val.textContent = M.DURATION_NAMES[c.dur] + (c.dur <= 1 ? ' COMP.' : ' COMPS.');
   });
 });
+
+// ouvir a tônica: a fundamental do acorde no REGISTRO da linha, enquanto o dedo/mouse estiver apertado
+let auditionH = null;
+function auditionStop() { if (auditionH) engine.liveOff(auditionH); auditionH = null; }
+function auditionStart(i) {
+  auditionStop();
+  const c = st.chords[i], base = st.base;
+  auditionH = engine.liveOn(base + (((c.root - base) % 12) + 12) % 12, st.velocity);
+}
+['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, auditionStop));
 
 // próximas harmonias (cadências do reggae, ../cadence.js): acorde 2 a 4, a partir do acorde ligado antes, na tonalidade do acorde 1
 function hintsFor(i) {
@@ -531,6 +561,16 @@ const engine = (() => {
     }
   }
 
+  let lit = [];   // notas agendadas da linha: { slot, pc, on, off } em segundos do AudioContext
+  function litNow() {
+    const m = [0, 0, 0, 0]; if (!ctx || !playing) return m;
+    const now = ctx.currentTime; lit = lit.filter(x => x.off > now);
+    for (const x of lit) if (x.on <= now && x.slot >= 0 && x.slot < 4) m[x.slot] |= 1 << x.pc;
+    return m;
+  }
+  // tecla da tônica: a nota soa até soltar (nota longa, cortada no liveOff)
+  function liveOn(note, vel) { ensure(); if (ctx.state === 'suspended') ctx.resume(); bassNote(ctx.currentTime + .005, note, vel, 8); return lastBass; }
+  function liveOff(h) { if (!ctx || !h) return; const t = ctx.currentTime; try { h.amp.gain.cancelScheduledValues(t); h.amp.gain.setTargetAtTime(0, t, .03); } catch (e) {} }
   const spb = () => 60 / st.bpm;
   function beatNow() { return ctx ? anchorBeat + (ctx.currentTime - anchorTime) / spb() : 0; }
   function tick() {
@@ -540,13 +580,14 @@ const engine = (() => {
     if (until <= from) return;
     const timeOf = b => anchorTime + (b - anchorBeat) * spb();
     const each = (start, fn) => { for (let k = Math.floor((from - start) / L); start + k * L < until; k++) { const b = start + k * L; if (b >= from) fn(b); } };
-    for (const e of line.events) each(e.start, b => bassNote(timeOf(b), e.note, e.velocity / 127, e.length * spb()));
+    for (const e of line.events) each(e.start, b => { const t0 = timeOf(b), len = e.length * spb(); bassNote(t0, e.note, e.velocity / 127, len); lit.push({ slot: e.slot, pc: e.note % 12, on: t0, off: t0 + Math.max(len, .1) }); });
     for (const e of drums) each(e.start, b => drumHit(timeOf(b), e.note, e.velocity, e.target === 1));
     scheduledTo = until;
   }
   return {
     start() { ensure(); ctx.resume(); anchorTime = ctx.currentTime + .06; anchorBeat = 0; scheduledTo = 0; playing = true; tick(); timer = setInterval(tick, 25); },
-    stop() { playing = false; clearInterval(timer); if (ctx) { const t = ctx.currentTime; mix.gain.setTargetAtTime(0, t, .03); setTimeout(() => mix.gain.setTargetAtTime(1, ctx.currentTime, .01), 250); } },
+    liveOn, liveOff, litNow,
+    stop() { playing = false; clearInterval(timer); lit = []; if (ctx) { const t = ctx.currentTime; mix.gain.setTargetAtTime(0, t, .03); setTimeout(() => mix.gain.setTargetAtTime(1, ctx.currentTime, .01), 250); } },
     isPlaying: () => playing,
     tempoChanged() { if (!ctx || !playing) return; const b = beatNow(); anchorBeat = b; anchorTime = ctx.currentTime; scheduledTo = Math.max(scheduledTo, b); },
     position() { if (!playing || line.loopBeats <= 0) return -1; const b = beatNow(); return b < 0 ? -1 : b % line.loopBeats; },
@@ -555,6 +596,15 @@ const engine = (() => {
   };
 })();
 $('volume').addEventListener('input', () => engine.setVolume());
+// notas da linha tocando agora: pintadas de verde no teclado da tônica de cada acorde
+(function litLoop() {
+  engine.litNow().forEach((mask, i) => {
+    const k = document.querySelectorAll('#chords .pkeys')[i]; if (!k || k.dataset.lit == mask) return;
+    k.dataset.lit = mask;
+    k.querySelectorAll('button').forEach(b => b.classList.toggle('lit', ((mask >> +b.dataset.n) & 1) === 1));
+  });
+  requestAnimationFrame(litLoop);
+})();
 function togglePlay() { if (engine.isPlaying()) engine.stop(); else engine.start(); }
 $('play').onclick = togglePlay; $('play2').onclick = togglePlay;
 

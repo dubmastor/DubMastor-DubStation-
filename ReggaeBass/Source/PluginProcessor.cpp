@@ -433,7 +433,11 @@ void DubBassAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const bool machineHeard = apvts.getRawParameterValue (ParamID::machineOn)->load() > 0.5f
                            || machine->apvts.getRawParameterValue ("preview")->load() > 0.5f;
     if (machineHeard) midi.addEvents (machineMidi, 0, numSamples, 0);
-    else              machineBuf.clear();
+    else
+    {
+        machineBuf.clear();
+        midi.addEvents (machine->getAuditionMidi(), 0, numSamples, 0);   // ouvir a tônica com a BASS MACHINE desligada
+    }
     {   // timbre escolhido na BASS MACHINE (ou por um riddim): leva os ajustes de fábrica do oscilador
         const int t = juce::roundToInt (machine->apvts.getRawParameterValue ("timbre")->load());
         if (t != machineTimbre.load()) { machineTimbre.store (t); triggerAsyncUpdate(); }

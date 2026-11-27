@@ -269,6 +269,7 @@ void NoteKeys::mouseDown (const juce::MouseEvent& e)
     if (k < 0) return;
     select (k);
     if (hints[(size_t) k].rank > 0 && onHintQuality) onHintQuality (hints[(size_t) k].minor);
+    pressed();   // a tônica soa no baixo enquanto o botão estiver apertado
 }
 
 void NoteKeys::paint (juce::Graphics& g)
@@ -282,9 +283,11 @@ void NoteKeys::paint (juce::Graphics& g)
     auto drawKey = [&] (int n)
     {
         const bool black = isBlack (n), on = n == active, over = n == hover;
+        const bool lit = (playing >> n) & 1u;                   // nota da linha tocando agora no play
         auto r = keyRect (n).reduced (black ? 0.0f : 1.0f, 0.0f);
         r = r.withTrimmedTop (on ? 3.0f : 0.0f);               // tecla afundada
         const float rad = 3.0f;
+        const juce::Colour jamGreen (0xff0b8a3c);
 
         if (! black)
         {
@@ -304,7 +307,16 @@ void NoteKeys::paint (juce::Graphics& g)
                 g.setColour (colours::amber.withAlpha (0.18f));
                 g.fillRoundedRectangle (r, rad);
             }
-            g.setColour (on ? juce::Colour (0xff6b3f05) : colours::inkSoft);
+            if (lit)
+            {
+                juce::ColourGradient gl (jamGreen.brighter (0.9f).withAlpha (0.75f), r.getCentreX(), r.getY(),
+                                         jamGreen.withAlpha (0.45f), r.getCentreX(), r.getBottom(), false);
+                g.setGradientFill (gl);
+                g.fillRoundedRectangle (r, rad);
+                g.setColour (jamGreen.darker (0.2f));
+                g.drawRoundedRectangle (r.reduced (1.0f), rad, 2.0f);
+            }
+            g.setColour (lit ? juce::Colour (0xff04361a) : on ? juce::Colour (0xff6b3f05) : colours::inkSoft);
             g.setFont (stencil (9.5f, 0.0f));
             g.drawText (mbm::rootName (n), r.withTrimmedBottom (9.0f).withTop (r.getBottom() - 28.0f), juce::Justification::centred);
         }
@@ -318,6 +330,13 @@ void NoteKeys::paint (juce::Graphics& g)
             g.fillRoundedRectangle (r, rad);
             g.setColour (juce::Colours::white.withAlpha (on ? 0.05f : 0.14f));
             g.fillRoundedRectangle (r.reduced (3.0f, 2.0f).withHeight (r.getHeight() * 0.55f), 2.0f);
+            if (lit)
+            {
+                juce::ColourGradient gl (jamGreen.brighter (0.6f), r.getCentreX(), r.getY(),
+                                         jamGreen.darker (0.5f), r.getCentreX(), r.getBottom(), false);
+                g.setGradientFill (gl);
+                g.fillRoundedRectangle (r.reduced (1.0f), rad);
+            }
         }
 
         // próxima harmonia sugerida: contorno dourado + grau (IV, V, IIm, bVII...)
@@ -356,6 +375,7 @@ void QualitySwitch::mouseDown (const juce::MouseEvent& e)
 {
     const int i = juce::jlimit (0, mbm::NumQualities - 1, (int) (e.position.x / (float) getWidth() * (float) mbm::NumQualities));
     select (i);
+    pressed();
 }
 
 void QualitySwitch::paint (juce::Graphics& g)
@@ -1017,6 +1037,11 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
                     q->endChangeGesture();
                 }
             };
+        for (ParamControl* pc : { (ParamControl*) m.keys.get(), (ParamControl*) m.qual.get() })   // ouvir a tônica ao escolher
+        {
+            pc->onPress   = [this, i] { proc.auditionStart (i); };
+            pc->onRelease = [this]    { proc.auditionStop(); };
+        }
         addAndMakeVisible (*m.keys);
         addAndMakeVisible (*m.qual);
         addAndMakeVisible (*m.dur);
@@ -1183,6 +1208,19 @@ void BassMachinePanel::updateHints()
 void BassMachinePanel::timerCallback()
 {
     updateHints();
+    for (int i = 0; i < BassMachineProcessor::numSlots; ++i)   // pinta as notas da linha que estão tocando (cada tecla fica ~100 ms acesa)
+    {
+        const auto now = proc.takePlayingMask (i);
+        juce::uint32 mask = 0;
+        auto& hold = litHold[(size_t) i];
+        for (int n = 0; n < 12; ++n)
+        {
+            if ((now >> n) & 1u) hold[(size_t) n] = 3;
+            else if (hold[(size_t) n] > 0) --hold[(size_t) n];
+            if (hold[(size_t) n] > 0) mask |= 1u << n;
+        }
+        mods[(size_t) i].keys->setPlaying (mask);
+    }
     for (int i = 0; i < BassMachineProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);

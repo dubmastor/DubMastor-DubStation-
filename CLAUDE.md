@@ -122,6 +122,8 @@ As sugestões de cadência (contagem das passagens de acorde do banco de riddims
 em `site/cadence.js` (`cadenceHints`, usado pela versão para celular do MRK-80 em `site/keys/` e pela BASS MACHINE do MRB-69 em `site/bassmachine/`):
 ao mudar um, mude o outro (as mesmas 3 sugestões, na mesma ordem). Vale para a CHORD MACHINE (MRK-80, MRCM-1240, MRM-0420) e para a
 BASS MACHINE (`ReggaeBassMachine/Source/PluginEditor.cpp`, `updateHints`: MRB-69, MRBM-69, MRM-0420; 7 conta como maior, m7 como menor).
+O teclado da TÔNICA da BASS MACHINE é o mesmo sistema da CHORD MACHINE: ouvir ao apertar (`auditionStart`/`auditionStop`, a fundamental no REGISTRO)
+e as notas tocando em verde (`takePlayingMask`); na versão para celular (`site/bassmachine/`) o teclado usa o mesmo CSS do `site/keys/` (`.pkeys`).
 
 ## GUITAR SKANK do MRK-80 (ReggaeKeys/Source/GuitarSkank.h)
 O botão GUITAR SKANK do Mastor Reggae Keys MRK-80 toca a guitarra do skank junto com o piano usando o **motor do

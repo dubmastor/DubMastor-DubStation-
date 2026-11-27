@@ -230,6 +230,35 @@ int main (int argc, char** argv)
         h = cadence::suggest (0, 0, 0, 0);        // C → F (IV)
         check (! h.empty() && h[0].root == 5 && h[0].minor == 0, "cadencia: depois de C a mais comum e F (IV)");
     }
+    {   // 2.2: teclado da tônica da BASS MACHINE igual ao da CHORD MACHINE (ouvir ao apertar, notas pintadas no play)
+        DubBassAudioProcessor b;
+        b.prepareToPlay (48000.0, 512);
+        auto& mach = b.getMachine();
+        setP (mach, "drumsOn", 0.0f); setP (mach, "keysOn", 0.0f);
+        auto run = [&] (int n) { float pk = 0.0f; for (int i = 0; i < n; ++i) { juce::AudioBuffer<float> buf (2, 512); juce::MidiBuffer mm; b.processBlock (buf, mm); pk = juce::jmax (pk, buf.getMagnitude (0, 0, 512)); } return pk; };
+        check (run (20) < 1.0e-4f, "ouvir tonica: silencio antes do clique");
+        setP (mach, "root1", 7.0f);                 // acorde 2 = G
+        mach.auditionStart (1);
+        const float held = run (30);
+        const int note = juce::roundToInt (b.currentNote.load());
+        const int base = juce::roundToInt (mach.apvts.getRawParameterValue ("base")->load());
+        check (held > 0.01f && note % 12 == 7 && note >= base && note < base + 12,
+               "ouvir tonica: G soa no baixo, no REGISTRO da linha, com a BASS MACHINE desligada (nota " + juce::String (note) + ")");
+        mach.auditionStop();
+        run (4);
+        const float tail = run (200);
+        check (tail < held * 0.2f, "ouvir tonica: soltar o mouse solta a nota");
+
+        setP (mach, "preview", 1.0f);               // play: o acorde 1 acende a tônica dele (e as notas de passagem que ele tocar)
+        juce::uint32 seen[4] {};
+        for (int i = 0; i < 300; ++i) { run (1); for (int c = 0; c < 4; ++c) seen[c] |= mach.takePlayingMask (c); }
+        const int r0 = juce::roundToInt (mach.apvts.getRawParameterValue ("root0")->load());
+        check ((seen[0] >> r0) & 1u, "tonica no play: o acorde 1 acende a tonica dele (mask " + juce::String::toHexString ((int) seen[0]) + ")");
+        setP (mach, "preview", 0.0f);
+        run (4); for (int c = 0; c < 4; ++c) mach.takePlayingMask (c);
+        juce::uint32 after = 0; for (int c = 0; c < 4; ++c) after |= mach.takePlayingMask (c);
+        check (after == 0, "tonica no play: parar apaga as teclas");
+    }
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");
     return failures == 0 ? 0 : 1;
 }

@@ -46,9 +46,12 @@ public:
         setMouseCursor (juce::MouseCursor::PointingHandCursor);
         setRepaintsOnMouseActivity (true);
     }
+    std::function<void()> onPress, onRelease;   // ouvir a tônica enquanto o mouse estiver apertado
+    void mouseUp (const juce::MouseEvent&) override { if (onRelease) onRelease(); }
 protected:
     int  index() const  { return juce::roundToInt (value); }
     void select (int i) { att.setValueAsCompleteGesture ((float) i); }
+    void pressed()      { if (onPress) onPress(); }
 
     juce::RangedAudioParameter& param;
     float value = 0.0f;
@@ -69,11 +72,14 @@ public:
     struct KeyHint { int minor = 0, rank = 0; juce::String label; bool operator!= (const KeyHint& o) const { return minor != o.minor || rank != o.rank || label != o.label; } };
     void setHints (const std::array<KeyHint, 12>& h) { bool ch = false; for (int k = 0; k < 12; ++k) ch = ch || (h[(size_t) k] != hints[(size_t) k]); if (ch) { hints = h; repaint(); } }
     std::function<void (int minor)> onHintQuality;   // tocar numa tecla sugerida já escolhe maior/menor da sugestão
+    // notas da linha tocando agora no play (bit 0..11 = dó..si): ficam pintadas de verde
+    void setPlaying (juce::uint32 mask) { if (mask != playing) { playing = mask; repaint(); } }
 private:
     juce::Rectangle<float> keyRect (int note) const;
     int keyAt (juce::Point<float>) const;
     int hover = -1;
     std::array<KeyHint, 12> hints {};
+    juce::uint32 playing = 0;
 };
 
 // Tipo do acorde: 4 botões de pressão intertravados (MAIOR, MENOR, 7, m7)
@@ -242,6 +248,7 @@ private:
     void exportMidi();
     bool slotEnabled (int i) const;
     void updateHints();
+    std::array<std::array<int, 12>, BassMachineProcessor::numSlots> litHold {};   // quadros que a tecla ainda fica acesa
 
     BassMachineProcessor& proc;
     BassLookAndFeel lnf;
