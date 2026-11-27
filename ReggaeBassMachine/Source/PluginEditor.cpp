@@ -1,6 +1,7 @@
 #include "PluginEditor.h"
 #include "RiddimPresets.h"
 #include "../../RiddimBank/Source/RiddimBankMenu.h"
+#include "../../ReggaeChordMachine/Source/CadenceHints.h"
 #include <tuple>
 
 #ifndef JucePlugin_VersionString
@@ -265,7 +266,9 @@ int NoteKeys::keyAt (juce::Point<float> p) const
 void NoteKeys::mouseDown (const juce::MouseEvent& e)
 {
     const int k = keyAt (e.position);
-    if (k >= 0) select (k);
+    if (k < 0) return;
+    select (k);
+    if (hints[(size_t) k].rank > 0 && onHintQuality) onHintQuality (hints[(size_t) k].minor);
 }
 
 void NoteKeys::paint (juce::Graphics& g)
@@ -315,6 +318,22 @@ void NoteKeys::paint (juce::Graphics& g)
             g.fillRoundedRectangle (r, rad);
             g.setColour (juce::Colours::white.withAlpha (on ? 0.05f : 0.14f));
             g.fillRoundedRectangle (r.reduced (3.0f, 2.0f).withHeight (r.getHeight() * 0.55f), 2.0f);
+        }
+
+        // próxima harmonia sugerida: contorno dourado + grau (IV, V, IIm, bVII...)
+        if (const auto& h = hints[(size_t) n]; h.rank > 0)
+        {
+            const auto gold = juce::Colour (0xffeabd12);
+            g.setColour (gold.withAlpha (h.rank == 1 ? 1.0f : h.rank == 2 ? 0.8f : 0.6f));
+            g.drawRoundedRectangle (r.reduced (1.5f), rad, h.rank == 1 ? 2.6f : 1.6f);
+            auto pill = black ? juce::Rectangle<float> (r.getWidth() - 2.0f, 13.0f).withCentre ({ r.getCentreX(), r.getY() + 16.0f })
+                              : juce::Rectangle<float> (juce::jmin (r.getWidth() - 4.0f, 34.0f), 14.0f).withCentre ({ r.getCentreX(), r.getBottom() - 38.0f });
+            g.setColour (h.rank == 1 ? gold : juce::Colour (0xff2b241d));
+            g.fillRoundedRectangle (pill, 3.0f);
+            g.setColour (h.rank == 1 ? juce::Colour (0xff2b241d) : gold);
+            g.drawRoundedRectangle (pill, 3.0f, 1.0f);
+            g.setFont (stencil (h.label.length() > 3 ? 7.5f : 9.0f, 0.0f));
+            g.drawText (h.label, pill, juce::Justification::centred);
         }
 
         if (on)
@@ -986,6 +1005,18 @@ BassMachinePanel::BassMachinePanel (BassMachineProcessor& p) : proc (p), dragZon
         m.keys = std::make_unique<NoteKeys>      (*proc.apvts.getParameter ("root" + n));
         m.qual = std::make_unique<QualitySwitch> (*proc.apvts.getParameter ("qual" + n));
         m.dur  = std::make_unique<CounterWindow> (*proc.apvts.getParameter ("dur" + n), CounterWindow::Duration);
+        if (i > 0)   // tecla sugerida (cadência) já escolhe maior/menor; com 7 ou m7 escolhido, fica 7 ou m7
+            m.keys->onHintQuality = [this, n] (int minor)
+            {
+                if (auto* q = proc.apvts.getParameter ("qual" + n))
+                {
+                    const bool seventh = juce::roundToInt (q->convertFrom0to1 (q->getValue())) >= mbm::Dom7;
+                    const int v = seventh ? (minor ? mbm::Min7 : mbm::Dom7) : (minor ? mbm::Min : mbm::Maj);
+                    q->beginChangeGesture();
+                    q->setValueNotifyingHost (q->convertTo0to1 ((float) v));
+                    q->endChangeGesture();
+                }
+            };
         addAndMakeVisible (*m.keys);
         addAndMakeVisible (*m.qual);
         addAndMakeVisible (*m.dur);
@@ -1131,8 +1162,27 @@ void BassMachinePanel::exportMidi()
                           });
 }
 
+// Cada acorde (do 2 ao 4) destaca as próximas harmonias que combinam com o acorde ligado antes dele,
+// na tonalidade do ACORDE 1, conforme as cadências das músicas do banco de riddims (7 conta como maior, m7 como menor).
+void BassMachinePanel::updateHints()
+{
+    auto val = [this] (const char* id, int i) { return juce::roundToInt (proc.apvts.getRawParameterValue (id + juce::String (i))->load()); };
+    auto isMinor = [] (int q) { return q == mbm::Min || q == mbm::Min7 ? 1 : 0; };
+    const int tonic = val ("root", 0), tonicMinor = isMinor (val ("qual", 0));
+    for (int i = 1; i < BassMachineProcessor::numSlots; ++i)
+    {
+        int prev = i - 1;
+        while (prev > 0 && ! slotEnabled (prev)) --prev;
+        std::array<NoteKeys::KeyHint, 12> h {};
+        for (const auto& s : cadence::suggest (tonic, tonicMinor, val ("root", prev), isMinor (val ("qual", prev))))
+            h[(size_t) s.root] = { s.minor, s.rank, juce::String (cadence::degreeName (tonic, s.root, s.minor)) };
+        mods[(size_t) i].keys->setHints (h);
+    }
+}
+
 void BassMachinePanel::timerCallback()
 {
+    updateHints();
     for (int i = 0; i < BassMachineProcessor::numSlots; ++i)
     {
         const bool on = slotEnabled (i);

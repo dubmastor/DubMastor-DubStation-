@@ -65,10 +65,15 @@ public:
     void mouseDown (const juce::MouseEvent&) override;
     void mouseMove (const juce::MouseEvent& e) override { hover = keyAt (e.position); repaint(); }
     void mouseExit (const juce::MouseEvent&) override   { hover = -1; repaint(); }
+    // próximas harmonias que combinam (cadências do reggae, ReggaeChordMachine/Source/CadenceHints.h): grau na tecla, rank 1 = a mais comum
+    struct KeyHint { int minor = 0, rank = 0; juce::String label; bool operator!= (const KeyHint& o) const { return minor != o.minor || rank != o.rank || label != o.label; } };
+    void setHints (const std::array<KeyHint, 12>& h) { bool ch = false; for (int k = 0; k < 12; ++k) ch = ch || (h[(size_t) k] != hints[(size_t) k]); if (ch) { hints = h; repaint(); } }
+    std::function<void (int minor)> onHintQuality;   // tocar numa tecla sugerida já escolhe maior/menor da sugestão
 private:
     juce::Rectangle<float> keyRect (int note) const;
     int keyAt (juce::Point<float>) const;
     int hover = -1;
+    std::array<KeyHint, 12> hints {};
 };
 
 // Tipo do acorde: 4 botões de pressão intertravados (MAIOR, MENOR, 7, m7)
@@ -236,6 +241,7 @@ private:
     void drawKnobScale (juce::Graphics&, juce::Slider&, int ticks, const juce::StringArray& labels = {}, float labelW = 44.0f);
     void exportMidi();
     bool slotEnabled (int i) const;
+    void updateHints();
 
     BassMachineProcessor& proc;
     BassLookAndFeel lnf;

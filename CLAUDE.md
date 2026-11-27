@@ -119,8 +119,9 @@ Toda alteração sobe a versão nos `rep(...)` do `build_web.py`, no README da p
 
 ## Próximas harmonias da CHORD MACHINE (ReggaeChordMachine/Source/CadenceHints.h)
 As sugestões de cadência (contagem das passagens de acorde do banco de riddims + tabela de teoria) têm uma cópia em JavaScript
-na versão para celular do MRK-80 (`site/keys/index.html`, `cadenceHints`): ao mudar um, mude o outro (as mesmas 3 sugestões, na mesma ordem).
-O código vale também para o MRCM-1240 e o MRM-0420 (mesmo editor).
+em `site/cadence.js` (`cadenceHints`, usado pela versão para celular do MRK-80 em `site/keys/` e pela BASS MACHINE do MRB-69 em `site/bassmachine/`):
+ao mudar um, mude o outro (as mesmas 3 sugestões, na mesma ordem). Vale para a CHORD MACHINE (MRK-80, MRCM-1240, MRM-0420) e para a
+BASS MACHINE (`ReggaeBassMachine/Source/PluginEditor.cpp`, `updateHints`: MRB-69, MRBM-69, MRM-0420; 7 conta como maior, m7 como menor).
 
 ## GUITAR SKANK do MRK-80 (ReggaeKeys/Source/GuitarSkank.h)
 O botão GUITAR SKANK do Mastor Reggae Keys MRK-80 toca a guitarra do skank junto com o piano usando o **motor do

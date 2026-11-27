@@ -1,3 +1,8 @@
+## Mastor Reggae Bass MRB-69 2.2 🟢🟡⚫
+
+- **BASS MACHINE · próximas harmonias (cadências do reggae):** escolhido o ACORDE 1, a TÔNICA dos acordes 2, 3 e 4 destaca em dourado as **3 harmonias que mais combinam** depois do acorde anterior, com o grau escrito na tecla (IV, V, IIm, bVII, IVm...). A mais comum ganha o selo cheio. É o mesmo cálculo da CHORD MACHINE do Mastor Reggae Keys MRK-80: as passagens de acorde das **321 músicas com harmonia do banco de riddims**, na tonalidade do ACORDE 1 (7 conta como maior, m7 como menor). Tocar numa tecla sugerida já escolhe maior/menor da sugestão; com 7 ou m7 escolhido, fica 7 ou m7.
+- Versão para celular 2.2 com as mesmas sugestões na aba BASS MACHINE.
+
 ## Mastor Reggae Bass MRB-69 2.1 🟢🟡⚫
 
 - **BASS MACHINE · banco de riddims:** só ficam ativos os riddims com o **baixo original da gravação** (luz B acesa): 160 músicas. As outras aparecem apagadas no menu e as setas do visor pulam direto para a próxima com baixo original. Os 160 riddims do MRBM-69 continuam todos lá.

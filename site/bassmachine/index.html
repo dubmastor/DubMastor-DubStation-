@@ -44,6 +44,11 @@ header h1{color:#f3e6c8}header .sub{color:rgba(243,230,200,.75)}
 .btns.style .b small{margin-left:auto;opacity:.35;font-size:10px}
 .keys12 .b{font-size:11px;letter-spacing:0;padding:8px 2px;min-height:34px}
 .btns.c3 .b,.btns.c4 .b{font-size:10.5px;letter-spacing:.03em;gap:5px;padding:8px 3px;white-space:normal;line-height:1.15;text-align:center}
+.keys12 .b{position:relative}
+.keys12 .b.hint{outline:1.5px solid rgba(234,189,18,.7);outline-offset:-2px}
+.keys12 .b.h1{outline:2.5px solid #eabd12}
+.keys12 .deg{position:absolute;top:-6px;right:-2px;font-size:8.5px;line-height:12px;padding:0 3px;border-radius:3px;background:#2b241d;color:#eabd12;border:1px solid #eabd12;pointer-events:none;letter-spacing:0}
+.keys12 .h1 .deg{background:#eabd12;color:#2b241d;border-color:#2b241d}
 .keys12 .b.sharp{background:linear-gradient(180deg,#151210,#050403);color:#a89c84}
 /* riddims clássicos */
 .riddim{margin-bottom:14px}
@@ -197,6 +202,7 @@ canvas#roll{display:block;width:100%;height:260px;touch-action:none;cursor:cross
 <script src="engine.js"></script>
 <script src="riddims.js"></script>
 <script src="../riddimbank.js"></script>
+<script src="../cadence.js"></script>
 <script src="../riddimbankmenu.js"></script>
 <script>
 'use strict';
@@ -297,7 +303,13 @@ st.chords.forEach((c, i) => {
     <div class="chordbody"><div class="btns c6 keys12"></div><div style="height:6px"></div><div class="btns c4 qual"></div><div style="height:6px"></div>
     <div class="stepper"><button>◀</button><div class="val"></div><button>▶</button></div></div>`;
   $('chords').appendChild(box);
-  const rk = buttons(box.querySelector('.keys12'), M.ROOT_NAMES, () => c.root, r => { c.root = r; changedGen(); }, r => [1, 3, 6, 8, 10].includes(r) ? 'sharp nolamp' : 'nolamp');
+  const rk = buttons(box.querySelector('.keys12'), M.ROOT_NAMES, () => c.root, r => {
+    c.root = r;
+    const h = hintsFor(i).find(x => x.root === r);   // tecla sugerida já escolhe maior/menor (com 7 ou m7, fica 7 ou m7)
+    if (h) c.quality = c.quality >= 2 ? (h.minor ? 3 : 2) : (h.minor ? 1 : 0);
+    changedGen();
+  }, r => [1, 3, 6, 8, 10].includes(r) ? 'sharp nolamp' : 'nolamp');
+  const keyBtns = [...box.querySelectorAll('.keys12 .b')];
   const rq = buttons(box.querySelector('.qual'), ['MAIOR', 'MENOR', '7', 'm7'], () => c.quality, q => { c.quality = q; changedGen(); });
   const [dn, val, up] = box.querySelectorAll('.stepper > *');
   dn.onclick = () => { c.dur = Math.max(0, c.dur - 1); changedGen(); refresh(); };
@@ -306,6 +318,13 @@ st.chords.forEach((c, i) => {
   if (tg) tg.onclick = () => { c.on = !c.on; changedGen(); refresh(); };
   chordRefresh.push(() => {
     rk(); rq();
+    const hints = hintsFor(i);
+    keyBtns.forEach((b, r) => {
+      const h = hints.find(x => x.root === r);
+      b.classList.toggle('hint', !!h); b.classList.toggle('h1', !!h && h.rank === 1);
+      let tag = b.querySelector('.deg'); if (h && !tag) { tag = document.createElement('span'); tag.className = 'deg'; b.appendChild(tag); }
+      if (tag) { if (h) tag.textContent = h.label; else tag.remove(); }
+    });
     const on = i === 0 || c.on;
     box.classList.toggle('off', !on);
     if (tg) tg.classList.toggle('on', c.on);
@@ -314,6 +333,13 @@ st.chords.forEach((c, i) => {
   });
 });
 
+// próximas harmonias (cadências do reggae, ../cadence.js): acorde 2 a 4, a partir do acorde ligado antes, na tonalidade do acorde 1
+function hintsFor(i) {
+  if (i === 0 || !window.cadenceHints) return [];
+  let p = i - 1; while (p > 0 && !st.chords[p].on) p--;
+  const mn = q => (q === 1 || q === 3 ? 1 : 0), t = st.chords[0], q = st.chords[p];
+  return cadenceHints(t.root, mn(t.quality), q.root, mn(q.quality));
+}
 function changedGen() { save(); regenerate(); refresh(); }
 function refresh() {
   refreshers.forEach(f => f()); chordRefresh.forEach(f => f());

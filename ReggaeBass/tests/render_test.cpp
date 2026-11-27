@@ -10,6 +10,7 @@
 #include "../../ReggaeBassMachine/Source/PluginProcessor.h"   // aba BASS MACHINE (MRBM-69)
 #include "../../ReggaeBassMachine/Source/RiddimPresets.h"
 #include "../../ReggaeBassMachine/Source/AccompEngine.h"
+#include "../../ReggaeChordMachine/Source/CadenceHints.h"
 #include "../../RiddimBank/Source/RiddimBankMenu.h"
 
 static int failures = 0;
@@ -222,6 +223,12 @@ int main (int argc, char** argv)
         int on = 0;
         for (int i = 0; i < riddimbank::numEntries; ++i) on += riddimbank::active (i, true);
         check (on == 160, "banco: só os " + juce::String (on) + " riddims com baixo original ficam ativos");
+    }
+    {   // 2.2: próximas harmonias (cadências do reggae) na BASS MACHINE — mesmo cálculo do MRK-80
+        auto h = cadence::suggest (9, 1, 9, 1);   // Am → G (bVII) primeiro
+        check (! h.empty() && h[0].root == 7 && h[0].minor == 0 && h.size() == 3, "cadencia: depois de Am a mais comum e G (bVII)");
+        h = cadence::suggest (0, 0, 0, 0);        // C → F (IV)
+        check (! h.empty() && h[0].root == 5 && h[0].minor == 0, "cadencia: depois de C a mais comum e F (IV)");
     }
     std::printf ("\n%s\n", failures == 0 ? "TODOS OS TESTES PASSARAM" : "HOUVE FALHAS");
     return failures == 0 ? 0 : 1;
